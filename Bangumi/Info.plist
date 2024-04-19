@@ -2,9 +2,20 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>BANGUMI_APP_ID</key>
-	<string>$(BANGUMI_APP_ID)</string>
-	<key>BANGUMI_APP_SECRET</key>
-	<string>$(BANGUMI_APP_SECRET)</string>
+	<key>CFBundleGetInfoString</key>
+	<string></string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>CFBundleURLName</key>
+			<string>com.everpcpc.bangumi</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>bangumi</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>

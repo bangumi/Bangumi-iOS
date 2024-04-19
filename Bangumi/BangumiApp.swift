@@ -25,7 +25,10 @@ struct BangumiApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ContentView().onOpenURL(perform: { url in
+                // TODO: handle auth
+                print(url)
+            })
         }
         .modelContainer(sharedModelContainer)
     }
