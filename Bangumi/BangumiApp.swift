@@ -5,8 +5,8 @@
 //  Created by Chuan Chuan on 2024/4/19.
 //
 
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 @main
 struct BangumiApp: App {

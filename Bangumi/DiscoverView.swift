@@ -15,5 +15,4 @@ struct DiscoverView: View {
 
 #Preview {
     DiscoverView()
-        .modelContainer(for: Item.self, inMemory: true)
 }

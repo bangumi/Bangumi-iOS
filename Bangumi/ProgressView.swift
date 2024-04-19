@@ -5,8 +5,8 @@
 //  Created by Chuan Chuan on 2024/4/19.
 //
 
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 struct ProgressView: View {
     @Environment(\.modelContext) private var modelContext
@@ -38,6 +38,7 @@ struct ProgressView: View {
             Text("Select an item")
         }
     }
+
     private func addItem() {
         withAnimation {
             let newItem = Item(timestamp: Date())
@@ -56,5 +57,4 @@ struct ProgressView: View {
 
 #Preview {
     ProgressView()
-        .modelContainer(for: Item.self, inMemory: true)
 }

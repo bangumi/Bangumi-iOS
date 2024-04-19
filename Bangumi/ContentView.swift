@@ -5,8 +5,8 @@
 //  Created by Chuan Chuan on 2024/4/19.
 //
 
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 enum Tab: String, CaseIterable, Identifiable {
     case home
@@ -15,7 +15,6 @@ enum Tab: String, CaseIterable, Identifiable {
 
     var id: Self { self }
 }
-
 
 struct ContentView: View {
     @State private var tab = Tab.progress
@@ -40,5 +39,4 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
-        .modelContainer(for: Item.self, inMemory: true)
 }

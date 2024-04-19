@@ -21,6 +21,8 @@
 		19A03A422BD24ADC00BC5E53 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		19A03A442BD24BA800BC5E53 /* ProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressView.swift; sourceTree = "<group>"; };
 		19A03A462BD24F9700BC5E53 /* DiscoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverView.swift; sourceTree = "<group>"; };
+		19A03A482BD26AC100BC5E53 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
+		19A03A492BD26D0A00BC5E53 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		19BB342B2BD239AB00E5C295 /* Bangumi.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Bangumi.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		19BB342E2BD239AB00E5C295 /* BangumiApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BangumiApp.swift; sourceTree = "<group>"; };
 		19BB34302BD239AB00E5C295 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -59,6 +61,7 @@
 		19BB342D2BD239AB00E5C295 /* Bangumi */ = {
 			isa = PBXGroup;
 			children = (
+				19A03A492BD26D0A00BC5E53 /* Info.plist */,
 				19BB342E2BD239AB00E5C295 /* BangumiApp.swift */,
 				19BB34302BD239AB00E5C295 /* ContentView.swift */,
 				19A03A462BD24F9700BC5E53 /* DiscoverView.swift */,
@@ -67,6 +70,7 @@
 				19BB34322BD239AB00E5C295 /* Item.swift */,
 				19BB34342BD239AC00E5C295 /* Assets.xcassets */,
 				19BB34362BD239AC00E5C295 /* Preview Content */,
+				19A03A482BD26AC100BC5E53 /* Config.xcconfig */,
 			);
 			path = Bangumi;
 			sourceTree = "<group>";
@@ -163,6 +167,7 @@
 /* Begin XCBuildConfiguration section */
 		19BB34392BD239AC00E5C295 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 19A03A482BD26AC100BC5E53 /* Config.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -226,6 +231,7 @@
 		};
 		19BB343A2BD239AC00E5C295 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 19A03A482BD26AC100BC5E53 /* Config.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -291,6 +297,7 @@
 				DEVELOPMENT_TEAM = 3K5DAJ7QQ9;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Bangumi/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Bangumi;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -322,6 +329,7 @@
 				DEVELOPMENT_TEAM = 3K5DAJ7QQ9;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Bangumi/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Bangumi;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;

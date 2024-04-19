@@ -8,12 +8,13 @@
 import SwiftUI
 
 struct HomeView: View {
+    let label: String = Bundle.main.infoDictionary?["BANGUMI_APP_ID"] as! String
+
     var body: some View {
-        Text("Hello, Bangumi!")
+        Text(label)
     }
 }
 
 #Preview {
     HomeView()
-        .modelContainer(for: Item.self, inMemory: true)
 }
