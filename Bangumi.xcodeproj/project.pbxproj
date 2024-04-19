@@ -13,7 +13,7 @@
 		19A03A4B2BD274EF00BC5E53 /* TimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19A03A4A2BD274EF00BC5E53 /* TimelineView.swift */; };
 		19BB342F2BD239AB00E5C295 /* BangumiApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19BB342E2BD239AB00E5C295 /* BangumiApp.swift */; };
 		19BB34312BD239AB00E5C295 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19BB34302BD239AB00E5C295 /* ContentView.swift */; };
-		19BB34332BD239AB00E5C295 /* Item.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19BB34322BD239AB00E5C295 /* Item.swift */; };
+		19BB34332BD239AB00E5C295 /* Chii.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19BB34322BD239AB00E5C295 /* Chii.swift */; };
 		19BB34352BD239AC00E5C295 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 19BB34342BD239AC00E5C295 /* Assets.xcassets */; };
 		19BB34382BD239AC00E5C295 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 19BB34372BD239AC00E5C295 /* Preview Assets.xcassets */; };
 /* End PBXBuildFile section */
@@ -28,7 +28,7 @@
 		19BB342B2BD239AB00E5C295 /* Bangumi.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Bangumi.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		19BB342E2BD239AB00E5C295 /* BangumiApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BangumiApp.swift; sourceTree = "<group>"; };
 		19BB34302BD239AB00E5C295 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		19BB34322BD239AB00E5C295 /* Item.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Item.swift; sourceTree = "<group>"; };
+		19BB34322BD239AB00E5C295 /* Chii.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Chii.swift; sourceTree = "<group>"; };
 		19BB34342BD239AC00E5C295 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		19BB34372BD239AC00E5C295 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -70,7 +70,7 @@
 				19A03A4A2BD274EF00BC5E53 /* TimelineView.swift */,
 				19A03A442BD24BA800BC5E53 /* ProgressView.swift */,
 				19A03A422BD24ADC00BC5E53 /* HomeView.swift */,
-				19BB34322BD239AB00E5C295 /* Item.swift */,
+				19BB34322BD239AB00E5C295 /* Chii.swift */,
 				19BB34342BD239AC00E5C295 /* Assets.xcassets */,
 				19BB34362BD239AC00E5C295 /* Preview Content */,
 				19A03A482BD26AC100BC5E53 /* Config.xcconfig */,
@@ -160,7 +160,7 @@
 				19A03A4B2BD274EF00BC5E53 /* TimelineView.swift in Sources */,
 				19A03A432BD24ADC00BC5E53 /* HomeView.swift in Sources */,
 				19A03A452BD24BA800BC5E53 /* ProgressView.swift in Sources */,
-				19BB34332BD239AB00E5C295 /* Item.swift in Sources */,
+				19BB34332BD239AB00E5C295 /* Chii.swift in Sources */,
 				19BB342F2BD239AB00E5C295 /* BangumiApp.swift in Sources */,
 				19A03A472BD24F9700BC5E53 /* DiscoverView.swift in Sources */,
 			);

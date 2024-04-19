@@ -18,6 +18,8 @@ enum Tab: String, CaseIterable, Identifiable {
 
 struct ContentView: View {
     @State private var tab = Tab.progress
+    @State private var auth: Auth?
+    @State private var profile: Profile?
 
     var body: some View {
         TabView(selection: $tab) {
