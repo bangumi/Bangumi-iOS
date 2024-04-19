@@ -8,18 +8,21 @@
 import Foundation
 import SwiftData
 
-final class Avatar {
-    var large: String
-    var medium: String
-    var small: String
+struct ChiiError: Error {
+    var message: String
 
-    init(large: String, medium: String, small: String) {
-        self.large = large
-        self.medium = medium
-        self.small = small
+    init(message: String) {
+        self.message = message
     }
 }
 
+struct Avatar: Codable {
+    var large: String
+    var medium: String
+    var small: String
+}
+
+@Model
 final class Profile {
     var id: UInt
     var username: String
@@ -38,6 +41,7 @@ final class Profile {
     }
 }
 
+@Model
 final class Auth {
     var access_token: String
     var expires_in: UInt
@@ -150,13 +154,13 @@ final class UserSubjectCollection {
     var updated_at: Date
     var `private`: Bool
 
-    init(subject_id: String, subject_type: UInt8, rate: UInt8, type: UInt8, comment: String?, tags: [String], ep_status: UInt, vol_status: UInt, updated_at: String, private: Bool) {
+    init(subject_id: String, subject_type: SubjectType, rate: UInt8, type: CollectionType, comment: String?, tags: [String], ep_status: UInt, vol_status: UInt, updated_at: String, private: Bool) {
         let dateFormatter = DateFormatter()
 
         self.subject_id = subject_id
-        self.subject_type = SubjectType(value: subject_type)
+        self.subject_type = subject_type
         self.rate = rate
-        self.type = CollectionType(value: type)
+        self.type = type
         self.comment = comment
         self.tags = tags
         self.ep_status = ep_status

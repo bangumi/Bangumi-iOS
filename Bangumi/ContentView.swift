@@ -18,23 +18,31 @@ enum Tab: String, CaseIterable, Identifiable {
 
 struct ContentView: View {
     @State private var tab = Tab.progress
-    @State private var auth: Auth?
-    @State private var profile: Profile?
+    @Query private var auths: [Auth]
+    @Query private var profiles: [Profile]
+
+    private var auth: Auth? { auths.first }
+    private var profile: Profile? { profiles.first }
 
     var body: some View {
-        TabView(selection: $tab) {
-            TimelineView()
-                .tabItem {
-                    Label("Timeline", systemImage: "person")
-                }.tag(Tab.timeline)
-            ProgressView()
-                .tabItem {
-                    Label("Progress", systemImage: "square.grid.3x2.fill")
-                }.tag(Tab.progress)
-            DiscoverView()
-                .tabItem {
-                    Label("Discover", systemImage: "magnifyingglass")
-                }.tag(Tab.discover)
+        switch auth {
+        case .some:
+            TabView(selection: $tab) {
+                TimelineView()
+                    .tabItem {
+                        Label("Timeline", systemImage: "person")
+                    }.tag(Tab.timeline)
+                ProgressView()
+                    .tabItem {
+                        Label("Progress", systemImage: "square.grid.3x2.fill")
+                    }.tag(Tab.progress)
+                DiscoverView()
+                    .tabItem {
+                        Label("Discover", systemImage: "magnifyingglass")
+                    }.tag(Tab.discover)
+            }
+        case .none:
+            AuthView()
         }
     }
 }
