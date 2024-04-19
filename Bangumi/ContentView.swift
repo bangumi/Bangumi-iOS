@@ -9,7 +9,7 @@ import SwiftData
 import SwiftUI
 
 enum Tab: String, CaseIterable, Identifiable {
-    case home
+    case timeline
     case progress
     case discover
 
@@ -21,10 +21,10 @@ struct ContentView: View {
 
     var body: some View {
         TabView(selection: $tab) {
-            HomeView()
+            TimelineView()
                 .tabItem {
-                    Label("Home", systemImage: "person")
-                }.tag(Tab.home)
+                    Label("Timeline", systemImage: "person")
+                }.tag(Tab.timeline)
             ProgressView()
                 .tabItem {
                     Label("Progress", systemImage: "square.grid.3x2.fill")
