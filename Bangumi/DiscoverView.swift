@@ -11,7 +11,7 @@ struct DiscoverView: View {
     @EnvironmentObject var chiiAPI: ChiiAPI
 
     var body: some View {
-        Text("Hello, Search!")
+        Text("TODO: Search")
     }
 }
 
