@@ -27,15 +27,15 @@ final class Profile {
     var id: UInt
     var username: String
     var nickname: String
-    var user_group: UInt
+    var userGroup: UInt
     var avatar: Avatar
     var sign: String
 
-    init(id: UInt, username: String, nickname: String, user_group: UInt, avatar: Avatar, sign: String) {
+    init(id: UInt, username: String, nickname: String, userGroup: UInt, avatar: Avatar, sign: String) {
         self.id = id
         self.username = username
         self.nickname = nickname
-        self.user_group = user_group
+        self.userGroup = userGroup
         self.avatar = avatar
         self.sign = sign
     }
@@ -43,16 +43,16 @@ final class Profile {
 
 @Model
 final class Auth {
-    var access_token: String
-    var expires_in: UInt
-    var token_type: String
-    var refresh_token: String
+    var accessToken: String
+    var expiresIn: UInt
+    var tokenType: String
+    var refreshToken: String
 
-    init(access_token: String, expires_in: UInt, token_type: String, refresh_token: String) {
-        self.access_token = access_token
-        self.expires_in = expires_in
-        self.token_type = token_type
-        self.refresh_token = refresh_token
+    init(accessToken: String, expiresIn: UInt, tokenType: String, refreshToken: String) {
+        self.accessToken = accessToken
+        self.expiresIn = expiresIn
+        self.tokenType = tokenType
+        self.refreshToken = refreshToken
     }
 }
 
@@ -111,7 +111,7 @@ enum CollectionType: UInt8, Codable {
     case wish = 1
     case collect = 2
     case `do` = 3
-    case on_hold = 4
+    case onHold = 4
     case dropped = 5
 
     init(value: UInt8 = 0) {
@@ -133,7 +133,7 @@ enum CollectionType: UInt8, Codable {
             return "看过"
         case .do:
             return "在看"
-        case .on_hold:
+        case .onHold:
             return "搁置"
         case .dropped:
             return "抛弃"
@@ -143,29 +143,29 @@ enum CollectionType: UInt8, Codable {
 
 @Model
 final class UserSubjectCollection {
-    var subject_id: String
-    var subject_type: SubjectType
+    var subjectID: String
+    var subjectType: SubjectType
     var rate: UInt8
     var type: CollectionType
     var comment: String?
     var tags: [String]
-    var ep_status: UInt
-    var vol_status: UInt
-    var updated_at: Date
+    var epStatus: UInt
+    var volStatus: UInt
+    var updatedAt: Date
     var `private`: Bool
 
-    init(subject_id: String, subject_type: SubjectType, rate: UInt8, type: CollectionType, comment: String?, tags: [String], ep_status: UInt, vol_status: UInt, updated_at: String, private: Bool) {
+    init(subjectID: String, subjectType: SubjectType, rate: UInt8, type: CollectionType, comment: String? = nil, tags: [String], epStatus: UInt, volStatus: UInt, updatedAt: String) {
         let dateFormatter = DateFormatter()
 
-        self.subject_id = subject_id
-        self.subject_type = subject_type
+        self.subjectID = subjectID
+        self.subjectType = subjectType
         self.rate = rate
         self.type = type
         self.comment = comment
         self.tags = tags
-        self.ep_status = ep_status
-        self.vol_status = vol_status
-        self.updated_at = dateFormatter.date(from: updated_at)!
-        self.private = `private`
+        self.epStatus = epStatus
+        self.volStatus = volStatus
+        self.updatedAt = dateFormatter.date(from: updatedAt)!
+        self.private = false
     }
 }
