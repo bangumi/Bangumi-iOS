@@ -46,6 +46,27 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		19A03A4E2BD40B1800BC5E53 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				19A03A4C2BD2A9BE00BC5E53 /* AuthView.swift */,
+				19BB34302BD239AB00E5C295 /* ContentView.swift */,
+				19A03A462BD24F9700BC5E53 /* DiscoverView.swift */,
+				19A03A4A2BD274EF00BC5E53 /* TimelineView.swift */,
+				19A03A442BD24BA800BC5E53 /* ProgressView.swift */,
+				19A03A422BD24ADC00BC5E53 /* HomeView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		19A03A4F2BD40B4300BC5E53 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				19BB34322BD239AB00E5C295 /* Chii.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
 		19BB34222BD239AB00E5C295 = {
 			isa = PBXGroup;
 			children = (
@@ -65,15 +86,10 @@
 		19BB342D2BD239AB00E5C295 /* Bangumi */ = {
 			isa = PBXGroup;
 			children = (
+				19A03A4F2BD40B4300BC5E53 /* Models */,
+				19A03A4E2BD40B1800BC5E53 /* Views */,
 				19A03A492BD26D0A00BC5E53 /* Info.plist */,
 				19BB342E2BD239AB00E5C295 /* BangumiApp.swift */,
-				19A03A4C2BD2A9BE00BC5E53 /* AuthView.swift */,
-				19BB34302BD239AB00E5C295 /* ContentView.swift */,
-				19A03A462BD24F9700BC5E53 /* DiscoverView.swift */,
-				19A03A4A2BD274EF00BC5E53 /* TimelineView.swift */,
-				19A03A442BD24BA800BC5E53 /* ProgressView.swift */,
-				19A03A422BD24ADC00BC5E53 /* HomeView.swift */,
-				19BB34322BD239AB00E5C295 /* Chii.swift */,
 				19BB34342BD239AC00E5C295 /* Assets.xcassets */,
 				19BB34362BD239AC00E5C295 /* Preview Content */,
 				19A03A482BD26AC100BC5E53 /* Config.xcconfig */,

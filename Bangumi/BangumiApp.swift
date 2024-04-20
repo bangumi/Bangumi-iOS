@@ -26,7 +26,7 @@ struct BangumiApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView().onOpenURL(perform: { url in
-                // TODO: handle auth
+                // TODO: handle urls
                 print(url)
             }).environmentObject(errorHandling)
                 .alert("Error", isPresented: $errorHandling.showAlert) {
