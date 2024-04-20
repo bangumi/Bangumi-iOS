@@ -24,6 +24,7 @@ struct Avatar: Codable {
 
 @Model
 final class Profile {
+    @Attribute(.unique)
     var id: UInt
     var username: String
     var nickname: String
@@ -41,11 +42,19 @@ final class Profile {
     }
 }
 
+struct TokenResponse: Codable {
+    var accessToken: String
+    var expiresIn: UInt
+    var tokenType: String
+    var refreshToken: String
+}
+
 @Model
 final class Auth {
     var accessToken: String
     var expiresIn: UInt
     var tokenType: String
+    @Attribute(.unique)
     var refreshToken: String
 
     init(accessToken: String, expiresIn: UInt, tokenType: String, refreshToken: String) {
@@ -53,6 +62,13 @@ final class Auth {
         self.expiresIn = expiresIn
         self.tokenType = tokenType
         self.refreshToken = refreshToken
+    }
+
+    init(response: TokenResponse) {
+        self.accessToken = response.accessToken
+        self.expiresIn = response.expiresIn
+        self.tokenType = response.tokenType
+        self.refreshToken = response.refreshToken
     }
 }
 
@@ -143,6 +159,7 @@ enum CollectionType: UInt8, Codable {
 
 @Model
 final class UserSubjectCollection {
+    @Attribute(.unique)
     var subjectID: String
     var subjectType: SubjectType
     var rate: UInt8
