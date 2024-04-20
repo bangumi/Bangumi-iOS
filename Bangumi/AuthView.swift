@@ -74,7 +74,6 @@ class SignInViewModel: NSObject, ObservableObject, ASWebAuthenticationPresentati
         let query = URLComponents(string: successURL.absoluteString)?
             .queryItems?.filter { $0.name == "code" }.first
         let authorizationCode = query?.value ?? ""
-        print("authorizationCode: \(authorizationCode)")
         Task { @MainActor in
             if let token = try? await exchangeForAccessToken(code: authorizationCode) {
                 let auth = Auth(response: token)

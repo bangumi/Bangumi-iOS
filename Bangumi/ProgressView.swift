@@ -9,6 +9,8 @@ import SwiftData
 import SwiftUI
 
 struct ProgressView: View {
+    @EnvironmentObject var chiiAPI: ChiiAPI
+
     var body: some View {
         Text("Hello, Progress!")
     }

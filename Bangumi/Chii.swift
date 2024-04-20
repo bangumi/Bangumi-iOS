@@ -16,10 +16,77 @@ struct ChiiError: Error {
     }
 }
 
+class ChiiAPI: ObservableObject, Observable {
+    let errorHandling: ErrorHandling
+    let modelContext: ModelContext
+    let auth: Auth
+
+    let apiBase = URL(string: "https://api.bgm.tv")!
+    var session: URLSession
+
+    init(errorHandling: ErrorHandling, modelContext: ModelContext, auth: Auth) {
+        self.errorHandling = errorHandling
+        self.modelContext = modelContext
+        self.auth = auth
+
+        let sessionConfig = URLSessionConfiguration.default
+        sessionConfig.httpAdditionalHeaders = ["Authorization": "Bearer \(auth.accessToken)"]
+        self.session = URLSession(configuration: sessionConfig)
+    }
+
+    func get(url: URL) async throws -> Data {
+        var request = URLRequest(url: url)
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpMethod = "GET"
+        let (data, response) = try await session.data(for: request)
+        guard let response = response as? HTTPURLResponse, response.statusCode == 200 else {
+            throw ChiiError(message: "failed to get data")
+        }
+        return data
+    }
+
+    func post(url: URL, body: Data) async throws -> Data {
+        var request = URLRequest(url: url)
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpMethod = "POST"
+        let bodyData = try? JSONSerialization.data(withJSONObject: body)
+        request.httpBody = bodyData
+        let (data, response) = try await session.data(for: request)
+        guard let response = response as? HTTPURLResponse, response.statusCode == 200 else {
+            throw ChiiError(message: "failed to post data")
+        }
+        return data
+    }
+
+    func updateProfile() {
+        let url = apiBase.appendingPathComponent("v0/me")
+        Task { @MainActor in
+            if let data = try? await get(url: url) {
+                let decoder = JSONDecoder()
+                decoder.keyDecodingStrategy = .convertFromSnakeCase
+                let response = try decoder.decode(ProfileResponse.self, from: data)
+                let me = Profile(response: response)
+                modelContext.insert(me)
+            } else {
+                errorHandling.handle(message: "failed to get profile")
+            }
+        }
+    }
+}
+
 struct Avatar: Codable {
     var large: String
     var medium: String
     var small: String
+}
+
+struct ProfileResponse: Codable {
+    var id: UInt
+    var username: String
+    var nickname: String
+    var userGroup: UInt
+    var avatar: Avatar
+    var sign: String
 }
 
 @Model
@@ -40,6 +107,15 @@ final class Profile {
         self.avatar = avatar
         self.sign = sign
     }
+
+    init(response: ProfileResponse) {
+        self.id = response.id
+        self.username = response.username
+        self.nickname = response.nickname
+        self.userGroup = response.userGroup
+        self.avatar = response.avatar
+        self.sign = response.sign
+    }
 }
 
 struct TokenResponse: Codable {
@@ -52,22 +128,19 @@ struct TokenResponse: Codable {
 @Model
 final class Auth {
     var accessToken: String
-    var expiresIn: UInt
-    var tokenType: String
+    var expiresAt: Date
     @Attribute(.unique)
     var refreshToken: String
 
-    init(accessToken: String, expiresIn: UInt, tokenType: String, refreshToken: String) {
+    init(accessToken: String, expiresAt: Date, refreshToken: String) {
         self.accessToken = accessToken
-        self.expiresIn = expiresIn
-        self.tokenType = tokenType
+        self.expiresAt = expiresAt
         self.refreshToken = refreshToken
     }
 
     init(response: TokenResponse) {
         self.accessToken = response.accessToken
-        self.expiresIn = response.expiresIn
-        self.tokenType = response.tokenType
+        self.expiresAt = Date().addingTimeInterval(TimeInterval(response.expiresIn))
         self.refreshToken = response.refreshToken
     }
 }

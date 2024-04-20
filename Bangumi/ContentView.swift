@@ -17,16 +17,18 @@ enum Tab: String, CaseIterable, Identifiable {
 }
 
 struct ContentView: View {
+    @EnvironmentObject var errorHandling: ErrorHandling
+    @Environment(\.modelContext) private var modelContext
+
     @State private var tab = Tab.progress
     @Query private var auths: [Auth]
-    @Query private var profiles: [Profile]
 
     private var auth: Auth? { auths.first }
-    private var profile: Profile? { profiles.first }
 
     var body: some View {
         switch auth {
-        case .some:
+        case .some(let auth):
+            let chiiAPI = ChiiAPI(errorHandling: errorHandling, modelContext: modelContext, auth: auth)
             TabView(selection: $tab) {
                 TimelineView()
                     .tabItem {
@@ -40,7 +42,7 @@ struct ContentView: View {
                     .tabItem {
                         Label("Discover", systemImage: "magnifyingglass")
                     }.tag(Tab.discover)
-            }
+            }.environment(chiiAPI)
         case .none:
             AuthView()
         }
