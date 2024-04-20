@@ -30,7 +30,10 @@ class ChiiAPI: ObservableObject, Observable {
         self.auth = auth
 
         let sessionConfig = URLSessionConfiguration.default
-        sessionConfig.httpAdditionalHeaders = ["Authorization": "Bearer \(auth.accessToken)"]
+        sessionConfig.httpAdditionalHeaders = [
+            "User-Agent": "everpcpc/Bangumi/0.0.1 (iOS)",
+            "Authorization": "Bearer \(auth.accessToken)"
+        ]
         self.session = URLSession(configuration: sessionConfig)
     }
 
