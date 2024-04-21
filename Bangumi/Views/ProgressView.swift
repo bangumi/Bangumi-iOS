@@ -47,7 +47,7 @@ struct ProgressView: View {
                                 UserCollectionRow(collection: collection).listRowSeparator(.automatic).listRowSpacing(10.0)
                             }
                         }
-                    }.listStyle(.plain)
+                    }.listStyle(.plain).transition(.asymmetric(insertion: .move(edge: .leading), removal: .move(edge: .trailing)))
                 }
             }
         case .none:
