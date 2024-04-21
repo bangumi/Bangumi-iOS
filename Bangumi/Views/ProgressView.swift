@@ -40,14 +40,14 @@ struct ProgressView: View {
                             Text(type.description)
                         }
                     }
-                    .pickerStyle(.segmented)
+                    .pickerStyle(.segmented).padding([.horizontal], 10)
                     List {
                         ForEach(collections) { collection in
                             if collection.subjectType == subjectType {
-                                UserCollectionRow(collection: collection)
+                                UserCollectionRow(collection: collection).listRowSeparator(.automatic).listRowSpacing(10.0)
                             }
                         }
-                    }
+                    }.listStyle(.plain)
                 }
             }
         case .none:

@@ -99,11 +99,11 @@
 		19BB342D2BD239AB00E5C295 /* Bangumi */ = {
 			isa = PBXGroup;
 			children = (
+				19A03A542BD4BBBD00BC5E53 /* Components */,
 				19A03A4F2BD40B4300BC5E53 /* Models */,
 				19A03A4E2BD40B1800BC5E53 /* Views */,
 				19A03A492BD26D0A00BC5E53 /* Info.plist */,
 				19BB342E2BD239AB00E5C295 /* BangumiApp.swift */,
-				19A03A542BD4BBBD00BC5E53 /* Components */,
 				19BB34342BD239AC00E5C295 /* Assets.xcassets */,
 				19BB34362BD239AC00E5C295 /* Preview Content */,
 				19A03A482BD26AC100BC5E53 /* Config.xcconfig */,
