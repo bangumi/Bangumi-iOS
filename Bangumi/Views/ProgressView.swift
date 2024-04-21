@@ -43,10 +43,24 @@ struct ProgressView: View {
                     .pickerStyle(.segmented).padding([.horizontal], 10)
 
                     List {
-                        ForEach(collections) { collection in
-                            if collection.subjectType == subjectType {
+                        switch subjectType {
+                        case .anime:
+                            let animes = collections.filter { $0.subjectType == .anime }
+                            ForEach(animes) { collection in
                                 UserCollectionRow(collection: collection)
                             }
+                        case .book:
+                            let books = collections.filter { $0.subjectType == .book }
+                            ForEach(books) { collection in
+                                UserCollectionRow(collection: collection)
+                            }
+                        case .real:
+                            let reals = collections.filter { $0.subjectType == .real }
+                            ForEach(reals) { collection in
+                                UserCollectionRow(collection: collection)
+                            }
+                        default:
+                            EmptyView()
                         }
                     }
                     .id(UUID())

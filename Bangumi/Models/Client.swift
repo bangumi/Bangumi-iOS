@@ -137,11 +137,9 @@ class ChiiClient: ObservableObject, Observable {
             }
             await MainActor.run {
                 for collect in response.data {
-                    print("insert collection: \(collect.subjectId), \(collect.subject?.name ?? "")")
                     self.modelContext.insert(collect)
                 }
             }
-            try self.modelContext.save()
             offset += 100
             if offset > response.total {
                 break
