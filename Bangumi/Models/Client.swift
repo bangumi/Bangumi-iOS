@@ -56,7 +56,8 @@ class ChiiClient: ObservableObject, Observable {
         request.httpBody = bodyData
         let (data, response) = try await URLSession.shared.data(for: request)
         guard let response = response as? HTTPURLResponse, response.statusCode == 200 else {
-            throw ChiiError(message: "failed to refresh access token")
+            let resp = String(data: data, encoding: .utf8) ?? ""
+            throw ChiiError(message: "failed to refresh access token \(resp)")
         }
         let decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .convertFromSnakeCase
@@ -77,7 +78,8 @@ class ChiiClient: ObservableObject, Observable {
         request.httpMethod = "GET"
         let (data, response) = try await session.data(for: request)
         guard let response = response as? HTTPURLResponse, response.statusCode == 200 else {
-            throw ChiiError(message: "failed to get data")
+            let resp = String(data: data, encoding: .utf8) ?? ""
+            throw ChiiError(message: "response: \(resp)")
         }
         return data
     }
@@ -91,7 +93,8 @@ class ChiiClient: ObservableObject, Observable {
         request.httpBody = bodyData
         let (data, response) = try await session.data(for: request)
         guard let response = response as? HTTPURLResponse, response.statusCode == 200 else {
-            throw ChiiError(message: "failed to post data")
+            let resp = String(data: data, encoding: .utf8) ?? ""
+            throw ChiiError(message: "response: \(resp)")
         }
         return data
     }
