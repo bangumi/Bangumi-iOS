@@ -24,7 +24,7 @@ struct UserCollectionRow: View {
                 "\(collection.volStatus)/? 卷"
             }
             HStack {
-                AsyncImage(url: gridURL) { image in
+                CachedAsyncImage(url: gridURL) { image in
                     image.resizable().scaledToFill().frame(width: 48, height: 48).clipped()
                 } placeholder: {
                     Image(systemName: "photo").frame(width: 48, height: 48)
