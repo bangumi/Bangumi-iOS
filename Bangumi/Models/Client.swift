@@ -104,7 +104,9 @@ class ChiiClient: ObservableObject, Observable {
         let decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .convertFromSnakeCase
         let profile = try decoder.decode(Profile.self, from: data)
-        self.modelContext.insert(profile)
+        await MainActor.run {
+            self.modelContext.insert(profile)
+        }
     }
 
     func updateCollections(profile: Profile, subjectType: SubjectType?) async throws {
@@ -133,8 +135,11 @@ class ChiiClient: ObservableObject, Observable {
             if response.data.isEmpty {
                 break
             }
-            for collect in response.data {
-                self.modelContext.insert(collect)
+            await MainActor.run {
+                for collect in response.data {
+                    print("insert collection: \(collect.subjectId), \(collect.subject?.name ?? "")")
+                    self.modelContext.insert(collect)
+                }
             }
             try self.modelContext.save()
             offset += 100

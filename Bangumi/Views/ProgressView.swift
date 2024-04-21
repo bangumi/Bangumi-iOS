@@ -25,11 +25,11 @@ struct ProgressView: View {
         case .some(let me):
             if collections.isEmpty {
                 Text("Updating collections...").onAppear {
-                    Task {
+                    Task.detached {
                         do {
                             try await chiiClient.updateCollections(profile: me, subjectType: nil)
                         } catch {
-                            errorHandling.handle(message: "\(error)")
+                            await errorHandling.handle(message: "\(error)")
                         }
                     }
                 }
@@ -45,30 +45,31 @@ struct ProgressView: View {
                     List {
                         ForEach(collections) { collection in
                             if collection.subjectType == subjectType {
-                                UserCollectionRow(collection: collection).listRowSeparator(.automatic).listRowSpacing(10.0)
+                                UserCollectionRow(collection: collection)
                             }
                         }
                     }
+                    .id(UUID())
+                    .listStyle(.plain)
                     .refreshable {
-                        Task {
+                        Task.detached(priority: .background) {
                             do {
                                 try await chiiClient.updateCollections(profile: me, subjectType: subjectType)
                             } catch {
-                                errorHandling.handle(message: "\(error)")
+                                await errorHandling.handle(message: "\(error)")
                             }
                         }
                     }
-                    .listStyle(.plain)
                     .transition(.asymmetric(insertion: .move(edge: .leading), removal: .move(edge: .trailing)))
                 }
             }
         case .none:
             Text("Refreshing profile...").onAppear {
-                Task {
+                Task.detached {
                     do {
                         try await chiiClient.updateProfile()
                     } catch {
-                        errorHandling.handle(message: "\(error)")
+                        await errorHandling.handle(message: "\(error)")
                     }
                 }
             }

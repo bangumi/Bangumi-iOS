@@ -20,7 +20,7 @@ struct TimelineView: View {
             Text("Hello, " + me.nickname)
         case .none:
             Text("Refreshing profile...").onAppear {
-                Task {
+                Task.detached {
                     try await chiiClient.updateProfile()
                 }
             }
