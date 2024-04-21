@@ -9,6 +9,7 @@ import SwiftUI
 
 struct UserCollectionRow: View {
     var collection: UserSubjectCollection
+    @State private var showDetail = false
 
     var body: some View {
         if let subject = collection.subject {
@@ -54,13 +55,20 @@ struct UserCollectionRow: View {
                 default:
                     Text(subject.name).bold()
                 }
-            }.frame(height: 64)
+            }
+            .frame(height: 64)
+            .clipShape(RoundedRectangle(cornerRadius: 10))
+            .onTapGesture {
+                showDetail = true
+            }
+            .scaleEffect(showDetail ? 1.1 : 1)
+            .shadow(color: .accent, radius: showDetail ? 5 : 0)
+            .animation(.spring(), value: showDetail)
+            .sheet(isPresented: $showDetail) {
+                CollectionDetailView(collection: collection).presentationDetents([.medium, .large]).presentationDragIndicator(.visible)
+            }
         } else {
             EmptyView()
         }
     }
 }
-
-// #Preview {
-//    UserCollectionRow(collection: collections[0])
-// }
