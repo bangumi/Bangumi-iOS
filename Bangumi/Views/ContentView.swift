@@ -28,7 +28,7 @@ struct ContentView: View {
     var body: some View {
         switch auth {
         case .some(let auth):
-            let chiiAPI = ChiiAPI(errorHandling: errorHandling, modelContext: modelContext, auth: auth)
+            let chiiClient = ChiiClient(errorHandling: errorHandling, modelContext: modelContext, auth: auth)
             TabView(selection: $tab) {
                 TimelineView()
                     .tabItem {
@@ -42,7 +42,7 @@ struct ContentView: View {
                     .tabItem {
                         Label("Discover", systemImage: "magnifyingglass")
                     }.tag(Tab.discover)
-            }.environment(chiiAPI)
+            }.environment(chiiClient)
         case .none:
             AuthView()
         }

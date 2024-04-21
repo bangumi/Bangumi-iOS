@@ -7,11 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		19A03A432BD24ADC00BC5E53 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19A03A422BD24ADC00BC5E53 /* HomeView.swift */; };
 		19A03A452BD24BA800BC5E53 /* ProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19A03A442BD24BA800BC5E53 /* ProgressView.swift */; };
 		19A03A472BD24F9700BC5E53 /* DiscoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19A03A462BD24F9700BC5E53 /* DiscoverView.swift */; };
 		19A03A4B2BD274EF00BC5E53 /* TimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19A03A4A2BD274EF00BC5E53 /* TimelineView.swift */; };
 		19A03A4D2BD2A9BE00BC5E53 /* AuthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19A03A4C2BD2A9BE00BC5E53 /* AuthView.swift */; };
+		19A03A512BD49A5F00BC5E53 /* Response.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19A03A502BD49A5F00BC5E53 /* Response.swift */; };
+		19A03A532BD49AF600BC5E53 /* Client.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19A03A522BD49AF600BC5E53 /* Client.swift */; };
+		19A03A562BD4BBF700BC5E53 /* UserCollectionRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19A03A552BD4BBF700BC5E53 /* UserCollectionRow.swift */; };
 		19BB342F2BD239AB00E5C295 /* BangumiApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19BB342E2BD239AB00E5C295 /* BangumiApp.swift */; };
 		19BB34312BD239AB00E5C295 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19BB34302BD239AB00E5C295 /* ContentView.swift */; };
 		19BB34332BD239AB00E5C295 /* Chii.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19BB34322BD239AB00E5C295 /* Chii.swift */; };
@@ -20,13 +22,15 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		19A03A422BD24ADC00BC5E53 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		19A03A442BD24BA800BC5E53 /* ProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressView.swift; sourceTree = "<group>"; };
 		19A03A462BD24F9700BC5E53 /* DiscoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverView.swift; sourceTree = "<group>"; };
 		19A03A482BD26AC100BC5E53 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 		19A03A492BD26D0A00BC5E53 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		19A03A4A2BD274EF00BC5E53 /* TimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineView.swift; sourceTree = "<group>"; };
 		19A03A4C2BD2A9BE00BC5E53 /* AuthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthView.swift; sourceTree = "<group>"; };
+		19A03A502BD49A5F00BC5E53 /* Response.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Response.swift; sourceTree = "<group>"; };
+		19A03A522BD49AF600BC5E53 /* Client.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Client.swift; sourceTree = "<group>"; };
+		19A03A552BD4BBF700BC5E53 /* UserCollectionRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserCollectionRow.swift; sourceTree = "<group>"; };
 		19BB342B2BD239AB00E5C295 /* Bangumi.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Bangumi.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		19BB342E2BD239AB00E5C295 /* BangumiApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BangumiApp.swift; sourceTree = "<group>"; };
 		19BB34302BD239AB00E5C295 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -54,7 +58,6 @@
 				19A03A462BD24F9700BC5E53 /* DiscoverView.swift */,
 				19A03A4A2BD274EF00BC5E53 /* TimelineView.swift */,
 				19A03A442BD24BA800BC5E53 /* ProgressView.swift */,
-				19A03A422BD24ADC00BC5E53 /* HomeView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -63,8 +66,18 @@
 			isa = PBXGroup;
 			children = (
 				19BB34322BD239AB00E5C295 /* Chii.swift */,
+				19A03A502BD49A5F00BC5E53 /* Response.swift */,
+				19A03A522BD49AF600BC5E53 /* Client.swift */,
 			);
 			path = Models;
+			sourceTree = "<group>";
+		};
+		19A03A542BD4BBBD00BC5E53 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				19A03A552BD4BBF700BC5E53 /* UserCollectionRow.swift */,
+			);
+			path = Components;
 			sourceTree = "<group>";
 		};
 		19BB34222BD239AB00E5C295 = {
@@ -90,6 +103,7 @@
 				19A03A4E2BD40B1800BC5E53 /* Views */,
 				19A03A492BD26D0A00BC5E53 /* Info.plist */,
 				19BB342E2BD239AB00E5C295 /* BangumiApp.swift */,
+				19A03A542BD4BBBD00BC5E53 /* Components */,
 				19BB34342BD239AC00E5C295 /* Assets.xcassets */,
 				19BB34362BD239AC00E5C295 /* Preview Content */,
 				19A03A482BD26AC100BC5E53 /* Config.xcconfig */,
@@ -177,12 +191,14 @@
 			files = (
 				19BB34312BD239AB00E5C295 /* ContentView.swift in Sources */,
 				19A03A4B2BD274EF00BC5E53 /* TimelineView.swift in Sources */,
-				19A03A432BD24ADC00BC5E53 /* HomeView.swift in Sources */,
 				19A03A452BD24BA800BC5E53 /* ProgressView.swift in Sources */,
+				19A03A562BD4BBF700BC5E53 /* UserCollectionRow.swift in Sources */,
+				19A03A532BD49AF600BC5E53 /* Client.swift in Sources */,
 				19BB34332BD239AB00E5C295 /* Chii.swift in Sources */,
 				19BB342F2BD239AB00E5C295 /* BangumiApp.swift in Sources */,
 				19A03A4D2BD2A9BE00BC5E53 /* AuthView.swift in Sources */,
 				19A03A472BD24F9700BC5E53 /* DiscoverView.swift in Sources */,
+				19A03A512BD49A5F00BC5E53 /* Response.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

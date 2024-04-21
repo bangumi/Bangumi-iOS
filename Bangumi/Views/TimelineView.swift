@@ -9,9 +9,9 @@ import SwiftData
 import SwiftUI
 
 struct TimelineView: View {
-    @EnvironmentObject var chiiAPI: ChiiAPI
+    @EnvironmentObject var chiiClient: ChiiClient
+    @EnvironmentObject var errorHandling: ErrorHandling
     @Query private var profiles: [Profile]
-
     private var profile: Profile? { profiles.first }
 
     var body: some View {
@@ -19,7 +19,11 @@ struct TimelineView: View {
         case .some(let me):
             Text("Hello, " + me.nickname)
         case .none:
-            Text("Refreshing profile...").onAppear(perform: chiiAPI.updateProfile)
+            Text("Refreshing profile...").onAppear {
+                Task {
+                    try await chiiClient.updateProfile()
+                }
+            }
         }
     }
 }

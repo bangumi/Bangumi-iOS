@@ -16,127 +16,17 @@ struct ChiiError: Error {
     }
 }
 
-class ChiiAPI: ObservableObject, Observable {
-    let errorHandling: ErrorHandling
-    let modelContext: ModelContext
-    let auth: Auth
-
-    let apiBase = URL(string: "https://api.bgm.tv")!
-    let userAgent = "everpcpc/Bangumi/0.0.1 (iOS)"
-    var session: URLSession
-
-    init(errorHandling: ErrorHandling, modelContext: ModelContext, auth: Auth) {
-        self.errorHandling = errorHandling
-        self.modelContext = modelContext
-        self.auth = auth
-
-        let sessionConfig = URLSessionConfiguration.default
-        sessionConfig.httpAdditionalHeaders = [
-            "User-Agent": self.userAgent,
-            "Authorization": "Bearer \(auth.accessToken)"
-        ]
-        self.session = URLSession(configuration: sessionConfig)
-    }
-
-    func checkRefreshAccessToken() async throws {
-        if !self.auth.isExpired() {
-            return
-        }
-        guard let plist = Bundle.main.infoDictionary else {
-            throw ChiiError(message: "Could not find Info.plist")
-        }
-        guard let clientID = plist["BANGUMI_APP_ID"] as? String else {
-            throw ChiiError(message: "Could not find BANGUMI_APP_ID in Info.plist")
-        }
-        guard let clientSecret = plist["BANGUMI_APP_SECRET"] as? String else {
-            throw ChiiError(message: "Could not find BANGUMI_APP_SECRET in Info.plist")
-        }
-        var request = URLRequest(url: URL(string: "https://bgm.tv/oauth/access_token")!)
-        request.httpMethod = "POST"
-        let body = [
-            "grant_type": "refresh_token",
-            "client_id": clientID,
-            "client_secret": clientSecret,
-            "refresh_token": self.auth.refreshToken,
-            "redirect_uri": "bangumi://oauth/callback"
-        ]
-        let bodyData = try? JSONSerialization.data(withJSONObject: body)
-        request.httpBody = bodyData
-        let (data, response) = try await URLSession.shared.data(for: request)
-        guard let response = response as? HTTPURLResponse, response.statusCode == 200 else {
-            throw ChiiError(message: "failed to refresh access token")
-        }
-        let decoder = JSONDecoder()
-        decoder.keyDecodingStrategy = .convertFromSnakeCase
-        let resp = try decoder.decode(TokenResponse.self, from: data)
-        self.auth.update(response: resp)
-        let sessionConfig = URLSessionConfiguration.default
-        sessionConfig.httpAdditionalHeaders = [
-            "User-Agent": self.userAgent,
-            "Authorization": "Bearer \(self.auth.accessToken)"
-        ]
-        self.session = URLSession(configuration: sessionConfig)
-    }
-
-    func get(url: URL) async throws -> Data {
-        try await self.checkRefreshAccessToken()
-        var request = URLRequest(url: url)
-        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.httpMethod = "GET"
-        let (data, response) = try await session.data(for: request)
-        guard let response = response as? HTTPURLResponse, response.statusCode == 200 else {
-            throw ChiiError(message: "failed to get data")
-        }
-        return data
-    }
-
-    func post(url: URL, body: Data) async throws -> Data {
-        try await self.checkRefreshAccessToken()
-        var request = URLRequest(url: url)
-        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.httpMethod = "POST"
-        let bodyData = try? JSONSerialization.data(withJSONObject: body)
-        request.httpBody = bodyData
-        let (data, response) = try await session.data(for: request)
-        guard let response = response as? HTTPURLResponse, response.statusCode == 200 else {
-            throw ChiiError(message: "failed to post data")
-        }
-        return data
-    }
-
-    func updateProfile() {
-        let url = self.apiBase.appendingPathComponent("v0/me")
-        Task { @MainActor in
-            if let data = try? await get(url: url) {
-                let decoder = JSONDecoder()
-                decoder.keyDecodingStrategy = .convertFromSnakeCase
-                let response = try decoder.decode(ProfileResponse.self, from: data)
-                let me = Profile(response: response)
-                self.modelContext.insert(me)
-            } else {
-                self.errorHandling.handle(message: "failed to get profile")
-            }
-        }
-    }
-}
-
-struct Avatar: Codable {
-    var large: String
-    var medium: String
-    var small: String
-}
-
-struct ProfileResponse: Codable {
-    var id: UInt
-    var username: String
-    var nickname: String
-    var userGroup: UInt
-    var avatar: Avatar
-    var sign: String
-}
-
 @Model
-final class Profile {
+final class Profile: Codable {
+    enum CodingKeys: String, CodingKey {
+        case id
+        case username
+        case nickname
+        case userGroup
+        case avatar
+        case sign
+    }
+
     @Attribute(.unique)
     var id: UInt
     var username: String
@@ -154,21 +44,25 @@ final class Profile {
         self.sign = sign
     }
 
-    init(response: ProfileResponse) {
-        self.id = response.id
-        self.username = response.username
-        self.nickname = response.nickname
-        self.userGroup = response.userGroup
-        self.avatar = response.avatar
-        self.sign = response.sign
+    required init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.id = try container.decode(UInt.self, forKey: .id)
+        self.username = try container.decode(String.self, forKey: .username)
+        self.nickname = try container.decode(String.self, forKey: .nickname)
+        self.userGroup = try container.decode(UInt.self, forKey: .userGroup)
+        self.avatar = try container.decode(Avatar.self, forKey: .avatar)
+        self.sign = try container.decode(String.self, forKey: .sign)
     }
-}
 
-struct TokenResponse: Codable {
-    var accessToken: String
-    var expiresIn: UInt
-    var tokenType: String
-    var refreshToken: String
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(self.id, forKey: .id)
+        try container.encode(self.username, forKey: .username)
+        try container.encode(self.nickname, forKey: .nickname)
+        try container.encode(self.userGroup, forKey: .userGroup)
+        try container.encode(self.avatar, forKey: .avatar)
+        try container.encode(self.sign, forKey: .sign)
+    }
 }
 
 @Model
@@ -201,95 +95,24 @@ final class Auth {
     }
 }
 
-/// 条目类型
-/// 1 为 书籍
-/// 2 为 动画
-/// 3 为 音乐
-/// 4 为 游戏
-/// 6 为 三次元
-///
-/// 没有 5
-enum SubjectType: UInt8, Codable {
-    case unknown = 0
-    case book = 1
-    case anime = 2
-    case music = 3
-    case game = 4
-    case real = 6
-
-    init(value: UInt8 = 0) {
-        let tmp = SubjectType(rawValue: value)
-        if let out = tmp {
-            self = out
-            return
-        }
-        self = SubjectType.unknown
-    }
-
-    var description: String {
-        switch self {
-        case .unknown:
-            return "未知"
-        case .book:
-            return "书籍"
-        case .anime:
-            return "动画"
-        case .music:
-            return "音乐"
-        case .game:
-            return "游戏"
-        case .real:
-            return "三次元"
-        }
-    }
-}
-
-/// 收藏类型
-///
-/// 1: 想看
-/// 2: 看过
-/// 3: 在看
-/// 4: 搁置
-/// 5: 抛弃
-enum CollectionType: UInt8, Codable {
-    case unknown = 0
-    case wish = 1
-    case collect = 2
-    case `do` = 3
-    case onHold = 4
-    case dropped = 5
-
-    init(value: UInt8 = 0) {
-        let tmp = CollectionType(rawValue: value)
-        if let out = tmp {
-            self = out
-            return
-        }
-        self = CollectionType.unknown
-    }
-
-    var description: String {
-        switch self {
-        case .unknown:
-            return "未知"
-        case .wish:
-            return "想看"
-        case .collect:
-            return "看过"
-        case .do:
-            return "在看"
-        case .onHold:
-            return "搁置"
-        case .dropped:
-            return "抛弃"
-        }
-    }
-}
-
 @Model
-final class UserSubjectCollection {
+final class UserSubjectCollection: Codable {
+    enum CodingKeys: String, CodingKey {
+        case subjectId
+        case subjectType
+        case rate
+        case type
+        case comment
+        case tags
+        case epStatus
+        case volStatus
+        case updatedAt
+        case `private`
+        case subject
+    }
+
     @Attribute(.unique)
-    var subjectID: String
+    var subjectId: UInt
     var subjectType: SubjectType
     var rate: UInt8
     var type: CollectionType
@@ -299,11 +122,12 @@ final class UserSubjectCollection {
     var volStatus: UInt
     var updatedAt: Date
     var `private`: Bool
+    var subject: SlimSubject?
 
-    init(subjectID: String, subjectType: SubjectType, rate: UInt8, type: CollectionType, comment: String? = nil, tags: [String], epStatus: UInt, volStatus: UInt, updatedAt: String) {
+    init(subjectId: UInt, subjectType: SubjectType, rate: UInt8, type: CollectionType, comment: String? = nil, tags: [String], epStatus: UInt, volStatus: UInt, updatedAt: String, private: Bool = false, subject: SlimSubject? = nil) {
         let dateFormatter = DateFormatter()
 
-        self.subjectID = subjectID
+        self.subjectId = subjectId
         self.subjectType = subjectType
         self.rate = rate
         self.type = type
@@ -312,6 +136,40 @@ final class UserSubjectCollection {
         self.epStatus = epStatus
         self.volStatus = volStatus
         self.updatedAt = dateFormatter.date(from: updatedAt)!
-        self.private = false
+        self.private = `private`
+        self.subject = subject
+    }
+
+    required init(from decoder: Decoder) throws {
+        let dateFormatter = DateFormatter()
+
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.subjectId = try container.decode(UInt.self, forKey: .subjectId)
+        self.subjectType = try container.decode(SubjectType.self, forKey: .subjectType)
+        self.rate = try container.decode(UInt8.self, forKey: .rate)
+        self.type = try container.decode(CollectionType.self, forKey: .type)
+        self.comment = try container.decode(String?.self, forKey: .comment)
+        self.tags = try container.decode([String].self, forKey: .tags)
+        self.epStatus = try container.decode(UInt.self, forKey: .epStatus)
+        self.volStatus = try container.decode(UInt.self, forKey: .volStatus)
+        let updatedAt = try container.decodeIfPresent(String.self, forKey: .updatedAt)
+        self.updatedAt = dateFormatter.date(from: updatedAt ?? "") ?? Date()
+        self.private = try container.decode(Bool.self, forKey: .private)
+        self.subject = try container.decode(SlimSubject?.self, forKey: .subject)
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(self.subjectId, forKey: .subjectId)
+        try container.encode(self.subjectType, forKey: .subjectType)
+        try container.encode(self.rate, forKey: .rate)
+        try container.encode(self.type, forKey: .type)
+        try container.encode(self.comment, forKey: .comment)
+        try container.encode(self.tags, forKey: .tags)
+        try container.encode(self.epStatus, forKey: .epStatus)
+        try container.encode(self.volStatus, forKey: .volStatus)
+        try container.encode(self.updatedAt, forKey: .updatedAt)
+        try container.encode(self.private, forKey: .private)
+        try container.encode(self.subject, forKey: .subject)
     }
 }

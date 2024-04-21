@@ -50,4 +50,9 @@ class ErrorHandling: ObservableObject {
         currentAlert = ChiiError(message: message)
         showAlert = true
     }
+
+    func handleError(error: ChiiError) {
+        currentAlert = error
+        showAlert = true
+    }
 }

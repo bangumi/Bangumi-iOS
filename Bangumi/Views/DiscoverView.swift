@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct DiscoverView: View {
-    @EnvironmentObject var chiiAPI: ChiiAPI
+    @EnvironmentObject var chiiClient: ChiiClient
 
     var body: some View {
         Text("TODO: Search")
