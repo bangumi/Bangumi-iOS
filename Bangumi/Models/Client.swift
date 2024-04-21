@@ -97,8 +97,6 @@ class ChiiClient: ObservableObject, Observable {
     }
 
     func updateProfile() async throws {
-        print("updating profile")
-
         let url = self.apiBase.appendingPathComponent("v0/me")
         guard let data = try? await get(url: url) else {
             throw ChiiError(message: "failed to get profile")
@@ -107,11 +105,9 @@ class ChiiClient: ObservableObject, Observable {
         decoder.keyDecodingStrategy = .convertFromSnakeCase
         let profile = try decoder.decode(Profile.self, from: data)
         self.modelContext.insert(profile)
-        print("profile updated for ", profile.nickname)
     }
 
-    func updateCollections(profile: Profile) async throws {
-        print("updating collections for ", profile.username)
+    func updateCollections(profile: Profile, subjectType: SubjectType?) async throws {
         let url = if profile.username.isEmpty {
             self.apiBase.appendingPathComponent("v0/users/\(profile.id)/collections")
         } else {
@@ -119,12 +115,14 @@ class ChiiClient: ObservableObject, Observable {
         }
         var offset = 0
         while true {
-            print("fetching collections, offset: ", offset)
-            let queryItems = [
+            var queryItems = [
                 URLQueryItem(name: "type", value: "3"),
                 URLQueryItem(name: "limit", value: "100"),
                 URLQueryItem(name: "offset", value: String(offset))
             ]
+            if let sType = subjectType {
+                queryItems.append(URLQueryItem(name: "subject_type", value: String(sType.rawValue)))
+            }
             let pageURL = url.appending(queryItems: queryItems)
             guard let data = try? await get(url: pageURL) else {
                 throw ChiiError(message: "failed to get collections")

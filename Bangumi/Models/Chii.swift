@@ -124,9 +124,7 @@ final class UserSubjectCollection: Codable {
     var `private`: Bool
     var subject: SlimSubject?
 
-    init(subjectId: UInt, subjectType: SubjectType, rate: UInt8, type: CollectionType, comment: String? = nil, tags: [String], epStatus: UInt, volStatus: UInt, updatedAt: String, private: Bool = false, subject: SlimSubject? = nil) {
-        let dateFormatter = DateFormatter()
-
+    init(subjectId: UInt, subjectType: SubjectType, rate: UInt8, type: CollectionType, comment: String? = nil, tags: [String], epStatus: UInt, volStatus: UInt, updatedAt: Date, private: Bool = false, subject: SlimSubject? = nil) {
         self.subjectId = subjectId
         self.subjectType = subjectType
         self.rate = rate
@@ -135,13 +133,16 @@ final class UserSubjectCollection: Codable {
         self.tags = tags
         self.epStatus = epStatus
         self.volStatus = volStatus
-        self.updatedAt = dateFormatter.date(from: updatedAt)!
+        self.updatedAt = updatedAt
         self.private = `private`
         self.subject = subject
     }
 
     required init(from decoder: Decoder) throws {
-        let dateFormatter = DateFormatter()
+        let RFC3339DateFormatter = DateFormatter()
+        RFC3339DateFormatter.locale = Locale(identifier: "en_US_POSIX")
+        RFC3339DateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZZZZZ"
+        RFC3339DateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
 
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.subjectId = try container.decode(UInt.self, forKey: .subjectId)
@@ -152,8 +153,13 @@ final class UserSubjectCollection: Codable {
         self.tags = try container.decode([String].self, forKey: .tags)
         self.epStatus = try container.decode(UInt.self, forKey: .epStatus)
         self.volStatus = try container.decode(UInt.self, forKey: .volStatus)
-        let updatedAt = try container.decodeIfPresent(String.self, forKey: .updatedAt)
-        self.updatedAt = dateFormatter.date(from: updatedAt ?? "") ?? Date()
+        guard let updatedAt = try container.decodeIfPresent(String.self, forKey: .updatedAt) else {
+            throw ChiiError(message: "Invalid updatedAt")
+        }
+        guard let updatedAt = RFC3339DateFormatter.date(from: updatedAt) else {
+            throw ChiiError(message: "Decode updatedAt failed: \(updatedAt)")
+        }
+        self.updatedAt = updatedAt
         self.private = try container.decode(Bool.self, forKey: .private)
         self.subject = try container.decode(SlimSubject?.self, forKey: .subject)
     }

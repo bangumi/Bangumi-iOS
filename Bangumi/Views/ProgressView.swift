@@ -14,7 +14,7 @@ struct ProgressView: View {
     @Environment(\.modelContext) private var modelContext
 
     @Query private var profiles: [Profile]
-    @Query(sort: \UserSubjectCollection.updatedAt) private var collections: [UserSubjectCollection]
+    @Query(sort: \UserSubjectCollection.updatedAt, order: .reverse) private var collections: [UserSubjectCollection]
 
     private var profile: Profile? { profiles.first }
 
@@ -27,7 +27,7 @@ struct ProgressView: View {
                 Text("Updating collections...").onAppear {
                     Task {
                         do {
-                            try await chiiClient.updateCollections(profile: me)
+                            try await chiiClient.updateCollections(profile: me, subjectType: nil)
                         } catch {
                             errorHandling.handle(message: "\(error)")
                         }
@@ -41,13 +41,25 @@ struct ProgressView: View {
                         }
                     }
                     .pickerStyle(.segmented).padding([.horizontal], 10)
+
                     List {
                         ForEach(collections) { collection in
                             if collection.subjectType == subjectType {
                                 UserCollectionRow(collection: collection).listRowSeparator(.automatic).listRowSpacing(10.0)
                             }
                         }
-                    }.listStyle(.plain).transition(.asymmetric(insertion: .move(edge: .leading), removal: .move(edge: .trailing)))
+                    }
+                    .refreshable {
+                        Task {
+                            do {
+                                try await chiiClient.updateCollections(profile: me, subjectType: subjectType)
+                            } catch {
+                                errorHandling.handle(message: "\(error)")
+                            }
+                        }
+                    }
+                    .listStyle(.plain)
+                    .transition(.asymmetric(insertion: .move(edge: .leading), removal: .move(edge: .trailing)))
                 }
             }
         case .none:

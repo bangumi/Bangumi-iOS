@@ -25,9 +25,9 @@ struct UserCollectionRow: View {
             }
             HStack {
                 CachedAsyncImage(url: gridURL) { image in
-                    image.resizable().scaledToFill().frame(width: 48, height: 48).clipped()
+                    image.resizable().scaledToFill().frame(width: 64, height: 64).clipped()
                 } placeholder: {
-                    Image(systemName: "photo").frame(width: 48, height: 48)
+                    Image(systemName: "photo").frame(width: 64, height: 64)
                 }
                 switch collection.subjectType {
                 case .anime:
@@ -35,23 +35,26 @@ struct UserCollectionRow: View {
                         Text(subject.name).bold()
                         Text(subject.nameCn).font(.caption).foregroundStyle(.gray)
                         Text(chapters).font(.caption).foregroundStyle(.accent)
+                        Text(collection.updatedAt.formatted()).font(.caption2).foregroundStyle(.gray)
                     }
                 case .book:
                     VStack(alignment: .leading) {
                         Text(subject.name).bold()
                         Text(subject.nameCn).font(.caption).foregroundStyle(.gray)
                         Text("\(chapters)  \(volumes)").font(.caption).foregroundStyle(.accent)
+                        Text(collection.updatedAt.formatted()).font(.caption2).foregroundStyle(.gray)
                     }
                 case .real:
                     VStack(alignment: .leading) {
                         Text(subject.name).bold()
                         Text(subject.nameCn).font(.caption).foregroundStyle(.gray)
                         Text(chapters).font(.caption).foregroundStyle(.accent)
+                        Text(collection.updatedAt.formatted()).font(.caption2).foregroundStyle(.gray)
                     }
                 default:
                     Text(subject.name).bold()
                 }
-            }.frame(height: 48)
+            }.frame(height: 64)
         } else {
             EmptyView()
         }
