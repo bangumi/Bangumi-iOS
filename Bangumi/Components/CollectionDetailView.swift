@@ -27,12 +27,13 @@ struct CollectionDetailView: View {
                             .lineLimit(2)
                         Label(collection.type.description, systemImage: collection.type.icon).font(.caption).foregroundStyle(.accent)
                     }
+                    Spacer()
                 }
                 Text("章节").font(.headline)
                 Text("简介").font(.headline)
                 Text(subject.shortSummary).font(.caption).multilineTextAlignment(.leading)
-
-            }.padding([.horizontal], 10)
+                Spacer()
+            }.padding([.horizontal], 10).padding([.vertical], 20)
         } else {
             EmptyView()
         }
