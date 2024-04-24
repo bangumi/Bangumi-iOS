@@ -40,31 +40,30 @@ struct ProgressView: View {
                             Text(type.description)
                         }
                     }
-                    .pickerStyle(.segmented).padding([.horizontal], 10)
-
-                    List {
-                        switch subjectType {
-                        case .anime:
-                            let animes = collections.filter { $0.subjectType == .anime }
-                            ForEach(animes) { collection in
-                                UserCollectionRow(collection: collection)
+                    .pickerStyle(.segmented)
+                    ScrollView {
+                        LazyVStack(alignment: .leading, spacing: 10) {
+                            switch subjectType {
+                            case .anime:
+                                let animes = collections.filter { $0.subjectType == .anime }
+                                ForEach(animes) { collection in
+                                    UserCollectionRow(collection: collection)
+                                }
+                            case .book:
+                                let books = collections.filter { $0.subjectType == .book }
+                                ForEach(books) { collection in
+                                    UserCollectionRow(collection: collection)
+                                }
+                            case .real:
+                                let reals = collections.filter { $0.subjectType == .real }
+                                ForEach(reals) { collection in
+                                    UserCollectionRow(collection: collection)
+                                }
+                            default:
+                                EmptyView()
                             }
-                        case .book:
-                            let books = collections.filter { $0.subjectType == .book }
-                            ForEach(books) { collection in
-                                UserCollectionRow(collection: collection)
-                            }
-                        case .real:
-                            let reals = collections.filter { $0.subjectType == .real }
-                            ForEach(reals) { collection in
-                                UserCollectionRow(collection: collection)
-                            }
-                        default:
-                            EmptyView()
                         }
                     }
-                    .id(UUID())
-                    .listStyle(.plain)
                     .refreshable {
                         Task.detached(priority: .background) {
                             do {
@@ -74,8 +73,7 @@ struct ProgressView: View {
                             }
                         }
                     }
-                    .transition(.asymmetric(insertion: .move(edge: .leading), removal: .move(edge: .trailing)))
-                }
+                }.padding([.horizontal], 10)
             }
         case .none:
             Text("Refreshing profile...").onAppear {

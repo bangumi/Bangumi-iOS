@@ -12,10 +12,10 @@ struct CollectionDetailView: View {
 
     var body: some View {
         if let subject = collection.subject {
-            let gridURL = URL(string: subject.images.grid)
+            let coverURL = URL(string: subject.images.large)
             VStack(alignment: .leading) {
                 HStack(alignment: .top) {
-                    CachedAsyncImage(url: gridURL) { image in
+                    CachedAsyncImage(url: coverURL) { image in
                         image.resizable().scaledToFill().frame(width: 100, height: 100).clipShape(RoundedRectangle(cornerRadius: 10)).clipped()
                     } placeholder: {
                         Image(systemName: "photo").frame(width: 100, height: 100)

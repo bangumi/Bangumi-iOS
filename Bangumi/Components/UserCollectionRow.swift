@@ -13,7 +13,7 @@ struct UserCollectionRow: View {
 
     var body: some View {
         if let subject = collection.subject {
-            let gridURL = URL(string: subject.images.grid)
+            let iconURL = URL(string: subject.images.common)
             let chapters = if subject.eps > 0 {
                 "\(collection.epStatus)/\(subject.eps) 话"
             } else {
@@ -25,10 +25,10 @@ struct UserCollectionRow: View {
                 "\(collection.volStatus)/? 卷"
             }
             HStack {
-                CachedAsyncImage(url: gridURL) { image in
+                CachedAsyncImage(url: iconURL) { image in
                     image.resizable().scaledToFill().frame(width: 64, height: 64).clipped()
                 } placeholder: {
-                    Image(systemName: "photo").frame(width: 64, height: 64)
+                    Rectangle().fill(.accent.opacity(0.1)).frame(width: 64, height: 64)
                 }
                 switch collection.subjectType {
                 case .anime:
