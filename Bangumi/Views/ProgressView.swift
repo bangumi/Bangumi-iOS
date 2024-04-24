@@ -41,37 +41,60 @@ struct ProgressView: View {
                         }
                     }
                     .pickerStyle(.segmented)
-                    ScrollView {
-                        LazyVStack(alignment: .leading, spacing: 10) {
-                            switch subjectType {
-                            case .anime:
+                    switch subjectType {
+                    case .anime:
+                        ScrollView {
+                            LazyVStack(alignment: .leading, spacing: 10) {
                                 let animes = collections.filter { $0.subjectType == .anime }
                                 ForEach(animes) { collection in
                                     UserCollectionRow(collection: collection)
                                 }
-                            case .book:
+                            }
+                        }.refreshable {
+                            Task.detached(priority: .background) {
+                                do {
+                                    try await chiiClient.updateCollections(profile: me, subjectType: subjectType)
+                                } catch {
+                                    await errorHandling.handle(message: "\(error)")
+                                }
+                            }
+                        }
+                    case .book:
+                        ScrollView {
+                            LazyVStack(alignment: .leading, spacing: 10) {
                                 let books = collections.filter { $0.subjectType == .book }
                                 ForEach(books) { collection in
                                     UserCollectionRow(collection: collection)
                                 }
-                            case .real:
+                            }
+                        }.refreshable {
+                            Task.detached(priority: .background) {
+                                do {
+                                    try await chiiClient.updateCollections(profile: me, subjectType: subjectType)
+                                } catch {
+                                    await errorHandling.handle(message: "\(error)")
+                                }
+                            }
+                        }
+                    case .real:
+                        ScrollView {
+                            LazyVStack(alignment: .leading, spacing: 10) {
                                 let reals = collections.filter { $0.subjectType == .real }
                                 ForEach(reals) { collection in
                                     UserCollectionRow(collection: collection)
                                 }
-                            default:
-                                EmptyView()
+                            }
+                        }.refreshable {
+                            Task.detached(priority: .background) {
+                                do {
+                                    try await chiiClient.updateCollections(profile: me, subjectType: subjectType)
+                                } catch {
+                                    await errorHandling.handle(message: "\(error)")
+                                }
                             }
                         }
-                    }
-                    .refreshable {
-                        Task.detached(priority: .background) {
-                            do {
-                                try await chiiClient.updateCollections(profile: me, subjectType: subjectType)
-                            } catch {
-                                await errorHandling.handle(message: "\(error)")
-                            }
-                        }
+                    default:
+                        EmptyView()
                     }
                 }.padding([.horizontal], 10)
             }

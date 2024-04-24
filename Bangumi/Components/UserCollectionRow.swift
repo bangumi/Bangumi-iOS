@@ -33,36 +33,36 @@ struct UserCollectionRow: View {
                 switch collection.subjectType {
                 case .anime:
                     VStack(alignment: .leading) {
-                        Text(subject.name).bold()
-                        Text(subject.nameCn).font(.caption).foregroundStyle(.gray)
+                        Text(subject.name).font(.headline)
+                        Text(subject.nameCn).font(.subheadline).foregroundStyle(.gray)
                         Text(chapters).font(.caption).foregroundStyle(.accent)
                         Text(collection.updatedAt.formatted()).font(.caption2).foregroundStyle(.gray)
                     }
                 case .book:
                     VStack(alignment: .leading) {
-                        Text(subject.name).bold()
-                        Text(subject.nameCn).font(.caption).foregroundStyle(.gray)
+                        Text(subject.name).font(.headline)
+                        Text(subject.nameCn).font(.subheadline).foregroundStyle(.gray)
                         Text("\(chapters)  \(volumes)").font(.caption).foregroundStyle(.accent)
                         Text(collection.updatedAt.formatted()).font(.caption2).foregroundStyle(.gray)
                     }
                 case .real:
                     VStack(alignment: .leading) {
-                        Text(subject.name).bold()
-                        Text(subject.nameCn).font(.caption).foregroundStyle(.gray)
+                        Text(subject.name).font(.headline)
+                        Text(subject.nameCn).font(.subheadline).foregroundStyle(.gray)
                         Text(chapters).font(.caption).foregroundStyle(.accent)
                         Text(collection.updatedAt.formatted()).font(.caption2).foregroundStyle(.gray)
                     }
                 default:
                     Text(subject.name).bold()
                 }
+                Spacer()
             }
             .frame(height: 64)
             .clipShape(RoundedRectangle(cornerRadius: 10))
             .onTapGesture {
                 showDetail = true
             }
-            .scaleEffect(showDetail ? 1.1 : 1)
-            .shadow(color: .accent, radius: showDetail ? 5 : 0)
+            .scaleEffect(showDetail ? 1.1 : 1.0)
             .animation(.spring(), value: showDetail)
             .sheet(isPresented: $showDetail) {
                 CollectionDetailView(collection: collection).presentationDetents([.medium, .large]).presentationDragIndicator(.visible)
