@@ -39,7 +39,7 @@ struct DiscoverView: View {
                         }
                     }
                 }
-            }
+            }.padding()
         }
         .searchable(text: $query)
         .onChange(of: query) { _, _ in
