@@ -138,6 +138,23 @@ enum SubjectType: UInt8, Codable, Identifiable {
         }
     }
 
+    var icon: String {
+        switch self {
+        case .unknown:
+            return "questionmark"
+        case .book:
+            return "book"
+        case .anime:
+            return "film"
+        case .music:
+            return "music"
+        case .game:
+            return "gamecontroller"
+        case .real:
+            return "photo"
+        }
+    }
+
     static func progressTypes() -> [SubjectType] {
         return [.anime, .book, .real]
     }
@@ -163,4 +180,24 @@ struct SlimSubject: Codable {
     var collectionTotal: UInt
     var score: Float
     var tags: [Tag]
+}
+
+struct SearchSubject: Codable {
+    var id: UInt
+    var type: SubjectType?
+    var date: String
+    var image: String
+    var summary: String
+    var name: String
+    var nameCn: String
+    var tags: [Tag]
+    var score: Float
+    var rank: UInt
+}
+
+struct SubjectSearchResponse: Codable {
+    var total: UInt
+    var limit: UInt
+    var offset: UInt
+    var data: [SearchSubject]
 }

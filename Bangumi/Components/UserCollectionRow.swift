@@ -62,7 +62,6 @@ struct UserCollectionRow: View {
             .onTapGesture {
                 showDetail = true
             }
-            .scaleEffect(showDetail ? 1.1 : 1.0)
             .animation(.spring(), value: showDetail)
             .sheet(isPresented: $showDetail) {
                 CollectionDetailView(collection: collection).presentationDetents([.medium, .large]).presentationDragIndicator(.visible)

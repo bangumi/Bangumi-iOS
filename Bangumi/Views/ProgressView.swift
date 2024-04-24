@@ -39,64 +39,24 @@ struct ProgressView: View {
                         ForEach(SubjectType.progressTypes()) { type in
                             Text(type.description)
                         }
+                    }.pickerStyle(.segmented)
+                    ScrollView {
+                        LazyVStack(alignment: .leading, spacing: 10) {
+                            let filtered = collections.filter { $0.subjectType == subjectType }
+                            ForEach(filtered) { collection in
+                                UserCollectionRow(collection: collection)
+                            }
+                        }
+                    }.refreshable {
+                        Task.detached(priority: .background) {
+                            do {
+                                try await chiiClient.updateCollections(profile: me, subjectType: subjectType)
+                            } catch {
+                                await errorHandling.handle(message: "\(error)")
+                            }
+                        }
                     }
-                    .pickerStyle(.segmented)
-                    switch subjectType {
-                    case .anime:
-                        ScrollView {
-                            LazyVStack(alignment: .leading, spacing: 10) {
-                                let animes = collections.filter { $0.subjectType == .anime }
-                                ForEach(animes) { collection in
-                                    UserCollectionRow(collection: collection)
-                                }
-                            }
-                        }.refreshable {
-                            Task.detached(priority: .background) {
-                                do {
-                                    try await chiiClient.updateCollections(profile: me, subjectType: subjectType)
-                                } catch {
-                                    await errorHandling.handle(message: "\(error)")
-                                }
-                            }
-                        }
-                    case .book:
-                        ScrollView {
-                            LazyVStack(alignment: .leading, spacing: 10) {
-                                let books = collections.filter { $0.subjectType == .book }
-                                ForEach(books) { collection in
-                                    UserCollectionRow(collection: collection)
-                                }
-                            }
-                        }.refreshable {
-                            Task.detached(priority: .background) {
-                                do {
-                                    try await chiiClient.updateCollections(profile: me, subjectType: subjectType)
-                                } catch {
-                                    await errorHandling.handle(message: "\(error)")
-                                }
-                            }
-                        }
-                    case .real:
-                        ScrollView {
-                            LazyVStack(alignment: .leading, spacing: 10) {
-                                let reals = collections.filter { $0.subjectType == .real }
-                                ForEach(reals) { collection in
-                                    UserCollectionRow(collection: collection)
-                                }
-                            }
-                        }.refreshable {
-                            Task.detached(priority: .background) {
-                                do {
-                                    try await chiiClient.updateCollections(profile: me, subjectType: subjectType)
-                                } catch {
-                                    await errorHandling.handle(message: "\(error)")
-                                }
-                            }
-                        }
-                    default:
-                        EmptyView()
-                    }
-                }.padding([.horizontal], 10)
+                }.padding()
             }
         case .none:
             Text("Refreshing profile...").onAppear {
