@@ -39,34 +39,28 @@ struct UserCollectionRow: View {
                     }
                     .clipShape(RoundedRectangle(cornerRadius: 10))
                     VStack(alignment: .leading) {
+                        Text(subject.name).font(.headline)
+                        Text(subject.nameCn).font(.subheadline).foregroundStyle(.gray)
                         switch collection.subjectType {
                         case .anime:
-                            Text(subject.name).font(.headline)
-                            Text(subject.nameCn).font(.subheadline).foregroundStyle(.gray)
                             HStack {
                                 Text(collection.updatedAt.formatted()).foregroundStyle(.gray)
                                 Spacer()
                                 Text(chapters).foregroundStyle(.accent)
                             }.font(.caption)
                         case .book:
-                            Text(subject.name).font(.headline)
-                            Text(subject.nameCn).font(.subheadline).foregroundStyle(.gray)
                             HStack {
                                 Text(collection.updatedAt.formatted()).foregroundStyle(.gray)
                                 Spacer()
                                 Text("\(chapters)  \(volumes)").foregroundStyle(.accent)
                             }.font(.caption)
                         case .real:
-                            Text(subject.name).font(.headline)
-                            Text(subject.nameCn).font(.subheadline).foregroundStyle(.gray)
                             HStack {
                                 Text(collection.updatedAt.formatted()).foregroundStyle(.gray)
                                 Spacer()
                                 Text(chapters).foregroundStyle(.accent)
                             }.font(.caption)
                         default:
-                            Text(subject.name).bold()
-                            Text(subject.nameCn).font(.subheadline).foregroundStyle(.gray)
                             HStack {
                                 Text(collection.updatedAt.formatted()).foregroundStyle(.gray)
                                 Spacer()
