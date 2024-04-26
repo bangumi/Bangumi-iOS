@@ -23,11 +23,11 @@ struct SubjectRow: View {
                 Text(subject.name).font(.headline)
                 Text(subject.nameCn).font(.subheadline).foregroundStyle(.gray)
                 HStack {
-                    Label(subject.type.description, systemImage: subject.type.icon).font(.caption).foregroundStyle(.accent)
-                    Label("\(score)", systemImage: "star").font(.caption).foregroundStyle(.gray)
+                    Label(subject.type.description, systemImage: subject.type.icon).foregroundStyle(.accent)
+                    Text("\(subject.collectionTotal) 人收藏").foregroundStyle(.gray)
                     Spacer()
-                }
-                Text("\(subject.collectionTotal) 人收藏").font(.caption)
+                    Label("\(score)", systemImage: "star").foregroundStyle(.gray)
+                }.font(.caption)
             }
             Spacer()
         }

@@ -24,47 +24,67 @@ struct UserCollectionRow: View {
             } else {
                 "\(collection.volStatus)/? 卷"
             }
-            HStack {
-                CachedAsyncImage(url: iconURL) { image in
-                    image.resizable().scaledToFill().frame(width: 64, height: 64).clipped()
-                } placeholder: {
-                    Rectangle().fill(.accent.opacity(0.1)).frame(width: 64, height: 64)
+            ZStack {
+                Rectangle()
+                    .fill(.accent)
+                    .opacity(showDetail ? 0.05 : 0.01)
+                    .frame(height: 64)
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                    .shadow(color: .accent, radius: 1, x: 1, y: 1)
+                HStack {
+                    CachedAsyncImage(url: iconURL) { image in
+                        image.resizable().scaledToFill().frame(width: 60, height: 60).clipped()
+                    } placeholder: {
+                        Rectangle().fill(.accent.opacity(0.1)).frame(width: 60, height: 60)
+                    }
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                    VStack(alignment: .leading) {
+                        switch collection.subjectType {
+                        case .anime:
+                            Text(subject.name).font(.headline)
+                            Text(subject.nameCn).font(.subheadline).foregroundStyle(.gray)
+                            HStack {
+                                Text(collection.updatedAt.formatted()).foregroundStyle(.gray)
+                                Spacer()
+                                Text(chapters).foregroundStyle(.accent)
+                            }.font(.caption)
+                        case .book:
+                            Text(subject.name).font(.headline)
+                            Text(subject.nameCn).font(.subheadline).foregroundStyle(.gray)
+                            HStack {
+                                Text(collection.updatedAt.formatted()).foregroundStyle(.gray)
+                                Spacer()
+                                Text("\(chapters)  \(volumes)").foregroundStyle(.accent)
+                            }.font(.caption)
+                        case .real:
+                            Text(subject.name).font(.headline)
+                            Text(subject.nameCn).font(.subheadline).foregroundStyle(.gray)
+                            HStack {
+                                Text(collection.updatedAt.formatted()).foregroundStyle(.gray)
+                                Spacer()
+                                Text(chapters).foregroundStyle(.accent)
+                            }.font(.caption)
+                        default:
+                            Text(subject.name).bold()
+                            Text(subject.nameCn).font(.subheadline).foregroundStyle(.gray)
+                            HStack {
+                                Text(collection.updatedAt.formatted()).foregroundStyle(.gray)
+                                Spacer()
+                            }.font(.caption)
+                        }
+                    }
+                    Spacer()
                 }
-                switch collection.subjectType {
-                case .anime:
-                    VStack(alignment: .leading) {
-                        Text(subject.name).font(.headline)
-                        Text(subject.nameCn).font(.subheadline).foregroundStyle(.gray)
-                        Text(chapters).font(.caption).foregroundStyle(.accent)
-                        Text(collection.updatedAt.formatted()).font(.caption2).foregroundStyle(.gray)
-                    }
-                case .book:
-                    VStack(alignment: .leading) {
-                        Text(subject.name).font(.headline)
-                        Text(subject.nameCn).font(.subheadline).foregroundStyle(.gray)
-                        Text("\(chapters)  \(volumes)").font(.caption).foregroundStyle(.accent)
-                        Text(collection.updatedAt.formatted()).font(.caption2).foregroundStyle(.gray)
-                    }
-                case .real:
-                    VStack(alignment: .leading) {
-                        Text(subject.name).font(.headline)
-                        Text(subject.nameCn).font(.subheadline).foregroundStyle(.gray)
-                        Text(chapters).font(.caption).foregroundStyle(.accent)
-                        Text(collection.updatedAt.formatted()).font(.caption2).foregroundStyle(.gray)
-                    }
-                default:
-                    Text(subject.name).bold()
+                .frame(height: 60)
+                .padding(2)
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+                .onTapGesture {
+                    showDetail = true
                 }
-                Spacer()
-            }
-            .frame(height: 64)
-            .clipShape(RoundedRectangle(cornerRadius: 10))
-            .onTapGesture {
-                showDetail = true
-            }
-            .animation(.spring(), value: showDetail)
-            .sheet(isPresented: $showDetail) {
-                CollectionDetailView(collection: collection).presentationDetents([.medium, .large]).presentationDragIndicator(.visible)
+                .animation(.spring(), value: showDetail)
+                .sheet(isPresented: $showDetail) {
+                    CollectionDetailView(collection: collection).presentationDetents([.medium, .large]).presentationDragIndicator(.visible)
+                }
             }
         } else {
             EmptyView()
