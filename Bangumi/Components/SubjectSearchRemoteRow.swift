@@ -33,10 +33,13 @@ struct SubjectSearchRemoteRow: View {
                         if let type = subject.type {
                             Label(type.description, systemImage: type.icon).foregroundStyle(.accent)
                         }
+                        if !subject.date.isEmpty {
+                            Label(subject.date, systemImage: "calendar").foregroundStyle(.gray)
+                        }
+                        Spacer()
                         if subject.rank > 0 {
                             Label("\(subject.rank)", systemImage: "chart.bar.xaxis").foregroundStyle(.accent)
                         }
-                        Spacer()
                         if subject.score > 0 {
                             Label("\(score)", systemImage: "star").foregroundStyle(.gray)
                         }
