@@ -17,6 +17,7 @@ struct CalendarView: View {
 
     var sortedCalendars: [BangumiCalendar] {
         let calendar = Calendar.current
+        // FIXME: something wrong with weekday for today
         guard let yesterday = calendar.date(byAdding: .day, value: -1, to: Date()) else {
             errorHandling.handle(message: "Could not get yesterday")
             return calendars
@@ -55,6 +56,7 @@ struct CalendarView: View {
 struct CalendarWeekdayView: View {
     let calendar: BangumiCalendar
 
+    // api /calendar returns image in http
     func imageURL(url: String) -> URL? {
         var components = URLComponents(string: url)
         components?.scheme = "https"
