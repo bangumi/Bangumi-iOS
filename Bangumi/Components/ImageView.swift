@@ -21,8 +21,7 @@ struct ImageView: View {
                 CachedAsyncImage(
                     url: iconURL,
                     placeholder: { _ in
-                        Image(systemName: "waveform")
-                            .frame(width: size, height: size)
+                        Image(systemName: "waveform").frame(width: size, height: size)
                     },
                     image: {
                         Image(uiImage: $0)
