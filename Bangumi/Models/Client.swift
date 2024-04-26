@@ -72,28 +72,17 @@ class ChiiClient: ObservableObject, Observable {
         self.session = URLSession(configuration: sessionConfig)
     }
 
-    func get(url: URL) async throws -> Data {
+    func request(url: URL, method: String, body: Any? = nil) async throws -> Data {
         try await self.checkRefreshAccessToken()
         var request = URLRequest(url: url)
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.httpMethod = "GET"
-        let (data, response) = try await session.data(for: request)
-        guard let response = response as? HTTPURLResponse, response.statusCode == 200 else {
-            let resp = String(data: data, encoding: .utf8) ?? ""
-            throw ChiiError(message: "response: \(resp)")
+        request.httpMethod = method
+        if let body = body {
+            let bodyData = try? JSONSerialization.data(withJSONObject: body)
+            request.httpBody = bodyData
         }
-        return data
-    }
-
-    func post(url: URL, body: Any) async throws -> Data {
-        try await self.checkRefreshAccessToken()
-        var request = URLRequest(url: url)
-        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.httpMethod = "POST"
-        let bodyData = try? JSONSerialization.data(withJSONObject: body)
-        request.httpBody = bodyData
         let (data, response) = try await session.data(for: request)
-        guard let response = response as? HTTPURLResponse, response.statusCode == 200 else {
+        guard let response = response as? HTTPURLResponse, response.statusCode < 400 else {
             let resp = String(data: data, encoding: .utf8) ?? ""
             throw ChiiError(message: "response: \(resp)")
         }
@@ -102,7 +91,7 @@ class ChiiClient: ObservableObject, Observable {
 
     func updateProfile() async throws {
         let url = self.apiBase.appendingPathComponent("v0/me")
-        guard let data = try? await get(url: url) else {
+        guard let data = try? await request(url: url, method: "GET") else {
             throw ChiiError(message: "failed to get profile")
         }
         let decoder = JSONDecoder()
@@ -132,7 +121,7 @@ class ChiiClient: ObservableObject, Observable {
                 queryItems.append(URLQueryItem(name: "subject_type", value: String(sType.rawValue)))
             }
             let pageURL = url.appending(queryItems: queryItems)
-            guard let data = try? await get(url: pageURL) else {
+            guard let data = try? await request(url: pageURL, method: "GET") else {
                 throw ChiiError(message: "failed to get collections")
             }
             let decoder = JSONDecoder()
@@ -157,7 +146,7 @@ class ChiiClient: ObservableObject, Observable {
 
     func updateCalendar() async throws {
         let url = self.apiBase.appendingPathComponent("calendar")
-        guard let data = try? await get(url: url) else {
+        guard let data = try? await request(url: url, method: "GET") else {
             throw ChiiError(message: "failed to get calendar")
         }
         let decoder = JSONDecoder()
@@ -186,7 +175,7 @@ class ChiiClient: ObservableObject, Observable {
                 "type": [type.rawValue]
             ]
         }
-        guard let data = try? await self.post(url: url, body: body) else {
+        guard let data = try? await self.request(url: url, method: "POST", body: body) else {
             throw ChiiError(message: "failed to search")
         }
         let decoder = JSONDecoder()
