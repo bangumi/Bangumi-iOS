@@ -12,7 +12,7 @@ struct CollectionDetailView: View {
 
     var body: some View {
         if let subject = collection.subject {
-            let coverURL = URL(string: subject.images.large)
+            let coverURL = URL(string: subject.images.common)
             VStack(alignment: .leading) {
                 HStack(alignment: .top) {
                     CachedAsyncImage(url: coverURL) { image in

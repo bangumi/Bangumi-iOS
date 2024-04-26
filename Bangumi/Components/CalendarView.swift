@@ -55,6 +55,12 @@ struct CalendarView: View {
 struct CalendarWeekdayView: View {
     let calendar: BangumiCalendar
 
+    func imageURL(url: String) -> URL? {
+        var components = URLComponents(string: url)
+        components?.scheme = "https"
+        return components?.url
+    }
+
     var body: some View {
         VStack {
             Text(calendar.weekday.cn).font(.title3)
@@ -67,7 +73,7 @@ struct CalendarWeekdayView: View {
                 ForEach(calendar.items) { subject in
                     VStack {
                         if let images = subject.images {
-                            let iconURL = URL(string: images.grid)
+                            let iconURL = imageURL(url: images.common)
                             CachedAsyncImage(url: iconURL) { image in
                                 image.resizable().scaledToFill().frame(width: 80, height: 80).clipped()
                             } placeholder: {
