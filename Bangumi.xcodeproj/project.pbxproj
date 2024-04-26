@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		191A3E592BDB527200AD4B71 /* SubjectSearchRemoteRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 191A3E582BDB527200AD4B71 /* SubjectSearchRemoteRow.swift */; };
 		19A03A452BD24BA800BC5E53 /* ProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19A03A442BD24BA800BC5E53 /* ProgressView.swift */; };
 		19A03A472BD24F9700BC5E53 /* DiscoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19A03A462BD24F9700BC5E53 /* DiscoverView.swift */; };
 		19A03A4B2BD274EF00BC5E53 /* TimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19A03A4A2BD274EF00BC5E53 /* TimelineView.swift */; };
@@ -21,10 +22,11 @@
 		19BB34332BD239AB00E5C295 /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19BB34322BD239AB00E5C295 /* Data.swift */; };
 		19BB34352BD239AC00E5C295 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 19BB34342BD239AC00E5C295 /* Assets.xcassets */; };
 		19BB34382BD239AC00E5C295 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 19BB34372BD239AC00E5C295 /* Preview Assets.xcassets */; };
-		19BE3F832BD956F100F32F29 /* SubjectLocalSearchRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19BE3F822BD956F100F32F29 /* SubjectLocalSearchRow.swift */; };
+		19BE3F832BD956F100F32F29 /* SubjectSearchLocalRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19BE3F822BD956F100F32F29 /* SubjectSearchLocalRow.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		191A3E582BDB527200AD4B71 /* SubjectSearchRemoteRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubjectSearchRemoteRow.swift; sourceTree = "<group>"; };
 		19A03A442BD24BA800BC5E53 /* ProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressView.swift; sourceTree = "<group>"; };
 		19A03A462BD24F9700BC5E53 /* DiscoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverView.swift; sourceTree = "<group>"; };
 		19A03A482BD26AC100BC5E53 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
@@ -42,7 +44,7 @@
 		19BB34322BD239AB00E5C295 /* Data.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data.swift; sourceTree = "<group>"; };
 		19BB34342BD239AC00E5C295 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		19BB34372BD239AC00E5C295 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		19BE3F822BD956F100F32F29 /* SubjectLocalSearchRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubjectLocalSearchRow.swift; sourceTree = "<group>"; };
+		19BE3F822BD956F100F32F29 /* SubjectSearchLocalRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubjectSearchLocalRow.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -84,7 +86,8 @@
 				19A03A552BD4BBF700BC5E53 /* UserCollectionRow.swift */,
 				19A03A5F2BD5042B00BC5E53 /* CachedAsyncImage.swift */,
 				19A03A612BD528F900BC5E53 /* CollectionDetailView.swift */,
-				19BE3F822BD956F100F32F29 /* SubjectLocalSearchRow.swift */,
+				191A3E582BDB527200AD4B71 /* SubjectSearchRemoteRow.swift */,
+				19BE3F822BD956F100F32F29 /* SubjectSearchLocalRow.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -205,7 +208,7 @@
 				19BB34312BD239AB00E5C295 /* ContentView.swift in Sources */,
 				19A03A4B2BD274EF00BC5E53 /* TimelineView.swift in Sources */,
 				19A03A452BD24BA800BC5E53 /* ProgressView.swift in Sources */,
-				19BE3F832BD956F100F32F29 /* SubjectLocalSearchRow.swift in Sources */,
+				19BE3F832BD956F100F32F29 /* SubjectSearchLocalRow.swift in Sources */,
 				19A03A622BD528F900BC5E53 /* CollectionDetailView.swift in Sources */,
 				19A03A562BD4BBF700BC5E53 /* UserCollectionRow.swift in Sources */,
 				19A03A532BD49AF600BC5E53 /* Client.swift in Sources */,
@@ -215,6 +218,7 @@
 				19A03A4D2BD2A9BE00BC5E53 /* AuthView.swift in Sources */,
 				19A03A472BD24F9700BC5E53 /* DiscoverView.swift in Sources */,
 				19A03A512BD49A5F00BC5E53 /* Chii.swift in Sources */,
+				191A3E592BDB527200AD4B71 /* SubjectSearchRemoteRow.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

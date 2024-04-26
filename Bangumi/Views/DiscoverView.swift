@@ -11,8 +11,10 @@ import SwiftUI
 struct DiscoverView: View {
     @EnvironmentObject var chiiClient: ChiiClient
 
+    @State private var searching = false
     @State private var query = ""
     @State private var local = true
+    @State private var subjectType: SubjectType = .unknown
     @Query private var collections: [UserSubjectCollection]
 
     var filterdCollections: [UserSubjectCollection] {
@@ -31,28 +33,53 @@ struct DiscoverView: View {
 
     var body: some View {
         NavigationStack {
-            if query.isEmpty {
-                // TODO:
-                EmptyView()
-            } else {
-                ScrollView {
-                    LazyVStack(alignment: .leading, spacing: 10) {
-                        ForEach(filterdCollections) { collection in
-                            if let subject = collection.subject {
-                                SubjectLocalSearchRow(subject: subject)
+            if searching {
+                Picker("Subject Type", selection: $subjectType) {
+                    Text("全部").tag(SubjectType.unknown)
+                    ForEach(SubjectType.searchTypes()) { type in
+                        Text(type.description).tag(type)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .padding(.horizontal, 16)
+                if query.isEmpty {
+                    // TODO:
+                    EmptyView()
+                } else {
+                    if local {
+                        ScrollView {
+                            LazyVStack(alignment: .leading, spacing: 10) {
+                                ForEach(filterdCollections) { collection in
+                                    if let subject = collection.subject {
+                                        if subjectType == .unknown || subjectType == subject.type {
+                                            SubjectSearchLocalRow(subject: subject)
+                                        }
+                                    }
+                                }
                             }
                         }
+                        .padding(.horizontal, 16)
+                    } else {
+                        ScrollView {
+                            LazyVStack(alignment: .leading, spacing: 10) {
+                                // TODO:
+                            }
+                        }
+                        .padding(.horizontal, 16)
                     }
-                }.padding()
+                }
+                Spacer()
+            } else {
+                // TODO:
+                EmptyView()
             }
         }
-        .searchable(text: $query)
+        .searchable(text: $query, isPresented: $searching)
         .onChange(of: query) { _, _ in
             local = true
         }
         .onSubmit(of: .search) {
             local = false
-            print(query)
         }
     }
 }

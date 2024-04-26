@@ -130,6 +130,14 @@ enum SubjectType: UInt8, Codable, Identifiable {
         self = SubjectType.unknown
     }
 
+    static func progressTypes() -> [SubjectType] {
+        return [.book, .anime, .real]
+    }
+
+    static func searchTypes() -> [SubjectType] {
+        return [.book, .anime, .music, .game, .real]
+    }
+
     var description: String {
         switch self {
         case .unknown:
@@ -162,10 +170,6 @@ enum SubjectType: UInt8, Codable, Identifiable {
         case .real:
             return "photo"
         }
-    }
-
-    static func progressTypes() -> [SubjectType] {
-        return [.anime, .book, .real]
     }
 }
 
