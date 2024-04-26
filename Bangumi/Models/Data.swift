@@ -8,14 +8,6 @@
 import Foundation
 import SwiftData
 
-struct ChiiError: Error {
-    var message: String
-
-    init(message: String) {
-        self.message = message
-    }
-}
-
 @Model
 final class Profile: Codable {
     enum CodingKeys: String, CodingKey {
@@ -177,5 +169,39 @@ final class UserSubjectCollection: Codable {
         try container.encode(self.updatedAt, forKey: .updatedAt)
         try container.encode(self.private, forKey: .private)
         try container.encode(self.subject, forKey: .subject)
+    }
+}
+
+@Model
+final class BangumiCalendar: Codable {
+    enum CodingKeys: String, CodingKey {
+        case weekday
+        case items
+    }
+
+    @Attribute(.unique)
+    var id: UInt
+
+    var weekday: Weekday
+    var items: [SubjectSmall]
+
+    init(weekday: Weekday, items: [SubjectSmall]) {
+        self.id = weekday.id
+        self.weekday = weekday
+        self.items = items
+    }
+
+    required init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let weekday = try container.decode(Weekday.self, forKey: .weekday)
+        self.id = weekday.id
+        self.weekday = weekday
+        self.items = try container.decode([SubjectSmall].self, forKey: .items)
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(self.weekday, forKey: .weekday)
+        try container.encode(self.items, forKey: .items)
     }
 }

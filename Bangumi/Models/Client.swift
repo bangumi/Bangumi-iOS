@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftData
+import SwiftUI
 
 class ChiiClient: ObservableObject, Observable {
     let errorHandling: ErrorHandling
@@ -108,7 +109,9 @@ class ChiiClient: ObservableObject, Observable {
         decoder.keyDecodingStrategy = .convertFromSnakeCase
         let profile = try decoder.decode(Profile.self, from: data)
         await MainActor.run {
-            self.modelContext.insert(profile)
+            withAnimation {
+                self.modelContext.insert(profile)
+            }
         }
     }
 
@@ -139,13 +142,32 @@ class ChiiClient: ObservableObject, Observable {
                 break
             }
             await MainActor.run {
-                for collect in response.data {
-                    self.modelContext.insert(collect)
+                withAnimation {
+                    for collect in response.data {
+                        self.modelContext.insert(collect)
+                    }
                 }
             }
             offset += 100
             if offset > response.total {
                 break
+            }
+        }
+    }
+
+    func updateCalendar() async throws {
+        let url = self.apiBase.appendingPathComponent("calendar")
+        guard let data = try? await get(url: url) else {
+            throw ChiiError(message: "failed to get calendar")
+        }
+        let decoder = JSONDecoder()
+        decoder.keyDecodingStrategy = .convertFromSnakeCase
+        let calendars = try decoder.decode([BangumiCalendar].self, from: data)
+        await MainActor.run {
+            withAnimation {
+                for calendar in calendars {
+                    self.modelContext.insert(calendar)
+                }
             }
         }
     }

@@ -31,24 +31,24 @@ struct ContentView: View {
             let chiiClient = ChiiClient(errorHandling: errorHandling, modelContext: modelContext, auth: auth)
             TabView(selection: $tab) {
                 TimelineView()
+                    .tag(Tab.timeline)
                     .tabItem {
-                        Label("Timeline", systemImage: "person")
-                    }.tag(Tab.timeline)
+                        Image(systemName: "person")
+                    }
                 ProgressView()
+                    .tag(Tab.progress)
                     .tabItem {
-                        Label("Progress", systemImage: "square.grid.3x2.fill")
-                    }.tag(Tab.progress)
+                        Image(systemName: "square.grid.3x2.fill")
+                    }
                 DiscoverView()
+                    .tag(Tab.discover)
                     .tabItem {
-                        Label("Discover", systemImage: "magnifyingglass")
-                    }.tag(Tab.discover)
-            }.environment(chiiClient)
+                        Image(systemName: "magnifyingglass")
+                    }
+            }
+            .environment(chiiClient)
         case .none:
             AuthView()
         }
     }
-}
-
-#Preview {
-    ContentView()
 }

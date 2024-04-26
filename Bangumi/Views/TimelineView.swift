@@ -27,7 +27,3 @@ struct TimelineView: View {
         }
     }
 }
-
-#Preview {
-    TimelineView()
-}

@@ -17,12 +17,15 @@ struct DiscoverView: View {
     @State private var subjectType: SubjectType = .unknown
     @Query private var collections: [UserSubjectCollection]
 
-    var filterdCollections: [UserSubjectCollection] {
+    var filteredCollections: [UserSubjectCollection] {
         if !local || query.isEmpty {
             return []
         }
         let filtered = collections.filter {
             if let subject = $0.subject {
+                if subjectType != .unknown && subjectType != subject.type {
+                    return false
+                }
                 return subject.nameCn.lowercased().contains(query) || subject.name.lowercased().contains(query)
             } else {
                 return false
@@ -46,32 +49,25 @@ struct DiscoverView: View {
                     // TODO:
                     EmptyView()
                 } else {
-                    if local {
-                        ScrollView {
-                            LazyVStack(alignment: .leading, spacing: 10) {
-                                ForEach(filterdCollections) { collection in
+                    ScrollView {
+                        LazyVStack(alignment: .leading, spacing: 10) {
+                            if local {
+                                ForEach(filteredCollections) { collection in
                                     if let subject = collection.subject {
-                                        if subjectType == .unknown || subjectType == subject.type {
-                                            SubjectSearchLocalRow(subject: subject)
-                                        }
+                                        SubjectSearchLocalRow(subject: subject)
                                     }
                                 }
-                            }
-                        }
-                        .padding(.horizontal, 16)
-                    } else {
-                        ScrollView {
-                            LazyVStack(alignment: .leading, spacing: 10) {
+                            } else {
                                 // TODO:
+                                EmptyView()
                             }
                         }
-                        .padding(.horizontal, 16)
                     }
+                    .padding(.horizontal, 16)
                 }
                 Spacer()
             } else {
-                // TODO:
-                EmptyView()
+                CalendarView().padding(.horizontal, 16)
             }
         }
         .searchable(text: $query, isPresented: $searching)

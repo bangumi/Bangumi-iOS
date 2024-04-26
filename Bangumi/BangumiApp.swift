@@ -11,7 +11,7 @@ import SwiftUI
 @main
 struct BangumiApp: App {
     var sharedModelContainer: ModelContainer = {
-        let schema = Schema([Auth.self, Profile.self, UserSubjectCollection.self])
+        let schema = Schema([Auth.self, Profile.self, UserSubjectCollection.self, BangumiCalendar.self])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
         do {

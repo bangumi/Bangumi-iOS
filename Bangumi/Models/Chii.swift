@@ -5,6 +5,14 @@
 //  Created by Chuan Chuan on 2024/4/21.
 //
 
+struct ChiiError: Error {
+    var message: String
+
+    init(message: String) {
+        self.message = message
+    }
+}
+
 struct TokenResponse: Codable {
     var accessToken: String
     var expiresIn: UInt
@@ -173,6 +181,46 @@ enum SubjectType: UInt8, Codable, Identifiable {
     }
 }
 
+struct RatingCount: Codable {
+    enum CodingKeys: String, CodingKey {
+        case one = "1"
+        case two = "2"
+        case three = "3"
+        case four = "4"
+        case five = "5"
+        case six = "6"
+        case seven = "7"
+        case eight = "8"
+        case nine = "9"
+        case ten = "10"
+    }
+
+    var one: UInt
+    var two: UInt
+    var three: UInt
+    var four: UInt
+    var five: UInt
+    var six: UInt
+    var seven: UInt
+    var eight: UInt
+    var nine: UInt
+    var ten: UInt
+}
+
+struct Rating: Codable {
+    var total: UInt
+    var count: RatingCount
+    var score: Float
+}
+
+struct SubjectCollection: Codable {
+    var wish: UInt?
+    var collect: UInt?
+    var doing: UInt?
+    var onHold: UInt?
+    var dropped: UInt?
+}
+
 struct CollectionResponse: Codable {
     var total: UInt
     var limit: UInt
@@ -213,4 +261,26 @@ struct SubjectSearchResponse: Codable {
     var limit: UInt
     var offset: UInt
     var data: [SearchSubject]
+}
+
+struct Weekday: Codable {
+    var en: String
+    var cn: String
+    var ja: String
+    var id: UInt
+}
+
+struct SubjectSmall: Codable, Identifiable {
+    var id: UInt
+    var url: String
+    var type: SubjectType
+    var name: String
+    var nameCn: String
+    var summary: String
+    var airDate: String
+    var airWeekday: UInt
+    var images: Images?
+    var rating: Rating?
+    var rank: UInt?
+    var collection: SubjectCollection?
 }

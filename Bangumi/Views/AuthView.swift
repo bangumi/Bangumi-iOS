@@ -122,7 +122,3 @@ class SignInViewModel: NSObject, ObservableObject, ASWebAuthenticationPresentati
         return auth
     }
 }
-
-#Preview {
-    AuthView()
-}

@@ -71,7 +71,3 @@ struct ProgressView: View {
         }
     }
 }
-
-#Preview {
-    ProgressView()
-}
