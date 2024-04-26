@@ -55,16 +55,27 @@ enum CollectionType: UInt8, Codable {
         self = CollectionType.unknown
     }
 
-    var description: String {
+    func description(type: SubjectType) -> String {
+        var action: String
+        switch type {
+        case .book:
+            action = "读"
+        case .music:
+            action = "听"
+        case .game:
+            action = "玩"
+        default:
+            action = "看"
+        }
         switch self {
         case .unknown:
             return "未知"
         case .wish:
-            return "想看"
+            return "想" + action
         case .collect:
-            return "看过"
+            return action + "过"
         case .do:
-            return "在看"
+            return "在" + action
         case .onHold:
             return "搁置"
         case .dropped:

@@ -25,7 +25,7 @@ struct CollectionDetailView: View {
                             .lineLimit(2)
                         Text(subject.name).font(.headline).multilineTextAlignment(.leading)
                             .lineLimit(2)
-                        Label(collection.type.description, systemImage: collection.type.icon).font(.subheadline).foregroundStyle(.accent)
+                        Label(collection.type.description(type: collection.subjectType), systemImage: collection.type.icon).font(.subheadline).foregroundStyle(.accent)
                     }
                     Spacer()
                 }
