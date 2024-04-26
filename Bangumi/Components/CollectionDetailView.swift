@@ -12,14 +12,9 @@ struct CollectionDetailView: View {
 
     var body: some View {
         if let subject = collection.subject {
-            let coverURL = URL(string: subject.images.common)
             VStack(alignment: .leading) {
                 HStack(alignment: .top) {
-                    CachedAsyncImage(url: coverURL) { image in
-                        image.resizable().scaledToFill().frame(width: 100, height: 100).clipShape(RoundedRectangle(cornerRadius: 10)).clipped()
-                    } placeholder: {
-                        Image(systemName: "photo").frame(width: 100, height: 100)
-                    }
+                    ImageView(img: subject.images.common, size: 100)
                     VStack(alignment: .leading) {
                         Text(subject.nameCn).font(.caption).foregroundStyle(.gray).multilineTextAlignment(.leading)
                             .lineLimit(2)

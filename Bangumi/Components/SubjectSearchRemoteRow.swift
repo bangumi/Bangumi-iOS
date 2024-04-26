@@ -11,7 +11,6 @@ struct SubjectSearchRemoteRow: View {
     var subject: SearchSubject
 
     var body: some View {
-        let iconURL = URL(string: subject.image)
         ZStack {
             Rectangle()
                 .fill(.accent)
@@ -20,12 +19,7 @@ struct SubjectSearchRemoteRow: View {
                 .clipShape(RoundedRectangle(cornerRadius: 10))
                 .shadow(color: .accent, radius: 1, x: 1, y: 1)
             HStack {
-                CachedAsyncImage(url: iconURL) { image in
-                    image.resizable().scaledToFill().frame(width: 60, height: 60).clipped()
-                } placeholder: {
-                    Image(systemName: "photo").frame(width: 60, height: 60)
-                }
-                .clipShape(RoundedRectangle(cornerRadius: 10))
+                ImageView(img: subject.image, size: 60)
                 VStack(alignment: .leading) {
                     let score = String(format: "%.1f", subject.score)
                     Text(subject.name).font(.headline)

@@ -74,17 +74,7 @@ struct CalendarWeekdayView: View {
             ]) {
                 ForEach(calendar.items) { subject in
                     VStack {
-                        if let images = subject.images {
-                            let iconURL = imageURL(url: images.common)
-                            CachedAsyncImage(url: iconURL) { image in
-                                image.resizable().scaledToFill().frame(width: 80, height: 80).clipped()
-                            } placeholder: {
-                                Rectangle().fill(.accent.opacity(0.1)).frame(width: 80, height: 80)
-                            }
-                            .clipShape(RoundedRectangle(cornerRadius: 10))
-                        } else {
-                            Image(systemName: "photo").frame(width: 80, height: 80)
-                        }
+                        ImageView(img: subject.images?.common, size: 80)
                         Text(subject.name).font(.caption).multilineTextAlignment(.leading).lineLimit(1)
                     }
                 }
