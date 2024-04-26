@@ -31,15 +31,20 @@ struct DiscoverView: View {
 
     var body: some View {
         NavigationStack {
-            ScrollView {
-                LazyVStack(alignment: .leading, spacing: 10) {
-                    ForEach(filterdCollections) { collection in
-                        if let subject = collection.subject {
-                            SubjectRow(subject: subject)
+            if query.isEmpty {
+                // TODO:
+                EmptyView()
+            } else {
+                ScrollView {
+                    LazyVStack(alignment: .leading, spacing: 10) {
+                        ForEach(filterdCollections) { collection in
+                            if let subject = collection.subject {
+                                SubjectLocalSearchRow(subject: subject)
+                            }
                         }
                     }
-                }
-            }.padding()
+                }.padding()
+            }
         }
         .searchable(text: $query)
         .onChange(of: query) { _, _ in
@@ -50,8 +55,4 @@ struct DiscoverView: View {
             print(query)
         }
     }
-}
-
-#Preview {
-    DiscoverView()
 }

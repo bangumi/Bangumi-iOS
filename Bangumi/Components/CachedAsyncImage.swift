@@ -68,22 +68,22 @@ import SwiftUI
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
 public struct CachedAsyncImage<Content>: View where Content: View {
     @State private var phase: AsyncImagePhase
-    
+
     private let urlRequest: URLRequest?
-    
+
     private let urlSession: URLSession
-    
+
     private let scale: CGFloat
-    
+
     private let transaction: Transaction
-    
+
     private let content: (AsyncImagePhase) -> Content
-    
+
     public var body: some View {
         content(phase)
             .task(id: urlRequest, load)
     }
-    
+
     /// Loads and displays an image from the specified URL.
     ///
     /// Until the image loads, SwiftUI displays a default placeholder. When
@@ -110,7 +110,7 @@ public struct CachedAsyncImage<Content>: View where Content: View {
         let urlRequest = url == nil ? nil : URLRequest(url: url!)
         self.init(urlRequest: urlRequest, urlCache: urlCache, scale: scale)
     }
-    
+
     /// Loads and displays an image from the specified URL.
     ///
     /// Until the image loads, SwiftUI displays a default placeholder. When
@@ -142,7 +142,7 @@ public struct CachedAsyncImage<Content>: View where Content: View {
 #endif
         }
     }
-    
+
     /// Loads and displays a modifiable image from the specified URL using
     /// a custom placeholder until the image loads.
     ///
@@ -178,7 +178,7 @@ public struct CachedAsyncImage<Content>: View where Content: View {
         let urlRequest = url == nil ? nil : URLRequest(url: url!)
         self.init(urlRequest: urlRequest, urlCache: urlCache, scale: scale, content: content, placeholder: placeholder)
     }
-    
+
     /// Loads and displays a modifiable image from the specified URL using
     /// a custom placeholder until the image loads.
     ///
@@ -219,7 +219,7 @@ public struct CachedAsyncImage<Content>: View where Content: View {
             }
         }
     }
-    
+
     /// Loads and displays a modifiable image from the specified URL in phases.
     ///
     /// If you set the asynchronous image's URL to `nil`, or after you set the
@@ -259,7 +259,7 @@ public struct CachedAsyncImage<Content>: View where Content: View {
         let urlRequest = url == nil ? nil : URLRequest(url: url!)
         self.init(urlRequest: urlRequest, urlCache: urlCache, scale: scale, transaction: transaction, content: content)
     }
-    
+
     /// Loads and displays a modifiable image from the specified URL in phases.
     ///
     /// If you set the asynchronous image's URL to `nil`, or after you set the
@@ -303,7 +303,7 @@ public struct CachedAsyncImage<Content>: View where Content: View {
         self.scale = scale
         self.transaction = transaction
         self.content = content
-        
+
         self._phase = State(wrappedValue: .empty)
         do {
             if let urlRequest = urlRequest, let image = try cachedImage(from: urlRequest, cache: urlCache) {
@@ -313,7 +313,7 @@ public struct CachedAsyncImage<Content>: View where Content: View {
             self._phase = State(wrappedValue: .failure(error))
         }
     }
-    
+
     @Sendable
     private func load() async {
         do {
@@ -361,12 +361,12 @@ private extension CachedAsyncImage {
         }
         return try (image(from: data), metrics)
     }
-    
+
     private func cachedImage(from request: URLRequest, cache: URLCache) throws -> Image? {
         guard let cachedResponse = cache.cachedResponse(for: request) else { return nil }
         return try image(from: cachedResponse.data)
     }
-    
+
     private func image(from data: Data) throws -> Image {
 #if os(macOS)
         if let nsImage = NSImage(data: data) {
@@ -388,7 +388,7 @@ private extension CachedAsyncImage {
 
 private class URLSessionTaskController: NSObject, URLSessionTaskDelegate {
     var metrics: URLSessionTaskMetrics?
-    
+
     func urlSession(_ session: URLSession, task: URLSessionTask, didFinishCollecting metrics: URLSessionTaskMetrics) {
         self.metrics = metrics
     }

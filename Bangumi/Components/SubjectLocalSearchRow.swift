@@ -1,5 +1,5 @@
 //
-//  SubjectRow.swift
+//  SubjectLocalSearchRow.swift
 //  Bangumi
 //
 //  Created by Chuan Chuan on 2024/4/24.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct SubjectRow: View {
+struct SubjectLocalSearchRow: View {
     var subject: SlimSubject
 
     var body: some View {
