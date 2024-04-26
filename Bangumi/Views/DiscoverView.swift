@@ -17,6 +17,7 @@ struct DiscoverView: View {
     @State private var local = true
     @State private var subjectType: SubjectType = .unknown
 
+    @State private var limit: UInt = 20
     @State private var offset: UInt = 0
     @State private var total: UInt = 0
     @State private var subjects: [SearchSubject] = []
@@ -47,7 +48,7 @@ struct DiscoverView: View {
         subjects = []
         Task.detached {
             guard let resp = try? await chiiClient.search(
-                keyword: query, type: subjectType, offset: offset)
+                keyword: query, type: subjectType, offset: offset, limit: limit)
             else {
                 await errorHandling.handle(message: "failed to search")
                 return
@@ -62,7 +63,7 @@ struct DiscoverView: View {
     }
 
     func checkSearchNextPage(current: SearchSubject) {
-        if offset + 10 > total {
+        if offset + limit > total {
             return
         }
         let thresholdIndex = subjects.index(subjects.endIndex, offsetBy: -2)
@@ -70,10 +71,10 @@ struct DiscoverView: View {
         if currentIndex != thresholdIndex {
             return
         }
-        offset += 10
+        offset += limit
         Task.detached {
             guard let resp = try? await chiiClient.search(
-                keyword: query, type: subjectType, offset: offset)
+                keyword: query, type: subjectType, offset: offset, limit: limit)
             else {
                 await errorHandling.handle(message: "failed to search")
                 return
@@ -110,25 +111,39 @@ struct DiscoverView: View {
                 if query.isEmpty {
                     EmptyView()
                 } else {
-                    ScrollView {
-                        LazyVStack(alignment: .leading, spacing: 10) {
-                            if local {
+                    if local {
+                        ScrollView {
+                            LazyVStack(alignment: .leading, spacing: 10) {
                                 ForEach(filteredCollections) { collection in
                                     if let subject = collection.subject {
                                         SubjectSearchLocalRow(subject: subject)
                                     }
                                 }
-                            } else {
-                                ForEach(subjects) { subject in
-                                    SubjectSearchRemoteRow(subject: subject)
-                                        .onAppear {
-                                            checkSearchNextPage(current: subject)
-                                        }
-                                }
                             }
+                        }.padding(.horizontal, 16)
+                    } else {
+                        if subjects.isEmpty {
+                            VStack {
+                                Spacer()
+                                Image(systemName: "waveform")
+                                    .resizable()
+                                    .frame(width: 100, height: 100)
+                                Spacer()
+                            }
+                            .symbolEffect(.variableColor.iterative.dimInactiveLayers)
+                        } else {
+                            ScrollView {
+                                LazyVStack(alignment: .leading, spacing: 10) {
+                                    ForEach(subjects) { subject in
+                                        SubjectSearchRemoteRow(subject: subject)
+                                            .onAppear {
+                                                checkSearchNextPage(current: subject)
+                                            }
+                                    }
+                                }
+                            }.padding(.horizontal, 16)
                         }
                     }
-                    .padding(.horizontal, 16)
                 }
                 Spacer()
             } else {

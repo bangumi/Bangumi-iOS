@@ -21,10 +21,11 @@ struct SubjectSearchRemoteRow: View {
                 .shadow(color: .accent, radius: 1, x: 1, y: 1)
             HStack {
                 CachedAsyncImage(url: iconURL) { image in
-                    image.resizable().scaledToFill().frame(width: 64, height: 64).clipped()
+                    image.resizable().scaledToFill().frame(width: 60, height: 60).clipped()
                 } placeholder: {
-                    Image(systemName: "photo").frame(width: 64, height: 64)
+                    Image(systemName: "photo").frame(width: 60, height: 60)
                 }
+                .clipShape(RoundedRectangle(cornerRadius: 10))
                 VStack(alignment: .leading) {
                     let score = String(format: "%.1f", subject.score)
                     Text(subject.name).font(.headline)
@@ -47,8 +48,9 @@ struct SubjectSearchRemoteRow: View {
                 }
                 Spacer()
             }
+            .frame(height: 60)
+            .padding(2)
+            .clipShape(RoundedRectangle(cornerRadius: 10))
         }
-        .frame(height: 64)
-        .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 }
