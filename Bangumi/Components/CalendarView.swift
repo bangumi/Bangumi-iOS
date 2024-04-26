@@ -41,11 +41,11 @@ struct CalendarView: View {
                 }
             }
         }.refreshable {
-            Task {
+            Task.detached {
                 do {
                     try await chiiClient.updateCalendar()
                 } catch {
-                    errorHandling.handle(message: "\(error)")
+                    await errorHandling.handle(message: "\(error)")
                 }
             }
         }
