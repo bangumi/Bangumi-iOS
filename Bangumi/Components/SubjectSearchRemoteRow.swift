@@ -11,6 +11,41 @@ struct SubjectSearchRemoteRow: View {
     var subject: SearchSubject
 
     var body: some View {
-        Text("Hello, World!")
+        let iconURL = URL(string: subject.image)
+        ZStack {
+            Rectangle()
+                .fill(.accent)
+                .opacity(0.01)
+                .frame(height: 64)
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+                .shadow(color: .accent, radius: 1, x: 1, y: 1)
+            HStack {
+                CachedAsyncImage(url: iconURL) { image in
+                    image.resizable().scaledToFill().frame(width: 64, height: 64).clipped()
+                } placeholder: {
+                    Rectangle().fill(.accent.opacity(0.1)).frame(width: 64, height: 64)
+                }
+                VStack(alignment: .leading) {
+                    let score = String(format: "%.1f", subject.score)
+                    Text(subject.name).font(.headline)
+                    Text(subject.nameCn).font(.subheadline).foregroundStyle(.gray)
+                    HStack {
+                        if let type = subject.type {
+                            Label(type.description, systemImage: type.icon).foregroundStyle(.accent)
+                        }
+                        if subject.rank > 0 {
+                            Label("\(subject.rank)", systemImage: "chart.bar.xaxis").foregroundStyle(.accent)
+                        }
+                        Spacer()
+                        if subject.score > 0 {
+                            Label("\(score)", systemImage: "star").foregroundStyle(.gray)
+                        }
+                    }.font(.caption)
+                }
+                Spacer()
+            }
+        }
+        .frame(height: 64)
+        .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 }

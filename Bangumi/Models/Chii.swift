@@ -170,13 +170,13 @@ enum SubjectType: UInt8, Codable, Identifiable {
         case .book:
             return "book"
         case .anime:
-            return "film"
+            return "photo.stack"
         case .music:
-            return "music"
+            return "music.note.list"
         case .game:
             return "gamecontroller"
         case .real:
-            return "photo"
+            return "film"
         }
     }
 }
@@ -243,7 +243,7 @@ struct SlimSubject: Codable {
     var tags: [Tag]
 }
 
-struct SearchSubject: Codable {
+struct SearchSubject: Codable, Identifiable {
     var id: UInt
     var type: SubjectType?
     var date: String

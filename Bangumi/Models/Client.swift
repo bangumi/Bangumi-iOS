@@ -85,7 +85,7 @@ class ChiiClient: ObservableObject, Observable {
         return data
     }
 
-    func post(url: URL, body: Data) async throws -> Data {
+    func post(url: URL, body: Any) async throws -> Data {
         try await self.checkRefreshAccessToken()
         var request = URLRequest(url: url)
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -170,5 +170,28 @@ class ChiiClient: ObservableObject, Observable {
                 }
             }
         }
+    }
+
+    func search(keyword: String, type: SubjectType = .unknown, offset: UInt = 0, limit: UInt = 10) async throws -> SubjectSearchResponse {
+        let queries: [URLQueryItem] = [
+            URLQueryItem(name: "limit", value: String(limit)),
+            URLQueryItem(name: "offset", value: String(offset))
+        ]
+        let url = self.apiBase.appendingPathComponent("v0/search/subjects").appending(queryItems: queries)
+        var body: [String: Any] = [
+            "keyword": keyword
+        ]
+        if type != .unknown {
+            body["filter"] = [
+                "type": [type.rawValue]
+            ]
+        }
+        guard let data = try? await self.post(url: url, body: body) else {
+            throw ChiiError(message: "failed to search")
+        }
+        let decoder = JSONDecoder()
+        decoder.keyDecodingStrategy = .convertFromSnakeCase
+        let resp = try decoder.decode(SubjectSearchResponse.self, from: data)
+        return resp
     }
 }

@@ -10,11 +10,17 @@ import SwiftUI
 
 struct DiscoverView: View {
     @EnvironmentObject var chiiClient: ChiiClient
+    @EnvironmentObject var errorHandling: ErrorHandling
 
     @State private var searching = false
     @State private var query = ""
     @State private var local = true
     @State private var subjectType: SubjectType = .unknown
+
+    @State private var offset: UInt = 0
+    @State private var total: UInt = 0
+    @State private var subjects: [SearchSubject] = []
+
     @Query private var collections: [UserSubjectCollection]
 
     var filteredCollections: [UserSubjectCollection] {
@@ -34,6 +40,51 @@ struct DiscoverView: View {
         return Array(filtered.prefix(10))
     }
 
+    func newSearch() {
+        offset = 0
+        total = 0
+        local = false
+        Task.detached {
+            guard let resp = try? await chiiClient.search(
+                keyword: query, type: subjectType, offset: offset)
+            else {
+                await errorHandling.handle(message: "failed to search")
+                return
+            }
+            await MainActor.run {
+                withAnimation {
+                    total = resp.total
+                    subjects = resp.data
+                }
+            }
+        }
+    }
+
+    func checkSearchNextPage(current: SearchSubject) {
+        if offset + 10 > total {
+            return
+        }
+        let thresholdIndex = subjects.index(subjects.endIndex, offsetBy: -2)
+        let currentIndex = subjects.firstIndex(where: { $0.id == current.id })
+        if currentIndex != thresholdIndex {
+            return
+        }
+        offset += 10
+        Task.detached {
+            guard let resp = try? await chiiClient.search(
+                keyword: query, type: subjectType, offset: offset)
+            else {
+                await errorHandling.handle(message: "failed to search")
+                return
+            }
+            await MainActor.run {
+                withAnimation {
+                    subjects.append(contentsOf: resp.data)
+                }
+            }
+        }
+    }
+
     var body: some View {
         NavigationStack {
             if searching {
@@ -43,10 +94,19 @@ struct DiscoverView: View {
                         Text(type.description).tag(type)
                     }
                 }
+                .onChange(of: subjectType) { _, _ in
+                    if local {
+                        return
+                    }
+                    if query.isEmpty {
+                        return
+                    }
+                    offset = 0
+                    newSearch()
+                }
                 .pickerStyle(.segmented)
                 .padding(.horizontal, 16)
                 if query.isEmpty {
-                    // TODO:
                     EmptyView()
                 } else {
                     ScrollView {
@@ -58,8 +118,12 @@ struct DiscoverView: View {
                                     }
                                 }
                             } else {
-                                // TODO:
-                                EmptyView()
+                                ForEach(subjects) { subject in
+                                    SubjectSearchRemoteRow(subject: subject)
+                                        .onAppear {
+                                            checkSearchNextPage(current: subject)
+                                        }
+                                }
                             }
                         }
                     }
@@ -74,8 +138,6 @@ struct DiscoverView: View {
         .onChange(of: query) { _, _ in
             local = true
         }
-        .onSubmit(of: .search) {
-            local = false
-        }
+        .onSubmit(of: .search, newSearch)
     }
 }
