@@ -44,6 +44,7 @@ struct DiscoverView: View {
         offset = 0
         total = 0
         local = false
+        subjects = []
         Task.detached {
             guard let resp = try? await chiiClient.search(
                 keyword: query, type: subjectType, offset: offset)
@@ -137,6 +138,7 @@ struct DiscoverView: View {
         .searchable(text: $query, isPresented: $searching)
         .onChange(of: query) { _, _ in
             local = true
+            subjects = []
         }
         .onSubmit(of: .search, newSearch)
     }
