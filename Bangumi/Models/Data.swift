@@ -183,9 +183,9 @@ final class BangumiCalendar: Codable {
     var id: UInt
 
     var weekday: Weekday
-    var items: [SubjectSmall]
+    var items: [SmallSubject]
 
-    init(weekday: Weekday, items: [SubjectSmall]) {
+    init(weekday: Weekday, items: [SmallSubject]) {
         self.id = weekday.id
         self.weekday = weekday
         self.items = items
@@ -196,7 +196,7 @@ final class BangumiCalendar: Codable {
         let weekday = try container.decode(Weekday.self, forKey: .weekday)
         self.id = weekday.id
         self.weekday = weekday
-        self.items = try container.decode([SubjectSmall].self, forKey: .items)
+        self.items = try container.decode([SmallSubject].self, forKey: .items)
     }
 
     func encode(to encoder: Encoder) throws {
