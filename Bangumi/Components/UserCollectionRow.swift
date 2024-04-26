@@ -35,7 +35,7 @@ struct UserCollectionRow: View {
                     CachedAsyncImage(url: iconURL) { image in
                         image.resizable().scaledToFill().frame(width: 60, height: 60).clipped()
                     } placeholder: {
-                        Rectangle().fill(.accent.opacity(0.1)).frame(width: 60, height: 60)
+                        Image(systemName: "photo").frame(width: 60, height: 60)
                     }
                     .clipShape(RoundedRectangle(cornerRadius: 10))
                     VStack(alignment: .leading) {

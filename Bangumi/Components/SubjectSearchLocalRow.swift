@@ -23,7 +23,7 @@ struct SubjectSearchLocalRow: View {
                 CachedAsyncImage(url: iconURL) { image in
                     image.resizable().scaledToFill().frame(width: 64, height: 64).clipped()
                 } placeholder: {
-                    Rectangle().fill(.accent.opacity(0.1)).frame(width: 64, height: 64)
+                    Image(systemName: "photo").frame(width: 64, height: 64)
                 }
                 VStack(alignment: .leading) {
                     let score = String(format: "%.1f", subject.score)
