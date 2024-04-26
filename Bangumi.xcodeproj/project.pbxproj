@@ -10,6 +10,7 @@
 		191A3E592BDB527200AD4B71 /* SubjectSearchRemoteRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 191A3E582BDB527200AD4B71 /* SubjectSearchRemoteRow.swift */; };
 		191FEF192BDB64740047162A /* CalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 191FEF182BDB64740047162A /* CalendarView.swift */; };
 		191FEF1B2BDBDD130047162A /* ImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 191FEF1A2BDBDD130047162A /* ImageView.swift */; };
+		191FEF1E2BDBE3FA0047162A /* CachedAsyncImage in Frameworks */ = {isa = PBXBuildFile; productRef = 191FEF1D2BDBE3FA0047162A /* CachedAsyncImage */; };
 		19A03A452BD24BA800BC5E53 /* ProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19A03A442BD24BA800BC5E53 /* ProgressView.swift */; };
 		19A03A472BD24F9700BC5E53 /* DiscoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19A03A462BD24F9700BC5E53 /* DiscoverView.swift */; };
 		19A03A4B2BD274EF00BC5E53 /* TimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19A03A4A2BD274EF00BC5E53 /* TimelineView.swift */; };
@@ -17,7 +18,6 @@
 		19A03A512BD49A5F00BC5E53 /* Chii.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19A03A502BD49A5F00BC5E53 /* Chii.swift */; };
 		19A03A532BD49AF600BC5E53 /* Client.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19A03A522BD49AF600BC5E53 /* Client.swift */; };
 		19A03A562BD4BBF700BC5E53 /* UserCollectionRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19A03A552BD4BBF700BC5E53 /* UserCollectionRow.swift */; };
-		19A03A602BD5042B00BC5E53 /* CachedAsyncImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19A03A5F2BD5042B00BC5E53 /* CachedAsyncImage.swift */; };
 		19A03A622BD528F900BC5E53 /* CollectionDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19A03A612BD528F900BC5E53 /* CollectionDetailView.swift */; };
 		19BB342F2BD239AB00E5C295 /* BangumiApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19BB342E2BD239AB00E5C295 /* BangumiApp.swift */; };
 		19BB34312BD239AB00E5C295 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19BB34302BD239AB00E5C295 /* ContentView.swift */; };
@@ -40,7 +40,6 @@
 		19A03A502BD49A5F00BC5E53 /* Chii.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Chii.swift; sourceTree = "<group>"; };
 		19A03A522BD49AF600BC5E53 /* Client.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Client.swift; sourceTree = "<group>"; };
 		19A03A552BD4BBF700BC5E53 /* UserCollectionRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserCollectionRow.swift; sourceTree = "<group>"; };
-		19A03A5F2BD5042B00BC5E53 /* CachedAsyncImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CachedAsyncImage.swift; sourceTree = "<group>"; };
 		19A03A612BD528F900BC5E53 /* CollectionDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionDetailView.swift; sourceTree = "<group>"; };
 		19BB342B2BD239AB00E5C295 /* Bangumi.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Bangumi.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		19BB342E2BD239AB00E5C295 /* BangumiApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BangumiApp.swift; sourceTree = "<group>"; };
@@ -56,6 +55,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				191FEF1E2BDBE3FA0047162A /* CachedAsyncImage in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -88,7 +88,6 @@
 			isa = PBXGroup;
 			children = (
 				19A03A552BD4BBF700BC5E53 /* UserCollectionRow.swift */,
-				19A03A5F2BD5042B00BC5E53 /* CachedAsyncImage.swift */,
 				19A03A612BD528F900BC5E53 /* CollectionDetailView.swift */,
 				191A3E582BDB527200AD4B71 /* SubjectSearchRemoteRow.swift */,
 				19BE3F822BD956F100F32F29 /* SubjectSearchLocalRow.swift */,
@@ -154,6 +153,7 @@
 			);
 			name = Bangumi;
 			packageProductDependencies = (
+				191FEF1D2BDBE3FA0047162A /* CachedAsyncImage */,
 			);
 			productName = Bangumi;
 			productReference = 19BB342B2BD239AB00E5C295 /* Bangumi.app */;
@@ -184,6 +184,7 @@
 			);
 			mainGroup = 19BB34222BD239AB00E5C295;
 			packageReferences = (
+				191FEF1C2BDBE3FA0047162A /* XCRemoteSwiftPackageReference "CachedAsyncImage" */,
 			);
 			productRefGroup = 19BB342C2BD239AB00E5C295 /* Products */;
 			projectDirPath = "";
@@ -221,7 +222,6 @@
 				19BB34332BD239AB00E5C295 /* Data.swift in Sources */,
 				191FEF1B2BDBDD130047162A /* ImageView.swift in Sources */,
 				191FEF192BDB64740047162A /* CalendarView.swift in Sources */,
-				19A03A602BD5042B00BC5E53 /* CachedAsyncImage.swift in Sources */,
 				19BB342F2BD239AB00E5C295 /* BangumiApp.swift in Sources */,
 				19A03A4D2BD2A9BE00BC5E53 /* AuthView.swift in Sources */,
 				19A03A472BD24F9700BC5E53 /* DiscoverView.swift in Sources */,
@@ -442,6 +442,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		191FEF1C2BDBE3FA0047162A /* XCRemoteSwiftPackageReference "CachedAsyncImage" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/bullinnyc/CachedAsyncImage";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.6.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		191FEF1D2BDBE3FA0047162A /* CachedAsyncImage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 191FEF1C2BDBE3FA0047162A /* XCRemoteSwiftPackageReference "CachedAsyncImage" */;
+			productName = CachedAsyncImage;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 19BB34232BD239AB00E5C295 /* Project object */;
 }
