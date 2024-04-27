@@ -33,29 +33,29 @@ struct UserCollectionRow: View {
           ImageView(img: subject.images.common, size: 60)
           VStack(alignment: .leading) {
             Text(subject.name).font(.headline)
-            Text(subject.nameCn).font(.subheadline).foregroundStyle(.gray)
+            Text(subject.nameCn).font(.subheadline).foregroundStyle(.secondary)
             switch collection.subjectType {
             case .anime:
               HStack {
-                Text(collection.updatedAt.formatted()).foregroundStyle(.gray)
+                Text(collection.updatedAt.formatted()).foregroundStyle(.secondary)
                 Spacer()
                 Text(chapters).foregroundStyle(.accent)
               }.font(.caption)
             case .book:
               HStack {
-                Text(collection.updatedAt.formatted()).foregroundStyle(.gray)
+                Text(collection.updatedAt.formatted()).foregroundStyle(.secondary)
                 Spacer()
                 Text("\(chapters)  \(volumes)").foregroundStyle(.accent)
               }.font(.caption)
             case .real:
               HStack {
-                Text(collection.updatedAt.formatted()).foregroundStyle(.gray)
+                Text(collection.updatedAt.formatted()).foregroundStyle(.secondary)
                 Spacer()
                 Text(chapters).foregroundStyle(.accent)
               }.font(.caption)
             default:
               HStack {
-                Text(collection.updatedAt.formatted()).foregroundStyle(.gray)
+                Text(collection.updatedAt.formatted()).foregroundStyle(.secondary)
                 Spacer()
               }.font(.caption)
             }

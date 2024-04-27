@@ -49,6 +49,7 @@ struct SubjectView: View {
           SubjectHeaderView(subject: subject)
           SubjectCollectionView(subject: subject)
           SubjectSummaryView(subject: subject)
+          SubjectTagView(subject: subject)
           Spacer()
         }
       }
@@ -74,13 +75,13 @@ struct SubjectHeaderView: View {
         HStack {
           Label(subject.type.description, systemImage: subject.type.icon).foregroundStyle(.accent)
           if let date = subject.date {
-            Label(date, systemImage: "calendar").foregroundStyle(.gray)
+            Label(date, systemImage: "calendar").foregroundStyle(.secondary)
           }
           Spacer()
         }.font(.caption)
         Text(subject.nameCn)
           .font(.caption)
-          .foregroundStyle(.gray)
+          .foregroundStyle(.secondary)
           .multilineTextAlignment(.leading)
           .lineLimit(2)
         Text(subject.name)
@@ -88,7 +89,7 @@ struct SubjectHeaderView: View {
           .multilineTextAlignment(.leading)
           .lineLimit(2)
         HStack {
-          Text("\(subject.rating.total) 人收藏").foregroundStyle(.gray)
+          Text("\(subject.rating.total) 人收藏").foregroundStyle(.secondary)
           if subject.rating.rank > 0 {
             Label("\(subject.rating.rank)", systemImage: "chart.bar.xaxis").foregroundStyle(.accent)
           }
@@ -126,19 +127,53 @@ struct SubjectSummaryView: View {
         .font(.caption)
         .multilineTextAlignment(.leading)
         .lineLimit(collapsed ? 5 : nil)
-        .onTapGesture {
+      HStack {
+        Spacer()
+        Button {
           withAnimation {
             collapsed.toggle()
           }
+        } label: {
+          if collapsed {
+            Text("more")
+          } else {
+            Text("close")
+          }
         }
-      HStack {
-        Spacer()
-        if collapsed {
-          Text("展开")
-        } else {
-          Text("收起")
+        .buttonStyle(PlainButtonStyle())
+        .font(.caption)
+        .foregroundStyle(.accent)
+      }
+    }.padding(.vertical, 10)
+  }
+}
+
+struct SubjectTagView: View {
+  var subject: Subject
+
+  var body: some View {
+    VStack(alignment: .leading) {
+      Text("标签").font(.headline)
+      FlowStack {
+        ForEach(subject.tags, id: \.name) { tag in
+          HStack {
+            Text(tag.name)
+              .font(.caption)
+              .foregroundColor(.accent)
+            Text("\(tag.count)")
+              .font(.caption2)
+              .foregroundColor(.secondary)
+          }
+          .padding(.horizontal, 6)
+          .padding(.vertical, 4)
+          .overlay {
+            RoundedRectangle(cornerRadius: 4)
+              .stroke(Color.secondary, lineWidth: 1)
+              .padding(.horizontal, 2)
+              .padding(.vertical, 2)
+          }
         }
-      }.font(.caption).foregroundStyle(.accent)
+      }
     }.padding(.vertical, 10)
   }
 }

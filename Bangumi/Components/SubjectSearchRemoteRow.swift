@@ -23,20 +23,20 @@ struct SubjectSearchRemoteRow: View {
         VStack(alignment: .leading) {
           let score = String(format: "%.1f", subject.score)
           Text(subject.name).font(.headline)
-          Text(subject.nameCn).font(.subheadline).foregroundStyle(.gray)
+          Text(subject.nameCn).font(.subheadline).foregroundStyle(.secondary)
           HStack {
             if let type = subject.type {
               Label(type.description, systemImage: type.icon).foregroundStyle(.accent)
             }
             if !subject.date.isEmpty {
-              Label(subject.date, systemImage: "calendar").foregroundStyle(.gray)
+              Label(subject.date, systemImage: "calendar").foregroundStyle(.secondary)
             }
             Spacer()
             if subject.rank > 0 {
               Label("\(subject.rank)", systemImage: "chart.bar.xaxis").foregroundStyle(.accent)
             }
             if subject.score > 0 {
-              Label("\(score)", systemImage: "star").foregroundStyle(.gray)
+              Label("\(score)", systemImage: "star").foregroundStyle(.secondary)
             }
           }.font(.caption)
         }
