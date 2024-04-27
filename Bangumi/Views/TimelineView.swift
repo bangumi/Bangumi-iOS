@@ -9,19 +9,23 @@ import SwiftData
 import SwiftUI
 
 struct TimelineView: View {
-  @EnvironmentObject var chiiClient: ChiiClient
   @EnvironmentObject var errorHandling: ErrorHandling
+  @EnvironmentObject var chiiClient: ChiiClient
+  @EnvironmentObject var navState: NavState
+
   @Query private var profiles: [Profile]
   private var profile: Profile? { profiles.first }
 
   var body: some View {
-    switch profile {
-    case .some(let me):
-      Text("Hello, " + me.nickname)
-    case .none:
-      Text("Refreshing profile...").onAppear {
-        Task.detached {
-          try await chiiClient.updateProfile()
+    NavigationStack(path: $navState.timelineNavigation) {
+      switch profile {
+      case .some(let me):
+        Text("Hello, " + me.nickname)
+      case .none:
+        Text("Refreshing profile...").onAppear {
+          Task.detached {
+            try await chiiClient.updateProfile()
+          }
         }
       }
     }

@@ -73,9 +73,9 @@
 			children = (
 				19A03A4C2BD2A9BE00BC5E53 /* AuthView.swift */,
 				19BB34302BD239AB00E5C295 /* ContentView.swift */,
-				19A03A462BD24F9700BC5E53 /* DiscoverView.swift */,
 				19A03A4A2BD274EF00BC5E53 /* TimelineView.swift */,
 				19A03A442BD24BA800BC5E53 /* ProgressView.swift */,
+				19A03A462BD24F9700BC5E53 /* DiscoverView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";

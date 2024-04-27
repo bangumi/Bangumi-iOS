@@ -9,8 +9,9 @@ import SwiftData
 import SwiftUI
 
 struct DiscoverView: View {
-  @EnvironmentObject var chiiClient: ChiiClient
   @EnvironmentObject var errorHandling: ErrorHandling
+  @EnvironmentObject var chiiClient: ChiiClient
+  @EnvironmentObject var navState: NavState
 
   @State private var searching = false
   @State private var query = ""
@@ -88,7 +89,7 @@ struct DiscoverView: View {
   }
 
   var body: some View {
-    NavigationStack {
+    NavigationStack(path: $navState.discoverNavigation) {
       if searching {
         Picker("Subject Type", selection: $subjectType) {
           Text("全部").tag(SubjectType.unknown)
@@ -127,7 +128,8 @@ struct DiscoverView: View {
                 Spacer()
                 Image(systemName: "waveform")
                   .resizable()
-                  .frame(width: 100, height: 100)
+                  .scaledToFit()
+                  .frame(width: 80, height: 80)
                 Spacer()
               }
               .symbolEffect(.variableColor.iterative.dimInactiveLayers)
@@ -156,5 +158,9 @@ struct DiscoverView: View {
       subjects = []
     }
     .onSubmit(of: .search, newSearch)
+    .onOpenURL(perform: { url in
+      // TODO: handle urls
+      print(url)
+    })
   }
 }

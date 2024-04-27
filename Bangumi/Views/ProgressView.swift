@@ -9,9 +9,9 @@ import SwiftData
 import SwiftUI
 
 struct ProgressView: View {
-  @EnvironmentObject var chiiClient: ChiiClient
   @EnvironmentObject var errorHandling: ErrorHandling
-  @Environment(\.modelContext) private var modelContext
+  @EnvironmentObject var chiiClient: ChiiClient
+  @EnvironmentObject var navState: NavState
 
   @Query private var profiles: [Profile]
   @Query(sort: \UserSubjectCollection.updatedAt, order: .reverse) private var collections: [UserSubjectCollection]
@@ -41,38 +41,44 @@ struct ProgressView: View {
   }
 
   var body: some View {
-    switch profile {
-    case .some(let me):
-      if collections.isEmpty {
-        VStack {
-          Text("Updating collections...")
-        }
-        .onAppear {
-          updateCollections(profile: me, type: nil)
-        }
-      } else {
-        VStack {
-          Picker("Subject Type", selection: $subjectType) {
-            ForEach(SubjectType.progressTypes()) { type in
-              Text(type.description)
-            }
-          }.pickerStyle(.segmented)
-          ScrollView {
-            LazyVStack(alignment: .leading, spacing: 10) {
-              let filtered = collections.filter { $0.subjectType == subjectType }
-              ForEach(filtered) { collection in
-                NavigationLink(destination: SubjectView(sid: collection.subjectId)) {
-                  UserCollectionRow(collection: collection)
-                }.buttonStyle(PlainButtonStyle())
+    NavigationStack(path: $navState.progressNavigation) {
+      switch profile {
+      case .some(let me):
+        if collections.isEmpty {
+          VStack {
+            Text("Updating collections...")
+          }
+          .onAppear {
+            updateCollections(profile: me, type: nil)
+          }
+        } else {
+          VStack {
+            Picker("Subject Type", selection: $subjectType) {
+              ForEach(SubjectType.progressTypes()) { type in
+                Text(type.description)
+              }
+            }.pickerStyle(.segmented)
+            ScrollView {
+              LazyVStack(alignment: .leading, spacing: 10) {
+                let filtered = collections.filter { $0.subjectType == subjectType }
+                ForEach(filtered) { collection in
+                  NavigationLink(value: collection) {
+                    UserCollectionRow(collection: collection)
+                  }.buttonStyle(PlainButtonStyle())
+                }
               }
             }
-          }.refreshable {
-            updateCollections(profile: me, type: subjectType)
-          }
-        }.padding()
+            .navigationDestination(for: UserSubjectCollection.self) { collection in
+              SubjectView(sid: collection.subjectId)
+            }
+            .refreshable {
+              updateCollections(profile: me, type: subjectType)
+            }
+          }.padding()
+        }
+      case .none:
+        Text("Refreshing profile...").onAppear(perform: updateProfile)
       }
-    case .none:
-      Text("Refreshing profile...").onAppear(perform: updateProfile)
     }
   }
 }

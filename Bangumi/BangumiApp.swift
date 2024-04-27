@@ -25,22 +25,18 @@ struct BangumiApp: App {
 
   var body: some Scene {
     WindowGroup {
-      NavigationStack {
-        ContentView().onOpenURL(perform: { url in
-          // TODO: handle urls
-          print(url)
-        }).environmentObject(errorHandling)
-          .alert("Error", isPresented: $errorHandling.showAlert) {
-            Button("OK") {
-              errorHandling.currentAlert = nil
-              errorHandling.showAlert = false
-            }
-          } message: {
-            Text(errorHandling.currentAlert?.message ?? "")
+      ContentView()
+        .environmentObject(errorHandling)
+        .alert("Error", isPresented: $errorHandling.showAlert) {
+          Button("OK") {
+            errorHandling.currentAlert = nil
+            errorHandling.showAlert = false
           }
-      }
-      .modelContainer(sharedModelContainer)
+        } message: {
+          Text(errorHandling.currentAlert?.message ?? "")
+        }
     }
+    .modelContainer(sharedModelContainer)
   }
 }
 
