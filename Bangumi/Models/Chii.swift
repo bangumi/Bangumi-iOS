@@ -5,12 +5,45 @@
 //  Created by Chuan Chuan on 2024/4/21.
 //
 
+import Foundation
+
 struct ChiiError: Error {
   var message: String
 
   init(message: String) {
     self.message = message
   }
+}
+
+struct AppInfo: Codable {
+  var clientId: String
+  var clientSecret: String
+  var callbackURL: String
+}
+
+struct Auth: Codable {
+  var accessToken: String
+  var expiresAt: Date
+  var refreshToken: String
+
+  init(response: TokenResponse) {
+    self.accessToken = response.accessToken
+    self.expiresAt = Date().addingTimeInterval(TimeInterval(response.expiresIn))
+    self.refreshToken = response.refreshToken
+  }
+
+  func isExpired() -> Bool {
+    return Date() > expiresAt
+  }
+}
+
+struct Profile: Codable {
+  var id: UInt
+  var username: String
+  var nickname: String
+  var userGroup: UInt
+  var avatar: Avatar
+  var sign: String
 }
 
 struct SlimSubject: Codable, Identifiable {

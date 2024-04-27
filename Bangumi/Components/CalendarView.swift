@@ -44,7 +44,14 @@ struct CalendarView: View {
     }.refreshable {
       Task.detached {
         do {
-          try await chiiClient.updateCalendar()
+          let cals = try await chiiClient.getCalendar()
+          await MainActor.run {
+            withAnimation {
+              for cal in cals {
+                modelContext.insert(cal)
+              }
+            }
+          }
         } catch {
           await errorHandling.handle(message: "\(error)")
         }

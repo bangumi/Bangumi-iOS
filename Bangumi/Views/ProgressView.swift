@@ -12,28 +12,35 @@ struct ProgressView: View {
   @EnvironmentObject var errorHandling: ErrorHandling
   @EnvironmentObject var chiiClient: ChiiClient
   @EnvironmentObject var navState: NavState
+  @Environment(\.modelContext) private var modelContext
 
-  @Query private var profiles: [Profile]
   @Query(sort: \UserSubjectCollection.updatedAt, order: .reverse) private var collections: [UserSubjectCollection]
-
-  private var profile: Profile? { profiles.first }
 
   @State private var subjectType = SubjectType.anime
 
-  func updateCollections(profile: Profile, type: SubjectType?) {
+  func updateCollections(type: SubjectType?) {
     Task.detached(priority: .background) {
       do {
-        try await chiiClient.updateCollections(profile: profile, subjectType: type)
-      } catch {
-        await errorHandling.handle(message: "\(error)")
-      }
-    }
-  }
+        var offset: UInt = 0
+        let limit: UInt = 100
+        while true {
+          let response = try await chiiClient.getCollections(subjectType: type, limit: limit, offset: offset)
+          if response.data.isEmpty {
+            break
+          }
+          await MainActor.run {
+            withAnimation {
+              for collect in response.data {
+                modelContext.insert(collect)
+              }
+            }
+          }
+          offset += 100
+          if offset > response.total {
+            break
+          }
+        }
 
-  func updateProfile() {
-    Task.detached {
-      do {
-        try await chiiClient.updateProfile()
       } catch {
         await errorHandling.handle(message: "\(error)")
       }
@@ -41,15 +48,14 @@ struct ProgressView: View {
   }
 
   var body: some View {
-    NavigationStack(path: $navState.progressNavigation) {
-      switch profile {
-      case .some(let me):
+    if chiiClient.isAuthenticated {
+      NavigationStack(path: $navState.progressNavigation) {
         if collections.isEmpty {
           VStack {
             Text("Updating collections...")
           }
           .onAppear {
-            updateCollections(profile: me, type: nil)
+            updateCollections(type: nil)
           }
         } else {
           VStack {
@@ -72,13 +78,13 @@ struct ProgressView: View {
               SubjectView(sid: collection.subjectId)
             }
             .refreshable {
-              updateCollections(profile: me, type: subjectType)
+              updateCollections(type: subjectType)
             }
           }.padding()
         }
-      case .none:
-        Text("Refreshing profile...").onAppear(perform: updateProfile)
       }
+    } else {
+      AuthView()
     }
   }
 }

@@ -11,7 +11,7 @@ import SwiftUI
 @main
 struct BangumiApp: App {
   var sharedModelContainer: ModelContainer = {
-    let schema = Schema([Auth.self, Profile.self, UserSubjectCollection.self, BangumiCalendar.self])
+    let schema = Schema([UserSubjectCollection.self, BangumiCalendar.self])
     let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
     do {
@@ -22,11 +22,13 @@ struct BangumiApp: App {
   }()
 
   @StateObject var errorHandling = ErrorHandling()
+  @StateObject var chiiClient = ChiiClient()
 
   var body: some Scene {
     WindowGroup {
       ContentView()
         .environmentObject(errorHandling)
+        .environment(chiiClient)
         .alert("Error", isPresented: $errorHandling.showAlert) {
           Button("OK") {
             errorHandling.currentAlert = nil

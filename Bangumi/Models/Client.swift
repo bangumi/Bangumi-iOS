@@ -6,74 +6,52 @@
 //
 
 import Foundation
+import KeychainSwift
 import SwiftData
 import SwiftUI
 
 class ChiiClient: ObservableObject, Observable {
-  let errorHandling: ErrorHandling
-  let modelContext: ModelContext
-  let auth: Auth
+  let keychain: KeychainSwift
+  let appInfo: AppInfo
 
   let apiBase = URL(string: "https://api.bgm.tv")!
   let userAgent = "everpcpc/Bangumi/0.0.1 (iOS)"
-  var session: URLSession
 
-  init(errorHandling: ErrorHandling, modelContext: ModelContext, auth: Auth) {
-    self.errorHandling = errorHandling
-    self.modelContext = modelContext
-    self.auth = auth
+  var auth: Auth?
+  var profile: Profile?
 
-    let sessionConfig = URLSessionConfiguration.default
-    sessionConfig.httpAdditionalHeaders = [
-      "User-Agent": self.userAgent,
-      "Authorization": "Bearer \(auth.accessToken)"
+  @Published var isAuthenticated: Bool = false
+
+  var oauthURL: URL {
+    let baseURL = URL(string: "https://bgm.tv/oauth/authorize")!
+    let queries = [
+      URLQueryItem(name: "client_id", value: self.appInfo.clientId),
+      URLQueryItem(name: "response_type", value: "code"),
+      URLQueryItem(name: "redirect_uri", value: self.appInfo.callbackURL)
     ]
-    self.session = URLSession(configuration: sessionConfig)
+    return baseURL.appending(queryItems: queries)
   }
 
-  func checkRefreshAccessToken() async throws {
-    if !self.auth.isExpired() {
-      return
-    }
+  init() {
+    self.keychain = KeychainSwift(keyPrefix: "com.everpcpc.bangumi.")
     guard let plist = Bundle.main.infoDictionary else {
-      throw ChiiError(message: "Could not find Info.plist")
+      fatalError("Could not find Info.plist")
     }
-    guard let clientID = plist["BANGUMI_APP_ID"] as? String else {
-      throw ChiiError(message: "Could not find BANGUMI_APP_ID in Info.plist")
+    guard let clientId = plist["BANGUMI_APP_ID"] as? String else {
+      fatalError("Could not find BANGUMI_APP_ID in Info.plist")
     }
     guard let clientSecret = plist["BANGUMI_APP_SECRET"] as? String else {
-      throw ChiiError(message: "Could not find BANGUMI_APP_SECRET in Info.plist")
+      fatalError("Could not find BANGUMI_APP_SECRET in Info.plist")
     }
-    var request = URLRequest(url: URL(string: "https://bgm.tv/oauth/access_token")!)
-    request.httpMethod = "POST"
-    let body = [
-      "grant_type": "refresh_token",
-      "client_id": clientID,
-      "client_secret": clientSecret,
-      "refresh_token": self.auth.refreshToken,
-      "redirect_uri": "bangumi://oauth/callback"
-    ]
-    let bodyData = try? JSONSerialization.data(withJSONObject: body)
-    request.httpBody = bodyData
-    let (data, response) = try await URLSession.shared.data(for: request)
-    guard let response = response as? HTTPURLResponse, response.statusCode == 200 else {
-      let resp = String(data: data, encoding: .utf8) ?? ""
-      throw ChiiError(message: "failed to refresh access token \(resp)")
-    }
-    let decoder = JSONDecoder()
-    decoder.keyDecodingStrategy = .convertFromSnakeCase
-    let resp = try decoder.decode(TokenResponse.self, from: data)
-    self.auth.update(response: resp)
-    let sessionConfig = URLSessionConfiguration.default
-    sessionConfig.httpAdditionalHeaders = [
-      "User-Agent": self.userAgent,
-      "Authorization": "Bearer \(self.auth.accessToken)"
-    ]
-    self.session = URLSession(configuration: sessionConfig)
+    self.appInfo = AppInfo(
+      clientId: clientId,
+      clientSecret: clientSecret,
+      callbackURL: "bangumi://oauth/callback"
+    )
   }
 
-  func request(url: URL, method: String, body: Any? = nil) async throws -> Data {
-    try await self.checkRefreshAccessToken()
+  func request(url: URL, method: String, body: Any? = nil, authorized: Bool = true) async throws -> Data {
+    let session = try await self.getSession(authroized: authorized)
     var request = URLRequest(url: url)
     request.addValue("application/json", forHTTPHeaderField: "Content-Type")
     request.httpMethod = method
@@ -89,7 +67,107 @@ class ChiiClient: ObservableObject, Observable {
     return data
   }
 
-  func updateProfile() async throws {
+  func getSession(authroized: Bool) async throws -> URLSession {
+    let sessionConfig = URLSessionConfiguration.default
+    var headers: [AnyHashable: Any] = [:]
+    headers["User-Agent"] = self.userAgent
+    if !authroized {
+      sessionConfig.httpAdditionalHeaders = headers
+      return URLSession(configuration: sessionConfig)
+    }
+    if let auth = self.auth {
+      if auth.isExpired() {
+        let auth = try await self.refreshAccessToken(auth: auth)
+        headers["Authorization"] = "Bearer \(auth.accessToken)"
+      } else {
+        headers["Authorization"] = "Bearer \(auth.accessToken)"
+      }
+    } else {
+      if let auth = try await self.getAuthFromKeychain() {
+        if auth.isExpired() {
+          let auth = try await self.refreshAccessToken(auth: auth)
+          headers["Authorization"] = "Bearer \(auth.accessToken)"
+        } else {
+          headers["Authorization"] = "Bearer \(auth.accessToken)"
+        }
+      } else {
+        throw ChiiError(message: "Please login with Bangumi")
+      }
+    }
+    sessionConfig.httpAdditionalHeaders = headers
+    await MainActor.run {
+      withAnimation {
+        self.isAuthenticated = true
+      }
+    }
+    return URLSession(configuration: sessionConfig)
+  }
+
+  func getAuthFromKeychain() async throws -> Auth? {
+    if let data = self.keychain.getData("auth") {
+      let decoder = JSONDecoder()
+      return try decoder.decode(Auth.self, from: data)
+    }
+    return nil
+  }
+
+  func saveAuthResponse(data: Data) throws -> Auth {
+    let decoder = JSONDecoder()
+    decoder.keyDecodingStrategy = .convertFromSnakeCase
+    let resp = try decoder.decode(TokenResponse.self, from: data)
+    let auth = Auth(response: resp)
+    let encoder = JSONEncoder()
+    let value = try encoder.encode(auth)
+    self.keychain.set(value, forKey: "auth")
+    self.auth = auth
+    return auth
+  }
+
+  func exchangeForAccessToken(code: String) async throws {
+    let url = URL(string: "https://bgm.tv/oauth/access_token")!
+    let body = [
+      "grant_type": "authorization_code",
+      "client_id": self.appInfo.clientId,
+      "client_secret": self.appInfo.clientSecret,
+      "code": code,
+      "redirect_uri": self.appInfo.callbackURL
+    ]
+    guard let data = try? await self.request(url: url, method: "POST", body: body, authorized: false) else {
+      throw ChiiError(message: "failed to get collection")
+    }
+    let _ = try self.saveAuthResponse(data: data)
+    await MainActor.run {
+      withAnimation {
+        self.isAuthenticated = true
+      }
+    }
+  }
+
+  func refreshAccessToken(auth: Auth) async throws -> Auth {
+    let url = URL(string: "https://bgm.tv/oauth/access_token")!
+    let body = [
+      "grant_type": "refresh_token",
+      "client_id": self.appInfo.clientId,
+      "client_secret": self.appInfo.clientSecret,
+      "refresh_token": auth.refreshToken,
+      "redirect_uri": self.appInfo.callbackURL
+    ]
+    guard let data = try? await self.request(url: url, method: "POST", body: body, authorized: false) else {
+      throw ChiiError(message: "failed to get collection")
+    }
+    let auth = try self.saveAuthResponse(data: data)
+    await MainActor.run {
+      withAnimation {
+        self.isAuthenticated = true
+      }
+    }
+    return auth
+  }
+
+  func getProfile() async throws -> Profile {
+    if let profile = self.profile {
+      return profile
+    }
     let url = self.apiBase.appendingPathComponent("v0/me")
     guard let data = try? await request(url: url, method: "GET") else {
       throw ChiiError(message: "failed to get profile")
@@ -97,68 +175,44 @@ class ChiiClient: ObservableObject, Observable {
     let decoder = JSONDecoder()
     decoder.keyDecodingStrategy = .convertFromSnakeCase
     let profile = try decoder.decode(Profile.self, from: data)
-    await MainActor.run {
-      withAnimation {
-        self.modelContext.insert(profile)
-      }
-    }
+    self.profile = profile
+    return profile
   }
 
-  func updateCollections(profile: Profile, subjectType: SubjectType?) async throws {
+  func getCollections(subjectType: SubjectType?, limit: UInt, offset: UInt) async throws -> CollectionResponse {
+    let profile = try await self.getProfile()
     let url = if profile.username.isEmpty {
       self.apiBase.appendingPathComponent("v0/users/\(profile.id)/collections")
     } else {
       self.apiBase.appendingPathComponent("v0/users/\(profile.username)/collections")
     }
-    var offset = 0
-    while true {
-      var queryItems = [
-        URLQueryItem(name: "type", value: "3"),
-        URLQueryItem(name: "limit", value: "100"),
-        URLQueryItem(name: "offset", value: String(offset))
-      ]
-      if let sType = subjectType {
-        queryItems.append(URLQueryItem(name: "subject_type", value: String(sType.rawValue)))
-      }
-      let pageURL = url.appending(queryItems: queryItems)
-      guard let data = try? await request(url: pageURL, method: "GET") else {
-        throw ChiiError(message: "failed to get collections")
-      }
-      let decoder = JSONDecoder()
-      decoder.keyDecodingStrategy = .convertFromSnakeCase
-      let response = try decoder.decode(CollectionResponse.self, from: data)
-      if response.data.isEmpty {
-        break
-      }
-      await MainActor.run {
-        withAnimation {
-          for collect in response.data {
-            self.modelContext.insert(collect)
-          }
-        }
-      }
-      offset += 100
-      if offset > response.total {
-        break
-      }
+    var queryItems = [
+      URLQueryItem(name: "type", value: "3"),
+      URLQueryItem(name: "limit", value: "100"),
+      URLQueryItem(name: "offset", value: String(offset))
+    ]
+    if let sType = subjectType {
+      queryItems.append(URLQueryItem(name: "subject_type", value: String(sType.rawValue)))
     }
+    let pageURL = url.appending(queryItems: queryItems)
+    guard let data = try? await request(url: pageURL, method: "GET") else {
+      throw ChiiError(message: "failed to get collections")
+    }
+    let decoder = JSONDecoder()
+    decoder.keyDecodingStrategy = .convertFromSnakeCase
+    let response = try decoder.decode(CollectionResponse.self, from: data)
+    return response
   }
 
-  func updateCalendar() async throws {
+  func getCalendar() async throws -> [BangumiCalendar] {
     let url = self.apiBase.appendingPathComponent("calendar")
-    guard let data = try? await request(url: url, method: "GET") else {
+    guard let data = try? await request(url: url, method: "GET", authorized: false) else {
       throw ChiiError(message: "failed to get calendar")
     }
     let decoder = JSONDecoder()
     decoder.keyDecodingStrategy = .convertFromSnakeCase
     let calendars = try decoder.decode([BangumiCalendar].self, from: data)
-    await MainActor.run {
-      withAnimation {
-        for calendar in calendars {
-          self.modelContext.insert(calendar)
-        }
-      }
-    }
+    return calendars
   }
 
   func search(keyword: String, type: SubjectType = .unknown, offset: UInt = 0, limit: UInt = 10) async throws -> SubjectSearchResponse {
@@ -175,12 +229,32 @@ class ChiiClient: ObservableObject, Observable {
         "type": [type.rawValue]
       ]
     }
-    guard let data = try? await self.request(url: url, method: "POST", body: body) else {
+    guard let data = try? await self.request(
+      url: url, method: "POST", body: body, authorized: self.isAuthenticated
+    )
+    else {
       throw ChiiError(message: "failed to search")
     }
     let decoder = JSONDecoder()
     decoder.keyDecodingStrategy = .convertFromSnakeCase
     let resp = try decoder.decode(SubjectSearchResponse.self, from: data)
     return resp
+  }
+
+  func getCollection(sid: UInt) async throws -> UserSubjectCollection {
+    let profile = try await self.getProfile()
+    let url = if profile.username.isEmpty {
+      self.apiBase.appendingPathComponent("v0/users/\(profile.id)/collections/\(sid)")
+    } else {
+      self.apiBase.appendingPathComponent("v0/users/\(profile.username)/collections/\(sid)")
+    }
+
+    guard let data = try? await request(url: url, method: "GET") else {
+      throw ChiiError(message: "failed to get collection")
+    }
+    let decoder = JSONDecoder()
+    decoder.keyDecodingStrategy = .convertFromSnakeCase
+    let collection = try decoder.decode(UserSubjectCollection.self, from: data)
+    return collection
   }
 }

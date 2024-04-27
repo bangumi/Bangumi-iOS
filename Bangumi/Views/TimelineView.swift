@@ -13,21 +13,34 @@ struct TimelineView: View {
   @EnvironmentObject var chiiClient: ChiiClient
   @EnvironmentObject var navState: NavState
 
-  @Query private var profiles: [Profile]
-  private var profile: Profile? { profiles.first }
+  @State var profile: Profile?
 
-  var body: some View {
-    NavigationStack(path: $navState.timelineNavigation) {
-      switch profile {
-      case .some(let me):
-        Text("Hello, " + me.nickname)
-      case .none:
-        Text("Refreshing profile...").onAppear {
-          Task.detached {
-            try await chiiClient.updateProfile()
+  func updateProfile() {
+    Task.detached {
+      do {
+        let profile = try await chiiClient.getProfile()
+        await MainActor.run {
+          withAnimation {
+            self.profile = profile
           }
         }
+      } catch {
+        await errorHandling.handle(message: "\(error)")
       }
+    }
+  }
+
+  var body: some View {
+    if chiiClient.isAuthenticated {
+      NavigationStack(path: $navState.timelineNavigation) {
+        if let me = profile {
+          Text("Hello, " + me.nickname)
+        } else {
+          Text("Refreshing profile...").onAppear(perform: updateProfile)
+        }
+      }
+    } else {
+      AuthView()
     }
   }
 }

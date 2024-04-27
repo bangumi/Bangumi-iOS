@@ -10,33 +10,31 @@ import SwiftUI
 
 struct ContentView: View {
   @EnvironmentObject var errorHandling: ErrorHandling
+  @EnvironmentObject var chiiClient: ChiiClient
   @Environment(\.modelContext) private var modelContext
 
   @StateObject var navState = NavState()
-  @Query private var auths: [Auth]
-
-  private var auth: Auth? { auths.first }
 
   private func createTabViewBinding() -> Binding<ContentViewTab> {
     Binding<ContentViewTab>(
-      get: { navState.selected },
+      get: { self.navState.selected },
       set: { selectedTab in
-        if selectedTab != navState.selected {
-          navState.selected = selectedTab
+        if selectedTab != self.navState.selected {
+          self.navState.selected = selectedTab
           return
         }
         switch selectedTab {
         case .timeline:
           withAnimation {
-            navState.timelineNavigation.removeLast(navState.timelineNavigation.count)
+            self.navState.timelineNavigation.removeLast(self.navState.timelineNavigation.count)
           }
         case .progress:
           withAnimation {
-            navState.progressNavigation.removeLast(navState.progressNavigation.count)
+            self.navState.progressNavigation.removeLast(self.navState.progressNavigation.count)
           }
         case .discover:
           withAnimation {
-            navState.discoverNavigation.removeLast(navState.discoverNavigation.count)
+            self.navState.discoverNavigation.removeLast(self.navState.discoverNavigation.count)
           }
         }
       }
@@ -44,31 +42,30 @@ struct ContentView: View {
   }
 
   var body: some View {
-    switch auth {
-    case .some(let auth):
-      let chiiClient = ChiiClient(errorHandling: errorHandling, modelContext: modelContext, auth: auth)
-      TabView(selection: createTabViewBinding()) {
-        TimelineView()
-          .tag(ContentViewTab.timeline)
-          .tabItem {
-            Image(systemName: "person")
-          }
-        ProgressView()
-          .tag(ContentViewTab.progress)
-          .tabItem {
-            Image(systemName: "square.grid.3x2.fill")
-          }
-        DiscoverView()
-          .tag(ContentViewTab.discover)
-          .tabItem {
-            Image(systemName: "magnifyingglass")
-          }
-      }
-      .environment(chiiClient)
-      .environment(navState)
-    case .none:
-      AuthView()
+    TabView(selection: createTabViewBinding()) {
+      TimelineView()
+        .tag(ContentViewTab.timeline)
+        .tabItem {
+          Image(systemName: "person")
+        }
+      ProgressView()
+        .tag(ContentViewTab.progress)
+        .tabItem {
+          Image(systemName: "square.grid.3x2.fill")
+        }
+      DiscoverView()
+        .tag(ContentViewTab.discover)
+        .tabItem {
+          Image(systemName: "magnifyingglass")
+        }
     }
+    .onAppear {
+      Task.detached {
+        let profile = try await chiiClient.getProfile()
+      }
+    }
+    .environment(chiiClient)
+    .environment(navState)
   }
 }
 
