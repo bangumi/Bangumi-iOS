@@ -6,88 +6,88 @@
 //
 
 struct SubjectImages: Codable {
-    var large: String
-    var common: String
-    var medium: String
-    var small: String
-    var grid: String
+  var large: String
+  var common: String
+  var medium: String
+  var small: String
+  var grid: String
 }
 
 struct Images: Codable {
-    var large: String
-    var medium: String
-    var small: String
-    var grid: String
+  var large: String
+  var medium: String
+  var small: String
+  var grid: String
 }
 
 struct Avatar: Codable {
-    var large: String
-    var medium: String
-    var small: String
+  var large: String
+  var medium: String
+  var small: String
 }
 
 struct Tag: Codable {
-    var name: String
-    var count: UInt
+  var name: String
+  var count: UInt
 }
 
 struct Weekday: Codable {
-    var en: String
-    var cn: String
-    var ja: String
-    var id: UInt
+  var en: String
+  var cn: String
+  var ja: String
+  var id: UInt
 }
 
 struct RatingCount: Codable {
-    enum CodingKeys: String, CodingKey {
-        case one = "1"
-        case two = "2"
-        case three = "3"
-        case four = "4"
-        case five = "5"
-        case six = "6"
-        case seven = "7"
-        case eight = "8"
-        case nine = "9"
-        case ten = "10"
-    }
+  enum CodingKeys: String, CodingKey {
+    case one = "1"
+    case two = "2"
+    case three = "3"
+    case four = "4"
+    case five = "5"
+    case six = "6"
+    case seven = "7"
+    case eight = "8"
+    case nine = "9"
+    case ten = "10"
+  }
 
-    var one: UInt
-    var two: UInt
-    var three: UInt
-    var four: UInt
-    var five: UInt
-    var six: UInt
-    var seven: UInt
-    var eight: UInt
-    var nine: UInt
-    var ten: UInt
+  var one: UInt
+  var two: UInt
+  var three: UInt
+  var four: UInt
+  var five: UInt
+  var six: UInt
+  var seven: UInt
+  var eight: UInt
+  var nine: UInt
+  var ten: UInt
 }
 
 struct SmallRating: Codable {
-    var total: UInt
-    var count: RatingCount
-    var score: Float
+  var total: UInt
+  var count: RatingCount
+  var score: Float
 }
 
 struct Rating: Codable {
-    var rank: UInt
-    var total: UInt
-    var count: RatingCount
-    var score: Float
+  var rank: UInt
+  var total: UInt
+  var count: RatingCount
+  var score: Float
 }
 
 struct InfoboxItem: Codable {
-    var key: String
-    var value: String
+  var key: String
+  var value: String
 }
 
 struct SubjectCollection: Codable {
-    var wish: UInt?
-    var collect: UInt?
-    var doing: UInt?
-    var onHold: UInt?
-    var dropped: UInt?
+  var wish: UInt?
+  var collect: UInt?
+  var doing: UInt?
+  var onHold: UInt?
+  var dropped: UInt?
 }
 
 /// 收藏类型
@@ -98,66 +98,66 @@ struct SubjectCollection: Codable {
 /// 4: 搁置
 /// 5: 抛弃
 enum CollectionType: UInt8, Codable {
-    case unknown = 0
-    case wish = 1
-    case collect = 2
-    case `do` = 3
-    case onHold = 4
-    case dropped = 5
+  case unknown = 0
+  case wish = 1
+  case collect = 2
+  case `do` = 3
+  case onHold = 4
+  case dropped = 5
 
-    init(value: UInt8 = 0) {
-        let tmp = CollectionType(rawValue: value)
-        if let out = tmp {
-            self = out
-            return
-        }
-        self = CollectionType.unknown
+  init(value: UInt8 = 0) {
+    let tmp = CollectionType(rawValue: value)
+    if let out = tmp {
+      self = out
+      return
     }
+    self = CollectionType.unknown
+  }
 
-    func description(type: SubjectType) -> String {
-        var action: String
-        switch type {
-        case .book:
-            action = "读"
-        case .music:
-            action = "听"
-        case .game:
-            action = "玩"
-        default:
-            action = "看"
-        }
-        switch self {
-        case .unknown:
-            return "未知"
-        case .wish:
-            return "想" + action
-        case .collect:
-            return action + "过"
-        case .do:
-            return "在" + action
-        case .onHold:
-            return "搁置"
-        case .dropped:
-            return "抛弃"
-        }
+  func description(type: SubjectType) -> String {
+    var action: String
+    switch type {
+    case .book:
+      action = "读"
+    case .music:
+      action = "听"
+    case .game:
+      action = "玩"
+    default:
+      action = "看"
     }
+    switch self {
+    case .unknown:
+      return "未知"
+    case .wish:
+      return "想" + action
+    case .collect:
+      return action + "过"
+    case .do:
+      return "在" + action
+    case .onHold:
+      return "搁置"
+    case .dropped:
+      return "抛弃"
+    }
+  }
 
-    var icon: String {
-        switch self {
-        case .unknown:
-            return "questionmark"
-        case .wish:
-            return "heart"
-        case .collect:
-            return "checkmark"
-        case .do:
-            return "eye"
-        case .onHold:
-            return "clock"
-        case .dropped:
-            return "trash"
-        }
+  var icon: String {
+    switch self {
+    case .unknown:
+      return "questionmark"
+    case .wish:
+      return "heart"
+    case .collect:
+      return "checkmark"
+    case .do:
+      return "eye"
+    case .onHold:
+      return "clock"
+    case .dropped:
+      return "trash"
     }
+  }
 }
 
 /// 条目类型
@@ -169,77 +169,77 @@ enum CollectionType: UInt8, Codable {
 ///
 /// 没有 5
 enum SubjectType: UInt8, Codable, Identifiable {
-    case unknown = 0
-    case book = 1
-    case anime = 2
-    case music = 3
-    case game = 4
-    case real = 6
+  case unknown = 0
+  case book = 1
+  case anime = 2
+  case music = 3
+  case game = 4
+  case real = 6
 
-    var id: Self {
-        self
-    }
+  var id: Self {
+    self
+  }
 
-    init(value: UInt8 = 0) {
-        let tmp = SubjectType(rawValue: value)
-        if let out = tmp {
-            self = out
-            return
-        }
-        self = SubjectType.unknown
+  init(value: UInt8 = 0) {
+    let tmp = SubjectType(rawValue: value)
+    if let out = tmp {
+      self = out
+      return
     }
+    self = SubjectType.unknown
+  }
 
-    static func progressTypes() -> [SubjectType] {
-        return [.book, .anime, .real]
-    }
+  static func progressTypes() -> [SubjectType] {
+    return [.book, .anime, .real]
+  }
 
-    static func searchTypes() -> [SubjectType] {
-        return [.book, .anime, .music, .game, .real]
-    }
+  static func searchTypes() -> [SubjectType] {
+    return [.book, .anime, .music, .game, .real]
+  }
 
-    var description: String {
-        switch self {
-        case .unknown:
-            return "未知"
-        case .book:
-            return "书籍"
-        case .anime:
-            return "动画"
-        case .music:
-            return "音乐"
-        case .game:
-            return "游戏"
-        case .real:
-            return "三次元"
-        }
+  var description: String {
+    switch self {
+    case .unknown:
+      return "未知"
+    case .book:
+      return "书籍"
+    case .anime:
+      return "动画"
+    case .music:
+      return "音乐"
+    case .game:
+      return "游戏"
+    case .real:
+      return "三次元"
     }
+  }
 
-    var icon: String {
-        switch self {
-        case .unknown:
-            return "questionmark"
-        case .book:
-            return "book"
-        case .anime:
-            return "play.tv"
-        case .music:
-            return "music.note.list"
-        case .game:
-            return "gamecontroller"
-        case .real:
-            return "film"
-        }
+  var icon: String {
+    switch self {
+    case .unknown:
+      return "questionmark"
+    case .book:
+      return "book"
+    case .anime:
+      return "play.tv"
+    case .music:
+      return "music.note.list"
+    case .game:
+      return "gamecontroller"
+    case .real:
+      return "film"
     }
+  }
 }
 
 enum PersonCareer: String, Codable {
-    case producer
-    case mangaka
-    case artist
-    case seiyu
-    case writer
-    case illustrator
-    case actor
+  case producer
+  case mangaka
+  case artist
+  case seiyu
+  case writer
+  case illustrator
+  case actor
 }
 
 /// 人物类型
@@ -247,49 +247,49 @@ enum PersonCareer: String, Codable {
 /// 2 为 公司
 /// 3 为 组合
 enum PersonType: UInt8, Codable, Identifiable {
-    case unknown = 0
-    case individual = 1
-    case company = 2
-    case group = 3
+  case unknown = 0
+  case individual = 1
+  case company = 2
+  case group = 3
 
-    var id: Self {
-        self
-    }
+  var id: Self {
+    self
+  }
 
-    init(value: UInt8 = 0) {
-        let tmp = PersonType(rawValue: value)
-        if let out = tmp {
-            self = out
-            return
-        }
-        self = PersonType.unknown
+  init(value: UInt8 = 0) {
+    let tmp = PersonType(rawValue: value)
+    if let out = tmp {
+      self = out
+      return
     }
+    self = PersonType.unknown
+  }
 
-    var description: String {
-        switch self {
-        case .unknown:
-            return "未知"
-        case .individual:
-            return "个人"
-        case .company:
-            return "公司"
-        case .group:
-            return "组合"
-        }
+  var description: String {
+    switch self {
+    case .unknown:
+      return "未知"
+    case .individual:
+      return "个人"
+    case .company:
+      return "公司"
+    case .group:
+      return "组合"
     }
+  }
 
-    var icon: String {
-        switch self {
-        case .unknown:
-            return "questionmark"
-        case .individual:
-            return "person"
-        case .company:
-            return "building.2"
-        case .group:
-            return "person.3"
-        }
+  var icon: String {
+    switch self {
+    case .unknown:
+      return "questionmark"
+    case .individual:
+      return "person"
+    case .company:
+      return "building.2"
+    case .group:
+      return "person.3"
     }
+  }
 }
 
 /// 角色类型
@@ -298,54 +298,54 @@ enum PersonType: UInt8, Codable, Identifiable {
 /// 3 为 舰船
 /// 4 为 组织
 enum CharacterType: UInt8, Codable, Identifiable {
-    case unknown = 0
-    case character = 1
-    case vehicle = 2
-    case ship = 3
-    case organization = 4
+  case unknown = 0
+  case character = 1
+  case vehicle = 2
+  case ship = 3
+  case organization = 4
 
-    var id: Self {
-        self
-    }
+  var id: Self {
+    self
+  }
 
-    init(value: UInt8 = 0) {
-        let tmp = CharacterType(rawValue: value)
-        if let out = tmp {
-            self = out
-            return
-        }
-        self = CharacterType.unknown
+  init(value: UInt8 = 0) {
+    let tmp = CharacterType(rawValue: value)
+    if let out = tmp {
+      self = out
+      return
     }
+    self = CharacterType.unknown
+  }
 
-    var description: String {
-        switch self {
-        case .unknown:
-            return "未知"
-        case .character:
-            return "角色"
-        case .vehicle:
-            return "机体"
-        case .ship:
-            return "舰船"
-        case .organization:
-            return "组织"
-        }
+  var description: String {
+    switch self {
+    case .unknown:
+      return "未知"
+    case .character:
+      return "角色"
+    case .vehicle:
+      return "机体"
+    case .ship:
+      return "舰船"
+    case .organization:
+      return "组织"
     }
+  }
 
-    var icon: String {
-        switch self {
-        case .unknown:
-            return "questionmark"
-        case .character:
-            return "person"
-        case .vehicle:
-            return "car"
-        case .ship:
-            return "ship"
-        case .organization:
-            return "building.2"
-        }
+  var icon: String {
+    switch self {
+    case .unknown:
+      return "questionmark"
+    case .character:
+      return "person"
+    case .vehicle:
+      return "car"
+    case .ship:
+      return "ship"
+    case .organization:
+      return "building.2"
     }
+  }
 }
 
 /// 章节类型
@@ -354,34 +354,34 @@ enum CharacterType: UInt8, Codable, Identifiable {
 /// 2 为 OP
 /// 3 为 ED
 enum EpisodeType: UInt8, Codable, Identifiable {
-    case main = 0
-    case sp = 1
-    case op = 2
-    case ed = 3
+  case main = 0
+  case sp = 1
+  case op = 2
+  case ed = 3
 
-    var id: Self {
-        self
-    }
+  var id: Self {
+    self
+  }
 
-    init(value: UInt8 = 0) {
-        let tmp = EpisodeType(rawValue: value)
-        if let out = tmp {
-            self = out
-            return
-        }
-        self = EpisodeType.main
+  init(value: UInt8 = 0) {
+    let tmp = EpisodeType(rawValue: value)
+    if let out = tmp {
+      self = out
+      return
     }
+    self = EpisodeType.main
+  }
 
-    var description: String {
-        switch self {
-        case .main:
-            return "本篇"
-        case .sp:
-            return "SP"
-        case .op:
-            return "OP"
-        case .ed:
-            return "ED"
-        }
+  var description: String {
+    switch self {
+    case .main:
+      return "本篇"
+    case .sp:
+      return "SP"
+    case .op:
+      return "OP"
+    case .ed:
+      return "ED"
     }
+  }
 }

@@ -1,2 +1,4 @@
 *.xcconfig
 *.xcbkptlist
+
+.vscode/

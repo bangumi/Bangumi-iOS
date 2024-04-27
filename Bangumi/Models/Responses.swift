@@ -6,29 +6,29 @@
 //
 
 struct TokenResponse: Codable {
-    var accessToken: String
-    var expiresIn: UInt
-    var tokenType: String
-    var refreshToken: String
+  var accessToken: String
+  var expiresIn: UInt
+  var tokenType: String
+  var refreshToken: String
 }
 
 struct CollectionResponse: Codable {
-    var total: UInt
-    var limit: UInt
-    var offset: UInt
-    var data: [UserSubjectCollection]
+  var total: UInt
+  var limit: UInt
+  var offset: UInt
+  var data: [UserSubjectCollection]
 }
 
 struct SubjectSearchResponse: Codable {
-    var total: UInt
-    var limit: UInt
-    var offset: UInt
-    var data: [SearchSubject]
+  var total: UInt
+  var limit: UInt
+  var offset: UInt
+  var data: [SearchSubject]
 }
 
 struct EpisodeResponse: Codable {
-    var total: UInt
-    var limit: UInt
-    var offset: UInt
-    var data: [Episode]
+  var total: UInt
+  var limit: UInt
+  var offset: UInt
+  var data: [Episode]
 }

@@ -8,43 +8,43 @@
 import SwiftUI
 
 struct SubjectSearchRemoteRow: View {
-    var subject: SearchSubject
+  var subject: SearchSubject
 
-    var body: some View {
-        ZStack {
-            Rectangle()
-                .fill(.accent)
-                .opacity(0.01)
-                .frame(height: 64)
-                .clipShape(RoundedRectangle(cornerRadius: 10))
-                .shadow(color: .accent, radius: 1, x: 1, y: 1)
-            HStack {
-                ImageView(img: subject.image, size: 60)
-                VStack(alignment: .leading) {
-                    let score = String(format: "%.1f", subject.score)
-                    Text(subject.name).font(.headline)
-                    Text(subject.nameCn).font(.subheadline).foregroundStyle(.gray)
-                    HStack {
-                        if let type = subject.type {
-                            Label(type.description, systemImage: type.icon).foregroundStyle(.accent)
-                        }
-                        if !subject.date.isEmpty {
-                            Label(subject.date, systemImage: "calendar").foregroundStyle(.gray)
-                        }
-                        Spacer()
-                        if subject.rank > 0 {
-                            Label("\(subject.rank)", systemImage: "chart.bar.xaxis").foregroundStyle(.accent)
-                        }
-                        if subject.score > 0 {
-                            Label("\(score)", systemImage: "star").foregroundStyle(.gray)
-                        }
-                    }.font(.caption)
-                }
-                Spacer()
+  var body: some View {
+    ZStack {
+      Rectangle()
+        .fill(.accent)
+        .opacity(0.01)
+        .frame(height: 64)
+        .clipShape(RoundedRectangle(cornerRadius: 10))
+        .shadow(color: .accent, radius: 1, x: 1, y: 1)
+      HStack {
+        ImageView(img: subject.image, size: 60)
+        VStack(alignment: .leading) {
+          let score = String(format: "%.1f", subject.score)
+          Text(subject.name).font(.headline)
+          Text(subject.nameCn).font(.subheadline).foregroundStyle(.gray)
+          HStack {
+            if let type = subject.type {
+              Label(type.description, systemImage: type.icon).foregroundStyle(.accent)
             }
-            .frame(height: 60)
-            .padding(2)
-            .clipShape(RoundedRectangle(cornerRadius: 10))
+            if !subject.date.isEmpty {
+              Label(subject.date, systemImage: "calendar").foregroundStyle(.gray)
+            }
+            Spacer()
+            if subject.rank > 0 {
+              Label("\(subject.rank)", systemImage: "chart.bar.xaxis").foregroundStyle(.accent)
+            }
+            if subject.score > 0 {
+              Label("\(score)", systemImage: "star").foregroundStyle(.gray)
+            }
+          }.font(.caption)
         }
+        Spacer()
+      }
+      .frame(height: 60)
+      .padding(2)
+      .clipShape(RoundedRectangle(cornerRadius: 10))
     }
+  }
 }

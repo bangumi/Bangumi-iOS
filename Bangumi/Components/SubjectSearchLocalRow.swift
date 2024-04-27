@@ -8,34 +8,34 @@
 import SwiftUI
 
 struct SubjectSearchLocalRow: View {
-    var subject: SlimSubject
+  var subject: SlimSubject
 
-    var body: some View {
-        ZStack {
-            Rectangle()
-                .fill(.accent)
-                .opacity(0.01)
-                .frame(height: 64)
-                .clipShape(RoundedRectangle(cornerRadius: 10))
-                .shadow(color: .accent, radius: 1, x: 1, y: 1)
-            HStack {
-                ImageView(img: subject.images.common, size: 60)
-                VStack(alignment: .leading) {
-                    let score = String(format: "%.1f", subject.score)
-                    Text(subject.name).font(.headline)
-                    Text(subject.nameCn).font(.subheadline).foregroundStyle(.gray)
-                    HStack {
-                        Label(subject.type.description, systemImage: subject.type.icon).foregroundStyle(.accent)
-                        Text("\(subject.collectionTotal) 人收藏").foregroundStyle(.gray)
-                        Spacer()
-                        Label("\(score)", systemImage: "star").foregroundStyle(.gray)
-                    }.font(.caption)
-                }
-                Spacer()
-            }
-            .frame(height: 60)
-            .padding(2)
-            .clipShape(RoundedRectangle(cornerRadius: 10))
+  var body: some View {
+    ZStack {
+      Rectangle()
+        .fill(.accent)
+        .opacity(0.01)
+        .frame(height: 64)
+        .clipShape(RoundedRectangle(cornerRadius: 10))
+        .shadow(color: .accent, radius: 1, x: 1, y: 1)
+      HStack {
+        ImageView(img: subject.images.common, size: 60)
+        VStack(alignment: .leading) {
+          let score = String(format: "%.1f", subject.score)
+          Text(subject.name).font(.headline)
+          Text(subject.nameCn).font(.subheadline).foregroundStyle(.gray)
+          HStack {
+            Label(subject.type.description, systemImage: subject.type.icon).foregroundStyle(.accent)
+            Text("\(subject.collectionTotal) 人收藏").foregroundStyle(.gray)
+            Spacer()
+            Label("\(score)", systemImage: "star").foregroundStyle(.gray)
+          }.font(.caption)
         }
+        Spacer()
+      }
+      .frame(height: 60)
+      .padding(2)
+      .clipShape(RoundedRectangle(cornerRadius: 10))
     }
+  }
 }

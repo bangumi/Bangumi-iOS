@@ -9,152 +9,152 @@ import SwiftData
 import SwiftUI
 
 struct DiscoverView: View {
-    @EnvironmentObject var chiiClient: ChiiClient
-    @EnvironmentObject var errorHandling: ErrorHandling
+  @EnvironmentObject var chiiClient: ChiiClient
+  @EnvironmentObject var errorHandling: ErrorHandling
 
-    @State private var searching = false
-    @State private var query = ""
-    @State private var local = true
-    @State private var subjectType: SubjectType = .unknown
+  @State private var searching = false
+  @State private var query = ""
+  @State private var local = true
+  @State private var subjectType: SubjectType = .unknown
 
-    @State private var limit: UInt = 20
-    @State private var offset: UInt = 0
-    @State private var total: UInt = 0
-    @State private var subjects: [SearchSubject] = []
+  @State private var limit: UInt = 20
+  @State private var offset: UInt = 0
+  @State private var total: UInt = 0
+  @State private var subjects: [SearchSubject] = []
 
-    @Query private var collections: [UserSubjectCollection]
+  @Query private var collections: [UserSubjectCollection]
 
-    var filteredCollections: [UserSubjectCollection] {
-        if !local || query.isEmpty {
-            return []
-        }
-        let filtered = collections.filter {
-            if let subject = $0.subject {
-                if subjectType != .unknown && subjectType != subject.type {
-                    return false
-                }
-                return subject.nameCn.lowercased().contains(query) || subject.name.lowercased().contains(query)
-            } else {
-                return false
-            }
-        }
-        return Array(filtered.prefix(10))
+  var filteredCollections: [UserSubjectCollection] {
+    if !local || query.isEmpty {
+      return []
     }
-
-    func newSearch() {
-        offset = 0
-        total = 0
-        local = false
-        subjects = []
-        Task.detached {
-            guard let resp = try? await chiiClient.search(
-                keyword: query, type: subjectType, offset: offset, limit: limit)
-            else {
-                await errorHandling.handle(message: "failed to search")
-                return
-            }
-            await MainActor.run {
-                withAnimation {
-                    total = resp.total
-                    subjects = resp.data
-                }
-            }
+    let filtered = collections.filter {
+      if let subject = $0.subject {
+        if subjectType != .unknown && subjectType != subject.type {
+          return false
         }
+        return subject.nameCn.lowercased().contains(query) || subject.name.lowercased().contains(query)
+      } else {
+        return false
+      }
     }
+    return Array(filtered.prefix(10))
+  }
 
-    func checkSearchNextPage(current: SearchSubject) {
-        if offset + limit > total {
+  func newSearch() {
+    offset = 0
+    total = 0
+    local = false
+    subjects = []
+    Task.detached {
+      guard let resp = try? await chiiClient.search(
+        keyword: query, type: subjectType, offset: offset, limit: limit)
+      else {
+        await errorHandling.handle(message: "failed to search")
+        return
+      }
+      await MainActor.run {
+        withAnimation {
+          total = resp.total
+          subjects = resp.data
+        }
+      }
+    }
+  }
+
+  func checkSearchNextPage(current: SearchSubject) {
+    if offset + limit > total {
+      return
+    }
+    let thresholdIndex = subjects.index(subjects.endIndex, offsetBy: -2)
+    let currentIndex = subjects.firstIndex(where: { $0.id == current.id })
+    if currentIndex != thresholdIndex {
+      return
+    }
+    offset += limit
+    Task.detached {
+      guard let resp = try? await chiiClient.search(
+        keyword: query, type: subjectType, offset: offset, limit: limit)
+      else {
+        await errorHandling.handle(message: "failed to search")
+        return
+      }
+      await MainActor.run {
+        withAnimation {
+          subjects.append(contentsOf: resp.data)
+        }
+      }
+    }
+  }
+
+  var body: some View {
+    NavigationStack {
+      if searching {
+        Picker("Subject Type", selection: $subjectType) {
+          Text("全部").tag(SubjectType.unknown)
+          ForEach(SubjectType.searchTypes()) { type in
+            Text(type.description).tag(type)
+          }
+        }
+        .onChange(of: subjectType) { _, _ in
+          if local {
             return
-        }
-        let thresholdIndex = subjects.index(subjects.endIndex, offsetBy: -2)
-        let currentIndex = subjects.firstIndex(where: { $0.id == current.id })
-        if currentIndex != thresholdIndex {
+          }
+          if query.isEmpty {
             return
+          }
+          offset = 0
+          newSearch()
         }
-        offset += limit
-        Task.detached {
-            guard let resp = try? await chiiClient.search(
-                keyword: query, type: subjectType, offset: offset, limit: limit)
-            else {
-                await errorHandling.handle(message: "failed to search")
-                return
-            }
-            await MainActor.run {
-                withAnimation {
-                    subjects.append(contentsOf: resp.data)
+        .pickerStyle(.segmented)
+        .padding(.horizontal, 16)
+        if query.isEmpty {
+          EmptyView()
+        } else {
+          if local {
+            ScrollView {
+              LazyVStack(alignment: .leading, spacing: 10) {
+                ForEach(filteredCollections) { collection in
+                  if let subject = collection.subject {
+                    SubjectSearchLocalRow(subject: subject)
+                  }
                 }
-            }
-        }
-    }
-
-    var body: some View {
-        NavigationStack {
-            if searching {
-                Picker("Subject Type", selection: $subjectType) {
-                    Text("全部").tag(SubjectType.unknown)
-                    ForEach(SubjectType.searchTypes()) { type in
-                        Text(type.description).tag(type)
-                    }
-                }
-                .onChange(of: subjectType) { _, _ in
-                    if local {
-                        return
-                    }
-                    if query.isEmpty {
-                        return
-                    }
-                    offset = 0
-                    newSearch()
-                }
-                .pickerStyle(.segmented)
-                .padding(.horizontal, 16)
-                if query.isEmpty {
-                    EmptyView()
-                } else {
-                    if local {
-                        ScrollView {
-                            LazyVStack(alignment: .leading, spacing: 10) {
-                                ForEach(filteredCollections) { collection in
-                                    if let subject = collection.subject {
-                                        SubjectSearchLocalRow(subject: subject)
-                                    }
-                                }
-                            }
-                        }.padding(.horizontal, 16)
-                    } else {
-                        if subjects.isEmpty {
-                            VStack {
-                                Spacer()
-                                Image(systemName: "waveform")
-                                    .resizable()
-                                    .frame(width: 100, height: 100)
-                                Spacer()
-                            }
-                            .symbolEffect(.variableColor.iterative.dimInactiveLayers)
-                        } else {
-                            ScrollView {
-                                LazyVStack(alignment: .leading, spacing: 10) {
-                                    ForEach(subjects) { subject in
-                                        SubjectSearchRemoteRow(subject: subject)
-                                            .onAppear {
-                                                checkSearchNextPage(current: subject)
-                                            }
-                                    }
-                                }
-                            }.padding(.horizontal, 16)
-                        }
-                    }
-                }
+              }
+            }.padding(.horizontal, 16)
+          } else {
+            if subjects.isEmpty {
+              VStack {
                 Spacer()
+                Image(systemName: "waveform")
+                  .resizable()
+                  .frame(width: 100, height: 100)
+                Spacer()
+              }
+              .symbolEffect(.variableColor.iterative.dimInactiveLayers)
             } else {
-                CalendarView().padding(.horizontal, 16)
+              ScrollView {
+                LazyVStack(alignment: .leading, spacing: 10) {
+                  ForEach(subjects) { subject in
+                    SubjectSearchRemoteRow(subject: subject)
+                      .onAppear {
+                        checkSearchNextPage(current: subject)
+                      }
+                  }
+                }
+              }.padding(.horizontal, 16)
             }
+          }
         }
-        .searchable(text: $query, isPresented: $searching)
-        .onChange(of: query) { _, _ in
-            local = true
-            subjects = []
-        }
-        .onSubmit(of: .search, newSearch)
+        Spacer()
+      } else {
+        CalendarView().padding(.horizontal, 16)
+      }
     }
+    .searchable(text: $query, isPresented: $searching)
+    .onChange(of: query) { _, _ in
+      local = true
+      subjects = []
+    }
+    .onSubmit(of: .search, newSearch)
+  }
 }
