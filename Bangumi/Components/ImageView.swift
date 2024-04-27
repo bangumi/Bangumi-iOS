@@ -16,7 +16,7 @@ struct ImageView: View {
   var body: some View {
     if let img = img {
       if img.isEmpty {
-        if width>0 && height>0 {
+        if width>0, height>0 {
           Image(systemName: "photo").frame(width: width, height: height)
         } else {
           Image(systemName: "photo")
@@ -43,7 +43,6 @@ struct ImageView: View {
               Image(uiImage: $0)
                 .resizable()
                 .scaledToFit()
-                .padding()
             }
           }
         )
@@ -51,7 +50,7 @@ struct ImageView: View {
         .clipShape(RoundedRectangle(cornerRadius: 10))
       }
     } else {
-      if width>0 && height>0 {
+      if width>0, height>0 {
         Image(systemName: "photo").frame(width: width, height: height)
       } else {
         Image(systemName: "photo")

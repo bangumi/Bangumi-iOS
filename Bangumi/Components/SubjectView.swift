@@ -81,7 +81,8 @@ struct SubjectHeaderView: View {
         }
         .sheet(isPresented: $coverDetail) {
           ImageView(img: subject.images.large, width: 0, height: 0)
-            .presentationCompactAdaptation(.automatic)
+            .presentationDragIndicator(.visible)
+            .presentationDetents([.fraction(0.8)])
         }
       VStack(alignment: .leading) {
         HStack {
@@ -126,6 +127,7 @@ struct SubjectHeaderView: View {
         }
         .sheet(isPresented: $collectionDetail, content: {
           SubjectRatingView(subject: subject)
+            .presentationDetents(.init([.medium]))
         })
         .font(.caption)
         .foregroundStyle(.accent)
