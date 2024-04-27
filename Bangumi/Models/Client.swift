@@ -56,7 +56,7 @@ class ChiiClient: ObservableObject, Observable {
     request.addValue("application/json", forHTTPHeaderField: "Content-Type")
     request.httpMethod = method
     if let body = body {
-      let bodyData = try? JSONSerialization.data(withJSONObject: body)
+      let bodyData = try JSONSerialization.data(withJSONObject: body)
       request.httpBody = bodyData
     }
     let (data, response) = try await session.data(for: request)
@@ -132,9 +132,7 @@ class ChiiClient: ObservableObject, Observable {
       "code": code,
       "redirect_uri": self.appInfo.callbackURL
     ]
-    guard let data = try? await self.request(url: url, method: "POST", body: body, authorized: false) else {
-      throw ChiiError(message: "failed to get collection")
-    }
+    let data = try await self.request(url: url, method: "POST", body: body, authorized: false)
     let _ = try self.saveAuthResponse(data: data)
     await MainActor.run {
       withAnimation {
@@ -152,9 +150,7 @@ class ChiiClient: ObservableObject, Observable {
       "refresh_token": auth.refreshToken,
       "redirect_uri": self.appInfo.callbackURL
     ]
-    guard let data = try? await self.request(url: url, method: "POST", body: body, authorized: false) else {
-      throw ChiiError(message: "failed to get collection")
-    }
+    let data = try await self.request(url: url, method: "POST", body: body, authorized: false)
     let auth = try self.saveAuthResponse(data: data)
     await MainActor.run {
       withAnimation {
@@ -169,9 +165,7 @@ class ChiiClient: ObservableObject, Observable {
       return profile
     }
     let url = self.apiBase.appendingPathComponent("v0/me")
-    guard let data = try? await request(url: url, method: "GET") else {
-      throw ChiiError(message: "failed to get profile")
-    }
+    let data = try await request(url: url, method: "GET")
     let decoder = JSONDecoder()
     decoder.keyDecodingStrategy = .convertFromSnakeCase
     let profile = try decoder.decode(Profile.self, from: data)
@@ -195,9 +189,7 @@ class ChiiClient: ObservableObject, Observable {
       queryItems.append(URLQueryItem(name: "subject_type", value: String(sType.rawValue)))
     }
     let pageURL = url.appending(queryItems: queryItems)
-    guard let data = try? await request(url: pageURL, method: "GET") else {
-      throw ChiiError(message: "failed to get collections")
-    }
+    let data = try await request(url: pageURL, method: "GET")
     let decoder = JSONDecoder()
     decoder.keyDecodingStrategy = .convertFromSnakeCase
     let response = try decoder.decode(CollectionResponse.self, from: data)
@@ -206,9 +198,7 @@ class ChiiClient: ObservableObject, Observable {
 
   func getCalendar() async throws -> [BangumiCalendar] {
     let url = self.apiBase.appendingPathComponent("calendar")
-    guard let data = try? await request(url: url, method: "GET", authorized: false) else {
-      throw ChiiError(message: "failed to get calendar")
-    }
+    let data = try await request(url: url, method: "GET", authorized: false)
     let decoder = JSONDecoder()
     decoder.keyDecodingStrategy = .convertFromSnakeCase
     let calendars = try decoder.decode([BangumiCalendar].self, from: data)
@@ -229,12 +219,9 @@ class ChiiClient: ObservableObject, Observable {
         "type": [type.rawValue]
       ]
     }
-    guard let data = try? await self.request(
+    let data = try await self.request(
       url: url, method: "POST", body: body, authorized: self.isAuthenticated
     )
-    else {
-      throw ChiiError(message: "failed to search")
-    }
     let decoder = JSONDecoder()
     decoder.keyDecodingStrategy = .convertFromSnakeCase
     let resp = try decoder.decode(SubjectSearchResponse.self, from: data)
@@ -248,13 +235,19 @@ class ChiiClient: ObservableObject, Observable {
     } else {
       self.apiBase.appendingPathComponent("v0/users/\(profile.username)/collections/\(sid)")
     }
-
-    guard let data = try? await request(url: url, method: "GET") else {
-      throw ChiiError(message: "failed to get collection")
-    }
+    let data = try await request(url: url, method: "GET")
     let decoder = JSONDecoder()
     decoder.keyDecodingStrategy = .convertFromSnakeCase
     let collection = try decoder.decode(UserSubjectCollection.self, from: data)
     return collection
+  }
+
+  func getSubject(sid: UInt) async throws -> Subject {
+    let url = self.apiBase.appendingPathComponent("v0/subjects/\(sid)")
+    let data = try await request(url: url, method: "GET")
+    let decoder = JSONDecoder()
+    decoder.keyDecodingStrategy = .convertFromSnakeCase
+    let subject = try decoder.decode(Subject.self, from: data)
+    return subject
   }
 }

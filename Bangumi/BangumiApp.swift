@@ -47,12 +47,20 @@ class ErrorHandling: ObservableObject {
   @Published var showAlert: Bool = false
 
   func handle(message: String) {
-    currentAlert = ChiiError(message: message)
-    showAlert = true
+    Task {
+      await MainActor.run {
+        currentAlert = ChiiError(message: message)
+        showAlert = true
+      }
+    }
   }
 
   func handleError(error: ChiiError) {
-    currentAlert = error
-    showAlert = true
+    Task {
+      await MainActor.run {
+        currentAlert = error
+        showAlert = true
+      }
+    }
   }
 }

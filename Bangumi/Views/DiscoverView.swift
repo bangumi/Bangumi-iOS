@@ -48,12 +48,8 @@ struct DiscoverView: View {
     local = false
     subjects = []
     Task.detached {
-      guard let resp = try? await chiiClient.search(
+      let resp = try await chiiClient.search(
         keyword: query, type: subjectType, offset: offset, limit: limit)
-      else {
-        await errorHandling.handle(message: "failed to search")
-        return
-      }
       await MainActor.run {
         withAnimation {
           total = resp.total
@@ -74,12 +70,8 @@ struct DiscoverView: View {
     }
     offset += limit
     Task.detached {
-      guard let resp = try? await chiiClient.search(
+      let resp = try await chiiClient.search(
         keyword: query, type: subjectType, offset: offset, limit: limit)
-      else {
-        await errorHandling.handle(message: "failed to search")
-        return
-      }
       await MainActor.run {
         withAnimation {
           subjects.append(contentsOf: resp.data)
