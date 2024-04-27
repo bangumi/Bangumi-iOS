@@ -46,62 +46,13 @@ struct SubjectView: View {
     if let subject = subject {
       ScrollView {
         LazyVStack(alignment: .leading) {
-          HStack(alignment: .top) {
-            ImageView(img: subject.images.common, size: 100)
-            VStack(alignment: .leading) {
-              HStack {
-                Label(subject.type.description, systemImage: subject.type.icon).foregroundStyle(.accent)
-                if let date = subject.date {
-                  Label(date, systemImage: "calendar").foregroundStyle(.gray)
-                }
-                Spacer()
-              }.font(.caption)
-              Text(subject.nameCn)
-                .font(.caption)
-                .foregroundStyle(.gray)
-                .multilineTextAlignment(.leading)
-                .lineLimit(2)
-              Text(subject.name)
-                .font(.headline)
-                .multilineTextAlignment(.leading)
-                .lineLimit(2)
-              HStack {
-                Text("\(subject.rating.total) 人收藏").foregroundStyle(.gray)
-                if subject.rating.rank > 0 {
-                  Label("\(subject.rating.rank)", systemImage: "chart.bar.xaxis").foregroundStyle(.accent)
-                }
-                if subject.rating.score > 0 {
-                  let score = String(format: "%.1f", subject.rating.score)
-                  Label("\(score)", systemImage: "star").foregroundStyle(.accent)
-                }
-                Spacer()
-              }.font(.caption)
-            }
-            Spacer()
-          }
-          VStack(alignment: .leading) {
-            Text("简介").font(.headline)
-            Text(subject.summary)
-              .font(.caption)
-              .multilineTextAlignment(.leading)
-              .lineLimit(summaryCollapsed ? 5 : nil)
-              .onTapGesture {
-                withAnimation {
-                  summaryCollapsed.toggle()
-                }
-              }
-            HStack {
-              Spacer()
-              if summaryCollapsed {
-                Text("展开")
-              } else {
-                Text("收起")
-              }
-            }.font(.caption).foregroundStyle(.accent)
-            Spacer()
-          }.padding(.vertical, 10)
+          SubjectHeaderView(subject: subject)
+          SubjectCollectionView(subject: subject)
+          SubjectSummaryView(subject: subject)
+          Spacer()
         }
-      }.padding()
+      }
+      .padding()
     } else {
       Image(systemName: "waveform")
         .resizable()
@@ -110,5 +61,84 @@ struct SubjectView: View {
         .symbolEffect(.variableColor.iterative.dimInactiveLayers)
         .onAppear(perform: fetchSubject)
     }
+  }
+}
+
+struct SubjectHeaderView: View {
+  var subject: Subject
+
+  var body: some View {
+    HStack(alignment: .top) {
+      ImageView(img: subject.images.common, size: 100)
+      VStack(alignment: .leading) {
+        HStack {
+          Label(subject.type.description, systemImage: subject.type.icon).foregroundStyle(.accent)
+          if let date = subject.date {
+            Label(date, systemImage: "calendar").foregroundStyle(.gray)
+          }
+          Spacer()
+        }.font(.caption)
+        Text(subject.nameCn)
+          .font(.caption)
+          .foregroundStyle(.gray)
+          .multilineTextAlignment(.leading)
+          .lineLimit(2)
+        Text(subject.name)
+          .font(.headline)
+          .multilineTextAlignment(.leading)
+          .lineLimit(2)
+        HStack {
+          Text("\(subject.rating.total) 人收藏").foregroundStyle(.gray)
+          if subject.rating.rank > 0 {
+            Label("\(subject.rating.rank)", systemImage: "chart.bar.xaxis").foregroundStyle(.accent)
+          }
+          if subject.rating.score > 0 {
+            let score = String(format: "%.1f", subject.rating.score)
+            Label("\(score)", systemImage: "star").foregroundStyle(.accent)
+          }
+          Spacer()
+        }.font(.caption)
+      }
+      Spacer()
+    }
+  }
+}
+
+struct SubjectCollectionView: View {
+  var subject: Subject
+
+  var body: some View {
+    VStack(alignment: .leading) {
+      Text("收藏").font(.headline)
+    }.padding(.vertical, 10)
+  }
+}
+
+struct SubjectSummaryView: View {
+  var subject: Subject
+
+  @State private var collapsed = true
+
+  var body: some View {
+    VStack(alignment: .leading) {
+      Text("简介").font(.headline)
+      Text(subject.summary)
+        .font(.caption)
+        .multilineTextAlignment(.leading)
+        .lineLimit(collapsed ? 5 : nil)
+        .onTapGesture {
+          withAnimation {
+            collapsed.toggle()
+          }
+        }
+      HStack {
+        Spacer()
+        if collapsed {
+          Text("展开")
+        } else {
+          Text("收起")
+        }
+      }.font(.caption).foregroundStyle(.accent)
+    }.padding(.vertical, 10)
   }
 }
