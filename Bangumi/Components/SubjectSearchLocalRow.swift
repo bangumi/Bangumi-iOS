@@ -20,7 +20,7 @@ struct SubjectSearchLocalRow: View {
           .clipShape(RoundedRectangle(cornerRadius: 10))
           .shadow(color: .accent, radius: 1, x: 1, y: 1)
         HStack {
-          ImageView(img: subject.images.common, size: 60)
+          ImageView(img: subject.images.common, width: 60, height: 60)
           VStack(alignment: .leading) {
             let score = String(format: "%.1f", subject.score)
             Text(subject.name).font(.headline)

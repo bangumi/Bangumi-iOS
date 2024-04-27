@@ -82,7 +82,7 @@ struct CalendarWeekdayView: View {
         ForEach(calendar.items) { subject in
           NavigationLink(value: subject) {
             VStack {
-              ImageView(img: subject.images?.common, size: 80)
+              ImageView(img: subject.images?.common, width: 80, height: 80)
               Text(subject.name).font(.caption).multilineTextAlignment(.leading).lineLimit(1)
             }
           }.buttonStyle(PlainButtonStyle())

@@ -48,7 +48,9 @@ struct SubjectView: View {
         LazyVStack(alignment: .leading) {
           SubjectHeaderView(subject: subject)
           SubjectCollectionView(subject: subject)
-          SubjectSummaryView(subject: subject)
+          if !subject.summary.isEmpty {
+            SubjectSummaryView(subject: subject)
+          }
           SubjectTagView(subject: subject)
           Spacer()
         }
@@ -68,39 +70,83 @@ struct SubjectView: View {
 struct SubjectHeaderView: View {
   var subject: Subject
 
+  @State private var coverDetail = false
+  @State private var collectionDetail = false
+
   var body: some View {
     HStack(alignment: .top) {
-      ImageView(img: subject.images.common, size: 100)
+      ImageView(img: subject.images.common, width: 100, height: 150)
+        .onTapGesture {
+          coverDetail.toggle()
+        }
+        .sheet(isPresented: $coverDetail) {
+          ImageView(img: subject.images.large, width: 0, height: 0)
+            .presentationCompactAdaptation(.automatic)
+        }
       VStack(alignment: .leading) {
         HStack {
+          Text(subject.platform).foregroundStyle(.secondary)
           Label(subject.type.description, systemImage: subject.type.icon).foregroundStyle(.accent)
           if let date = subject.date {
             Label(date, systemImage: "calendar").foregroundStyle(.secondary)
           }
           Spacer()
+          if subject.nsfw {
+            Label("", systemImage: "18.circle").foregroundStyle(.red)
+          }
+          if subject.locked {
+            Label("", systemImage: "lock").foregroundStyle(.red)
+          }
         }.font(.caption)
-        Text(subject.nameCn)
-          .font(.caption)
-          .foregroundStyle(.secondary)
-          .multilineTextAlignment(.leading)
-          .lineLimit(2)
+        Spacer()
         Text(subject.name)
           .font(.headline)
           .multilineTextAlignment(.leading)
           .lineLimit(2)
+        Spacer()
+        Text(subject.nameCn)
+          .font(.footnote)
+          .foregroundStyle(.secondary)
+          .multilineTextAlignment(.leading)
+          .lineLimit(2)
+        Spacer()
         HStack {
-          Text("\(subject.rating.total) 人收藏").foregroundStyle(.secondary)
+          Label("\(subject.rating.total)", systemImage: "bookmark")
           if subject.rating.rank > 0 {
-            Label("\(subject.rating.rank)", systemImage: "chart.bar.xaxis").foregroundStyle(.accent)
+            Label("\(subject.rating.rank)", systemImage: "chart.bar.xaxis")
           }
           if subject.rating.score > 0 {
             let score = String(format: "%.1f", subject.rating.score)
-            Label("\(score)", systemImage: "star").foregroundStyle(.accent)
+            Label("\(score)", systemImage: "star")
           }
           Spacer()
-        }.font(.caption)
+        }
+        .onTapGesture {
+          collectionDetail.toggle()
+        }
+        .sheet(isPresented: $collectionDetail, content: {
+          SubjectRatingView(subject: subject)
+        })
+        .font(.caption)
+        .foregroundStyle(.accent)
       }
-      Spacer()
+    }
+  }
+}
+
+struct SubjectRatingView: View {
+  var subject: Subject
+
+  var body: some View {
+    VStack {
+      Text("\(subject.rating.total) 人收藏")
+      if subject.rating.rank > 0 {
+        Text("Bangumi 排名 \(subject.rating.rank)")
+      }
+      if subject.rating.score > 0 {
+        let score = String(format: "%.1f", subject.rating.score)
+        Text("评分 \(score)")
+      }
     }
   }
 }
@@ -153,13 +199,15 @@ struct SubjectTagView: View {
 
   var body: some View {
     VStack(alignment: .leading) {
+      let tags = subject.tags.filter { $0.count > 30 }
       Text("标签").font(.headline)
       FlowStack {
-        ForEach(subject.tags, id: \.name) { tag in
+        ForEach(tags, id: \.name) { tag in
           HStack {
             Text(tag.name)
               .font(.caption)
               .foregroundColor(.accent)
+              .lineLimit(1)
             Text("\(tag.count)")
               .font(.caption2)
               .foregroundColor(.secondary)

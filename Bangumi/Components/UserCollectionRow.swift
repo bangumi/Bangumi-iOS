@@ -30,10 +30,10 @@ struct UserCollectionRow: View {
           .clipShape(RoundedRectangle(cornerRadius: 10))
           .shadow(color: .accent, radius: 1, x: 1, y: 1)
         HStack {
-          ImageView(img: subject.images.common, size: 60)
+          ImageView(img: subject.images.common, width: 60, height: 60)
           VStack(alignment: .leading) {
             Text(subject.name).font(.headline)
-            Text(subject.nameCn).font(.subheadline).foregroundStyle(.secondary)
+            Text(subject.nameCn).font(.footnote).foregroundStyle(.secondary)
             switch collection.subjectType {
             case .anime:
               HStack {

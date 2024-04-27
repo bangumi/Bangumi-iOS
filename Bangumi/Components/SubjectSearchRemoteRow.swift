@@ -19,7 +19,7 @@ struct SubjectSearchRemoteRow: View {
         .clipShape(RoundedRectangle(cornerRadius: 10))
         .shadow(color: .accent, radius: 1, x: 1, y: 1)
       HStack {
-        ImageView(img: subject.image, size: 60)
+        ImageView(img: subject.image, width: 60, height: 60)
         VStack(alignment: .leading) {
           let score = String(format: "%.1f", subject.score)
           Text(subject.name).font(.headline)
