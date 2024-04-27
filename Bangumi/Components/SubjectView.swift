@@ -18,6 +18,7 @@ struct SubjectView: View {
   var collection: UserSubjectCollection? { collections.first }
 
   @State private var subject: Subject? = nil
+  @State private var summaryCollapsed = true
 
   init(sid: UInt) {
     self.sid = sid
@@ -44,18 +45,53 @@ struct SubjectView: View {
   var body: some View {
     if let subject = subject {
       ScrollView {
-        LazyVStack {
-          Text(subject.nameCn)
+        LazyVStack(alignment: .leading) {
+          HStack(alignment: .top) {
+            ImageView(img: subject.images.common, size: 100)
+            VStack(alignment: .leading) {
+              HStack {
+                Label(subject.type.description, systemImage: subject.type.icon).foregroundStyle(.accent)
+                if let date = subject.date {
+                  Label(date, systemImage: "calendar").foregroundStyle(.gray)
+                }
+                Spacer()
+              }.font(.caption)
+              Text(subject.nameCn)
+                .font(.caption)
+                .foregroundStyle(.gray)
+                .multilineTextAlignment(.leading)
+                .lineLimit(2)
+              Text(subject.name)
+                .font(.headline)
+                .multilineTextAlignment(.leading)
+                .lineLimit(2)
+              HStack {
+                Text("\(subject.rating.total) 人收藏").foregroundStyle(.gray)
+                if subject.rating.rank > 0 {
+                  Label("\(subject.rating.rank)", systemImage: "chart.bar.xaxis").foregroundStyle(.accent)
+                }
+                if subject.rating.score > 0 {
+                  let score = String(format: "%.1f", subject.rating.score)
+                  Label("\(score)", systemImage: "star").foregroundStyle(.accent)
+                }
+                Spacer()
+              }.font(.caption)
+            }
+            Spacer()
+          }
+          Text("简介").font(.headline)
+          Text(subject.summary)
             .font(.caption)
-            .foregroundStyle(.gray)
             .multilineTextAlignment(.leading)
-            .lineLimit(2)
-          Text(subject.name)
-            .font(.title3)
-            .multilineTextAlignment(.leading)
-            .lineLimit(2)
+            .lineLimit(summaryCollapsed ? 5 : nil)
+            .onTapGesture {
+              withAnimation {
+                summaryCollapsed.toggle()
+              }
+            }
+          Spacer()
         }
-      }
+      }.padding()
     } else {
       Image(systemName: "waveform")
         .resizable()
@@ -64,29 +100,5 @@ struct SubjectView: View {
         .symbolEffect(.variableColor.iterative.dimInactiveLayers)
         .onAppear(perform: fetchSubject)
     }
-
-//    if let collection = collection {
-//      Text("\(collection.updatedAt)")
-//    } else {
-//      EmptyView().onAppear()
-//    }
-    //    VStack(alignment: .leading) {
-    //      HStack(alignment: .top) {
-    //        ImageView(img: subject.images.common, size: 100)
-    //        VStack(alignment: .leading) {
-    //
-    //          Text(subject.name).font(.headline).multilineTextAlignment(.leading)
-    //            .lineLimit(2)
-    //          Label(subject.type.description(), systemImage: subject.type.icon).font(.subheadline).foregroundStyle(.accent)
-    //        }
-    //        Spacer()
-    //      }
-    //      Text("简介").font(.headline)
-    //      Text(subject.shortSummary).font(.caption).multilineTextAlignment(.leading)
-    //      Spacer()
-    //    }.padding([.horizontal], 10).padding([.vertical], 20)
-    //  }
-
-    Text("Hello, Subject: \(sid)")
   }
 }

@@ -5,6 +5,8 @@
 //  Created by Chuan Chuan on 2024/4/26.
 //
 
+import Foundation
+
 struct SubjectImages: Codable {
   var large: String
   var common: String
@@ -77,9 +79,42 @@ struct Rating: Codable {
   var score: Float
 }
 
+struct InfoboxValueListValue: Codable {
+  var k: String?
+  var v: String
+}
+
+enum InfoboxValue: Codable {
+  case string(String)
+  case list([InfoboxValueListValue])
+
+  init(from decoder: Decoder) throws {
+    let container = try decoder.singleValueContainer()
+    if let string = try? container.decode(String.self) {
+      self = .string(string)
+      return
+    }
+    if let list = try? container.decode([InfoboxValueListValue].self) {
+      self = .list(list)
+      return
+    }
+    throw DecodingError.typeMismatch(InfoboxValue.self, DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Wrong type for InfoboxValue"))
+  }
+
+  func encode(to encoder: Encoder) throws {
+    var container = encoder.singleValueContainer()
+    switch self {
+    case .string(let string):
+      try container.encode(string)
+    case .list(let list):
+      try container.encode(list)
+    }
+  }
+}
+
 struct InfoboxItem: Codable {
   var key: String
-  var value: String
+  var value: InfoboxValue
 }
 
 struct SubjectCollection: Codable {
