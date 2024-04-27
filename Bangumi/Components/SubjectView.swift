@@ -79,17 +79,27 @@ struct SubjectView: View {
             }
             Spacer()
           }
-          Text("简介").font(.headline)
-          Text(subject.summary)
-            .font(.caption)
-            .multilineTextAlignment(.leading)
-            .lineLimit(summaryCollapsed ? 5 : nil)
-            .onTapGesture {
-              withAnimation {
-                summaryCollapsed.toggle()
+          VStack(alignment: .leading) {
+            Text("简介").font(.headline)
+            Text(subject.summary)
+              .font(.caption)
+              .multilineTextAlignment(.leading)
+              .lineLimit(summaryCollapsed ? 5 : nil)
+              .onTapGesture {
+                withAnimation {
+                  summaryCollapsed.toggle()
+                }
               }
-            }
-          Spacer()
+            HStack {
+              Spacer()
+              if summaryCollapsed {
+                Text("展开")
+              } else {
+                Text("收起")
+              }
+            }.font(.caption).foregroundStyle(.accent)
+            Spacer()
+          }.padding(.vertical, 10)
         }
       }.padding()
     } else {
