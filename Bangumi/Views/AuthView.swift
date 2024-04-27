@@ -15,11 +15,15 @@ struct AuthView: View {
   @EnvironmentObject var chiiClient: ChiiClient
 
   var body: some View {
-    Button {
-      signInView.signIn()
-    } label: {
-      Text("Sign in with Bangumi")
-    }.buttonStyle(.borderedProminent)
+    VStack {
+      Text("使用 Bangumi 管理观看进度")
+      Button {
+        signInView.signIn()
+      } label: {
+        Text("登录")
+      }
+      .buttonStyle(.borderedProminent)
+    }
   }
 
   private var signInView: SignInViewModel {

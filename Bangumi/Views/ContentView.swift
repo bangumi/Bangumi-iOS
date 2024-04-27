@@ -61,7 +61,7 @@ struct ContentView: View {
     }
     .onAppear {
       Task.detached {
-        let profile = try await chiiClient.getProfile()
+        _ = try await chiiClient.getProfile()
       }
     }
     .environment(chiiClient)
