@@ -114,6 +114,7 @@ struct DiscoverView: View {
                 }
               }
             }
+            .navigationBarTitleDisplayMode(.inline)
             .navigationDestination(for: UserSubjectCollection.self) { collection in
               SubjectView(sid: collection.subjectId)
             }
@@ -141,6 +142,7 @@ struct DiscoverView: View {
                   }
                 }
               }
+              .navigationBarTitleDisplayMode(.inline)
               .navigationDestination(for: SearchSubject.self) { subject in
                 SubjectView(sid: subject.id)
               }
@@ -151,6 +153,7 @@ struct DiscoverView: View {
         Spacer()
       } else {
         CalendarView()
+          .navigationBarTitleDisplayMode(.inline)
           .navigationDestination(for: SmallSubject.self) { subject in
             SubjectView(sid: subject.id)
           }
