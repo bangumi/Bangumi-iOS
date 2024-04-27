@@ -73,10 +73,12 @@ struct CalendarWeekdayView: View {
         GridItem(.flexible())
       ]) {
         ForEach(calendar.items) { subject in
-          VStack {
-            ImageView(img: subject.images?.common, size: 80)
-            Text(subject.name).font(.caption).multilineTextAlignment(.leading).lineLimit(1)
-          }
+          NavigationLink(value: subject) {
+            VStack {
+              ImageView(img: subject.images?.common, size: 80)
+              Text(subject.name).font(.caption).multilineTextAlignment(.leading).lineLimit(1)
+            }
+          }.buttonStyle(PlainButtonStyle())
         }
       }
     }

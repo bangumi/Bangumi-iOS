@@ -116,12 +116,16 @@ struct DiscoverView: View {
             ScrollView {
               LazyVStack(alignment: .leading, spacing: 10) {
                 ForEach(filteredCollections) { collection in
-                  if let subject = collection.subject {
-                    SubjectSearchLocalRow(subject: subject)
-                  }
+                  NavigationLink(value: collection) {
+                    SubjectSearchLocalRow(collection: collection)
+                  }.buttonStyle(PlainButtonStyle())
                 }
               }
-            }.padding(.horizontal, 16)
+            }
+            .navigationDestination(for: UserSubjectCollection.self) { collection in
+              SubjectView(sid: collection.subjectId)
+            }
+            .padding(.horizontal, 16)
           } else {
             if subjects.isEmpty {
               VStack {
@@ -137,19 +141,28 @@ struct DiscoverView: View {
               ScrollView {
                 LazyVStack(alignment: .leading, spacing: 10) {
                   ForEach(subjects) { subject in
-                    SubjectSearchRemoteRow(subject: subject)
-                      .onAppear {
+                    NavigationLink(value: subject) {
+                      SubjectSearchRemoteRow(subject: subject).onAppear {
                         checkSearchNextPage(current: subject)
                       }
+                    }.buttonStyle(PlainButtonStyle())
                   }
                 }
-              }.padding(.horizontal, 16)
+              }
+              .navigationDestination(for: SearchSubject.self) { subject in
+                SubjectView(sid: subject.id)
+              }
+              .padding(.horizontal, 16)
             }
           }
         }
         Spacer()
       } else {
-        CalendarView().padding(.horizontal, 16)
+        CalendarView()
+          .navigationDestination(for: SmallSubject.self) { subject in
+            SubjectView(sid: subject.id)
+          }
+          .padding(.horizontal, 16)
       }
     }
     .searchable(text: $query, isPresented: $searching)

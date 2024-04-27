@@ -106,12 +106,12 @@ enum CollectionType: UInt8, Codable {
   case dropped = 5
 
   init(value: UInt8 = 0) {
-    let tmp = CollectionType(rawValue: value)
+    let tmp = Self(rawValue: value)
     if let out = tmp {
       self = out
       return
     }
-    self = CollectionType.unknown
+    self = Self.unknown
   }
 
   func description(type: SubjectType) -> String {
@@ -181,19 +181,19 @@ enum SubjectType: UInt8, Codable, Identifiable {
   }
 
   init(value: UInt8 = 0) {
-    let tmp = SubjectType(rawValue: value)
+    let tmp = Self(rawValue: value)
     if let out = tmp {
       self = out
       return
     }
-    self = SubjectType.unknown
+    self = Self.unknown
   }
 
-  static func progressTypes() -> [SubjectType] {
+  static func progressTypes() -> [Self] {
     return [.book, .anime, .real]
   }
 
-  static func searchTypes() -> [SubjectType] {
+  static func searchTypes() -> [Self] {
     return [.book, .anime, .music, .game, .real]
   }
 
@@ -257,12 +257,12 @@ enum PersonType: UInt8, Codable, Identifiable {
   }
 
   init(value: UInt8 = 0) {
-    let tmp = PersonType(rawValue: value)
+    let tmp = Self(rawValue: value)
     if let out = tmp {
       self = out
       return
     }
-    self = PersonType.unknown
+    self = Self.unknown
   }
 
   var description: String {
@@ -309,12 +309,12 @@ enum CharacterType: UInt8, Codable, Identifiable {
   }
 
   init(value: UInt8 = 0) {
-    let tmp = CharacterType(rawValue: value)
+    let tmp = Self(rawValue: value)
     if let out = tmp {
       self = out
       return
     }
-    self = CharacterType.unknown
+    self = Self.unknown
   }
 
   var description: String {
@@ -364,12 +364,12 @@ enum EpisodeType: UInt8, Codable, Identifiable {
   }
 
   init(value: UInt8 = 0) {
-    let tmp = EpisodeType(rawValue: value)
+    let tmp = Self(rawValue: value)
     if let out = tmp {
       self = out
       return
     }
-    self = EpisodeType.main
+    self = Self.main
   }
 
   var description: String {

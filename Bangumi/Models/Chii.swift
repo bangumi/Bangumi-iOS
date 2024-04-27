@@ -28,7 +28,7 @@ struct SlimSubject: Codable, Identifiable {
   var tags: [Tag]
 }
 
-struct SearchSubject: Codable, Identifiable {
+struct SearchSubject: Codable, Identifiable, Hashable {
   var id: UInt
   var type: SubjectType?
   var date: String
@@ -39,9 +39,17 @@ struct SearchSubject: Codable, Identifiable {
   var tags: [Tag]
   var score: Float
   var rank: UInt
+
+  func hash(into hasher: inout Hasher) {
+    hasher.combine(id)
+  }
+
+  static func ==(lhs: Self, rhs: Self) -> Bool {
+    return lhs.id == rhs.id
+  }
 }
 
-struct SmallSubject: Codable, Identifiable {
+struct SmallSubject: Codable, Identifiable, Hashable {
   var id: UInt
   var url: String
   var type: SubjectType
@@ -54,6 +62,14 @@ struct SmallSubject: Codable, Identifiable {
   var rating: SmallRating?
   var rank: UInt?
   var collection: SubjectCollection?
+
+  func hash(into hasher: inout Hasher) {
+    hasher.combine(id)
+  }
+
+  static func ==(lhs: Self, rhs: Self) -> Bool {
+    return lhs.id == rhs.id
+  }
 }
 
 struct Subject: Codable, Identifiable {
