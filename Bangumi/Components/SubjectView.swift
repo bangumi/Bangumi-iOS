@@ -201,7 +201,7 @@ struct SubjectTagView: View {
 
   var body: some View {
     VStack(alignment: .leading) {
-      let tags = subject.tags.filter { $0.count > 30 }
+      let tags = subject.tags.sorted { $0.count > $1.count }.prefix(20)
       Text("标签").font(.headline)
       FlowStack {
         ForEach(tags, id: \.name) { tag in
