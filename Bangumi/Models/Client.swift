@@ -19,6 +19,8 @@ class ChiiClient: ObservableObject, Observable {
 
   var auth: Auth?
   var profile: Profile?
+  var anonymousSession: URLSession?
+  var authorizedSession: URLSession?
 
   @Published var isAuthenticated: Bool = false
 
@@ -68,19 +70,40 @@ class ChiiClient: ObservableObject, Observable {
   }
 
   func getSession(authroized: Bool) async throws -> URLSession {
+    if !authroized {
+      return await self.getAnoymousSession()
+    } else {
+      return try await self.getAuthorizedSession()
+    }
+  }
+
+  func getAnoymousSession() async -> URLSession {
+    let sessionConfig = URLSessionConfiguration.default
+    sessionConfig.httpAdditionalHeaders = [
+      "User-Agent": self.userAgent
+    ]
+    let session = URLSession(configuration: sessionConfig)
+    await MainActor.run {
+      self.anonymousSession = session
+    }
+    return session
+  }
+
+  func getAuthorizedSession() async throws -> URLSession {
     let sessionConfig = URLSessionConfiguration.default
     var headers: [AnyHashable: Any] = [:]
     headers["User-Agent"] = self.userAgent
-    if !authroized {
-      sessionConfig.httpAdditionalHeaders = headers
-      return URLSession(configuration: sessionConfig)
-    }
+
     if let auth = self.auth {
       if auth.isExpired() {
         let auth = try await self.refreshAccessToken(auth: auth)
         headers["Authorization"] = "Bearer \(auth.accessToken)"
       } else {
-        headers["Authorization"] = "Bearer \(auth.accessToken)"
+        if let session = self.authorizedSession {
+          return session
+        } else {
+          headers["Authorization"] = "Bearer \(auth.accessToken)"
+        }
       }
     } else {
       if let auth = try await self.getAuthFromKeychain() {
@@ -244,7 +267,7 @@ class ChiiClient: ObservableObject, Observable {
 
   func getSubject(sid: UInt) async throws -> Subject {
     let url = self.apiBase.appendingPathComponent("v0/subjects/\(sid)")
-    let data = try await request(url: url, method: "GET")
+    let data = try await request(url: url, method: "GET", authorized: self.isAuthenticated)
     let decoder = JSONDecoder()
     decoder.keyDecodingStrategy = .convertFromSnakeCase
     let subject = try decoder.decode(Subject.self, from: data)
