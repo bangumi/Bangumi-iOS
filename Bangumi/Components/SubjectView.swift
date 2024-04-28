@@ -104,18 +104,19 @@ struct SubjectHeaderView: View {
           .lineLimit(2)
         Spacer()
         HStack {
-          Label("\(subject.rating.total)", systemImage: "bookmark")
+          Label("\(subject.rating.total)", systemImage: "bookmark").foregroundStyle(Color("LinkTextColor"))
+          Spacer()
           if subject.rating.rank > 0 {
-            Label("\(subject.rating.rank)", systemImage: "chart.bar.xaxis")
+            Label("\(subject.rating.rank)", systemImage: "chart.bar.xaxis").foregroundStyle(.accent)
           }
           if subject.rating.score > 0 {
             let score = String(format: "%.1f", subject.rating.score)
-            Label("\(score)", systemImage: "star")
+            Label("\(score)", systemImage: "star").foregroundStyle(.accent)
           }
-          Spacer()
         }
         .font(.caption)
-        .foregroundStyle(.accent)
+        .padding(.top, 4)
+        .padding(.bottom, 8)
         .onTapGesture {
           collectionDetail.toggle()
         }
@@ -207,7 +208,7 @@ struct SubjectSummaryView: View {
         }
         .buttonStyle(PlainButtonStyle())
         .font(.caption)
-        .foregroundStyle(.accent)
+        .foregroundStyle(Color("LinkTextColor"))
       }
     }.padding(.vertical, 10)
   }
@@ -225,11 +226,11 @@ struct SubjectTagView: View {
           HStack {
             Text(tag.name)
               .font(.caption)
-              .foregroundColor(.accent)
+              .foregroundStyle(Color("LinkTextColor"))
               .lineLimit(1)
             Text("\(tag.count)")
               .font(.caption2)
-              .foregroundColor(.secondary)
+              .foregroundStyle(.secondary)
           }
           .padding(.horizontal, 6)
           .padding(.vertical, 4)

@@ -49,7 +49,7 @@ struct TimelineView: View {
       NavigationStack(path: $navState.timelineNavigation) {
         if let me = profile {
           ImageView(img: me.avatar.large, width: 80, height: 80)
-          Text(me.nickname)
+          Text("Hi! \(me.nickname)").font(.headline)
           Button(action: logout) {
             Text("退出登录")
           }
