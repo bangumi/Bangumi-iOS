@@ -10,6 +10,8 @@ import SwiftUI
 struct SubjectCollectionView: View {
   var subject: Subject
 
+  @State private var collection: UserSubjectCollection?
+
   var body: some View {
     VStack(alignment: .leading) {
       Text("收藏").font(.headline)

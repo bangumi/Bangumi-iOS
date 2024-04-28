@@ -38,15 +38,15 @@ struct SubjectHeaderView: View {
           if subject.locked {
             Label("", systemImage: "lock").foregroundStyle(.red)
           }
-        }.font(.caption)
+        }.font(.footnote)
         Spacer()
         Text(subject.name)
-          .font(.headline)
+          .font(.title3.bold())
           .multilineTextAlignment(.leading)
           .lineLimit(2)
         Spacer()
         Text(subject.nameCn)
-          .font(.footnote)
+          .font(.subheadline)
           .foregroundStyle(.secondary)
           .multilineTextAlignment(.leading)
           .lineLimit(2)
@@ -62,7 +62,7 @@ struct SubjectHeaderView: View {
             Label("\(score)", systemImage: "star").foregroundStyle(.accent)
           }
         }
-        .font(.caption)
+        .font(.subheadline)
         .padding(.top, 4)
         .padding(.bottom, 8)
         .onTapGesture {
@@ -73,7 +73,7 @@ struct SubjectHeaderView: View {
             .presentationDragIndicator(.visible)
             .presentationDetents(.init([.fraction(0.4)]))
         })
-      }
+      }.padding(.leading, 5)
     }
   }
 }
