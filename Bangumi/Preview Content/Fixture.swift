@@ -1,5 +1,5 @@
 //
-//  Preview.swift
+//  Fixture.swift
 //  Bangumi
 //
 //  Created by Chuan Chuan on 2024/4/28.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-func loadFixture<T: Decodable>(fixture: String, target: T.Type) throws -> Any? {
+func loadFixture<T: Decodable>(fixture: String, target: T.Type) throws -> T? {
   guard let url = Bundle.main.url(forResource: fixture, withExtension: nil) else {
     fatalError("Failed to locate \(fixture) in bundle")
   }
@@ -21,12 +21,12 @@ func loadFixture<T: Decodable>(fixture: String, target: T.Type) throws -> Any? {
 
 extension Subject {
   static var preview: Subject {
-    return try! loadFixture(fixture: "subject.json", target: Subject.self) as! Subject
+    return try! loadFixture(fixture: "subject.json", target: Subject.self)!
   }
 }
 
 extension UserSubjectCollection {
   static var preview: UserSubjectCollection {
-    return try! loadFixture(fixture: "user_collection.json", target: UserSubjectCollection.self) as! UserSubjectCollection
+    return try! loadFixture(fixture: "user_collection.json", target: UserSubjectCollection.self)!
   }
 }
