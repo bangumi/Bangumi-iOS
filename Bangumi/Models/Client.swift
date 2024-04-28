@@ -62,11 +62,20 @@ class ChiiClient: ObservableObject, Observable {
       request.httpBody = bodyData
     }
     let (data, response) = try await session.data(for: request)
-    guard let response = response as? HTTPURLResponse, response.statusCode < 400 else {
-      let resp = String(data: data, encoding: .utf8) ?? ""
-      throw ChiiError(message: "response: \(resp)")
+    guard let response = response as? HTTPURLResponse else {
+      throw ChiiError(message: "api response nil")
     }
-    return data
+    if response.statusCode < 400 {
+      return data
+    } else if response.statusCode < 500 {
+      let decoder = JSONDecoder()
+      decoder.keyDecodingStrategy = .convertFromSnakeCase
+      let error = try decoder.decode(ResponseError.self, from: data)
+      throw ChiiError(code: response.statusCode, response: error)
+    } else {
+      let error = String(data: data, encoding: .utf8) ?? ""
+      throw ChiiError(message: "api error \(response.statusCode): \(error)")
+    }
   }
 
   func logout() {

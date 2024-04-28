@@ -14,18 +14,8 @@ struct SubjectView: View {
   @EnvironmentObject var chiiClient: ChiiClient
   @EnvironmentObject var errorHandling: ErrorHandling
 
-  @Query private var collections: [UserSubjectCollection]
-  var collection: UserSubjectCollection? { collections.first }
-
   @State private var subject: Subject? = nil
   @State private var summaryCollapsed = true
-
-  init(sid: UInt) {
-    self.sid = sid
-    _collections = Query(filter: #Predicate<UserSubjectCollection> { collection in
-      collection.subjectId == sid
-    })
-  }
 
   func fetchSubject() {
     Task.detached {
@@ -47,7 +37,9 @@ struct SubjectView: View {
       ScrollView {
         LazyVStack(alignment: .leading) {
           SubjectHeaderView(subject: subject)
-          SubjectCollectionView(subject: subject)
+          if chiiClient.isAuthenticated {
+            SubjectCollectionView(subject: subject)
+          }
           if !subject.summary.isEmpty {
             SubjectSummaryView(subject: subject)
           }
@@ -122,6 +114,8 @@ struct SubjectHeaderView: View {
           }
           Spacer()
         }
+        .font(.caption)
+        .foregroundStyle(.accent)
         .onTapGesture {
           collectionDetail.toggle()
         }
@@ -129,8 +123,6 @@ struct SubjectHeaderView: View {
           SubjectRatingView(subject: subject)
             .presentationDetents(.init([.medium]))
         })
-        .font(.caption)
-        .foregroundStyle(.accent)
       }
     }
   }
@@ -139,9 +131,34 @@ struct SubjectHeaderView: View {
 struct SubjectRatingView: View {
   var subject: Subject
 
+  var collectionDesc: String {
+    var text = ""
+    if let wish = subject.collection.wish {
+      text += "\(wish) 人\(CollectionType.wish.description(type: subject.type))"
+      text += " / "
+    }
+    if let collect = subject.collection.collect {
+      text += "\(collect) 人\(CollectionType.collect.description(type: subject.type))"
+      text += " / "
+    }
+    if let doing = subject.collection.doing {
+      text += "\(doing) 人\(CollectionType.do.description(type: subject.type))"
+      text += " / "
+    }
+    if let onHold = subject.collection.onHold {
+      text += "\(onHold) 人\(CollectionType.onHold.description(type: subject.type))"
+      text += " / "
+    }
+    if let dropped = subject.collection.dropped {
+      text += "\(dropped) 人\(CollectionType.dropped.description(type: subject.type))"
+    }
+    return text
+  }
+
   var body: some View {
-    VStack {
-      Text("\(subject.rating.total) 人收藏")
+    VStack(alignment: .leading) {
+      Text("\(subject.rating.total) 人评分")
+      Text(collectionDesc)
       if subject.rating.rank > 0 {
         Text("Bangumi 排名 \(subject.rating.rank)")
       }

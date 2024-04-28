@@ -7,11 +7,50 @@
 
 import Foundation
 
-struct ChiiError: Error {
-  var message: String
+struct ResponseError: Codable {
+  var title: String
+  var description: String
+  var details: String
+
+  var display: String {
+    return "API ERROR: \(title): \(description)\n\(details)"
+  }
+}
+
+enum ChiiError: Error {
+  case validation(ResponseError)
+  case notAuthorized(ResponseError)
+  case notFound(ResponseError)
+  case generic(String)
 
   init(message: String) {
-    self.message = message
+    self = .generic(message)
+  }
+
+  init(code: Int, response: ResponseError) {
+    switch code {
+    case 400:
+      self = .validation(response)
+    case 401, 403:
+      self = .notAuthorized(response)
+    case 404:
+      self = .notFound(response)
+    default:
+      self = .generic(response.description)
+    }
+  }
+
+  var message: String {
+    switch self {
+    case .validation(let error):
+      return error.display
+    case .notAuthorized(let error):
+      return error.display
+    case .notFound(let error):
+      return error.display
+    case .generic(let message):
+      return message
+    }
   }
 }
 
