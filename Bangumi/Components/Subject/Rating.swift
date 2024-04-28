@@ -61,46 +61,116 @@ struct SubjectRatingView: View {
   }
 
   var body: some View {
-    VStack(alignment: .leading) {
-      HStack {
-        Image("Musume")
-          .scaleEffect(x: 0.5, y: 0.5, anchor: .bottomLeading)
-          .offset(x: CGFloat(-40 * scoreInfo.offset), y: 20)
-          .frame(width: 40, height: 55, alignment: .bottomLeading)
-          .clipped()
-        VStack(alignment: .leading) {
-          HStack(alignment: .center) {
-            let score = String(format: "%.1f", subject.rating.score)
-            Text("\(score)").font(.title).foregroundStyle(.accent)
-            if subject.rating.score > 0 {
-              Text(scoreInfo.desc)
+    GeometryReader { geometry in
+      VStack(alignment: .leading) {
+        HStack {
+          Image("Musume")
+            .scaleEffect(x: 0.5, y: 0.5, anchor: .bottomLeading)
+            .offset(x: CGFloat(-40 * scoreInfo.offset), y: 20)
+            .frame(width: 40, height: 55, alignment: .bottomLeading)
+            .clipped()
+          VStack(alignment: .leading) {
+            HStack(alignment: .center) {
+              let score = String(format: "%.1f", subject.rating.score)
+              Text("\(score)").font(.title).foregroundStyle(.accent)
+              if subject.rating.score > 0 {
+                Text(scoreInfo.desc)
+              }
+            }
+            if subject.rating.rank > 0 {
+              HStack {
+                Text("Bangumi Anime Rank:").foregroundStyle(.secondary)
+                Text("#\(subject.rating.rank)")
+              }
             }
           }
-          if subject.rating.rank > 0 {
+        }.padding(.vertical, 10)
+        HStack {
+          Spacer()
+          Text("\(subject.rating.total) 人评分").font(.footnote)
+        }
+        ChartView(data: subject.rating.count, width: geometry.size.width, height: 160)
+          .frame(width: geometry.size.width, height: 160)
+        FlowStack {
+          ForEach(collectionDesc, id: \.self) { desc in
             HStack {
-              Text("Bangumi Anime Rank:").foregroundStyle(.secondary)
-              Text("#\(subject.rating.rank)")
-            }
+              Text(desc).foregroundStyle(Color("LinkTextColor"))
+              Text("/  ").foregroundStyle(.secondary)
+            }.font(.footnote)
           }
         }
-      }.padding(.vertical, 10)
-
-      Text("\(subject.rating.total) 人评分").font(.headline)
-      FlowStack {
-        ForEach(Array(collectionDesc.enumerated()), id: \.element) { idx, desc in
-          HStack {
-            if idx > 0 {
-              Text(" / ").foregroundStyle(.secondary)
-            }
-            Text(desc).foregroundStyle(Color("LinkTextColor"))
-          }.font(.footnote)
-        }
+        Spacer()
       }
-
-      Spacer()
     }
     .padding(.vertical, 10)
     .padding(.horizontal, 20)
+  }
+}
+
+struct ChartView: View {
+  let data: [String: UInt]
+  let width: CGFloat
+  let height: CGFloat
+
+  var show: Bool {
+    if data.count == 0 {
+      return false
+    }
+    if data.values.max() == 0 {
+      return false
+    }
+    return true
+  }
+
+  var barWidth: CGFloat {
+    if data.count == 0 {
+      return 0
+    }
+    return (width / CGFloat(data.count)) * 0.8
+  }
+
+  var barSpacing: CGFloat {
+    if data.count == 0 {
+      return 0
+    }
+    return (width / CGFloat(data.count)) * 0.2
+  }
+
+  func barHeight(_ value: UInt) -> CGFloat {
+    if let maxValue = data.values.max() {
+      if maxValue == 0 {
+        return 0
+      }
+      return height * CGFloat(value) / CGFloat(maxValue)
+    }
+    return 0
+  }
+
+  var body: some View {
+    if show {
+      HStack(alignment: .bottom, spacing: barSpacing) {
+        let sorted = data.sorted { first, second -> Bool in
+          first.key.localizedStandardCompare(second.key) == .orderedDescending
+        }
+        ForEach(sorted, id: \.key) { key, value in
+          VStack {
+            Spacer()
+            Rectangle()
+              .fill(.secondary)
+              .frame(width: barWidth, height: barHeight(value))
+              .clipShape(RoundedRectangle(cornerRadius: 4))
+            Text(key)
+          }
+        }
+      }.padding(.bottom, 40)
+    } else {
+      HStack {
+        Spacer()
+        Text("暂无数据")
+          .foregroundStyle(.secondary)
+        Spacer()
+      }
+    }
   }
 }
 

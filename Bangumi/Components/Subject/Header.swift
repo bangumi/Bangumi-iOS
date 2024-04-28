@@ -70,7 +70,8 @@ struct SubjectHeaderView: View {
         }
         .sheet(isPresented: $collectionDetail, content: {
           SubjectRatingView(subject: subject)
-            .presentationDetents(.init([.medium]))
+            .presentationDragIndicator(.visible)
+            .presentationDetents(.init([.fraction(0.4)]))
         })
       }
     }
