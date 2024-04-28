@@ -38,3 +38,11 @@ struct SubjectTagView: View {
     }.padding(.vertical, 10)
   }
 }
+
+#Preview {
+  ScrollView {
+    LazyVStack(alignment: .leading) {
+      SubjectTagView(subject: .preview)
+    }
+  }.padding()
+}

@@ -16,3 +16,11 @@ struct SubjectCollectionView: View {
     }.padding(.vertical, 10)
   }
 }
+
+#Preview {
+  ScrollView {
+    LazyVStack(alignment: .leading) {
+      SubjectCollectionView(subject: .preview)
+    }
+  }.padding()
+}

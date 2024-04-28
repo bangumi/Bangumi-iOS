@@ -76,3 +76,11 @@ struct SubjectHeaderView: View {
     }
   }
 }
+
+#Preview {
+  ScrollView {
+    LazyVStack(alignment: .leading) {
+      SubjectHeaderView(subject: .preview)
+    }
+  }.padding()
+}

@@ -7,44 +7,103 @@
 
 import SwiftUI
 
+struct ScoreInfo {
+  var desc: String
+  var offset: Int
+
+  init(desc: String, offset: Int) {
+    self.desc = desc
+    self.offset = offset
+  }
+}
+
 struct SubjectRatingView: View {
   var subject: Subject
 
-  var collectionDesc: String {
-    var text = ""
+  var collectionDesc: [String] {
+    var text: [String] = []
     if let wish = subject.collection.wish {
-      text += "\(wish) 人\(CollectionType.wish.description(type: subject.type))"
-      text += " / "
+      text.append("\(wish) 人\(CollectionType.wish.description(type: subject.type))")
     }
     if let collect = subject.collection.collect {
-      text += "\(collect) 人\(CollectionType.collect.description(type: subject.type))"
-      text += " / "
+      text.append("\(collect) 人\(CollectionType.collect.description(type: subject.type))")
     }
     if let doing = subject.collection.doing {
-      text += "\(doing) 人\(CollectionType.do.description(type: subject.type))"
-      text += " / "
+      text.append("\(doing) 人\(CollectionType.do.description(type: subject.type))")
     }
     if let onHold = subject.collection.onHold {
-      text += "\(onHold) 人\(CollectionType.onHold.description(type: subject.type))"
-      text += " / "
+      text.append("\(onHold) 人\(CollectionType.onHold.description(type: subject.type))")
     }
     if let dropped = subject.collection.dropped {
-      text += "\(dropped) 人\(CollectionType.dropped.description(type: subject.type))"
+      text.append("\(dropped) 人\(CollectionType.dropped.description(type: subject.type))")
     }
     return text
   }
 
-  var body: some View {
-    VStack(alignment: .leading) {
-      Text("\(subject.rating.total) 人评分")
-      Text(collectionDesc)
-      if subject.rating.rank > 0 {
-        Text("Bangumi 排名 \(subject.rating.rank)")
-      }
-      if subject.rating.score > 0 {
-        let score = String(format: "%.1f", subject.rating.score)
-        Text("评分 \(score)")
-      }
+  var scoreInfo: ScoreInfo {
+    if subject.rating.score >= 9.5 {
+      ScoreInfo(desc: "超神作", offset: 6)
+    } else if subject.rating.score >= 8.5 {
+      ScoreInfo(desc: "神作", offset: 5)
+    } else if subject.rating.score >= 7.5 {
+      ScoreInfo(desc: "力荐", offset: 4)
+    } else if subject.rating.score >= 6.5 {
+      ScoreInfo(desc: "推荐", offset: 3)
+    } else if subject.rating.score >= 5.5 {
+      ScoreInfo(desc: "还行", offset: 2)
+    } else if subject.rating.score >= 4.5 {
+      ScoreInfo(desc: "较差", offset: 1)
+    } else if subject.rating.score >= 3.5 {
+      ScoreInfo(desc: "较差", offset: 0)
+    } else {
+      ScoreInfo(desc: "较差", offset: 0)
     }
   }
+
+  var body: some View {
+    VStack(alignment: .leading) {
+      HStack {
+        Image("Musume")
+          .scaleEffect(x: 0.5, y: 0.5, anchor: .bottomLeading)
+          .offset(x: CGFloat(-40 * scoreInfo.offset), y: 20)
+          .frame(width: 40, height: 55, alignment: .bottomLeading)
+          .clipped()
+        VStack(alignment: .leading) {
+          HStack(alignment: .center) {
+            let score = String(format: "%.1f", subject.rating.score)
+            Text("\(score)").font(.title).foregroundStyle(.accent)
+            if subject.rating.score > 0 {
+              Text(scoreInfo.desc)
+            }
+          }
+          if subject.rating.rank > 0 {
+            HStack {
+              Text("Bangumi Anime Rank:").foregroundStyle(.secondary)
+              Text("#\(subject.rating.rank)")
+            }
+          }
+        }
+      }.padding(.vertical, 10)
+
+      Text("\(subject.rating.total) 人评分").font(.headline)
+      FlowStack {
+        ForEach(Array(collectionDesc.enumerated()), id: \.element) { idx, desc in
+          HStack {
+            if idx > 0 {
+              Text(" / ").foregroundStyle(.secondary)
+            }
+            Text(desc).foregroundStyle(Color("LinkTextColor"))
+          }.font(.footnote)
+        }
+      }
+
+      Spacer()
+    }
+    .padding(.vertical, 10)
+    .padding(.horizontal, 20)
+  }
+}
+
+#Preview {
+  SubjectRatingView(subject: .preview)
 }

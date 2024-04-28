@@ -39,3 +39,11 @@ struct SubjectSummaryView: View {
     }.padding(.vertical, 10)
   }
 }
+
+#Preview {
+  ScrollView {
+    LazyVStack(alignment: .leading) {
+      SubjectSummaryView(subject: .preview)
+    }
+  }.padding()
+}
