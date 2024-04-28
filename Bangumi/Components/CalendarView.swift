@@ -34,27 +34,35 @@ struct CalendarView: View {
     }
   }
 
-  var body: some View {
-    ScrollView {
-      LazyVStack {
-        ForEach(sortedCalendars) { calendar in
-          CalendarWeekdayView(calendar: calendar).padding(.vertical, 10)
-        }
-      }
-    }.refreshable {
-      Task.detached {
-        do {
-          let cals = try await chiiClient.getCalendar()
-          await MainActor.run {
-            withAnimation {
-              for cal in cals {
-                modelContext.insert(cal)
-              }
+  func refreshCalendar() {
+    Task.detached {
+      do {
+        let cals = try await chiiClient.getCalendar()
+        await MainActor.run {
+          withAnimation {
+            for cal in cals {
+              modelContext.insert(cal)
             }
           }
-        } catch {
-          await errorHandling.handle(message: "\(error)")
         }
+      } catch {
+        await errorHandling.handle(message: "\(error)")
+      }
+    }
+  }
+
+  var body: some View {
+    if calendars.isEmpty {
+      LoadingView().onAppear(perform: refreshCalendar)
+    } else {
+      ScrollView {
+        LazyVStack {
+          ForEach(sortedCalendars) { calendar in
+            CalendarWeekdayView(calendar: calendar).padding(.vertical, 10)
+          }
+        }
+      }.refreshable {
+        refreshCalendar()
       }
     }
   }
