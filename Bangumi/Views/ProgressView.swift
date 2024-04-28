@@ -51,10 +51,7 @@ struct ProgressView: View {
     if chiiClient.isAuthenticated {
       NavigationStack(path: $navState.progressNavigation) {
         if collections.isEmpty {
-          VStack {
-            Text("Updating collections...")
-          }
-          .onAppear {
+          LoadingView().onAppear {
             updateCollections(type: nil)
           }
         } else {
@@ -84,7 +81,7 @@ struct ProgressView: View {
         }
       }
     } else {
-      AuthView()
+      AuthView(slogan: "使用 Bangumi 管理观看进度")
     }
   }
 }

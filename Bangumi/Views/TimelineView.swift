@@ -13,6 +13,8 @@ struct TimelineView: View {
   @EnvironmentObject var chiiClient: ChiiClient
   @EnvironmentObject var navState: NavState
 
+  @Environment(\.modelContext) private var modelContext
+
   @State var profile: Profile?
 
   func updateProfile() {
@@ -30,17 +32,33 @@ struct TimelineView: View {
     }
   }
 
+  func logout() {
+    withAnimation {
+      profile = nil
+      chiiClient.logout()
+      do {
+        try modelContext.delete(model: UserSubjectCollection.self)
+      } catch {
+        fatalError(error.localizedDescription)
+      }
+    }
+  }
+
   var body: some View {
     if chiiClient.isAuthenticated {
       NavigationStack(path: $navState.timelineNavigation) {
         if let me = profile {
           Text("Hello, " + me.nickname)
+          Button(action: logout) {
+            Text("退出登录")
+          }
+          .buttonStyle(.borderedProminent)
         } else {
-          Text("Refreshing profile...").onAppear(perform: updateProfile)
+          LoadingView().onAppear(perform: updateProfile)
         }
       }
     } else {
-      AuthView()
+      AuthView(slogan: "Bangumi 让你的 ACG 生活更美好")
     }
   }
 }

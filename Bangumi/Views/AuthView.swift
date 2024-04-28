@@ -14,9 +14,11 @@ struct AuthView: View {
   @EnvironmentObject var errorHandling: ErrorHandling
   @EnvironmentObject var chiiClient: ChiiClient
 
+  var slogan: String
+
   var body: some View {
     VStack {
-      Text("使用 Bangumi 管理观看进度")
+      Text(slogan)
       Button {
         signInView.signIn()
       } label: {

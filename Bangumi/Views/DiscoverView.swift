@@ -121,15 +121,7 @@ struct DiscoverView: View {
             .padding(.horizontal, 16)
           } else {
             if subjects.isEmpty {
-              VStack {
-                Spacer()
-                Image(systemName: "waveform")
-                  .resizable()
-                  .scaledToFit()
-                  .frame(width: 80, height: 80)
-                Spacer()
-              }
-              .symbolEffect(.variableColor.iterative.dimInactiveLayers)
+              LoadingView()
             } else {
               ScrollView {
                 LazyVStack(alignment: .leading, spacing: 10) {

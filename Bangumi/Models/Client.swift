@@ -69,6 +69,14 @@ class ChiiClient: ObservableObject, Observable {
     return data
   }
 
+  func logout() {
+    self.keychain.delete("auth")
+    self.isAuthenticated = false
+    self.auth = nil
+    self.profile = nil
+    self.authorizedSession = nil
+  }
+
   func getSession(authroized: Bool) async throws -> URLSession {
     if !authroized {
       return await self.getAnoymousSession()
