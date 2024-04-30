@@ -16,7 +16,7 @@ struct SubjectSummaryView: View {
     VStack(alignment: .leading) {
       Text("简介").font(.headline)
       Text(subject.summary)
-        .font(.caption)
+        .font(.footnote)
         .multilineTextAlignment(.leading)
         .lineLimit(collapsed ? 5 : nil)
       HStack {

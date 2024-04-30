@@ -16,7 +16,7 @@ struct ProgressView: View {
 
   @Query(sort: \UserSubjectCollection.updatedAt, order: .reverse) private var collections: [UserSubjectCollection]
 
-  @State private var subjectType = SubjectType.anime
+  @State private var subjectType = SubjectType.unknown
 
   func updateCollections(type: SubjectType?) {
     Task.detached(priority: .background) {
@@ -63,7 +63,8 @@ struct ProgressView: View {
             }.pickerStyle(.segmented)
             ScrollView {
               LazyVStack(alignment: .leading, spacing: 10) {
-                let filtered = collections.filter { $0.subjectType == subjectType }
+                let filtered = collections.filter { $0.subjectType == subjectType || subjectType == .unknown }
+
                 ForEach(filtered) { collection in
                   NavigationLink(value: collection) {
                     UserCollectionRow(collection: collection)
@@ -71,6 +72,7 @@ struct ProgressView: View {
                 }
               }
             }
+            .animation(.smooth, value: subjectType)
             .navigationDestination(for: UserSubjectCollection.self) { collection in
               SubjectView(sid: collection.subjectId)
             }

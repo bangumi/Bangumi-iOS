@@ -225,7 +225,7 @@ class ChiiClient: ObservableObject, Observable {
       URLQueryItem(name: "limit", value: "100"),
       URLQueryItem(name: "offset", value: String(offset))
     ]
-    if let sType = subjectType {
+    if let sType = subjectType, sType != .unknown {
       queryItems.append(URLQueryItem(name: "subject_type", value: String(sType.rawValue)))
     }
     let pageURL = url.appending(queryItems: queryItems)

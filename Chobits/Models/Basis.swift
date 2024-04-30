@@ -199,7 +199,7 @@ enum SubjectType: UInt8, Codable, Identifiable {
   }
 
   static func progressTypes() -> [Self] {
-    return [.book, .anime, .real]
+    return [.unknown, .book, .anime, .real]
   }
 
   static func searchTypes() -> [Self] {
@@ -209,7 +209,7 @@ enum SubjectType: UInt8, Codable, Identifiable {
   var description: String {
     switch self {
     case .unknown:
-      return "未知"
+      return "全部"
     case .book:
       return "书籍"
     case .anime:
@@ -226,17 +226,17 @@ enum SubjectType: UInt8, Codable, Identifiable {
   var icon: String {
     switch self {
     case .unknown:
-      return "questionmark"
+      return ""
     case .book:
       return "book"
     case .anime:
-      return "play.tv"
+      return "photo.tv"
     case .music:
       return "music.note.list"
     case .game:
       return "gamecontroller"
     case .real:
-      return "film"
+      return "play.tv"
     }
   }
 }

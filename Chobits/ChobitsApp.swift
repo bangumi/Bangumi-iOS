@@ -29,13 +29,17 @@ struct ChobitsApp: App {
       ContentView()
         .environmentObject(errorHandling)
         .environment(chiiClient)
-        .alert("Error", isPresented: $errorHandling.showAlert) {
+        .alert("ERROR", isPresented: $errorHandling.showAlert) {
           Button("OK") {
             errorHandling.currentAlert = nil
             errorHandling.showAlert = false
           }
         } message: {
-          Text(errorHandling.currentAlert?.message ?? "")
+          if let error = errorHandling.currentAlert {
+            Text("\(error)")
+          } else {
+            Text("Unknown error")
+          }
         }
     }
     .modelContainer(sharedModelContainer)

@@ -57,6 +57,7 @@ struct UserCollectionRow: View {
               HStack {
                 Text(collection.updatedAt.formatted()).foregroundStyle(.secondary)
                 Spacer()
+                Label(collection.subjectType.description, systemImage: collection.subjectType.icon).foregroundStyle(.accent)
               }.font(.caption)
             }
           }

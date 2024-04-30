@@ -7,18 +7,76 @@
 
 import Foundation
 
-struct ResponseError: Codable {
-  var title: String
-  var description: String
-  var details: String
+struct ResponseDetailedError: Codable, CustomStringConvertible {
+  var path: String
+  var error: String?
+  var method: String?
+  var queryString: String?
 
-  var display: String {
-    return "API ERROR: \(title): \(description)\n\(details)"
+  var description: String {
+    var desc = "path: \(path)"
+    if let error = error {
+      desc += ", error: \(error)"
+    }
+    if let method = method {
+      desc += ", method: \(method)"
+    }
+    if let queryString = queryString {
+      desc += ", queryString: \(queryString)"
+    }
+    return desc
   }
 }
 
-enum ChiiError: Error {
-  case validation(ResponseError)
+enum ResponseErrorDetails: Codable, CustomStringConvertible {
+  case string(String)
+  case detail(ResponseDetailedError)
+
+  init(from decoder: Decoder) throws {
+    let container = try decoder.singleValueContainer()
+    if let string = try? container.decode(String.self) {
+      self = .string(string)
+      return
+    }
+    if let path = try? container.decode(ResponseDetailedError.self) {
+      self = .detail(path)
+      return
+    }
+    throw DecodingError.typeMismatch(ResponseErrorDetails.self, DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Wrong type for ResponseErrorDetails"))
+  }
+
+  func encode(to encoder: Encoder) throws {
+    var container = encoder.singleValueContainer()
+    switch self {
+    case .string(let string):
+      try container.encode(string)
+    case .detail(let path):
+      try container.encode(path)
+    }
+  }
+
+  var description: String {
+    switch self {
+    case .string(let string):
+      return string
+    case .detail(let path):
+      return path.description
+    }
+  }
+}
+
+struct ResponseError: Codable, CustomStringConvertible {
+  var title: String
+  var description: String
+  var details: ResponseErrorDetails
+
+  var display: String {
+    return "API ERROR: \(title): \(description)\n\n\(details)"
+  }
+}
+
+enum ChiiError: Error, CustomStringConvertible {
+  case badRequest(ResponseError)
   case notAuthorized(ResponseError)
   case notFound(ResponseError)
   case generic(String)
@@ -30,7 +88,7 @@ enum ChiiError: Error {
   init(code: Int, response: ResponseError) {
     switch code {
     case 400:
-      self = .validation(response)
+      self = .badRequest(response)
     case 401, 403:
       self = .notAuthorized(response)
     case 404:
@@ -40,14 +98,14 @@ enum ChiiError: Error {
     }
   }
 
-  var message: String {
+  var description: String {
     switch self {
-    case .validation(let error):
-      return error.display
+    case .badRequest(let error):
+      return "Bad Request!\n\(error.display)"
     case .notAuthorized(let error):
-      return error.display
+      return "Unauthorized!\n\(error.display)"
     case .notFound(let error):
-      return error.display
+      return "Not Found!\n\(error.display)"
     case .generic(let message):
       return message
     }
