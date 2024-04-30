@@ -230,7 +230,7 @@ enum SubjectType: UInt8, Codable, Identifiable {
     case .book:
       return "book"
     case .anime:
-      return "photo.tv"
+      return "photo.stack"
     case .music:
       return "music.note.list"
     case .game:

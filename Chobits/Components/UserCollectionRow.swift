@@ -34,32 +34,23 @@ struct UserCollectionRow: View {
           VStack(alignment: .leading) {
             Text(subject.name).font(.headline)
             Text(subject.nameCn).font(.footnote).foregroundStyle(.secondary)
-            switch collection.subjectType {
-            case .anime:
-              HStack {
-                Text(collection.updatedAt.formatted()).foregroundStyle(.secondary)
-                Spacer()
+            HStack {
+              Text(collection.updatedAt.formatted()).foregroundStyle(.secondary)
+              if collection.private {
+                Image(systemName: "lock.fill").foregroundStyle(.accent)
+              }
+              Spacer()
+              switch collection.subjectType {
+              case .anime:
                 Text(chapters).foregroundStyle(.accent)
-              }.font(.caption)
-            case .book:
-              HStack {
-                Text(collection.updatedAt.formatted()).foregroundStyle(.secondary)
-                Spacer()
+              case .book:
                 Text("\(chapters)  \(volumes)").foregroundStyle(.accent)
-              }.font(.caption)
-            case .real:
-              HStack {
-                Text(collection.updatedAt.formatted()).foregroundStyle(.secondary)
-                Spacer()
+              case .real:
                 Text(chapters).foregroundStyle(.accent)
-              }.font(.caption)
-            default:
-              HStack {
-                Text(collection.updatedAt.formatted()).foregroundStyle(.secondary)
-                Spacer()
+              default:
                 Label(collection.subjectType.description, systemImage: collection.subjectType.icon).foregroundStyle(.accent)
-              }.font(.caption)
-            }
+              }
+            }.font(.caption)
           }
           Spacer()
         }
