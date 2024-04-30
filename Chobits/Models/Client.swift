@@ -22,6 +22,8 @@ class ChiiClient: ObservableObject, Observable {
   var anonymousSession: URLSession?
   var authorizedSession: URLSession?
 
+  var mock: Bool = false
+
   @Published var isAuthenticated: Bool = false
 
   var oauthURL: URL {
@@ -34,7 +36,7 @@ class ChiiClient: ObservableObject, Observable {
     return baseURL.appending(queryItems: queries)
   }
 
-  init() {
+  init(mock: Bool = false) {
     self.keychain = KeychainSwift(keyPrefix: "com.everpcpc.chobits.")
     guard let plist = Bundle.main.infoDictionary else {
       fatalError("Could not find Info.plist")
@@ -50,6 +52,7 @@ class ChiiClient: ObservableObject, Observable {
       clientSecret: clientSecret,
       callbackURL: "bangumi://oauth/callback"
     )
+    self.mock = mock
   }
 
   func request(url: URL, method: String, body: Any? = nil, authorized: Bool = true) async throws -> Data {
@@ -269,6 +272,9 @@ class ChiiClient: ObservableObject, Observable {
   }
 
   func getCollection(sid: UInt) async throws -> UserSubjectCollection {
+    if self.mock {
+      return try loadFixture(fixture: "user_collection.json", target: UserSubjectCollection.self)
+    }
     let profile = try await self.getProfile()
     let url = if profile.username.isEmpty {
       self.apiBase.appendingPathComponent("v0/users/\(profile.id)/collections/\(sid)")
@@ -283,6 +289,9 @@ class ChiiClient: ObservableObject, Observable {
   }
 
   func getSubject(sid: UInt) async throws -> Subject {
+    if self.mock {
+      return try loadFixture(fixture: "subject.json", target: Subject.self)
+    }
     let url = self.apiBase.appendingPathComponent("v0/subjects/\(sid)")
     let data = try await request(url: url, method: "GET", authorized: self.isAuthenticated)
     let decoder = JSONDecoder()

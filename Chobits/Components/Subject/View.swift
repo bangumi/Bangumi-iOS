@@ -58,3 +58,9 @@ struct SubjectView: View {
     }
   }
 }
+
+#Preview {
+  SubjectView(sid: 1)
+    .environmentObject(ErrorHandling())
+    .environmentObject(ChiiClient(mock: true))
+}
