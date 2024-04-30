@@ -8,7 +8,7 @@
 import SwiftData
 import SwiftUI
 
-struct ProgressView: View {
+struct ChiiProgressView: View {
   @EnvironmentObject var errorHandling: ErrorHandling
   @EnvironmentObject var chiiClient: ChiiClient
   @EnvironmentObject var navState: NavState
@@ -51,7 +51,7 @@ struct ProgressView: View {
     if chiiClient.isAuthenticated {
       NavigationStack(path: $navState.progressNavigation) {
         if collections.isEmpty {
-          LoadingView().onAppear {
+          ProgressView().onAppear {
             updateCollections(type: nil)
           }
         } else {

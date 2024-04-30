@@ -8,7 +8,7 @@
 import SwiftData
 import SwiftUI
 
-struct TimelineView: View {
+struct ChiiTimelineView: View {
   @EnvironmentObject var errorHandling: ErrorHandling
   @EnvironmentObject var chiiClient: ChiiClient
   @EnvironmentObject var navState: NavState
@@ -55,7 +55,7 @@ struct TimelineView: View {
           }
           .buttonStyle(.borderedProminent)
         } else {
-          LoadingView().onAppear(perform: updateProfile)
+          ProgressView().onAppear(perform: updateProfile)
         }
       }
     } else {

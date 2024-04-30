@@ -49,11 +49,7 @@ struct SubjectView: View {
       }
       .padding()
     } else {
-      Image(systemName: "waveform")
-        .resizable()
-        .scaledToFit()
-        .frame(width: 80, height: 80)
-        .symbolEffect(.variableColor.iterative.dimInactiveLayers)
+      ProgressView()
         .onAppear(perform: fetchSubject)
     }
   }

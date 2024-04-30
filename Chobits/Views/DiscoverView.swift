@@ -8,7 +8,7 @@
 import SwiftData
 import SwiftUI
 
-struct DiscoverView: View {
+struct ChiiDiscoverView: View {
   @EnvironmentObject var errorHandling: ErrorHandling
   @EnvironmentObject var chiiClient: ChiiClient
   @EnvironmentObject var navState: NavState
@@ -121,7 +121,7 @@ struct DiscoverView: View {
             .padding(.horizontal, 16)
           } else {
             if subjects.isEmpty {
-              LoadingView()
+              ProgressView()
             } else {
               ScrollView {
                 LazyVStack(alignment: .leading, spacing: 10) {

@@ -53,7 +53,7 @@ struct CalendarView: View {
 
   var body: some View {
     if calendars.isEmpty {
-      LoadingView().onAppear(perform: refreshCalendar)
+      ProgressView().onAppear(perform: refreshCalendar)
     } else {
       ScrollView {
         LazyVStack {

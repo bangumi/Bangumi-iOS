@@ -26,11 +26,7 @@ struct ImageView: View {
         CachedAsyncImage(
           url: iconURL,
           placeholder: { _ in
-            if width>0, height>0 {
-              Image(systemName: "waveform").frame(width: width, height: height)
-            } else {
-              Image(systemName: "waveform")
-            }
+            ProgressView()
           },
           image: {
             if width>0, height>0 {

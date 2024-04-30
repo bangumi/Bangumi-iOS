@@ -37,17 +37,17 @@ struct ContentView: View {
 
   var body: some View {
     TabView(selection: createTabViewBinding()) {
-      TimelineView()
+      ChiiTimelineView()
         .tag(ContentViewTab.timeline)
         .tabItem {
           Image(systemName: "person")
         }
-      ProgressView()
+      ChiiProgressView()
         .tag(ContentViewTab.progress)
         .tabItem {
           Image(systemName: "square.grid.3x2.fill")
         }
-      DiscoverView()
+      ChiiDiscoverView()
         .tag(ContentViewTab.discover)
         .tabItem {
           Image(systemName: "magnifyingglass")
