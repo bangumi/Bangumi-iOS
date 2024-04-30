@@ -76,6 +76,15 @@ struct SubjectRatingView: View {
               if subject.rating.score > 0 {
                 Text(scoreInfo.desc)
               }
+              Spacer()
+              Text("\(subject.rating.total) 人评分")
+                .font(.footnote)
+                .overlay {
+                  RoundedRectangle(cornerRadius: 4)
+                    .stroke(Color.secondary, lineWidth: 1)
+                    .padding(.horizontal, -4)
+                    .padding(.vertical, -2)
+                }
             }
             if subject.rating.rank > 0 {
               HStack {
@@ -84,13 +93,12 @@ struct SubjectRatingView: View {
               }
             }
           }
-        }.padding(.vertical, 10)
-        HStack {
-          Spacer()
-          Text("\(subject.rating.total) 人评分").font(.footnote)
-        }
-        ChartView(data: subject.rating.count, width: geometry.size.width, height: 160)
-          .frame(width: geometry.size.width, height: 160)
+        }.padding(.top, 10)
+        ChartView(data: subject.rating.count, width: geometry.size.width, height: 150)
+          .frame(width: geometry.size.width, height: 150)
+          .padding(.vertical, 20)
+          .background(Color.secondary.opacity(0.02))
+          .clipShape(RoundedRectangle(cornerRadius: 8))
         FlowStack {
           ForEach(collectionDesc, id: \.self) { desc in
             HStack {
@@ -98,7 +106,7 @@ struct SubjectRatingView: View {
               Text("/  ").foregroundStyle(.secondary)
             }.font(.footnote)
           }
-        }
+        }.padding(.horizontal, 8)
         Spacer()
       }
     }
@@ -126,14 +134,14 @@ struct ChartView: View {
     if data.count == 0 {
       return 0
     }
-    return (width / CGFloat(data.count)) * 0.8
+    return (width / CGFloat(data.count)) * 0.75
   }
 
   var barSpacing: CGFloat {
     if data.count == 0 {
       return 0
     }
-    return (width / CGFloat(data.count)) * 0.2
+    return (width / CGFloat(data.count)) * 0.15
   }
 
   func barHeight(_ value: UInt) -> CGFloat {
@@ -156,13 +164,13 @@ struct ChartView: View {
           VStack {
             Spacer()
             Rectangle()
-              .fill(.secondary)
+              .fill(.secondary.opacity(0.8))
               .frame(width: barWidth, height: barHeight(value))
               .clipShape(RoundedRectangle(cornerRadius: 4))
-            Text(key)
+            Text(key).font(.footnote)
           }
         }
-      }.padding(.bottom, 40)
+      }
     } else {
       HStack {
         Spacer()
