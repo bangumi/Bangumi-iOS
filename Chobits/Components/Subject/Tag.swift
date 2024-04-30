@@ -35,7 +35,7 @@ struct SubjectTagView: View {
           }
         }
       }
-    }.padding(.vertical, 10)
+    }
   }
 }
 

@@ -36,7 +36,7 @@ struct SubjectSummaryView: View {
         .font(.caption)
         .foregroundStyle(Color("LinkTextColor"))
       }
-    }.padding(.vertical, 10)
+    }
   }
 }
 

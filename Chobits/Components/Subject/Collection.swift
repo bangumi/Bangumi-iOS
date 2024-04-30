@@ -15,7 +15,7 @@ struct SubjectCollectionView: View {
   var body: some View {
     VStack(alignment: .leading) {
       Text("收藏").font(.headline)
-    }.padding(.vertical, 10)
+    }
   }
 }
 
