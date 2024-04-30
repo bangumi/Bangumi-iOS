@@ -21,24 +21,24 @@ struct ChobitsApp: App {
     }
   }()
 
-  @StateObject var errorHandling = ErrorHandling()
-  @StateObject var chiiClient = ChiiClient()
+  @StateObject var notifier = Notifier()
+  @StateObject var chii = ChiiClient()
 
   var body: some Scene {
     WindowGroup {
       ContentView()
-        .environmentObject(errorHandling)
-        .environment(chiiClient)
-        .alert("ERROR", isPresented: $errorHandling.showAlert) {
+        .environmentObject(notifier)
+        .environment(chii)
+        .alert("ERROR", isPresented: $notifier.showAlert) {
           Button("OK") {
-            errorHandling.currentAlert = nil
-            errorHandling.showAlert = false
+            notifier.error = nil
+            notifier.showAlert = false
           }
         } message: {
-          if let error = errorHandling.currentAlert {
+          if let error = notifier.error {
             Text("\(error)")
           } else {
-            Text("Unknown error")
+            Text("Unknown Error")
           }
         }
     }
@@ -46,24 +46,36 @@ struct ChobitsApp: App {
   }
 }
 
-class ErrorHandling: ObservableObject {
-  @Published var currentAlert: ChiiError?
+class Notifier: ObservableObject {
+  @Published var error: ChiiError?
   @Published var showAlert: Bool = false
 
-  func handle(message: String) {
+  @Published var notification: String?
+  @Published var showNotification: Bool = false
+
+  func alert(error: ChiiError) {
     Task {
       await MainActor.run {
-        currentAlert = ChiiError(message: message)
-        showAlert = true
+        self.error = error
+        self.showAlert = true
       }
     }
   }
 
-  func handleError(error: ChiiError) {
+  func alert(message: String) {
     Task {
       await MainActor.run {
-        currentAlert = error
-        showAlert = true
+        self.error = ChiiError(message: message)
+        self.showAlert = true
+      }
+    }
+  }
+
+  func notify(message: String) {
+    Task {
+      await MainActor.run {
+        self.notification = message
+        self.showNotification = true
       }
     }
   }

@@ -9,8 +9,8 @@ import SwiftData
 import SwiftUI
 
 struct ChiiDiscoverView: View {
-  @EnvironmentObject var errorHandling: ErrorHandling
-  @EnvironmentObject var chiiClient: ChiiClient
+  @EnvironmentObject var notifier: Notifier
+  @EnvironmentObject var chii: ChiiClient
   @EnvironmentObject var navState: NavState
 
   @State private var searching = false
@@ -48,7 +48,7 @@ struct ChiiDiscoverView: View {
     local = false
     subjects = []
     Task.detached {
-      let resp = try await chiiClient.search(
+      let resp = try await chii.search(
         keyword: query, type: subjectType, offset: offset, limit: limit)
       await MainActor.run {
         withAnimation {
@@ -70,7 +70,7 @@ struct ChiiDiscoverView: View {
     }
     offset += limit
     Task.detached {
-      let resp = try await chiiClient.search(
+      let resp = try await chii.search(
         keyword: query, type: subjectType, offset: offset, limit: limit)
       await MainActor.run {
         withAnimation {

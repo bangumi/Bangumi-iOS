@@ -11,8 +11,8 @@ import SwiftUI
 struct SubjectView: View {
   var sid: UInt
 
-  @EnvironmentObject var chiiClient: ChiiClient
-  @EnvironmentObject var errorHandling: ErrorHandling
+  @EnvironmentObject var notifier: Notifier
+  @EnvironmentObject var chii: ChiiClient
 
   @State private var subject: Subject? = nil
   @State private var summaryCollapsed = true
@@ -20,14 +20,14 @@ struct SubjectView: View {
   func fetchSubject() {
     Task.detached {
       do {
-        let subject = try await chiiClient.getSubject(sid: sid)
+        let subject = try await chii.getSubject(sid: sid)
         await MainActor.run {
           withAnimation {
             self.subject = subject
           }
         }
       } catch {
-        await errorHandling.handle(message: "\(error)")
+        await notifier.alert(message: "\(error)")
       }
     }
   }
@@ -37,7 +37,7 @@ struct SubjectView: View {
       ScrollView {
         LazyVStack(alignment: .leading) {
           SubjectHeaderView(subject: subject)
-          if chiiClient.isAuthenticated {
+          if chii.isAuthenticated {
             SubjectCollectionView(subject: subject)
           }
           if !subject.summary.isEmpty {
@@ -57,6 +57,6 @@ struct SubjectView: View {
 
 #Preview {
   SubjectView(sid: 1)
-    .environmentObject(ErrorHandling())
+    .environmentObject(Notifier())
     .environmentObject(ChiiClient(mock: true))
 }

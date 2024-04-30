@@ -11,8 +11,8 @@ import SwiftUI
 import UIKit
 
 struct AuthView: View {
-  @EnvironmentObject var errorHandling: ErrorHandling
-  @EnvironmentObject var chiiClient: ChiiClient
+  @EnvironmentObject var notifier: Notifier
+  @EnvironmentObject var chii: ChiiClient
 
   var slogan: String
 
@@ -29,17 +29,17 @@ struct AuthView: View {
   }
 
   private var signInView: SignInViewModel {
-    return SignInViewModel(errorHandling: errorHandling, chiiClient: chiiClient)
+    return SignInViewModel(notifier: notifier, chii: chii)
   }
 }
 
 class SignInViewModel: NSObject, ObservableObject, ASWebAuthenticationPresentationContextProviding {
-  let errorHandling: ErrorHandling
-  let chiiClient: ChiiClient
+  let notifier: Notifier
+  let chii: ChiiClient
 
-  init(errorHandling: ErrorHandling, chiiClient: ChiiClient) {
-    self.errorHandling = errorHandling
-    self.chiiClient = chiiClient
+  init(notifier: Notifier, chii: ChiiClient) {
+    self.notifier = notifier
+    self.chii = chii
   }
 
   func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
@@ -54,19 +54,19 @@ class SignInViewModel: NSObject, ObservableObject, ASWebAuthenticationPresentati
       .queryItems?.filter { $0.name == "code" }.first
     let authorizationCode = query?.value ?? ""
     if authorizationCode.isEmpty {
-      errorHandling.handle(message: "failed to get oauth token")
+      notifier.alert(message: "failed to get oauth token")
     }
     Task {
       do {
-        try await self.chiiClient.exchangeForAccessToken(code: authorizationCode)
+        try await self.chii.exchangeForAccessToken(code: authorizationCode)
       } catch {
-        errorHandling.handle(message: "failed to exchange for access token")
+        notifier.alert(message: "failed to exchange for access token")
       }
     }
   }
 
   func signIn() {
-    let authURL = chiiClient.oauthURL
+    let authURL = chii.oauthURL
     let session = ASWebAuthenticationSession(url: authURL, callbackURLScheme: "bangumi") {
       callback, error in
       self.handleAuthCallback(callback: callback, error: error)

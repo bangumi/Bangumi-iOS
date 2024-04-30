@@ -9,8 +9,8 @@ import SwiftData
 import SwiftUI
 
 struct CalendarView: View {
-  @EnvironmentObject var chiiClient: ChiiClient
-  @EnvironmentObject var errorHandling: ErrorHandling
+  @EnvironmentObject var notifier: Notifier
+  @EnvironmentObject var chii: ChiiClient
   @Environment(\.modelContext) private var modelContext
 
   @Query(sort: \BangumiCalendar.id) private var calendars: [BangumiCalendar]
@@ -19,7 +19,7 @@ struct CalendarView: View {
     let calendar = Calendar.current
     // FIXME: something wrong with weekday for today
     guard let yesterday = calendar.date(byAdding: .day, value: -1, to: Date()) else {
-      errorHandling.handle(message: "Could not get yesterday")
+      notifier.alert(message: "Could not get yesterday")
       return calendars
     }
     let weekday = calendar.component(.weekday, from: yesterday)
@@ -37,7 +37,7 @@ struct CalendarView: View {
   func refreshCalendar() {
     Task.detached {
       do {
-        let cals = try await chiiClient.getCalendar()
+        let cals = try await chii.getCalendar()
         await MainActor.run {
           withAnimation {
             for cal in cals {
@@ -46,7 +46,7 @@ struct CalendarView: View {
           }
         }
       } catch {
-        await errorHandling.handle(message: "\(error)")
+        await notifier.alert(message: "\(error)")
       }
     }
   }

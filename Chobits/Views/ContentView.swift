@@ -9,8 +9,9 @@ import SwiftData
 import SwiftUI
 
 struct ContentView: View {
-  @EnvironmentObject var errorHandling: ErrorHandling
-  @EnvironmentObject var chiiClient: ChiiClient
+  @EnvironmentObject var notifier: Notifier
+  @EnvironmentObject var chii: ChiiClient
+
   @Environment(\.modelContext) private var modelContext
 
   @StateObject var navState = NavState()
@@ -55,10 +56,9 @@ struct ContentView: View {
     }
     .onAppear {
       Task.detached {
-        _ = try await chiiClient.getProfile()
+        _ = try await chii.getProfile()
       }
     }
-    .environment(chiiClient)
     .environment(navState)
   }
 }

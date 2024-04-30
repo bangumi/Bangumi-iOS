@@ -9,9 +9,10 @@ import SwiftData
 import SwiftUI
 
 struct ChiiProgressView: View {
-  @EnvironmentObject var errorHandling: ErrorHandling
-  @EnvironmentObject var chiiClient: ChiiClient
+  @EnvironmentObject var notifier: Notifier
+  @EnvironmentObject var chii: ChiiClient
   @EnvironmentObject var navState: NavState
+
   @Environment(\.modelContext) private var modelContext
 
   @Query(sort: \UserSubjectCollection.updatedAt, order: .reverse) private var collections: [UserSubjectCollection]
@@ -24,7 +25,7 @@ struct ChiiProgressView: View {
         var offset: UInt = 0
         let limit: UInt = 100
         while true {
-          let response = try await chiiClient.getCollections(subjectType: type, limit: limit, offset: offset)
+          let response = try await chii.getCollections(subjectType: type, limit: limit, offset: offset)
           if response.data.isEmpty {
             break
           }
@@ -42,13 +43,13 @@ struct ChiiProgressView: View {
         }
 
       } catch {
-        await errorHandling.handle(message: "\(error)")
+        await notifier.alert(message: "\(error)")
       }
     }
   }
 
   var body: some View {
-    if chiiClient.isAuthenticated {
+    if chii.isAuthenticated {
       NavigationStack(path: $navState.progressNavigation) {
         if collections.isEmpty {
           ProgressView().onAppear {

@@ -9,8 +9,8 @@ import SwiftData
 import SwiftUI
 
 struct ChiiTimelineView: View {
-  @EnvironmentObject var errorHandling: ErrorHandling
-  @EnvironmentObject var chiiClient: ChiiClient
+  @EnvironmentObject var notifier: Notifier
+  @EnvironmentObject var chii: ChiiClient
   @EnvironmentObject var navState: NavState
 
   @Environment(\.modelContext) private var modelContext
@@ -20,14 +20,14 @@ struct ChiiTimelineView: View {
   func updateProfile() {
     Task.detached {
       do {
-        let profile = try await chiiClient.getProfile()
+        let profile = try await chii.getProfile()
         await MainActor.run {
           withAnimation {
             self.profile = profile
           }
         }
       } catch {
-        await errorHandling.handle(message: "\(error)")
+        await notifier.alert(message: "\(error)")
       }
     }
   }
@@ -35,17 +35,17 @@ struct ChiiTimelineView: View {
   func logout() {
     withAnimation {
       profile = nil
-      chiiClient.logout()
+      chii.logout()
       do {
         try modelContext.delete(model: UserSubjectCollection.self)
       } catch {
-        fatalError(error.localizedDescription)
+        notifier.alert(message: "\(error)")
       }
     }
   }
 
   var body: some View {
-    if chiiClient.isAuthenticated {
+    if chii.isAuthenticated {
       NavigationStack(path: $navState.timelineNavigation) {
         if let me = profile {
           ImageView(img: me.avatar.large, width: 80, height: 80)
