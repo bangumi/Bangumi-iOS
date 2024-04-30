@@ -39,6 +39,7 @@
 		19671C702BDEB55D000B4D99 /* Config.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 19671C502BDEB55D000B4D99 /* Config.xcconfig */; };
 		19671C732BDEB8B1000B4D99 /* KeychainSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 19671C722BDEB8B1000B4D99 /* KeychainSwift */; };
 		19671C752BDEB8BD000B4D99 /* CachedAsyncImage in Frameworks */ = {isa = PBXBuildFile; productRef = 19671C742BDEB8BD000B4D99 /* CachedAsyncImage */; };
+		19671C782BE1BB72000B4D99 /* search_subject.json in Resources */ = {isa = PBXBuildFile; fileRef = 19671C772BE1BB72000B4D99 /* search_subject.json */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -73,6 +74,7 @@
 		19671C4F2BDEB55D000B4D99 /* ChobitsApp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChobitsApp.swift; sourceTree = "<group>"; };
 		19671C502BDEB55D000B4D99 /* Config.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 		19671C512BDEB55D000B4D99 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		19671C772BE1BB72000B4D99 /* search_subject.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = search_subject.json; sourceTree = "<group>"; };
 		19BB342B2BD239AB00E5C295 /* Chobits.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Chobits.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -144,6 +146,7 @@
 				19671C442BDEB55D000B4D99 /* Preview Assets.xcassets */,
 				19671C452BDEB55D000B4D99 /* subject.json */,
 				19671C462BDEB55D000B4D99 /* user_collection.json */,
+				19671C772BE1BB72000B4D99 /* search_subject.json */,
 			);
 			path = "Preview Content";
 			sourceTree = "<group>";
@@ -257,6 +260,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				19671C782BE1BB72000B4D99 /* search_subject.json in Resources */,
 				19671C682BDEB55D000B4D99 /* user_collection.json in Resources */,
 				19671C702BDEB55D000B4D99 /* Config.xcconfig in Resources */,
 				19671C672BDEB55D000B4D99 /* subject.json in Resources */,

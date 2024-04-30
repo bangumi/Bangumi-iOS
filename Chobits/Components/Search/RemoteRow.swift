@@ -48,3 +48,12 @@ struct SubjectSearchRemoteRow: View {
     }
   }
 }
+
+#Preview {
+  ScrollView {
+    LazyVStack(alignment: .leading, spacing: 10) {
+      SubjectSearchRemoteRow(subject: .preview)
+    }
+  }
+  .padding(.horizontal, 16)
+}

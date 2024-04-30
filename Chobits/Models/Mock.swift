@@ -25,6 +25,12 @@ extension Subject {
   }
 }
 
+extension SearchSubject {
+  static var preview: SearchSubject {
+    return try! loadFixture(fixture: "search_subject.json", target: SearchSubject.self)
+  }
+}
+
 extension UserSubjectCollection {
   static var preview: UserSubjectCollection {
     return try! loadFixture(fixture: "user_collection.json", target: UserSubjectCollection.self)

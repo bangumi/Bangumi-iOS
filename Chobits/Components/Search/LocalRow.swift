@@ -43,3 +43,12 @@ struct SubjectSearchLocalRow: View {
     }
   }
 }
+
+#Preview {
+  ScrollView {
+    LazyVStack(alignment: .leading, spacing: 10) {
+      SubjectSearchLocalRow(collection: .preview)
+    }
+  }
+  .padding(.horizontal, 16)
+}
