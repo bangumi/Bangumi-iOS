@@ -151,6 +151,26 @@ enum CollectionType: UInt8, Codable {
     }
   }
 
+  func message(type: SubjectType) -> String {
+    var text = "我"
+    text += self.description(type: type)
+    switch type {
+    case .book:
+      text += "这本书"
+    case .anime:
+      text += "这部动画"
+    case .music:
+      text += "这张唱片"
+    case .game:
+      text += "这游戏"
+    case .real:
+      text += "这部影视"
+    default:
+      text += "这个作品"
+    }
+    return text
+  }
+
   var icon: String {
     switch self {
     case .unknown:

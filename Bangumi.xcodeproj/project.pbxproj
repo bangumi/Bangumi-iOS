@@ -40,6 +40,7 @@
 		19671C732BDEB8B1000B4D99 /* KeychainSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 19671C722BDEB8B1000B4D99 /* KeychainSwift */; };
 		19671C752BDEB8BD000B4D99 /* CachedAsyncImage in Frameworks */ = {isa = PBXBuildFile; productRef = 19671C742BDEB8BD000B4D99 /* CachedAsyncImage */; };
 		19671C782BE1BB72000B4D99 /* search_subject.json in Resources */ = {isa = PBXBuildFile; fileRef = 19671C772BE1BB72000B4D99 /* search_subject.json */; };
+		19C2CE5D2BE1E7B10080A056 /* NotFoundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19C2CE5C2BE1E7B10080A056 /* NotFoundView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -76,6 +77,7 @@
 		19671C512BDEB55D000B4D99 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		19671C772BE1BB72000B4D99 /* search_subject.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = search_subject.json; sourceTree = "<group>"; };
 		19BB342B2BD239AB00E5C295 /* Chobits.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Chobits.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		19C2CE5C2BE1E7B10080A056 /* NotFoundView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotFoundView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -123,6 +125,7 @@
 				19671C392BDEB55D000B4D99 /* ImageView.swift */,
 				19671C3A2BDEB55D000B4D99 /* LoadingView.swift */,
 				19671C3B2BDEB55D000B4D99 /* UserCollectionRow.swift */,
+				19C2CE5C2BE1E7B10080A056 /* NotFoundView.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -291,6 +294,7 @@
 				19671C622BDEB55D000B4D99 /* Client.swift in Sources */,
 				19671C5E2BDEB55D000B4D99 /* LoadingView.swift in Sources */,
 				19671C572BDEB55D000B4D99 /* Rating.swift in Sources */,
+				19C2CE5D2BE1E7B10080A056 /* NotFoundView.swift in Sources */,
 				19671C6B2BDEB55D000B4D99 /* DiscoverView.swift in Sources */,
 				19671C5B2BDEB55D000B4D99 /* CalendarView.swift in Sources */,
 				19671C5C2BDEB55D000B4D99 /* FlowStack.swift in Sources */,

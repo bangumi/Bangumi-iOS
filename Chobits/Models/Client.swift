@@ -53,6 +53,9 @@ class ChiiClient: ObservableObject, Observable {
       callbackURL: "bangumi://oauth/callback"
     )
     self.mock = mock
+    if mock {
+      self.isAuthenticated = true
+    }
   }
 
   func request(url: URL, method: String, body: Any? = nil, authorized: Bool = true) async throws -> Data {

@@ -14,17 +14,19 @@ struct SubjectView: View {
   @EnvironmentObject var notifier: Notifier
   @EnvironmentObject var chii: ChiiClient
 
+  @State private var empty = false
   @State private var subject: Subject? = nil
-  @State private var summaryCollapsed = true
 
   func fetchSubject() {
     Task.detached {
       do {
         let subject = try await chii.getSubject(sid: sid)
         await MainActor.run {
-          withAnimation {
-            self.subject = subject
-          }
+          self.subject = subject
+        }
+      } catch ChiiError.notFound(_) {
+        await MainActor.run {
+          self.empty = true
         }
       } catch {
         await notifier.alert(message: "\(error)")
@@ -49,14 +51,18 @@ struct SubjectView: View {
       }
       .padding()
     } else {
-      ProgressView()
-        .onAppear(perform: fetchSubject)
+      if empty {
+        NotFoundView()
+      } else {
+        ProgressView()
+          .onAppear(perform: fetchSubject)
+      }
     }
   }
 }
 
 #Preview {
   SubjectView(sid: 1)
-    .environmentObject(Notifier())
-    .environmentObject(ChiiClient(mock: true))
+  .environmentObject(Notifier())
+  .environmentObject(ChiiClient(mock: true))
 }
