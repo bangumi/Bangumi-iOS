@@ -38,8 +38,6 @@ struct SubjectSearchLocalRow: View {
         .padding(2)
         .clipShape(RoundedRectangle(cornerRadius: 10))
       }
-    } else {
-      EmptyView()
     }
   }
 }

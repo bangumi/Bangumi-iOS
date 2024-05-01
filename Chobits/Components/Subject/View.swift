@@ -63,7 +63,11 @@ struct SubjectView: View {
 }
 
 #Preview {
-  SubjectView(sid: 1)
+  let config = ModelConfiguration(isStoredInMemoryOnly: true)
+  let container = try! ModelContainer(for: UserSubjectCollection.self, configurations: config)
+
+  return SubjectView(sid: 1)
   .environmentObject(Notifier())
-  .environmentObject(ChiiClient(mock: .anime))
+  .environmentObject(ChiiClient(mock: .book))
+  .modelContainer(container)
 }

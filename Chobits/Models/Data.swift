@@ -37,7 +37,7 @@ final class UserSubjectCollection: Codable {
   var `private`: Bool
   var subject: SlimSubject?
 
-  init(subjectId: UInt, subjectType: SubjectType, rate: UInt8, type: CollectionType, comment: String? = nil, tags: [String], epStatus: UInt, volStatus: UInt, updatedAt: Date, private: Bool = false, subject: SlimSubject? = nil) {
+  init(subjectId: UInt, subjectType: SubjectType, rate: UInt8, type: CollectionType, comment: String?, tags: [String], epStatus: UInt, volStatus: UInt, updatedAt: Date, private: Bool, subject: SlimSubject?) {
     self.subjectId = subjectId
     self.subjectType = subjectType
     self.rate = rate

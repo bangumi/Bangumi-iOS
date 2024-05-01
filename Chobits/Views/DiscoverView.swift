@@ -101,9 +101,7 @@ struct ChiiDiscoverView: View {
         }
         .pickerStyle(.segmented)
         .padding(.horizontal, 16)
-        if query.isEmpty {
-          EmptyView()
-        } else {
+        if !query.isEmpty {
           if local {
             ScrollView {
               LazyVStack(alignment: .leading, spacing: 10) {
