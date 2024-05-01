@@ -11,9 +11,12 @@ import SwiftUI
 @main
 struct ChobitsApp: App {
   var sharedModelContainer: ModelContainer = {
-    let schema = Schema([UserSubjectCollection.self, BangumiCalendar.self])
+    let schema = Schema([
+      BangumiCalendar.self,
+      UserSubjectCollection.self,
+      Subject.self,
+    ])
     let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
-
     do {
       return try ModelContainer(for: schema, configurations: [modelConfiguration])
     } catch {

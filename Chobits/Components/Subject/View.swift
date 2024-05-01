@@ -13,23 +13,48 @@ struct SubjectView: View {
 
   @EnvironmentObject var notifier: Notifier
   @EnvironmentObject var chii: ChiiClient
+  @Environment(\.modelContext) var modelContext
 
   @State private var empty = false
-  @State private var subject: Subject? = nil
+  @State private var updating: Bool
+  @Query private var subjects: [Subject]
+
+  private var subject: Subject? { subjects.first}
+
+  init(sid: UInt) {
+    self.sid = sid
+    self.empty = false
+    self.updating = false
+    _subjects = Query(filter: #Predicate<Subject> { subject in
+      subject.id == sid
+    })
+  }
 
   func fetchSubject() {
     Task.detached {
       do {
-        let subject = try await chii.getSubject(sid: sid)
+        let resp = try await chii.getSubject(sid: sid)
         await MainActor.run {
-          self.subject = subject
+          modelContext.insert(resp)
+          self.empty = false
+          self.updating = false
         }
       } catch ChiiError.notFound(_) {
         await MainActor.run {
+          do {
+            try modelContext.delete(model: Subject.self, where: #Predicate {
+              $0.id == sid })
+          } catch {
+            notifier.alert(message: "\(error)")
+          }
           self.empty = true
+          self.updating = false
         }
       } catch {
-        await notifier.alert(message: "\(error)")
+        await MainActor.run {
+          notifier.alert(message: "\(error)")
+          self.updating = false
+        }
       }
     }
   }
@@ -64,10 +89,16 @@ struct SubjectView: View {
 
 #Preview {
   let config = ModelConfiguration(isStoredInMemoryOnly: true)
-  let container = try! ModelContainer(for: UserSubjectCollection.self, configurations: config)
+  let container = try! ModelContainer(for: Subject.self, UserSubjectCollection.self, configurations: config)
 
-  return SubjectView(sid: 1)
-  .environmentObject(Notifier())
-  .environmentObject(ChiiClient(mock: .book))
-  .modelContainer(container)
+//  let sid: UInt = 7699
+//  let sType: SubjectType = .book
+
+  let sid: UInt = 372010
+  let sType: SubjectType = .anime
+
+  return SubjectView(sid: sid)
+    .environmentObject(Notifier())
+    .environmentObject(ChiiClient(mock: sType))
+    .modelContainer(container)
 }

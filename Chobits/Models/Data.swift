@@ -126,3 +126,125 @@ final class BangumiCalendar: Codable {
     try container.encode(self.items, forKey: .items)
   }
 }
+
+@Model
+final class Subject: Codable {
+  enum CodingKeys: String, CodingKey {
+    case id
+    case type
+    case name
+    case nameCn
+    case summary
+    case nsfw
+    case locked
+    case date
+    case platform
+    case images
+    case infobox
+    case volumes
+    case eps
+    case totalEpisodes
+    case rating
+    case collection
+    case tags
+  }
+
+  @Attribute(.unique)
+  var id: UInt
+  var type: SubjectType
+  var name: String
+  var nameCn: String
+  var summary: String
+  var nsfw: Bool
+  var locked: Bool
+  var date: String?
+  var platform: String
+  var images: SubjectImages
+  var infobox: [InfoboxItem]?
+  var volumes: UInt
+  var eps: UInt
+  var totalEpisodes: UInt
+  var rating: Rating
+  var collection: SubjectCollection
+  var tags: [Tag]
+
+  init(
+    id: UInt,
+    type: SubjectType,
+    name: String,
+    nameCn: String,
+    summary: String,
+    nsfw: Bool,
+    locked: Bool,
+    date: String?,
+    platform: String,
+    images: SubjectImages,
+    infobox: [InfoboxItem]?,
+    volumes: UInt,
+    eps: UInt,
+    totalEpisodes: UInt,
+    rating: Rating,
+    collection: SubjectCollection,
+    tags: [Tag]
+  ) {
+    self.id = id
+    self.type = type
+    self.name = name
+    self.nameCn = nameCn
+    self.summary = summary
+    self.nsfw = nsfw
+    self.locked = locked
+    self.date = date
+    self.platform = platform
+    self.images = images
+    self.infobox = infobox
+    self.volumes = volumes
+    self.eps = eps
+    self.totalEpisodes = totalEpisodes
+    self.rating = rating
+    self.collection = collection
+    self.tags = tags
+  }
+
+  required init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.id = try container.decode(UInt.self, forKey: .id)
+    self.type = try container.decode(SubjectType.self, forKey: .type)
+    self.name = try container.decode(String.self, forKey: .name)
+    self.nameCn = try container.decode(String.self, forKey: .nameCn)
+    self.summary = try container.decode(String.self, forKey: .summary)
+    self.nsfw = try container.decode(Bool.self, forKey: .nsfw)
+    self.locked = try container.decode(Bool.self, forKey: .locked)
+    self.date = try container.decodeIfPresent(String.self, forKey: .date)
+    self.platform = try container.decode(String.self, forKey: .platform)
+    self.images = try container.decode(SubjectImages.self, forKey: .images)
+    self.infobox = try container.decodeIfPresent([InfoboxItem].self, forKey: .infobox)
+    self.volumes = try container.decode(UInt.self, forKey: .volumes)
+    self.eps = try container.decode(UInt.self, forKey: .eps)
+    self.totalEpisodes = try container.decode(UInt.self, forKey: .totalEpisodes)
+    self.rating = try container.decode(Rating.self, forKey: .rating)
+    self.collection = try container.decode(SubjectCollection.self, forKey: .collection)
+    self.tags = try container.decode([Tag].self, forKey: .tags)
+  }
+
+  func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(self.id, forKey: .id)
+    try container.encode(self.type, forKey: .type)
+    try container.encode(self.name, forKey: .name)
+    try container.encode(self.nameCn, forKey: .nameCn)
+    try container.encode(self.summary, forKey: .summary)
+    try container.encode(self.nsfw, forKey: .nsfw)
+    try container.encode(self.locked, forKey: .locked)
+    try container.encode(self.date, forKey: .date)
+    try container.encode(self.platform, forKey: .platform)
+    try container.encode(self.images, forKey: .images)
+    try container.encode(self.infobox, forKey: .infobox)
+    try container.encode(self.volumes, forKey: .volumes)
+    try container.encode(self.eps, forKey: .eps)
+    try container.encode(self.totalEpisodes, forKey: .totalEpisodes)
+    try container.encode(self.rating, forKey: .rating)
+    try container.encode(self.collection, forKey: .collection)
+    try container.encode(self.tags, forKey: .tags)
+  }
+}

@@ -202,26 +202,6 @@ struct SmallSubject: Codable, Identifiable, Hashable {
   }
 }
 
-struct Subject: Codable, Identifiable {
-  var id: UInt
-  var type: SubjectType
-  var name: String
-  var nameCn: String
-  var summary: String
-  var nsfw: Bool
-  var locked: Bool
-  var date: String?
-  var platform: String
-  var images: SubjectImages
-  var infobox: [InfoboxItem]?
-  var volumes: UInt
-  var eps: UInt
-  var totalEpisodes: UInt
-  var rating: Rating
-  var collection: SubjectCollection
-  var tags: [Tag]
-}
-
 struct SubjectPerson: Codable, Identifiable {
   var id: UInt
   var name: String
