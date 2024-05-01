@@ -153,6 +153,7 @@ struct SubjectCollectionBookView: View {
             .textFieldStyle(.roundedBorder)
           Text(subject.eps>0 ? "/\(subject.eps)话" : "/?话").foregroundColor(.secondary)
         }.monospaced()
+        Spacer()
         HStack(alignment: .firstTextBaseline, spacing: 0) {
           Button {
             if let value = vols {
