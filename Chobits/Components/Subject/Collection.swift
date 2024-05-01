@@ -16,6 +16,7 @@ struct SubjectCollectionView: View {
   @Environment(\.modelContext) var modelContext
 
   @State private var empty: Bool
+  @State private var updating: Bool
   @Query private var collections: [UserSubjectCollection]
 
   private var collection: UserSubjectCollection? { collections.first}
@@ -23,25 +24,38 @@ struct SubjectCollectionView: View {
   init(subject: Subject) {
     self.subject = subject
     self.empty = false
+    self.updating = false
     _collections = Query(filter: #Predicate<UserSubjectCollection> { collection in
       collection.subjectId == subject.id
     })
   }
 
   func fetchCollection() {
+    self.updating = true
     Task.detached {
       do {
         let resp = try await chii.getCollection(sid: subject.id)
         await MainActor.run {
           modelContext.insert(resp)
           self.empty = false
+          self.updating = false
         }
       } catch ChiiError.notFound(_) {
         await MainActor.run {
+          do {
+            try modelContext.delete(model: UserSubjectCollection.self, where: #Predicate {
+              $0.subjectId == subject.id })
+          } catch {
+            notifier.alert(message: "\(error)")
+          }
           self.empty = true
+          self.updating = false
         }
       } catch {
-        await notifier.alert(message: "\(error)")
+        await MainActor.run {
+          notifier.alert(message: "\(error)")
+          self.updating = false
+        }
       }
     }
   }
@@ -49,6 +63,9 @@ struct SubjectCollectionView: View {
   var body: some View {
     HStack {
       Text("收藏").font(.headline)
+      if updating {
+        ProgressView().padding(.leading, 10)
+      }
       Spacer()
       if let collection = collection {
         if collection.private {

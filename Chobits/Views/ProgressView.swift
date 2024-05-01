@@ -41,11 +41,19 @@ struct ChiiProgressView: View {
             break
           }
         }
-
       } catch {
         await notifier.alert(message: "\(error)")
       }
     }
+  }
+
+  var doing: [SubjectType:[UserSubjectCollection]] {
+    let filtered = collections.filter{
+      $0.type == .do
+    }
+    var doing = Dictionary(grouping: filtered, by: { $0.subjectType })
+    doing[.unknown] = filtered
+    return doing
   }
 
   var body: some View {
@@ -59,15 +67,12 @@ struct ChiiProgressView: View {
           VStack {
             Picker("Subject Type", selection: $subjectType) {
               ForEach(SubjectType.progressTypes()) { type in
-                Text(type.description)
+                Text("\(type.description)(\(doing[type]?.count ?? 0))")
               }
             }.pickerStyle(.segmented)
             ScrollView {
               LazyVStack(alignment: .leading, spacing: 10) {
-                let filtered = collections.filter {
-                  return ($0.subjectType == subjectType || subjectType == .unknown) && $0.type == .do
-                }
-                ForEach(filtered) { collection in
+                ForEach(doing[subjectType] ?? []) { collection in
                   NavigationLink(value: collection) {
                     UserCollectionRow(collection: collection)
                   }.buttonStyle(PlainButtonStyle())
