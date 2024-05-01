@@ -15,7 +15,7 @@ struct SubjectView: View {
   @EnvironmentObject var chii: ChiiClient
   @Environment(\.modelContext) var modelContext
 
-  @State private var empty = false
+  @State private var empty: Bool
   @State private var updating: Bool
   @Query private var subjects: [Subject]
 
@@ -31,6 +31,7 @@ struct SubjectView: View {
   }
 
   func fetchSubject() {
+    self.updating = true
     Task.detached {
       do {
         let resp = try await chii.getSubject(sid: sid)
@@ -60,30 +61,30 @@ struct SubjectView: View {
   }
 
   var body: some View {
-    if let subject = subject {
-      ScrollView {
-        LazyVStack(alignment: .leading) {
-          SubjectHeaderView(subject: subject)
-          if chii.isAuthenticated {
-            SubjectCollectionView(subject: subject)
+    Section {
+      if let subject = subject {
+        ScrollView {
+          LazyVStack(alignment: .leading) {
+            SubjectHeaderView(subject: subject)
+            if chii.isAuthenticated {
+              SubjectCollectionView(subject: subject)
+            }
+            if !subject.summary.isEmpty {
+              Divider()
+              SubjectSummaryView(subject: subject)
+            }
+            SubjectTagView(subject: subject)
+            Spacer()
           }
-          if !subject.summary.isEmpty {
-            Divider()
-            SubjectSummaryView(subject: subject)
-          }
-          SubjectTagView(subject: subject)
-          Spacer()
+        }.padding()
+      } else {
+        if empty {
+          NotFoundView()
+        } else {
+          ProgressView()
         }
       }
-      .padding()
-    } else {
-      if empty {
-        NotFoundView()
-      } else {
-        ProgressView()
-          .onAppear(perform: fetchSubject)
-      }
-    }
+    }.onAppear(perform: fetchSubject)
   }
 }
 
