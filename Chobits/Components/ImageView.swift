@@ -16,7 +16,7 @@ struct ImageView: View {
   var body: some View {
     if let img = img {
       if img.isEmpty {
-        if width>0, height>0 {
+        if width > 0, height > 0 {
           Image(systemName: "photo").frame(width: width, height: height)
         } else {
           Image(systemName: "photo")
@@ -26,14 +26,14 @@ struct ImageView: View {
         CachedAsyncImage(
           url: iconURL,
           placeholder: { _ in
-            if width>0, height>0 {
+            if width > 0, height > 0 {
               ProgressView().frame(width: width, height: height)
             } else {
               ProgressView()
             }
           },
           image: {
-            if width>0, height>0 {
+            if width > 0, height > 0 {
               Image(uiImage: $0)
                 .resizable()
                 .scaledToFill()
@@ -50,7 +50,7 @@ struct ImageView: View {
         .clipShape(RoundedRectangle(cornerRadius: 10))
       }
     } else {
-      if width>0, height>0 {
+      if width > 0, height > 0 {
         Image(systemName: "photo").frame(width: width, height: height)
       } else {
         Image(systemName: "photo")

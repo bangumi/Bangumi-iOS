@@ -26,7 +26,8 @@ struct SubjectSearchLocalRow: View {
             Text(subject.name).font(.headline)
             Text(subject.nameCn).font(.subheadline).foregroundStyle(.secondary)
             HStack {
-              Label(subject.type.description, systemImage: subject.type.icon).foregroundStyle(.accent)
+              Label(subject.type.description, systemImage: subject.type.icon).foregroundStyle(
+                .accent)
               Text("\(subject.collectionTotal) 人收藏").foregroundStyle(.secondary)
               Label("\(score)", systemImage: "star").foregroundStyle(.secondary)
               Spacer()

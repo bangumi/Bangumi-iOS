@@ -119,7 +119,10 @@ enum InfoboxValue: Codable {
       self = .list(list)
       return
     }
-    throw DecodingError.typeMismatch(InfoboxValue.self, DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Wrong type for InfoboxValue"))
+    throw DecodingError.typeMismatch(
+      InfoboxValue.self,
+      DecodingError.Context(
+        codingPath: decoder.codingPath, debugDescription: "Wrong type for InfoboxValue"))
   }
 
   func encode(to encoder: Encoder) throws {
@@ -291,7 +294,7 @@ enum SubjectType: UInt8, Codable, Identifiable {
   }
 
   var name: String {
-    switch self{
+    switch self {
     case .unknown:
       return "unknown"
     case .book:

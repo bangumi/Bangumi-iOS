@@ -19,15 +19,16 @@ struct SubjectView: View {
   @State private var updating: Bool
   @Query private var subjects: [Subject]
 
-  private var subject: Subject? { subjects.first}
+  private var subject: Subject? { subjects.first }
 
   init(sid: UInt) {
     self.sid = sid
     self.empty = false
     self.updating = false
-    _subjects = Query(filter: #Predicate<Subject> { subject in
-      subject.id == sid
-    })
+    _subjects = Query(
+      filter: #Predicate<Subject> { subject in
+        subject.id == sid
+      })
   }
 
   func fetchSubject() {
@@ -43,8 +44,11 @@ struct SubjectView: View {
       } catch ChiiError.notFound(_) {
         await MainActor.run {
           do {
-            try modelContext.delete(model: Subject.self, where: #Predicate {
-              $0.id == sid })
+            try modelContext.delete(
+              model: Subject.self,
+              where: #Predicate {
+                $0.id == sid
+              })
           } catch {
             notifier.alert(message: "\(error)")
           }
@@ -90,10 +94,11 @@ struct SubjectView: View {
 
 #Preview {
   let config = ModelConfiguration(isStoredInMemoryOnly: true)
-  let container = try! ModelContainer(for: Subject.self, UserSubjectCollection.self, configurations: config)
+  let container = try! ModelContainer(
+    for: Subject.self, UserSubjectCollection.self, configurations: config)
 
-//  let sid: UInt = 7699
-//  let sType: SubjectType = .book
+  //  let sid: UInt = 7699
+  //  let sType: SubjectType = .book
 
   let sid: UInt = 372010
   let sType: SubjectType = .anime

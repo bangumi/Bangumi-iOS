@@ -37,10 +37,12 @@ extension SearchSubject {
 
 extension UserSubjectCollection {
   static var previewAnime: UserSubjectCollection {
-    return try! loadFixture(fixture: "user_collection_anime.json", target: UserSubjectCollection.self)
+    return try! loadFixture(
+      fixture: "user_collection_anime.json", target: UserSubjectCollection.self)
   }
 
   static var previewBook: UserSubjectCollection {
-    return try! loadFixture(fixture: "user_collection_book.json", target: UserSubjectCollection.self)
+    return try! loadFixture(
+      fixture: "user_collection_book.json", target: UserSubjectCollection.self)
   }
 }

@@ -15,7 +15,8 @@ struct ChiiProgressView: View {
 
   @Environment(\.modelContext) private var modelContext
 
-  @Query(sort: \UserSubjectCollection.updatedAt, order: .reverse) private var collections: [UserSubjectCollection]
+  @Query(sort: \UserSubjectCollection.updatedAt, order: .reverse) private var collections:
+    [UserSubjectCollection]
 
   @State private var subjectType = SubjectType.unknown
 
@@ -25,7 +26,8 @@ struct ChiiProgressView: View {
         var offset: UInt = 0
         let limit: UInt = 100
         while true {
-          let response = try await chii.getCollections(subjectType: type, limit: limit, offset: offset)
+          let response = try await chii.getCollections(
+            subjectType: type, limit: limit, offset: offset)
           if response.data.isEmpty {
             break
           }
@@ -47,8 +49,8 @@ struct ChiiProgressView: View {
     }
   }
 
-  var doing: [SubjectType:[UserSubjectCollection]] {
-    let filtered = collections.filter{
+  var doing: [SubjectType: [UserSubjectCollection]] {
+    let filtered = collections.filter {
       $0.type == .do
     }
     var doing = Dictionary(grouping: filtered, by: { $0.subjectType })

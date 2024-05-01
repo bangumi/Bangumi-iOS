@@ -52,7 +52,8 @@ struct SubjectHeaderView: View {
           .lineLimit(2)
         Spacer()
         HStack {
-          Label("\(subject.rating.total)", systemImage: "bookmark").foregroundStyle(Color("LinkTextColor"))
+          Label("\(subject.rating.total)", systemImage: "bookmark").foregroundStyle(
+            Color("LinkTextColor"))
           Spacer()
           if subject.rating.rank > 0 {
             Label("\(subject.rating.rank)", systemImage: "chart.bar.xaxis").foregroundStyle(.accent)
@@ -68,11 +69,13 @@ struct SubjectHeaderView: View {
         .onTapGesture {
           collectionDetail.toggle()
         }
-        .sheet(isPresented: $collectionDetail, content: {
-          SubjectRatingView(subject: subject)
-            .presentationDragIndicator(.visible)
-            .presentationDetents(.init([.fraction(0.4)]))
-        })
+        .sheet(
+          isPresented: $collectionDetail,
+          content: {
+            SubjectRatingView(subject: subject)
+              .presentationDragIndicator(.visible)
+              .presentationDetents(.init([.fraction(0.4)]))
+          })
       }.padding(.leading, 5)
     }
   }

@@ -31,7 +31,7 @@ class ChiiClient: ObservableObject, Observable {
     let queries = [
       URLQueryItem(name: "client_id", value: self.appInfo.clientId),
       URLQueryItem(name: "response_type", value: "code"),
-      URLQueryItem(name: "redirect_uri", value: self.appInfo.callbackURL)
+      URLQueryItem(name: "redirect_uri", value: self.appInfo.callbackURL),
     ]
     return baseURL.appending(queryItems: queries)
   }
@@ -58,7 +58,9 @@ class ChiiClient: ObservableObject, Observable {
     }
   }
 
-  func request(url: URL, method: String, body: Any? = nil, authorized: Bool = true) async throws -> Data {
+  func request(url: URL, method: String, body: Any? = nil, authorized: Bool = true) async throws
+    -> Data
+  {
     let session = try await self.getSession(authroized: authorized)
     var request = URLRequest(url: url)
     request.addValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -176,7 +178,7 @@ class ChiiClient: ObservableObject, Observable {
       "client_id": self.appInfo.clientId,
       "client_secret": self.appInfo.clientSecret,
       "code": code,
-      "redirect_uri": self.appInfo.callbackURL
+      "redirect_uri": self.appInfo.callbackURL,
     ]
     let data = try await self.request(url: url, method: "POST", body: body, authorized: false)
     let _ = try self.saveAuthResponse(data: data)
@@ -194,7 +196,7 @@ class ChiiClient: ObservableObject, Observable {
       "client_id": self.appInfo.clientId,
       "client_secret": self.appInfo.clientSecret,
       "refresh_token": auth.refreshToken,
-      "redirect_uri": self.appInfo.callbackURL
+      "redirect_uri": self.appInfo.callbackURL,
     ]
     let data = try await self.request(url: url, method: "POST", body: body, authorized: false)
     let auth = try self.saveAuthResponse(data: data)
@@ -222,17 +224,20 @@ class ChiiClient: ObservableObject, Observable {
     return profile
   }
 
-  func getCollections(subjectType: SubjectType?, limit: UInt, offset: UInt) async throws -> CollectionResponse {
+  func getCollections(subjectType: SubjectType?, limit: UInt, offset: UInt) async throws
+    -> CollectionResponse
+  {
     let profile = try await self.getProfile()
-    let url = if profile.username.isEmpty {
-      self.apiBase.appendingPathComponent("v0/users/\(profile.id)/collections")
-    } else {
-      self.apiBase.appendingPathComponent("v0/users/\(profile.username)/collections")
-    }
+    let url =
+      if profile.username.isEmpty {
+        self.apiBase.appendingPathComponent("v0/users/\(profile.id)/collections")
+      } else {
+        self.apiBase.appendingPathComponent("v0/users/\(profile.username)/collections")
+      }
     var queryItems = [
       URLQueryItem(name: "type", value: "3"),
       URLQueryItem(name: "limit", value: "100"),
-      URLQueryItem(name: "offset", value: String(offset))
+      URLQueryItem(name: "offset", value: String(offset)),
     ]
     if let sType = subjectType, sType != .unknown {
       queryItems.append(URLQueryItem(name: "subject_type", value: String(sType.rawValue)))
@@ -254,12 +259,15 @@ class ChiiClient: ObservableObject, Observable {
     return calendars
   }
 
-  func search(keyword: String, type: SubjectType = .unknown, offset: UInt = 0, limit: UInt = 10) async throws -> SubjectSearchResponse {
+  func search(keyword: String, type: SubjectType = .unknown, offset: UInt = 0, limit: UInt = 10)
+    async throws -> SubjectSearchResponse
+  {
     let queries: [URLQueryItem] = [
       URLQueryItem(name: "limit", value: String(limit)),
-      URLQueryItem(name: "offset", value: String(offset))
+      URLQueryItem(name: "offset", value: String(offset)),
     ]
-    let url = self.apiBase.appendingPathComponent("v0/search/subjects").appending(queryItems: queries)
+    let url = self.apiBase.appendingPathComponent("v0/search/subjects").appending(
+      queryItems: queries)
     var body: [String: Any] = [
       "keyword": keyword
     ]
@@ -279,14 +287,16 @@ class ChiiClient: ObservableObject, Observable {
 
   func getCollection(sid: UInt) async throws -> UserSubjectCollection {
     if let mock = self.mock {
-      return try loadFixture(fixture: "user_collection_\(mock.name).json", target: UserSubjectCollection.self)
+      return try loadFixture(
+        fixture: "user_collection_\(mock.name).json", target: UserSubjectCollection.self)
     }
     let profile = try await self.getProfile()
-    let url = if profile.username.isEmpty {
-      self.apiBase.appendingPathComponent("v0/users/\(profile.id)/collections/\(sid)")
-    } else {
-      self.apiBase.appendingPathComponent("v0/users/\(profile.username)/collections/\(sid)")
-    }
+    let url =
+      if profile.username.isEmpty {
+        self.apiBase.appendingPathComponent("v0/users/\(profile.id)/collections/\(sid)")
+      } else {
+        self.apiBase.appendingPathComponent("v0/users/\(profile.username)/collections/\(sid)")
+      }
     let data = try await request(url: url, method: "GET")
     let decoder = JSONDecoder()
     decoder.keyDecodingStrategy = .convertFromSnakeCase
@@ -295,7 +305,7 @@ class ChiiClient: ObservableObject, Observable {
   }
 
   // update progress for books
-  func updateCollection(sid:UInt, eps: UInt?, vols: UInt?) async throws -> UserSubjectCollection {
+  func updateCollection(sid: UInt, eps: UInt?, vols: UInt?) async throws -> UserSubjectCollection {
     if self.mock != nil {
       return try await getCollection(sid: sid)
     }
@@ -313,7 +323,9 @@ class ChiiClient: ObservableObject, Observable {
     return try await getCollection(sid: sid)
   }
 
-  func updateCollection(sid:UInt, type: CollectionType?, rate: UInt?, comment: String?, priv: Bool?, tags: [String]?) async throws -> UserSubjectCollection {
+  func updateCollection(
+    sid: UInt, type: CollectionType?, rate: UInt?, comment: String?, priv: Bool?, tags: [String]?
+  ) async throws -> UserSubjectCollection {
     if self.mock != nil {
       return try await getCollection(sid: sid)
     }

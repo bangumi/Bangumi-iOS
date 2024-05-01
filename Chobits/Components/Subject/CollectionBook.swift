@@ -5,16 +5,15 @@
 //  Created by Chuan Chuan on 2024/5/2.
 //
 
-import SwiftUI
 import SwiftData
-
+import SwiftUI
 
 struct SubjectCollectionBookView: View {
   var subject: Subject
 
   @Query private var collections: [UserSubjectCollection]
 
-  private var collection: UserSubjectCollection? { collections.first}
+  private var collection: UserSubjectCollection? { collections.first }
 
   @EnvironmentObject var notifier: Notifier
   @EnvironmentObject var chii: ChiiClient
@@ -26,14 +25,15 @@ struct SubjectCollectionBookView: View {
 
   init(subject: Subject) {
     self.subject = subject
-    _collections = Query(filter: #Predicate<UserSubjectCollection> { collection in
-      collection.subjectId == subject.id
-    })
+    _collections = Query(
+      filter: #Predicate<UserSubjectCollection> { collection in
+        collection.subjectId == subject.id
+      })
   }
 
   var body: some View {
     if let collection = collection {
-      HStack{
+      HStack {
         HStack(alignment: .firstTextBaseline, spacing: 0) {
           Button {
             if let value = eps {
@@ -51,7 +51,7 @@ struct SubjectCollectionBookView: View {
             .fixedSize(horizontal: true, vertical: false)
             .padding(.trailing, 5)
             .textFieldStyle(.roundedBorder)
-          Text(subject.eps>0 ? "/\(subject.eps)话" : "/?话").foregroundColor(.secondary)
+          Text(subject.eps > 0 ? "/\(subject.eps)话" : "/?话").foregroundColor(.secondary)
         }.monospaced()
         Spacer()
         HStack(alignment: .firstTextBaseline, spacing: 0) {
@@ -71,7 +71,7 @@ struct SubjectCollectionBookView: View {
             .fixedSize(horizontal: true, vertical: false)
             .padding(.trailing, 5)
             .textFieldStyle(.roundedBorder)
-          Text(subject.volumes>0 ? "/\(subject.volumes)卷" : "/?卷").foregroundColor(.secondary)
+          Text(subject.volumes > 0 ? "/\(subject.volumes)卷" : "/?卷").foregroundColor(.secondary)
         }.monospaced()
         Spacer()
         Button("更新") {
@@ -98,7 +98,6 @@ struct SubjectCollectionBookView: View {
     }
   }
 }
-
 
 #Preview {
   let config = ModelConfiguration(isStoredInMemoryOnly: true)

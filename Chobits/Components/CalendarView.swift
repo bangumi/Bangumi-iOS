@@ -85,7 +85,7 @@ struct CalendarWeekdayView: View {
         GridItem(.flexible()),
         GridItem(.flexible()),
         GridItem(.flexible()),
-        GridItem(.flexible())
+        GridItem(.flexible()),
       ]) {
         ForEach(calendar.items) { subject in
           NavigationLink(value: subject) {

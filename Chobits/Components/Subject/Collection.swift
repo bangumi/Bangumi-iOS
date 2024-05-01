@@ -5,8 +5,8 @@
 //  Created by Chuan Chuan on 2024/4/28.
 //
 
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 struct SubjectCollectionView: View {
   var subject: Subject
@@ -19,15 +19,16 @@ struct SubjectCollectionView: View {
   @State private var updating: Bool
   @Query private var collections: [UserSubjectCollection]
 
-  private var collection: UserSubjectCollection? { collections.first}
+  private var collection: UserSubjectCollection? { collections.first }
 
   init(subject: Subject) {
     self.subject = subject
     self.empty = false
     self.updating = false
-    _collections = Query(filter: #Predicate<UserSubjectCollection> { collection in
-      collection.subjectId == subject.id
-    })
+    _collections = Query(
+      filter: #Predicate<UserSubjectCollection> { collection in
+        collection.subjectId == subject.id
+      })
   }
 
   func fetchCollection() {
@@ -43,8 +44,11 @@ struct SubjectCollectionView: View {
       } catch ChiiError.notFound(_) {
         await MainActor.run {
           do {
-            try modelContext.delete(model: UserSubjectCollection.self, where: #Predicate {
-              $0.subjectId == subject.id })
+            try modelContext.delete(
+              model: UserSubjectCollection.self,
+              where: #Predicate {
+                $0.subjectId == subject.id
+              })
           } catch {
             notifier.alert(message: "\(error)")
           }
@@ -98,7 +102,7 @@ struct SubjectCollectionView: View {
       switch collection.subjectType {
       case .book:
         SubjectCollectionBookView(subject: subject)
-      case .anime,.real:
+      case .anime, .real:
         Text("点格子")
       default:
         Text("\(collection.updatedAt)").font(.caption).foregroundStyle(.secondary)

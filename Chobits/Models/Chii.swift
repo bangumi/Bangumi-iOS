@@ -42,7 +42,10 @@ enum ResponseErrorDetails: Codable, CustomStringConvertible {
       self = .detail(path)
       return
     }
-    throw DecodingError.typeMismatch(ResponseErrorDetails.self, DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Wrong type for ResponseErrorDetails"))
+    throw DecodingError.typeMismatch(
+      ResponseErrorDetails.self,
+      DecodingError.Context(
+        codingPath: decoder.codingPath, debugDescription: "Wrong type for ResponseErrorDetails"))
   }
 
   func encode(to encoder: Encoder) throws {
@@ -174,7 +177,7 @@ struct SearchSubject: Codable, Identifiable, Hashable {
     hasher.combine(id)
   }
 
-  static func ==(lhs: Self, rhs: Self) -> Bool {
+  static func == (lhs: Self, rhs: Self) -> Bool {
     return lhs.id == rhs.id
   }
 }
@@ -197,7 +200,7 @@ struct SmallSubject: Codable, Identifiable, Hashable {
     hasher.combine(id)
   }
 
-  static func ==(lhs: Self, rhs: Self) -> Bool {
+  static func == (lhs: Self, rhs: Self) -> Bool {
     return lhs.id == rhs.id
   }
 }

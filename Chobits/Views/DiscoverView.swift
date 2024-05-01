@@ -34,7 +34,8 @@ struct ChiiDiscoverView: View {
         if subjectType != .unknown && subjectType != subject.type {
           return false
         }
-        return subject.nameCn.lowercased().contains(query) || subject.name.lowercased().contains(query)
+        return subject.nameCn.lowercased().contains(query)
+          || subject.name.lowercased().contains(query)
       } else {
         return false
       }
@@ -119,7 +120,7 @@ struct ChiiDiscoverView: View {
             .padding(.horizontal, 16)
           } else {
             if subjects.isEmpty {
-              VStack{
+              VStack {
                 Spacer()
                 ProgressView()
                 Spacer()

@@ -12,16 +12,18 @@ struct UserCollectionRow: View {
 
   var body: some View {
     if let subject = collection.subject {
-      let chapters = if subject.eps > 0 {
-        "\(collection.epStatus)/\(subject.eps) 话"
-      } else {
-        "\(collection.epStatus)/? 话"
-      }
-      let volumes = if subject.volumes > 0 {
-        "\(collection.volStatus)/\(subject.volumes) 卷"
-      } else {
-        "\(collection.volStatus)/? 卷"
-      }
+      let chapters =
+        if subject.eps > 0 {
+          "\(collection.epStatus)/\(subject.eps) 话"
+        } else {
+          "\(collection.epStatus)/? 话"
+        }
+      let volumes =
+        if subject.volumes > 0 {
+          "\(collection.volStatus)/\(subject.volumes) 卷"
+        } else {
+          "\(collection.volStatus)/? 卷"
+        }
       ZStack {
         Rectangle()
           .fill(.accent)
@@ -48,7 +50,8 @@ struct UserCollectionRow: View {
               case .real:
                 Text(chapters).foregroundStyle(.accent)
               default:
-                Label(collection.subjectType.description, systemImage: collection.subjectType.icon).foregroundStyle(.accent)
+                Label(collection.subjectType.description, systemImage: collection.subjectType.icon)
+                  .foregroundStyle(.accent)
               }
             }.font(.caption)
           }
