@@ -26,7 +26,11 @@ struct ImageView: View {
         CachedAsyncImage(
           url: iconURL,
           placeholder: { _ in
-            ProgressView()
+            if width>0, height>0 {
+              ProgressView().frame(width: width, height: height)
+            } else {
+              ProgressView()
+            }
           },
           image: {
             if width>0, height>0 {
