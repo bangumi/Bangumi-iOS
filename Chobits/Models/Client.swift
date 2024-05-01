@@ -304,7 +304,9 @@ class ChiiClient: ObservableObject, Observable {
     if let volStatus = vols {
       body["vol_status"] = volStatus
     }
-    _ = try await self.request(url: url, method: "POST", body: body, authorized: true)
+    if body.count > 0 {
+      _ = try await self.request(url: url, method: "POST", body: body, authorized: true)
+    }
     return try await getCollection(sid: sid)
   }
 
@@ -329,7 +331,9 @@ class ChiiClient: ObservableObject, Observable {
     if let tags = tags {
       body["tags"] = tags
     }
-    _ = try await self.request(url: url, method: "POST", body: body, authorized: true)
+    if body.count > 0 {
+      _ = try await self.request(url: url, method: "POST", body: body, authorized: true)
+    }
     return try await getCollection(sid: sid)
   }
 

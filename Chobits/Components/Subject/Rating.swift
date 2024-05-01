@@ -88,7 +88,7 @@ struct SubjectRatingView: View {
             }
             if subject.rating.rank > 0 {
               HStack {
-                Text("Bangumi Anime Rank:").foregroundStyle(.secondary)
+                Text("Bangumi \(subject.type.name.capitalized) Ranked:").foregroundStyle(.secondary)
                 Text("#\(subject.rating.rank)")
               }
             }

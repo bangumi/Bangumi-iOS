@@ -98,21 +98,12 @@ struct SubjectCollectionView: View {
       switch collection.subjectType {
       case .book:
         SubjectCollectionBookView(subject: subject, collection: collection)
-      case .anime:
-        Text("动画")
-      case .music:
-        Text("音乐")
-      case .game:
-        Text("游戏")
-      case .real:
-        Text("影视")
+      case .anime,.real:
+        Text("点格子")
       default:
-        Text("未知")
+        Text("\(collection.updatedAt)").font(.caption).foregroundStyle(.secondary)
       }
-      // TODO: show
-      Text("\(collection.updatedAt)").font(.caption).foregroundStyle(.secondary)
     } else if empty {
-      // TODO: show
       EmptyView().padding()
     }
   }
