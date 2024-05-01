@@ -1,0 +1,117 @@
+//
+//  CollectionBook.swift
+//  Chobits
+//
+//  Created by Chuan Chuan on 2024/5/2.
+//
+
+import SwiftUI
+import SwiftData
+
+
+struct SubjectCollectionBookView: View {
+  var subject: Subject
+
+  @Query private var collections: [UserSubjectCollection]
+
+  private var collection: UserSubjectCollection? { collections.first}
+
+  @EnvironmentObject var notifier: Notifier
+  @EnvironmentObject var chii: ChiiClient
+  @Environment(\.modelContext) private var modelContext
+
+  @State private var eps: UInt? = nil
+  @State private var vols: UInt? = nil
+  @State private var waiting: Bool = false
+
+  init(subject: Subject) {
+    self.subject = subject
+    _collections = Query(filter: #Predicate<UserSubjectCollection> { collection in
+      collection.subjectId == subject.id
+    })
+  }
+
+  var body: some View {
+    if let collection = collection {
+      HStack{
+        HStack(alignment: .firstTextBaseline, spacing: 0) {
+          Button {
+            if let value = eps {
+              self.eps = value + 1
+            } else {
+              self.eps = collection.epStatus + 1
+            }
+          } label: {
+            Image(systemName: "plus.circle").foregroundStyle(.secondary).padding(.trailing, 5)
+          }.buttonStyle(.plain)
+          TextField("\(collection.epStatus)", value: $eps, formatter: NumberFormatter())
+            .keyboardType(.numberPad)
+            .frame(width: 50)
+            .multilineTextAlignment(.trailing)
+            .fixedSize(horizontal: true, vertical: false)
+            .padding(.trailing, 5)
+            .textFieldStyle(.roundedBorder)
+          Text(subject.eps>0 ? "/\(subject.eps)话" : "/?话").foregroundColor(.secondary)
+        }.monospaced()
+        Spacer()
+        HStack(alignment: .firstTextBaseline, spacing: 0) {
+          Button {
+            if let value = vols {
+              self.vols = value + 1
+            } else {
+              self.vols = collection.volStatus + 1
+            }
+          } label: {
+            Image(systemName: "plus.circle").foregroundStyle(.secondary).padding(.trailing, 5)
+          }.buttonStyle(.plain)
+          TextField("\(collection.volStatus)", value: $vols, formatter: NumberFormatter())
+            .keyboardType(.numberPad)
+            .frame(width: 50)
+            .multilineTextAlignment(.trailing)
+            .fixedSize(horizontal: true, vertical: false)
+            .padding(.trailing, 5)
+            .textFieldStyle(.roundedBorder)
+          Text(subject.volumes>0 ? "/\(subject.volumes)卷" : "/?卷").foregroundColor(.secondary)
+        }.monospaced()
+        Spacer()
+        Button("更新") {
+          self.waiting = true
+          Task.detached {
+            do {
+              let resp = try await chii.updateCollection(sid: subject.id, eps: eps, vols: vols)
+              await MainActor.run {
+                modelContext.insert(resp)
+              }
+            } catch {
+              await notifier.alert(message: "\(error)")
+            }
+            await MainActor.run {
+              self.eps = nil
+              self.vols = nil
+              self.waiting = false
+            }
+          }
+        }
+        .buttonStyle(.borderedProminent)
+        .disabled(waiting)
+      }
+    }
+  }
+}
+
+
+#Preview {
+  let config = ModelConfiguration(isStoredInMemoryOnly: true)
+  let container = try! ModelContainer(for: UserSubjectCollection.self, configurations: config)
+  container.mainContext.insert(UserSubjectCollection.previewBook)
+
+  return ScrollView {
+    LazyVStack(alignment: .leading) {
+      SubjectCollectionBookView(subject: .previewBook)
+        .environmentObject(Notifier())
+        .environmentObject(ChiiClient(mock: .book))
+    }
+  }
+  .padding()
+  .modelContainer(container)
+}

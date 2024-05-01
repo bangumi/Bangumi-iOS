@@ -43,6 +43,7 @@
 		19C2CE5D2BE1E7B10080A056 /* NotFoundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19C2CE5C2BE1E7B10080A056 /* NotFoundView.swift */; };
 		19C2CE5F2BE2536D0080A056 /* user_collection_book.json in Resources */ = {isa = PBXBuildFile; fileRef = 19C2CE5E2BE2536D0080A056 /* user_collection_book.json */; };
 		19C2CE612BE2538A0080A056 /* subject_book.json in Resources */ = {isa = PBXBuildFile; fileRef = 19C2CE602BE2538A0080A056 /* subject_book.json */; };
+		19C2CE632BE2A4F10080A056 /* CollectionBook.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19C2CE622BE2A4F10080A056 /* CollectionBook.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -82,6 +83,7 @@
 		19C2CE5C2BE1E7B10080A056 /* NotFoundView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotFoundView.swift; sourceTree = "<group>"; };
 		19C2CE5E2BE2536D0080A056 /* user_collection_book.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = user_collection_book.json; sourceTree = "<group>"; };
 		19C2CE602BE2538A0080A056 /* subject_book.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = subject_book.json; sourceTree = "<group>"; };
+		19C2CE622BE2A4F10080A056 /* CollectionBook.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionBook.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -112,6 +114,7 @@
 				19671C332BDEB55D000B4D99 /* View.swift */,
 				19671C312BDEB55D000B4D99 /* Header.swift */,
 				19671C302BDEB55D000B4D99 /* Collection.swift */,
+				19C2CE622BE2A4F10080A056 /* CollectionBook.swift */,
 				19671C342BDEB55D000B4D99 /* Summary.swift */,
 				19671C322BDEB55D000B4D99 /* Rating.swift */,
 				19671C352BDEB55D000B4D99 /* Tag.swift */,
@@ -300,6 +303,7 @@
 				19671C642BDEB55D000B4D99 /* Mock.swift in Sources */,
 				19671C5D2BDEB55D000B4D99 /* ImageView.swift in Sources */,
 				19671C622BDEB55D000B4D99 /* Client.swift in Sources */,
+				19C2CE632BE2A4F10080A056 /* CollectionBook.swift in Sources */,
 				19671C5E2BDEB55D000B4D99 /* LoadingView.swift in Sources */,
 				19671C572BDEB55D000B4D99 /* Rating.swift in Sources */,
 				19C2CE5D2BE1E7B10080A056 /* NotFoundView.swift in Sources */,

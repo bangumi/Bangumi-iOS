@@ -10,8 +10,12 @@ import SwiftUI
 struct SubjectTagView: View {
   var subject: Subject
 
+  var tags: [Tag] {
+   Array(subject.tags.sorted { $0.count > $1.count }.prefix(20))
+  }
+
   var body: some View {
-    let tags = subject.tags.sorted { $0.count > $1.count }.prefix(20)
+    Text("标签").font(.headline)
     FlowStack {
       ForEach(tags, id: \.name) { tag in
         HStack {
