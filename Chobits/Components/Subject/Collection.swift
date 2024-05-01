@@ -111,17 +111,9 @@ struct SubjectCollectionView: View {
       }
       // TODO: show
       Text("\(collection.updatedAt)").font(.caption).foregroundStyle(.secondary)
-    } else {
-      if empty {
-        // TODO: show
-        EmptyView()
-      } else {
-        HStack{
-          Spacer()
-          ProgressView()
-          Spacer()
-        }
-      }
+    } else if empty {
+      // TODO: show
+      EmptyView().padding()
     }
   }
 }
