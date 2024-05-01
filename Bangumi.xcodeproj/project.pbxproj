@@ -44,6 +44,7 @@
 		19C2CE5F2BE2536D0080A056 /* user_collection_book.json in Resources */ = {isa = PBXBuildFile; fileRef = 19C2CE5E2BE2536D0080A056 /* user_collection_book.json */; };
 		19C2CE612BE2538A0080A056 /* subject_book.json in Resources */ = {isa = PBXBuildFile; fileRef = 19C2CE602BE2538A0080A056 /* subject_book.json */; };
 		19C2CE632BE2A4F10080A056 /* CollectionBook.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19C2CE622BE2A4F10080A056 /* CollectionBook.swift */; };
+		19C2CE652BE2ACE60080A056 /* profile.json in Resources */ = {isa = PBXBuildFile; fileRef = 19C2CE642BE2ACE60080A056 /* profile.json */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -84,6 +85,7 @@
 		19C2CE5E2BE2536D0080A056 /* user_collection_book.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = user_collection_book.json; sourceTree = "<group>"; };
 		19C2CE602BE2538A0080A056 /* subject_book.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = subject_book.json; sourceTree = "<group>"; };
 		19C2CE622BE2A4F10080A056 /* CollectionBook.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionBook.swift; sourceTree = "<group>"; };
+		19C2CE642BE2ACE60080A056 /* profile.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = profile.json; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -159,6 +161,7 @@
 				19671C772BE1BB72000B4D99 /* search_subject.json */,
 				19C2CE5E2BE2536D0080A056 /* user_collection_book.json */,
 				19C2CE602BE2538A0080A056 /* subject_book.json */,
+				19C2CE642BE2ACE60080A056 /* profile.json */,
 			);
 			path = "Preview Content";
 			sourceTree = "<group>";
@@ -275,6 +278,7 @@
 				19671C782BE1BB72000B4D99 /* search_subject.json in Resources */,
 				19671C682BDEB55D000B4D99 /* user_collection_anime.json in Resources */,
 				19671C702BDEB55D000B4D99 /* Config.xcconfig in Resources */,
+				19C2CE652BE2ACE60080A056 /* profile.json in Resources */,
 				19C2CE612BE2538A0080A056 /* subject_book.json in Resources */,
 				19C2CE5F2BE2536D0080A056 /* user_collection_book.json in Resources */,
 				19671C672BDEB55D000B4D99 /* subject_anime.json in Resources */,

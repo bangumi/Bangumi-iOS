@@ -28,6 +28,53 @@ struct Avatar: Codable {
   var small: String
 }
 
+enum UserGroup: UInt8, Codable {
+  case unknown = 0
+  case admin = 1
+  case bangumiManager = 2
+  case doujinManager = 3
+  case banned = 4
+  case forbidden = 5
+  case characterManager = 8
+  case wikiManager = 9
+  case user = 10
+  case wikipedians = 11
+
+  init(value: UInt8 = 0) {
+    let tmp = Self(rawValue: value)
+    if let out = tmp {
+      self = out
+      return
+    }
+    self = Self.unknown
+  }
+
+  var description: String {
+    switch self {
+    case .unknown:
+      return "未知"
+    case .admin:
+      return "管理员"
+    case .bangumiManager:
+      return "Bangumi 管理猿"
+    case .doujinManager:
+      return "天窗管理猿"
+    case .banned:
+      return "禁言用户"
+    case .forbidden:
+      return "禁止访问用户"
+    case .characterManager:
+      return "人物管理猿"
+    case .wikiManager:
+      return "维基条目管理猿"
+    case .user:
+      return "用户"
+    case .wikipedians:
+      return "维基人"
+    }
+  }
+}
+
 struct Tag: Codable {
   var name: String
   var count: UInt

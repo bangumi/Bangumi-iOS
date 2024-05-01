@@ -207,6 +207,9 @@ class ChiiClient: ObservableObject, Observable {
   }
 
   func getProfile() async throws -> Profile {
+    if mock != nil {
+      return try loadFixture(fixture: "profile.json", target: Profile.self)
+    }
     if let profile = self.profile {
       return profile
     }

@@ -138,7 +138,7 @@ struct Profile: Codable {
   var id: UInt
   var username: String
   var nickname: String
-  var userGroup: UInt
+  var userGroup: UserGroup
   var avatar: Avatar
   var sign: String
 }

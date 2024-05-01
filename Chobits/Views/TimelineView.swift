@@ -49,11 +49,23 @@ struct ChiiTimelineView: View {
       NavigationStack(path: $navState.timelineNavigation) {
         if let me = profile {
           ImageView(img: me.avatar.large, width: 80, height: 80)
-          Text("Hi! \(me.nickname)").font(.headline)
+          Text("\(me.nickname)").font(.title3)
+          Text(me.userGroup.description)
+            .font(.footnote)
+            .foregroundStyle(.accent)
+            .overlay {
+              RoundedRectangle(cornerRadius: 5)
+                .stroke(.accent, lineWidth: 1)
+                .padding(.horizontal, -4)
+                .padding(.vertical, -2)
+            }.padding(2)
           Button(action: logout) {
             Text("退出登录")
-          }
-          .buttonStyle(.borderedProminent)
+          }.buttonStyle(.borderedProminent)
+          Text(me.sign)
+            .font(.callout)
+            .foregroundStyle(.secondary)
+            .padding()
         } else {
           ProgressView().onAppear(perform: updateProfile)
         }
@@ -62,4 +74,15 @@ struct ChiiTimelineView: View {
       AuthView(slogan: "Bangumi 让你的 ACG 生活更美好")
     }
   }
+}
+
+#Preview {
+  let config = ModelConfiguration(isStoredInMemoryOnly: true)
+  let container = try! ModelContainer(for: UserSubjectCollection.self, configurations: config)
+
+  return ChiiTimelineView()
+    .environmentObject(Notifier())
+    .environmentObject(ChiiClient(mock: .anime))
+    .environmentObject(NavState())
+    .modelContainer(container)
 }
