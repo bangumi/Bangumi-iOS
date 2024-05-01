@@ -119,7 +119,11 @@ struct ChiiDiscoverView: View {
             .padding(.horizontal, 16)
           } else {
             if subjects.isEmpty {
-              ProgressView()
+              VStack{
+                Spacer()
+                ProgressView()
+                Spacer()
+              }
             } else {
               ScrollView {
                 LazyVStack(alignment: .leading, spacing: 10) {
