@@ -64,8 +64,9 @@ struct ChiiProgressView: View {
             }.pickerStyle(.segmented)
             ScrollView {
               LazyVStack(alignment: .leading, spacing: 10) {
-                let filtered = collections.filter { $0.subjectType == subjectType || subjectType == .unknown }
-
+                let filtered = collections.filter {
+                  return ($0.subjectType == subjectType || subjectType == .unknown) && $0.type == .do
+                }
                 ForEach(filtered) { collection in
                   NavigationLink(value: collection) {
                     UserCollectionRow(collection: collection)

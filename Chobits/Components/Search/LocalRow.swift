@@ -28,8 +28,16 @@ struct SubjectSearchLocalRow: View {
             HStack {
               Label(subject.type.description, systemImage: subject.type.icon).foregroundStyle(.accent)
               Text("\(subject.collectionTotal) 人收藏").foregroundStyle(.secondary)
-              Spacer()
               Label("\(score)", systemImage: "star").foregroundStyle(.secondary)
+              Spacer()
+              Text(collection.type.description(type: subject.type))
+                .foregroundStyle(.accent)
+                .overlay {
+                  RoundedRectangle(cornerRadius: 5)
+                    .stroke(.accent, lineWidth: 1)
+                    .padding(.horizontal, -4)
+                    .padding(.vertical, -2)
+                }
             }.font(.caption)
           }
           Spacer()

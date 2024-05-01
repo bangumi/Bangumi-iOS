@@ -26,7 +26,7 @@ struct SubjectTagView: View {
         .padding(.horizontal, 6)
         .padding(.vertical, 4)
         .overlay {
-          RoundedRectangle(cornerRadius: 4)
+          RoundedRectangle(cornerRadius: 5)
             .stroke(Color.secondary, lineWidth: 1)
             .padding(.horizontal, 2)
             .padding(.vertical, 2)

@@ -80,7 +80,7 @@ struct SubjectRatingView: View {
               Text("\(subject.rating.total) 人评分")
                 .font(.footnote)
                 .overlay {
-                  RoundedRectangle(cornerRadius: 4)
+                  RoundedRectangle(cornerRadius: 5)
                     .stroke(Color.secondary, lineWidth: 1)
                     .padding(.horizontal, -4)
                     .padding(.vertical, -2)
@@ -98,7 +98,7 @@ struct SubjectRatingView: View {
           .frame(width: geometry.size.width, height: 150)
           .padding(.vertical, 20)
           .background(Color.secondary.opacity(0.02))
-          .clipShape(RoundedRectangle(cornerRadius: 8))
+          .clipShape(RoundedRectangle(cornerRadius: 10))
         FlowStack {
           ForEach(collectionDesc, id: \.self) { desc in
             HStack {
@@ -166,7 +166,7 @@ struct ChartView: View {
             Rectangle()
               .fill(.secondary.opacity(0.8))
               .frame(width: barWidth, height: barHeight(value))
-              .clipShape(RoundedRectangle(cornerRadius: 4))
+              .clipShape(RoundedRectangle(cornerRadius: 5))
             Text(key).font(.footnote)
           }
         }

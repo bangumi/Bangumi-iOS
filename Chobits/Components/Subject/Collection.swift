@@ -57,7 +57,7 @@ struct SubjectCollectionView: View {
         Text(collection.type.message(type: collection.subjectType))
           .foregroundStyle(Color("LinkTextColor"))
           .overlay {
-            RoundedRectangle(cornerRadius: 4)
+            RoundedRectangle(cornerRadius: 5)
               .stroke(Color("LinkTextColor"), lineWidth: 1)
               .padding(.horizontal, -4)
               .padding(.vertical, -2)
@@ -68,7 +68,7 @@ struct SubjectCollectionView: View {
             .font(.footnote)
             .foregroundStyle(.secondary)
             .overlay {
-              RoundedRectangle(cornerRadius: 4)
+              RoundedRectangle(cornerRadius: 5)
                 .stroke(.secondary, lineWidth: 1)
                 .padding(.horizontal, -4)
                 .padding(.vertical, -2)
