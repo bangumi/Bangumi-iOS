@@ -22,7 +22,7 @@ class ChiiClient: ObservableObject, Observable {
   var anonymousSession: URLSession?
   var authorizedSession: URLSession?
 
-  var mock: Bool = false
+  var mock: SubjectType?
 
   @Published var isAuthenticated: Bool = false
 
@@ -36,7 +36,7 @@ class ChiiClient: ObservableObject, Observable {
     return baseURL.appending(queryItems: queries)
   }
 
-  init(mock: Bool = false) {
+  init(mock: SubjectType? = nil) {
     self.keychain = KeychainSwift(keyPrefix: "com.everpcpc.chobits.")
     guard let plist = Bundle.main.infoDictionary else {
       fatalError("Could not find Info.plist")
@@ -53,7 +53,7 @@ class ChiiClient: ObservableObject, Observable {
       callbackURL: "bangumi://oauth/callback"
     )
     self.mock = mock
-    if mock {
+    if mock != nil {
       self.isAuthenticated = true
     }
   }
@@ -275,8 +275,8 @@ class ChiiClient: ObservableObject, Observable {
   }
 
   func getCollection(sid: UInt) async throws -> UserSubjectCollection {
-    if self.mock {
-      return try loadFixture(fixture: "user_collection.json", target: UserSubjectCollection.self)
+    if let mock = self.mock {
+      return try loadFixture(fixture: "user_collection_\(mock.name).json", target: UserSubjectCollection.self)
     }
     let profile = try await self.getProfile()
     let url = if profile.username.isEmpty {
@@ -291,9 +291,51 @@ class ChiiClient: ObservableObject, Observable {
     return collection
   }
 
+  // update progress for books
+  func updateCollection(sid:UInt, eps: UInt?, vols: UInt?) async throws -> UserSubjectCollection {
+    if self.mock != nil {
+      return try await getCollection(sid: sid)
+    }
+    let url = self.apiBase.appendingPathComponent("v0/users/-/collections/\(sid)")
+    var body: [String: Any] = [:]
+    if let epStatus = eps {
+      body["ep_status"] = epStatus
+    }
+    if let volStatus = vols {
+      body["vol_status"] = volStatus
+    }
+    _ = try await self.request(url: url, method: "POST", body: body, authorized: true)
+    return try await getCollection(sid: sid)
+  }
+
+  func updateCollection(sid:UInt, type: CollectionType?, rate: UInt?, comment: String?, priv: Bool?, tags: [String]?) async throws -> UserSubjectCollection {
+    if self.mock != nil {
+      return try await getCollection(sid: sid)
+    }
+    let url = self.apiBase.appendingPathComponent("v0/users/-/collections/\(sid)")
+    var body: [String: Any] = [:]
+    if let type = type {
+      body["type"] = type.rawValue
+    }
+    if let rate = rate {
+      body["rate"] = rate
+    }
+    if let comment = comment {
+      body["comment"] = comment
+    }
+    if let priv = priv {
+      body["private"] = priv
+    }
+    if let tags = tags {
+      body["tags"] = tags
+    }
+    _ = try await self.request(url: url, method: "POST", body: body, authorized: true)
+    return try await getCollection(sid: sid)
+  }
+
   func getSubject(sid: UInt) async throws -> Subject {
-    if self.mock {
-      return try loadFixture(fixture: "subject.json", target: Subject.self)
+    if let mock = self.mock {
+      return try loadFixture(fixture: "subject_\(mock.name).json", target: Subject.self)
     }
     let url = self.apiBase.appendingPathComponent("v0/subjects/\(sid)")
     let data = try await request(url: url, method: "GET", authorized: self.isAuthenticated)

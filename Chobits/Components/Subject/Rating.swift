@@ -183,5 +183,5 @@ struct ChartView: View {
 }
 
 #Preview {
-  SubjectRatingView(subject: .preview)
+  SubjectRatingView(subject: .previewAnime)
 }

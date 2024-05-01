@@ -43,6 +43,7 @@ struct SubjectView: View {
             SubjectCollectionView(subject: subject)
           }
           if !subject.summary.isEmpty {
+            Divider()
             SubjectSummaryView(subject: subject)
           }
           SubjectTagView(subject: subject)
@@ -64,5 +65,5 @@ struct SubjectView: View {
 #Preview {
   SubjectView(sid: 1)
   .environmentObject(Notifier())
-  .environmentObject(ChiiClient(mock: true))
+  .environmentObject(ChiiClient(mock: .anime))
 }

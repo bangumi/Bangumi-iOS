@@ -27,8 +27,8 @@
 		19671C642BDEB55D000B4D99 /* Mock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19671C412BDEB55D000B4D99 /* Mock.swift */; };
 		19671C652BDEB55D000B4D99 /* Responses.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19671C422BDEB55D000B4D99 /* Responses.swift */; };
 		19671C662BDEB55D000B4D99 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 19671C442BDEB55D000B4D99 /* Preview Assets.xcassets */; };
-		19671C672BDEB55D000B4D99 /* subject.json in Resources */ = {isa = PBXBuildFile; fileRef = 19671C452BDEB55D000B4D99 /* subject.json */; };
-		19671C682BDEB55D000B4D99 /* user_collection.json in Resources */ = {isa = PBXBuildFile; fileRef = 19671C462BDEB55D000B4D99 /* user_collection.json */; };
+		19671C672BDEB55D000B4D99 /* subject_anime.json in Resources */ = {isa = PBXBuildFile; fileRef = 19671C452BDEB55D000B4D99 /* subject_anime.json */; };
+		19671C682BDEB55D000B4D99 /* user_collection_anime.json in Resources */ = {isa = PBXBuildFile; fileRef = 19671C462BDEB55D000B4D99 /* user_collection_anime.json */; };
 		19671C692BDEB55D000B4D99 /* AuthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19671C482BDEB55D000B4D99 /* AuthView.swift */; };
 		19671C6A2BDEB55D000B4D99 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19671C492BDEB55D000B4D99 /* ContentView.swift */; };
 		19671C6B2BDEB55D000B4D99 /* DiscoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19671C4A2BDEB55D000B4D99 /* DiscoverView.swift */; };
@@ -41,6 +41,8 @@
 		19671C752BDEB8BD000B4D99 /* CachedAsyncImage in Frameworks */ = {isa = PBXBuildFile; productRef = 19671C742BDEB8BD000B4D99 /* CachedAsyncImage */; };
 		19671C782BE1BB72000B4D99 /* search_subject.json in Resources */ = {isa = PBXBuildFile; fileRef = 19671C772BE1BB72000B4D99 /* search_subject.json */; };
 		19C2CE5D2BE1E7B10080A056 /* NotFoundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19C2CE5C2BE1E7B10080A056 /* NotFoundView.swift */; };
+		19C2CE5F2BE2536D0080A056 /* user_collection_book.json in Resources */ = {isa = PBXBuildFile; fileRef = 19C2CE5E2BE2536D0080A056 /* user_collection_book.json */; };
+		19C2CE612BE2538A0080A056 /* subject_book.json in Resources */ = {isa = PBXBuildFile; fileRef = 19C2CE602BE2538A0080A056 /* subject_book.json */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -64,8 +66,8 @@
 		19671C412BDEB55D000B4D99 /* Mock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Mock.swift; sourceTree = "<group>"; };
 		19671C422BDEB55D000B4D99 /* Responses.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Responses.swift; sourceTree = "<group>"; };
 		19671C442BDEB55D000B4D99 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		19671C452BDEB55D000B4D99 /* subject.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = subject.json; sourceTree = "<group>"; };
-		19671C462BDEB55D000B4D99 /* user_collection.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = user_collection.json; sourceTree = "<group>"; };
+		19671C452BDEB55D000B4D99 /* subject_anime.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = subject_anime.json; sourceTree = "<group>"; };
+		19671C462BDEB55D000B4D99 /* user_collection_anime.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = user_collection_anime.json; sourceTree = "<group>"; };
 		19671C482BDEB55D000B4D99 /* AuthView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthView.swift; sourceTree = "<group>"; };
 		19671C492BDEB55D000B4D99 /* ContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		19671C4A2BDEB55D000B4D99 /* DiscoverView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DiscoverView.swift; sourceTree = "<group>"; };
@@ -78,6 +80,8 @@
 		19671C772BE1BB72000B4D99 /* search_subject.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = search_subject.json; sourceTree = "<group>"; };
 		19BB342B2BD239AB00E5C295 /* Chobits.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Chobits.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		19C2CE5C2BE1E7B10080A056 /* NotFoundView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotFoundView.swift; sourceTree = "<group>"; };
+		19C2CE5E2BE2536D0080A056 /* user_collection_book.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = user_collection_book.json; sourceTree = "<group>"; };
+		19C2CE602BE2538A0080A056 /* subject_book.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = subject_book.json; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -147,9 +151,11 @@
 			isa = PBXGroup;
 			children = (
 				19671C442BDEB55D000B4D99 /* Preview Assets.xcassets */,
-				19671C452BDEB55D000B4D99 /* subject.json */,
-				19671C462BDEB55D000B4D99 /* user_collection.json */,
+				19671C452BDEB55D000B4D99 /* subject_anime.json */,
+				19671C462BDEB55D000B4D99 /* user_collection_anime.json */,
 				19671C772BE1BB72000B4D99 /* search_subject.json */,
+				19C2CE5E2BE2536D0080A056 /* user_collection_book.json */,
+				19C2CE602BE2538A0080A056 /* subject_book.json */,
 			);
 			path = "Preview Content";
 			sourceTree = "<group>";
@@ -264,9 +270,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				19671C782BE1BB72000B4D99 /* search_subject.json in Resources */,
-				19671C682BDEB55D000B4D99 /* user_collection.json in Resources */,
+				19671C682BDEB55D000B4D99 /* user_collection_anime.json in Resources */,
 				19671C702BDEB55D000B4D99 /* Config.xcconfig in Resources */,
-				19671C672BDEB55D000B4D99 /* subject.json in Resources */,
+				19C2CE612BE2538A0080A056 /* subject_book.json in Resources */,
+				19C2CE5F2BE2536D0080A056 /* user_collection_book.json in Resources */,
+				19671C672BDEB55D000B4D99 /* subject_anime.json in Resources */,
 				19671C6E2BDEB55D000B4D99 /* Assets.xcassets in Resources */,
 				19671C662BDEB55D000B4D99 /* Preview Assets.xcassets in Resources */,
 			);

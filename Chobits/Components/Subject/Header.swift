@@ -81,7 +81,7 @@ struct SubjectHeaderView: View {
 #Preview {
   ScrollView {
     LazyVStack(alignment: .leading) {
-      SubjectHeaderView(subject: .preview)
+      SubjectHeaderView(subject: .previewAnime)
     }
   }.padding()
 }

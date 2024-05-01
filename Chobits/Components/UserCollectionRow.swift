@@ -67,7 +67,7 @@ struct UserCollectionRow: View {
 #Preview {
   ScrollView {
     LazyVStack(alignment: .leading, spacing: 10) {
-      UserCollectionRow(collection: .preview)
+      UserCollectionRow(collection: .previewAnime)
     }
   }.padding()
 }

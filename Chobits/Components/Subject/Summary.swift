@@ -13,29 +13,27 @@ struct SubjectSummaryView: View {
   @State private var collapsed = true
 
   var body: some View {
-    VStack(alignment: .leading) {
-      Text("简介").font(.headline)
-      Text(subject.summary)
-        .font(.footnote)
-        .multilineTextAlignment(.leading)
-        .lineLimit(collapsed ? 5 : nil)
-      HStack {
-        Spacer()
-        Button {
-          withAnimation {
-            collapsed.toggle()
-          }
-        } label: {
-          if collapsed {
-            Text("more")
-          } else {
-            Text("close")
-          }
+    Text("简介").font(.headline)
+    Text(subject.summary)
+      .font(.footnote)
+      .multilineTextAlignment(.leading)
+      .lineLimit(collapsed ? 5 : nil)
+    HStack {
+      Spacer()
+      Button {
+        withAnimation {
+          collapsed.toggle()
         }
-        .buttonStyle(PlainButtonStyle())
-        .font(.caption)
-        .foregroundStyle(Color("LinkTextColor"))
+      } label: {
+        if collapsed {
+          Text("more")
+        } else {
+          Text("close")
+        }
       }
+      .buttonStyle(PlainButtonStyle())
+      .font(.caption)
+      .foregroundStyle(Color("LinkTextColor"))
     }
   }
 }
@@ -43,7 +41,7 @@ struct SubjectSummaryView: View {
 #Preview {
   ScrollView {
     LazyVStack(alignment: .leading) {
-      SubjectSummaryView(subject: .preview)
+      SubjectSummaryView(subject: .previewAnime)
     }
   }.padding()
 }

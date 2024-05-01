@@ -243,6 +243,23 @@ enum SubjectType: UInt8, Codable, Identifiable {
     }
   }
 
+  var name: String {
+    switch self{
+    case .unknown:
+      return "unknown"
+    case .book:
+      return "book"
+    case .anime:
+      return "anime"
+    case .music:
+      return "music"
+    case .game:
+      return "game"
+    case .real:
+      return "real"
+    }
+  }
+
   var icon: String {
     switch self {
     case .unknown:

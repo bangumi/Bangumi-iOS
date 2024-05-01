@@ -1,0 +1,74 @@
+{
+  "updated_at": "2024-04-28T10:14:41+08:00",
+  "comment": null,
+  "tags": [],
+  "subject": {
+    "date": "2003-05-16",
+    "images": {
+      "small": "https://lain.bgm.tv/r/200/pic/cover/l/20/48/7699_AUo9O.jpg",
+      "grid": "https://lain.bgm.tv/r/100/pic/cover/l/20/48/7699_AUo9O.jpg",
+      "large": "https://lain.bgm.tv/pic/cover/l/20/48/7699_AUo9O.jpg",
+      "medium": "https://lain.bgm.tv/r/800/pic/cover/l/20/48/7699_AUo9O.jpg",
+      "common": "https://lain.bgm.tv/r/400/pic/cover/l/20/48/7699_AUo9O.jpg"
+    },
+    "name": "スクールランブル",
+    "name_cn": "校园迷糊大王",
+    "short_summary": "　　冢本天满是矢神高中二年级的学生。她就跟许多女孩子一样正陷入爱河之中。她喜欢上的对象是同班同学乌丸大路。为了跟一年后就要去美国的乌丸告白，她每天都在努力地奋斗中。而戴着太阳眼镜、留着胡子，一眼就看得出是个不良少年的播磨拳儿，喜欢上同班同学",
+    "tags": [
+      {
+        "name": "漫画",
+        "count": 136
+      },
+      {
+        "name": "小林尽",
+        "count": 99
+      },
+      {
+        "name": "青春",
+        "count": 71
+      },
+      {
+        "name": "恋爱",
+        "count": 67
+      },
+      {
+        "name": "校园迷糊大王",
+        "count": 67
+      },
+      {
+        "name": "校园",
+        "count": 63
+      },
+      {
+        "name": "搞笑",
+        "count": 55
+      },
+      {
+        "name": "单角恋死循环",
+        "count": 26
+      },
+      {
+        "name": "2002",
+        "count": 22
+      },
+      {
+        "name": "KUSO神作",
+        "count": 22
+      }
+    ],
+    "score": 8.6,
+    "type": 1,
+    "id": 7699,
+    "eps": 345,
+    "volumes": 22,
+    "collection_total": 1004,
+    "rank": 98
+  },
+  "subject_id": 7699,
+  "vol_status": 0,
+  "ep_status": 0,
+  "subject_type": 1,
+  "type": 3,
+  "rate": 0,
+  "private": false
+}

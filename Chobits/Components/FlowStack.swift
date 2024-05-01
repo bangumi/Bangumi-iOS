@@ -62,14 +62,12 @@ public struct FlowStack<Content: View>: View {
   }
 }
 
-struct FlowStack_Previews: PreviewProvider {
-  static var previews: some View {
-    FlowStack {
-      ForEach(1 ..< 100) { num in
-        Text(String(num))
-          .frame(minWidth: 30, minHeight: 30)
-          .background(Circle().fill(Color.red))
-      }
+#Preview{
+  FlowStack {
+    ForEach(1 ..< 100) { num in
+      Text(String(num))
+        .frame(minWidth: 30, minHeight: 30)
+        .background(Circle().fill(Color.red))
     }
   }
 }
