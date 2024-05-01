@@ -14,6 +14,7 @@ struct ContentView: View {
 
   @Environment(\.modelContext) private var modelContext
 
+  @State private var waiting = true
   @StateObject var navState = NavState()
 
   private func createTabViewBinding() -> Binding<ContentViewTab> {
@@ -37,29 +38,34 @@ struct ContentView: View {
   }
 
   var body: some View {
-    TabView(selection: createTabViewBinding()) {
-      ChiiTimelineView()
-        .tag(ContentViewTab.timeline)
-        .tabItem {
-          Image(systemName: "person")
+    if waiting {
+      ProgressView()
+        .onAppear {
+          self.waiting = true
+          Task {
+            _ = try await chii.getProfile()
+            self.waiting = false
+          }
         }
-      ChiiProgressView()
-        .tag(ContentViewTab.progress)
-        .tabItem {
-          Image(systemName: "square.grid.3x2.fill")
-        }
-      ChiiDiscoverView()
-        .tag(ContentViewTab.discover)
-        .tabItem {
-          Image(systemName: "magnifyingglass")
-        }
+    } else {
+      TabView(selection: createTabViewBinding()) {
+        ChiiTimelineView()
+          .tag(ContentViewTab.timeline)
+          .tabItem {
+            Image(systemName: "person")
+          }
+        ChiiProgressView()
+          .tag(ContentViewTab.progress)
+          .tabItem {
+            Image(systemName: "square.grid.3x2.fill")
+          }
+        ChiiDiscoverView()
+          .tag(ContentViewTab.discover)
+          .tabItem {
+            Image(systemName: "magnifyingglass")
+          }
+      }.environment(navState)
     }
-    .onAppear {
-      Task.detached {
-        _ = try await chii.getProfile()
-      }
-    }
-    .environment(navState)
   }
 }
 

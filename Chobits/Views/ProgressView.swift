@@ -79,7 +79,7 @@ struct ChiiProgressView: View {
                 }
               }
             }
-            .animation(.smooth, value: subjectType)
+            .animation(.easeInOut, value: subjectType)
             .navigationDestination(for: UserSubjectCollection.self) { collection in
               SubjectView(sid: collection.subjectId)
             }
