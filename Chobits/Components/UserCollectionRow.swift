@@ -70,7 +70,7 @@ struct UserCollectionRow: View {
                       .padding(.horizontal, -4)
                       .padding(.vertical, -2)
                   }
-                  .padding(.horizontal, 2)
+                  .padding(.horizontal, 4)
                 Text("\(volumes)")
                   .foregroundStyle(volsColor)
                   .overlay {
