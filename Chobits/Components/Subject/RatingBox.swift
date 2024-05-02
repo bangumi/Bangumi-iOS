@@ -1,5 +1,5 @@
 //
-//  Rating.swift
+//  RatingBox.swift
 //  Chobits
 //
 //  Created by Chuan Chuan on 2024/4/28.

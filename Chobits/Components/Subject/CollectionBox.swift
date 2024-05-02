@@ -11,11 +11,11 @@ struct CollectionBox: View {
   var subject: Subject
   var collection: UserSubjectCollection?
 
-    var body: some View {
-        Text("Hello, World!")
-    }
+  var body: some View {
+    Text("Hello, World!")
+  }
 }
 
 #Preview {
-  CollectionBox(subject: .previewAnime,collection: .previewAnime)
+  CollectionBox(subject: .previewAnime, collection: .previewAnime)
 }

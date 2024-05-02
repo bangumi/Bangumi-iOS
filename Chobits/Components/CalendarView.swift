@@ -36,12 +36,12 @@ struct CalendarView: View {
 
   func refreshCalendar() {
     let actor = BackgroundActor(modelContainer: modelContext.container)
-    Task.detached {
+    Task {
       do {
         let cals = try await chii.getCalendar()
         try await actor.insert(cals: cals)
       } catch {
-        await notifier.alert(message: "\(error)")
+        notifier.alert(message: "\(error)")
       }
     }
   }

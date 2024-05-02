@@ -18,12 +18,11 @@ struct SubjectSummaryView: View {
       .font(.footnote)
       .multilineTextAlignment(.leading)
       .lineLimit(collapsed ? 5 : nil)
+      .animation(.easeInOut, value: collapsed)
     HStack {
       Spacer()
       Button {
-        withAnimation {
-          collapsed.toggle()
-        }
+        collapsed.toggle()
       } label: {
         if collapsed {
           Text("more")

@@ -8,9 +8,8 @@
 import SwiftData
 import SwiftUI
 
-@MainActor
 struct SubjectView: View {
-  var sid: UInt
+  let sid: UInt
 
   @EnvironmentObject var notifier: Notifier
   @EnvironmentObject var chii: ChiiClient
@@ -40,32 +39,24 @@ struct SubjectView: View {
     }
     self.updating = true
     let actor = BackgroundActor(modelContainer: modelContext.container)
-    Task.detached {
+    Task {
       do {
         let resp = try await chii.getSubject(sid: self.sid)
         try await actor.insert(subjects: [resp])
-        await MainActor.run {
-          self.empty = false
-          self.updating = false
-          self.updated = true
-        }
+        self.empty = false
+        self.updating = false
+        self.updated = true
       } catch ChiiError.notFound(_) {
-        do {
-          try await actor.deleteSubject(sid: self.sid)
-        } catch {
-          await notifier.alert(message: "\(error)")
+        if let subject = subject {
+          modelContext.delete(subject)
         }
-        await MainActor.run {
-          self.empty = true
-          self.updating = false
-          self.updated = true
-        }
+        self.empty = true
+        self.updating = false
+        self.updated = true
       } catch {
-        await notifier.alert(message: "\(error)")
-        await MainActor.run {
-          self.updating = false
-          self.updated = true
-        }
+        notifier.alert(message: "\(error)")
+        self.updating = false
+        self.updated = true
       }
     }
   }
@@ -98,17 +89,15 @@ struct SubjectView: View {
   }
 }
 
+// .anime 12
+// .book 497
 #Preview {
   let config = ModelConfiguration(isStoredInMemoryOnly: true)
   let container = try! ModelContainer(
     for: Subject.self, UserSubjectCollection.self, configurations: config)
 
-  // .anime 12
-  // .book 497
-  return MainActor.assumeIsolated {
-    SubjectView(sid: 497)
-      .environmentObject(Notifier())
-      .environmentObject(ChiiClient(mock: .book))
-      .modelContainer(container)
-  }
+  return SubjectView(sid: 497)
+    .environmentObject(Notifier())
+    .environmentObject(ChiiClient(mock: .book))
+    .modelContainer(container)
 }

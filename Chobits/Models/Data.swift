@@ -277,20 +277,4 @@ extension BackgroundActor {
     }
     try modelContext.save()
   }
-
-  func deleteSubject(sid: UInt) throws {
-    let predicate = #Predicate<Subject> { subject in
-      subject.id == sid
-    }
-    try modelContext.delete(model: Subject.self, where: predicate)
-    try modelContext.save()
-  }
-
-  func deleteCollection(sid: UInt) throws {
-    let predicate = #Predicate<UserSubjectCollection> { collection in
-      collection.subjectId == sid
-    }
-    try modelContext.delete(model: UserSubjectCollection.self, where: predicate)
-    try modelContext.save()
-  }
 }

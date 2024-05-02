@@ -41,32 +41,24 @@ struct SubjectCollectionView: View {
     }
     self.updating = true
     let actor = BackgroundActor(modelContainer: modelContext.container)
-    Task.detached {
+    Task {
       do {
         let resp = try await chii.getCollection(sid: subject.id)
         try await actor.insert(collections: [resp])
-        await MainActor.run {
-          self.empty = false
-          self.updating = false
-          self.updated = true
-        }
+        self.empty = false
+        self.updating = false
+        self.updated = true
       } catch ChiiError.notFound(_) {
-        do {
-          try await actor.deleteCollection(sid: subject.id)
-        } catch {
-          await notifier.alert(message: "\(error)")
+        if let collection = collection {
+          modelContext.delete(collection)
         }
-        await MainActor.run {
-          self.empty = true
-          self.updating = false
-          self.updated = true
-        }
+        self.empty = true
+        self.updating = false
+        self.updated = true
       } catch {
-        await notifier.alert(message: "\(error)")
-        await MainActor.run {
-          self.updating = false
-          self.updated = true
-        }
+        notifier.alert(message: "\(error)")
+        self.updating = false
+        self.updated = true
       }
     }
   }
@@ -146,7 +138,7 @@ struct SubjectCollectionView: View {
   let config = ModelConfiguration(isStoredInMemoryOnly: true)
   let container = try! ModelContainer(for: UserSubjectCollection.self, configurations: config)
 
-  return MainActor.assumeIsolated {
+  return
     ScrollView {
       LazyVStack(alignment: .leading) {
         SubjectCollectionView(subject: .previewBook)
@@ -156,5 +148,4 @@ struct SubjectCollectionView: View {
     }
     .padding()
     .modelContainer(container)
-  }
 }

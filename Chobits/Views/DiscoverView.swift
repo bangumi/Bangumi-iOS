@@ -48,15 +48,11 @@ struct ChiiDiscoverView: View {
     total = 0
     local = false
     subjects = []
-    Task.detached {
+    Task {
       let resp = try await chii.search(
         keyword: query, type: subjectType, offset: offset, limit: limit)
-      await MainActor.run {
-        withAnimation {
-          total = resp.total
-          subjects = resp.data
-        }
-      }
+      total = resp.total
+      subjects = resp.data
     }
   }
 
@@ -70,14 +66,10 @@ struct ChiiDiscoverView: View {
       return
     }
     offset += limit
-    Task.detached {
+    Task {
       let resp = try await chii.search(
         keyword: query, type: subjectType, offset: offset, limit: limit)
-      await MainActor.run {
-        withAnimation {
-          subjects.append(contentsOf: resp.data)
-        }
-      }
+      subjects.append(contentsOf: resp.data)
     }
   }
 

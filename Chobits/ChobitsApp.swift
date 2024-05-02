@@ -57,29 +57,17 @@ class Notifier: ObservableObject {
   @Published var showNotification: Bool = false
 
   func alert(error: ChiiError) {
-    Task {
-      await MainActor.run {
-        self.error = error
-        self.showAlert = true
-      }
-    }
+    self.error = error
+    self.showAlert = true
   }
 
   func alert(message: String) {
-    Task {
-      await MainActor.run {
-        self.error = ChiiError(message: message)
-        self.showAlert = true
-      }
-    }
+    self.error = ChiiError(message: message)
+    self.showAlert = true
   }
 
   func notify(message: String) {
-    Task {
-      await MainActor.run {
-        self.notification = message
-        self.showNotification = true
-      }
-    }
+    self.notification = message
+    self.showNotification = true
   }
 }

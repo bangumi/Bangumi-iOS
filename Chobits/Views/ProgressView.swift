@@ -22,7 +22,7 @@ struct ChiiProgressView: View {
 
   func updateCollections(type: SubjectType?) {
     let actor = BackgroundActor(modelContainer: modelContext.container)
-    Task.detached(priority: .background) {
+    Task {
       do {
         var offset: UInt = 0
         let limit: UInt = 100
@@ -39,7 +39,7 @@ struct ChiiProgressView: View {
           }
         }
       } catch {
-        await notifier.alert(message: "\(error)")
+        notifier.alert(message: "\(error)")
       }
     }
   }

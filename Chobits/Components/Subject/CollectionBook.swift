@@ -34,18 +34,16 @@ struct SubjectCollectionBookView: View {
   func update() {
     self.updating = true
     let actor = BackgroundActor(modelContainer: modelContext.container)
-    Task.detached {
+    Task {
       do {
         let resp = try await chii.updateCollection(sid: subject.id, eps: eps, vols: vols)
         try await actor.insert(collections: [resp])
       } catch {
-        await notifier.alert(message: "\(error)")
+        notifier.alert(message: "\(error)")
       }
-      await MainActor.run {
-        self.eps = nil
-        self.vols = nil
-        self.updating = false
-      }
+      self.eps = nil
+      self.vols = nil
+      self.updating = false
     }
   }
 
@@ -105,7 +103,7 @@ struct SubjectCollectionBookView: View {
   let container = try! ModelContainer(for: UserSubjectCollection.self, configurations: config)
   container.mainContext.insert(UserSubjectCollection.previewBook)
 
-  return MainActor.assumeIsolated {
+  return
     ScrollView {
       LazyVStack(alignment: .leading) {
         SubjectCollectionBookView(subject: .previewBook)
@@ -115,5 +113,4 @@ struct SubjectCollectionBookView: View {
     }
     .padding()
     .modelContainer(container)
-  }
 }

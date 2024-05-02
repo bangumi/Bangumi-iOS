@@ -18,29 +18,25 @@ struct ChiiTimelineView: View {
   @State var profile: Profile?
 
   func updateProfile() {
-    Task.detached {
+    Task {
       do {
         let profile = try await chii.getProfile()
-        await MainActor.run {
-          withAnimation {
-            self.profile = profile
-          }
-        }
+        self.profile = profile
       } catch {
-        await notifier.alert(message: "\(error)")
+        notifier.alert(message: "\(error)")
       }
     }
   }
 
   func logout() {
-    withAnimation {
-      profile = nil
-      chii.logout()
-      do {
-        try modelContext.delete(model: UserSubjectCollection.self)
-      } catch {
-        notifier.alert(message: "\(error)")
-      }
+    profile = nil
+    Task {
+      await chii.logout()
+    }
+    do {
+      try modelContext.delete(model: UserSubjectCollection.self)
+    } catch {
+      notifier.alert(message: "\(error)")
     }
   }
 

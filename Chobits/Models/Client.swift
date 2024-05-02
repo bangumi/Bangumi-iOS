@@ -58,6 +58,12 @@ class ChiiClient: ObservableObject, Observable {
     }
   }
 
+  func setAuthed(authed: Bool) async {
+    await MainActor.run {
+      self.isAuthenticated = authed
+    }
+  }
+
   func request(url: URL, method: String, body: Any? = nil, authorized: Bool = true) async throws
     -> Data
   {
@@ -86,9 +92,9 @@ class ChiiClient: ObservableObject, Observable {
     }
   }
 
-  func logout() {
+  func logout() async {
     self.keychain.delete("auth")
-    self.isAuthenticated = false
+    await self.setAuthed(authed: false)
     self.auth = nil
     self.profile = nil
     self.authorizedSession = nil
@@ -108,9 +114,7 @@ class ChiiClient: ObservableObject, Observable {
       "User-Agent": self.userAgent
     ]
     let session = URLSession(configuration: sessionConfig)
-    await MainActor.run {
-      self.anonymousSession = session
-    }
+    self.anonymousSession = session
     return session
   }
 
@@ -143,11 +147,7 @@ class ChiiClient: ObservableObject, Observable {
       }
     }
     sessionConfig.httpAdditionalHeaders = headers
-    await MainActor.run {
-      withAnimation {
-        self.isAuthenticated = true
-      }
-    }
+    await self.setAuthed(authed: true)
     return URLSession(configuration: sessionConfig)
   }
 
@@ -182,11 +182,7 @@ class ChiiClient: ObservableObject, Observable {
     ]
     let data = try await self.request(url: url, method: "POST", body: body, authorized: false)
     let _ = try self.saveAuthResponse(data: data)
-    await MainActor.run {
-      withAnimation {
-        self.isAuthenticated = true
-      }
-    }
+    await self.setAuthed(authed: true)
   }
 
   func refreshAccessToken(auth: Auth) async throws -> Auth {
@@ -200,11 +196,7 @@ class ChiiClient: ObservableObject, Observable {
     ]
     let data = try await self.request(url: url, method: "POST", body: body, authorized: false)
     let auth = try self.saveAuthResponse(data: data)
-    await MainActor.run {
-      withAnimation {
-        self.isAuthenticated = true
-      }
-    }
+    await self.setAuthed(authed: true)
     return auth
   }
 
