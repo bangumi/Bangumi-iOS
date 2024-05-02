@@ -316,7 +316,7 @@ class ChiiClient: ObservableObject, Observable {
   }
 
   func updateCollection(
-    sid: UInt, type: CollectionType?, rate: UInt?, comment: String?, priv: Bool?, tags: [String]?
+    sid: UInt, type: CollectionType?, rate: UInt8?, comment: String?, priv: Bool?, tags: [String]?
   ) async throws -> UserSubjectCollection {
     if self.mock != nil {
       return try await getCollection(sid: sid)

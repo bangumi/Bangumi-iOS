@@ -65,10 +65,10 @@
     "rank": 1586
   },
   "subject_id": 497,
-  "vol_status": 0,
-  "ep_status": 0,
+  "vol_status": 3,
+  "ep_status": 34,
   "subject_type": 1,
   "type": 3,
-  "rate": 0,
+  "rate": 8,
   "private": false
 }

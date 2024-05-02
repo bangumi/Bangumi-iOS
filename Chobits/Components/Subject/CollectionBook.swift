@@ -67,7 +67,7 @@ struct SubjectCollectionBookView: View {
             .fixedSize(horizontal: true, vertical: false)
             .padding(.trailing, 5)
             .textFieldStyle(.roundedBorder)
-          Text(subject.eps > 0 ? "/\(subject.eps)话" : "/?话").foregroundColor(.secondary)
+          Text(subject.eps > 0 ? "/\(subject.eps)话" : "/?话").foregroundStyle(.secondary)
         }.monospaced()
         Spacer()
         HStack(alignment: .firstTextBaseline, spacing: 0) {
@@ -87,13 +87,12 @@ struct SubjectCollectionBookView: View {
             .fixedSize(horizontal: true, vertical: false)
             .padding(.trailing, 5)
             .textFieldStyle(.roundedBorder)
-          Text(subject.volumes > 0 ? "/\(subject.volumes)卷" : "/?卷").foregroundColor(.secondary)
+          Text(subject.volumes > 0 ? "/\(subject.volumes)卷" : "/?卷").foregroundStyle(.secondary)
         }.monospaced()
         Spacer()
         Button("更新", action: update)
           .buttonStyle(.borderedProminent)
-          .disabled(updating)
-      }
+      }.disabled(updating)
     }
   }
 }

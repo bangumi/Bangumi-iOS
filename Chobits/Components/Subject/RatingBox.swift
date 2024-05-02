@@ -52,11 +52,17 @@ struct SubjectRatingView: View {
     } else if subject.rating.score >= 5.5 {
       ScoreInfo(desc: "还行", offset: 2)
     } else if subject.rating.score >= 4.5 {
-      ScoreInfo(desc: "较差", offset: 1)
+      ScoreInfo(desc: "不过不失", offset: 1)
     } else if subject.rating.score >= 3.5 {
       ScoreInfo(desc: "较差", offset: 0)
+    } else if subject.rating.score >= 2.5 {
+      ScoreInfo(desc: "差", offset: 0)
+    } else if subject.rating.score >= 1.5 {
+      ScoreInfo(desc: "很差", offset: 0)
+    } else if subject.rating.score >= 0.5 {
+      ScoreInfo(desc: "不忍直视", offset: 0)
     } else {
-      ScoreInfo(desc: "较差", offset: 0)
+      ScoreInfo(desc: "", offset: 0)
     }
   }
 

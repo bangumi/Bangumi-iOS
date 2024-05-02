@@ -162,11 +162,11 @@
 			children = (
 				19671C442BDEB55D000B4D99 /* Preview Assets.xcassets */,
 				19671C452BDEB55D000B4D99 /* subject_anime.json */,
-				19671C462BDEB55D000B4D99 /* user_collection_anime.json */,
-				19671C772BE1BB72000B4D99 /* search_subject_book.json */,
-				19C2CE662BE3211B0080A056 /* search_subject_anime.json */,
-				19C2CE5E2BE2536D0080A056 /* user_collection_book.json */,
 				19C2CE602BE2538A0080A056 /* subject_book.json */,
+				19671C462BDEB55D000B4D99 /* user_collection_anime.json */,
+				19C2CE5E2BE2536D0080A056 /* user_collection_book.json */,
+				19C2CE662BE3211B0080A056 /* search_subject_anime.json */,
+				19671C772BE1BB72000B4D99 /* search_subject_book.json */,
 				19C2CE642BE2ACE60080A056 /* profile.json */,
 			);
 			path = "Preview Content";

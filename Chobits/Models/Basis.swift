@@ -156,13 +156,17 @@ struct SubjectCollection: Codable {
 /// 3: 在看
 /// 4: 搁置
 /// 5: 抛弃
-enum CollectionType: UInt8, Codable {
+enum CollectionType: UInt8, Codable, Identifiable {
   case unknown = 0
   case wish = 1
   case collect = 2
   case `do` = 3
   case onHold = 4
   case dropped = 5
+
+  var id: Self {
+    self
+  }
 
   init(value: UInt8 = 0) {
     let tmp = Self(rawValue: value)
@@ -171,6 +175,10 @@ enum CollectionType: UInt8, Codable {
       return
     }
     self = Self.unknown
+  }
+
+  static func boxTypes() -> [Self] {
+    return [.wish, .collect, .do, .onHold, .dropped]
   }
 
   func description(type: SubjectType) -> String {
@@ -462,5 +470,23 @@ enum EpisodeType: UInt8, Codable, Identifiable {
     case .ed:
       return "ED"
     }
+  }
+}
+
+extension UInt8 {
+  var ratingDescription: String {
+    let desc: [String: String] = [
+      "10": "超神作",
+      "9": "神作",
+      "8": "力荐",
+      "7": "推荐",
+      "6": "还行",
+      "5": "不过不失",
+      "4": "较差",
+      "3": "差",
+      "2": "很差",
+      "1": "不忍直视",
+    ]
+    return desc["\(self)"] ?? ""
   }
 }

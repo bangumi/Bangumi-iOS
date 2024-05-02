@@ -69,6 +69,6 @@
   "ep_status": 0,
   "subject_type": 2,
   "type": 3,
-  "rate": 0,
+  "rate": 10,
   "private": false
 }
