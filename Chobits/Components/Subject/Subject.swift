@@ -14,13 +14,12 @@ struct SubjectView: View {
   @Environment(\.modelContext) var modelContext
 
   @State private var subjectId: UInt
-  @State private var page: PageStatus
+  @StateObject private var page: PageStatus = PageStatus()
   @Query private var subjects: [Subject]
 
   private var subject: Subject? { subjects.first }
 
   init(sid: UInt) {
-    self.page = PageStatus()
     let predicate = #Predicate<Subject> { subject in
       subject.id == sid
     }

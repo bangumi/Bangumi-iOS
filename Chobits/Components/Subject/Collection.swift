@@ -15,16 +15,14 @@ struct SubjectCollectionView: View {
   @EnvironmentObject var chii: ChiiClient
   @Environment(\.modelContext) var modelContext
 
-  @State private var page: PageStatus
-  @State private var edit: Bool
+  @StateObject private var page: PageStatus = PageStatus()
+  @State private var edit: Bool = false
   @Query private var collections: [UserSubjectCollection]
 
   private var collection: UserSubjectCollection? { collections.first }
 
   init(subject: Subject) {
     self.subject = subject
-    self.page = PageStatus()
-    self.edit = false
     let predicate = #Predicate<UserSubjectCollection> { collection in
       collection.subjectId == subject.id
     }
@@ -56,7 +54,7 @@ struct SubjectCollectionView: View {
   var body: some View {
     HStack {
       Text("收藏").font(.headline)
-      if page.updating {
+      if self.page.updating {
         ProgressView().padding(.leading, 10)
       }
       Spacer()
@@ -84,7 +82,7 @@ struct SubjectCollectionView: View {
                 .presentationDetents(.init([.medium, .large]))
             })
       } else {
-        if page.empty {
+        if self.page.empty {
           Label("未收藏", systemImage: "plus")
             .font(.footnote)
             .foregroundStyle(.secondary)
@@ -118,7 +116,7 @@ struct SubjectCollectionView: View {
       default:
         Text("\(collection.updatedAt)").font(.caption).foregroundStyle(.secondary)
       }
-    } else if page.empty {
+    } else if self.page.empty {
       EmptyView().padding()
     }
   }
