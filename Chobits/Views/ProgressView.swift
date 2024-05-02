@@ -27,7 +27,7 @@ struct ChiiProgressView: View {
         var offset: UInt = 0
         let limit: UInt = 100
         while true {
-          let response = try await chii.getCollections(
+          let response = try await chii.getSubjectCollections(
             subjectType: type, limit: limit, offset: offset)
           if response.data.isEmpty {
             break

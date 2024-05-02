@@ -172,6 +172,9 @@ final class Subject: Codable {
   var collection: SubjectCollection
   var tags: [Tag]
 
+  @Relationship(deleteRule: .cascade, inverse: \Episode.subject)
+  var episodes: [Episode] = []
+
   init(
     id: UInt,
     type: SubjectType,
@@ -253,6 +256,104 @@ final class Subject: Codable {
   }
 }
 
+@Model
+final class Episode: Codable {
+  enum CodingKeys: String, CodingKey {
+    case id
+    case type
+    case name
+    case nameCn
+    case sort
+    case ep
+    case airdate
+    case comment
+    case duration
+    case desc
+    case disc
+    case durationSeconds
+  }
+
+  @Attribute(.unique)
+  var id: UInt
+  var type: EpisodeType
+  var name: String
+  var nameCn: String
+  var sort: Float
+  var ep: Float?
+  var airdate: String
+  var comment: UInt
+  var duration: String
+  var desc: String
+  var disc: String
+  var durationSeconds: UInt?
+
+  @Relationship
+  var subject: Subject?
+
+  @Relationship(deleteRule: .cascade, inverse: \EpisodeCollection.episode)
+  var collection: EpisodeCollection?
+
+  init(
+    id: UInt,
+    type: EpisodeType,
+    name: String,
+    nameCn: String,
+    sort: Float,
+    ep: Float?,
+    airdate: String,
+    comment: UInt,
+    duration: String,
+    desc: String,
+    disc: String,
+    durationSeconds: UInt?
+  ) {
+    self.id = id
+    self.type = type
+    self.name = name
+    self.nameCn = nameCn
+    self.sort = sort
+    self.ep = ep
+    self.airdate = airdate
+    self.comment = comment
+    self.duration = duration
+    self.desc = desc
+    self.disc = disc
+    self.durationSeconds = durationSeconds
+  }
+
+  required init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.id = try container.decode(UInt.self, forKey: .id)
+    self.type = try container.decode(EpisodeType.self, forKey: .type)
+    self.name = try container.decode(String.self, forKey: .name)
+    self.nameCn = try container.decode(String.self, forKey: .nameCn)
+    self.sort = try container.decode(Float.self, forKey: .sort)
+    self.ep = try container.decodeIfPresent(Float.self, forKey: .ep)
+    self.airdate = try container.decode(String.self, forKey: .airdate)
+    self.comment = try container.decode(UInt.self, forKey: .comment)
+    self.duration = try container.decode(String.self, forKey: .duration)
+    self.desc = try container.decode(String.self, forKey: .desc)
+    self.disc = try container.decode(String.self, forKey: .disc)
+    self.durationSeconds = try container.decodeIfPresent(UInt.self, forKey: .durationSeconds)
+  }
+
+  func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(self.id, forKey: .id)
+    try container.encode(self.type, forKey: .type)
+    try container.encode(self.name, forKey: .name)
+    try container.encode(self.nameCn, forKey: .nameCn)
+    try container.encode(self.sort, forKey: .sort)
+    try container.encode(self.ep, forKey: .ep)
+    try container.encode(self.airdate, forKey: .airdate)
+    try container.encode(self.comment, forKey: .comment)
+    try container.encode(self.duration, forKey: .duration)
+    try container.encode(self.desc, forKey: .desc)
+    try container.encode(self.disc, forKey: .disc)
+    try container.encode(self.durationSeconds, forKey: .durationSeconds)
+  }
+}
+
 @ModelActor
 actor BackgroundActor {}
 
@@ -276,5 +377,40 @@ extension BackgroundActor {
       modelContext.insert(collection)
     }
     try modelContext.save()
+  }
+}
+
+@Model
+final class EpisodeCollection: Codable {
+  enum CodingKeys: CodingKey {
+    case episode
+    case type
+  }
+
+  @Attribute(.unique)
+  var episodeId: UInt
+
+  @Relationship
+  var episode: Episode
+  var type: EpisodeCollectionType
+
+  init(episode: Episode, type: EpisodeCollectionType) {
+    self.episodeId = episode.id
+    self.episode = episode
+    self.type = type
+  }
+
+  required init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    let episode = try container.decode(Episode.self, forKey: .episode)
+    self.episodeId = episode.id
+    self.episode = episode
+    self.type = try container.decode(EpisodeCollectionType.self, forKey: .type)
+  }
+
+  func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(self.episode, forKey: .episode)
+    try container.encode(self.type, forKey: .type)
   }
 }

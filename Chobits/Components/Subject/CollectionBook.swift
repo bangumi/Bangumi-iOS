@@ -36,7 +36,7 @@ struct SubjectCollectionBookView: View {
     let actor = BackgroundActor(modelContainer: modelContext.container)
     Task {
       do {
-        let resp = try await chii.updateCollection(sid: subject.id, eps: eps, vols: vols)
+        let resp = try await chii.updateSubjectCollection(sid: subject.id, eps: eps, vols: vols)
         try await actor.insert(collections: [resp])
       } catch {
         notifier.alert(message: "\(error)")
@@ -102,14 +102,13 @@ struct SubjectCollectionBookView: View {
   let container = try! ModelContainer(for: UserSubjectCollection.self, configurations: config)
   container.mainContext.insert(UserSubjectCollection.previewBook)
 
-  return
-    ScrollView {
-      LazyVStack(alignment: .leading) {
-        SubjectCollectionBookView(subject: .previewBook)
-          .environmentObject(Notifier())
-          .environmentObject(ChiiClient(mock: .book))
-      }
+  return ScrollView {
+    LazyVStack(alignment: .leading) {
+      SubjectCollectionBookView(subject: .previewBook)
+        .environmentObject(Notifier())
+        .environmentObject(ChiiClient(mock: .book))
     }
-    .padding()
-    .modelContainer(container)
+  }
+  .padding()
+  .modelContainer(container)
 }

@@ -36,7 +36,7 @@ struct SubjectCollectionView: View {
     let actor = BackgroundActor(modelContainer: modelContext.container)
     Task {
       do {
-        let resp = try await chii.getCollection(sid: subject.id)
+        let resp = try await chii.getSubjectCollection(sid: subject.id)
         try await actor.insert(collections: [resp])
         self.page.success()
       } catch ChiiError.notFound(_) {
@@ -124,7 +124,7 @@ struct SubjectCollectionView: View {
       case .book:
         SubjectCollectionBookView(subject: subject)
       case .anime, .real:
-        Text("点格子")
+        SubjectCollectionEpsView(subject: subject)
       default:
         Text("\(collection.updatedAt)").font(.caption).foregroundStyle(.secondary)
       }
@@ -138,14 +138,13 @@ struct SubjectCollectionView: View {
   let config = ModelConfiguration(isStoredInMemoryOnly: true)
   let container = try! ModelContainer(for: UserSubjectCollection.self, configurations: config)
 
-  return
-    ScrollView {
-      LazyVStack(alignment: .leading) {
-        SubjectCollectionView(subject: .previewBook)
-          .environmentObject(Notifier())
-          .environmentObject(ChiiClient(mock: .book))
-      }
+  return ScrollView {
+    LazyVStack(alignment: .leading) {
+      SubjectCollectionView(subject: .previewBook)
+        .environmentObject(Notifier())
+        .environmentObject(ChiiClient(mock: .book))
     }
-    .padding()
-    .modelContainer(container)
+  }
+  .padding()
+  .modelContainer(container)
 }

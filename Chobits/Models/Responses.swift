@@ -12,7 +12,7 @@ struct TokenResponse: Codable {
   var refreshToken: String
 }
 
-struct CollectionResponse: Codable {
+struct SubjectCollectionResponse: Codable {
   var total: UInt
   var limit: UInt
   var offset: UInt
@@ -31,4 +31,11 @@ struct EpisodeResponse: Codable {
   var limit: UInt
   var offset: UInt
   var data: [Episode]
+}
+
+struct EpisodeCollectionResponse: Codable {
+  var total: UInt
+  var limit: UInt
+  var offset: UInt
+  var data: [EpisodeCollection]
 }

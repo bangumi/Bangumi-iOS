@@ -242,21 +242,6 @@ struct SubjectRelation: Codable, Identifiable {
   var relation: String
 }
 
-struct Episode: Codable, Identifiable {
-  var id: UInt
-  var type: EpisodeType
-  var name: String
-  var nameCn: String
-  var sort: Float
-  var ep: Float?
-  var airdate: String
-  var comment: UInt
-  var duration: String
-  var desc: String
-  var disc: String
-  var durationSeconds: UInt?
-}
-
 struct EpisodeDetail: Codable, Identifiable {
   var id: UInt
   var type: EpisodeType

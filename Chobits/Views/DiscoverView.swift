@@ -50,7 +50,7 @@ struct ChiiDiscoverView: View {
     subjects = []
     Task {
       let resp = try await chii.search(
-        keyword: query, type: subjectType, offset: offset, limit: limit)
+        keyword: query, type: subjectType, limit: limit, offset: offset)
       total = resp.total
       subjects = resp.data
     }
@@ -68,7 +68,7 @@ struct ChiiDiscoverView: View {
     offset += limit
     Task {
       let resp = try await chii.search(
-        keyword: query, type: subjectType, offset: offset, limit: limit)
+        keyword: query, type: subjectType, limit: limit, offset: offset)
       subjects.append(contentsOf: resp.data)
     }
   }

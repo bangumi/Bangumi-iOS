@@ -48,7 +48,7 @@ struct CollectionBox: View {
     let actor = BackgroundActor(modelContainer: modelContext.container)
     Task {
       do {
-        let resp = try await chii.updateCollection(
+        let resp = try await chii.updateSubjectCollection(
           sid: subject.id,
           type: collectionType,
           rate: rate,

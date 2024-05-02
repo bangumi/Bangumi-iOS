@@ -216,8 +216,8 @@ class ChiiClient: ObservableObject, Observable {
     return profile
   }
 
-  func getCollections(subjectType: SubjectType?, limit: UInt, offset: UInt) async throws
-    -> CollectionResponse
+  func getSubjectCollections(subjectType: SubjectType?, limit: UInt, offset: UInt) async throws
+    -> SubjectCollectionResponse
   {
     let profile = try await self.getProfile()
     let url =
@@ -238,7 +238,7 @@ class ChiiClient: ObservableObject, Observable {
     let data = try await request(url: pageURL, method: "GET")
     let decoder = JSONDecoder()
     decoder.keyDecodingStrategy = .convertFromSnakeCase
-    let response = try decoder.decode(CollectionResponse.self, from: data)
+    let response = try decoder.decode(SubjectCollectionResponse.self, from: data)
     return response
   }
 
@@ -251,7 +251,7 @@ class ChiiClient: ObservableObject, Observable {
     return calendars
   }
 
-  func search(keyword: String, type: SubjectType = .unknown, offset: UInt = 0, limit: UInt = 10)
+  func search(keyword: String, type: SubjectType = .unknown, limit: UInt = 10, offset: UInt = 0)
     async throws -> SubjectSearchResponse
   {
     let queries: [URLQueryItem] = [
@@ -277,7 +277,7 @@ class ChiiClient: ObservableObject, Observable {
     return resp
   }
 
-  func getCollection(sid: UInt) async throws -> UserSubjectCollection {
+  func getSubjectCollection(sid: UInt) async throws -> UserSubjectCollection {
     if let mock = self.mock {
       return try loadFixture(
         fixture: "user_collection_\(mock.name).json", target: UserSubjectCollection.self)
@@ -297,9 +297,11 @@ class ChiiClient: ObservableObject, Observable {
   }
 
   // update progress for books
-  func updateCollection(sid: UInt, eps: UInt?, vols: UInt?) async throws -> UserSubjectCollection {
+  func updateSubjectCollection(sid: UInt, eps: UInt?, vols: UInt?) async throws
+    -> UserSubjectCollection
+  {
     if self.mock != nil {
-      return try await getCollection(sid: sid)
+      return try await getSubjectCollection(sid: sid)
     }
     let url = self.apiBase.appendingPathComponent("v0/users/-/collections/\(sid)")
     var body: [String: Any] = [:]
@@ -312,14 +314,14 @@ class ChiiClient: ObservableObject, Observable {
     if body.count > 0 {
       _ = try await self.request(url: url, method: "POST", body: body, authorized: true)
     }
-    return try await getCollection(sid: sid)
+    return try await getSubjectCollection(sid: sid)
   }
 
-  func updateCollection(
+  func updateSubjectCollection(
     sid: UInt, type: CollectionType?, rate: UInt8?, comment: String?, priv: Bool?, tags: [String]?
   ) async throws -> UserSubjectCollection {
     if self.mock != nil {
-      return try await getCollection(sid: sid)
+      return try await getSubjectCollection(sid: sid)
     }
     let url = self.apiBase.appendingPathComponent("v0/users/-/collections/\(sid)")
     var body: [String: Any] = [:]
@@ -341,7 +343,7 @@ class ChiiClient: ObservableObject, Observable {
     if body.count > 0 {
       _ = try await self.request(url: url, method: "POST", body: body, authorized: true)
     }
-    return try await getCollection(sid: sid)
+    return try await getSubjectCollection(sid: sid)
   }
 
   func getSubject(sid: UInt) async throws -> Subject {
@@ -354,5 +356,50 @@ class ChiiClient: ObservableObject, Observable {
     decoder.keyDecodingStrategy = .convertFromSnakeCase
     let subject = try decoder.decode(Subject.self, from: data)
     return subject
+  }
+
+  func getSubjectEpisodes(subjectId: UInt, type: EpisodeType?, limit: UInt = 10, offset: UInt = 0)
+    async throws -> [Episode]
+  {
+    if self.mock != nil {
+      return try loadFixture(fixture: "episodes.json", target: [Episode].self)
+    }
+    var queries: [URLQueryItem] = [
+      URLQueryItem(name: "subject_id", value: String(subjectId)),
+      URLQueryItem(name: "limit", value: String(limit)),
+      URLQueryItem(name: "offset", value: String(offset)),
+    ]
+    if let type = type {
+      queries.append(URLQueryItem(name: "type", value: String(type.rawValue)))
+    }
+    let url = self.apiBase.appendingPathComponent("v0/episodes")
+      .appending(queryItems: queries)
+    let data = try await request(url: url, method: "GET", authorized: self.isAuthenticated)
+    let decoder = JSONDecoder()
+    decoder.keyDecodingStrategy = .convertFromSnakeCase
+    let resp = try decoder.decode(EpisodeResponse.self, from: data)
+    return resp.data
+  }
+
+  func getEpisodeCollection(subjectId: UInt, type: EpisodeType?, limit: UInt = 10, offset: UInt = 0)
+    async throws -> [EpisodeCollection]
+  {
+    if self.mock != nil {
+      return try loadFixture(fixture: "episode_collections.json", target: [EpisodeCollection].self)
+    }
+    var queries: [URLQueryItem] = [
+      URLQueryItem(name: "limit", value: String(limit)),
+      URLQueryItem(name: "offset", value: String(offset)),
+    ]
+    if let type = type {
+      queries.append(URLQueryItem(name: "episode_type", value: String(type.rawValue)))
+    }
+    let url = self.apiBase.appendingPathComponent("v0/users/-/collections/\(subjectId)/episodes")
+      .appending(queryItems: queries)
+    let data = try await request(url: url, method: "GET", authorized: self.isAuthenticated)
+    let decoder = JSONDecoder()
+    decoder.keyDecodingStrategy = .convertFromSnakeCase
+    let resp = try decoder.decode(EpisodeCollectionResponse.self, from: data)
+    return resp.data
   }
 }

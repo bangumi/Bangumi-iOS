@@ -15,6 +15,8 @@ struct ChobitsApp: App {
       BangumiCalendar.self,
       UserSubjectCollection.self,
       Subject.self,
+      Episode.self,
+      EpisodeCollection.self,
     ])
     let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
     do {

@@ -473,6 +473,43 @@ enum EpisodeType: UInt8, Codable, Identifiable {
   }
 }
 
+/// 0: 未收藏
+/// 1: 想看
+/// 2: 看过
+/// 3: 抛弃
+enum EpisodeCollectionType: UInt8, Codable, Identifiable {
+  case none = 0
+  case wish = 1
+  case collect = 2
+  case dropped = 3
+
+  var id: Self {
+    self
+  }
+
+  init(value: UInt8 = 0) {
+    let tmp = Self(rawValue: value)
+    if let out = tmp {
+      self = out
+      return
+    }
+    self = Self.none
+  }
+
+  var description: String {
+    switch self {
+    case .none:
+      return "未收藏"
+    case .wish:
+      return "想看"
+    case .collect:
+      return "看过"
+    case .dropped:
+      return "抛弃"
+    }
+  }
+}
+
 extension UInt8 {
   var ratingDescription: String {
     let desc: [String: String] = [
