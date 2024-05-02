@@ -62,6 +62,18 @@ struct SubjectCollectionView: View {
         if collection.private {
           Image(systemName: "lock.fill").foregroundStyle(.accent)
         }
+        if collection.rate > 0 {
+          ForEach(1..<6) { idx in
+            Image(
+              systemName: idx * 2 <= collection.rate
+                ? "star.fill" : idx * 2 - 1 == collection.rate ? "star.leadinghalf.fill" : "star"
+            )
+            .resizable()
+            .foregroundStyle(.orange)
+            .frame(width: 16, height: 16)
+            .padding(.horizontal, -2)
+          }
+        }
         Label(collection.type.message(type: collection.subjectType), systemImage: "pencil")
           .foregroundStyle(Color("LinkTextColor"))
           .overlay {
