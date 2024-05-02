@@ -78,7 +78,7 @@ struct ChiiProgressView: View {
             }
             .animation(.easeInOut, value: subjectType)
             .navigationDestination(for: UserSubjectCollection.self) { collection in
-              SubjectView(sid: collection.subjectId)
+              SubjectView(ssid: collection.subjectId)
             }
             .refreshable {
               updateCollections(type: subjectType)

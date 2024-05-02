@@ -15,9 +15,7 @@ struct SubjectCollectionView: View {
   @EnvironmentObject var chii: ChiiClient
   @Environment(\.modelContext) var modelContext
 
-  @State private var empty: Bool
-  @State private var updating: Bool
-  @State private var updated: Bool
+  @State private var page: PageStatus
   @State private var edit: Bool
   @Query private var collections: [UserSubjectCollection]
 
@@ -25,9 +23,7 @@ struct SubjectCollectionView: View {
 
   init(subject: Subject) {
     self.subject = subject
-    self.empty = false
-    self.updating = false
-    self.updated = false
+    self.page = PageStatus()
     self.edit = false
     let predicate = #Predicate<UserSubjectCollection> { collection in
       collection.subjectId == subject.id
@@ -36,29 +32,23 @@ struct SubjectCollectionView: View {
   }
 
   func fetchCollection() {
-    if self.updated {
+    if !self.page.start() {
       return
     }
-    self.updating = true
     let actor = BackgroundActor(modelContainer: modelContext.container)
     Task {
       do {
         let resp = try await chii.getCollection(sid: subject.id)
         try await actor.insert(collections: [resp])
-        self.empty = false
-        self.updating = false
-        self.updated = true
+        self.page.success()
       } catch ChiiError.notFound(_) {
         if let collection = collection {
           modelContext.delete(collection)
         }
-        self.empty = true
-        self.updating = false
-        self.updated = true
+        self.page.missing()
       } catch {
         notifier.alert(message: "\(error)")
-        self.updating = false
-        self.updated = true
+        self.page.finish()
       }
     }
   }
@@ -66,7 +56,7 @@ struct SubjectCollectionView: View {
   var body: some View {
     HStack {
       Text("收藏").font(.headline)
-      if updating {
+      if page.updating {
         ProgressView().padding(.leading, 10)
       }
       Spacer()
@@ -94,7 +84,7 @@ struct SubjectCollectionView: View {
                 .presentationDetents(.init([.medium, .large]))
             })
       } else {
-        if empty {
+        if page.empty {
           Label("未收藏", systemImage: "plus")
             .font(.footnote)
             .foregroundStyle(.secondary)
@@ -128,7 +118,7 @@ struct SubjectCollectionView: View {
       default:
         Text("\(collection.updatedAt)").font(.caption).foregroundStyle(.secondary)
       }
-    } else if empty {
+    } else if page.empty {
       EmptyView().padding()
     }
   }

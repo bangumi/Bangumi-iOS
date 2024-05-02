@@ -8,55 +8,45 @@
 import SwiftData
 import SwiftUI
 
-struct SubjectView: View {
-  let sid: UInt
 
+struct SubjectView: View {
   @EnvironmentObject var notifier: Notifier
   @EnvironmentObject var chii: ChiiClient
   @Environment(\.modelContext) var modelContext
 
-  @State private var empty: Bool
-  @State private var updating: Bool
-  @State private var updated: Bool
+  @State private var subjectId: UInt
+  @State private var page: PageStatus
   @Query private var subjects: [Subject]
 
   private var subject: Subject? { subjects.first }
 
-  init(sid: UInt) {
-    self.sid = sid
-    self.empty = false
-    self.updating = false
-    self.updated = false
+  init(ssid: UInt) {
+    self.page = PageStatus()
     let predicate = #Predicate<Subject> { subject in
-      subject.id == sid
+      subject.id == ssid
     }
     _subjects = Query(filter: predicate)
+    self.subjectId = ssid
   }
 
   func fetchSubject() {
-    if self.updated {
+    if !self.page.start() {
       return
     }
-    self.updating = true
     let actor = BackgroundActor(modelContainer: modelContext.container)
     Task {
       do {
-        let resp = try await chii.getSubject(sid: self.sid)
+        let resp = try await chii.getSubject(sid: self.subjectId)
         try await actor.insert(subjects: [resp])
-        self.empty = false
-        self.updating = false
-        self.updated = true
+        self.page.success()
       } catch ChiiError.notFound(_) {
         if let subject = subject {
           modelContext.delete(subject)
         }
-        self.empty = true
-        self.updating = false
-        self.updated = true
+        self.page.missing()
       } catch {
         notifier.alert(message: "\(error)")
-        self.updating = false
-        self.updated = true
+        self.page.finish()
       }
     }
   }
@@ -79,7 +69,7 @@ struct SubjectView: View {
           }
         }.padding()
       } else {
-        if empty {
+        if page.empty {
           NotFoundView()
         } else {
           ProgressView()
@@ -96,7 +86,7 @@ struct SubjectView: View {
   let container = try! ModelContainer(
     for: Subject.self, UserSubjectCollection.self, configurations: config)
 
-  return SubjectView(sid: 497)
+  return SubjectView(ssid: 497)
     .environmentObject(Notifier())
     .environmentObject(ChiiClient(mock: .book))
     .modelContainer(container)

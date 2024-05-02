@@ -107,7 +107,7 @@ struct ChiiDiscoverView: View {
             }
             .navigationBarTitleDisplayMode(.inline)
             .navigationDestination(for: UserSubjectCollection.self) { collection in
-              SubjectView(sid: collection.subjectId)
+              SubjectView(ssid: collection.subjectId)
             }
             .padding(.horizontal, 16)
           } else {
@@ -131,7 +131,7 @@ struct ChiiDiscoverView: View {
               }
               .navigationBarTitleDisplayMode(.inline)
               .navigationDestination(for: SearchSubject.self) { subject in
-                SubjectView(sid: subject.id)
+                SubjectView(ssid: subject.id)
               }
               .padding(.horizontal, 16)
             }
@@ -142,7 +142,7 @@ struct ChiiDiscoverView: View {
         CalendarView()
           .navigationBarTitleDisplayMode(.inline)
           .navigationDestination(for: SmallSubject.self) { subject in
-            SubjectView(sid: subject.id)
+            SubjectView(ssid: subject.id)
           }
           .padding(.horizontal, 16)
       }
