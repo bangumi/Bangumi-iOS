@@ -17,6 +17,7 @@ struct SubjectCollectionView: View {
 
   @State private var empty: Bool
   @State private var updating: Bool
+  @State private var updated: Bool
   @Query private var collections: [UserSubjectCollection]
 
   private var collection: UserSubjectCollection? { collections.first }
@@ -25,6 +26,7 @@ struct SubjectCollectionView: View {
     self.subject = subject
     self.empty = false
     self.updating = false
+    self.updated = false
     let predicate = #Predicate<UserSubjectCollection> { collection in
       collection.subjectId == subject.id
     }
@@ -32,6 +34,9 @@ struct SubjectCollectionView: View {
   }
 
   func fetchCollection() {
+    if self.updated {
+      return
+    }
     self.updating = true
     let actor = BackgroundActor(modelContainer: modelContext.container)
     Task.detached {
@@ -41,6 +46,7 @@ struct SubjectCollectionView: View {
         await MainActor.run {
           self.empty = false
           self.updating = false
+          self.updated = true
         }
       } catch ChiiError.notFound(_) {
         do {
@@ -51,11 +57,13 @@ struct SubjectCollectionView: View {
         await MainActor.run {
           self.empty = true
           self.updating = false
+          self.updated = true
         }
       } catch {
         await notifier.alert(message: "\(error)")
         await MainActor.run {
           self.updating = false
+          self.updated = true
         }
       }
     }

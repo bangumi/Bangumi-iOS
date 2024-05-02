@@ -21,7 +21,7 @@ struct SubjectCollectionBookView: View {
 
   @State private var eps: UInt? = nil
   @State private var vols: UInt? = nil
-  @State private var waiting: Bool = false
+  @State private var updating: Bool = false
 
   init(subject: Subject) {
     self.subject = subject
@@ -32,7 +32,7 @@ struct SubjectCollectionBookView: View {
   }
 
   func update() {
-    self.waiting = true
+    self.updating = true
     let actor = BackgroundActor(modelContainer: modelContext.container)
     Task.detached {
       do {
@@ -44,7 +44,7 @@ struct SubjectCollectionBookView: View {
       await MainActor.run {
         self.eps = nil
         self.vols = nil
-        self.waiting = false
+        self.updating = false
       }
     }
   }
@@ -94,7 +94,7 @@ struct SubjectCollectionBookView: View {
         Spacer()
         Button("更新", action: update)
           .buttonStyle(.borderedProminent)
-          .disabled(waiting)
+          .disabled(updating)
       }
     }
   }
