@@ -8,7 +8,6 @@
 import SwiftData
 import SwiftUI
 
-
 struct SubjectView: View {
   @EnvironmentObject var notifier: Notifier
   @EnvironmentObject var chii: ChiiClient
@@ -20,13 +19,13 @@ struct SubjectView: View {
 
   private var subject: Subject? { subjects.first }
 
-  init(ssid: UInt) {
+  init(sid: UInt) {
     self.page = PageStatus()
     let predicate = #Predicate<Subject> { subject in
-      subject.id == ssid
+      subject.id == sid
     }
     _subjects = Query(filter: predicate)
-    self.subjectId = ssid
+    self.subjectId = sid
   }
 
   func fetchSubject() {
@@ -86,7 +85,7 @@ struct SubjectView: View {
   let container = try! ModelContainer(
     for: Subject.self, UserSubjectCollection.self, configurations: config)
 
-  return SubjectView(ssid: 497)
+  return SubjectView(sid: 497)
     .environmentObject(Notifier())
     .environmentObject(ChiiClient(mock: .book))
     .modelContainer(container)

@@ -18,7 +18,7 @@ struct SubjectSummaryView: View {
       .font(.footnote)
       .multilineTextAlignment(.leading)
       .lineLimit(collapsed ? 5 : nil)
-      .animation(.easeInOut, value: collapsed)
+      .animation(.default, value: collapsed)
     HStack {
       Spacer()
       Button {
