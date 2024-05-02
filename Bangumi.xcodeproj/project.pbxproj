@@ -46,6 +46,7 @@
 		19C2CE632BE2A4F10080A056 /* CollectionBook.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19C2CE622BE2A4F10080A056 /* CollectionBook.swift */; };
 		19C2CE652BE2ACE60080A056 /* profile.json in Resources */ = {isa = PBXBuildFile; fileRef = 19C2CE642BE2ACE60080A056 /* profile.json */; };
 		19C2CE672BE3211B0080A056 /* search_subject_anime.json in Resources */ = {isa = PBXBuildFile; fileRef = 19C2CE662BE3211B0080A056 /* search_subject_anime.json */; };
+		19C2CE692BE330F60080A056 /* CollectionBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19C2CE682BE330F60080A056 /* CollectionBox.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -88,6 +89,7 @@
 		19C2CE622BE2A4F10080A056 /* CollectionBook.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionBook.swift; sourceTree = "<group>"; };
 		19C2CE642BE2ACE60080A056 /* profile.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = profile.json; sourceTree = "<group>"; };
 		19C2CE662BE3211B0080A056 /* search_subject_anime.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = search_subject_anime.json; sourceTree = "<group>"; };
+		19C2CE682BE330F60080A056 /* CollectionBox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionBox.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -118,6 +120,7 @@
 				19671C332BDEB55D000B4D99 /* Subject.swift */,
 				19671C312BDEB55D000B4D99 /* Header.swift */,
 				19671C302BDEB55D000B4D99 /* Collection.swift */,
+				19C2CE682BE330F60080A056 /* CollectionBox.swift */,
 				19C2CE622BE2A4F10080A056 /* CollectionBook.swift */,
 				19671C342BDEB55D000B4D99 /* Summary.swift */,
 				19671C322BDEB55D000B4D99 /* Rating.swift */,
@@ -313,6 +316,7 @@
 				19671C622BDEB55D000B4D99 /* Client.swift in Sources */,
 				19C2CE632BE2A4F10080A056 /* CollectionBook.swift in Sources */,
 				19671C5E2BDEB55D000B4D99 /* LoadingView.swift in Sources */,
+				19C2CE692BE330F60080A056 /* CollectionBox.swift in Sources */,
 				19671C572BDEB55D000B4D99 /* Rating.swift in Sources */,
 				19C2CE5D2BE1E7B10080A056 /* NotFoundView.swift in Sources */,
 				19671C6B2BDEB55D000B4D99 /* DiscoverView.swift in Sources */,

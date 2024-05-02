@@ -220,23 +220,6 @@ enum CollectionType: UInt8, Codable {
     }
     return text
   }
-
-  var icon: String {
-    switch self {
-    case .unknown:
-      return "questionmark"
-    case .wish:
-      return "heart"
-    case .collect:
-      return "checkmark"
-    case .do:
-      return "eye"
-    case .onHold:
-      return "clock"
-    case .dropped:
-      return "trash"
-    }
-  }
 }
 
 /// 条目类型

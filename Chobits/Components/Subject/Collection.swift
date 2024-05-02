@@ -18,6 +18,7 @@ struct SubjectCollectionView: View {
   @State private var empty: Bool
   @State private var updating: Bool
   @State private var updated: Bool
+  @State private var edit: Bool
   @Query private var collections: [UserSubjectCollection]
 
   private var collection: UserSubjectCollection? { collections.first }
@@ -27,6 +28,7 @@ struct SubjectCollectionView: View {
     self.empty = false
     self.updating = false
     self.updated = false
+    self.edit = false
     let predicate = #Predicate<UserSubjectCollection> { collection in
       collection.subjectId == subject.id
     }
@@ -80,17 +82,28 @@ struct SubjectCollectionView: View {
         if collection.private {
           Image(systemName: "lock.fill").foregroundStyle(.accent)
         }
-        Text(collection.type.message(type: collection.subjectType))
+        Label(collection.type.message(type: collection.subjectType), systemImage: "pencil")
           .foregroundStyle(Color("LinkTextColor"))
           .overlay {
             RoundedRectangle(cornerRadius: 5)
               .stroke(Color("LinkTextColor"), lineWidth: 1)
               .padding(.horizontal, -4)
               .padding(.vertical, -2)
-          }.padding(5)
+          }
+          .padding(5)
+          .onTapGesture {
+            edit.toggle()
+          }
+          .sheet(
+            isPresented: $edit,
+            content: {
+              CollectionBox(subject: subject, collection: collection)
+                .presentationDragIndicator(.visible)
+                .presentationDetents(.init([.medium, .large]))
+            })
       } else {
         if empty {
-          Text("未收藏")
+          Label("未收藏", systemImage: "plus")
             .font(.footnote)
             .foregroundStyle(.secondary)
             .overlay {
@@ -98,7 +111,18 @@ struct SubjectCollectionView: View {
                 .stroke(.secondary, lineWidth: 1)
                 .padding(.horizontal, -4)
                 .padding(.vertical, -2)
-            }.padding(5)
+            }
+            .padding(5)
+            .onTapGesture {
+              edit.toggle()
+            }
+            .sheet(
+              isPresented: $edit,
+              content: {
+                CollectionBox(subject: subject, collection: nil)
+                  .presentationDragIndicator(.visible)
+                  .presentationDetents(.init([.medium, .large]))
+              })
         }
       }
     }.onAppear(perform: fetchCollection)
