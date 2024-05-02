@@ -1,72 +1,72 @@
 {
-  "updated_at": "2024-04-28T10:14:41+08:00",
+  "updated_at": "2024-05-02T09:11:49+08:00",
   "comment": null,
   "tags": [],
   "subject": {
-    "date": "2003-05-16",
+    "date": "2001-02-06",
     "images": {
-      "small": "https://lain.bgm.tv/r/200/pic/cover/l/20/48/7699_AUo9O.jpg",
-      "grid": "https://lain.bgm.tv/r/100/pic/cover/l/20/48/7699_AUo9O.jpg",
-      "large": "https://lain.bgm.tv/pic/cover/l/20/48/7699_AUo9O.jpg",
-      "medium": "https://lain.bgm.tv/r/800/pic/cover/l/20/48/7699_AUo9O.jpg",
-      "common": "https://lain.bgm.tv/r/400/pic/cover/l/20/48/7699_AUo9O.jpg"
+      "small": "https://lain.bgm.tv/r/200/pic/cover/l/73/80/497_7mGTv.jpg",
+      "grid": "https://lain.bgm.tv/r/100/pic/cover/l/73/80/497_7mGTv.jpg",
+      "large": "https://lain.bgm.tv/pic/cover/l/73/80/497_7mGTv.jpg",
+      "medium": "https://lain.bgm.tv/r/800/pic/cover/l/73/80/497_7mGTv.jpg",
+      "common": "https://lain.bgm.tv/r/400/pic/cover/l/73/80/497_7mGTv.jpg"
     },
-    "name": "スクールランブル",
-    "name_cn": "校园迷糊大王",
-    "short_summary": "　　冢本天满是矢神高中二年级的学生。她就跟许多女孩子一样正陷入爱河之中。她喜欢上的对象是同班同学乌丸大路。为了跟一年后就要去美国的乌丸告白，她每天都在努力地奋斗中。而戴着太阳眼镜、留着胡子，一眼就看得出是个不良少年的播磨拳儿，喜欢上同班同学",
+    "name": "ちょびっツ",
+    "name_cn": "人形电脑天使心",
+    "short_summary": "　　在人型电脑开始量产，人手一台的时代，靠打工养活自己的大学重考生本须和秀树偶然在垃圾场捡到一台女生人型电脑，但是找不到开机钮，在新保的帮忙下得知这台叫「唧」的电脑会令别的电脑当机，而且无法读取资料。于是透过新保介绍自组电脑的高手国分寺稔来",
     "tags": [
       {
+        "name": "CLAMP",
+        "count": 174
+      },
+      {
+        "name": "chobits",
+        "count": 95
+      },
+      {
         "name": "漫画",
-        "count": 136
+        "count": 89
       },
       {
-        "name": "小林尽",
-        "count": 99
+        "name": "治愈系",
+        "count": 65
       },
       {
-        "name": "青春",
-        "count": 71
+        "name": "科幻",
+        "count": 34
+      },
+      {
+        "name": "叽",
+        "count": 28
       },
       {
         "name": "恋爱",
-        "count": 67
+        "count": 24
       },
       {
-        "name": "校园迷糊大王",
-        "count": 67
+        "name": "爱情",
+        "count": 24
       },
       {
-        "name": "校园",
-        "count": 63
+        "name": "萌的机械耳",
+        "count": 24
       },
       {
-        "name": "搞笑",
-        "count": 55
-      },
-      {
-        "name": "单角恋死循环",
-        "count": 26
-      },
-      {
-        "name": "2002",
-        "count": 22
-      },
-      {
-        "name": "KUSO神作",
-        "count": 22
+        "name": "最初的感动",
+        "count": 23
       }
     ],
-    "score": 8.6,
+    "score": 7.6,
     "type": 1,
-    "id": 7699,
-    "eps": 345,
-    "volumes": 22,
-    "collection_total": 1004,
-    "rank": 98
+    "id": 497,
+    "eps": 88,
+    "volumes": 8,
+    "collection_total": 880,
+    "rank": 1586
   },
-  "subject_id": 7699,
-  "vol_status": 5,
-  "ep_status": 45,
+  "subject_id": 497,
+  "vol_status": 0,
+  "ep_status": 0,
   "subject_type": 1,
   "type": 3,
   "rate": 0,

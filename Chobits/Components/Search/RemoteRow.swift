@@ -52,7 +52,7 @@ struct SubjectSearchRemoteRow: View {
 #Preview {
   ScrollView {
     LazyVStack(alignment: .leading, spacing: 10) {
-      SubjectSearchRemoteRow(subject: .preview)
+      SubjectSearchRemoteRow(subject: .previewAnime)
     }
   }
   .padding(.horizontal, 16)

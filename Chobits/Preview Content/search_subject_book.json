@@ -1,13 +1,7 @@
 {
   "date": "2001-02-06",
-  "platform": "漫画",
-  "images": {
-    "small": "https://lain.bgm.tv/r/200/pic/cover/l/73/80/497_7mGTv.jpg",
-    "grid": "https://lain.bgm.tv/r/100/pic/cover/l/73/80/497_7mGTv.jpg",
-    "large": "https://lain.bgm.tv/pic/cover/l/73/80/497_7mGTv.jpg",
-    "medium": "https://lain.bgm.tv/r/800/pic/cover/l/73/80/497_7mGTv.jpg",
-    "common": "https://lain.bgm.tv/r/400/pic/cover/l/73/80/497_7mGTv.jpg"
-  },
+  "image": "https://lain.bgm.tv/pic/cover/l/73/80/497_7mGTv.jpg",
+  "type": 1,
   "summary": "　　在人型电脑开始量产，人手一台的时代，靠打工养活自己的大学重考生本须和秀树偶然在垃圾场捡到一台女生人型电脑，但是找不到开机钮，在新保的帮忙下得知这台叫「唧」的电脑会令别的电脑当机，而且无法读取资料。于是透过新保介绍自组电脑的高手国分寺稔来帮忙…唧跟着秀树学习，可爱的言行令秀树着迷不已…有一晚，补习老师清水突然要求秀树让她过夜…\r\n\r\n　　可愛さ無敵！の人型パソコン「ちぃ」！――浪人生の本須和秀樹（もとすわ・ひでき）が、近所のゴミ捨て場で拾ってきた、1台の人型パソコン。「ちぃ」と名付け、思いっきり期待したものの、なんのソフトも入っていない役立たずとわかり……！？パソコンが人型をしている世界を舞台にCLAMPが描く、キュートな21世紀型ファンタジック・ラブコメディ！！",
   "name": "ちょびっツ",
   "name_cn": "人形电脑天使心",
@@ -133,82 +127,7 @@
       "count": 2
     }
   ],
-  "infobox": [
-    {
-      "key": "中文名",
-      "value": "人形电脑天使心"
-    },
-    {
-      "key": "别名",
-      "value": [
-        {
-          "k": "en",
-          "v": "Chobits"
-        }
-      ]
-    },
-    {
-      "key": "出版社",
-      "value": "講談社、台灣東販、天下出版"
-    },
-    {
-      "key": "连载杂志",
-      "value": "週刊ヤングマガジン"
-    },
-    {
-      "key": "发售日",
-      "value": "2001-02-06"
-    },
-    {
-      "key": "册数",
-      "value": "8"
-    },
-    {
-      "key": "话数",
-      "value": "88"
-    },
-    {
-      "key": "作者",
-      "value": "CLAMP"
-    },
-    {
-      "key": "开始",
-      "value": "2000年第43号"
-    },
-    {
-      "key": "结束",
-      "value": "2002年第48号"
-    }
-  ],
-  "rating": {
-    "rank": 1586,
-    "total": 451,
-    "count": {
-      "1": 2,
-      "2": 0,
-      "3": 0,
-      "4": 1,
-      "5": 8,
-      "6": 50,
-      "7": 128,
-      "8": 179,
-      "9": 55,
-      "10": 28
-    },
-    "score": 7.6
-  },
-  "total_episodes": 0,
-  "collection": {
-    "on_hold": 30,
-    "dropped": 9,
-    "wish": 202,
-    "collect": 605,
-    "doing": 34
-  },
+  "score": 7.6,
   "id": 497,
-  "eps": 88,
-  "volumes": 8,
-  "locked": false,
-  "nsfw": false,
-  "type": 1
-}
+  "rank": 1586
+  }

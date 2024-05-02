@@ -30,8 +30,11 @@ extension Subject {
 }
 
 extension SearchSubject {
-  static var preview: SearchSubject {
-    return try! loadFixture(fixture: "search_subject.json", target: SearchSubject.self)
+  static var previewAnime: SearchSubject {
+    return try! loadFixture(fixture: "search_subject_anime.json", target: SearchSubject.self)
+  }
+  static var previewBook: SearchSubject {
+    return try! loadFixture(fixture: "search_subject_book.json", target: SearchSubject.self)
   }
 }
 

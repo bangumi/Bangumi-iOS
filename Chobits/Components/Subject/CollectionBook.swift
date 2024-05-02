@@ -25,10 +25,28 @@ struct SubjectCollectionBookView: View {
 
   init(subject: Subject) {
     self.subject = subject
-    _collections = Query(
-      filter: #Predicate<UserSubjectCollection> { collection in
-        collection.subjectId == subject.id
-      })
+    let predicate = #Predicate<UserSubjectCollection> { collection in
+      collection.subjectId == subject.id
+    }
+    _collections = Query(filter: predicate)
+  }
+
+  func update() {
+    self.waiting = true
+    let actor = BackgroundActor(modelContainer: modelContext.container)
+    Task.detached {
+      do {
+        let resp = try await chii.updateCollection(sid: subject.id, eps: eps, vols: vols)
+        try await actor.insert(collections: [resp])
+      } catch {
+        await notifier.alert(message: "\(error)")
+      }
+      await MainActor.run {
+        self.eps = nil
+        self.vols = nil
+        self.waiting = false
+      }
+    }
   }
 
   var body: some View {
@@ -74,26 +92,9 @@ struct SubjectCollectionBookView: View {
           Text(subject.volumes > 0 ? "/\(subject.volumes)卷" : "/?卷").foregroundColor(.secondary)
         }.monospaced()
         Spacer()
-        Button("更新") {
-          self.waiting = true
-          Task.detached {
-            do {
-              let resp = try await chii.updateCollection(sid: subject.id, eps: eps, vols: vols)
-              await MainActor.run {
-                modelContext.insert(resp)
-              }
-            } catch {
-              await notifier.alert(message: "\(error)")
-            }
-            await MainActor.run {
-              self.eps = nil
-              self.vols = nil
-              self.waiting = false
-            }
-          }
-        }
-        .buttonStyle(.borderedProminent)
-        .disabled(waiting)
+        Button("更新", action: update)
+          .buttonStyle(.borderedProminent)
+          .disabled(waiting)
       }
     }
   }
@@ -104,13 +105,15 @@ struct SubjectCollectionBookView: View {
   let container = try! ModelContainer(for: UserSubjectCollection.self, configurations: config)
   container.mainContext.insert(UserSubjectCollection.previewBook)
 
-  return ScrollView {
-    LazyVStack(alignment: .leading) {
-      SubjectCollectionBookView(subject: .previewBook)
-        .environmentObject(Notifier())
-        .environmentObject(ChiiClient(mock: .book))
+  return MainActor.assumeIsolated {
+    ScrollView {
+      LazyVStack(alignment: .leading) {
+        SubjectCollectionBookView(subject: .previewBook)
+          .environmentObject(Notifier())
+          .environmentObject(ChiiClient(mock: .book))
+      }
     }
+    .padding()
+    .modelContainer(container)
   }
-  .padding()
-  .modelContainer(container)
 }

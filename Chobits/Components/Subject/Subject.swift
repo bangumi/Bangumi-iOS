@@ -1,5 +1,5 @@
 //
-//  View.swift
+//  Subject.swift
 //  Chobits
 //
 //  Created by Chuan Chuan on 2024/4/27.
@@ -25,39 +25,36 @@ struct SubjectView: View {
     self.sid = sid
     self.empty = false
     self.updating = false
-    _subjects = Query(
-      filter: #Predicate<Subject> { subject in
-        subject.id == sid
-      })
+    let predicate = #Predicate<Subject> { subject in
+      subject.id == sid
+    }
+    _subjects = Query(filter: predicate)
   }
 
   func fetchSubject() {
     self.updating = true
+    let actor = BackgroundActor(modelContainer: modelContext.container)
     Task.detached {
       do {
-        let resp = try await chii.getSubject(sid: sid)
+        let resp = try await chii.getSubject(sid: self.sid)
+        try await actor.insert(subjects: [resp])
         await MainActor.run {
-          modelContext.insert(resp)
           self.empty = false
           self.updating = false
         }
       } catch ChiiError.notFound(_) {
+        do {
+          try await actor.deleteSubject(sid: self.sid)
+        } catch {
+          await notifier.alert(message: "\(error)")
+        }
         await MainActor.run {
-          do {
-            try modelContext.delete(
-              model: Subject.self,
-              where: #Predicate {
-                $0.id == sid
-              })
-          } catch {
-            notifier.alert(message: "\(error)")
-          }
           self.empty = true
           self.updating = false
         }
       } catch {
+        await notifier.alert(message: "\(error)")
         await MainActor.run {
-          notifier.alert(message: "\(error)")
           self.updating = false
         }
       }
@@ -97,14 +94,12 @@ struct SubjectView: View {
   let container = try! ModelContainer(
     for: Subject.self, UserSubjectCollection.self, configurations: config)
 
-  //  let sid: UInt = 7699
-  //  let sType: SubjectType = .book
-
-  let sid: UInt = 372010
-  let sType: SubjectType = .anime
-
-  return SubjectView(sid: sid)
-    .environmentObject(Notifier())
-    .environmentObject(ChiiClient(mock: sType))
-    .modelContainer(container)
+  // .anime 12
+  // .book 497
+  return MainActor.assumeIsolated {
+    SubjectView(sid: 12)
+      .environmentObject(Notifier())
+      .environmentObject(ChiiClient(mock: .anime))
+      .modelContainer(container)
+  }
 }

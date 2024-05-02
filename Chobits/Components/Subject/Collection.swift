@@ -25,39 +25,36 @@ struct SubjectCollectionView: View {
     self.subject = subject
     self.empty = false
     self.updating = false
-    _collections = Query(
-      filter: #Predicate<UserSubjectCollection> { collection in
-        collection.subjectId == subject.id
-      })
+    let predicate = #Predicate<UserSubjectCollection> { collection in
+      collection.subjectId == subject.id
+    }
+    _collections = Query(filter: predicate)
   }
 
   func fetchCollection() {
     self.updating = true
+    let actor = BackgroundActor(modelContainer: modelContext.container)
     Task.detached {
       do {
         let resp = try await chii.getCollection(sid: subject.id)
+        try await actor.insert(collections: [resp])
         await MainActor.run {
-          modelContext.insert(resp)
           self.empty = false
           self.updating = false
         }
       } catch ChiiError.notFound(_) {
+        do {
+          try await actor.deleteCollection(sid: subject.id)
+        } catch {
+          await notifier.alert(message: "\(error)")
+        }
         await MainActor.run {
-          do {
-            try modelContext.delete(
-              model: UserSubjectCollection.self,
-              where: #Predicate {
-                $0.subjectId == subject.id
-              })
-          } catch {
-            notifier.alert(message: "\(error)")
-          }
           self.empty = true
           self.updating = false
         }
       } catch {
+        await notifier.alert(message: "\(error)")
         await MainActor.run {
-          notifier.alert(message: "\(error)")
           self.updating = false
         }
       }
@@ -117,13 +114,15 @@ struct SubjectCollectionView: View {
   let config = ModelConfiguration(isStoredInMemoryOnly: true)
   let container = try! ModelContainer(for: UserSubjectCollection.self, configurations: config)
 
-  return ScrollView {
-    LazyVStack(alignment: .leading) {
-      SubjectCollectionView(subject: .previewBook)
-        .environmentObject(Notifier())
-        .environmentObject(ChiiClient(mock: .book))
+  return MainActor.assumeIsolated {
+    ScrollView {
+      LazyVStack(alignment: .leading) {
+        SubjectCollectionView(subject: .previewBook)
+          .environmentObject(Notifier())
+          .environmentObject(ChiiClient(mock: .book))
+      }
     }
+    .padding()
+    .modelContainer(container)
   }
-  .padding()
-  .modelContainer(container)
 }

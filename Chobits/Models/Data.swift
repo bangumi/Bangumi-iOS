@@ -252,3 +252,45 @@ final class Subject: Codable {
     try container.encode(self.tags, forKey: .tags)
   }
 }
+
+@ModelActor
+actor BackgroundActor {}
+
+extension BackgroundActor {
+  func insert(cals: [BangumiCalendar]) throws {
+    for cal in cals {
+      modelContext.insert(cal)
+    }
+    try modelContext.save()
+  }
+
+  func insert(subjects: [Subject]) throws {
+    for subject in subjects {
+      modelContext.insert(subject)
+    }
+    try modelContext.save()
+  }
+
+  func insert(collections: [UserSubjectCollection]) throws {
+    for collection in collections {
+      modelContext.insert(collection)
+    }
+    try modelContext.save()
+  }
+
+  func deleteSubject(sid: UInt) throws {
+    let predicate = #Predicate<Subject> { subject in
+      subject.id == sid
+    }
+    try modelContext.delete(model: Subject.self, where: predicate)
+    try modelContext.save()
+  }
+
+  func deleteCollection(sid: UInt) throws {
+    let predicate = #Predicate<UserSubjectCollection> { collection in
+      collection.subjectId == sid
+    }
+    try modelContext.delete(model: UserSubjectCollection.self, where: predicate)
+    try modelContext.save()
+  }
+}
