@@ -35,6 +35,15 @@ struct SubjectView: View {
     Task {
       do {
         let resp = try await chii.getSubject(sid: self.subjectId)
+
+        // 对于合并的条目，可能搜索返回的 ID 跟 API 拿到的 ID 不同
+        // 我们直接返回 404 防止其他问题
+        // 后面可以考虑直接跳转到页面
+        if self.subjectId != resp.id {
+          self.page.missing()
+          return
+        }
+
         try await actor.insert(subjects: [resp])
         self.page.success()
       } catch ChiiError.notFound(_) {
