@@ -103,7 +103,7 @@ struct CollectionBox: View {
           .font(.callout)
           .padding(.top, 10)
           HStack {
-            Image(systemName: "minus.circle")
+            Image(systemName: "star.slash")
               .resizable()
               .foregroundStyle(.secondary)
               .frame(width: 20, height: 20)
