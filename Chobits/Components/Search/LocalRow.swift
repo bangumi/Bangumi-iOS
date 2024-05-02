@@ -22,14 +22,13 @@ struct SubjectSearchLocalRow: View {
         HStack {
           ImageView(img: subject.images.common, width: 60, height: 60)
           VStack(alignment: .leading) {
-            let score = String(format: "%.1f", subject.score)
             Text(subject.name).font(.headline)
             Text(subject.nameCn).font(.subheadline).foregroundStyle(.secondary)
             HStack {
               Label(subject.type.description, systemImage: subject.type.icon).foregroundStyle(
                 .accent)
               Text("\(subject.collectionTotal) 人收藏").foregroundStyle(.secondary)
-              Label("\(score)", systemImage: "star").foregroundStyle(.secondary)
+              Label("\(subject.score.rateDisplay)", systemImage: "star").foregroundStyle(.secondary)
               Spacer()
 
               Text(collection.type.description(type: subject.type))

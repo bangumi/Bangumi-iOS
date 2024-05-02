@@ -27,11 +27,11 @@ struct SubjectView: View {
     self.subjectId = sid
   }
 
-  func fetchSubject() {
+  func updateSubject() {
     if !self.page.start() {
       return
     }
-    let actor = BackgroundActor(modelContainer: modelContext.container)
+    let actor = BackgroundActor(container: modelContext.container)
     Task {
       do {
         let resp = try await chii.getSubject(sid: self.subjectId)
@@ -44,11 +44,11 @@ struct SubjectView: View {
           return
         }
 
-        try await actor.insert(subjects: [resp])
+        await actor.insert(data: resp)
         self.page.success()
       } catch ChiiError.notFound(_) {
         if let subject = subject {
-          modelContext.delete(subject)
+          await actor.delete(data: subject)
         }
         self.page.missing()
       } catch {
@@ -82,7 +82,7 @@ struct SubjectView: View {
           ProgressView()
         }
       }
-    }.onAppear(perform: fetchSubject)
+    }.onAppear(perform: updateSubject)
   }
 }
 
@@ -91,10 +91,11 @@ struct SubjectView: View {
 #Preview {
   let config = ModelConfiguration(isStoredInMemoryOnly: true)
   let container = try! ModelContainer(
-    for: Subject.self, UserSubjectCollection.self, configurations: config)
+    for: UserSubjectCollection.self, Subject.self, Episode.self, EpisodeCollection.self,
+    configurations: config)
 
-  return SubjectView(sid: 497)
+  return SubjectView(sid: 12)
     .environmentObject(Notifier())
-    .environmentObject(ChiiClient(mock: .book))
+    .environmentObject(ChiiClient(mock: .anime))
     .modelContainer(container)
 }

@@ -8,7 +8,7 @@
 import SwiftData
 import SwiftUI
 
-struct CollectionBox: View {
+struct SubjectCollectionBox: View {
   private var subject: Subject
   private var collection: UserSubjectCollection?
   @Binding var isPresented: Bool
@@ -45,7 +45,7 @@ struct CollectionBox: View {
 
   func update() {
     self.updating = true
-    let actor = BackgroundActor(modelContainer: modelContext.container)
+    let actor = BackgroundActor(container: modelContext.container)
     Task {
       do {
         let resp = try await chii.updateSubjectCollection(
@@ -56,7 +56,7 @@ struct CollectionBox: View {
           priv: priv,
           tags: tags
         )
-        try await actor.insert(collections: [resp])
+        await actor.insert(data: resp)
         self.isPresented = false
       } catch {
         notifier.alert(message: "\(error)")
@@ -196,5 +196,6 @@ struct CollectionBox: View {
 }
 
 #Preview {
-  CollectionBox(subject: .previewAnime, collection: .previewAnime, isPresented: .constant(true))
+  SubjectCollectionBox(
+    subject: .previewAnime, collection: .previewAnime, isPresented: .constant(true))
 }

@@ -77,8 +77,7 @@ struct SubjectRatingView: View {
             .clipped()
           VStack(alignment: .leading) {
             HStack(alignment: .center) {
-              let score = String(format: "%.1f", subject.rating.score)
-              Text("\(score)").font(.title).foregroundStyle(.accent)
+              Text("\(subject.rating.score.rateDisplay)").font(.title).foregroundStyle(.accent)
               if subject.rating.score > 0 {
                 Text(scoreInfo.desc)
               }

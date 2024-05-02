@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftData
+import SwiftUI
 
 @Model
 final class UserSubjectCollection: Codable {
@@ -172,9 +173,6 @@ final class Subject: Codable {
   var collection: SubjectCollection
   var tags: [Tag]
 
-  @Relationship(deleteRule: .cascade, inverse: \Episode.subject)
-  var episodes: [Episode] = []
-
   init(
     id: UInt,
     type: SubjectType,
@@ -271,6 +269,7 @@ final class Episode: Codable {
     case desc
     case disc
     case durationSeconds
+    case subjectId
   }
 
   @Attribute(.unique)
@@ -284,14 +283,9 @@ final class Episode: Codable {
   var comment: UInt
   var duration: String
   var desc: String
-  var disc: String
+  var disc: UInt
   var durationSeconds: UInt?
-
-  @Relationship
-  var subject: Subject?
-
-  @Relationship(deleteRule: .cascade, inverse: \EpisodeCollection.episode)
-  var collection: EpisodeCollection?
+  var subjectId: UInt
 
   init(
     id: UInt,
@@ -304,8 +298,9 @@ final class Episode: Codable {
     comment: UInt,
     duration: String,
     desc: String,
-    disc: String,
-    durationSeconds: UInt?
+    disc: UInt,
+    durationSeconds: UInt?,
+    subjectId: UInt
   ) {
     self.id = id
     self.type = type
@@ -319,6 +314,23 @@ final class Episode: Codable {
     self.desc = desc
     self.disc = disc
     self.durationSeconds = durationSeconds
+    self.subjectId = subjectId
+  }
+
+  init(item: EpisodeItem, subjectId: UInt) {
+    self.id = item.id
+    self.type = item.type
+    self.name = item.name
+    self.nameCn = item.nameCn
+    self.sort = item.sort
+    self.ep = item.ep
+    self.airdate = item.airdate
+    self.comment = item.comment
+    self.duration = item.duration
+    self.desc = item.desc
+    self.disc = item.disc
+    self.durationSeconds = item.durationSeconds
+    self.subjectId = subjectId
   }
 
   required init(from decoder: Decoder) throws {
@@ -333,8 +345,9 @@ final class Episode: Codable {
     self.comment = try container.decode(UInt.self, forKey: .comment)
     self.duration = try container.decode(String.self, forKey: .duration)
     self.desc = try container.decode(String.self, forKey: .desc)
-    self.disc = try container.decode(String.self, forKey: .disc)
+    self.disc = try container.decode(UInt.self, forKey: .disc)
     self.durationSeconds = try container.decodeIfPresent(UInt.self, forKey: .durationSeconds)
+    self.subjectId = (try? container.decode(UInt.self, forKey: .subjectId)) ?? 0
   }
 
   func encode(to encoder: Encoder) throws {
@@ -351,32 +364,37 @@ final class Episode: Codable {
     try container.encode(self.desc, forKey: .desc)
     try container.encode(self.disc, forKey: .disc)
     try container.encode(self.durationSeconds, forKey: .durationSeconds)
-  }
-}
-
-@ModelActor
-actor BackgroundActor {}
-
-extension BackgroundActor {
-  func insert(cals: [BangumiCalendar]) throws {
-    for cal in cals {
-      modelContext.insert(cal)
-    }
-    try modelContext.save()
+    try container.encode(self.subjectId, forKey: .subjectId)
   }
 
-  func insert(subjects: [Subject]) throws {
-    for subject in subjects {
-      modelContext.insert(subject)
-    }
-    try modelContext.save()
+  var airdateDate: Date {
+    let dateFormatter = DateFormatter()
+    dateFormatter.dateFormat = "yyyy-MM-dd"
+    return dateFormatter.date(from: self.airdate) ?? Date(timeIntervalSince1970: 0)
   }
 
-  func insert(collections: [UserSubjectCollection]) throws {
-    for collection in collections {
-      modelContext.insert(collection)
+  var borderColor: Color {
+    if airdateDate > Date() {
+      return Color(hex: 0x909090)
+    } else {
+      return Color(hex: 0x00A8FF)
     }
-    try modelContext.save()
+  }
+
+  var backgroundColor: Color {
+    if airdateDate > Date() {
+      return Color(hex: 0xe0e0e0)
+    } else {
+      return Color(hex: 0xDAEAFF)
+    }
+  }
+
+  var textColor: Color {
+    if airdateDate > Date() {
+      return Color(hex: 0x909090)
+    } else {
+      return Color(hex: 0x06C)
+    }
   }
 }
 
@@ -389,28 +407,93 @@ final class EpisodeCollection: Codable {
 
   @Attribute(.unique)
   var episodeId: UInt
-
-  @Relationship
-  var episode: Episode
+  var episode: EpisodeItem
   var type: EpisodeCollectionType
+  var subjectId: UInt
 
-  init(episode: Episode, type: EpisodeCollectionType) {
-    self.episodeId = episode.id
+  init(episodeId: UInt, episode: EpisodeItem, type: EpisodeCollectionType, subjectId: UInt) {
+    self.episodeId = episodeId
     self.episode = episode
     self.type = type
+    self.subjectId = subjectId
+  }
+
+  init(item: EpisodeCollectionItem, subjectId: UInt) {
+    self.episodeId = item.episode.id
+    self.episode = item.episode
+    self.type = item.type
+    self.subjectId = subjectId
   }
 
   required init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: CodingKeys.self)
-    let episode = try container.decode(Episode.self, forKey: .episode)
+    let episode = try container.decode(EpisodeItem.self, forKey: .episode)
     self.episodeId = episode.id
     self.episode = episode
     self.type = try container.decode(EpisodeCollectionType.self, forKey: .type)
+    self.subjectId = 0
   }
 
   func encode(to encoder: Encoder) throws {
     var container = encoder.container(keyedBy: CodingKeys.self)
     try container.encode(self.episode, forKey: .episode)
     try container.encode(self.type, forKey: .type)
+  }
+
+  var airdate: Date {
+    let dateFormatter = DateFormatter()
+    dateFormatter.dateFormat = "yyyy-MM-dd"
+    return dateFormatter.date(from: self.episode.airdate) ?? Date(timeIntervalSince1970: 0)
+  }
+
+  var borderColor: Color {
+    switch self.type {
+    case .none:
+      if airdate > Date() {
+        return Color(hex: 0x909090)
+      } else {
+        return Color(hex: 0x00A8FF)
+      }
+    case .wish:
+      return Color(hex: 0xFF2293)
+    case .collect:
+      return Color(hex: 0x1175a8)
+    case .dropped:
+      return Color(hex: 0x666666)
+    }
+  }
+
+  var backgroundColor: Color {
+    switch self.type {
+    case .none:
+      if airdate > Date() {
+        return Color(hex: 0xe0e0e0)
+      } else {
+        return Color(hex: 0xDAEAFF)
+      }
+    case .wish:
+      return Color(hex: 0xFFADD1)
+    case .collect:
+      return Color(hex: 0x4897ff)
+    case .dropped:
+      return Color(hex: 0xCCCCCC)
+    }
+  }
+
+  var textColor: Color {
+    switch self.type {
+    case .none:
+      if airdate > Date() {
+        return Color(hex: 0x909090)
+      } else {
+        return Color(hex: 0x0066CC)
+      }
+    case .wish:
+      return Color(hex: 0xFF2293)
+    case .collect:
+      return .white
+    case .dropped:
+      return .white
+    }
   }
 }

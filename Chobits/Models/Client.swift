@@ -202,7 +202,7 @@ class ChiiClient: ObservableObject, Observable {
 
   func getProfile() async throws -> Profile {
     if mock != nil {
-      return try loadFixture(fixture: "profile.json", target: Profile.self)
+      return loadFixture(fixture: "profile.json", target: Profile.self)
     }
     if let profile = self.profile {
       return profile
@@ -279,7 +279,7 @@ class ChiiClient: ObservableObject, Observable {
 
   func getSubjectCollection(sid: UInt) async throws -> UserSubjectCollection {
     if let mock = self.mock {
-      return try loadFixture(
+      return loadFixture(
         fixture: "user_collection_\(mock.name).json", target: UserSubjectCollection.self)
     }
     let profile = try await self.getProfile()
@@ -348,7 +348,7 @@ class ChiiClient: ObservableObject, Observable {
 
   func getSubject(sid: UInt) async throws -> Subject {
     if let mock = self.mock {
-      return try loadFixture(fixture: "subject_\(mock.name).json", target: Subject.self)
+      return loadFixture(fixture: "subject_\(mock.name).json", target: Subject.self)
     }
     let url = self.apiBase.appendingPathComponent("v0/subjects/\(sid)")
     let data = try await request(url: url, method: "GET", authorized: self.isAuthenticated)
@@ -359,10 +359,10 @@ class ChiiClient: ObservableObject, Observable {
   }
 
   func getSubjectEpisodes(subjectId: UInt, type: EpisodeType?, limit: UInt = 10, offset: UInt = 0)
-    async throws -> [Episode]
+    async throws -> EpisodeResponse
   {
     if self.mock != nil {
-      return try loadFixture(fixture: "episodes.json", target: [Episode].self)
+      return loadFixture(fixture: "episodes.json", target: EpisodeResponse.self)
     }
     var queries: [URLQueryItem] = [
       URLQueryItem(name: "subject_id", value: String(subjectId)),
@@ -378,14 +378,17 @@ class ChiiClient: ObservableObject, Observable {
     let decoder = JSONDecoder()
     decoder.keyDecodingStrategy = .convertFromSnakeCase
     let resp = try decoder.decode(EpisodeResponse.self, from: data)
-    return resp.data
+    return resp
   }
 
-  func getEpisodeCollection(subjectId: UInt, type: EpisodeType?, limit: UInt = 10, offset: UInt = 0)
-    async throws -> [EpisodeCollection]
+  func getEpisodeCollections(
+    subjectId: UInt, type: EpisodeType?, limit: UInt = 10, offset: UInt = 0
+  )
+    async throws -> EpisodeCollectionResponse
   {
     if self.mock != nil {
-      return try loadFixture(fixture: "episode_collections.json", target: [EpisodeCollection].self)
+      return loadFixture(
+        fixture: "episode_collections.json", target: EpisodeCollectionResponse.self)
     }
     var queries: [URLQueryItem] = [
       URLQueryItem(name: "limit", value: String(limit)),
@@ -400,6 +403,6 @@ class ChiiClient: ObservableObject, Observable {
     let decoder = JSONDecoder()
     decoder.keyDecodingStrategy = .convertFromSnakeCase
     let resp = try decoder.decode(EpisodeCollectionResponse.self, from: data)
-    return resp.data
+    return resp
   }
 }

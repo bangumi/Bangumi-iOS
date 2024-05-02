@@ -37,5 +37,5 @@ struct EpisodeCollectionResponse: Codable {
   var total: UInt
   var limit: UInt
   var offset: UInt
-  var data: [EpisodeCollection]
+  var data: [EpisodeCollectionItem]
 }

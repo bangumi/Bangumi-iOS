@@ -21,7 +21,7 @@ struct ChiiProgressView: View {
   @State private var subjectType = SubjectType.unknown
 
   func updateCollections(type: SubjectType?) {
-    let actor = BackgroundActor(modelContainer: modelContext.container)
+    let actor = BackgroundActor(container: modelContext.container)
     Task {
       do {
         var offset: UInt = 0
@@ -32,8 +32,10 @@ struct ChiiProgressView: View {
           if response.data.isEmpty {
             break
           }
-          try await actor.insert(collections: response.data)
-          offset += 100
+          for collection in response.data {
+            await actor.insert(data: collection, background: true)
+          }
+          offset += limit
           if offset > response.total {
             break
           }

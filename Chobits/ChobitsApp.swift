@@ -92,6 +92,9 @@ class PageStatus: ObservableObject {
   }
 
   func start() -> Bool {
+    if self.updating {
+      return false
+    }
     if self.updated {
       return false
     }

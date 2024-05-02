@@ -59,8 +59,8 @@ struct SubjectHeaderView: View {
             Label("\(subject.rating.rank)", systemImage: "chart.bar.xaxis").foregroundStyle(.accent)
           }
           if subject.rating.score > 0 {
-            let score = String(format: "%.1f", subject.rating.score)
-            Label("\(score)", systemImage: "star").foregroundStyle(.accent)
+            Label("\(subject.rating.score.rateDisplay)", systemImage: "star").foregroundStyle(
+              .accent)
           }
         }
         .font(.subheadline)

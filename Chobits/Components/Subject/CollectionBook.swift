@@ -33,11 +33,11 @@ struct SubjectCollectionBookView: View {
 
   func update() {
     self.updating = true
-    let actor = BackgroundActor(modelContainer: modelContext.container)
+    let actor = BackgroundActor(container: modelContext.container)
     Task {
       do {
         let resp = try await chii.updateSubjectCollection(sid: subject.id, eps: eps, vols: vols)
-        try await actor.insert(collections: [resp])
+        await actor.insert(data: resp)
       } catch {
         notifier.alert(message: "\(error)")
       }

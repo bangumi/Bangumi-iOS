@@ -40,7 +40,10 @@
 		19671C732BDEB8B1000B4D99 /* KeychainSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 19671C722BDEB8B1000B4D99 /* KeychainSwift */; };
 		19671C752BDEB8BD000B4D99 /* CachedAsyncImage in Frameworks */ = {isa = PBXBuildFile; productRef = 19671C742BDEB8BD000B4D99 /* CachedAsyncImage */; };
 		19671C782BE1BB72000B4D99 /* search_subject_book.json in Resources */ = {isa = PBXBuildFile; fileRef = 19671C772BE1BB72000B4D99 /* search_subject_book.json */; };
-		1980EDFE2BE3F10100E013EA /* CollectionEps.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1980EDFD2BE3F10100E013EA /* CollectionEps.swift */; };
+		1980EDFE2BE3F10100E013EA /* Episodes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1980EDFD2BE3F10100E013EA /* Episodes.swift */; };
+		1980EE002BE418C800E013EA /* episodes.json in Resources */ = {isa = PBXBuildFile; fileRef = 1980EDFF2BE418C800E013EA /* episodes.json */; };
+		1980EE022BE419D500E013EA /* episode_collections.json in Resources */ = {isa = PBXBuildFile; fileRef = 1980EE012BE419D500E013EA /* episode_collections.json */; };
+		19AB93CB2BE4F0F4007531A4 /* BackgroundActor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19AB93CA2BE4F0F4007531A4 /* BackgroundActor.swift */; };
 		19C2CE5D2BE1E7B10080A056 /* NotFoundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19C2CE5C2BE1E7B10080A056 /* NotFoundView.swift */; };
 		19C2CE5F2BE2536D0080A056 /* user_collection_book.json in Resources */ = {isa = PBXBuildFile; fileRef = 19C2CE5E2BE2536D0080A056 /* user_collection_book.json */; };
 		19C2CE612BE2538A0080A056 /* subject_book.json in Resources */ = {isa = PBXBuildFile; fileRef = 19C2CE602BE2538A0080A056 /* subject_book.json */; };
@@ -83,7 +86,10 @@
 		19671C502BDEB55D000B4D99 /* Config.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 		19671C512BDEB55D000B4D99 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		19671C772BE1BB72000B4D99 /* search_subject_book.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = search_subject_book.json; sourceTree = "<group>"; };
-		1980EDFD2BE3F10100E013EA /* CollectionEps.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionEps.swift; sourceTree = "<group>"; };
+		1980EDFD2BE3F10100E013EA /* Episodes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Episodes.swift; sourceTree = "<group>"; };
+		1980EDFF2BE418C800E013EA /* episodes.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = episodes.json; sourceTree = "<group>"; };
+		1980EE012BE419D500E013EA /* episode_collections.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = episode_collections.json; sourceTree = "<group>"; };
+		19AB93CA2BE4F0F4007531A4 /* BackgroundActor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundActor.swift; sourceTree = "<group>"; };
 		19BB342B2BD239AB00E5C295 /* Chobits.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Chobits.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		19C2CE5C2BE1E7B10080A056 /* NotFoundView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotFoundView.swift; sourceTree = "<group>"; };
 		19C2CE5E2BE2536D0080A056 /* user_collection_book.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = user_collection_book.json; sourceTree = "<group>"; };
@@ -124,7 +130,7 @@
 				19671C302BDEB55D000B4D99 /* Collection.swift */,
 				19C2CE682BE330F60080A056 /* CollectionBox.swift */,
 				19C2CE622BE2A4F10080A056 /* CollectionBook.swift */,
-				1980EDFD2BE3F10100E013EA /* CollectionEps.swift */,
+				1980EDFD2BE3F10100E013EA /* Episodes.swift */,
 				19671C342BDEB55D000B4D99 /* Summary.swift */,
 				19671C322BDEB55D000B4D99 /* RatingBox.swift */,
 				19671C352BDEB55D000B4D99 /* Tag.swift */,
@@ -156,6 +162,7 @@
 				19671C402BDEB55D000B4D99 /* Data.swift */,
 				19671C422BDEB55D000B4D99 /* Responses.swift */,
 				19671C412BDEB55D000B4D99 /* Mock.swift */,
+				19AB93CA2BE4F0F4007531A4 /* BackgroundActor.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -171,6 +178,8 @@
 				19C2CE662BE3211B0080A056 /* search_subject_anime.json */,
 				19671C772BE1BB72000B4D99 /* search_subject_book.json */,
 				19C2CE642BE2ACE60080A056 /* profile.json */,
+				1980EDFF2BE418C800E013EA /* episodes.json */,
+				1980EE012BE419D500E013EA /* episode_collections.json */,
 			);
 			path = "Preview Content";
 			sourceTree = "<group>";
@@ -286,6 +295,7 @@
 			files = (
 				19671C782BE1BB72000B4D99 /* search_subject_book.json in Resources */,
 				19671C682BDEB55D000B4D99 /* user_collection_anime.json in Resources */,
+				1980EE002BE418C800E013EA /* episodes.json in Resources */,
 				19671C702BDEB55D000B4D99 /* Config.xcconfig in Resources */,
 				19C2CE652BE2ACE60080A056 /* profile.json in Resources */,
 				19C2CE612BE2538A0080A056 /* subject_book.json in Resources */,
@@ -294,6 +304,7 @@
 				19C2CE672BE3211B0080A056 /* search_subject_anime.json in Resources */,
 				19671C6E2BDEB55D000B4D99 /* Assets.xcassets in Resources */,
 				19671C662BDEB55D000B4D99 /* Preview Assets.xcassets in Resources */,
+				1980EE022BE419D500E013EA /* episode_collections.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -315,12 +326,13 @@
 				19671C6D2BDEB55D000B4D99 /* TimelineView.swift in Sources */,
 				19671C692BDEB55D000B4D99 /* AuthView.swift in Sources */,
 				19671C642BDEB55D000B4D99 /* Mock.swift in Sources */,
+				19AB93CB2BE4F0F4007531A4 /* BackgroundActor.swift in Sources */,
 				19671C5D2BDEB55D000B4D99 /* ImageView.swift in Sources */,
 				19671C622BDEB55D000B4D99 /* Client.swift in Sources */,
 				19C2CE632BE2A4F10080A056 /* CollectionBook.swift in Sources */,
 				19671C5E2BDEB55D000B4D99 /* LoadingView.swift in Sources */,
 				19C2CE692BE330F60080A056 /* CollectionBox.swift in Sources */,
-				1980EDFE2BE3F10100E013EA /* CollectionEps.swift in Sources */,
+				1980EDFE2BE3F10100E013EA /* Episodes.swift in Sources */,
 				19671C572BDEB55D000B4D99 /* RatingBox.swift in Sources */,
 				19C2CE5D2BE1E7B10080A056 /* NotFoundView.swift in Sources */,
 				19671C6B2BDEB55D000B4D99 /* DiscoverView.swift in Sources */,
