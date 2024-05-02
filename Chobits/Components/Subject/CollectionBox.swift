@@ -9,8 +9,9 @@ import SwiftData
 import SwiftUI
 
 struct CollectionBox: View {
-  var subject: Subject
-  var collection: UserSubjectCollection?
+  private var subject: Subject
+  private var collection: UserSubjectCollection?
+  @Binding var isPresented: Bool
 
   @EnvironmentObject var notifier: Notifier
   @EnvironmentObject var chii: ChiiClient
@@ -25,9 +26,10 @@ struct CollectionBox: View {
 
   @State private var updating: Bool = false
 
-  init(subject: Subject, collection: UserSubjectCollection?) {
+  init(subject: Subject, collection: UserSubjectCollection?, isPresented: Binding<Bool>) {
     self.subject = subject
     self.collection = collection
+    self._isPresented = isPresented
     self.collectionType = collection?.type ?? .do
     self.rate = collection?.rate ?? 0
     self.comment = collection?.comment ?? ""
@@ -55,6 +57,7 @@ struct CollectionBox: View {
           tags: tags
         )
         try await actor.insert(collections: [resp])
+        self.isPresented = false
       } catch {
         notifier.alert(message: "\(error)")
       }
@@ -192,5 +195,5 @@ struct CollectionBox: View {
 }
 
 #Preview {
-  CollectionBox(subject: .previewAnime, collection: .previewAnime)
+  CollectionBox(subject: .previewAnime, collection: .previewAnime, isPresented: .constant(true))
 }

@@ -31,6 +31,7 @@ struct SubjectSearchLocalRow: View {
               Text("\(subject.collectionTotal) 人收藏").foregroundStyle(.secondary)
               Label("\(score)", systemImage: "star").foregroundStyle(.secondary)
               Spacer()
+
               Text(collection.type.description(type: subject.type))
                 .foregroundStyle(.accent)
                 .overlay {
