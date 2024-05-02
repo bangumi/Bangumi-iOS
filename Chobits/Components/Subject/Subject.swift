@@ -8,6 +8,7 @@
 import SwiftData
 import SwiftUI
 
+@MainActor
 struct SubjectView: View {
   var sid: UInt
 
