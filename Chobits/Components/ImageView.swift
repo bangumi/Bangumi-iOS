@@ -9,9 +9,9 @@ import CachedAsyncImage
 import SwiftUI
 
 struct ImageView: View {
-  var img: String?
-  var width: CGFloat
-  var height: CGFloat
+  let img: String?
+  let width: CGFloat
+  let height: CGFloat
 
   var body: some View {
     if let img = img {

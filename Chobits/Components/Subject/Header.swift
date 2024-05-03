@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct SubjectHeaderView: View {
-  var subject: Subject
+  let subject: Subject
 
   @State private var coverDetail = false
   @State private var collectionDetail = false
@@ -27,7 +27,8 @@ struct SubjectHeaderView: View {
       VStack(alignment: .leading) {
         HStack {
           Text(subject.platform).foregroundStyle(.secondary)
-          Label(subject.type.description, systemImage: subject.type.icon).foregroundStyle(.accent)
+          Label(subject.typeEnum.description, systemImage: subject.typeEnum.icon).foregroundStyle(
+            .accent)
           if let date = subject.date {
             Label(date, systemImage: "calendar").foregroundStyle(.secondary)
           }

@@ -9,8 +9,8 @@ import SwiftData
 import SwiftUI
 
 struct SubjectCollectionBox: View {
-  private var subject: Subject
-  private var collection: UserSubjectCollection?
+  let subject: Subject
+  let collection: UserSubjectCollection?
   @Binding var isPresented: Bool
 
   @EnvironmentObject var notifier: Notifier
@@ -23,14 +23,13 @@ struct SubjectCollectionBox: View {
   @State private var priv: Bool
   @State private var tags: [String]
   @State private var tagsInput: String
-
   @State private var updating: Bool = false
 
   init(subject: Subject, collection: UserSubjectCollection?, isPresented: Binding<Bool>) {
     self.subject = subject
     self.collection = collection
     self._isPresented = isPresented
-    self.collectionType = collection?.type ?? .do
+    self.collectionType = collection?.typeEnum ?? .do
     self.rate = collection?.rate ?? 0
     self.comment = collection?.comment ?? ""
     self.priv = collection?.private ?? false
@@ -57,6 +56,7 @@ struct SubjectCollectionBox: View {
           tags: tags
         )
         await actor.insert(data: resp)
+        try await actor.save()
         self.isPresented = false
       } catch {
         notifier.alert(message: "\(error)")
@@ -70,7 +70,7 @@ struct SubjectCollectionBox: View {
       VStack {
         Picker("Collection Type", selection: $collectionType) {
           ForEach(CollectionType.boxTypes()) { ct in
-            Text("\(ct.description(type: subject.type))")
+            Text("\(ct.description(type: subject.typeEnum))")
           }
         }
         .pickerStyle(.segmented)
@@ -78,7 +78,7 @@ struct SubjectCollectionBox: View {
         HStack {
           Button(action: update) {
             Spacer()
-            Text(priv ? "悄悄更新" : "更新")
+            Text(priv ? "悄悄地更新" : "更新")
             Spacer()
           }
           .buttonStyle(.borderedProminent)
@@ -89,6 +89,9 @@ struct SubjectCollectionBox: View {
           .buttonStyle(.borderedProminent)
           .frame(width: 40)
         }.padding(.vertical, 5)
+        if let collection = collection {
+          Text("上次更新：\(collection.updatedAt)").font(.caption).foregroundStyle(.secondary)
+        }
 
         VStack(alignment: .leading) {
           HStack(alignment: .top) {
@@ -138,6 +141,7 @@ struct SubjectCollectionBox: View {
               }
             }
             .font(.callout)
+            .monospaced()
             .padding(.horizontal, 5)
             .padding(.vertical, 5)
             .overlay {

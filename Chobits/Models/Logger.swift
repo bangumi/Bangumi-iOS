@@ -1,0 +1,19 @@
+//
+//  Logger.swift
+//  Chobits
+//
+//  Created by Chuan Chuan on 2024/5/4.
+//
+
+import Foundation
+import OSLog
+
+extension Logger {
+  private static var subsystem = Bundle.main.bundleIdentifier!
+
+  static let subject = Logger(subsystem: subsystem, category: "subject")
+
+  static let collection = Logger(subsystem: subsystem, category: "collection")
+
+  static let episode = Logger(subsystem: subsystem, category: "episode")
+}

@@ -10,60 +10,36 @@ import SwiftUI
 struct ScoreInfo {
   var desc: String
   var offset: Int
-
-  init(desc: String, offset: Int) {
-    self.desc = desc
-    self.offset = offset
-  }
 }
 
 struct SubjectRatingView: View {
-  var subject: Subject
+  let subject: Subject
 
   var collectionDesc: [String] {
     var text: [String] = []
+    let type = subject.typeEnum
     if let wish = subject.collection.wish {
-      text.append("\(wish) 人\(CollectionType.wish.description(type: subject.type))")
+      text.append("\(wish) 人\(CollectionType.wish.description(type: type))")
     }
     if let collect = subject.collection.collect {
-      text.append("\(collect) 人\(CollectionType.collect.description(type: subject.type))")
+      text.append("\(collect) 人\(CollectionType.collect.description(type: type))")
     }
     if let doing = subject.collection.doing {
-      text.append("\(doing) 人\(CollectionType.do.description(type: subject.type))")
+      text.append("\(doing) 人\(CollectionType.do.description(type: type))")
     }
     if let onHold = subject.collection.onHold {
-      text.append("\(onHold) 人\(CollectionType.onHold.description(type: subject.type))")
+      text.append("\(onHold) 人\(CollectionType.onHold.description(type: type))")
     }
     if let dropped = subject.collection.dropped {
-      text.append("\(dropped) 人\(CollectionType.dropped.description(type: subject.type))")
+      text.append("\(dropped) 人\(CollectionType.dropped.description(type: type))")
     }
     return text
   }
 
   var scoreInfo: ScoreInfo {
-    if subject.rating.score >= 9.5 {
-      ScoreInfo(desc: "超神作", offset: 6)
-    } else if subject.rating.score >= 8.5 {
-      ScoreInfo(desc: "神作", offset: 5)
-    } else if subject.rating.score >= 7.5 {
-      ScoreInfo(desc: "力荐", offset: 4)
-    } else if subject.rating.score >= 6.5 {
-      ScoreInfo(desc: "推荐", offset: 3)
-    } else if subject.rating.score >= 5.5 {
-      ScoreInfo(desc: "还行", offset: 2)
-    } else if subject.rating.score >= 4.5 {
-      ScoreInfo(desc: "不过不失", offset: 1)
-    } else if subject.rating.score >= 3.5 {
-      ScoreInfo(desc: "较差", offset: 0)
-    } else if subject.rating.score >= 2.5 {
-      ScoreInfo(desc: "差", offset: 0)
-    } else if subject.rating.score >= 1.5 {
-      ScoreInfo(desc: "很差", offset: 0)
-    } else if subject.rating.score >= 0.5 {
-      ScoreInfo(desc: "不忍直视", offset: 0)
-    } else {
-      ScoreInfo(desc: "", offset: 0)
-    }
+    let score = UInt8(subject.rating.score.rounded())
+    let offset = score >= 4 ? Int(score - 4) : 0
+    return ScoreInfo(desc: score.ratingDescription, offset: offset)
   }
 
   var body: some View {
@@ -93,7 +69,8 @@ struct SubjectRatingView: View {
             }
             if subject.rating.rank > 0 {
               HStack {
-                Text("Bangumi \(subject.type.name.capitalized) Ranked:").foregroundStyle(.secondary)
+                Text("Bangumi \(subject.typeEnum.name.capitalized) Ranked:").foregroundStyle(
+                  .secondary)
                 Text("#\(subject.rating.rank)")
               }
             }

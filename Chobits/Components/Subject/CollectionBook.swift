@@ -9,19 +9,19 @@ import SwiftData
 import SwiftUI
 
 struct SubjectCollectionBookView: View {
-  var subject: Subject
-
-  @Query private var collections: [UserSubjectCollection]
-
-  private var collection: UserSubjectCollection? { collections.first }
+  let subject: Subject
 
   @EnvironmentObject var notifier: Notifier
   @EnvironmentObject var chii: ChiiClient
   @Environment(\.modelContext) private var modelContext
 
-  @State private var eps: UInt? = nil
-  @State private var vols: UInt? = nil
+  @State private var eps: UInt?
+  @State private var vols: UInt?
   @State private var updating: Bool = false
+
+  @Query
+  private var collections: [UserSubjectCollection]
+  private var collection: UserSubjectCollection? { collections.first }
 
   init(subject: Subject) {
     self.subject = subject
@@ -38,6 +38,7 @@ struct SubjectCollectionBookView: View {
       do {
         let resp = try await chii.updateSubjectCollection(sid: subject.id, eps: eps, vols: vols)
         await actor.insert(data: resp)
+        try await actor.save()
       } catch {
         notifier.alert(message: "\(error)")
       }

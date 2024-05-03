@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct SubjectSearchRemoteRow: View {
-  var subject: SearchSubject
+  let subject: SearchSubject
 
   var body: some View {
     ZStack {

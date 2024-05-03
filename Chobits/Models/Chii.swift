@@ -256,6 +256,13 @@ struct EpisodeItem: Codable, Identifiable {
   var disc: UInt
   var subjectId: UInt?
   var durationSeconds: UInt?
+
+  static func == (lhs: Self, rhs: Self) -> Bool {
+    return lhs.id == rhs.id && lhs.type == rhs.type && lhs.name == rhs.name
+      && lhs.nameCn == rhs.nameCn && lhs.sort == rhs.sort && lhs.ep == rhs.ep
+      && lhs.airdate == rhs.airdate && lhs.comment == rhs.comment && lhs.duration == rhs.duration
+      && lhs.desc == rhs.desc && lhs.disc == rhs.disc
+  }
 }
 
 struct EpisodeCollectionItem: Codable {

@@ -13,7 +13,8 @@ struct CalendarView: View {
   @EnvironmentObject var chii: ChiiClient
   @Environment(\.modelContext) private var modelContext
 
-  @Query(sort: \BangumiCalendar.id) private var calendars: [BangumiCalendar]
+  @Query(sort: \BangumiCalendar.id)
+  private var calendars: [BangumiCalendar]
 
   var sortedCalendars: [BangumiCalendar] {
     let calendar = Calendar.current
@@ -34,23 +35,24 @@ struct CalendarView: View {
     }
   }
 
-  func refreshCalendar() {
+  func refreshCalendar() async {
     let actor = BackgroundActor(container: modelContext.container)
-    Task {
-      do {
-        let cals = try await chii.getCalendar()
-        for cal in cals {
-          await actor.insert(data: cal, background: true)
-        }
-      } catch {
-        notifier.alert(message: "\(error)")
+    do {
+      let cals = try await chii.getCalendar()
+      for cal in cals {
+        await actor.insert(data: cal, background: true)
       }
+      try await actor.save()
+    } catch {
+      notifier.alert(message: "\(error)")
     }
   }
 
   var body: some View {
     if calendars.isEmpty {
-      ProgressView().onAppear(perform: refreshCalendar)
+      ProgressView().task {
+        await refreshCalendar()
+      }
     } else {
       ScrollView {
         LazyVStack {
@@ -59,7 +61,7 @@ struct CalendarView: View {
           }
         }
       }.refreshable {
-        refreshCalendar()
+        await refreshCalendar()
       }
     }
   }
@@ -67,13 +69,6 @@ struct CalendarView: View {
 
 struct CalendarWeekdayView: View {
   let calendar: BangumiCalendar
-
-  // api /calendar returns image in http
-  func imageURL(url: String) -> URL? {
-    var components = URLComponents(string: url)
-    components?.scheme = "https"
-    return components?.url
-  }
 
   var body: some View {
     VStack {

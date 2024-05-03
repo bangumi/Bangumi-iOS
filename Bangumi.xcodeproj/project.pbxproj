@@ -40,6 +40,9 @@
 		19671C732BDEB8B1000B4D99 /* KeychainSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 19671C722BDEB8B1000B4D99 /* KeychainSwift */; };
 		19671C752BDEB8BD000B4D99 /* CachedAsyncImage in Frameworks */ = {isa = PBXBuildFile; productRef = 19671C742BDEB8BD000B4D99 /* CachedAsyncImage */; };
 		19671C782BE1BB72000B4D99 /* search_subject_book.json in Resources */ = {isa = PBXBuildFile; fileRef = 19671C772BE1BB72000B4D99 /* search_subject_book.json */; };
+		197A19CB2BE5E59900804B13 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 197A19CA2BE5E59900804B13 /* Logger.swift */; };
+		197A19CD2BE5E5CD00804B13 /* PageStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 197A19CC2BE5E5CD00804B13 /* PageStatus.swift */; };
+		197A19CF2BE5E5E700804B13 /* Notifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 197A19CE2BE5E5E700804B13 /* Notifier.swift */; };
 		1980EDFE2BE3F10100E013EA /* Episodes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1980EDFD2BE3F10100E013EA /* Episodes.swift */; };
 		1980EE002BE418C800E013EA /* episodes.json in Resources */ = {isa = PBXBuildFile; fileRef = 1980EDFF2BE418C800E013EA /* episodes.json */; };
 		1980EE022BE419D500E013EA /* episode_collections.json in Resources */ = {isa = PBXBuildFile; fileRef = 1980EE012BE419D500E013EA /* episode_collections.json */; };
@@ -86,6 +89,9 @@
 		19671C502BDEB55D000B4D99 /* Config.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 		19671C512BDEB55D000B4D99 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		19671C772BE1BB72000B4D99 /* search_subject_book.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = search_subject_book.json; sourceTree = "<group>"; };
+		197A19CA2BE5E59900804B13 /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
+		197A19CC2BE5E5CD00804B13 /* PageStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageStatus.swift; sourceTree = "<group>"; };
+		197A19CE2BE5E5E700804B13 /* Notifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notifier.swift; sourceTree = "<group>"; };
 		1980EDFD2BE3F10100E013EA /* Episodes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Episodes.swift; sourceTree = "<group>"; };
 		1980EDFF2BE418C800E013EA /* episodes.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = episodes.json; sourceTree = "<group>"; };
 		1980EE012BE419D500E013EA /* episode_collections.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = episode_collections.json; sourceTree = "<group>"; };
@@ -163,6 +169,9 @@
 				19671C422BDEB55D000B4D99 /* Responses.swift */,
 				19671C412BDEB55D000B4D99 /* Mock.swift */,
 				19AB93CA2BE4F0F4007531A4 /* BackgroundActor.swift */,
+				197A19CA2BE5E59900804B13 /* Logger.swift */,
+				197A19CC2BE5E5CD00804B13 /* PageStatus.swift */,
+				197A19CE2BE5E5E700804B13 /* Notifier.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -315,6 +324,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				197A19CB2BE5E59900804B13 /* Logger.swift in Sources */,
+				197A19CF2BE5E5E700804B13 /* Notifier.swift in Sources */,
 				19671C652BDEB55D000B4D99 /* Responses.swift in Sources */,
 				19671C5A2BDEB55D000B4D99 /* Tag.swift in Sources */,
 				19671C6A2BDEB55D000B4D99 /* ContentView.swift in Sources */,
@@ -326,6 +337,7 @@
 				19671C6D2BDEB55D000B4D99 /* TimelineView.swift in Sources */,
 				19671C692BDEB55D000B4D99 /* AuthView.swift in Sources */,
 				19671C642BDEB55D000B4D99 /* Mock.swift in Sources */,
+				197A19CD2BE5E5CD00804B13 /* PageStatus.swift in Sources */,
 				19AB93CB2BE4F0F4007531A4 /* BackgroundActor.swift in Sources */,
 				19671C5D2BDEB55D000B4D99 /* ImageView.swift in Sources */,
 				19671C622BDEB55D000B4D99 /* Client.swift in Sources */,

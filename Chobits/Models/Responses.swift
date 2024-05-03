@@ -13,29 +13,29 @@ struct TokenResponse: Codable {
 }
 
 struct SubjectCollectionResponse: Codable {
-  var total: UInt
-  var limit: UInt
-  var offset: UInt
+  var total: Int
+  var limit: Int
+  var offset: Int
   var data: [UserSubjectCollection]
 }
 
 struct SubjectSearchResponse: Codable {
-  var total: UInt
-  var limit: UInt
-  var offset: UInt
+  var total: Int
+  var limit: Int
+  var offset: Int
   var data: [SearchSubject]
 }
 
 struct EpisodeResponse: Codable {
-  var total: UInt
-  var limit: UInt
-  var offset: UInt
+  var total: Int
+  var limit: Int
+  var offset: Int
   var data: [Episode]
 }
 
 struct EpisodeCollectionResponse: Codable {
-  var total: UInt
-  var limit: UInt
-  var offset: UInt
+  var total: Int
+  var limit: Int
+  var offset: Int
   var data: [EpisodeCollectionItem]
 }

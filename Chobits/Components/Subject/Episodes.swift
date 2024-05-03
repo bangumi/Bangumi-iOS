@@ -5,21 +5,22 @@
 //  Created by Chuan Chuan on 2024/5/3.
 //
 
+import OSLog
 import SwiftData
 import SwiftUI
 
 struct SubjectEpisodesView: View {
-  var subject: Subject
+  let subject: Subject
 
   @EnvironmentObject var notifier: Notifier
   @EnvironmentObject var chii: ChiiClient
   @Environment(\.modelContext) private var modelContext
 
+  @State private var edit: Bool = false
+  @StateObject private var page: PageStatus = PageStatus()
+
   @Query private var episodes: [Episode]
   @Query private var collections: [EpisodeCollection]
-
-  @StateObject private var page: PageStatus = PageStatus()
-  @State private var edit: Bool = false
 
   init(subject: Subject) {
     self.subject = subject
@@ -33,83 +34,64 @@ struct SubjectEpisodesView: View {
       })
   }
 
-  func update() {
+  func update() async {
     if !self.page.start() {
       return
     }
     let actor = BackgroundActor(container: modelContext.container)
-    Task {
-      do {
-        var offset: UInt = 0
-        let limit: UInt = 50
-        let subjectId = subject.id
-        while true {
-          print("fetch collection at offset: \(offset)")
-          var total: UInt = 0
-          if chii.isAuthenticated {
-            let response = try await chii.getEpisodeCollections(
-              subjectId: subject.id, type: nil, limit: limit, offset: offset)
-            if response.data.isEmpty {
-              break
-            }
-            print("got \(response.data.count) episodes")
-            for item in response.data {
-              let collection = EpisodeCollection(item: item, subjectId: subjectId)
-              await actor.insert(data: collection, background: true)
-              let episode = Episode(item: item.episode, subjectId: subjectId)
-              await actor.insert(data: episode, background: true)
-            }
-            total = response.total
-          } else {
-            let response = try await chii.getSubjectEpisodes(
-              subjectId: subject.id, type: nil, limit: limit, offset: offset)
-            if response.data.isEmpty {
-              break
-            }
-            print("got \(response.data.count) episodes")
-            for episode in response.data {
-              episode.subjectId = subjectId
-              await actor.insert(data: episode, background: true)
-            }
-            total = response.total
-          }
-          offset += limit
-          if offset > total {
+    do {
+      var offset: Int = 0
+      let limit: Int = 50
+      let subjectId = subject.id
+      while true {
+        var total: Int = 0
+        if chii.isAuthenticated {
+          let response = try await chii.getEpisodeCollections(
+            subjectId: subject.id, type: nil, limit: limit, offset: offset)
+          if response.data.isEmpty {
             break
           }
+          for item in response.data {
+            let collection = EpisodeCollection(item: item, subjectId: subjectId)
+            await actor.insert(data: collection, background: true)
+            let episode = Episode(item: item.episode, subjectId: subjectId)
+            await actor.insert(data: episode, background: true)
+          }
+          total = response.total
+        } else {
+          let response = try await chii.getSubjectEpisodes(
+            subjectId: subject.id, type: nil, limit: limit, offset: offset)
+          if response.data.isEmpty {
+            break
+          }
+          for episode in response.data {
+            episode.subjectId = subjectId
+            await actor.insert(data: episode, background: true)
+          }
+          total = response.total
         }
-        await MainActor.run {
-          page.success()
+        offset += limit
+        if offset > total {
+          break
         }
-      } catch {
-        print("ERR: \(error)")
-        await MainActor.run {
-          notifier.alert(message: "\(error)")
-          page.finish()
-        }
+      }
+      try await actor.save()
+      await MainActor.run {
+        page.success()
+      }
+    } catch {
+      print("ERR: \(error)")
+      await MainActor.run {
+        notifier.alert(message: "\(error)")
+        page.finish()
       }
     }
   }
 
   var mainCollections: [EpisodeCollection] {
-    let displayLimit = 50
-    let mains = collections.filter { $0.episode.type == .main }.sorted(by: {
+    return collections.filter { $0.episode.type.rawValue == EpisodeType.main.rawValue }.sorted(by: {
       $0.episode.sort < $1.episode.sort
     })
-    if mains.count < displayLimit {
-      return mains
-    }
-    var todoIdx = 0
-    for (idx, collect) in mains.enumerated() {
-      switch collect.type {
-      case .none:
-        todoIdx = idx == 0 ? 0 : idx - 1
-        break
-      default:
-        continue
-      }
-    }
-    return Array(mains[todoIdx..<min(todoIdx + displayLimit, mains.count)])
   }
 
   var body: some View {
@@ -119,10 +101,12 @@ struct SubjectEpisodesView: View {
       } else {
         Text("章节列表:").font(.callout)
       }
-    }.onAppear(perform: update)
+    }.task {
+      await update()
+    }
     if chii.isAuthenticated {
       FlowStack {
-        ForEach(mainCollections) { collection in
+        ForEach(mainCollections.prefix(50)) { collection in
           Button {
             edit = true
           } label: {
@@ -134,11 +118,11 @@ struct SubjectEpisodesView: View {
               .border(collection.borderColor, width: 1)
               .padding(2)
               .monospaced()
-              .strikethrough(collection.type == .dropped)
+              .strikethrough(collection.type == EpisodeCollectionType.dropped.rawValue)
           }
         }
         ForEach(EpisodeType.otherTypes()) { type in
-          let others = collections.filter { $0.episode.type == type }.sorted(by: {
+          let others = collections.filter { $0.episode.type.rawValue == type.rawValue }.sorted(by: {
             $0.episode.sort < $1.episode.sort
           }).prefix(10)
           if !others.isEmpty {
@@ -169,7 +153,7 @@ struct SubjectEpisodesView: View {
                   .border(collection.borderColor, width: 1)
                   .padding(2)
                   .monospaced()
-                  .strikethrough(collection.type == .dropped)
+                  .strikethrough(collection.type == EpisodeCollectionType.dropped.rawValue)
               }
             }
           }

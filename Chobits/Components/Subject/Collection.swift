@@ -9,7 +9,7 @@ import SwiftData
 import SwiftUI
 
 struct SubjectCollectionView: View {
-  var subject: Subject
+  let subject: Subject
 
   @EnvironmentObject var notifier: Notifier
   @EnvironmentObject var chii: ChiiClient
@@ -17,42 +17,43 @@ struct SubjectCollectionView: View {
 
   @State private var edit: Bool = false
   @StateObject private var page: PageStatus = PageStatus()
-  @Query private var collections: [UserSubjectCollection]
 
+  @Query
+  private var collections: [UserSubjectCollection]
   private var collection: UserSubjectCollection? { collections.first }
 
   init(subject: Subject) {
     self.subject = subject
-    let predicate = #Predicate<UserSubjectCollection> { collection in
-      collection.subjectId == subject.id
+    let predicate = #Predicate<UserSubjectCollection> {
+      $0.subjectId == subject.id
     }
-    _collections = Query(filter: predicate)
+    _collections = Query(filter: predicate, sort: \UserSubjectCollection.subjectId)
   }
 
-  func updateCollection() {
+  func updateCollection() async {
     if !self.page.start() {
       return
     }
     let actor = BackgroundActor(container: modelContext.container)
-    Task {
+    do {
+      let resp = try await chii.getSubjectCollection(sid: subject.id)
+      await actor.insert(data: resp)
+      try await actor.save()
+      self.page.success()
+    } catch ChiiError.notFound(_) {
       do {
-        let resp = try await chii.getSubjectCollection(sid: subject.id)
-        await actor.insert(data: resp)
-        self.page.success()
-      } catch ChiiError.notFound(_) {
-        do {
-          try await actor.remove(
-            predicate: #Predicate<UserSubjectCollection> { collection in
-              collection.subjectId == subject.id
-            })
-        } catch {
-          notifier.alert(message: "could not clear collection: \(error)")
-        }
-        self.page.missing()
+        try await actor.remove(
+          predicate: #Predicate<UserSubjectCollection> { collection in
+            collection.subjectId == subject.id
+          })
+        try await actor.save()
       } catch {
-        notifier.alert(message: "\(error)")
-        self.page.finish()
+        notifier.alert(message: "could not clear collection: \(error)")
       }
+      self.page.missing()
+    } catch {
+      notifier.alert(message: "\(error)")
+      self.page.finish()
     }
   }
 
@@ -64,26 +65,28 @@ struct SubjectCollectionView: View {
           if collection.private {
             Image(systemName: "lock.fill").foregroundStyle(.accent)
           }
-          Label(collection.type.message(type: collection.subjectType), systemImage: "pencil")
-            .font(.footnote)
-            .foregroundStyle(Color("LinkTextColor"))
-            .overlay {
-              RoundedRectangle(cornerRadius: 5)
-                .stroke(Color("LinkTextColor"), lineWidth: 1)
-                .padding(.horizontal, -4)
-                .padding(.vertical, -2)
-            }
-            .padding(5)
-            .onTapGesture {
-              edit.toggle()
-            }
-            .sheet(
-              isPresented: $edit,
-              content: {
-                SubjectCollectionBox(subject: subject, collection: collection, isPresented: $edit)
-                  .presentationDragIndicator(.visible)
-                  .presentationDetents(.init([.medium, .large]))
-              })
+          Label(
+            collection.typeEnum.message(type: collection.subjectTypeEnum), systemImage: "pencil"
+          )
+          .font(.footnote)
+          .foregroundStyle(Color("LinkTextColor"))
+          .overlay {
+            RoundedRectangle(cornerRadius: 5)
+              .stroke(Color("LinkTextColor"), lineWidth: 1)
+              .padding(.horizontal, -4)
+              .padding(.vertical, -2)
+          }
+          .padding(5)
+          .onTapGesture {
+            edit.toggle()
+          }
+          .sheet(
+            isPresented: $edit,
+            content: {
+              SubjectCollectionBox(subject: subject, collection: collection, isPresented: $edit)
+                .presentationDragIndicator(.visible)
+                .presentationDetents(.init([.medium, .large]))
+            })
           if self.page.updating {
             ProgressView().padding(.leading, 10)
           }
@@ -92,7 +95,7 @@ struct SubjectCollectionView: View {
             ForEach(1..<6) { idx in
               Image(
                 systemName: idx * 2 <= collection.rate
-                ? "star.fill" : idx * 2 - 1 == collection.rate ? "star.leadinghalf.fill" : "star"
+                  ? "star.fill" : idx * 2 - 1 == collection.rate ? "star.leadinghalf.fill" : "star"
               )
               .resizable()
               .foregroundStyle(.orange)
@@ -127,18 +130,17 @@ struct SubjectCollectionView: View {
         }
       }
 
-      switch subject.type {
+      switch subject.typeEnum {
       case .book:
         SubjectCollectionBookView(subject: subject)
       case .anime, .real:
         SubjectEpisodesView(subject: subject)
       default:
         EmptyView()
-        //      if let collection = collection {
-        //        Text("\(collection.updatedAt)").font(.caption).foregroundStyle(.secondary)
-        //      }
       }
-    }.onAppear(perform: updateCollection)
+    }.task {
+      await updateCollection()
+    }
   }
 }
 

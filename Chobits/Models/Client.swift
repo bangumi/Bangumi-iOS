@@ -181,7 +181,7 @@ class ChiiClient: ObservableObject, Observable {
       "redirect_uri": self.appInfo.callbackURL,
     ]
     let data = try await self.request(url: url, method: "POST", body: body, authorized: false)
-    let _ = try self.saveAuthResponse(data: data)
+    _ = try self.saveAuthResponse(data: data)
     await self.setAuthed(authed: true)
   }
 
@@ -216,7 +216,7 @@ class ChiiClient: ObservableObject, Observable {
     return profile
   }
 
-  func getSubjectCollections(subjectType: SubjectType?, limit: UInt, offset: UInt) async throws
+  func getSubjectCollections(subjectType: SubjectType?, limit: Int, offset: Int) async throws
     -> SubjectCollectionResponse
   {
     let profile = try await self.getProfile()
@@ -251,7 +251,7 @@ class ChiiClient: ObservableObject, Observable {
     return calendars
   }
 
-  func search(keyword: String, type: SubjectType = .unknown, limit: UInt = 10, offset: UInt = 0)
+  func search(keyword: String, type: SubjectType = .unknown, limit: Int = 10, offset: Int = 0)
     async throws -> SubjectSearchResponse
   {
     let queries: [URLQueryItem] = [
@@ -261,8 +261,16 @@ class ChiiClient: ObservableObject, Observable {
     let url = self.apiBase.appendingPathComponent("v0/search/subjects").appending(
       queryItems: queries)
     var body: [String: Any] = [
-      "keyword": keyword
+      "keyword": keyword,
+      "sort": "rank",
     ]
+    //    排序规则
+    //
+    //    match meilisearch 的默认排序，按照匹配程度
+    //    heat 收藏人数
+    //    rank 排名由高到低
+    //    score 评分
+
     if type != .unknown {
       body["filter"] = [
         "type": [type.rawValue]
@@ -358,7 +366,7 @@ class ChiiClient: ObservableObject, Observable {
     return subject
   }
 
-  func getSubjectEpisodes(subjectId: UInt, type: EpisodeType?, limit: UInt = 10, offset: UInt = 0)
+  func getSubjectEpisodes(subjectId: UInt, type: EpisodeType?, limit: Int = 10, offset: Int = 0)
     async throws -> EpisodeResponse
   {
     if self.mock != nil {
@@ -382,7 +390,7 @@ class ChiiClient: ObservableObject, Observable {
   }
 
   func getEpisodeCollections(
-    subjectId: UInt, type: EpisodeType?, limit: UInt = 10, offset: UInt = 0
+    subjectId: UInt, type: EpisodeType?, limit: Int = 10, offset: Int = 0
   )
     async throws -> EpisodeCollectionResponse
   {

@@ -12,51 +12,87 @@ struct ChiiDiscoverView: View {
   @EnvironmentObject var notifier: Notifier
   @EnvironmentObject var chii: ChiiClient
   @EnvironmentObject var navState: NavState
+  @Environment(\.modelContext) private var modelContext
 
   @State private var searching = false
   @State private var query = ""
   @State private var local = true
   @State private var subjectType: SubjectType = .unknown
 
-  @State private var limit: UInt = 20
-  @State private var offset: UInt = 0
-  @State private var total: UInt = 0
+  @State private var limit: Int = 20
+  @State private var offset: Int = 0
+  @State private var total: Int = 0
   @State private var subjects: [SearchSubject] = []
+  @State private var collections: [UserSubjectCollection] = []
 
-  @Query private var collections: [UserSubjectCollection]
-
-  var filteredCollections: [UserSubjectCollection] {
-    if !local || query.isEmpty {
-      return []
+  func newLocalSearch() async {
+    offset = 0
+    total = 0
+    local = true
+    subjects = []
+    let actor = BackgroundActor(container: modelContext.container)
+    let stype = subjectType.rawValue
+    let allType = SubjectType.unknown.rawValue
+    let predicate = #Predicate<UserSubjectCollection> {
+      return (stype == allType || stype == $0.subjectType)
+        && ($0.subject.name.localizedStandardContains(query)
+          || $0.subject.nameCn.localizedStandardContains(query))
     }
-    let filtered = collections.filter {
-      if let subject = $0.subject {
-        if subjectType != .unknown && subjectType != subject.type {
-          return false
-        }
-        return subject.nameCn.lowercased().contains(query)
-          || subject.name.lowercased().contains(query)
-      } else {
-        return false
+    do {
+      let collections = try await actor.fetchData(
+        predicate: predicate, limit: limit, offset: offset)
+      if collections.count < limit {
+        total = -1
       }
+      self.collections = collections
+    } catch {
+      notifier.alert(message: "\(error)")
     }
-    return Array(filtered.prefix(10))
   }
 
-  func newSearch() {
+  func localSearchNextPage(current: UserSubjectCollection) async {
+    if total < 0 {
+      return
+    }
+    let thresholdIndex = collections.index(collections.endIndex, offsetBy: -2)
+    let currentIndex = collections.firstIndex(where: { $0.id == current.id })
+    if currentIndex != thresholdIndex {
+      return
+    }
+    offset += limit
+    let actor = BackgroundActor(container: modelContext.container)
+    let predicate = #Predicate<UserSubjectCollection> {
+      return $0.subject.name.localizedStandardContains(query)
+        || $0.subject.nameCn.localizedStandardContains(query)
+    }
+    do {
+      let collections = try await actor.fetchData(
+        predicate: predicate, limit: limit, offset: offset)
+      if collections.count < limit {
+        total = -1
+      }
+      self.collections.append(contentsOf: collections)
+    } catch {
+      notifier.alert(message: "\(error)")
+    }
+  }
+
+  func newRemoteSearch() async {
     offset = 0
     total = 0
     local = false
     subjects = []
-    Task {
+    do {
       let resp = try await chii.search(
         keyword: query, type: subjectType, limit: limit, offset: offset)
       total = resp.total
       subjects = resp.data
+    } catch {
+      notifier.alert(message: "\(error)")
     }
   }
 
-  func checkSearchNextPage(current: SearchSubject) {
+  func remoteSearchNextPage(current: SearchSubject) async {
     if offset + limit > total {
       return
     }
@@ -66,10 +102,12 @@ struct ChiiDiscoverView: View {
       return
     }
     offset += limit
-    Task {
+    do {
       let resp = try await chii.search(
         keyword: query, type: subjectType, limit: limit, offset: offset)
       subjects.append(contentsOf: resp.data)
+    } catch {
+      notifier.alert(message: "\(error)")
     }
   }
 
@@ -83,14 +121,16 @@ struct ChiiDiscoverView: View {
           }
         }
         .onChange(of: subjectType) { _, _ in
-          if local {
-            return
-          }
           if query.isEmpty {
             return
           }
-          offset = 0
-          newSearch()
+          Task {
+            if local {
+              await newLocalSearch()
+            } else {
+              await newRemoteSearch()
+            }
+          }
         }
         .pickerStyle(.segmented)
         .padding(.horizontal, 16)
@@ -98,16 +138,18 @@ struct ChiiDiscoverView: View {
           if local {
             ScrollView {
               LazyVStack(alignment: .leading, spacing: 10) {
-                ForEach(filteredCollections) { collection in
+                ForEach(collections) { collection in
                   NavigationLink(value: collection) {
-                    SubjectSearchLocalRow(collection: collection)
+                    SubjectSearchLocalRow(collection: collection).task {
+                      await localSearchNextPage(current: collection)
+                    }
                   }.buttonStyle(PlainButtonStyle())
                 }
               }
             }
             .navigationBarTitleDisplayMode(.inline)
             .navigationDestination(for: UserSubjectCollection.self) { collection in
-              SubjectView(sid: collection.subjectId)
+              SubjectView(subjectId: collection.subjectId)
             }
             .padding(.horizontal, 16)
           } else {
@@ -122,8 +164,8 @@ struct ChiiDiscoverView: View {
                 LazyVStack(alignment: .leading, spacing: 10) {
                   ForEach(subjects) { subject in
                     NavigationLink(value: subject) {
-                      SubjectSearchRemoteRow(subject: subject).onAppear {
-                        checkSearchNextPage(current: subject)
+                      SubjectSearchRemoteRow(subject: subject).task {
+                        await remoteSearchNextPage(current: subject)
                       }
                     }.buttonStyle(PlainButtonStyle())
                   }
@@ -131,7 +173,7 @@ struct ChiiDiscoverView: View {
               }
               .navigationBarTitleDisplayMode(.inline)
               .navigationDestination(for: SearchSubject.self) { subject in
-                SubjectView(sid: subject.id)
+                SubjectView(subjectId: subject.id)
               }
               .padding(.horizontal, 16)
             }
@@ -142,17 +184,22 @@ struct ChiiDiscoverView: View {
         CalendarView()
           .navigationBarTitleDisplayMode(.inline)
           .navigationDestination(for: SmallSubject.self) { subject in
-            SubjectView(sid: subject.id)
+            SubjectView(subjectId: subject.id)
           }
           .padding(.horizontal, 16)
       }
     }
     .searchable(text: $query, isPresented: $searching)
     .onChange(of: query) { _, _ in
-      local = true
-      subjects = []
+      Task {
+        await newLocalSearch()
+      }
     }
-    .onSubmit(of: .search, newSearch)
+    .onSubmit(of: .search) {
+      Task {
+        await newRemoteSearch()
+      }
+    }
     .onOpenURL(perform: { url in
       // TODO: handle urls
       print(url)

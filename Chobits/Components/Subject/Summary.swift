@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct SubjectSummaryView: View {
-  var subject: Subject
+  let subject: Subject
 
   @State private var collapsed = true
 

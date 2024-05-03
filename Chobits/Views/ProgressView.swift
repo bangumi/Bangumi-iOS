@@ -24,8 +24,8 @@ struct ChiiProgressView: View {
     let actor = BackgroundActor(container: modelContext.container)
     Task {
       do {
-        var offset: UInt = 0
-        let limit: UInt = 100
+        var offset: Int = 0
+        let limit: Int = 100
         while true {
           let response = try await chii.getSubjectCollections(
             subjectType: type, limit: limit, offset: offset)
@@ -40,6 +40,7 @@ struct ChiiProgressView: View {
             break
           }
         }
+        try await actor.save()
       } catch {
         notifier.alert(message: "\(error)")
       }
@@ -48,9 +49,9 @@ struct ChiiProgressView: View {
 
   var doing: [SubjectType: [UserSubjectCollection]] {
     let filtered = collections.filter {
-      $0.type == .do
+      $0.typeEnum == .do
     }
-    var doing = Dictionary(grouping: filtered, by: { $0.subjectType })
+    var doing = Dictionary(grouping: filtered, by: { $0.subjectTypeEnum })
     doing[.unknown] = filtered
     return doing
   }
@@ -80,7 +81,7 @@ struct ChiiProgressView: View {
             }
             .animation(.easeInOut, value: subjectType)
             .navigationDestination(for: UserSubjectCollection.self) { collection in
-              SubjectView(sid: collection.subjectId)
+              SubjectView(subjectId: collection.subjectId)
             }
             .refreshable {
               updateCollections(type: subjectType)

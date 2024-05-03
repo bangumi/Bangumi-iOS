@@ -11,7 +11,6 @@ import SwiftUI
 struct ContentView: View {
   @EnvironmentObject var notifier: Notifier
   @EnvironmentObject var chii: ChiiClient
-
   @Environment(\.modelContext) private var modelContext
 
   @State private var waiting = true
@@ -37,15 +36,21 @@ struct ContentView: View {
     )
   }
 
+  func refreshProfile() async {
+    self.waiting = true
+    do {
+      _ = try await chii.getProfile()
+    } catch {
+      notifier.alert(message: "\(error)")
+    }
+    self.waiting = false
+  }
+
   var body: some View {
     if waiting {
       ProgressView()
-        .onAppear {
-          self.waiting = true
-          Task {
-            _ = try await chii.getProfile()
-            self.waiting = false
-          }
+        .task {
+          await refreshProfile()
         }
     } else {
       TabView(selection: createTabViewBinding()) {

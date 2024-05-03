@@ -9,52 +9,53 @@ import SwiftData
 import SwiftUI
 
 struct SubjectView: View {
+  let subjectId: UInt
+
   @EnvironmentObject var notifier: Notifier
   @EnvironmentObject var chii: ChiiClient
   @Environment(\.modelContext) var modelContext
 
-  @State private var subjectId: UInt
   @StateObject private var page: PageStatus = PageStatus()
-  @Query private var subjects: [Subject]
 
+  @Query
+  private var subjects: [Subject]
   private var subject: Subject? { subjects.first }
 
-  init(sid: UInt) {
-    let predicate = #Predicate<Subject> { subject in
-      subject.id == sid
+  init(subjectId: UInt) {
+    self.subjectId = subjectId
+    let predicate = #Predicate<Subject> {
+      $0.id == subjectId
     }
-    _subjects = Query(filter: predicate)
-    self.subjectId = sid
+    _subjects = Query(filter: predicate, sort: \Subject.id)
   }
 
-  func updateSubject() {
+  func updateSubject() async {
     if !self.page.start() {
       return
     }
     let actor = BackgroundActor(container: modelContext.container)
-    Task {
-      do {
-        let resp = try await chii.getSubject(sid: self.subjectId)
+    do {
+      let subject = try await chii.getSubject(sid: self.subjectId)
 
-        // 对于合并的条目，可能搜索返回的 ID 跟 API 拿到的 ID 不同
-        // 我们直接返回 404 防止其他问题
-        // 后面可以考虑直接跳转到页面
-        if self.subjectId != resp.id {
-          self.page.missing()
-          return
-        }
-
-        await actor.insert(data: resp)
-        self.page.success()
-      } catch ChiiError.notFound(_) {
-        if let subject = subject {
-          await actor.delete(data: subject)
-        }
+      // 对于合并的条目，可能搜索返回的 ID 跟 API 拿到的 ID 不同
+      // 我们直接返回 404 防止其他问题
+      // 后面可以考虑直接跳转到页面
+      if self.subjectId != subject.id {
         self.page.missing()
-      } catch {
-        notifier.alert(message: "\(error)")
-        self.page.finish()
+        return
       }
+
+      await actor.insert(data: subject)
+      try await actor.save()
+      self.page.success()
+    } catch ChiiError.notFound(_) {
+      if let subject = subject {
+        await actor.delete(data: subject)
+      }
+      self.page.missing()
+    } catch {
+      notifier.alert(message: "\(error)")
+      self.page.finish()
     }
   }
 
@@ -82,7 +83,9 @@ struct SubjectView: View {
           ProgressView()
         }
       }
-    }.onAppear(perform: updateSubject)
+    }.task {
+      await updateSubject()
+    }
   }
 }
 
@@ -94,7 +97,7 @@ struct SubjectView: View {
     for: UserSubjectCollection.self, Subject.self, Episode.self, EpisodeCollection.self,
     configurations: config)
 
-  return SubjectView(sid: 12)
+  return SubjectView(subjectId: 12)
     .environmentObject(Notifier())
     .environmentObject(ChiiClient(mock: .anime))
     .modelContainer(container)

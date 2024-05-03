@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct SubjectTagView: View {
-  var subject: Subject
+  let subject: Subject
 
   var tags: [Tag] {
     Array(subject.tags.sorted { $0.count > $1.count }.prefix(20))

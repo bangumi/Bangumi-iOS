@@ -27,21 +27,29 @@ final class UserSubjectCollection: Codable {
 
   @Attribute(.unique)
   var subjectId: UInt
-  var subjectType: SubjectType
+  var subjectType: UInt8
   var rate: UInt8
-  var type: CollectionType
+  var type: UInt8
   var comment: String?
   var tags: [String]
   var epStatus: UInt
   var volStatus: UInt
   var updatedAt: Date
   var `private`: Bool
-  var subject: SlimSubject?
+  var subject: SlimSubject
+
+  var subjectTypeEnum: SubjectType {
+    SubjectType(value: subjectType)
+  }
+
+  var typeEnum: CollectionType {
+    CollectionType(value: type)
+  }
 
   init(
-    subjectId: UInt, subjectType: SubjectType, rate: UInt8, type: CollectionType, comment: String?,
+    subjectId: UInt, subjectType: UInt8, rate: UInt8, type: UInt8, comment: String?,
     tags: [String], epStatus: UInt, volStatus: UInt, updatedAt: Date, private: Bool,
-    subject: SlimSubject?
+    subject: SlimSubject
   ) {
     self.subjectId = subjectId
     self.subjectType = subjectType
@@ -64,9 +72,9 @@ final class UserSubjectCollection: Codable {
 
     let container = try decoder.container(keyedBy: CodingKeys.self)
     self.subjectId = try container.decode(UInt.self, forKey: .subjectId)
-    self.subjectType = try container.decode(SubjectType.self, forKey: .subjectType)
+    self.subjectType = try container.decode(UInt8.self, forKey: .subjectType)
     self.rate = try container.decode(UInt8.self, forKey: .rate)
-    self.type = try container.decode(CollectionType.self, forKey: .type)
+    self.type = try container.decode(UInt8.self, forKey: .type)
     self.comment = try container.decode(String?.self, forKey: .comment)
     self.tags = try container.decode([String].self, forKey: .tags)
     self.epStatus = try container.decode(UInt.self, forKey: .epStatus)
@@ -79,7 +87,7 @@ final class UserSubjectCollection: Codable {
     }
     self.updatedAt = updatedAt
     self.private = try container.decode(Bool.self, forKey: .private)
-    self.subject = try container.decode(SlimSubject?.self, forKey: .subject)
+    self.subject = try container.decode(SlimSubject.self, forKey: .subject)
   }
 
   func encode(to encoder: Encoder) throws {
@@ -156,7 +164,7 @@ final class Subject: Codable {
 
   @Attribute(.unique)
   var id: UInt
-  var type: SubjectType
+  var type: UInt8
   var name: String
   var nameCn: String
   var summary: String
@@ -173,9 +181,13 @@ final class Subject: Codable {
   var collection: SubjectCollection
   var tags: [Tag]
 
+  var typeEnum: SubjectType {
+    return SubjectType(value: type)
+  }
+
   init(
     id: UInt,
-    type: SubjectType,
+    type: UInt8,
     name: String,
     nameCn: String,
     summary: String,
@@ -214,7 +226,7 @@ final class Subject: Codable {
   required init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: CodingKeys.self)
     self.id = try container.decode(UInt.self, forKey: .id)
-    self.type = try container.decode(SubjectType.self, forKey: .type)
+    self.type = try container.decode(UInt8.self, forKey: .type)
     self.name = try container.decode(String.self, forKey: .name)
     self.nameCn = try container.decode(String.self, forKey: .nameCn)
     self.summary = try container.decode(String.self, forKey: .summary)
@@ -274,7 +286,7 @@ final class Episode: Codable {
 
   @Attribute(.unique)
   var id: UInt
-  var type: EpisodeType
+  var type: UInt8
   var name: String
   var nameCn: String
   var sort: Float
@@ -287,9 +299,13 @@ final class Episode: Codable {
   var durationSeconds: UInt?
   var subjectId: UInt
 
+  var typeEnum: EpisodeType {
+    return EpisodeType(value: type)
+  }
+
   init(
     id: UInt,
-    type: EpisodeType,
+    type: UInt8,
     name: String,
     nameCn: String,
     sort: Float,
@@ -319,7 +335,7 @@ final class Episode: Codable {
 
   init(item: EpisodeItem, subjectId: UInt) {
     self.id = item.id
-    self.type = item.type
+    self.type = item.type.rawValue
     self.name = item.name
     self.nameCn = item.nameCn
     self.sort = item.sort
@@ -336,7 +352,7 @@ final class Episode: Codable {
   required init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: CodingKeys.self)
     self.id = try container.decode(UInt.self, forKey: .id)
-    self.type = try container.decode(EpisodeType.self, forKey: .type)
+    self.type = try container.decode(UInt8.self, forKey: .type)
     self.name = try container.decode(String.self, forKey: .name)
     self.nameCn = try container.decode(String.self, forKey: .nameCn)
     self.sort = try container.decode(Float.self, forKey: .sort)
@@ -408,10 +424,14 @@ final class EpisodeCollection: Codable {
   @Attribute(.unique)
   var episodeId: UInt
   var episode: EpisodeItem
-  var type: EpisodeCollectionType
+  var type: UInt8
   var subjectId: UInt
 
-  init(episodeId: UInt, episode: EpisodeItem, type: EpisodeCollectionType, subjectId: UInt) {
+  var typeEnum: EpisodeCollectionType {
+    return EpisodeCollectionType(value: type)
+  }
+
+  init(episodeId: UInt, episode: EpisodeItem, type: UInt8, subjectId: UInt) {
     self.episodeId = episodeId
     self.episode = episode
     self.type = type
@@ -421,7 +441,7 @@ final class EpisodeCollection: Codable {
   init(item: EpisodeCollectionItem, subjectId: UInt) {
     self.episodeId = item.episode.id
     self.episode = item.episode
-    self.type = item.type
+    self.type = item.type.rawValue
     self.subjectId = subjectId
   }
 
@@ -430,7 +450,7 @@ final class EpisodeCollection: Codable {
     let episode = try container.decode(EpisodeItem.self, forKey: .episode)
     self.episodeId = episode.id
     self.episode = episode
-    self.type = try container.decode(EpisodeCollectionType.self, forKey: .type)
+    self.type = try container.decode(UInt8.self, forKey: .type)
     self.subjectId = 0
   }
 
@@ -447,7 +467,7 @@ final class EpisodeCollection: Codable {
   }
 
   var borderColor: Color {
-    switch self.type {
+    switch EpisodeCollectionType(value: self.type) {
     case .none:
       if airdate > Date() {
         return Color(hex: 0x909090)
@@ -464,7 +484,7 @@ final class EpisodeCollection: Codable {
   }
 
   var backgroundColor: Color {
-    switch self.type {
+    switch EpisodeCollectionType(value: self.type) {
     case .none:
       if airdate > Date() {
         return Color(hex: 0xe0e0e0)
@@ -481,7 +501,7 @@ final class EpisodeCollection: Codable {
   }
 
   var textColor: Color {
-    switch self.type {
+    switch EpisodeCollectionType(value: self.type) {
     case .none:
       if airdate > Date() {
         return Color(hex: 0x909090)

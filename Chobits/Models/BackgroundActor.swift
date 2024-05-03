@@ -27,14 +27,29 @@ public actor BackgroundActor {
   public init(container: ModelContainer) {
     self.modelContainer = container
     let context = ModelContext(modelContainer)
+    context.autosaveEnabled = false
     modelExecutor = DefaultSerialModelExecutor(modelContext: context)
+  }
+
+  public func fetchOne<T: PersistentModel>(
+    predicate: Predicate<T>? = nil,
+    sortBy: [SortDescriptor<T>] = []
+  ) throws -> T? {
+    var fetchDescriptor = FetchDescriptor<T>(predicate: predicate, sortBy: sortBy)
+    fetchDescriptor.fetchLimit = 1
+    let list: [T] = try context.fetch(fetchDescriptor)
+    return list.first
   }
 
   public func fetchData<T: PersistentModel>(
     predicate: Predicate<T>? = nil,
-    sortBy: [SortDescriptor<T>] = []
+    sortBy: [SortDescriptor<T>] = [],
+    limit: Int? = nil,
+    offset: Int? = nil
   ) throws -> [T] {
-    let fetchDescriptor = FetchDescriptor<T>(predicate: predicate, sortBy: sortBy)
+    var fetchDescriptor = FetchDescriptor<T>(predicate: predicate, sortBy: sortBy)
+    fetchDescriptor.fetchLimit = limit
+    fetchDescriptor.fetchOffset = offset
     let list: [T] = try context.fetch(fetchDescriptor)
     return list
   }
@@ -68,10 +83,11 @@ public actor BackgroundActor {
 
   public func saveAndInsertIfNeeded<T: PersistentModel>(
     data: T,
-    predicate: Predicate<T>
+    predicate: Predicate<T>,
+    background: Bool = false
   ) throws {
     let descriptor = FetchDescriptor<T>(predicate: predicate)
-    let context = data.modelContext ?? context
+    let context = background ? context : data.modelContext ?? context
     let savedCount = try context.fetchCount(descriptor)
     if savedCount == 0 {
       context.insert(data)
