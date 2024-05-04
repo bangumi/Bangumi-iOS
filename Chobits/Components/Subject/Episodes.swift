@@ -27,11 +27,11 @@ struct SubjectEpisodesView: View {
     _episodes = Query(
       filter: #Predicate<Episode> { episode in
         episode.subjectId == subject.id
-      })
+      }, sort: \Episode.sort)
     _collections = Query(
       filter: #Predicate<EpisodeCollection> { collection in
         collection.subjectId == subject.id
-      })
+      }, sort: \EpisodeCollection.episode.sort)
   }
 
   func update() async {
@@ -157,6 +157,29 @@ struct SubjectEpisodesView: View {
               }
             }
           }
+        }
+      }
+    } else {
+      FlowStack {
+        ForEach(episodes.prefix(50)) { episode in
+          Button {
+            edit = true
+          } label: {
+            Text("\(episode.sort.episodeDisplay)")
+              .foregroundStyle(episode.textColor)
+              .font(.callout)
+              .padding(3)
+              .background(episode.backgroundColor)
+              .border(episode.borderColor, width: 1)
+              .padding(2)
+              .monospaced()
+          }.sheet(
+            isPresented: $edit,
+            content: {
+              EpisodeInfobox(episode: episode)
+                .presentationDragIndicator(.visible)
+                .presentationDetents(.init([.medium, .large]))
+            })
         }
       }
     }

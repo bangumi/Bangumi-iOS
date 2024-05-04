@@ -55,3 +55,9 @@ extension UserSubjectCollection {
       fixture: "user_collection_book.json", target: UserSubjectCollection.self)
   }
 }
+
+extension Episode {
+  static var preview: Episode {
+    return loadFixture(fixture: "episodes.json", target: EpisodeResponse.self).data.first!
+  }
+}

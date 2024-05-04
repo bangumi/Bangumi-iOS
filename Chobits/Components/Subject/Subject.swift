@@ -67,6 +67,13 @@ struct SubjectView: View {
             SubjectHeaderView(subject: subject)
             if chii.isAuthenticated {
               SubjectCollectionView(subject: subject)
+            } else {
+              switch subject.typeEnum {
+              case .anime, .music,.real:
+                SubjectEpisodesView(subject: subject)
+              default:
+                EmptyView()
+              }
             }
             if !subject.summary.isEmpty {
               Divider()
