@@ -42,7 +42,7 @@ struct SubjectEpisodesView: View {
     let actor = BackgroundActor(container: modelContext.container)
     do {
       var offset: Int = 0
-      let limit: Int = 50
+      let limit: Int = 1000
       let subjectId = subject.id
       while true {
         var total: Int = 0
