@@ -75,7 +75,21 @@ class ChiiClient: ObservableObject, Observable {
       let bodyData = try JSONSerialization.data(withJSONObject: body)
       request.httpBody = bodyData
     }
-    let (data, response) = try await session.data(for: request)
+    var data: Data
+    var response: URLResponse
+    do {
+      let (sdata, sresponse) = try await session.data(for: request)
+      data = sdata
+      response = sresponse
+    } catch let error as NSError where error.domain == NSURLErrorDomain {
+      if error.code == NSURLErrorCancelled {
+        throw ChiiError(ignore: "NSURLErrorCancelled")
+      } else {
+        throw ChiiError(request: "NSURLErrorDomain: \(error)")
+      }
+    } catch {
+      throw ChiiError(request: "\(error)")
+    }
     guard let response = response as? HTTPURLResponse else {
       throw ChiiError(message: "api response nil")
     }
@@ -122,7 +136,6 @@ class ChiiClient: ObservableObject, Observable {
     let sessionConfig = URLSessionConfiguration.default
     var headers: [AnyHashable: Any] = [:]
     headers["User-Agent"] = self.userAgent
-
     if let auth = self.auth {
       if auth.isExpired() {
         let auth = try await self.refreshAccessToken(auth: auth)

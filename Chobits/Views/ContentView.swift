@@ -41,7 +41,7 @@ struct ContentView: View {
     do {
       _ = try await chii.getProfile()
     } catch {
-      notifier.alert(message: "\(error)")
+      notifier.alert(error: error)
     }
     self.waiting = false
   }

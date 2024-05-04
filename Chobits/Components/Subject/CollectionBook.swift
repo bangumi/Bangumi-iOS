@@ -40,7 +40,7 @@ struct SubjectCollectionBookView: View {
         await actor.insert(data: resp)
         try await actor.save()
       } catch {
-        notifier.alert(message: "\(error)")
+        notifier.alert(error: error)
       }
       self.eps = nil
       self.vols = nil

@@ -82,7 +82,7 @@ struct SubjectEpisodesView: View {
     } catch {
       print("ERR: \(error)")
       await MainActor.run {
-        notifier.alert(message: "\(error)")
+        notifier.alert(error: error)
         page.finish()
       }
     }

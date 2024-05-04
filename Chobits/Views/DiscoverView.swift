@@ -16,25 +16,18 @@ struct ChiiDiscoverView: View {
 
   @State private var searching = false
   @State private var query = ""
-  @State private var local = true
   @State private var subjectType: SubjectType = .unknown
+  @State private var local = true
+  @State private var offset = 0
+  @State private var exhausted = false
 
-  @State private var limit: Int = 20
-  @State private var offset: Int = 0
-  @State private var total: Int = 0
   @State private var subjects: [SearchSubject] = []
   @State private var collections: [UserSubjectCollection] = []
 
-  func newLocalSearch() async {
-    offset = 0
-    total = 0
-    local = true
-    subjects = []
+  func localSearch(limit: Int = 20) async -> [UserSubjectCollection] {
     let actor = BackgroundActor(container: modelContext.container)
-    let stype = subjectType.rawValue
-    let allType = SubjectType.unknown.rawValue
     let predicate = #Predicate<UserSubjectCollection> {
-      return (stype == allType || stype == $0.subjectType)
+      return (subjectType.rawValue == 0 || subjectType.rawValue == $0.subjectType)
         && ($0.subject.name.localizedStandardContains(query)
           || $0.subject.nameCn.localizedStandardContains(query))
     }
@@ -42,16 +35,27 @@ struct ChiiDiscoverView: View {
       let collections = try await actor.fetchData(
         predicate: predicate, limit: limit, offset: offset)
       if collections.count < limit {
-        total = -1
+        exhausted = true
       }
-      self.collections = collections
+      offset += limit
+      return collections
     } catch {
-      notifier.alert(message: "\(error)")
+      notifier.alert(error: error)
     }
+    return []
+  }
+
+  func newLocalSearch() async {
+    local = true
+    offset = 0
+    exhausted = false
+    collections.removeAll()
+    let collections = await localSearch()
+    self.collections.append(contentsOf: collections)
   }
 
   func localSearchNextPage(current: UserSubjectCollection) async {
-    if total < 0 {
+    if exhausted {
       return
     }
     let thresholdIndex = collections.index(collections.endIndex, offsetBy: -2)
@@ -59,41 +63,36 @@ struct ChiiDiscoverView: View {
     if currentIndex != thresholdIndex {
       return
     }
-    offset += limit
-    let actor = BackgroundActor(container: modelContext.container)
-    let predicate = #Predicate<UserSubjectCollection> {
-      return $0.subject.name.localizedStandardContains(query)
-        || $0.subject.nameCn.localizedStandardContains(query)
-    }
-    do {
-      let collections = try await actor.fetchData(
-        predicate: predicate, limit: limit, offset: offset)
-      if collections.count < limit {
-        total = -1
-      }
-      self.collections.append(contentsOf: collections)
-    } catch {
-      notifier.alert(message: "\(error)")
-    }
+    let collections = await localSearch()
+    self.collections.append(contentsOf: collections)
   }
 
-  func newRemoteSearch() async {
-    offset = 0
-    total = 0
-    local = false
-    subjects = []
+  func remoteSearch(limit: Int = 20) async -> [SearchSubject] {
     do {
       let resp = try await chii.search(
         keyword: query, type: subjectType, limit: limit, offset: offset)
-      total = resp.total
-      subjects = resp.data
+      offset += limit
+      if offset > resp.total {
+        exhausted = true
+      }
+      return resp.data
     } catch {
-      notifier.alert(message: "\(error)")
+      notifier.alert(error: error)
     }
+    return []
+  }
+
+  func newRemoteSearch() async {
+    local = false
+    offset = 0
+    exhausted = false
+    subjects.removeAll()
+    let subjects = await remoteSearch()
+    self.subjects.append(contentsOf: subjects)
   }
 
   func remoteSearchNextPage(current: SearchSubject) async {
-    if offset + limit > total {
+    if exhausted {
       return
     }
     let thresholdIndex = subjects.index(subjects.endIndex, offsetBy: -2)
@@ -101,14 +100,8 @@ struct ChiiDiscoverView: View {
     if currentIndex != thresholdIndex {
       return
     }
-    offset += limit
-    do {
-      let resp = try await chii.search(
-        keyword: query, type: subjectType, limit: limit, offset: offset)
-      subjects.append(contentsOf: resp.data)
-    } catch {
-      notifier.alert(message: "\(error)")
-    }
+    let subjects = await remoteSearch()
+    self.subjects.append(contentsOf: subjects)
   }
 
   var body: some View {
@@ -147,6 +140,7 @@ struct ChiiDiscoverView: View {
                 }
               }
             }
+            .animation(.easeInOut, value: subjectType)
             .navigationBarTitleDisplayMode(.inline)
             .navigationDestination(for: UserSubjectCollection.self) { collection in
               SubjectView(subjectId: collection.subjectId)
@@ -171,6 +165,7 @@ struct ChiiDiscoverView: View {
                   }
                 }
               }
+              .animation(.easeInOut, value: subjectType)
               .navigationBarTitleDisplayMode(.inline)
               .navigationDestination(for: SearchSubject.self) { subject in
                 SubjectView(subjectId: subject.id)

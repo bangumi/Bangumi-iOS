@@ -23,7 +23,7 @@ struct ChiiTimelineView: View {
         let profile = try await chii.getProfile()
         self.profile = profile
       } catch {
-        notifier.alert(message: "\(error)")
+        notifier.alert(error: error)
       }
     }
   }
@@ -36,7 +36,7 @@ struct ChiiTimelineView: View {
     do {
       try modelContext.delete(model: UserSubjectCollection.self)
     } catch {
-      notifier.alert(message: "\(error)")
+      notifier.alert(error: error)
     }
   }
 

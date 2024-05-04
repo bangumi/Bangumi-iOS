@@ -36,11 +36,11 @@ struct ChobitsApp: App {
         .environment(chii)
         .alert("ERROR", isPresented: $notifier.showAlert) {
           Button("OK") {
-            notifier.error = nil
+            notifier.currentError = nil
             notifier.showAlert = false
           }
         } message: {
-          if let error = notifier.error {
+          if let error = notifier.currentError {
             Text("\(error)")
           } else {
             Text("Unknown Error")

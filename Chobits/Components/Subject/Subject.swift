@@ -54,7 +54,7 @@ struct SubjectView: View {
       }
       self.page.missing()
     } catch {
-      notifier.alert(message: "\(error)")
+      notifier.alert(error: error)
       self.page.finish()
     }
   }

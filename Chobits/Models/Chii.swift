@@ -79,13 +79,23 @@ struct ResponseError: Codable, CustomStringConvertible {
 }
 
 enum ChiiError: Error, CustomStringConvertible {
+  case request(String)
   case badRequest(ResponseError)
   case notAuthorized(ResponseError)
   case notFound(ResponseError)
   case generic(String)
+  case ignore(String)
+
+  init(request: String) {
+    self = .request(request)
+  }
 
   init(message: String) {
     self = .generic(message)
+  }
+
+  init(ignore: String) {
+    self = .ignore(ignore)
   }
 
   init(code: Int, response: ResponseError) {
@@ -103,6 +113,8 @@ enum ChiiError: Error, CustomStringConvertible {
 
   var description: String {
     switch self {
+    case .request(let message):
+      return "Request Error!\n\(message)"
     case .badRequest(let error):
       return "Bad Request!\n\(error.display)"
     case .notAuthorized(let error):
@@ -111,6 +123,8 @@ enum ChiiError: Error, CustomStringConvertible {
       return "Not Found!\n\(error.display)"
     case .generic(let message):
       return message
+    case .ignore(let message):
+      return "Ignore Error: \(message)"
     }
   }
 }

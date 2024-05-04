@@ -59,7 +59,7 @@ struct SubjectCollectionBox: View {
         try await actor.save()
         self.isPresented = false
       } catch {
-        notifier.alert(message: "\(error)")
+        notifier.alert(error: error)
       }
       self.updating = false
     }

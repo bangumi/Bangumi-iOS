@@ -8,20 +8,34 @@
 import Foundation
 
 class Notifier: ObservableObject {
-  @Published var error: ChiiError?
+  @Published var currentError: ChiiError?
   @Published var showAlert: Bool = false
 
   @Published var notification: String?
   @Published var showNotification: Bool = false
 
   func alert(error: ChiiError) {
-    self.error = error
-    self.showAlert = true
+    switch error {
+    case .ignore:
+      print("error ignored")
+      return
+    default:
+      self.currentError = error
+      self.showAlert = true
+    }
   }
 
   func alert(message: String) {
-    self.error = ChiiError(message: message)
+    self.currentError = ChiiError(message: message)
     self.showAlert = true
+  }
+
+  func alert(error: any Error) {
+    if let chiiError = error as? ChiiError {
+      self.alert(error: chiiError)
+    } else {
+      self.alert(message: "\(error)")
+    }
   }
 
   func notify(message: String) {

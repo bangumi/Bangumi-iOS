@@ -44,7 +44,7 @@ struct CalendarView: View {
       }
       try await actor.save()
     } catch {
-      notifier.alert(message: "\(error)")
+      notifier.alert(error: error)
     }
   }
 

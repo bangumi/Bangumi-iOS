@@ -12,38 +12,43 @@ struct ChiiProgressView: View {
   @EnvironmentObject var notifier: Notifier
   @EnvironmentObject var chii: ChiiClient
   @EnvironmentObject var navState: NavState
-
   @Environment(\.modelContext) private var modelContext
-
-  @Query(sort: \UserSubjectCollection.updatedAt, order: .reverse) private var collections:
-    [UserSubjectCollection]
 
   @State private var subjectType = SubjectType.unknown
 
-  func updateCollections(type: SubjectType?) {
+  static var descriptor: FetchDescriptor<UserSubjectCollection> {
+    var descriptor = FetchDescriptor<UserSubjectCollection>(sortBy: [
+      SortDescriptor(\.updatedAt, order: .reverse)
+    ])
+    descriptor.fetchLimit = 100
+    return descriptor
+  }
+
+  @Query(descriptor)
+  private var collections: [UserSubjectCollection]
+
+  func updateCollections(type: SubjectType?) async {
     let actor = BackgroundActor(container: modelContext.container)
-    Task {
-      do {
-        var offset: Int = 0
-        let limit: Int = 100
-        while true {
-          let response = try await chii.getSubjectCollections(
-            subjectType: type, limit: limit, offset: offset)
-          if response.data.isEmpty {
-            break
-          }
-          for collection in response.data {
-            await actor.insert(data: collection, background: true)
-          }
-          offset += limit
-          if offset > response.total {
-            break
-          }
+    var offset: Int = 0
+    let limit: Int = 100
+    do {
+      while true {
+        let response = try await chii.getSubjectCollections(
+          subjectType: type, limit: limit, offset: offset)
+        if response.data.isEmpty {
+          break
         }
-        try await actor.save()
-      } catch {
-        notifier.alert(message: "\(error)")
+        for collection in response.data {
+          await actor.insert(data: collection, background: true)
+        }
+        offset += limit
+        if offset > response.total {
+          break
+        }
       }
+      try await actor.save()
+    } catch {
+      notifier.alert(error: error)
     }
   }
 
@@ -60,8 +65,8 @@ struct ChiiProgressView: View {
     if chii.isAuthenticated {
       NavigationStack(path: $navState.progressNavigation) {
         if collections.isEmpty {
-          ProgressView().onAppear {
-            updateCollections(type: nil)
+          ProgressView().task {
+            await updateCollections(type: nil)
           }
         } else {
           VStack {
@@ -84,7 +89,9 @@ struct ChiiProgressView: View {
               SubjectView(subjectId: collection.subjectId)
             }
             .refreshable {
-              updateCollections(type: subjectType)
+              Task {
+                await updateCollections(type: subjectType)
+              }
             }
           }.padding()
         }
