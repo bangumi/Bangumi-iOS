@@ -7,9 +7,9 @@
 
 import Foundation
 import KeychainSwift
+import OSLog
 import SwiftData
 import SwiftUI
-import OSLog
 
 class ChiiClient: ObservableObject, Observable {
   let keychain: KeychainSwift

@@ -472,6 +472,10 @@ enum EpisodeType: UInt8, Codable, Identifiable {
     }
   }
 
+  static func allTypes() -> [Self] {
+    return [.main, .sp, .op, .ed]
+  }
+
   static func otherTypes() -> [Self] {
     return [.sp, .op, .ed]
   }

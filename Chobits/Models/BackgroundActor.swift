@@ -54,6 +54,11 @@ public actor BackgroundActor {
     return list
   }
 
+  public func fetchData<T: PersistentModel>(descriptor: FetchDescriptor<T>) throws -> [T] {
+    let list: [T] = try context.fetch(descriptor)
+    return list
+  }
+
   public func fetchCount<T: PersistentModel>(
     predicate: Predicate<T>? = nil,
     sortBy: [SortDescriptor<T>] = []

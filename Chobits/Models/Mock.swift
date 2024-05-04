@@ -57,16 +57,24 @@ extension UserSubjectCollection {
 }
 
 extension Episode {
+  static var previewList: [Episode] {
+    return loadFixture(fixture: "episodes.json", target: EpisodeResponse.self).data
+  }
+
   static var preview: Episode {
-    return loadFixture(fixture: "episodes.json", target: EpisodeResponse.self).data.first!
+    return self.previewList.first!
   }
 }
 
 extension EpisodeCollection {
-  static var preview: EpisodeCollection {
-    let item = loadFixture(
+  static var previewList: [EpisodeCollection] {
+    let items = loadFixture(
       fixture: "episode_collections.json", target: EpisodeCollectionResponse.self
-    ).data.first!
-    return EpisodeCollection(item: item, subjectId: 0)
+    ).data
+    return items.map { EpisodeCollection(item: $0, subjectId: 0) }
+  }
+
+  static var preview: EpisodeCollection {
+    return self.previewList.first!
   }
 }

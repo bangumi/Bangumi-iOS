@@ -70,7 +70,7 @@ struct SubjectCollectionBox: View {
       VStack {
         Picker("Collection Type", selection: $collectionType) {
           ForEach(CollectionType.boxTypes()) { ct in
-            Text("\(ct.description(type: subject.typeEnum))")
+            Text("\(ct.description(type: subject.typeEnum))").tag(ct)
           }
         }
         .pickerStyle(.segmented)

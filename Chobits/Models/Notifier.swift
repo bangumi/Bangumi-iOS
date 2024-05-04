@@ -5,8 +5,8 @@
 //  Created by Chuan Chuan on 2024/5/4.
 //
 
-import OSLog
 import Foundation
+import OSLog
 
 class Notifier: ObservableObject {
   @Published var currentError: ChiiError?

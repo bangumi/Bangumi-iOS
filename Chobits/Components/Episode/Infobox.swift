@@ -1,5 +1,5 @@
 //
-//  EpisodeInfobox.swift
+//  Infobox.swift
 //  Chobits
 //
 //  Created by Chuan Chuan on 2024/5/4.
@@ -25,14 +25,6 @@ struct EpisodeInfobox: View {
   init(episode: Episode) {
     self.episode = episode.item
     self.collection = nil
-  }
-
-  var epNumber: String {
-    if let ep = episode.ep {
-      return ep.episodeDisplay
-    } else {
-      return episode.sort.episodeDisplay
-    }
   }
 
   func updateSingle(type: EpisodeCollectionType) async {
@@ -80,16 +72,7 @@ struct EpisodeInfobox: View {
     ScrollView {
       VStack(alignment: .leading) {
         HStack {
-          switch episode.type {
-          case .main:
-            Text("ep.\(epNumber) \(episode.name)").font(.headline).lineLimit(1)
-          case .sp:
-            Text("sp.\(episode.sort.episodeDisplay) \(episode.name)").font(.headline).lineLimit(1)
-          case .op:
-            Text("op.\(episode.sort.episodeDisplay) \(episode.name)").font(.headline).lineLimit(1)
-          case .ed:
-            Text("ed.\(episode.sort.episodeDisplay) \(episode.name)").font(.headline).lineLimit(1)
-          }
+          Text(episode.title).font(.headline).lineLimit(1)
           Text(episode.type.description)
             .font(.footnote)
             .foregroundStyle(.secondary)

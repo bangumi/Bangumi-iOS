@@ -5,8 +5,8 @@
 //  Created by Chuan Chuan on 2024/5/4.
 //
 
-import OSLog
 import Foundation
+import OSLog
 
 extension ChiiClient {
   // update progress for books
@@ -16,7 +16,9 @@ extension ChiiClient {
     if self.mock != nil {
       return try await getSubjectCollection(sid: sid)
     }
-    Logger.api.info("start update subject collection: \(sid), eps: \(eps.debugDescription), vols: \(vols.debugDescription)")
+    Logger.api.info(
+      "start update subject collection: \(sid), eps: \(eps.debugDescription), vols: \(vols.debugDescription)"
+    )
     let url = self.apiBase.appendingPathComponent("v0/users/-/collections/\(sid)")
     var body: [String: Any] = [:]
     if let epStatus = eps {
@@ -28,7 +30,9 @@ extension ChiiClient {
     if body.count > 0 {
       _ = try await self.request(url: url, method: "POST", body: body, authorized: true)
     }
-    Logger.api.info("finish update subject collection: \(sid), eps: \(eps.debugDescription), vols: \(vols.debugDescription)")
+    Logger.api.info(
+      "finish update subject collection: \(sid), eps: \(eps.debugDescription), vols: \(vols.debugDescription)"
+    )
     return try await getSubjectCollection(sid: sid)
   }
 

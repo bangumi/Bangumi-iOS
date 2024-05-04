@@ -72,7 +72,7 @@ struct ChiiProgressView: View {
           VStack {
             Picker("Subject Type", selection: $subjectType) {
               ForEach(SubjectType.progressTypes()) { type in
-                Text("\(type.description)(\(doing[type]?.count ?? 0))")
+                Text("\(type.description)(\(doing[type]?.count ?? 0))").tag(type)
               }
             }.pickerStyle(.segmented)
             ScrollView {

@@ -87,9 +87,6 @@ struct SubjectCollectionView: View {
                 .presentationDragIndicator(.visible)
                 .presentationDetents(.init([.medium, .large]))
             })
-          if self.page.updating {
-            ProgressView().padding(.leading, 10)
-          }
           Spacer()
           if collection.rate > 0 {
             ForEach(1..<6) { idx in
@@ -126,20 +123,24 @@ struct SubjectCollectionView: View {
                     .presentationDetents(.init([.medium, .large]))
                 })
             Spacer()
+          } else {
+            ProgressView().padding(5)
           }
         }
-      }.animation(.default, value: page.empty)
-
-      switch subject.typeEnum {
-      case .book:
-        SubjectCollectionBookView(subject: subject)
-      case .anime, .real:
-        SubjectEpisodesView(subject: subject)
-      default:
-        EmptyView()
       }
-    }.task {
+    }
+    .animation(.default, value: page.empty)
+    .task {
       await updateCollection()
+    }
+
+    switch subject.typeEnum {
+    case .book:
+      SubjectCollectionBookView(subject: subject)
+    case .anime, .real:
+      EpisodeGridCollectionView(subject: subject)
+    default:
+      EmptyView()
     }
   }
 }

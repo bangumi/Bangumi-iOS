@@ -5,8 +5,8 @@
 //  Created by Chuan Chuan on 2024/5/4.
 //
 
-import OSLog
 import Foundation
+import OSLog
 
 extension ChiiClient {
 
@@ -144,7 +144,8 @@ extension ChiiClient {
     if self.mock != nil {
       return loadFixture(fixture: "episodes.json", target: EpisodeResponse.self)
     }
-    Logger.api.info("start get subject episodes: \(subjectId), \(type.debugDescription), \(limit), \(offset)")
+    Logger.api.info(
+      "start get subject episodes: \(subjectId), \(type.debugDescription), \(limit), \(offset)")
     var queries: [URLQueryItem] = [
       URLQueryItem(name: "subject_id", value: String(subjectId)),
       URLQueryItem(name: "limit", value: String(limit)),
@@ -159,7 +160,8 @@ extension ChiiClient {
     let decoder = JSONDecoder()
     decoder.keyDecodingStrategy = .convertFromSnakeCase
     let resp = try decoder.decode(EpisodeResponse.self, from: data)
-    Logger.api.info("finish get subject episodes: \(subjectId), \(type.debugDescription), \(limit), \(offset)")
+    Logger.api.info(
+      "finish get subject episodes: \(subjectId), \(type.debugDescription), \(limit), \(offset)")
     return resp
   }
 
@@ -172,7 +174,8 @@ extension ChiiClient {
       return loadFixture(
         fixture: "episode_collections.json", target: EpisodeCollectionResponse.self)
     }
-    Logger.api.info("start get episode collections: \(subjectId), \(type.debugDescription), \(limit), \(offset)")
+    Logger.api.info(
+      "start get episode collections: \(subjectId), \(type.debugDescription), \(limit), \(offset)")
     var queries: [URLQueryItem] = [
       URLQueryItem(name: "limit", value: String(limit)),
       URLQueryItem(name: "offset", value: String(offset)),
@@ -186,7 +189,8 @@ extension ChiiClient {
     let decoder = JSONDecoder()
     decoder.keyDecodingStrategy = .convertFromSnakeCase
     let resp = try decoder.decode(EpisodeCollectionResponse.self, from: data)
-    Logger.api.info("finish get episode collections: \(subjectId), \(type.debugDescription), \(limit), \(offset)")
+    Logger.api.info(
+      "finish get episode collections: \(subjectId), \(type.debugDescription), \(limit), \(offset)")
     return resp
   }
 

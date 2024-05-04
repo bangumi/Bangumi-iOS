@@ -363,7 +363,7 @@ final class Episode: Codable {
     self.desc = item.desc
     self.disc = item.disc
     self.durationSeconds = item.durationSeconds
-    self.subjectId = subjectId
+    self.subjectId = item.subjectId ?? subjectId
   }
 
   required init(from decoder: Decoder) throws {
@@ -440,29 +440,35 @@ final class EpisodeCollection: Codable {
 
   @Attribute(.unique)
   var episodeId: UInt
+  var episodeType: UInt8
+  var sort: Float
   var episode: EpisodeItem
   var type: UInt8
-  var sort: Float
   var subjectId: UInt
 
   var typeEnum: EpisodeCollectionType {
     return EpisodeCollectionType(value: type)
   }
 
-  init(episodeId: UInt, episode: EpisodeItem, type: UInt8, sort: Float, subjectId: UInt) {
+  init(
+    episodeId: UInt, episodeType: UInt8, sort: Float, episode: EpisodeItem, type: UInt8,
+    subjectId: UInt
+  ) {
     self.episodeId = episodeId
+    self.episodeType = episodeType
+    self.sort = sort
     self.episode = episode
     self.type = type
-    self.sort = sort
     self.subjectId = subjectId
   }
 
   init(item: EpisodeCollectionItem, subjectId: UInt) {
     self.episodeId = item.episode.id
+    self.episodeType = item.episode.type.rawValue
+    self.sort = item.episode.sort
+    self.subjectId = item.episode.subjectId ?? subjectId
     self.episode = item.episode
     self.type = item.type.rawValue
-    self.sort = item.episode.sort
-    self.subjectId = subjectId
   }
 
   required init(from decoder: Decoder) throws {
@@ -470,9 +476,10 @@ final class EpisodeCollection: Codable {
     let episode = try container.decode(EpisodeItem.self, forKey: .episode)
     self.episodeId = episode.id
     self.sort = episode.sort
+    self.episodeType = episode.type.rawValue
+    self.subjectId = episode.subjectId ?? 0
     self.episode = episode
     self.type = try container.decode(UInt8.self, forKey: .type)
-    self.subjectId = 0
   }
 
   func encode(to encoder: Encoder) throws {
