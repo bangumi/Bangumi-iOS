@@ -1,4 +1,5 @@
 *.xcconfig
 *.xcbkptlist
 
+xcshareddata/
 .vscode/

@@ -442,16 +442,18 @@ final class EpisodeCollection: Codable {
   var episodeId: UInt
   var episode: EpisodeItem
   var type: UInt8
+  var sort: Float
   var subjectId: UInt
 
   var typeEnum: EpisodeCollectionType {
     return EpisodeCollectionType(value: type)
   }
 
-  init(episodeId: UInt, episode: EpisodeItem, type: UInt8, subjectId: UInt) {
+  init(episodeId: UInt, episode: EpisodeItem, type: UInt8, sort: Float, subjectId: UInt) {
     self.episodeId = episodeId
     self.episode = episode
     self.type = type
+    self.sort = sort
     self.subjectId = subjectId
   }
 
@@ -459,6 +461,7 @@ final class EpisodeCollection: Codable {
     self.episodeId = item.episode.id
     self.episode = item.episode
     self.type = item.type.rawValue
+    self.sort = item.episode.sort
     self.subjectId = subjectId
   }
 
@@ -466,6 +469,7 @@ final class EpisodeCollection: Codable {
     let container = try decoder.container(keyedBy: CodingKeys.self)
     let episode = try container.decode(EpisodeItem.self, forKey: .episode)
     self.episodeId = episode.id
+    self.sort = episode.sort
     self.episode = episode
     self.type = try container.decode(UInt8.self, forKey: .type)
     self.subjectId = 0

@@ -32,7 +32,7 @@ struct SubjectEpisodesView: View {
     _collections = Query(
       filter: #Predicate<EpisodeCollection> { collection in
         collection.subjectId == subject.id
-      }, sort: \EpisodeCollection.episode.sort)
+      }, sort: \EpisodeCollection.sort)
   }
 
   func update() async {

@@ -84,11 +84,11 @@ struct EpisodeInfobox: View {
           case .main:
             Text("ep.\(epNumber) \(episode.name)").font(.headline).lineLimit(1)
           case .sp:
-            Text("sp.\(episode.sort.episodeDisplay) \(episode.name)").font(.headline)
+            Text("sp.\(episode.sort.episodeDisplay) \(episode.name)").font(.headline).lineLimit(1)
           case .op:
-            Text("op.\(episode.sort.episodeDisplay) \(episode.name)").font(.headline)
+            Text("op.\(episode.sort.episodeDisplay) \(episode.name)").font(.headline).lineLimit(1)
           case .ed:
-            Text("ed.\(episode.sort.episodeDisplay) \(episode.name)").font(.headline)
+            Text("ed.\(episode.sort.episodeDisplay) \(episode.name)").font(.headline).lineLimit(1)
           }
           Text(episode.type.description)
             .font(.footnote)
@@ -124,8 +124,7 @@ struct EpisodeInfobox: View {
               Text("看到")
             }
             Spacer()
-            Text(collection.typeEnum.description).foregroundStyle(.accent).buttonStyle(
-              .borderedProminent)
+            Text(collection.typeEnum.description).foregroundStyle(.accent)
           }
           .buttonStyle(.borderedProminent)
           .font(.callout)
