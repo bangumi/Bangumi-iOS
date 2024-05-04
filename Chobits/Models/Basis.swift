@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import SwiftUI
 
 struct SubjectImages: Codable {
   var large: String
@@ -538,49 +537,5 @@ enum EpisodeCollectionType: UInt8, Codable, Identifiable {
     case .dropped:
       return [.none, .wish, .collect]
     }
-  }
-}
-
-extension UInt8 {
-  var ratingDescription: String {
-    let desc: [String: String] = [
-      "10": "超神作",
-      "9": "神作",
-      "8": "力荐",
-      "7": "推荐",
-      "6": "还行",
-      "5": "不过不失",
-      "4": "较差",
-      "3": "差",
-      "2": "很差",
-      "1": "不忍直视",
-    ]
-    return desc["\(self)"] ?? ""
-  }
-}
-
-extension Float {
-  var episodeDisplay: String {
-    let formatter = NumberFormatter()
-    formatter.minimumFractionDigits = 0
-    formatter.maximumFractionDigits = 1
-    formatter.minimumIntegerDigits = 2
-    return formatter.string(from: NSNumber(value: self)) ?? ""
-  }
-
-  var rateDisplay: String {
-    String(format: "%.1f", self)
-  }
-}
-
-extension Color {
-  init(hex: Int, opacity: Double = 1) {
-    self.init(
-      .sRGB,
-      red: Double((hex >> 16) & 0xff) / 255,
-      green: Double((hex >> 08) & 0xff) / 255,
-      blue: Double((hex >> 00) & 0xff) / 255,
-      opacity: opacity
-    )
   }
 }

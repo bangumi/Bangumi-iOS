@@ -1,5 +1,5 @@
 //
-//  Responses.swift
+//  Response.swift
 //  Chobits
 //
 //  Created by Chuan Chuan on 2024/4/26.
