@@ -61,3 +61,12 @@ extension Episode {
     return loadFixture(fixture: "episodes.json", target: EpisodeResponse.self).data.first!
   }
 }
+
+extension EpisodeCollection {
+  static var preview: EpisodeCollection {
+    let item = loadFixture(
+      fixture: "episode_collections.json", target: EpisodeCollectionResponse.self
+    ).data.first!
+    return EpisodeCollection(item: item, subjectId: 0)
+  }
+}

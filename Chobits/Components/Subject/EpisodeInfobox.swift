@@ -8,7 +8,24 @@
 import SwiftUI
 
 struct EpisodeInfobox: View {
-  let episode: Episode
+  let episode: EpisodeItem
+  let collection: EpisodeCollection?
+
+  @EnvironmentObject var notifier: Notifier
+  @EnvironmentObject var chii: ChiiClient
+  @Environment(\.modelContext) private var modelContext
+
+  @State private var updating: Bool = false
+
+  init(collection: EpisodeCollection) {
+    self.episode = collection.episode
+    self.collection = collection
+  }
+
+  init(episode: Episode) {
+    self.episode = episode.item
+    self.collection = nil
+  }
 
   var epNumber: String {
     if let ep = episode.ep {
@@ -18,11 +35,52 @@ struct EpisodeInfobox: View {
     }
   }
 
+  func updateSingle(type: EpisodeCollectionType) async {
+    guard let collection = collection else {
+      return
+    }
+    updating = true
+    do {
+      try await chii.updateEpisodeCollection(episodeId: collection.episode.id, type: type)
+      updating = false
+      collection.type = type.rawValue
+    } catch {
+      updating = false
+      notifier.alert(error: error)
+    }
+  }
+
+  func updateBatch() async {
+    guard let collection = collection else {
+      return
+    }
+    updating = true
+    let actor = BackgroundActor(container: modelContext.container)
+    let predicate = #Predicate<EpisodeCollection> {
+      $0.subjectId == collection.subjectId && $0.episode.sort <= collection.episode.sort
+    }
+    do {
+      let previous = try await actor.fetchData(predicate: predicate)
+      let episodeIds = previous.map { $0.episode.id }
+      try await chii.updateSubjectEpisodeCollection(
+        subjectId: collection.subjectId, episodeIds: episodeIds, type: EpisodeCollectionType.collect
+      )
+      for collect in previous {
+        collect.type = EpisodeCollectionType.collect.rawValue
+      }
+      try await actor.save()
+      updating = false
+    } catch {
+      updating = false
+      notifier.alert(error: error)
+    }
+  }
+
   var body: some View {
-    ScrollView{
+    ScrollView {
       VStack(alignment: .leading) {
         HStack {
-          switch episode.typeEnum {
+          switch episode.type {
           case .main:
             Text("ep.\(epNumber) \(episode.name)").font(.headline).lineLimit(1)
           case .sp:
@@ -32,7 +90,7 @@ struct EpisodeInfobox: View {
           case .ed:
             Text("ed.\(episode.sort.episodeDisplay) \(episode.name)").font(.headline)
           }
-          Text(episode.typeEnum.description)
+          Text(episode.type.description)
             .font(.footnote)
             .foregroundStyle(.secondary)
             .overlay {
@@ -46,6 +104,32 @@ struct EpisodeInfobox: View {
             Label("讨论", systemImage: "bubble.fill").font(.caption).foregroundStyle(.secondary)
             Text("(+\(episode.comment))").font(.caption).foregroundStyle(.red)
           }
+        }
+        if let collection = collection {
+          HStack {
+            ForEach(collection.typeEnum.otherTypes()) { type in
+              Button {
+                Task {
+                  await updateSingle(type: type)
+                }
+              } label: {
+                Text(type.action)
+              }
+            }
+            Button {
+              Task {
+                await updateBatch()
+              }
+            } label: {
+              Text("看到")
+            }
+            Spacer()
+            Text(collection.typeEnum.description).foregroundStyle(.accent).buttonStyle(
+              .borderedProminent)
+          }
+          .buttonStyle(.borderedProminent)
+          .font(.callout)
+          .disabled(updating)
         }
         Divider()
         if !episode.name.isEmpty {
@@ -74,5 +158,6 @@ struct EpisodeInfobox: View {
 }
 
 #Preview {
-  EpisodeInfobox(episode: Episode.preview)
+  EpisodeInfobox(collection: .preview)
+    .environmentObject(ChiiClient(mock: .anime))
 }

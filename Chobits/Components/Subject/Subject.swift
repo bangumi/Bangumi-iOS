@@ -69,7 +69,7 @@ struct SubjectView: View {
               SubjectCollectionView(subject: subject)
             } else {
               switch subject.typeEnum {
-              case .anime, .music,.real:
+              case .anime, .music, .real:
                 SubjectEpisodesView(subject: subject)
               default:
                 EmptyView()

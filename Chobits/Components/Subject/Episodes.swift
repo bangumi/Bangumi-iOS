@@ -16,7 +16,8 @@ struct SubjectEpisodesView: View {
   @EnvironmentObject var chii: ChiiClient
   @Environment(\.modelContext) private var modelContext
 
-  @State private var edit: Bool = false
+  @State private var selectedEpisode: Episode? = nil
+  @State private var selectedCollection: EpisodeCollection? = nil
   @StateObject private var page: PageStatus = PageStatus()
 
   @Query private var episodes: [Episode]
@@ -108,7 +109,7 @@ struct SubjectEpisodesView: View {
       FlowStack {
         ForEach(mainCollections.prefix(50)) { collection in
           Button {
-            edit = true
+            selectedCollection = collection
           } label: {
             Text("\(collection.episode.sort.episodeDisplay)")
               .foregroundStyle(collection.textColor)
@@ -143,7 +144,7 @@ struct SubjectEpisodesView: View {
               .monospaced()
             ForEach(others) { collection in
               Button {
-                edit = true
+                selectedCollection = collection
               } label: {
                 Text("\(collection.episode.sort.episodeDisplay)")
                   .foregroundStyle(collection.textColor)
@@ -159,11 +160,20 @@ struct SubjectEpisodesView: View {
           }
         }
       }
+      .animation(.default, value: collections)
+      .sheet(
+        item: $selectedCollection,
+        content: { collection in
+          EpisodeInfobox(collection: collection)
+            .presentationDragIndicator(.visible)
+            .presentationDetents(.init([.medium, .large]))
+        }
+      )
     } else {
       FlowStack {
         ForEach(episodes.prefix(50)) { episode in
           Button {
-            edit = true
+            selectedEpisode = episode
           } label: {
             Text("\(episode.sort.episodeDisplay)")
               .foregroundStyle(episode.textColor)
@@ -173,15 +183,17 @@ struct SubjectEpisodesView: View {
               .border(episode.borderColor, width: 1)
               .padding(2)
               .monospaced()
-          }.sheet(
-            isPresented: $edit,
-            content: {
-              EpisodeInfobox(episode: episode)
-                .presentationDragIndicator(.visible)
-                .presentationDetents(.init([.medium, .large]))
-            })
+          }
         }
       }
+      .animation(.default, value: episodes)
+      .sheet(
+        item: $selectedEpisode,
+        content: { episode in
+          EpisodeInfobox(episode: episode)
+            .presentationDragIndicator(.visible)
+            .presentationDetents(.init([.medium, .large]))
+        })
     }
   }
 }

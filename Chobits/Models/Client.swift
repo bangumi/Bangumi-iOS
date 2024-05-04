@@ -426,4 +426,30 @@ class ChiiClient: ObservableObject, Observable {
     let resp = try decoder.decode(EpisodeCollectionResponse.self, from: data)
     return resp
   }
+
+  func updateSubjectEpisodeCollection(
+    subjectId: UInt, episodeIds: [UInt], type: EpisodeCollectionType
+  ) async throws {
+    if self.mock != nil {
+      return
+    }
+    let url = self.apiBase
+      .appendingPathComponent("v0/users/-/collections/\(subjectId)/episodes")
+    let body: [String: Any] = [
+      "episode_id": episodeIds,
+      "type": type.rawValue,
+    ]
+    _ = try await self.request(url: url, method: "PATCH", body: body, authorized: true)
+  }
+
+  func updateEpisodeCollection(episodeId: UInt, type: EpisodeCollectionType) async throws {
+    if self.mock != nil {
+      return
+    }
+    let url = self.apiBase.appendingPathComponent("v0/users/-/collections/-/episodes/\(episodeId)")
+    let body: [String: Any] = [
+      "type": type.rawValue
+    ]
+    _ = try await self.request(url: url, method: "PUT", body: body, authorized: true)
+  }
 }

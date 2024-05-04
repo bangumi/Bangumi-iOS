@@ -303,6 +303,23 @@ final class Episode: Codable {
     return EpisodeType(value: type)
   }
 
+  var item: EpisodeItem {
+    return EpisodeItem(
+      id: self.id,
+      type: self.typeEnum,
+      name: self.name,
+      nameCn: self.nameCn,
+      sort: self.sort,
+      ep: self.ep,
+      airdate: self.airdate,
+      comment: self.comment,
+      duration: self.duration,
+      desc: self.desc,
+      disc: self.disc,
+      durationSeconds: self.durationSeconds
+    )
+  }
+
   init(
     id: UInt,
     type: UInt8,

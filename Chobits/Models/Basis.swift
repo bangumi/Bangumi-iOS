@@ -513,6 +513,32 @@ enum EpisodeCollectionType: UInt8, Codable, Identifiable {
       return "抛弃"
     }
   }
+
+  var action: String {
+    switch self {
+    case .none:
+      return "撤销"
+    case .wish:
+      return "想看"
+    case .collect:
+      return "看过"
+    case .dropped:
+      return "抛弃"
+    }
+  }
+
+  func otherTypes() -> [Self] {
+    switch self {
+    case .none:
+      return [.wish, .collect, .dropped]
+    case .wish:
+      return [.none, .collect, .dropped]
+    case .collect:
+      return [.none, .wish, .dropped]
+    case .dropped:
+      return [.none, .wish, .collect]
+    }
+  }
 }
 
 extension UInt8 {
