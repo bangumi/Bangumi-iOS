@@ -128,7 +128,7 @@ struct SubjectCollectionView: View {
             Spacer()
           }
         }
-      }
+      }.animation(.default, value: page.empty)
 
       switch subject.typeEnum {
       case .book:

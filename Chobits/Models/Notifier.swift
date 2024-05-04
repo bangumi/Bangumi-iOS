@@ -5,6 +5,7 @@
 //  Created by Chuan Chuan on 2024/5/4.
 //
 
+import OSLog
 import Foundation
 
 class Notifier: ObservableObject {
@@ -17,8 +18,7 @@ class Notifier: ObservableObject {
   func alert(error: ChiiError) {
     switch error {
     case .ignore:
-      print("error ignored")
-      return
+      Logger.app.warning("ignore error: \(error)")
     default:
       self.currentError = error
       self.showAlert = true

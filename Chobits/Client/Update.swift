@@ -5,6 +5,7 @@
 //  Created by Chuan Chuan on 2024/5/4.
 //
 
+import OSLog
 import Foundation
 
 extension ChiiClient {
@@ -15,6 +16,7 @@ extension ChiiClient {
     if self.mock != nil {
       return try await getSubjectCollection(sid: sid)
     }
+    Logger.api.info("start update subject collection: \(sid), eps: \(eps.debugDescription), vols: \(vols.debugDescription)")
     let url = self.apiBase.appendingPathComponent("v0/users/-/collections/\(sid)")
     var body: [String: Any] = [:]
     if let epStatus = eps {
@@ -26,6 +28,7 @@ extension ChiiClient {
     if body.count > 0 {
       _ = try await self.request(url: url, method: "POST", body: body, authorized: true)
     }
+    Logger.api.info("finish update subject collection: \(sid), eps: \(eps.debugDescription), vols: \(vols.debugDescription)")
     return try await getSubjectCollection(sid: sid)
   }
 
@@ -35,6 +38,7 @@ extension ChiiClient {
     if self.mock != nil {
       return try await getSubjectCollection(sid: sid)
     }
+    Logger.api.info("start update subject collection: \(sid)")
     let url = self.apiBase.appendingPathComponent("v0/users/-/collections/\(sid)")
     var body: [String: Any] = [:]
     if let type = type {
@@ -55,6 +59,7 @@ extension ChiiClient {
     if body.count > 0 {
       _ = try await self.request(url: url, method: "POST", body: body, authorized: true)
     }
+    Logger.api.info("finish update subject collection: \(sid)")
     return try await getSubjectCollection(sid: sid)
   }
 
@@ -64,6 +69,7 @@ extension ChiiClient {
     if self.mock != nil {
       return
     }
+    Logger.api.info("start update subject episode collection: \(subjectId), \(episodeIds)")
     let url = self.apiBase
       .appendingPathComponent("v0/users/-/collections/\(subjectId)/episodes")
     let body: [String: Any] = [
@@ -71,17 +77,20 @@ extension ChiiClient {
       "type": type.rawValue,
     ]
     _ = try await self.request(url: url, method: "PATCH", body: body, authorized: true)
+    Logger.api.info("finish update subject episode collection: \(subjectId), \(episodeIds)")
   }
 
   func updateEpisodeCollection(episodeId: UInt, type: EpisodeCollectionType) async throws {
     if self.mock != nil {
       return
     }
+    Logger.api.info("start update episode collection: \(episodeId)")
     let url = self.apiBase.appendingPathComponent("v0/users/-/collections/-/episodes/\(episodeId)")
     let body: [String: Any] = [
       "type": type.rawValue
     ]
     _ = try await self.request(url: url, method: "PUT", body: body, authorized: true)
+    Logger.api.info("finish update episode collection: \(episodeId)")
   }
 
 }

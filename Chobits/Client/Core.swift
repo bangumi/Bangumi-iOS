@@ -9,6 +9,7 @@ import Foundation
 import KeychainSwift
 import SwiftData
 import SwiftUI
+import OSLog
 
 class ChiiClient: ObservableObject, Observable {
   let keychain: KeychainSwift
@@ -67,6 +68,7 @@ class ChiiClient: ObservableObject, Observable {
   func request(url: URL, method: String, body: Any? = nil, authorized: Bool = true) async throws
     -> Data
   {
+    Logger.api.info("\(method): \(url.absoluteString)")
     let session = try await self.getSession(authroized: authorized)
     var request = URLRequest(url: url)
     request.addValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -82,26 +84,31 @@ class ChiiClient: ObservableObject, Observable {
       data = sdata
       response = sresponse
     } catch let error as NSError where error.domain == NSURLErrorDomain {
+      Logger.api.error("request NSURLErrorDomain: \(error)")
       if error.code == NSURLErrorCancelled {
         throw ChiiError(ignore: "NSURLErrorCancelled")
       } else {
         throw ChiiError(request: "NSURLErrorDomain: \(error)")
       }
     } catch {
+      Logger.api.error("request error: \(error)")
       throw ChiiError(request: "\(error)")
     }
     guard let response = response as? HTTPURLResponse else {
+      Logger.api.error("response error: \(response)")
       throw ChiiError(message: "api response nil")
     }
     if response.statusCode < 400 {
       return data
     } else if response.statusCode < 500 {
+      Logger.api.warning("response: \(response.statusCode)")
       let decoder = JSONDecoder()
       decoder.keyDecodingStrategy = .convertFromSnakeCase
       let error = try decoder.decode(ResponseError.self, from: data)
       throw ChiiError(code: response.statusCode, response: error)
     } else {
       let error = String(data: data, encoding: .utf8) ?? ""
+      Logger.api.error("response: \(response.statusCode): \(error)")
       throw ChiiError(message: "api error \(response.statusCode): \(error)")
     }
   }

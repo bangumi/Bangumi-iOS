@@ -5,6 +5,7 @@
 //  Created by Chuan Chuan on 2024/4/19.
 //
 
+import OSLog
 import SwiftData
 import SwiftUI
 
@@ -41,7 +42,7 @@ struct ContentView: View {
     do {
       _ = try await chii.getProfile()
     } catch {
-      notifier.alert(error: error)
+      Logger.api.warning("refresh profile failed: \(error)")
     }
     self.waiting = false
   }
