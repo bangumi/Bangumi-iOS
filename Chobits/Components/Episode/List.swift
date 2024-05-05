@@ -22,7 +22,7 @@ struct EpisodeListView: View {
   @State private var sortDesc: Bool = false
   @State private var exhausted: Bool = false
   @State private var selected: Episode? = nil
-  @State private var episodes: [Episode] = []
+  @State private var episodes: [EnumerateItem<Episode>] = []
   @State private var counts: [EpisodeType: Int] = [:]
 
   func loadCounts() async {
@@ -40,7 +40,7 @@ struct EpisodeListView: View {
     }
   }
 
-  func fetch(limit: Int = 50) async -> [Episode] {
+  func fetch(limit: Int = 100) async -> [EnumerateItem<Episode>] {
     let actor = BackgroundActor(container: modelContext.container)
     let sortBy =
       sortDesc ? SortDescriptor<Episode>(\.sort, order: .reverse) : SortDescriptor<Episode>(\.sort)
@@ -55,8 +55,11 @@ struct EpisodeListView: View {
       if episodes.count < limit {
         exhausted = true
       }
+      let result = episodes.enumerated().map { (idx, episode) in
+        EnumerateItem(idx: idx + offset, inner: episode)
+      }
       offset += limit
-      return episodes
+      return result
     } catch {
       notifier.alert(error: error)
     }
@@ -71,18 +74,13 @@ struct EpisodeListView: View {
     self.episodes.append(contentsOf: episodes)
   }
 
-  func loadNextPage(current: Episode) async {
+  func loadNextPage(idx: Int) async {
     if exhausted {
       return
     }
-    Logger.episode.info("checking load next page for: \(current.title)")
-    let thresholdIndex = episodes.index(episodes.endIndex, offsetBy: -8)
-    let currentIndex = episodes.firstIndex(where: { $0.id == current.id })
-    Logger.episode.info("checked")
-    if currentIndex != thresholdIndex {
+    if idx != episodes.count - 10 {
       return
     }
-    Logger.episode.info("loading next page for: \(current.title)")
     let episodes = await fetch()
     self.episodes.append(contentsOf: episodes)
   }
@@ -113,7 +111,8 @@ struct EpisodeListView: View {
     }.padding(.horizontal, 16)
     ScrollView {
       LazyVStack {
-        ForEach(episodes) { episode in
+        ForEach(episodes, id: \.idx) { item in
+          let episode = item.inner
           Button {
             selected = episode
           } label: {
@@ -173,8 +172,8 @@ struct EpisodeListView: View {
             }
           }
           .padding(5)
-          .task {
-            await loadNextPage(current: episode)
+          .task(priority: .background) {
+            await loadNextPage(idx: item.idx)
           }
         }
       }
@@ -182,7 +181,7 @@ struct EpisodeListView: View {
     .padding(.horizontal, 16)
     .buttonStyle(.plain)
     .animation(.default, value: episodes)
-    .task {
+    .task(priority: .background) {
       await loadCounts()
       await load()
     }

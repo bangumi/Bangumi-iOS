@@ -34,3 +34,12 @@ struct NavSubject: Hashable {
 struct NavEpisodeList: Hashable {
   var subjectId: UInt
 }
+
+struct EnumerateItem<T: Equatable>: Equatable {
+  var idx: Int
+  var inner: T
+
+  static func == (lhs: EnumerateItem<T>, rhs: EnumerateItem<T>) -> Bool {
+    lhs.idx == rhs.idx && lhs.inner == rhs.inner
+  }
+}
