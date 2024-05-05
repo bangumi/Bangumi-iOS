@@ -204,7 +204,6 @@ struct SubjectCollectionBox: View {
 #Preview {
   let config = ModelConfiguration(isStoredInMemoryOnly: true)
   let container = try! ModelContainer(for: UserSubjectCollection.self, configurations: config)
-  let collection = UserSubjectCollection.previewBook
   container.mainContext.insert(UserSubjectCollection.previewBook)
 
   return SubjectCollectionBox(

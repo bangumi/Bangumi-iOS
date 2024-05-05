@@ -133,7 +133,6 @@ struct UserCollectionRow: View {
 #Preview {
   let config = ModelConfiguration(isStoredInMemoryOnly: true)
   let container = try! ModelContainer(for:Subject.self, UserSubjectCollection.self, configurations: config)
-  let collection = UserSubjectCollection.previewBook
   container.mainContext.insert(UserSubjectCollection.previewBook)
   container.mainContext.insert(Subject.previewBook)
 
