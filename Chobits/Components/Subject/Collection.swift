@@ -138,7 +138,7 @@ struct SubjectCollectionView: View {
     case .book:
       SubjectCollectionBookView(subject: subject)
     case .anime, .real:
-      EpisodeGridView(subject: subject)
+      EpisodeGridView(subjectId: subject.id)
     default:
       EmptyView()
     }

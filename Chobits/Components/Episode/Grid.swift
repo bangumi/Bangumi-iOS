@@ -10,7 +10,7 @@ import SwiftData
 import SwiftUI
 
 struct EpisodeGridView: View {
-  let subject: Subject
+  let subjectId: UInt
 
   @EnvironmentObject var notifier: Notifier
   @EnvironmentObject var chii: ChiiClient
@@ -24,8 +24,8 @@ struct EpisodeGridView: View {
   @Query private var ops: [Episode]
   @Query private var eds: [Episode]
 
-  init(subject: Subject) {
-    self.subject = subject
+  init(subjectId: UInt) {
+    self.subjectId = subjectId
 
     let mainType = EpisodeType.main.rawValue
     let spType = EpisodeType.sp.rawValue
@@ -34,28 +34,28 @@ struct EpisodeGridView: View {
 
     var mainDescriptor = FetchDescriptor<Episode>(
       predicate: #Predicate<Episode> {
-        $0.subjectId == subject.id && $0.type == mainType
+        $0.subjectId == subjectId && $0.type == mainType
       }, sortBy: [SortDescriptor(\.sort)])
     mainDescriptor.fetchLimit = 50
     _mains = Query(mainDescriptor)
 
     var spDescriptor = FetchDescriptor<Episode>(
       predicate: #Predicate<Episode> {
-        $0.subjectId == subject.id && $0.type == spType
+        $0.subjectId == subjectId && $0.type == spType
       }, sortBy: [SortDescriptor(\.sort)])
     spDescriptor.fetchLimit = 10
     _sps = Query(spDescriptor)
 
     var opDescriptor = FetchDescriptor<Episode>(
       predicate: #Predicate<Episode> {
-        $0.subjectId == subject.id && $0.type == opType
+        $0.subjectId == subjectId && $0.type == opType
       }, sortBy: [SortDescriptor(\.sort)])
     opDescriptor.fetchLimit = 10
     _ops = Query(opDescriptor)
 
     var edDescriptor = FetchDescriptor<Episode>(
       predicate: #Predicate<Episode> {
-        $0.subjectId == subject.id && $0.type == edType
+        $0.subjectId == subjectId && $0.type == edType
       }, sortBy: [SortDescriptor(\.sort)])
     edDescriptor.fetchLimit = 10
     _eds = Query(edDescriptor)
@@ -69,12 +69,12 @@ struct EpisodeGridView: View {
     do {
       var offset: Int = 0
       let limit: Int = 1000
-      let subjectId = subject.id
+      let subjectId = subjectId
       while true {
         var total: Int = 0
         if authenticated {
           let response = try await chii.getEpisodeCollections(
-            subjectId: subject.id, type: nil, limit: limit, offset: offset)
+            subjectId: subjectId, type: nil, limit: limit, offset: offset)
           if response.data.isEmpty {
             break
           }
@@ -85,7 +85,7 @@ struct EpisodeGridView: View {
           total = response.total
         } else {
           let response = try await chii.getSubjectEpisodes(
-            subjectId: subject.id, type: nil, limit: limit, offset: offset)
+            subjectId: subjectId, type: nil, limit: limit, offset: offset)
           if response.data.isEmpty {
             break
           }
@@ -119,15 +119,12 @@ struct EpisodeGridView: View {
       } else {
         Text("章节列表:")
       }
-      NavigationLink(value: subject) {
+      NavigationLink(value: NavEpisodeList(subjectId: subjectId)) {
         Text("[全部]").foregroundStyle(Color("LinkTextColor"))
       }.buttonStyle(.plain)
       Spacer()
     }
     .font(.callout)
-    .navigationDestination(for: Subject.self) { subject in
-      EpisodeListView(subject: subject)
-    }
     .task {
       await update(authenticated: chii.isAuthenticated)
     }
@@ -269,7 +266,7 @@ struct EpisodeGridView: View {
 
   return ScrollView {
     LazyVStack(alignment: .leading) {
-      EpisodeGridView(subject: .previewAnime)
+      EpisodeGridView(subjectId: Subject.previewAnime.id)
         .environmentObject(Notifier())
         .environmentObject(ChiiClient(mock: .anime))
     }

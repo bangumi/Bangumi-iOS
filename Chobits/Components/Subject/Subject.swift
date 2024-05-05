@@ -70,7 +70,7 @@ struct SubjectView: View {
             } else {
               switch subject.typeEnum {
               case .anime, .music, .real:
-                EpisodeGridView(subject: subject)
+                EpisodeGridView(subjectId: subject.id)
               default:
                 EmptyView()
               }

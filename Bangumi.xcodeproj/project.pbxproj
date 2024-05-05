@@ -61,6 +61,7 @@
 		19C2CE652BE2ACE60080A056 /* profile.json in Resources */ = {isa = PBXBuildFile; fileRef = 19C2CE642BE2ACE60080A056 /* profile.json */; };
 		19C2CE672BE3211B0080A056 /* search_subject_anime.json in Resources */ = {isa = PBXBuildFile; fileRef = 19C2CE662BE3211B0080A056 /* search_subject_anime.json */; };
 		19C2CE692BE330F60080A056 /* CollectionBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19C2CE682BE330F60080A056 /* CollectionBox.swift */; };
+		19F8C3D82BE73B830037D723 /* Navigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19F8C3D72BE73B820037D723 /* Navigation.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -118,6 +119,7 @@
 		19C2CE642BE2ACE60080A056 /* profile.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = profile.json; sourceTree = "<group>"; };
 		19C2CE662BE3211B0080A056 /* search_subject_anime.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = search_subject_anime.json; sourceTree = "<group>"; };
 		19C2CE682BE330F60080A056 /* CollectionBox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionBox.swift; sourceTree = "<group>"; };
+		19F8C3D72BE73B820037D723 /* Navigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Navigation.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -186,6 +188,7 @@
 				197A19CE2BE5E5E700804B13 /* Notifier.swift */,
 				197A19D72BE672E000804B13 /* Extension.swift */,
 				197A19D92BE6733A00804B13 /* Error.swift */,
+				19F8C3D72BE73B820037D723 /* Navigation.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -364,6 +367,7 @@
 				197A19CB2BE5E59900804B13 /* Logger.swift in Sources */,
 				197A19CF2BE5E5E700804B13 /* Notifier.swift in Sources */,
 				19671C652BDEB55D000B4D99 /* Response.swift in Sources */,
+				19F8C3D82BE73B830037D723 /* Navigation.swift in Sources */,
 				19671C5A2BDEB55D000B4D99 /* Tag.swift in Sources */,
 				19671C6A2BDEB55D000B4D99 /* ContentView.swift in Sources */,
 				19671C562BDEB55D000B4D99 /* Header.swift in Sources */,

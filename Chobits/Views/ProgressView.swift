@@ -78,22 +78,26 @@ struct ChiiProgressView: View {
             ScrollView {
               LazyVStack(alignment: .leading, spacing: 10) {
                 ForEach(doing[subjectType] ?? []) { collection in
-                  NavigationLink(value: collection) {
+                  NavigationLink(value: NavSubject(collection: collection)) {
                     UserCollectionRow(collection: collection)
                   }.buttonStyle(PlainButtonStyle())
                 }
               }
             }
             .animation(.easeInOut, value: subjectType)
-            .navigationDestination(for: UserSubjectCollection.self) { collection in
-              SubjectView(subjectId: collection.subjectId)
-            }
             .refreshable {
               Task {
                 await updateCollections(type: subjectType)
               }
             }
-          }.padding()
+          }
+          .padding()
+          .navigationDestination(for: NavSubject.self) { nav in
+            SubjectView(subjectId: nav.subjectId)
+          }
+          .navigationDestination(for: NavEpisodeList.self) { nav in
+            EpisodeListView(subjectId: nav.subjectId)
+          }
         }
       }
     } else {

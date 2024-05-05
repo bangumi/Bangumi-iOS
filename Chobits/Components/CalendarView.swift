@@ -80,7 +80,7 @@ struct CalendarWeekdayView: View {
         GridItem(.flexible()),
       ]) {
         ForEach(calendar.items) { subject in
-          NavigationLink(value: subject) {
+          NavigationLink(value: NavSubject(subject: subject)) {
             VStack {
               ImageView(img: subject.images?.common, width: 80, height: 80)
               Text(subject.name).font(.caption).multilineTextAlignment(.leading).lineLimit(1)

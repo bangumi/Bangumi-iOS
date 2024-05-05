@@ -5,11 +5,12 @@
 //  Created by Chuan Chuan on 2024/5/5.
 //
 
+import OSLog
 import SwiftData
 import SwiftUI
 
 struct EpisodeListView: View {
-  let subject: Subject
+  let subjectId: UInt
 
   @EnvironmentObject var notifier: Notifier
   @EnvironmentObject var chii: ChiiClient
@@ -30,7 +31,7 @@ struct EpisodeListView: View {
       for type in EpisodeType.allTypes() {
         let count = try await actor.fetchCount(
           predicate: #Predicate<Episode> {
-            $0.subjectId == subject.id && $0.type == type.rawValue
+            $0.subjectId == subjectId && $0.type == type.rawValue
           })
         counts[type] = count
       }
@@ -45,7 +46,7 @@ struct EpisodeListView: View {
       sortDesc ? SortDescriptor<Episode>(\.sort, order: .reverse) : SortDescriptor<Episode>(\.sort)
     var descriptor = FetchDescriptor<Episode>(
       predicate: #Predicate {
-        $0.subjectId == subject.id && $0.type == type.rawValue
+        $0.subjectId == subjectId && $0.type == type.rawValue
       }, sortBy: [sortBy])
     descriptor.fetchLimit = limit
     descriptor.fetchOffset = offset
@@ -74,13 +75,14 @@ struct EpisodeListView: View {
     if exhausted {
       return
     }
-    print("checking load next page for: \(current.title)")
+    Logger.episode.info("checking load next page for: \(current.title)")
     let thresholdIndex = episodes.index(episodes.endIndex, offsetBy: -8)
     let currentIndex = episodes.firstIndex(where: { $0.id == current.id })
+    Logger.episode.info("checked")
     if currentIndex != thresholdIndex {
       return
     }
-    print("loading next page for: \(current.title)")
+    Logger.episode.info("loading next page for: \(current.title)")
     let episodes = await fetch()
     self.episodes.append(contentsOf: episodes)
   }
@@ -205,7 +207,7 @@ struct EpisodeListView: View {
     container.mainContext.insert(episode)
   }
 
-  return EpisodeListView(subject: .previewAnime)
+  return EpisodeListView(subjectId: Subject.previewAnime.id)
     .environmentObject(Notifier())
     .environment(ChiiClient(mock: .anime))
     .modelContainer(container)

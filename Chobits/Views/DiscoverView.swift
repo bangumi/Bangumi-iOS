@@ -106,60 +106,36 @@ struct ChiiDiscoverView: View {
 
   var body: some View {
     NavigationStack(path: $navState.discoverNavigation) {
-      if searching {
-        Picker("Subject Type", selection: $subjectType) {
-          Text("全部").tag(SubjectType.unknown)
-          ForEach(SubjectType.searchTypes()) { type in
-            Text(type.description).tag(type)
+      Section{
+        if searching {
+          Picker("Subject Type", selection: $subjectType) {
+            Text("全部").tag(SubjectType.unknown)
+            ForEach(SubjectType.searchTypes()) { type in
+              Text(type.description).tag(type)
+            }
           }
-        }
-        .onChange(of: subjectType) { _, _ in
-          if query.isEmpty {
-            return
+          .onChange(of: subjectType) { _, _ in
+            if query.isEmpty {
+              return
+            }
+            Task {
+              if local {
+                await newLocalSearch()
+              } else {
+                await newRemoteSearch()
+              }
+            }
           }
-          Task {
+          .pickerStyle(.segmented)
+          .padding(.horizontal, 16)
+          if !query.isEmpty {
             if local {
-              await newLocalSearch()
-            } else {
-              await newRemoteSearch()
-            }
-          }
-        }
-        .pickerStyle(.segmented)
-        .padding(.horizontal, 16)
-        if !query.isEmpty {
-          if local {
-            ScrollView {
-              LazyVStack(alignment: .leading, spacing: 10) {
-                ForEach(collections) { collection in
-                  NavigationLink(value: collection) {
-                    SubjectSearchLocalRow(collection: collection).task {
-                      await localSearchNextPage(current: collection)
-                    }
-                  }.buttonStyle(PlainButtonStyle())
-                }
-              }
-            }
-            .animation(.easeInOut, value: subjectType)
-            .navigationBarTitleDisplayMode(.inline)
-            .navigationDestination(for: UserSubjectCollection.self) { collection in
-              SubjectView(subjectId: collection.subjectId)
-            }
-            .padding(.horizontal, 16)
-          } else {
-            if subjects.isEmpty {
-              VStack {
-                Spacer()
-                ProgressView()
-                Spacer()
-              }
-            } else {
               ScrollView {
                 LazyVStack(alignment: .leading, spacing: 10) {
-                  ForEach(subjects) { subject in
-                    NavigationLink(value: subject) {
-                      SubjectSearchRemoteRow(subject: subject).task {
-                        await remoteSearchNextPage(current: subject)
+                  ForEach(collections) { collection in
+                    NavigationLink(value: NavSubject(collection: collection)) {
+                      SubjectSearchLocalRow(collection: collection).task {
+                        await localSearchNextPage(current: collection)
                       }
                     }.buttonStyle(PlainButtonStyle())
                   }
@@ -167,21 +143,45 @@ struct ChiiDiscoverView: View {
               }
               .animation(.easeInOut, value: subjectType)
               .navigationBarTitleDisplayMode(.inline)
-              .navigationDestination(for: SearchSubject.self) { subject in
-                SubjectView(subjectId: subject.id)
-              }
               .padding(.horizontal, 16)
+            } else {
+              if subjects.isEmpty {
+                VStack {
+                  Spacer()
+                  ProgressView()
+                  Spacer()
+                }
+              } else {
+                ScrollView {
+                  LazyVStack(alignment: .leading, spacing: 10) {
+                    ForEach(subjects) { subject in
+                      NavigationLink(value: NavSubject(subject: subject)) {
+                        SubjectSearchRemoteRow(subject: subject).task {
+                          await remoteSearchNextPage(current: subject)
+                        }
+                      }.buttonStyle(PlainButtonStyle())
+                    }
+                  }
+                }
+                .animation(.easeInOut, value: subjectType)
+                .navigationBarTitleDisplayMode(.inline)
+                .padding(.horizontal, 16)
+              }
             }
           }
+          Spacer()
+        } else {
+          CalendarView()
+            .navigationBarTitleDisplayMode(.inline)
+
+            .padding(.horizontal, 16)
         }
-        Spacer()
-      } else {
-        CalendarView()
-          .navigationBarTitleDisplayMode(.inline)
-          .navigationDestination(for: SmallSubject.self) { subject in
-            SubjectView(subjectId: subject.id)
-          }
-          .padding(.horizontal, 16)
+      }
+      .navigationDestination(for: NavSubject.self) { nav in
+        SubjectView(subjectId: nav.subjectId)
+      }
+      .navigationDestination(for: NavEpisodeList.self) { nav in
+        EpisodeListView(subjectId: nav.subjectId)
       }
     }
     .searchable(text: $query, isPresented: $searching)

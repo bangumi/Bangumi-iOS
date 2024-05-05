@@ -92,7 +92,7 @@ struct EpisodeInfobox: View {
               Text("看到")
             }
             Spacer()
-            Text(episode.collectionTypeEnum.description).foregroundStyle(.accent)
+            Text(episode.collectionTypeEnum.description).foregroundStyle(.red)
           }
           .buttonStyle(.borderedProminent)
           .font(.callout)
