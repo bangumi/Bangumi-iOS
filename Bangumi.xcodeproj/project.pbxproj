@@ -34,7 +34,6 @@
 		19671C6D2BDEB55D000B4D99 /* TimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19671C4C2BDEB55D000B4D99 /* TimelineView.swift */; };
 		19671C6E2BDEB55D000B4D99 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 19671C4E2BDEB55D000B4D99 /* Assets.xcassets */; };
 		19671C6F2BDEB55D000B4D99 /* ChobitsApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19671C4F2BDEB55D000B4D99 /* ChobitsApp.swift */; };
-		19671C702BDEB55D000B4D99 /* Config.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 19671C502BDEB55D000B4D99 /* Config.xcconfig */; };
 		19671C732BDEB8B1000B4D99 /* KeychainSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 19671C722BDEB8B1000B4D99 /* KeychainSwift */; };
 		19671C752BDEB8BD000B4D99 /* CachedAsyncImage in Frameworks */ = {isa = PBXBuildFile; productRef = 19671C742BDEB8BD000B4D99 /* CachedAsyncImage */; };
 		19671C782BE1BB72000B4D99 /* search_subject_book.json in Resources */ = {isa = PBXBuildFile; fileRef = 19671C772BE1BB72000B4D99 /* search_subject_book.json */; };
@@ -331,7 +330,6 @@
 				19671C782BE1BB72000B4D99 /* search_subject_book.json in Resources */,
 				19671C682BDEB55D000B4D99 /* user_collection_anime.json in Resources */,
 				1980EE002BE418C800E013EA /* episodes.json in Resources */,
-				19671C702BDEB55D000B4D99 /* Config.xcconfig in Resources */,
 				19C2CE652BE2ACE60080A056 /* profile.json in Resources */,
 				19C2CE612BE2538A0080A056 /* subject_book.json in Resources */,
 				19C2CE5F2BE2536D0080A056 /* user_collection_book.json in Resources */,
@@ -523,7 +521,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 9;
+				CURRENT_PROJECT_VERSION = 10;
 				DEVELOPMENT_ASSET_PATHS = "\"Chobits/Preview Content\"";
 				DEVELOPMENT_TEAM = M777UHWZA4;
 				ENABLE_PREVIEWS = YES;
@@ -557,7 +555,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 9;
+				CURRENT_PROJECT_VERSION = 10;
 				DEVELOPMENT_ASSET_PATHS = "\"Chobits/Preview Content\"";
 				DEVELOPMENT_TEAM = M777UHWZA4;
 				ENABLE_PREVIEWS = YES;
