@@ -123,7 +123,7 @@ struct ChiiDiscoverView: View {
             if query.isEmpty {
               return
             }
-            Task {
+            Task(priority: .background) {
               if local {
                 await newLocalSearch()
               } else {
@@ -165,7 +165,7 @@ struct ChiiDiscoverView: View {
                         SubjectSearchRemoteRow(subject: item.inner)
                           .task(priority: .background) {
                             await remoteSearchNextPage(idx: item.idx)
-                        }
+                          }
                       }.buttonStyle(PlainButtonStyle())
                     }
                   }

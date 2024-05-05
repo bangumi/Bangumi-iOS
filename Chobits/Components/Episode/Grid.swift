@@ -125,7 +125,7 @@ struct EpisodeGridView: View {
       Spacer()
     }
     .font(.callout)
-    .task {
+    .task(priority: .background) {
       await update(authenticated: chii.isAuthenticated)
     }
     FlowStack {

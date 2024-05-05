@@ -86,7 +86,7 @@ struct ChiiProgressView: View {
             }
             .animation(.easeInOut, value: subjectType)
             .refreshable {
-              Task {
+              Task(priority: .background) {
                 await updateCollections(type: subjectType)
               }
             }

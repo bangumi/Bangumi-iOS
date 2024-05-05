@@ -130,7 +130,7 @@ struct SubjectCollectionView: View {
       }
     }
     .animation(.default, value: page.empty)
-    .task {
+    .task(priority: .background) {
       await updateCollection()
     }
 

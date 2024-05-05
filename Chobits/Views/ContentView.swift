@@ -49,10 +49,18 @@ struct ContentView: View {
 
   var body: some View {
     if waiting {
-      ProgressView()
-        .task {
-          await refreshProfile()
-        }
+      VStack {
+        Spacer()
+        Image(systemName: "waveform.and.person.filled")
+          .resizable()
+          .scaledToFit()
+          .frame(width: 80, height: 80)
+        Spacer()
+      }
+      .symbolEffect(.variableColor.iterative.dimInactiveLayers)
+      .task {
+        await refreshProfile()
+      }
     } else {
       TabView(selection: createTabViewBinding()) {
         ChiiTimelineView()

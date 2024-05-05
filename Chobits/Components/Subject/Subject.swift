@@ -90,7 +90,7 @@ struct SubjectView: View {
           ProgressView()
         }
       }
-    }.task {
+    }.task(priority: .background) {
       await updateSubject()
     }
   }
