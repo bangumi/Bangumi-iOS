@@ -119,10 +119,10 @@ struct EpisodeGridView: View {
       } else {
         Text("章节列表:")
       }
-      Spacer()
       NavigationLink(value: subject) {
         Text("[全部]").foregroundStyle(Color("LinkTextColor"))
       }.buttonStyle(.plain)
+      Spacer()
     }
     .font(.callout)
     .navigationDestination(for: Subject.self) { subject in

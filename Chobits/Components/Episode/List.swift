@@ -22,6 +22,22 @@ struct EpisodeListView: View {
   @State private var exhausted: Bool = false
   @State private var selected: Episode? = nil
   @State private var episodes: [Episode] = []
+  @State private var counts: [EpisodeType: Int] = [:]
+
+  func loadCounts() async {
+    let actor = BackgroundActor(container: modelContext.container)
+    do {
+      for type in EpisodeType.allTypes() {
+        let count = try await actor.fetchCount(
+          predicate: #Predicate<Episode> {
+            $0.subjectId == subject.id && $0.type == type.rawValue
+          })
+        counts[type] = count
+      }
+    } catch {
+      notifier.alert(error: error)
+    }
+  }
 
   func fetch(limit: Int = 50) async -> [Episode] {
     let actor = BackgroundActor(container: modelContext.container)
@@ -58,11 +74,13 @@ struct EpisodeListView: View {
     if exhausted {
       return
     }
-    let thresholdIndex = episodes.index(episodes.endIndex, offsetBy: -2)
+    print("checking load next page for: \(current.title)")
+    let thresholdIndex = episodes.index(episodes.endIndex, offsetBy: -8)
     let currentIndex = episodes.firstIndex(where: { $0.id == current.id })
     if currentIndex != thresholdIndex {
       return
     }
+    print("loading next page for: \(current.title)")
     let episodes = await fetch()
     self.episodes.append(contentsOf: episodes)
   }
@@ -71,7 +89,7 @@ struct EpisodeListView: View {
     HStack {
       Picker("Episode Type", selection: $type) {
         ForEach(EpisodeType.allTypes()) { et in
-          Text("\(et.description)").tag(et)
+          Text("\(et.description)(\(counts[et, default: 0]))").tag(et)
         }
       }
       .pickerStyle(.segmented)
@@ -151,7 +169,10 @@ struct EpisodeListView: View {
                 Spacer()
               }
             }
-            .padding(5)
+          }
+          .padding(5)
+          .task {
+            await loadNextPage(current: episode)
           }
         }
       }
@@ -160,6 +181,7 @@ struct EpisodeListView: View {
     .buttonStyle(.plain)
     .animation(.default, value: episodes)
     .task {
+      await loadCounts()
       await load()
     }
     .sheet(
