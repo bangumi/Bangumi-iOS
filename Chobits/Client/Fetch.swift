@@ -70,7 +70,7 @@ extension ChiiClient {
   func search(keyword: String, type: SubjectType = .unknown, limit: Int = 10, offset: Int = 0)
     async throws -> SubjectSearchResponse
   {
-    Logger.api.info("start search: \(keyword), \(type.description), \(limit), \(offset)")
+    Logger.api.info("start search: \(keyword), \(type.name), \(limit), \(offset)")
     let queries: [URLQueryItem] = [
       URLQueryItem(name: "limit", value: String(limit)),
       URLQueryItem(name: "offset", value: String(offset)),
@@ -99,7 +99,7 @@ extension ChiiClient {
     let decoder = JSONDecoder()
     decoder.keyDecodingStrategy = .convertFromSnakeCase
     let resp = try decoder.decode(SubjectSearchResponse.self, from: data)
-    Logger.api.info("finish search: \(keyword), \(type.description), \(limit), \(offset)")
+    Logger.api.info("finish search: \(keyword), \(type.name), \(limit), \(offset)")
     return resp
   }
 
