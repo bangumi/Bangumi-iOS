@@ -138,7 +138,7 @@ struct SubjectCollectionView: View {
     case .book:
       SubjectCollectionBookView(subject: subject)
     case .anime, .real:
-      EpisodeGridCollectionView(subject: subject)
+      EpisodeGridView(subject: subject)
     default:
       EmptyView()
     }
@@ -148,7 +148,7 @@ struct SubjectCollectionView: View {
 #Preview {
   let config = ModelConfiguration(isStoredInMemoryOnly: true)
   let container = try! ModelContainer(
-    for: UserSubjectCollection.self, Subject.self, Episode.self, EpisodeCollection.self,
+    for: UserSubjectCollection.self, Subject.self, Episode.self,
     configurations: config)
 
   return ScrollView {

@@ -148,23 +148,6 @@ struct EpisodeItem: Codable, Identifiable {
   var disc: UInt
   var subjectId: UInt?
   var durationSeconds: UInt?
-
-  var title: String {
-    switch self.type {
-    case .main:
-      if let ep = self.ep {
-        return "ep.\(ep.episodeDisplay) \(self.name)"
-      } else {
-        return "ep.\(self.sort.episodeDisplay) \(self.name)"
-      }
-    case .sp:
-      return "sp.\(self.sort.episodeDisplay) \(self.name)"
-    case .op:
-      return "op.\(self.sort.episodeDisplay) \(self.name)"
-    case .ed:
-      return "ed.\(self.sort.episodeDisplay) \(self.name)"
-    }
-  }
 }
 
 struct EpisodeCollectionItem: Codable {

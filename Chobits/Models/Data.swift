@@ -7,7 +7,6 @@
 
 import Foundation
 import SwiftData
-import SwiftUI
 
 @Model
 final class UserSubjectCollection: Codable {
@@ -267,23 +266,7 @@ final class Subject: Codable {
 }
 
 @Model
-final class Episode: Codable {
-  enum CodingKeys: String, CodingKey {
-    case id
-    case type
-    case name
-    case nameCn
-    case sort
-    case ep
-    case airdate
-    case comment
-    case duration
-    case desc
-    case disc
-    case durationSeconds
-    case subjectId
-  }
-
+final class Episode {
   @Attribute(.unique)
   var id: UInt
   var type: UInt8
@@ -291,33 +274,22 @@ final class Episode: Codable {
   var nameCn: String
   var sort: Float
   var ep: Float?
-  var airdate: String
+  var airdateStr: String
+  var airdate: Date
   var comment: UInt
   var duration: String
   var desc: String
   var disc: UInt
   var durationSeconds: UInt?
   var subjectId: UInt
+  var collection: UInt8
 
   var typeEnum: EpisodeType {
     return EpisodeType(value: type)
   }
 
-  var item: EpisodeItem {
-    return EpisodeItem(
-      id: self.id,
-      type: self.typeEnum,
-      name: self.name,
-      nameCn: self.nameCn,
-      sort: self.sort,
-      ep: self.ep,
-      airdate: self.airdate,
-      comment: self.comment,
-      duration: self.duration,
-      desc: self.desc,
-      disc: self.disc,
-      durationSeconds: self.durationSeconds
-    )
+  var collectionTypeEnum: EpisodeCollectionType {
+    return EpisodeCollectionType(value: collection)
   }
 
   init(
@@ -327,13 +299,15 @@ final class Episode: Codable {
     nameCn: String,
     sort: Float,
     ep: Float?,
-    airdate: String,
+    airdateStr: String,
+    airdate: Date,
     comment: UInt,
     duration: String,
     desc: String,
     disc: UInt,
     durationSeconds: UInt?,
-    subjectId: UInt
+    subjectId: UInt,
+    collection: UInt8
   ) {
     self.id = id
     self.type = type
@@ -341,6 +315,7 @@ final class Episode: Codable {
     self.nameCn = nameCn
     self.sort = sort
     self.ep = ep
+    self.airdateStr = airdateStr
     self.airdate = airdate
     self.comment = comment
     self.duration = duration
@@ -348,200 +323,101 @@ final class Episode: Codable {
     self.disc = disc
     self.durationSeconds = durationSeconds
     self.subjectId = subjectId
+    self.collection = collection
   }
 
-  init(item: EpisodeItem, subjectId: UInt) {
+  init(item: EpisodeItem, subjectId: UInt? = 0, collection: UInt8? = 0) {
+    let dateFormatter = DateFormatter()
+    dateFormatter.locale = Locale(identifier: "en_US_POSIX")
+    dateFormatter.dateFormat = "yyyy-MM-dd"
+    dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
+
     self.id = item.id
     self.type = item.type.rawValue
     self.name = item.name
     self.nameCn = item.nameCn
     self.sort = item.sort
     self.ep = item.ep
-    self.airdate = item.airdate
+    self.airdate = dateFormatter.date(from: item.airdate) ?? Date(timeIntervalSince1970: 0)
+    self.airdateStr = item.airdate
     self.comment = item.comment
     self.duration = item.duration
     self.desc = item.desc
     self.disc = item.disc
     self.durationSeconds = item.durationSeconds
-    self.subjectId = item.subjectId ?? subjectId
+    self.subjectId = item.subjectId ?? subjectId ?? 0
+    self.collection = collection ?? 0
   }
 
-  required init(from decoder: Decoder) throws {
-    let container = try decoder.container(keyedBy: CodingKeys.self)
-    self.id = try container.decode(UInt.self, forKey: .id)
-    self.type = try container.decode(UInt8.self, forKey: .type)
-    self.name = try container.decode(String.self, forKey: .name)
-    self.nameCn = try container.decode(String.self, forKey: .nameCn)
-    self.sort = try container.decode(Float.self, forKey: .sort)
-    self.ep = try container.decodeIfPresent(Float.self, forKey: .ep)
-    self.airdate = try container.decode(String.self, forKey: .airdate)
-    self.comment = try container.decode(UInt.self, forKey: .comment)
-    self.duration = try container.decode(String.self, forKey: .duration)
-    self.desc = try container.decode(String.self, forKey: .desc)
-    self.disc = try container.decode(UInt.self, forKey: .disc)
-    self.durationSeconds = try container.decodeIfPresent(UInt.self, forKey: .durationSeconds)
-    self.subjectId = (try? container.decode(UInt.self, forKey: .subjectId)) ?? 0
+  convenience init(collection: EpisodeCollectionItem, subjectId: UInt? = 0) {
+    self.init(item: collection.episode, subjectId: subjectId, collection: collection.type.rawValue)
   }
 
-  func encode(to encoder: Encoder) throws {
-    var container = encoder.container(keyedBy: CodingKeys.self)
-    try container.encode(self.id, forKey: .id)
-    try container.encode(self.type, forKey: .type)
-    try container.encode(self.name, forKey: .name)
-    try container.encode(self.nameCn, forKey: .nameCn)
-    try container.encode(self.sort, forKey: .sort)
-    try container.encode(self.ep, forKey: .ep)
-    try container.encode(self.airdate, forKey: .airdate)
-    try container.encode(self.comment, forKey: .comment)
-    try container.encode(self.duration, forKey: .duration)
-    try container.encode(self.desc, forKey: .desc)
-    try container.encode(self.disc, forKey: .disc)
-    try container.encode(self.durationSeconds, forKey: .durationSeconds)
-    try container.encode(self.subjectId, forKey: .subjectId)
-  }
-
-  var airdateDate: Date {
-    let dateFormatter = DateFormatter()
-    dateFormatter.dateFormat = "yyyy-MM-dd"
-    return dateFormatter.date(from: self.airdate) ?? Date(timeIntervalSince1970: 0)
-  }
-
-  var borderColor: Color {
-    if airdateDate > Date() {
-      return Color(hex: 0x909090)
-    } else {
-      return Color(hex: 0x00A8FF)
+  var title: String {
+    switch EpisodeType(value: self.type) {
+    case .main:
+      if let ep = self.ep {
+        return "ep.\(ep.episodeDisplay) \(self.name)"
+      } else {
+        return "ep.\(self.sort.episodeDisplay) \(self.name)"
+      }
+    case .sp:
+      return "sp.\(self.sort.episodeDisplay) \(self.name)"
+    case .op:
+      return "op.\(self.sort.episodeDisplay) \(self.name)"
+    case .ed:
+      return "ed.\(self.sort.episodeDisplay) \(self.name)"
     }
   }
 
-  var backgroundColor: Color {
-    if airdateDate > Date() {
-      return Color(hex: 0xe0e0e0)
-    } else {
-      return Color(hex: 0xDAEAFF)
-    }
-  }
-
-  var textColor: Color {
-    if airdateDate > Date() {
-      return Color(hex: 0x909090)
-    } else {
-      return Color(hex: 0x06C)
-    }
-  }
-}
-
-@Model
-final class EpisodeCollection: Codable {
-  enum CodingKeys: CodingKey {
-    case episode
-    case type
-  }
-
-  @Attribute(.unique)
-  var episodeId: UInt
-  var episodeType: UInt8
-  var sort: Float
-  var episode: EpisodeItem
-  var type: UInt8
-  var subjectId: UInt
-
-  var typeEnum: EpisodeCollectionType {
-    return EpisodeCollectionType(value: type)
-  }
-
-  init(
-    episodeId: UInt, episodeType: UInt8, sort: Float, episode: EpisodeItem, type: UInt8,
-    subjectId: UInt
-  ) {
-    self.episodeId = episodeId
-    self.episodeType = episodeType
-    self.sort = sort
-    self.episode = episode
-    self.type = type
-    self.subjectId = subjectId
-  }
-
-  init(item: EpisodeCollectionItem, subjectId: UInt) {
-    self.episodeId = item.episode.id
-    self.episodeType = item.episode.type.rawValue
-    self.sort = item.episode.sort
-    self.subjectId = item.episode.subjectId ?? subjectId
-    self.episode = item.episode
-    self.type = item.type.rawValue
-  }
-
-  required init(from decoder: Decoder) throws {
-    let container = try decoder.container(keyedBy: CodingKeys.self)
-    let episode = try container.decode(EpisodeItem.self, forKey: .episode)
-    self.episodeId = episode.id
-    self.sort = episode.sort
-    self.episodeType = episode.type.rawValue
-    self.subjectId = episode.subjectId ?? 0
-    self.episode = episode
-    self.type = try container.decode(UInt8.self, forKey: .type)
-  }
-
-  func encode(to encoder: Encoder) throws {
-    var container = encoder.container(keyedBy: CodingKeys.self)
-    try container.encode(self.episode, forKey: .episode)
-    try container.encode(self.type, forKey: .type)
-  }
-
-  var airdate: Date {
-    let dateFormatter = DateFormatter()
-    dateFormatter.dateFormat = "yyyy-MM-dd"
-    return dateFormatter.date(from: self.episode.airdate) ?? Date(timeIntervalSince1970: 0)
-  }
-
-  var borderColor: Color {
-    switch EpisodeCollectionType(value: self.type) {
+  var borderColor: Int {
+    switch EpisodeCollectionType(value: self.collection) {
     case .none:
       if airdate > Date() {
-        return Color(hex: 0x909090)
+        return 0x909090
       } else {
-        return Color(hex: 0x00A8FF)
+        return 0x00A8FF
       }
     case .wish:
-      return Color(hex: 0xFF2293)
+      return 0xFF2293
     case .collect:
-      return Color(hex: 0x1175a8)
+      return 0x1175a8
     case .dropped:
-      return Color(hex: 0x666666)
+      return 0x666666
     }
   }
 
-  var backgroundColor: Color {
-    switch EpisodeCollectionType(value: self.type) {
+  var backgroundColor: Int {
+    switch EpisodeCollectionType(value: self.collection) {
     case .none:
       if airdate > Date() {
-        return Color(hex: 0xe0e0e0)
+        return 0xe0e0e0
       } else {
-        return Color(hex: 0xDAEAFF)
+        return 0xDAEAFF
       }
     case .wish:
-      return Color(hex: 0xFFADD1)
+      return 0xFFADD1
     case .collect:
-      return Color(hex: 0x4897ff)
+      return 0x4897ff
     case .dropped:
-      return Color(hex: 0xCCCCCC)
+      return 0xCCCCCC
     }
   }
 
-  var textColor: Color {
-    switch EpisodeCollectionType(value: self.type) {
+  var textColor: Int {
+    switch EpisodeCollectionType(value: self.collection) {
     case .none:
       if airdate > Date() {
-        return Color(hex: 0x909090)
+        return 0x909090
       } else {
-        return Color(hex: 0x0066CC)
+        return 0x0066CC
       }
     case .wish:
-      return Color(hex: 0xFF2293)
+      return 0xFF2293
     case .collect:
-      return .white
+      return 0xFFFFFF
     case .dropped:
-      return .white
+      return 0xFFFFFF
     }
   }
 }

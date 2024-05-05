@@ -68,12 +68,12 @@ public actor BackgroundActor {
     return count
   }
 
-  public func insert<T: PersistentModel>(data: T, background: Bool = false) {
+  public func insert<T: PersistentModel>(data: T, background: Bool = true) {
     let context = background ? context : data.modelContext ?? context
     context.insert(data)
   }
 
-  public func delete<T: PersistentModel>(data: T, background: Bool = false) {
+  public func delete<T: PersistentModel>(data: T, background: Bool = true) {
     let context = background ? context : data.modelContext ?? context
     context.delete(data)
   }
@@ -89,7 +89,7 @@ public actor BackgroundActor {
   public func saveAndInsertIfNeeded<T: PersistentModel>(
     data: T,
     predicate: Predicate<T>,
-    background: Bool = false
+    background: Bool = true
   ) throws {
     let descriptor = FetchDescriptor<T>(predicate: predicate)
     let context = background ? context : data.modelContext ?? context

@@ -101,7 +101,7 @@ struct SubjectView: View {
 #Preview {
   let config = ModelConfiguration(isStoredInMemoryOnly: true)
   let container = try! ModelContainer(
-    for: UserSubjectCollection.self, Subject.self, Episode.self, EpisodeCollection.self,
+    for: UserSubjectCollection.self, Subject.self, Episode.self,
     configurations: config)
 
   return SubjectView(subjectId: 12)

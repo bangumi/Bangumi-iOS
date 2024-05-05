@@ -12,6 +12,7 @@ struct EpisodeListView: View {
   let subject: Subject
 
   @EnvironmentObject var notifier: Notifier
+  @EnvironmentObject var chii: ChiiClient
   @Environment(\.modelContext) var modelContext
 
   @State private var now: Date = Date()
@@ -97,38 +98,53 @@ struct EpisodeListView: View {
             selected = episode
           } label: {
             VStack(alignment: .leading) {
-              Text(episode.item.title)
+              Text(episode.title)
                 .font(.headline)
                 .lineLimit(1)
               HStack {
-                if episode.airdateDate > now {
-                  Text("未播")
-                    .font(.callout)
-                    .foregroundStyle(.secondary)
+                if chii.isAuthenticated && episode.collectionTypeEnum != .none {
+                  RoundedRectangle(cornerRadius: 5)
+                    .fill(Color(hex: episode.backgroundColor))
+                    .stroke(Color(hex: episode.borderColor), lineWidth: 1)
+                    .frame(width: 40, height: 24)
                     .overlay {
-                      RoundedRectangle(cornerRadius: 5)
-                        .stroke(Color.secondary, lineWidth: 1)
-                        .padding(.horizontal, -4)
-                        .padding(.vertical, -2)
+                      Text("\(episode.collectionTypeEnum.description)")
+                        .foregroundStyle(Color(hex: episode.textColor))
+                        .font(.callout)
                     }
-                    .padding(.horizontal, 10)
+                    .padding(.horizontal, 2)
+                    .strikethrough(episode.collection == EpisodeCollectionType.dropped.rawValue)
                 } else {
-                  Text("已播")
-                    .font(.callout)
-                    .overlay {
-                      RoundedRectangle(cornerRadius: 5)
-                        .stroke(Color.secondary, lineWidth: 1)
-                        .padding(.horizontal, -4)
-                        .padding(.vertical, -2)
-                    }
-                    .padding(.horizontal, 10)
+                  if episode.airdate > now {
+                    RoundedRectangle(cornerRadius: 5)
+                      .stroke(.secondary, lineWidth: 1)
+                      .frame(width: 40, height: 24)
+                      .overlay {
+                        Text("未播")
+                          .foregroundStyle(.secondary)
+                          .font(.callout)
+                      }
+                      .padding(.horizontal, 2)
+                  } else {
+                    RoundedRectangle(cornerRadius: 5)
+                      .stroke(.primary, lineWidth: 1)
+                      .frame(width: 40, height: 24)
+                      .overlay {
+                        Text("已播")
+                          .foregroundStyle(.primary)
+                          .font(.callout)
+                      }
+                      .padding(.horizontal, 2)
+                  }
                 }
                 VStack(alignment: .leading) {
-                  Text(episode.nameCn)
-                    .lineLimit(1)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                  Text("时长:\(episode.duration) / 首播:\(episode.airdate) / 讨论:+\(episode.comment)")
+                  if !episode.nameCn.isEmpty {
+                    Text(episode.nameCn)
+                      .lineLimit(1)
+                      .font(.subheadline)
+                      .foregroundStyle(.secondary)
+                  }
+                  Text("时长:\(episode.duration) / 首播:\(episode.airdateStr) / 讨论:+\(episode.comment)")
                     .font(.footnote)
                     .foregroundStyle(.secondary)
                 }
@@ -160,7 +176,7 @@ struct EpisodeListView: View {
 #Preview {
   let config = ModelConfiguration(isStoredInMemoryOnly: true)
   let container = try! ModelContainer(
-    for: UserSubjectCollection.self, Subject.self, Episode.self, EpisodeCollection.self,
+    for: UserSubjectCollection.self, Subject.self, Episode.self,
     configurations: config)
   let episodes = Episode.previewList
   for episode in episodes {
@@ -169,5 +185,6 @@ struct EpisodeListView: View {
 
   return EpisodeListView(subject: .previewAnime)
     .environmentObject(Notifier())
+    .environment(ChiiClient(mock: .anime))
     .modelContainer(container)
 }
