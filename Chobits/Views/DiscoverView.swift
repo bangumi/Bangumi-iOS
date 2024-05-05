@@ -21,24 +21,23 @@ struct ChiiDiscoverView: View {
   @State private var offset = 0
   @State private var exhausted = false
 
-  @State private var subjects: [EnumerateItem<SearchSubject>] = []
-  @State private var collections: [EnumerateItem<UserSubjectCollection>] = []
+  @State private var subjects: [EnumerateItem<Subject>] = []
 
-  func localSearch(limit: Int = 50) async -> [EnumerateItem<UserSubjectCollection>] {
+  func localSearch(limit: Int = 50) async -> [EnumerateItem<Subject>] {
     let actor = BackgroundActor(container: modelContext.container)
-    let predicate = #Predicate<UserSubjectCollection> {
-      return (subjectType.rawValue == 0 || subjectType.rawValue == $0.subjectType)
-        && ($0.subject.name.localizedStandardContains(query)
-          || $0.subject.nameCn.localizedStandardContains(query))
+    let predicate = #Predicate<Subject> {
+      return (subjectType.rawValue == 0 || subjectType.rawValue == $0.type)
+        && ($0.name.localizedStandardContains(query)
+          || $0.nameCn.localizedStandardContains(query))
     }
     do {
-      let collections = try await actor.fetchData(
+      let subjects = try await actor.fetchData(
         predicate: predicate, limit: limit, offset: offset)
-      if collections.count < limit {
+      if subjects.count < limit {
         exhausted = true
       }
-      let result = collections.enumerated().map { (idx, collection) in
-        EnumerateItem(idx: idx + offset, inner: collection)
+      let result = subjects.enumerated().map { (idx, subject) in
+        EnumerateItem(idx: idx + offset, inner: subject)
       }
       offset += limit
       return result
@@ -52,23 +51,24 @@ struct ChiiDiscoverView: View {
     local = true
     offset = 0
     exhausted = false
-    collections.removeAll()
-    let collections = await localSearch()
-    self.collections.append(contentsOf: collections)
+    subjects.removeAll()
+    let subjects = await localSearch()
+    self.subjects.append(contentsOf: subjects)
   }
 
   func localSearchNextPage(idx: Int) async {
     if exhausted {
       return
     }
-    if idx != collections.count - 10 {
+    if idx != subjects.count - 10 {
       return
     }
-    let collections = await localSearch()
-    self.collections.append(contentsOf: collections)
+    let subjects = await localSearch()
+    self.subjects.append(contentsOf: subjects)
   }
 
-  func remoteSearch(limit: Int = 50) async -> [EnumerateItem<SearchSubject>] {
+  func remoteSearch(limit: Int = 50) async -> [EnumerateItem<Subject>] {
+    let actor = BackgroundActor(container: modelContext.container)
     do {
       let resp = try await chii.search(
         keyword: query, type: subjectType, limit: limit, offset: offset)
@@ -76,9 +76,18 @@ struct ChiiDiscoverView: View {
       if offset > resp.total {
         exhausted = true
       }
-      let result = resp.data.enumerated().map { (idx, subject) in
-        EnumerateItem(idx: idx + offset, inner: subject)
+      var result: [EnumerateItem<Subject>] = []
+      for item in resp.data.enumerated() {
+        let subject = Subject(search: item.element)
+        let subjectId = item.element.id
+        try await actor.insertIfNeeded(
+          data: subject,
+          predicate: #Predicate<Subject> {
+            $0.id == subjectId
+          })
+        result.append(EnumerateItem(idx: item.offset, inner: subject))
       }
+      try await actor.save()
       if result.count < limit {
         exhausted = true
       }
@@ -134,14 +143,24 @@ struct ChiiDiscoverView: View {
           .pickerStyle(.segmented)
           .padding(.horizontal, 16)
           if !query.isEmpty {
-            if local {
+            if subjects.isEmpty {
+              VStack {
+                Spacer()
+                ProgressView()
+                Spacer()
+              }
+            } else {
               ScrollView {
                 LazyVStack(alignment: .leading, spacing: 10) {
-                  ForEach(collections, id: \.idx) { item in
-                    NavigationLink(value: NavDestination.subject(subjectId: item.inner.subjectId)) {
-                      SubjectSearchLocalRow(collection: item.inner)
+                  ForEach(subjects, id: \.idx) { item in
+                    NavigationLink(value: NavDestination.subject(subjectId: item.inner.id)) {
+                      SubjectSearchRow(subject: item.inner)
                         .task(priority: .background) {
-                          await localSearchNextPage(idx: item.idx)
+                          if local {
+                            await localSearchNextPage(idx: item.idx)
+                          } else {
+                            await remoteSearchNextPage(idx: item.idx)
+                          }
                         }
                     }.buttonStyle(PlainButtonStyle())
                   }
@@ -150,30 +169,6 @@ struct ChiiDiscoverView: View {
               .animation(.easeInOut, value: subjectType)
               .navigationBarTitleDisplayMode(.inline)
               .padding(.horizontal, 16)
-            } else {
-              if subjects.isEmpty {
-                VStack {
-                  Spacer()
-                  ProgressView()
-                  Spacer()
-                }
-              } else {
-                ScrollView {
-                  LazyVStack(alignment: .leading, spacing: 10) {
-                    ForEach(subjects, id: \.idx) { item in
-                      NavigationLink(value: NavDestination.subject(subjectId: item.inner.id)) {
-                        SubjectSearchRemoteRow(subject: item.inner)
-                          .task(priority: .background) {
-                            await remoteSearchNextPage(idx: item.idx)
-                          }
-                      }.buttonStyle(PlainButtonStyle())
-                    }
-                  }
-                }
-                .animation(.easeInOut, value: subjectType)
-                .navigationBarTitleDisplayMode(.inline)
-                .padding(.horizontal, 16)
-              }
             }
           }
           Spacer()

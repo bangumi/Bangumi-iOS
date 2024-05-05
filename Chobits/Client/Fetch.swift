@@ -56,13 +56,13 @@ extension ChiiClient {
     return response
   }
 
-  func getCalendar() async throws -> [BangumiCalendar] {
+  func getCalendar() async throws -> [BangumiCalendarItem] {
     Logger.api.info("start get calendar")
     let url = self.apiBase.appendingPathComponent("calendar")
     let data = try await request(url: url, method: "GET", authorized: false)
     let decoder = JSONDecoder()
     decoder.keyDecodingStrategy = .convertFromSnakeCase
-    let calendars = try decoder.decode([BangumiCalendar].self, from: data)
+    let calendars = try decoder.decode([BangumiCalendarItem].self, from: data)
     Logger.api.info("finish get calendar")
     return calendars
   }
@@ -103,10 +103,10 @@ extension ChiiClient {
     return resp
   }
 
-  func getSubjectCollection(sid: UInt) async throws -> UserSubjectCollection {
+  func getSubjectCollection(sid: UInt) async throws -> UserSubjectCollectionItem {
     if let mock = self.mock {
       return loadFixture(
-        fixture: "user_collection_\(mock.name).json", target: UserSubjectCollection.self)
+        fixture: "user_collection_\(mock.name).json", target: UserSubjectCollectionItem.self)
     }
     Logger.api.info("start get subject collection: \(sid)")
     let profile = try await self.getProfile()
@@ -119,21 +119,21 @@ extension ChiiClient {
     let data = try await request(url: url, method: "GET")
     let decoder = JSONDecoder()
     decoder.keyDecodingStrategy = .convertFromSnakeCase
-    let collection = try decoder.decode(UserSubjectCollection.self, from: data)
+    let collection = try decoder.decode(UserSubjectCollectionItem.self, from: data)
     Logger.api.info("finish get subject collection: \(sid)")
     return collection
   }
 
-  func getSubject(sid: UInt) async throws -> Subject {
+  func getSubject(sid: UInt) async throws -> SubjectItem {
     if let mock = self.mock {
-      return loadFixture(fixture: "subject_\(mock.name).json", target: Subject.self)
+      return loadFixture(fixture: "subject_\(mock.name).json", target: SubjectItem.self)
     }
     Logger.api.info("start get subject: \(sid)")
     let url = self.apiBase.appendingPathComponent("v0/subjects/\(sid)")
     let data = try await request(url: url, method: "GET", authorized: self.isAuthenticated)
     let decoder = JSONDecoder()
     decoder.keyDecodingStrategy = .convertFromSnakeCase
-    let subject = try decoder.decode(Subject.self, from: data)
+    let subject = try decoder.decode(SubjectItem.self, from: data)
     Logger.api.info("finish get subject: \(sid)")
     return subject
   }

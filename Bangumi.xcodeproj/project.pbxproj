@@ -7,14 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		19671C532BDEB55D000B4D99 /* LocalRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19671C2D2BDEB55D000B4D99 /* LocalRow.swift */; };
-		19671C542BDEB55D000B4D99 /* RemoteRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19671C2E2BDEB55D000B4D99 /* RemoteRow.swift */; };
+		19671C542BDEB55D000B4D99 /* SearchRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19671C2E2BDEB55D000B4D99 /* SearchRow.swift */; };
 		19671C552BDEB55D000B4D99 /* Collection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19671C302BDEB55D000B4D99 /* Collection.swift */; };
 		19671C562BDEB55D000B4D99 /* Header.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19671C312BDEB55D000B4D99 /* Header.swift */; };
 		19671C572BDEB55D000B4D99 /* RatingBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19671C322BDEB55D000B4D99 /* RatingBox.swift */; };
 		19671C582BDEB55D000B4D99 /* Subject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19671C332BDEB55D000B4D99 /* Subject.swift */; };
 		19671C592BDEB55D000B4D99 /* Summary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19671C342BDEB55D000B4D99 /* Summary.swift */; };
-		19671C5A2BDEB55D000B4D99 /* Tag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19671C352BDEB55D000B4D99 /* Tag.swift */; };
 		19671C5B2BDEB55D000B4D99 /* CalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19671C372BDEB55D000B4D99 /* CalendarView.swift */; };
 		19671C5C2BDEB55D000B4D99 /* FlowStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19671C382BDEB55D000B4D99 /* FlowStack.swift */; };
 		19671C5D2BDEB55D000B4D99 /* ImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19671C392BDEB55D000B4D99 /* ImageView.swift */; };
@@ -65,14 +63,12 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		19671C2D2BDEB55D000B4D99 /* LocalRow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocalRow.swift; sourceTree = "<group>"; };
-		19671C2E2BDEB55D000B4D99 /* RemoteRow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RemoteRow.swift; sourceTree = "<group>"; };
+		19671C2E2BDEB55D000B4D99 /* SearchRow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchRow.swift; sourceTree = "<group>"; };
 		19671C302BDEB55D000B4D99 /* Collection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Collection.swift; sourceTree = "<group>"; };
 		19671C312BDEB55D000B4D99 /* Header.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Header.swift; sourceTree = "<group>"; };
 		19671C322BDEB55D000B4D99 /* RatingBox.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RatingBox.swift; sourceTree = "<group>"; };
 		19671C332BDEB55D000B4D99 /* Subject.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Subject.swift; sourceTree = "<group>"; };
 		19671C342BDEB55D000B4D99 /* Summary.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Summary.swift; sourceTree = "<group>"; };
-		19671C352BDEB55D000B4D99 /* Tag.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Tag.swift; sourceTree = "<group>"; };
 		19671C372BDEB55D000B4D99 /* CalendarView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CalendarView.swift; sourceTree = "<group>"; };
 		19671C382BDEB55D000B4D99 /* FlowStack.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlowStack.swift; sourceTree = "<group>"; };
 		19671C392BDEB55D000B4D99 /* ImageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageView.swift; sourceTree = "<group>"; };
@@ -135,15 +131,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		19671C2F2BDEB55D000B4D99 /* Search */ = {
-			isa = PBXGroup;
-			children = (
-				19671C2D2BDEB55D000B4D99 /* LocalRow.swift */,
-				19671C2E2BDEB55D000B4D99 /* RemoteRow.swift */,
-			);
-			path = Search;
-			sourceTree = "<group>";
-		};
 		19671C362BDEB55D000B4D99 /* Subject */ = {
 			isa = PBXGroup;
 			children = (
@@ -154,7 +141,6 @@
 				19C2CE622BE2A4F10080A056 /* CollectionBook.swift */,
 				19671C342BDEB55D000B4D99 /* Summary.swift */,
 				19671C322BDEB55D000B4D99 /* RatingBox.swift */,
-				19671C352BDEB55D000B4D99 /* Tag.swift */,
 			);
 			path = Subject;
 			sourceTree = "<group>";
@@ -162,12 +148,12 @@
 		19671C3C2BDEB55D000B4D99 /* Components */ = {
 			isa = PBXGroup;
 			children = (
-				19671C2F2BDEB55D000B4D99 /* Search */,
+				197A19E52BE69B0600804B13 /* Episode */,
 				19671C362BDEB55D000B4D99 /* Subject */,
 				19671C372BDEB55D000B4D99 /* CalendarView.swift */,
+				19671C2E2BDEB55D000B4D99 /* SearchRow.swift */,
 				19671C382BDEB55D000B4D99 /* FlowStack.swift */,
 				19671C392BDEB55D000B4D99 /* ImageView.swift */,
-				197A19E52BE69B0600804B13 /* Episode */,
 				19671C3A2BDEB55D000B4D99 /* LoadingView.swift */,
 				19671C3B2BDEB55D000B4D99 /* UserCollectionRow.swift */,
 				19C2CE5C2BE1E7B10080A056 /* NotFoundView.swift */,
@@ -368,7 +354,6 @@
 				197A19CF2BE5E5E700804B13 /* Notifier.swift in Sources */,
 				19671C652BDEB55D000B4D99 /* Response.swift in Sources */,
 				19F8C3D82BE73B830037D723 /* Navigation.swift in Sources */,
-				19671C5A2BDEB55D000B4D99 /* Tag.swift in Sources */,
 				19671C6A2BDEB55D000B4D99 /* ContentView.swift in Sources */,
 				19671C562BDEB55D000B4D99 /* Header.swift in Sources */,
 				19671C582BDEB55D000B4D99 /* Subject.swift in Sources */,
@@ -392,8 +377,7 @@
 				19671C6B2BDEB55D000B4D99 /* DiscoverView.swift in Sources */,
 				19671C5B2BDEB55D000B4D99 /* CalendarView.swift in Sources */,
 				19671C5C2BDEB55D000B4D99 /* FlowStack.swift in Sources */,
-				19671C542BDEB55D000B4D99 /* RemoteRow.swift in Sources */,
-				19671C532BDEB55D000B4D99 /* LocalRow.swift in Sources */,
+				19671C542BDEB55D000B4D99 /* SearchRow.swift in Sources */,
 				197A19E42BE699CF00804B13 /* List.swift in Sources */,
 				19671C632BDEB55D000B4D99 /* Data.swift in Sources */,
 				197A19E02BE696E200804B13 /* Grid.swift in Sources */,

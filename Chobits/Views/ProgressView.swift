@@ -19,25 +19,27 @@ struct ChiiProgressView: View {
   @State private var offset: Int = 0
   @State private var exhausted: Bool = false
   @State private var counts: [SubjectType: Int] = [:]
-  @State private var collections: [EnumerateItem<UserSubjectCollection>] = []
+  @State private var collections: [EnumerateItem<(UserSubjectCollection)>] = []
 
   func loadCounts() async {
     let actor = BackgroundActor(container: modelContext.container)
     let doingType = CollectionType.do.rawValue
     do {
       for type in SubjectType.progressTypes() {
+        if type == .unknown {
+          continue
+        }
         let count = try await actor.fetchCount(
           predicate: #Predicate<UserSubjectCollection> {
             $0.type == doingType && $0.subjectType == type.rawValue
           })
-        Logger.collection.info("progress type: \(type.name), count: \(count)")
         counts[type] = count
       }
       let totalCount = try await actor.fetchCount(
         predicate: #Predicate<UserSubjectCollection> {
           $0.type == doingType
         })
-      Logger.collection.info("progress total: \(totalCount)")
+      Logger.collection.info("load progress total count: \(totalCount)")
       counts[.unknown] = totalCount
     } catch {
       notifier.alert(error: error)
@@ -93,6 +95,7 @@ struct ChiiProgressView: View {
   }
 
   func updateCollections(type: SubjectType?) async {
+    Logger.collection.info("start update collection for \(type?.name ?? "all")")
     let actor = BackgroundActor(container: modelContext.container)
     var offset: Int = 0
     let limit: Int = 100
@@ -103,8 +106,16 @@ struct ChiiProgressView: View {
         if response.data.isEmpty {
           break
         }
-        for collection in response.data {
-          await actor.insert(data: collection, background: true)
+        for collect in response.data {
+          let collection = UserSubjectCollection(item: collect)
+          await actor.insert(data: collection)
+          if let slim = collect.subject {
+            try await actor.insertIfNeeded(
+              data: Subject(slim: slim),
+              predicate: #Predicate<Subject> {
+                $0.id == slim.id
+              })
+          }
         }
         offset += limit
         if offset > response.total {
@@ -115,6 +126,7 @@ struct ChiiProgressView: View {
     } catch {
       notifier.alert(error: error)
     }
+    Logger.collection.info("finish update collection for \(type?.name ?? "all")")
   }
 
   var body: some View {
@@ -123,13 +135,8 @@ struct ChiiProgressView: View {
         if counts.isEmpty {
           ProgressView().task {
             Logger.collection.info("loading progress")
-            await loadCounts()
-            if counts.allSatisfy({ $0.value == 0 }) {
-              Logger.collection.info("updating collections for all types")
-              await updateCollections(type: nil)
-              await loadCounts()
-            }
             await load()
+            await loadCounts()
           }
         } else {
           VStack {
@@ -141,6 +148,13 @@ struct ChiiProgressView: View {
             .pickerStyle(.segmented)
             .onChange(of: subjectType) {
               Task {
+                await load()
+              }
+            }
+            .task {
+              if counts.allSatisfy({ $0.value == 0 }) {
+                await updateCollections(type: nil)
+                await loadCounts()
                 await load()
               }
             }
@@ -164,7 +178,6 @@ struct ChiiProgressView: View {
                   // do not fresh when page loads
                   return
                 }
-                Logger.collection.info("updating collections for \(subjectType.name)")
                 await updateCollections(type: subjectType)
                 await loadCounts()
                 await load()

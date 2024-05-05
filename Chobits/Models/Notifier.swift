@@ -20,12 +20,14 @@ class Notifier: ObservableObject {
     case .ignore:
       Logger.app.warning("ignore error: \(error)")
     default:
+      Logger.app.error("error: \(error)")
       self.currentError = error
       self.showAlert = true
     }
   }
 
   func alert(message: String) {
+    Logger.app.error("error: \(message)")
     self.currentError = ChiiError(message: message)
     self.showAlert = true
   }
@@ -39,6 +41,7 @@ class Notifier: ObservableObject {
   }
 
   func notify(message: String) {
+    Logger.app.info("notification: \(message)")
     self.notification = message
     self.showNotification = true
   }

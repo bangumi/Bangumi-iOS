@@ -1,5 +1,5 @@
 //
-//  RemoteRow.swift
+//  SearchRow.swift
 //  Chobits
 //
 //  Created by Chuan Chuan on 2024/4/26.
@@ -7,8 +7,8 @@
 
 import SwiftUI
 
-struct SubjectSearchRemoteRow: View {
-  let subject: SearchSubject
+struct SubjectSearchRow: View {
+  let subject: Subject
 
   var body: some View {
     ZStack {
@@ -19,23 +19,24 @@ struct SubjectSearchRemoteRow: View {
         .clipShape(RoundedRectangle(cornerRadius: 10))
         .shadow(color: .accent, radius: 1, x: 1, y: 1)
       HStack {
-        ImageView(img: subject.image, width: 60, height: 60)
+        ImageView(img: subject.images.common, width: 60, height: 60)
         VStack(alignment: .leading) {
           Text(subject.name).font(.headline)
           Text(subject.nameCn).font(.subheadline).foregroundStyle(.secondary)
           HStack {
-            if let type = subject.type {
-              Label(type.description, systemImage: type.icon).foregroundStyle(.accent)
-            }
-            if !subject.date.isEmpty {
-              Label(subject.date, systemImage: "calendar").foregroundStyle(.secondary)
+            Label(subject.typeEnum.description, systemImage: subject.typeEnum.icon).foregroundStyle(
+              .accent)
+            if subject.date.timeIntervalSince1970 > 0 {
+              Label(subject.date.formatAirdate, systemImage: "calendar").foregroundStyle(.secondary)
             }
             Spacer()
-            if subject.rank > 0 {
-              Label("\(subject.rank)", systemImage: "chart.bar.xaxis").foregroundStyle(.accent)
+            if subject.rating.rank > 0 {
+              Label("\(subject.rating.rank)", systemImage: "chart.bar.xaxis").foregroundStyle(
+                .accent)
             }
-            if subject.score > 0 {
-              Label("\(subject.score.rateDisplay)", systemImage: "star").foregroundStyle(.secondary)
+            if subject.rating.score > 0 {
+              Label("\(subject.rating.score.rateDisplay)", systemImage: "star").foregroundStyle(
+                .secondary)
             }
           }.font(.caption)
         }
@@ -51,7 +52,7 @@ struct SubjectSearchRemoteRow: View {
 #Preview {
   ScrollView {
     LazyVStack(alignment: .leading, spacing: 10) {
-      SubjectSearchRemoteRow(subject: .previewAnime)
+      SubjectSearchRow(subject: .previewAnime)
     }
   }
   .padding(.horizontal, 16)

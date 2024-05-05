@@ -51,3 +51,12 @@ extension Color {
     )
   }
 }
+
+extension Date {
+  var formatAirdate: String {
+    let formatter = DateFormatter()
+    formatter.dateStyle = .medium
+    formatter.timeStyle = .none
+    return formatter.string(from: self)
+  }
+}

@@ -73,6 +73,46 @@ public actor BackgroundActor {
     context.insert(data)
   }
 
+  public func insertIfNeeded<T: PersistentModel>(
+    data: T,
+    predicate: Predicate<T>
+  ) throws {
+    let descriptor = FetchDescriptor<T>(predicate: predicate)
+    let savedCount = try context.fetchCount(descriptor)
+    if savedCount == 0 {
+      context.insert(data)
+    }
+  }
+
+  public func insertOrGet<T: PersistentModel>(
+    data: T, predicate: Predicate<T>? = nil, background: Bool = true
+  ) throws -> T {
+    let context = background ? context : data.modelContext ?? context
+    var fetchDescriptor = FetchDescriptor<T>(predicate: predicate)
+    fetchDescriptor.fetchLimit = 1
+    let list: [T] = try context.fetch(fetchDescriptor)
+    if let item = list.first {
+      return item
+    } else {
+      context.insert(data)
+      return data
+    }
+  }
+
+  public func createOrGet<T: PersistentModel>(
+    data: T, predicate: Predicate<T>? = nil, background: Bool = true
+  ) throws -> T {
+    let context = background ? context : data.modelContext ?? context
+    var fetchDescriptor = FetchDescriptor<T>(predicate: predicate)
+    fetchDescriptor.fetchLimit = 1
+    let list: [T] = try context.fetch(fetchDescriptor)
+    if let item = list.first {
+      return item
+    } else {
+      return data
+    }
+  }
+
   public func delete<T: PersistentModel>(data: T, background: Bool = true) {
     let context = background ? context : data.modelContext ?? context
     context.delete(data)
@@ -84,20 +124,6 @@ public actor BackgroundActor {
 
   public func remove<T: PersistentModel>(predicate: Predicate<T>? = nil) throws {
     try context.delete(model: T.self, where: predicate)
-  }
-
-  public func saveAndInsertIfNeeded<T: PersistentModel>(
-    data: T,
-    predicate: Predicate<T>,
-    background: Bool = true
-  ) throws {
-    let descriptor = FetchDescriptor<T>(predicate: predicate)
-    let context = background ? context : data.modelContext ?? context
-    let savedCount = try context.fetchCount(descriptor)
-    if savedCount == 0 {
-      context.insert(data)
-    }
-    try context.save()
   }
 
   func insertBatch<T: PersistentModel>(data: [T]) throws {

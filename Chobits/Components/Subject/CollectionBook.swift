@@ -10,6 +10,7 @@ import SwiftUI
 
 struct SubjectCollectionBookView: View {
   let subject: Subject
+  let collection: UserSubjectCollection
 
   @EnvironmentObject var notifier: Notifier
   @EnvironmentObject var chii: ChiiClient
@@ -19,25 +20,14 @@ struct SubjectCollectionBookView: View {
   @State private var vols: UInt?
   @State private var updating: Bool = false
 
-  @Query
-  private var collections: [UserSubjectCollection]
-  private var collection: UserSubjectCollection? { collections.first }
-
-  init(subject: Subject) {
-    self.subject = subject
-    let predicate = #Predicate<UserSubjectCollection> { collection in
-      collection.subjectId == subject.id
-    }
-    _collections = Query(filter: predicate)
-  }
-
   func update() {
     self.updating = true
     let actor = BackgroundActor(container: modelContext.container)
     Task {
       do {
-        let resp = try await chii.updateSubjectCollection(sid: subject.id, eps: eps, vols: vols)
-        await actor.insert(data: resp)
+        let item = try await chii.updateSubjectCollection(sid: subject.id, eps: eps, vols: vols)
+        let collect = UserSubjectCollection(item: item)
+        await actor.insert(data: collect)
         try await actor.save()
       } catch {
         notifier.alert(error: error)
@@ -48,64 +38,71 @@ struct SubjectCollectionBookView: View {
     }
   }
 
+  var epsDesc: String {
+    return subject.eps > 0 ? "/\(subject.eps)话" : "/?话"
+  }
+
+  var volumesDesc: String {
+    return subject.volumes > 0 ? "/\(subject.volumes)卷" : "/?卷"
+  }
+
   var body: some View {
-    if let collection = collection {
-      HStack {
-        HStack(alignment: .firstTextBaseline, spacing: 0) {
-          Button {
-            if let value = eps {
-              self.eps = value + 1
-            } else {
-              self.eps = collection.epStatus + 1
-            }
-          } label: {
-            Image(systemName: "plus.circle").foregroundStyle(.secondary).padding(.trailing, 5)
-          }.buttonStyle(.plain)
-          TextField("\(collection.epStatus)", value: $eps, formatter: NumberFormatter())
-            .keyboardType(.numberPad)
-            .frame(width: 50)
-            .multilineTextAlignment(.trailing)
-            .fixedSize(horizontal: true, vertical: false)
-            .padding(.trailing, 5)
-            .textFieldStyle(.roundedBorder)
-          Text(subject.eps > 0 ? "/\(subject.eps)话" : "/?话").foregroundStyle(.secondary)
-        }.monospaced()
-        Spacer()
-        HStack(alignment: .firstTextBaseline, spacing: 0) {
-          Button {
-            if let value = vols {
-              self.vols = value + 1
-            } else {
-              self.vols = collection.volStatus + 1
-            }
-          } label: {
-            Image(systemName: "plus.circle").foregroundStyle(.secondary).padding(.trailing, 5)
-          }.buttonStyle(.plain)
-          TextField("\(collection.volStatus)", value: $vols, formatter: NumberFormatter())
-            .keyboardType(.numberPad)
-            .frame(width: 50)
-            .multilineTextAlignment(.trailing)
-            .fixedSize(horizontal: true, vertical: false)
-            .padding(.trailing, 5)
-            .textFieldStyle(.roundedBorder)
-          Text(subject.volumes > 0 ? "/\(subject.volumes)卷" : "/?卷").foregroundStyle(.secondary)
-        }.monospaced()
-        Spacer()
-        Button("更新", action: update)
-          .buttonStyle(.borderedProminent)
-      }.disabled(updating)
-    }
+    HStack {
+      HStack(alignment: .firstTextBaseline, spacing: 0) {
+        Button {
+          if let value = eps {
+            self.eps = value + 1
+          } else {
+            self.eps = collection.epStatus + 1
+          }
+        } label: {
+          Image(systemName: "plus.circle").foregroundStyle(.secondary).padding(.trailing, 5)
+        }.buttonStyle(.plain)
+        TextField("\(collection.epStatus)", value: $eps, formatter: NumberFormatter())
+          .keyboardType(.numberPad)
+          .frame(width: 50)
+          .multilineTextAlignment(.trailing)
+          .fixedSize(horizontal: true, vertical: false)
+          .padding(.trailing, 5)
+          .textFieldStyle(.roundedBorder)
+        Text(epsDesc).foregroundStyle(.secondary)
+      }.monospaced()
+      Spacer()
+      HStack(alignment: .firstTextBaseline, spacing: 0) {
+        Button {
+          if let value = vols {
+            self.vols = value + 1
+          } else {
+            self.vols = collection.volStatus + 1
+          }
+        } label: {
+          Image(systemName: "plus.circle").foregroundStyle(.secondary).padding(.trailing, 5)
+        }.buttonStyle(.plain)
+        TextField("\(collection.volStatus)", value: $vols, formatter: NumberFormatter())
+          .keyboardType(.numberPad)
+          .frame(width: 50)
+          .multilineTextAlignment(.trailing)
+          .fixedSize(horizontal: true, vertical: false)
+          .padding(.trailing, 5)
+          .textFieldStyle(.roundedBorder)
+        Text(volumesDesc).foregroundStyle(.secondary)
+      }.monospaced()
+      Spacer()
+      Button("更新", action: update)
+        .buttonStyle(.borderedProminent)
+    }.disabled(updating)
   }
 }
 
 #Preview {
   let config = ModelConfiguration(isStoredInMemoryOnly: true)
   let container = try! ModelContainer(for: UserSubjectCollection.self, configurations: config)
+  let collection = UserSubjectCollection.previewBook
   container.mainContext.insert(UserSubjectCollection.previewBook)
 
   return ScrollView {
     LazyVStack(alignment: .leading) {
-      SubjectCollectionBookView(subject: .previewBook)
+      SubjectCollectionBookView(subject: .previewBook, collection: .previewBook)
         .environmentObject(Notifier())
         .environmentObject(ChiiClient(mock: .book))
     }

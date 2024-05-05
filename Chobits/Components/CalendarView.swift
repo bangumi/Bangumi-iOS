@@ -5,6 +5,7 @@
 //  Created by Chuan Chuan on 2024/4/26.
 //
 
+import OSLog
 import SwiftData
 import SwiftUI
 
@@ -38,8 +39,21 @@ struct CalendarView: View {
   func refreshCalendar() async {
     let actor = BackgroundActor(container: modelContext.container)
     do {
-      let cals = try await chii.getCalendar()
-      try await actor.insertBatch(data: cals)
+      let items = try await chii.getCalendar()
+      for item in items {
+        Logger.subject.info("processing calendar: \(item.weekday.en)")
+        let cal = BangumiCalendar(item: item)
+        await actor.insert(data: cal)
+        for small in item.items {
+          let subject = Subject(small: small)
+          try await actor.insertIfNeeded(
+            data: subject,
+            predicate: #Predicate<Subject> {
+              $0.id == small.id
+            })
+        }
+      }
+      try await actor.save()
     } catch {
       notifier.alert(error: error)
     }
@@ -76,7 +90,7 @@ struct CalendarWeekdayView: View {
         GridItem(.flexible()),
         GridItem(.flexible()),
       ]) {
-        ForEach(calendar.items) { subject in
+        ForEach(calendar.items, id: \.id) { subject in
           NavigationLink(value: NavDestination.subject(subjectId: subject.id)) {
             VStack {
               ImageView(img: subject.images?.common, width: 80, height: 80)

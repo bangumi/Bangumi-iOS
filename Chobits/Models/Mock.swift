@@ -24,11 +24,13 @@ func loadFixture<T: Decodable>(fixture: String, target: T.Type) -> T {
 
 extension Subject {
   static var previewAnime: Subject {
-    return loadFixture(fixture: "subject_anime.json", target: Subject.self)
+    let item = loadFixture(fixture: "subject_anime.json", target: SubjectItem.self)
+    return Subject(item: item)
   }
 
   static var previewBook: Subject {
-    return loadFixture(fixture: "subject_book.json", target: Subject.self)
+    let item = loadFixture(fixture: "subject_book.json", target: SubjectItem.self)
+    return Subject(item: item)
   }
 }
 
@@ -43,13 +45,15 @@ extension SearchSubject {
 
 extension UserSubjectCollection {
   static var previewAnime: UserSubjectCollection {
-    return loadFixture(
-      fixture: "user_collection_anime.json", target: UserSubjectCollection.self)
+    let item = loadFixture(
+      fixture: "user_collection_anime.json", target: UserSubjectCollectionItem.self)
+    return UserSubjectCollection(item: item)
   }
 
   static var previewBook: UserSubjectCollection {
-    return loadFixture(
-      fixture: "user_collection_book.json", target: UserSubjectCollection.self)
+    let item = loadFixture(
+      fixture: "user_collection_book.json", target: UserSubjectCollectionItem.self)
+    return UserSubjectCollection(item: item)
   }
 }
 

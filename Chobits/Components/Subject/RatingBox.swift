@@ -18,21 +18,11 @@ struct SubjectRatingView: View {
   var collectionDesc: [String] {
     var text: [String] = []
     let type = subject.typeEnum
-    if let wish = subject.collection.wish {
-      text.append("\(wish) 人\(CollectionType.wish.description(type: type))")
-    }
-    if let collect = subject.collection.collect {
-      text.append("\(collect) 人\(CollectionType.collect.description(type: type))")
-    }
-    if let doing = subject.collection.doing {
-      text.append("\(doing) 人\(CollectionType.do.description(type: type))")
-    }
-    if let onHold = subject.collection.onHold {
-      text.append("\(onHold) 人\(CollectionType.onHold.description(type: type))")
-    }
-    if let dropped = subject.collection.dropped {
-      text.append("\(dropped) 人\(CollectionType.dropped.description(type: type))")
-    }
+    text.append("\(subject.collection.wish) 人\(CollectionType.wish.description(type: type))")
+    text.append("\(subject.collection.collect) 人\(CollectionType.collect.description(type: type))")
+    text.append("\(subject.collection.doing) 人\(CollectionType.do.description(type: type))")
+    text.append("\(subject.collection.onHold) 人\(CollectionType.onHold.description(type: type))")
+    text.append("\(subject.collection.dropped) 人\(CollectionType.dropped.description(type: type))")
     return text
   }
 

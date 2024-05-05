@@ -11,7 +11,7 @@ import OSLog
 extension ChiiClient {
   // update progress for books
   func updateSubjectCollection(sid: UInt, eps: UInt?, vols: UInt?) async throws
-    -> UserSubjectCollection
+    -> UserSubjectCollectionItem
   {
     if self.mock != nil {
       return try await getSubjectCollection(sid: sid)
@@ -38,7 +38,7 @@ extension ChiiClient {
 
   func updateSubjectCollection(
     sid: UInt, type: CollectionType?, rate: UInt8?, comment: String?, priv: Bool?, tags: [String]?
-  ) async throws -> UserSubjectCollection {
+  ) async throws -> UserSubjectCollectionItem {
     if self.mock != nil {
       return try await getSubjectCollection(sid: sid)
     }

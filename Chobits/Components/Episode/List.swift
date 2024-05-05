@@ -85,11 +85,20 @@ struct EpisodeListView: View {
     self.episodes.append(contentsOf: episodes)
   }
 
+  func pickerHeader(type: EpisodeType ) -> String {
+    let count = counts[type, default: 0]
+    if count == 0 {
+      return "\(type.description)"
+    } else {
+      return "\(type.description)(\(count))"
+    }
+  }
+
   var body: some View {
     HStack {
       Picker("Episode Type", selection: $type) {
         ForEach(EpisodeType.allTypes()) { et in
-          Text("\(et.description)(\(counts[et, default: 0]))").tag(et)
+          Text(pickerHeader(type: et)).tag(et)
         }
       }
       .pickerStyle(.segmented)

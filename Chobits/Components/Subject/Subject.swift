@@ -5,6 +5,7 @@
 //  Created by Chuan Chuan on 2024/4/27.
 //
 
+import OSLog
 import SwiftData
 import SwiftUI
 
@@ -19,7 +20,7 @@ struct SubjectView: View {
 
   @Query
   private var subjects: [Subject]
-  private var subject: Subject? { subjects.first }
+  var subject: Subject? { subjects.first }
 
   init(subjectId: UInt) {
     self.subjectId = subjectId
@@ -33,18 +34,22 @@ struct SubjectView: View {
     if !self.page.start() {
       return
     }
+    Logger.subject.info("updating subject: \(self.subjectId)")
     let actor = BackgroundActor(container: modelContext.container)
     do {
-      let subject = try await chii.getSubject(sid: self.subjectId)
+      let item = try await chii.getSubject(sid: self.subjectId)
 
       // 对于合并的条目，可能搜索返回的 ID 跟 API 拿到的 ID 不同
       // 我们直接返回 404 防止其他问题
       // 后面可以考虑直接跳转到页面
-      if self.subjectId != subject.id {
+      if self.subjectId != item.id {
+        Logger.subject.warning("subject id mismatch: \(self.subjectId) != \(item.id)")
         self.page.missing()
         return
       }
 
+      Logger.subject.info("fetched subject: \(item.id)")
+      let subject = Subject(item: item)
       await actor.insert(data: subject)
       try await actor.save()
       self.page.success()
@@ -70,7 +75,7 @@ struct SubjectView: View {
             } else {
               switch subject.typeEnum {
               case .anime, .music, .real:
-                EpisodeGridView(subjectId: subject.id)
+                EpisodeGridView(subject: subject)
               default:
                 EmptyView()
               }
@@ -79,7 +84,6 @@ struct SubjectView: View {
               Divider()
               SubjectSummaryView(subject: subject)
             }
-            SubjectTagView(subject: subject)
             Spacer()
           }
         }.padding()

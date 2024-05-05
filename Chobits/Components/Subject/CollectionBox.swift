@@ -17,29 +17,31 @@ struct SubjectCollectionBox: View {
   @EnvironmentObject var chii: ChiiClient
   @Environment(\.modelContext) private var modelContext
 
-  @State private var collectionType: CollectionType
-  @State private var rate: UInt8
-  @State private var comment: String
-  @State private var priv: Bool
-  @State private var tags: [String]
-  @State private var tagsInput: String
+  @State private var collectionType: CollectionType = .do
+  @State private var rate: UInt8 = 0
+  @State private var comment: String = ""
+  @State private var priv: Bool = false
+  @State private var tags: [String] = []
+  @State private var tagsInput: String = ""
   @State private var updating: Bool = false
 
   init(subject: Subject, collection: UserSubjectCollection?, isPresented: Binding<Bool>) {
     self.subject = subject
-    self.collection = collection
     self._isPresented = isPresented
-    self.collectionType = collection?.typeEnum ?? .do
-    self.rate = collection?.rate ?? 0
-    self.comment = collection?.comment ?? ""
-    self.priv = collection?.private ?? false
-    let ctags = collection?.tags ?? []
-    self.tags = ctags
-    self.tagsInput = ctags.joined(separator: " ")
+    self.collection = collection
+    if let collect = collection {
+      self.collectionType = collect.typeEnum
+      self.rate = collect.rate
+      self.comment = collect.comment
+      self.priv = collect.priv
+      let ctags = collect.tags
+      self.tags = ctags
+      self.tagsInput = ctags.joined(separator: " ")
+    }
   }
 
   var recommendedTags: [String] {
-    subject.tags.sorted(by: { $0.count > $1.count }).prefix(15).map { $0.name }
+    return subject.tags.sorted(by: { $0.count > $1.count }).prefix(15).map { $0.name }
   }
 
   func update() {
@@ -47,7 +49,7 @@ struct SubjectCollectionBox: View {
     let actor = BackgroundActor(container: modelContext.container)
     Task {
       do {
-        let resp = try await chii.updateSubjectCollection(
+        let item = try await chii.updateSubjectCollection(
           sid: subject.id,
           type: collectionType,
           rate: rate,
@@ -55,7 +57,8 @@ struct SubjectCollectionBox: View {
           priv: priv,
           tags: tags
         )
-        await actor.insert(data: resp)
+        let collect = UserSubjectCollection(item: item)
+        await actor.insert(data: collect)
         try await actor.save()
         self.isPresented = false
       } catch {
@@ -89,8 +92,8 @@ struct SubjectCollectionBox: View {
           .buttonStyle(.borderedProminent)
           .frame(width: 40)
         }.padding(.vertical, 5)
-        if let collection = collection {
-          Text("上次更新：\(collection.updatedAt)").font(.caption).foregroundStyle(.secondary)
+        if let collect = collection {
+          Text("上次更新：\(collect.updatedAt)").font(.caption).foregroundStyle(.secondary)
         }
 
         VStack(alignment: .leading) {
@@ -188,7 +191,6 @@ struct SubjectCollectionBox: View {
                 .padding(.vertical, -2)
             }
         }
-
         Spacer()
       }
       .disabled(updating)
@@ -200,6 +202,17 @@ struct SubjectCollectionBox: View {
 }
 
 #Preview {
-  SubjectCollectionBox(
-    subject: .previewAnime, collection: .previewAnime, isPresented: .constant(true))
+  let config = ModelConfiguration(isStoredInMemoryOnly: true)
+  let container = try! ModelContainer(for: UserSubjectCollection.self, configurations: config)
+  let collection = UserSubjectCollection.previewBook
+  container.mainContext.insert(UserSubjectCollection.previewBook)
+
+  return SubjectCollectionBox(
+    subject: .previewBook,
+    collection: .previewBook,
+    isPresented: .constant(true)
+  )
+  .environmentObject(Notifier())
+  .environmentObject(ChiiClient(mock: .book))
+  .modelContainer(container)
 }

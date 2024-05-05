@@ -5,10 +5,25 @@
 //  Created by Chuan Chuan on 2024/4/21.
 //
 
+import SwiftData
 import SwiftUI
 
 struct UserCollectionRow: View {
   let collection: UserSubjectCollection
+
+  @Query
+  private var subjects: [Subject]
+  var subject: Subject? { subjects.first }
+
+  init(collection: UserSubjectCollection) {
+    self.collection = collection
+
+    let subjectId = collection.subjectId
+    let predicate = #Predicate<Subject> {
+      $0.id == subjectId
+    }
+    _subjects = Query(filter: predicate, sort: \Subject.id)
+  }
 
   var epsColor: Color {
     collection.epStatus == 0 ? .secondary : .accent
@@ -19,16 +34,18 @@ struct UserCollectionRow: View {
   }
 
   var chapters: String {
-    if collection.subject.eps > 0 {
-      return "\(collection.epStatus) / \(collection.subject.eps) 话"
+    guard let subject = subject else { return "" }
+    if subject.eps > 0 {
+      return "\(collection.epStatus) / \(subject.eps) 话"
     } else {
       return "\(collection.epStatus) / ? 话"
     }
   }
 
   var volumes: String {
-    if collection.subject.volumes > 0 {
-      return "\(collection.volStatus) / \(collection.subject.volumes) 卷"
+    guard let subject = subject else { return "" }
+    if subject.volumes > 0 {
+      return "\(collection.volStatus) / \(subject.volumes) 卷"
     } else {
       return "\(collection.volStatus) / ? 卷"
     }
@@ -43,13 +60,13 @@ struct UserCollectionRow: View {
         .clipShape(RoundedRectangle(cornerRadius: 10))
         .shadow(color: .accent, radius: 1, x: 1, y: 1)
       HStack {
-        ImageView(img: collection.subject.images.common, width: 60, height: 60)
+        ImageView(img: subject?.images.common, width: 60, height: 60)
         VStack(alignment: .leading) {
-          Text(collection.subject.name).font(.headline)
-          Text(collection.subject.nameCn).font(.footnote).foregroundStyle(.secondary)
+          Text(subject?.name ?? "").font(.headline)
+          Text(subject?.nameCn ?? "").font(.footnote).foregroundStyle(.secondary)
           HStack {
             Text(collection.updatedAt.formatted()).foregroundStyle(.secondary)
-            if collection.private {
+            if collection.priv {
               Image(systemName: "lock.fill").foregroundStyle(.accent)
             }
             Spacer()
@@ -111,10 +128,21 @@ struct UserCollectionRow: View {
   }
 }
 
+
+
 #Preview {
-  ScrollView {
-    LazyVStack(alignment: .leading, spacing: 10) {
-      UserCollectionRow(collection: .previewAnime)
+  let config = ModelConfiguration(isStoredInMemoryOnly: true)
+  let container = try! ModelContainer(for:Subject.self, UserSubjectCollection.self, configurations: config)
+  let collection = UserSubjectCollection.previewBook
+  container.mainContext.insert(UserSubjectCollection.previewBook)
+  container.mainContext.insert(Subject.previewBook)
+
+  return ScrollView {
+    LazyVStack(alignment: .leading) {
+      UserCollectionRow(collection: .previewBook)
+        .environmentObject(Notifier())
     }
-  }.padding()
+  }
+  .padding()
+  .modelContainer(container)
 }

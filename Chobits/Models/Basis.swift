@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import OSLog
 
 struct SubjectImages: Codable {
   var large: String
@@ -13,6 +14,23 @@ struct SubjectImages: Codable {
   var medium: String
   var small: String
   var grid: String
+
+  init() {
+    self.large = ""
+    self.common = ""
+    self.medium = ""
+    self.small = ""
+    self.grid = ""
+  }
+
+  init(large: String, common: String, medium: String, small: String, grid: String) {
+    self.large = large
+    self.common = common
+    self.medium = medium
+    self.small = small
+    self.grid = grid
+  }
+
 }
 
 struct Images: Codable {
@@ -142,11 +160,19 @@ struct InfoboxItem: Codable {
 }
 
 struct SubjectCollection: Codable {
-  var wish: UInt?
-  var collect: UInt?
-  var doing: UInt?
-  var onHold: UInt?
-  var dropped: UInt?
+  var wish: UInt
+  var collect: UInt
+  var doing: UInt
+  var onHold: UInt
+  var dropped: UInt
+
+  init() {
+    self.wish = 0
+    self.collect = 0
+    self.doing = 0
+    self.onHold = 0
+    self.dropped = 0
+  }
 }
 
 /// 收藏类型
@@ -541,5 +567,41 @@ enum EpisodeCollectionType: UInt8, Codable, Identifiable {
     case .dropped:
       return [.none, .wish, .collect]
     }
+  }
+}
+
+func safeParseDate(str: String?) -> Date {
+  guard let str = str else {
+    return Date(timeIntervalSince1970: 0)
+  }
+
+  let dateFormatter = DateFormatter()
+  dateFormatter.locale = Locale(identifier: "en_US_POSIX")
+  dateFormatter.dateFormat = "yyyy-MM-dd"
+  dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
+
+  if let date = dateFormatter.date(from: str) {
+    return date
+  } else {
+    Logger.app.warning("failed to parse date: \(str)")
+    return Date(timeIntervalSince1970: 0)
+  }
+}
+
+func safeParseRFC3339Date(str: String?) -> Date {
+  guard let str = str else {
+    return Date(timeIntervalSince1970: 0)
+  }
+
+  let RFC3339DateFormatter = DateFormatter()
+  RFC3339DateFormatter.locale = Locale(identifier: "en_US_POSIX")
+  RFC3339DateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZZZZZ"
+  RFC3339DateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
+
+  if let date = RFC3339DateFormatter.date(from: str) {
+    return date
+  } else {
+    Logger.app.warning("failed to parse RFC3339 date: \(str)")
+    return Date(timeIntervalSince1970: 0)
   }
 }

@@ -38,6 +38,45 @@ struct Profile: Codable {
   var sign: String
 }
 
+struct BangumiCalendarItem: Codable {
+  var weekday: Weekday
+  var items: [SmallSubject]
+}
+
+struct UserSubjectCollectionItem: Codable {
+  var subjectId: UInt
+  var subjectType: UInt8
+  var rate: UInt8
+  var type: CollectionType
+  var comment: String?
+  var tags: [String]
+  var epStatus: UInt
+  var volStatus: UInt
+  var updatedAt: String
+  var `private`: Bool
+  var subject: SlimSubject?
+}
+
+struct SubjectItem: Codable {
+  var id: UInt
+  var type: SubjectType
+  var name: String
+  var nameCn: String
+  var summary: String
+  var nsfw: Bool
+  var locked: Bool
+  var date: String?
+  var platform: String
+  var images: SubjectImages
+  var infobox: [InfoboxItem]?
+  var volumes: UInt
+  var eps: UInt
+  var totalEpisodes: UInt
+  var rating: Rating
+  var collection: SubjectCollection
+  var tags: [Tag]
+}
+
 struct SlimSubject: Codable, Identifiable {
   var id: UInt
   var type: SubjectType
@@ -53,7 +92,7 @@ struct SlimSubject: Codable, Identifiable {
   var tags: [Tag]
 }
 
-struct SearchSubject: Codable, Identifiable, Hashable {
+struct SearchSubject: Codable, Identifiable {
   var id: UInt
   var type: SubjectType?
   var date: String
@@ -64,17 +103,9 @@ struct SearchSubject: Codable, Identifiable, Hashable {
   var tags: [Tag]
   var score: Float
   var rank: UInt
-
-  func hash(into hasher: inout Hasher) {
-    hasher.combine(id)
-  }
-
-  static func == (lhs: Self, rhs: Self) -> Bool {
-    return lhs.id == rhs.id
-  }
 }
 
-struct SmallSubject: Codable, Identifiable, Hashable {
+struct SmallSubject: Codable {
   var id: UInt
   var url: String
   var type: SubjectType
@@ -86,15 +117,7 @@ struct SmallSubject: Codable, Identifiable, Hashable {
   var images: SubjectImages?
   var rating: SmallRating?
   var rank: UInt?
-  var collection: SubjectCollection?
-
-  func hash(into hasher: inout Hasher) {
-    hasher.combine(id)
-  }
-
-  static func == (lhs: Self, rhs: Self) -> Bool {
-    return lhs.id == rhs.id
-  }
+  // var collection: SubjectCollection?
 }
 
 struct SubjectPerson: Codable, Identifiable {

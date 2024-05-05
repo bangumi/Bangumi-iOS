@@ -20,14 +20,15 @@ struct SubjectCollectionView: View {
 
   @Query
   private var collections: [UserSubjectCollection]
-  private var collection: UserSubjectCollection? { collections.first }
+  var collection: UserSubjectCollection? { collections.first }
 
   init(subject: Subject) {
     self.subject = subject
+    let subjectId = subject.id
     let predicate = #Predicate<UserSubjectCollection> {
-      $0.subjectId == subject.id
+      $0.subjectId == subjectId
     }
-    _collections = Query(filter: predicate, sort: \UserSubjectCollection.subjectId)
+    _collections = Query(filter: predicate)
   }
 
   func updateCollection() async {
@@ -36,15 +37,17 @@ struct SubjectCollectionView: View {
     }
     let actor = BackgroundActor(container: modelContext.container)
     do {
-      let resp = try await chii.getSubjectCollection(sid: subject.id)
-      await actor.insert(data: resp)
+      let item = try await chii.getSubjectCollection(sid: subject.id)
+      let collection = UserSubjectCollection(item: item)
+      await actor.insert(data: collection)
       try await actor.save()
       self.page.success()
     } catch ChiiError.notFound(_) {
       do {
+        let subjectId = subject.id
         try await actor.remove(
           predicate: #Predicate<UserSubjectCollection> { collection in
-            collection.subjectId == subject.id
+            collection.subjectId == subjectId
           })
         try await actor.save()
       } catch {
@@ -62,7 +65,7 @@ struct SubjectCollectionView: View {
       Divider()
       HStack {
         if let collection = collection {
-          if collection.private {
+          if collection.priv {
             Image(systemName: "lock.fill").foregroundStyle(.accent)
           }
           Label(
@@ -136,9 +139,13 @@ struct SubjectCollectionView: View {
 
     switch subject.typeEnum {
     case .book:
-      SubjectCollectionBookView(subject: subject)
+      if let collection = collection {
+        SubjectCollectionBookView(subject: subject, collection: collection)
+      } else {
+        EmptyView()
+      }
     case .anime, .real:
-      EpisodeGridView(subjectId: subject.id)
+      EpisodeGridView(subject: subject)
     default:
       EmptyView()
     }
@@ -150,6 +157,7 @@ struct SubjectCollectionView: View {
   let container = try! ModelContainer(
     for: UserSubjectCollection.self, Subject.self, Episode.self,
     configurations: config)
+  container.mainContext.insert(UserSubjectCollection.previewBook)
 
   return ScrollView {
     LazyVStack(alignment: .leading) {

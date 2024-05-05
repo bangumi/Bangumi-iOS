@@ -29,8 +29,8 @@ struct SubjectHeaderView: View {
           Text(subject.platform).foregroundStyle(.secondary)
           Label(subject.typeEnum.description, systemImage: subject.typeEnum.icon).foregroundStyle(
             .accent)
-          if let date = subject.date {
-            Label(date, systemImage: "calendar").foregroundStyle(.secondary)
+          if subject.date.timeIntervalSince1970 > 0 {
+            Label(subject.date.formatAirdate, systemImage: "calendar").foregroundStyle(.secondary)
           }
           Spacer()
           if subject.nsfw {
