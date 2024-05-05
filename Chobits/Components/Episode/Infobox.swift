@@ -83,7 +83,7 @@ struct EpisodeInfobox: View {
               } label: {
                 Text(type.action)
               }
-            }
+            }.buttonStyle(.borderedProminent)
             Button {
               Task {
                 await updateBatch()
@@ -91,10 +91,11 @@ struct EpisodeInfobox: View {
             } label: {
               Text("看到")
             }
+            .buttonStyle(.bordered)
+            .foregroundColor(.red)
             Spacer()
             Text(episode.collectionTypeEnum.description).foregroundStyle(.red)
           }
-          .buttonStyle(.borderedProminent)
           .font(.callout)
           .disabled(updating)
         }
