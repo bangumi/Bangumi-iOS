@@ -138,7 +138,7 @@ struct ChiiDiscoverView: View {
               ScrollView {
                 LazyVStack(alignment: .leading, spacing: 10) {
                   ForEach(collections, id: \.idx) { item in
-                    NavigationLink(value: NavSubject(collection: item.inner)) {
+                    NavigationLink(value: NavDestination.subject(subjectId: item.inner.subjectId)) {
                       SubjectSearchLocalRow(collection: item.inner)
                         .task(priority: .background) {
                           await localSearchNextPage(idx: item.idx)
@@ -161,7 +161,7 @@ struct ChiiDiscoverView: View {
                 ScrollView {
                   LazyVStack(alignment: .leading, spacing: 10) {
                     ForEach(subjects, id: \.idx) { item in
-                      NavigationLink(value: NavSubject(subject: item.inner)) {
+                      NavigationLink(value: NavDestination.subject(subjectId: item.inner.id)) {
                         SubjectSearchRemoteRow(subject: item.inner)
                           .task(priority: .background) {
                             await remoteSearchNextPage(idx: item.idx)
@@ -183,11 +183,13 @@ struct ChiiDiscoverView: View {
             .padding(.horizontal, 16)
         }
       }
-      .navigationDestination(for: NavSubject.self) { nav in
-        SubjectView(subjectId: nav.subjectId)
-      }
-      .navigationDestination(for: NavEpisodeList.self) { nav in
-        EpisodeListView(subjectId: nav.subjectId)
+      .navigationDestination(for: NavDestination.self) { nav in
+        switch nav {
+        case .subject(let sid):
+          SubjectView(subjectId: sid)
+        case .episodeList(let sid):
+          EpisodeListView(subjectId: sid)
+        }
       }
     }
     .searchable(text: $query, isPresented: $searching)

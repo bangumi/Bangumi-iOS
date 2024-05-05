@@ -100,12 +100,10 @@ public actor BackgroundActor {
     try context.save()
   }
 
-  //  func insert<T: PersistentModel>(data: [T]) throws {
-  //    let context = data.modelContext ?? context
-  //    for row in data {
-  //      context.insert(row)
-  //    }
-  //    try context.save()
-  //  }
-
+  func insertBatch<T: PersistentModel>(data: [T]) throws {
+    for row in data {
+      context.insert(row)
+    }
+    try context.save()
+  }
 }

@@ -39,10 +39,7 @@ struct CalendarView: View {
     let actor = BackgroundActor(container: modelContext.container)
     do {
       let cals = try await chii.getCalendar()
-      for cal in cals {
-        await actor.insert(data: cal, background: true)
-      }
-      try await actor.save()
+      try await actor.insertBatch(data: cals)
     } catch {
       notifier.alert(error: error)
     }
@@ -80,7 +77,7 @@ struct CalendarWeekdayView: View {
         GridItem(.flexible()),
       ]) {
         ForEach(calendar.items) { subject in
-          NavigationLink(value: NavSubject(subject: subject)) {
+          NavigationLink(value: NavDestination.subject(subjectId: subject.id)) {
             VStack {
               ImageView(img: subject.images?.common, width: 80, height: 80)
               Text(subject.name).font(.caption).multilineTextAlignment(.leading).lineLimit(1)
