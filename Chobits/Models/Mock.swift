@@ -9,17 +9,14 @@ import Foundation
 
 func loadFixture<T: Decodable>(fixture: String, target: T.Type) -> T {
   guard let url = Bundle.main.url(forResource: fixture, withExtension: nil) else {
-    print("ERR: Failed to locate \(fixture) in bundle")
     fatalError("Failed to locate \(fixture) in bundle")
   }
   guard let data = try? Data(contentsOf: url) else {
-    print("ERR: Failed to load file from \(fixture) from bundle")
     fatalError("Failed to load file from \(fixture) from bundle")
   }
   let decoder = JSONDecoder()
   decoder.keyDecodingStrategy = .convertFromSnakeCase
   guard let obj = try? decoder.decode(target, from: data) else {
-    print("ERR: Failed to decode \(fixture) from bundle")
     fatalError("Failed to decode \(fixture) from bundle")
   }
   return obj

@@ -105,7 +105,6 @@ struct EpisodeGridView: View {
         page.success()
       }
     } catch {
-      print("ERR: \(error)")
       await MainActor.run {
         notifier.alert(error: error)
         page.finish()
