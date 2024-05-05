@@ -35,6 +35,7 @@ struct ChiiTimelineView: View {
     }
     do {
       try modelContext.delete(model: UserSubjectCollection.self)
+      try modelContext.delete(model: Episode.self)
     } catch {
       notifier.alert(error: error)
     }
