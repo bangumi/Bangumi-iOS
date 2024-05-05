@@ -101,7 +101,7 @@ class ChiiClient: ObservableObject, Observable {
     if response.statusCode < 400 {
       return data
     } else if response.statusCode < 500 {
-      Logger.api.warning("response: \(response.statusCode)")
+      Logger.api.warning("response \(response.statusCode): \(url.absoluteString)")
       let decoder = JSONDecoder()
       decoder.keyDecodingStrategy = .convertFromSnakeCase
       let error = try decoder.decode(ResponseError.self, from: data)
