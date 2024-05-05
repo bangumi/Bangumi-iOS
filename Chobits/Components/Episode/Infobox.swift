@@ -58,7 +58,7 @@ struct EpisodeInfobox: View {
       VStack(alignment: .leading) {
         HStack {
           Text(episode.title).font(.headline).lineLimit(1)
-          Text(episode.type.description)
+          Text(episode.typeEnum.description)
             .font(.footnote)
             .foregroundStyle(.secondary)
             .overlay {
