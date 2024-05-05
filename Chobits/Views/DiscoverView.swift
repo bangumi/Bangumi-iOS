@@ -143,7 +143,7 @@ struct ChiiDiscoverView: View {
           .pickerStyle(.segmented)
           .padding(.horizontal, 16)
           if !query.isEmpty {
-            if subjects.isEmpty {
+            if subjects.isEmpty && !local {
               VStack {
                 Spacer()
                 ProgressView()
