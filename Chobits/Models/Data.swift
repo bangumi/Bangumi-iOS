@@ -36,7 +36,7 @@ final class UserSubjectCollection {
       subjectId: subjectId, subjectType: SubjectType(value: subjectType),
       rate: rate, type: CollectionType(value: type), comment: comment,
       tags: tags, epStatus: epStatus, volStatus: volStatus,
-      updatedAt:  updatedAt.formatCollectionDate, private: priv
+      updatedAt: updatedAt.formatCollectionDate, private: priv
     )
   }
 
@@ -290,18 +290,13 @@ final class Episode {
   }
 
   init(item: EpisodeItem, subjectId: UInt? = 0, collection: UInt8? = 0) {
-    let dateFormatter = DateFormatter()
-    dateFormatter.locale = Locale(identifier: "en_US_POSIX")
-    dateFormatter.dateFormat = "yyyy-MM-dd"
-    dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
-
     self.id = item.id
     self.type = item.type.rawValue
     self.name = item.name
     self.nameCn = item.nameCn
     self.sort = item.sort
     self.ep = item.ep
-    self.airdate = dateFormatter.date(from: item.airdate) ?? Date(timeIntervalSince1970: 0)
+    self.airdate = safeParseDate(str: item.airdate)
     self.airdateStr = item.airdate
     self.comment = item.comment
     self.duration = item.duration

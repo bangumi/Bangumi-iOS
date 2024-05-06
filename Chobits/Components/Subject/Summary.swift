@@ -5,8 +5,8 @@
 //  Created by Chuan Chuan on 2024/4/28.
 //
 
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 struct SubjectSummaryView: View {
   let subjectId: UInt
@@ -81,7 +81,8 @@ struct SubjectSummaryView: View {
 
 #Preview {
   let config = ModelConfiguration(isStoredInMemoryOnly: true)
-  let container = try! ModelContainer(for: UserSubjectCollection.self, Subject.self, configurations: config)
+  let container = try! ModelContainer(
+    for: UserSubjectCollection.self, Subject.self, configurations: config)
 
   let subject = Subject.previewBook
 

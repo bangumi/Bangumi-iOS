@@ -17,11 +17,15 @@ struct SubjectRatingView: View {
 
   var collectionDesc: [String] {
     var text: [String] = []
-    text.append("\(subject.collection.wish) 人\(CollectionType.wish.description(type: subject.type))")
-    text.append("\(subject.collection.collect) 人\(CollectionType.collect.description(type: subject.type))")
+    text.append(
+      "\(subject.collection.wish) 人\(CollectionType.wish.description(type: subject.type))")
+    text.append(
+      "\(subject.collection.collect) 人\(CollectionType.collect.description(type: subject.type))")
     text.append("\(subject.collection.doing) 人\(CollectionType.do.description(type: subject.type))")
-    text.append("\(subject.collection.onHold) 人\(CollectionType.onHold.description(type: subject.type))")
-    text.append("\(subject.collection.dropped) 人\(CollectionType.dropped.description(type: subject.type))")
+    text.append(
+      "\(subject.collection.onHold) 人\(CollectionType.onHold.description(type: subject.type))")
+    text.append(
+      "\(subject.collection.dropped) 人\(CollectionType.dropped.description(type: subject.type))")
     return text
   }
 

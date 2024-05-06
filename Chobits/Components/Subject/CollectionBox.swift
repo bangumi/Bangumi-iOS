@@ -10,8 +10,9 @@ import SwiftUI
 
 struct SubjectCollectionBox: View {
   let subjectId: UInt
-  @Binding var isPresented: Bool
+  let collection: UserSubjectCollectionItem?
 
+  @Environment(\.dismiss) private var dismiss
   @EnvironmentObject var notifier: Notifier
   @EnvironmentObject var chii: ChiiClient
   @Environment(\.modelContext) private var modelContext
@@ -28,25 +29,25 @@ struct SubjectCollectionBox: View {
   private var subjects: [Subject]
   private var subject: Subject? { subjects.first }
 
-  @Query
-  private var collections: [UserSubjectCollection]
-  private var collection: UserSubjectCollection? { collections.first }
-
-  init(subjectId: UInt, isPresented: Binding<Bool>) {
+  init(subjectId: UInt, collection: UserSubjectCollectionItem?) {
     self.subjectId = subjectId
-    self._isPresented = isPresented
+    self.collection = collection
+    if let collection = collection {
+      self.collectionType = collection.type
+      self.rate = collection.rate
+      self.comment = collection.comment ?? ""
+      self.priv = collection.private
+      self.tags = collection.tags
+      self.tagsInput = collection.tags.joined(separator: ",")
+    }
     _subjects = Query(
       filter: #Predicate<Subject> {
         $0.id == subjectId
       })
-    _collections = Query(
-      filter: #Predicate<UserSubjectCollection> {
-        $0.subjectId == subjectId
-      })
   }
 
   var recommendedTags: [String] {
-    guard let subject = self.subject else { return [] }
+    guard let subject = subject else { return [] }
     return subject.tags.sorted(by: { $0.count > $1.count }).prefix(15).map { $0.name }
   }
 
@@ -66,7 +67,7 @@ struct SubjectCollectionBox: View {
         let collect = UserSubjectCollection(item: item)
         await actor.insert(data: collect)
         try await actor.save()
-        self.isPresented = false
+        dismiss()
       } catch {
         notifier.alert(error: error)
       }
@@ -98,8 +99,8 @@ struct SubjectCollectionBox: View {
           .buttonStyle(.borderedProminent)
           .frame(width: 40)
         }.padding(.vertical, 5)
-        if let collect = collection {
-          Text("上次更新：\(collect.updatedAt)").font(.caption).foregroundStyle(.secondary)
+        if let collection = collection {
+          Text("上次更新：\(collection.updatedAt)").font(.caption).foregroundStyle(.secondary)
         }
 
         VStack(alignment: .leading) {
@@ -209,7 +210,8 @@ struct SubjectCollectionBox: View {
 
 #Preview {
   let config = ModelConfiguration(isStoredInMemoryOnly: true)
-  let container = try! ModelContainer(for: UserSubjectCollection.self, Subject.self, configurations: config)
+  let container = try! ModelContainer(
+    for: UserSubjectCollection.self, Subject.self, configurations: config)
   container.mainContext.insert(UserSubjectCollection.previewBook)
 
   let collection = UserSubjectCollection.previewAnime
@@ -217,10 +219,10 @@ struct SubjectCollectionBox: View {
 
   container.mainContext.insert(collection)
   container.mainContext.insert(subject)
-  
+
   return SubjectCollectionBox(
     subjectId: subject.id,
-    isPresented: .constant(true)
+    collection: collection.item
   )
   .environmentObject(Notifier())
   .environmentObject(ChiiClient(mock: .anime))

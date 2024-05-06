@@ -197,7 +197,7 @@ struct EpisodeListView: View {
     .sheet(
       item: $selected,
       content: { episode in
-        EpisodeInfobox(subjectId: subjectId, episodeId: episode.id)
+        EpisodeInfobox(episodeId: episode.id)
           .presentationDragIndicator(.visible)
           .presentationDetents(.init([.medium, .large]))
       }

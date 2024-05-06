@@ -75,7 +75,7 @@ struct SubjectView: View {
               SubjectCollectionView(subjectId: subject.id)
             }
 
-            switch subject.typeEnum  {
+            switch subject.typeEnum {
             case .book:
               SubjectBookChaptersView(subjectId: subjectId)
             case .anime, .real:
