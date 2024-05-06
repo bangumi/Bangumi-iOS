@@ -9,8 +9,7 @@ import SwiftData
 import SwiftUI
 
 struct SubjectCollectionBox: View {
-  let subject: Subject
-  let collection: UserSubjectCollection?
+  let subjectId: UInt
   @Binding var isPresented: Bool
 
   @EnvironmentObject var notifier: Notifier
@@ -25,22 +24,29 @@ struct SubjectCollectionBox: View {
   @State private var tagsInput: String = ""
   @State private var updating: Bool = false
 
-  init(subject: Subject, collection: UserSubjectCollection?, isPresented: Binding<Bool>) {
-    self.subject = subject
+  @Query
+  private var subjects: [Subject]
+  private var subject: Subject? { subjects.first }
+
+  @Query
+  private var collections: [UserSubjectCollection]
+  private var collection: UserSubjectCollection? { collections.first }
+
+  init(subjectId: UInt, isPresented: Binding<Bool>) {
+    self.subjectId = subjectId
     self._isPresented = isPresented
-    self.collection = collection
-    if let collect = collection {
-      self.collectionType = collect.typeEnum
-      self.rate = collect.rate
-      self.comment = collect.comment
-      self.priv = collect.priv
-      let ctags = collect.tags
-      self.tags = ctags
-      self.tagsInput = ctags.joined(separator: " ")
-    }
+    _subjects = Query(
+      filter: #Predicate<Subject> {
+        $0.id == subjectId
+      })
+    _collections = Query(
+      filter: #Predicate<UserSubjectCollection> {
+        $0.subjectId == subjectId
+      })
   }
 
   var recommendedTags: [String] {
+    guard let subject = self.subject else { return [] }
     return subject.tags.sorted(by: { $0.count > $1.count }).prefix(15).map { $0.name }
   }
 
@@ -50,7 +56,7 @@ struct SubjectCollectionBox: View {
     Task {
       do {
         let item = try await chii.updateSubjectCollection(
-          sid: subject.id,
+          sid: subjectId,
           type: collectionType,
           rate: rate,
           comment: comment,
@@ -73,7 +79,7 @@ struct SubjectCollectionBox: View {
       VStack {
         Picker("Collection Type", selection: $collectionType) {
           ForEach(CollectionType.boxTypes()) { ct in
-            Text("\(ct.description(type: subject.typeEnum))").tag(ct)
+            Text("\(ct.description(type: subject?.typeEnum))").tag(ct)
           }
         }
         .pickerStyle(.segmented)
@@ -203,15 +209,20 @@ struct SubjectCollectionBox: View {
 
 #Preview {
   let config = ModelConfiguration(isStoredInMemoryOnly: true)
-  let container = try! ModelContainer(for: UserSubjectCollection.self, configurations: config)
+  let container = try! ModelContainer(for: UserSubjectCollection.self, Subject.self, configurations: config)
   container.mainContext.insert(UserSubjectCollection.previewBook)
 
+  let collection = UserSubjectCollection.previewAnime
+  let subject = Subject.previewAnime
+
+  container.mainContext.insert(collection)
+  container.mainContext.insert(subject)
+  
   return SubjectCollectionBox(
-    subject: .previewBook,
-    collection: .previewBook,
+    subjectId: subject.id,
     isPresented: .constant(true)
   )
   .environmentObject(Notifier())
-  .environmentObject(ChiiClient(mock: .book))
+  .environmentObject(ChiiClient(mock: .anime))
   .modelContainer(container)
 }

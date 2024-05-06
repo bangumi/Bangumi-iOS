@@ -69,20 +69,24 @@ struct SubjectView: View {
       if let subject = subject {
         ScrollView {
           LazyVStack(alignment: .leading) {
-            SubjectHeaderView(subject: subject)
+            SubjectHeaderView(subjectId: subject.id)
+
             if chii.isAuthenticated {
-              SubjectCollectionView(subject: subject)
-            } else {
-              switch subject.typeEnum {
-              case .anime, .music, .real:
-                EpisodeGridView(subject: subject)
-              default:
-                EmptyView()
-              }
+              SubjectCollectionView(subjectId: subject.id)
             }
+
+            switch subject.typeEnum  {
+            case .book:
+              SubjectBookChaptersView(subjectId: subjectId)
+            case .anime, .real:
+              EpisodeGridView(subjectId: subjectId)
+            default:
+              EmptyView()
+            }
+
             if !subject.summary.isEmpty {
               Divider()
-              SubjectSummaryView(subject: subject)
+              SubjectSummaryView(subjectId: subject.id)
             }
             Spacer()
           }
@@ -100,15 +104,23 @@ struct SubjectView: View {
   }
 }
 
-// .anime 12
-// .book 497
 #Preview {
   let config = ModelConfiguration(isStoredInMemoryOnly: true)
   let container = try! ModelContainer(
     for: UserSubjectCollection.self, Subject.self, Episode.self,
     configurations: config)
 
-  return SubjectView(subjectId: 12)
+  let collection = UserSubjectCollection.previewAnime
+  let subject = Subject.previewAnime
+  let episodes = Episode.previewList
+
+  container.mainContext.insert(collection)
+  container.mainContext.insert(subject)
+  for episode in episodes {
+    container.mainContext.insert(episode)
+  }
+
+  return SubjectView(subjectId: subject.id)
     .environmentObject(Notifier())
     .environmentObject(ChiiClient(mock: .anime))
     .modelContainer(container)

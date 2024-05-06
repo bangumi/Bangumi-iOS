@@ -10,7 +10,7 @@ import SwiftData
 import SwiftUI
 
 struct EpisodeGridView: View {
-  let subject: Subject
+  let subjectId: UInt
 
   @EnvironmentObject var notifier: Notifier
   @EnvironmentObject var chii: ChiiClient
@@ -26,7 +26,6 @@ struct EpisodeGridView: View {
     do {
       for type in EpisodeType.allTypes() {
         let typeValue = type.rawValue
-        let subjectId = subject.id
         var descripter = FetchDescriptor<Episode>(
           predicate: #Predicate<Episode> {
             $0.subjectId == subjectId && $0.type == typeValue
@@ -52,7 +51,6 @@ struct EpisodeGridView: View {
     do {
       var offset: Int = 0
       let limit: Int = 1000
-      let subjectId = subject.id
       while true {
         var total: Int = 0
         if authenticated {
@@ -102,7 +100,7 @@ struct EpisodeGridView: View {
       } else {
         Text("章节列表:")
       }
-      NavigationLink(value: NavDestination.episodeList(subjectId: subject.id)) {
+      NavigationLink(value: NavDestination.episodeList(subjectId: subjectId)) {
         Text("[全部]").foregroundStyle(Color("LinkTextColor"))
       }.buttonStyle(.plain)
       Spacer()
@@ -173,7 +171,7 @@ struct EpisodeGridView: View {
     .sheet(
       item: $selected,
       content: { episode in
-        EpisodeInfobox(episode: episode)
+        EpisodeInfobox(subjectId: subjectId, episodeId: episode.id)
           .presentationDragIndicator(.visible)
           .presentationDetents(.init([.medium, .large]))
       }
@@ -188,13 +186,20 @@ struct EpisodeGridView: View {
     configurations: config)
   container.mainContext.insert(UserSubjectCollection.previewAnime)
 
+  let subject = Subject.previewAnime
+  container.mainContext.insert(subject)
+
+  let episodes = Episode.previewList
+  for episode in episodes {
+    container.mainContext.insert(episode)
+  }
+
   return ScrollView {
     LazyVStack(alignment: .leading) {
-      EpisodeGridView(subject: .previewAnime)
+      EpisodeGridView(subjectId: subject.id)
         .environmentObject(Notifier())
         .environmentObject(ChiiClient(mock: .anime))
+        .modelContainer(container)
     }
-  }
-  .padding()
-  .modelContainer(container)
+  }.padding()
 }

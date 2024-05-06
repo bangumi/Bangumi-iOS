@@ -1,5 +1,5 @@
 //
-//  RatingBox.swift
+//  Rating.swift
 //  Chobits
 //
 //  Created by Chuan Chuan on 2024/4/28.
@@ -13,16 +13,15 @@ struct ScoreInfo {
 }
 
 struct SubjectRatingView: View {
-  let subject: Subject
+  let subject: SubjectItem
 
   var collectionDesc: [String] {
     var text: [String] = []
-    let type = subject.typeEnum
-    text.append("\(subject.collection.wish) 人\(CollectionType.wish.description(type: type))")
-    text.append("\(subject.collection.collect) 人\(CollectionType.collect.description(type: type))")
-    text.append("\(subject.collection.doing) 人\(CollectionType.do.description(type: type))")
-    text.append("\(subject.collection.onHold) 人\(CollectionType.onHold.description(type: type))")
-    text.append("\(subject.collection.dropped) 人\(CollectionType.dropped.description(type: type))")
+    text.append("\(subject.collection.wish) 人\(CollectionType.wish.description(type: subject.type))")
+    text.append("\(subject.collection.collect) 人\(CollectionType.collect.description(type: subject.type))")
+    text.append("\(subject.collection.doing) 人\(CollectionType.do.description(type: subject.type))")
+    text.append("\(subject.collection.onHold) 人\(CollectionType.onHold.description(type: subject.type))")
+    text.append("\(subject.collection.dropped) 人\(CollectionType.dropped.description(type: subject.type))")
     return text
   }
 
@@ -59,7 +58,7 @@ struct SubjectRatingView: View {
             }
             if subject.rating.rank > 0 {
               HStack {
-                Text("Bangumi \(subject.typeEnum.name.capitalized) Ranked:").foregroundStyle(
+                Text("Bangumi \(subject.type.name.capitalized) Ranked:").foregroundStyle(
                   .secondary)
                 Text("#\(subject.rating.rank)")
               }
@@ -155,5 +154,5 @@ struct ChartView: View {
 }
 
 #Preview {
-  SubjectRatingView(subject: .previewAnime)
+  SubjectRatingView(subject: Subject.previewAnime.item)
 }

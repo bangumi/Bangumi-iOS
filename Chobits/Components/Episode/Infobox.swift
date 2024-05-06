@@ -5,10 +5,12 @@
 //  Created by Chuan Chuan on 2024/5/4.
 //
 
+import SwiftData
 import SwiftUI
 
 struct EpisodeInfobox: View {
-  let episode: Episode
+  let subjectId: UInt
+  let episodeId: UInt
 
   @EnvironmentObject var notifier: Notifier
   @EnvironmentObject var chii: ChiiClient
@@ -16,12 +18,25 @@ struct EpisodeInfobox: View {
 
   @State private var updating: Bool = false
 
+  @Query
+  private var episodes: [Episode]
+  private var episode: Episode? { episodes.first }
+
+  init(subjectId: UInt, episodeId: UInt) {
+    self.subjectId = subjectId
+    self.episodeId = episodeId
+    let predicate = #Predicate<Episode> {
+      $0.id == episodeId
+    }
+    _episodes = Query(filter: predicate, sort: \Episode.sort)
+  }
+
   func updateSingle(type: EpisodeCollectionType) async {
     updating = true
     do {
-      try await chii.updateEpisodeCollection(episodeId: episode.id, type: type)
+      try await chii.updateEpisodeCollection(episodeId: episodeId, type: type)
       updating = false
-      episode.collection = type.rawValue
+      episode?.collection = type.rawValue
     } catch {
       updating = false
       notifier.alert(error: error)
@@ -30,7 +45,7 @@ struct EpisodeInfobox: View {
 
   func updateBatch() async {
     updating = true
-    let subjectId = episode.subjectId
+    guard let episode = episode else { return }
     let sort = episode.sort
     let actor = BackgroundActor(container: modelContext.container)
     let predicate = #Predicate<Episode> {
@@ -56,76 +71,94 @@ struct EpisodeInfobox: View {
   var body: some View {
     ScrollView {
       VStack(alignment: .leading) {
-        HStack {
-          Text(episode.title).font(.headline).lineLimit(1)
-          Text(episode.typeEnum.description)
-            .font(.footnote)
-            .foregroundStyle(.secondary)
-            .overlay {
-              RoundedRectangle(cornerRadius: 5)
-                .stroke(Color.secondary, lineWidth: 1)
-                .padding(.horizontal, -4)
-                .padding(.vertical, -2)
-            }
-          Spacer()
-          if episode.comment > 0 {
-            Label("讨论", systemImage: "bubble.fill").font(.caption).foregroundStyle(.secondary)
-            Text("(+\(episode.comment))").font(.caption).foregroundStyle(.red)
-          }
-        }
-        if chii.isAuthenticated {
+        if let episode = episode {
           HStack {
-            ForEach(episode.collectionTypeEnum.otherTypes()) { type in
+            Text(episode.title).font(.headline).lineLimit(1)
+            Text(episode.typeEnum.description)
+              .font(.footnote)
+              .foregroundStyle(.secondary)
+              .overlay {
+                RoundedRectangle(cornerRadius: 5)
+                  .stroke(Color.secondary, lineWidth: 1)
+                  .padding(.horizontal, -4)
+                  .padding(.vertical, -2)
+              }
+            Spacer()
+            if episode.comment > 0 {
+              Label("讨论", systemImage: "bubble.fill").font(.caption).foregroundStyle(.secondary)
+              Text("(+\(episode.comment))").font(.caption).foregroundStyle(.red)
+            }
+          }
+          if chii.isAuthenticated {
+            HStack {
+              ForEach(episode.collectionTypeEnum.otherTypes()) { type in
+                Button {
+                  Task {
+                    await updateSingle(type: type)
+                  }
+                } label: {
+                  Text(type.action)
+                }
+              }.buttonStyle(.borderedProminent)
               Button {
                 Task {
-                  await updateSingle(type: type)
+                  await updateBatch()
                 }
               } label: {
-                Text(type.action)
+                Text("看到")
               }
-            }.buttonStyle(.borderedProminent)
-            Button {
-              Task {
-                await updateBatch()
-              }
-            } label: {
-              Text("看到")
+              .buttonStyle(.bordered)
+              .foregroundColor(.red)
+              Spacer()
+              Text(episode.collectionTypeEnum.description).foregroundStyle(.red)
             }
-            .buttonStyle(.bordered)
-            .foregroundColor(.red)
-            Spacer()
-            Text(episode.collectionTypeEnum.description).foregroundStyle(.red)
+            .font(.callout)
+            .disabled(updating)
           }
-          .font(.callout)
-          .disabled(updating)
+          Divider()
+          if !episode.name.isEmpty {
+            Text("标题: \(episode.name)")
+          }
+          if !episode.nameCn.isEmpty {
+            Text("中文标题: \(episode.nameCn)")
+          }
+          if !episode.airdateStr.isEmpty {
+            Text("首播时间: \(episode.airdateStr)")
+          }
+          if !episode.duration.isEmpty {
+            Text("时长: \(episode.duration)")
+          }
+          if episode.disc > 0 {
+            Text("Disc: \(episode.disc)")
+          }
+          if !episode.desc.isEmpty {
+            Text("描述:")
+            Text(episode.desc).foregroundStyle(.secondary)
+          }
+          Spacer()
         }
-        Divider()
-        if !episode.name.isEmpty {
-          Text("标题: \(episode.name)")
-        }
-        if !episode.nameCn.isEmpty {
-          Text("中文标题: \(episode.nameCn)")
-        }
-        if !episode.airdateStr.isEmpty {
-          Text("首播时间: \(episode.airdateStr)")
-        }
-        if !episode.duration.isEmpty {
-          Text("时长: \(episode.duration)")
-        }
-        if episode.disc > 0 {
-          Text("Disc: \(episode.disc)")
-        }
-        if !episode.desc.isEmpty {
-          Text("描述:")
-          Text(episode.desc).foregroundStyle(.secondary)
-        }
-        Spacer()
       }
     }.padding()
   }
 }
 
 #Preview {
-  EpisodeInfobox(episode: .preview)
-    .environmentObject(ChiiClient(mock: .anime))
+  let config = ModelConfiguration(isStoredInMemoryOnly: true)
+  let container = try! ModelContainer(
+    for: UserSubjectCollection.self, Subject.self, Episode.self,
+    configurations: config)
+  container.mainContext.insert(UserSubjectCollection.previewAnime)
+
+  let subject = Subject.previewAnime
+  container.mainContext.insert(subject)
+
+  let episodes = Episode.previewList
+  for episode in episodes {
+    container.mainContext.insert(episode)
+  }
+
+  return EpisodeInfobox(subjectId: subject.id, episodeId: episodes.first!.id)
+    .environmentObject(Notifier())
+    .environment(ChiiClient(mock: .anime))
+    .modelContainer(container)
 }

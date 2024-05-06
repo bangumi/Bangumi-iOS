@@ -9,7 +9,7 @@ import SwiftData
 import SwiftUI
 
 struct SubjectCollectionView: View {
-  let subject: Subject
+  let subjectId: UInt
 
   @EnvironmentObject var notifier: Notifier
   @EnvironmentObject var chii: ChiiClient
@@ -22,13 +22,12 @@ struct SubjectCollectionView: View {
   private var collections: [UserSubjectCollection]
   var collection: UserSubjectCollection? { collections.first }
 
-  init(subject: Subject) {
-    self.subject = subject
-    let subjectId = subject.id
-    let predicate = #Predicate<UserSubjectCollection> {
-      $0.subjectId == subjectId
-    }
-    _collections = Query(filter: predicate)
+  init(subjectId: UInt) {
+    self.subjectId = subjectId
+    _collections = Query(
+      filter: #Predicate<UserSubjectCollection> {
+        $0.subjectId == subjectId
+      })
   }
 
   func updateCollection() async {
@@ -37,14 +36,13 @@ struct SubjectCollectionView: View {
     }
     let actor = BackgroundActor(container: modelContext.container)
     do {
-      let item = try await chii.getSubjectCollection(sid: subject.id)
+      let item = try await chii.getSubjectCollection(sid: subjectId)
       let collection = UserSubjectCollection(item: item)
       await actor.insert(data: collection)
       try await actor.save()
       self.page.success()
     } catch ChiiError.notFound(_) {
       do {
-        let subjectId = subject.id
         try await actor.remove(
           predicate: #Predicate<UserSubjectCollection> { collection in
             collection.subjectId == subjectId
@@ -86,7 +84,7 @@ struct SubjectCollectionView: View {
           .sheet(
             isPresented: $edit,
             content: {
-              SubjectCollectionBox(subject: subject, collection: collection, isPresented: $edit)
+              SubjectCollectionBox(subjectId: subjectId, isPresented: $edit)
                 .presentationDragIndicator(.visible)
                 .presentationDetents(.init([.medium, .large]))
             })
@@ -121,7 +119,7 @@ struct SubjectCollectionView: View {
               .sheet(
                 isPresented: $edit,
                 content: {
-                  SubjectCollectionBox(subject: subject, collection: nil, isPresented: $edit)
+                  SubjectCollectionBox(subjectId: subjectId, isPresented: $edit)
                     .presentationDragIndicator(.visible)
                     .presentationDetents(.init([.medium, .large]))
                 })
@@ -136,19 +134,6 @@ struct SubjectCollectionView: View {
     .task(priority: .background) {
       await updateCollection()
     }
-
-    switch subject.typeEnum {
-    case .book:
-      if let collection = collection {
-        SubjectCollectionBookView(subject: subject, collection: collection)
-      } else {
-        EmptyView()
-      }
-    case .anime, .real:
-      EpisodeGridView(subject: subject)
-    default:
-      EmptyView()
-    }
   }
 }
 
@@ -157,11 +142,13 @@ struct SubjectCollectionView: View {
   let container = try! ModelContainer(
     for: UserSubjectCollection.self, Subject.self, Episode.self,
     configurations: config)
-  container.mainContext.insert(UserSubjectCollection.previewBook)
+
+  let collection = UserSubjectCollection.previewBook
+  container.mainContext.insert(collection)
 
   return ScrollView {
     LazyVStack(alignment: .leading) {
-      SubjectCollectionView(subject: .previewBook)
+      SubjectCollectionView(subjectId: collection.subjectId)
         .environmentObject(Notifier())
         .environmentObject(ChiiClient(mock: .book))
     }

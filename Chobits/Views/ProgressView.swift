@@ -162,7 +162,7 @@ struct ChiiProgressView: View {
               LazyVStack(alignment: .leading, spacing: 10) {
                 ForEach(collections, id: \.idx) { item in
                   NavigationLink(value: NavDestination.subject(subjectId: item.inner.subjectId)) {
-                    UserCollectionRow(collection: item.inner)
+                    UserCollectionRow(collection: item.inner.item)
                   }
                   .buttonStyle(PlainButtonStyle())
                   .task(priority: .background) {

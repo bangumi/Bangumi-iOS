@@ -9,13 +9,13 @@ import SwiftData
 import SwiftUI
 
 struct UserCollectionRow: View {
-  let collection: UserSubjectCollection
+  let collection: UserSubjectCollectionItem
 
   @Query
   private var subjects: [Subject]
   var subject: Subject? { subjects.first }
 
-  init(collection: UserSubjectCollection) {
+  init(collection: UserSubjectCollectionItem) {
     self.collection = collection
 
     let subjectId = collection.subjectId
@@ -65,12 +65,12 @@ struct UserCollectionRow: View {
           Text(subject?.name ?? "").font(.headline)
           Text(subject?.nameCn ?? "").font(.footnote).foregroundStyle(.secondary)
           HStack {
-            Text(collection.updatedAt.formatted()).foregroundStyle(.secondary)
-            if collection.priv {
+            Text(collection.updatedAt).foregroundStyle(.secondary)
+            if collection.private {
               Image(systemName: "lock.fill").foregroundStyle(.accent)
             }
             Spacer()
-            switch collection.subjectTypeEnum {
+            switch collection.subjectType {
             case .anime:
               Text(chapters)
                 .foregroundStyle(epsColor)
@@ -112,8 +112,8 @@ struct UserCollectionRow: View {
                 .padding(.horizontal, 2)
             default:
               Label(
-                collection.subjectTypeEnum.description,
-                systemImage: collection.subjectTypeEnum.icon
+                collection.subjectType.description,
+                systemImage: collection.subjectType.icon
               )
               .foregroundStyle(.accent)
             }
@@ -128,17 +128,20 @@ struct UserCollectionRow: View {
   }
 }
 
-
-
 #Preview {
   let config = ModelConfiguration(isStoredInMemoryOnly: true)
-  let container = try! ModelContainer(for:Subject.self, UserSubjectCollection.self, configurations: config)
-  container.mainContext.insert(UserSubjectCollection.previewBook)
-  container.mainContext.insert(Subject.previewBook)
+  let container = try! ModelContainer(
+    for: Subject.self, UserSubjectCollection.self, configurations: config)
+
+  let collection = UserSubjectCollection.previewBook
+  let subject = Subject.previewBook
+
+  container.mainContext.insert(collection)
+  container.mainContext.insert(subject)
 
   return ScrollView {
     LazyVStack(alignment: .leading) {
-      UserCollectionRow(collection: .previewBook)
+      UserCollectionRow(collection: collection.item)
         .environmentObject(Notifier())
     }
   }

@@ -20,3 +20,7 @@ struct LoadingView: View {
     .symbolEffect(.variableColor.iterative.dimInactiveLayers)
   }
 }
+
+#Preview {
+  LoadingView()
+}

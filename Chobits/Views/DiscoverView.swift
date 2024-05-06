@@ -154,7 +154,7 @@ struct ChiiDiscoverView: View {
                 LazyVStack(alignment: .leading, spacing: 10) {
                   ForEach(subjects, id: \.idx) { item in
                     NavigationLink(value: NavDestination.subject(subjectId: item.inner.id)) {
-                      SubjectSearchRow(subject: item.inner)
+                      SubjectSearchRow(subject: item.inner.item)
                         .task(priority: .background) {
                           if local {
                             await localSearchNextPage(idx: item.idx)

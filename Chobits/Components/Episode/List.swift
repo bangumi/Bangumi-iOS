@@ -85,7 +85,7 @@ struct EpisodeListView: View {
     self.episodes.append(contentsOf: episodes)
   }
 
-  func pickerHeader(type: EpisodeType ) -> String {
+  func pickerHeader(type: EpisodeType) -> String {
     let count = counts[type, default: 0]
     if count == 0 {
       return "\(type.description)"
@@ -197,11 +197,11 @@ struct EpisodeListView: View {
     .sheet(
       item: $selected,
       content: { episode in
-        EpisodeInfobox(episode: episode)
+        EpisodeInfobox(subjectId: subjectId, episodeId: episode.id)
           .presentationDragIndicator(.visible)
           .presentationDetents(.init([.medium, .large]))
-      })
-
+      }
+    )
   }
 }
 
@@ -210,12 +210,15 @@ struct EpisodeListView: View {
   let container = try! ModelContainer(
     for: UserSubjectCollection.self, Subject.self, Episode.self,
     configurations: config)
+
+  let subject = Subject.previewAnime
+  container.mainContext.insert(subject)
   let episodes = Episode.previewList
   for episode in episodes {
     container.mainContext.insert(episode)
   }
 
-  return EpisodeListView(subjectId: Subject.previewAnime.id)
+  return EpisodeListView(subjectId: subject.id)
     .environmentObject(Notifier())
     .environment(ChiiClient(mock: .anime))
     .modelContainer(container)

@@ -8,9 +8,8 @@
 import SwiftData
 import SwiftUI
 
-struct SubjectCollectionBookView: View {
-  let subject: Subject
-  let collection: UserSubjectCollection
+struct SubjectBookChaptersView: View {
+  let subjectId: UInt
 
   @EnvironmentObject var notifier: Notifier
   @EnvironmentObject var chii: ChiiClient
@@ -20,12 +19,39 @@ struct SubjectCollectionBookView: View {
   @State private var vols: UInt?
   @State private var updating: Bool = false
 
+  @Query
+  private var subjects: [Subject]
+  private var subject: Subject? { subjects.first }
+
+  @Query
+  private var collections: [UserSubjectCollection]
+  private var collection: UserSubjectCollection? { collections.first }
+
+  init(subjectId: UInt) {
+    self.subjectId = subjectId
+    _subjects = Query(
+      filter: #Predicate<Subject> {
+        $0.id == subjectId
+      })
+    _collections = Query(
+      filter: #Predicate<UserSubjectCollection> {
+        $0.subjectId == subjectId
+      })
+  }
+
+  var updateButtonDisable: Bool {
+    if updating {
+      return true
+    }
+    return eps == nil && vols == nil
+  }
+
   func update() {
     self.updating = true
     let actor = BackgroundActor(container: modelContext.container)
     Task {
       do {
-        let item = try await chii.updateSubjectCollection(sid: subject.id, eps: eps, vols: vols)
+        let item = try await chii.updateSubjectCollection(sid: subjectId, eps: eps, vols: vols)
         let collect = UserSubjectCollection(item: item)
         await actor.insert(data: collect)
         try await actor.save()
@@ -39,11 +65,23 @@ struct SubjectCollectionBookView: View {
   }
 
   var epsDesc: String {
+    guard let subject = self.subject else { return "/?话" }
     return subject.eps > 0 ? "/\(subject.eps)话" : "/?话"
   }
 
   var volumesDesc: String {
+    guard let subject = self.subject else { return "/?卷" }
     return subject.volumes > 0 ? "/\(subject.volumes)卷" : "/?卷"
+  }
+
+  var collectionEps: UInt {
+    guard let collection = self.collection else { return 0 }
+    return collection.epStatus
+  }
+
+  var collectionVols: UInt {
+    guard let collection = self.collection else { return 0 }
+    return collection.volStatus
   }
 
   var body: some View {
@@ -53,12 +91,12 @@ struct SubjectCollectionBookView: View {
           if let value = eps {
             self.eps = value + 1
           } else {
-            self.eps = collection.epStatus + 1
+            self.eps = collectionEps + 1
           }
         } label: {
           Image(systemName: "plus.circle").foregroundStyle(.secondary).padding(.trailing, 5)
         }.buttonStyle(.plain)
-        TextField("\(collection.epStatus)", value: $eps, formatter: NumberFormatter())
+        TextField("\(collectionEps)", value: $eps, formatter: NumberFormatter())
           .keyboardType(.numberPad)
           .frame(width: 50)
           .multilineTextAlignment(.trailing)
@@ -73,12 +111,12 @@ struct SubjectCollectionBookView: View {
           if let value = vols {
             self.vols = value + 1
           } else {
-            self.vols = collection.volStatus + 1
+            self.vols = collectionVols + 1
           }
         } label: {
           Image(systemName: "plus.circle").foregroundStyle(.secondary).padding(.trailing, 5)
         }.buttonStyle(.plain)
-        TextField("\(collection.volStatus)", value: $vols, formatter: NumberFormatter())
+        TextField("\(collectionVols)", value: $vols, formatter: NumberFormatter())
           .keyboardType(.numberPad)
           .frame(width: 50)
           .multilineTextAlignment(.trailing)
@@ -89,6 +127,7 @@ struct SubjectCollectionBookView: View {
       }.monospaced()
       Spacer()
       Button("更新", action: update)
+        .disabled(updateButtonDisable)
         .buttonStyle(.borderedProminent)
     }.disabled(updating)
   }
@@ -96,16 +135,21 @@ struct SubjectCollectionBookView: View {
 
 #Preview {
   let config = ModelConfiguration(isStoredInMemoryOnly: true)
-  let container = try! ModelContainer(for: UserSubjectCollection.self, configurations: config)
-  container.mainContext.insert(UserSubjectCollection.previewBook)
+  let container = try! ModelContainer(for: UserSubjectCollection.self, Subject.self, configurations: config)
+
+  let collection = UserSubjectCollection.previewBook
+  let subject = Subject.previewBook
+
+  container.mainContext.insert(collection)
+  container.mainContext.insert(subject)
 
   return ScrollView {
     LazyVStack(alignment: .leading) {
-      SubjectCollectionBookView(subject: .previewBook, collection: .previewBook)
+      SubjectBookChaptersView(subjectId: subject.id)
         .environmentObject(Notifier())
         .environmentObject(ChiiClient(mock: .book))
+        .modelContainer(container)
     }
   }
   .padding()
-  .modelContainer(container)
 }

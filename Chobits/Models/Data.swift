@@ -31,6 +31,15 @@ final class UserSubjectCollection {
     CollectionType(value: type)
   }
 
+  var item: UserSubjectCollectionItem {
+    UserSubjectCollectionItem(
+      subjectId: subjectId, subjectType: SubjectType(value: subjectType),
+      rate: rate, type: CollectionType(value: type), comment: comment,
+      tags: tags, epStatus: epStatus, volStatus: volStatus,
+      updatedAt: updatedAt.description, private: priv
+    )
+  }
+
   init(
     subjectId: UInt, subjectType: UInt8, rate: UInt8, type: UInt8, comment: String, tags: [String],
     epStatus: UInt, volStatus: UInt, updatedAt: Date, priv: Bool
@@ -49,7 +58,7 @@ final class UserSubjectCollection {
 
   init(item: UserSubjectCollectionItem) {
     self.subjectId = item.subjectId
-    self.subjectType = item.subjectType
+    self.subjectType = item.subjectType.rawValue
     self.rate = item.rate
     self.type = item.type.rawValue
     self.comment = item.comment ?? ""
@@ -104,6 +113,16 @@ final class Subject {
 
   var typeEnum: SubjectType {
     return SubjectType(value: type)
+  }
+
+  var item: SubjectItem {
+    return SubjectItem(
+      id: id, type: SubjectType(value: type), name: name, nameCn: nameCn,
+      summary: summary, nsfw: nsfw, locked: locked,
+      date: date.formatAirdate, platform: platform,
+      images: images, infobox: infobox, volumes: volumes, eps: eps,
+      totalEpisodes: totalEpisodes, rating: rating, collection: collection, tags: tags
+    )
   }
 
   init(

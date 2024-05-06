@@ -207,8 +207,9 @@ enum CollectionType: UInt8, Codable, Identifiable {
     return [.wish, .collect, .do, .onHold, .dropped]
   }
 
-  func description(type: SubjectType) -> String {
+  func description(type: SubjectType?) -> String {
     var action: String
+    let type = type ?? .unknown
     switch type {
     case .book:
       action = "读"

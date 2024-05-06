@@ -6,19 +6,36 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct SubjectSummaryView: View {
-  let subject: Subject
+  let subjectId: UInt
+
+  @EnvironmentObject var notifier: Notifier
+  @EnvironmentObject var chii: ChiiClient
+  @Environment(\.modelContext) private var modelContext
 
   @State private var collapsed = true
 
+  @Query
+  private var subjects: [Subject]
+  var subject: Subject? { subjects.first }
+
+  init(subjectId: UInt) {
+    self.subjectId = subjectId
+    let predicate = #Predicate<Subject> {
+      $0.id == subjectId
+    }
+    _subjects = Query(filter: predicate, sort: \Subject.id)
+  }
+
   var tags: [Tag] {
-    Array(subject.tags.sorted { $0.count > $1.count }.prefix(20))
+    guard let subject = self.subject else { return [] }
+    return Array(subject.tags.sorted { $0.count > $1.count }.prefix(20))
   }
 
   var body: some View {
-    Text("简介").font(.headline)
-    Text(subject.summary)
+    Text(subject?.summary ?? "")
       .font(.footnote)
       .multilineTextAlignment(.leading)
       .lineLimit(collapsed ? 5 : nil)
@@ -63,9 +80,19 @@ struct SubjectSummaryView: View {
 }
 
 #Preview {
-  ScrollView {
+  let config = ModelConfiguration(isStoredInMemoryOnly: true)
+  let container = try! ModelContainer(for: UserSubjectCollection.self, Subject.self, configurations: config)
+
+  let subject = Subject.previewBook
+
+  container.mainContext.insert(subject)
+
+  return ScrollView {
     LazyVStack(alignment: .leading) {
-      SubjectSummaryView(subject: .previewAnime)
+      SubjectSummaryView(subjectId: subject.id)
+        .environmentObject(Notifier())
+        .environmentObject(ChiiClient(mock: .book))
+        .modelContainer(container)
     }
   }.padding()
 }

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct SubjectSearchRow: View {
-  let subject: Subject
+  let subject: SubjectItem
 
   var body: some View {
     ZStack {
@@ -24,10 +24,10 @@ struct SubjectSearchRow: View {
           Text(subject.name).font(.headline)
           Text(subject.nameCn).font(.subheadline).foregroundStyle(.secondary)
           HStack {
-            Label(subject.typeEnum.description, systemImage: subject.typeEnum.icon).foregroundStyle(
+            Label(subject.type.description, systemImage: subject.type.icon).foregroundStyle(
               .accent)
-            if subject.date.timeIntervalSince1970 > 0 {
-              Label(subject.date.formatAirdate, systemImage: "calendar").foregroundStyle(.secondary)
+            if let airDate = subject.date {
+              Label(airDate, systemImage: "calendar").foregroundStyle(.secondary)
             }
             Spacer()
             if subject.rating.rank > 0 {
@@ -52,7 +52,7 @@ struct SubjectSearchRow: View {
 #Preview {
   ScrollView {
     LazyVStack(alignment: .leading, spacing: 10) {
-      SubjectSearchRow(subject: .previewAnime)
+      SubjectSearchRow(subject: Subject.previewAnime.item)
     }
   }
   .padding(.horizontal, 16)

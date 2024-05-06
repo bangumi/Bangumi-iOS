@@ -45,7 +45,7 @@ struct BangumiCalendarItem: Codable {
 
 struct UserSubjectCollectionItem: Codable {
   var subjectId: UInt
-  var subjectType: UInt8
+  var subjectType: SubjectType
   var rate: UInt8
   var type: CollectionType
   var comment: String?
