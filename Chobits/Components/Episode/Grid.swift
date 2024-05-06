@@ -17,8 +17,6 @@ struct EpisodeGridView: View {
   @Environment(\.modelContext) private var modelContext
 
   @State private var selected: Episode? = nil
-  @StateObject private var page: PageStatus = PageStatus()
-
   @State private var episodes: [EpisodeType: [Episode]] = [:]
 
   func fetch() async {
@@ -44,9 +42,6 @@ struct EpisodeGridView: View {
   }
 
   func update(authenticated: Bool) async {
-    if !self.page.start() {
-      return
-    }
     let actor = BackgroundActor(container: modelContext.container)
     do {
       var offset: Int = 0
@@ -82,14 +77,8 @@ struct EpisodeGridView: View {
         }
       }
       try await actor.save()
-      await MainActor.run {
-        page.success()
-      }
     } catch {
-      await MainActor.run {
-        notifier.alert(error: error)
-        page.finish()
-      }
+      notifier.alert(error: error)
     }
   }
 

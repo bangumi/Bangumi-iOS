@@ -111,14 +111,14 @@ struct EpisodeListView: View {
       Image(systemName: sortDesc ? "arrow.down.circle.fill" : "arrow.up.circle.fill")
         .foregroundStyle(sortDesc ? .accent : .secondary)
         .font(.title)
-      .onTapGesture {
-        self.sortDesc.toggle()
-      }
-      .onChange(of: sortDesc) {
-        Task {
-          await load()
+        .onTapGesture {
+          self.sortDesc.toggle()
         }
-      }
+        .onChange(of: sortDesc) {
+          Task {
+            await load()
+          }
+        }
     }.padding(.horizontal, 16)
     ScrollView {
       LazyVStack {

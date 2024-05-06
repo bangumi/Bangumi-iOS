@@ -16,7 +16,6 @@ struct SubjectCollectionView: View {
   @Environment(\.modelContext) var modelContext
 
   @State private var edit: Bool = false
-  @StateObject private var page: PageStatus = PageStatus()
 
   @Query
   private var collections: [UserSubjectCollection]
@@ -31,16 +30,12 @@ struct SubjectCollectionView: View {
   }
 
   func updateCollection() async {
-    if !self.page.start() {
-      return
-    }
     let actor = BackgroundActor(container: modelContext.container)
     do {
       let item = try await chii.getSubjectCollection(sid: subjectId)
       let collection = UserSubjectCollection(item: item)
       await actor.insert(data: collection)
       try await actor.save()
-      self.page.success()
     } catch ChiiError.notFound(_) {
       do {
         try await actor.remove(
@@ -51,10 +46,8 @@ struct SubjectCollectionView: View {
       } catch {
         notifier.alert(message: "could not clear collection: \(error)")
       }
-      self.page.missing()
     } catch {
       notifier.alert(error: error)
-      self.page.finish()
     }
   }
 
@@ -102,36 +95,31 @@ struct SubjectCollectionView: View {
             }
           }
         } else {
-          if self.page.empty {
-            Label("未收藏", systemImage: "plus")
-              .font(.callout)
-              .foregroundStyle(.secondary)
-              .overlay {
-                RoundedRectangle(cornerRadius: 5)
-                  .stroke(.secondary, lineWidth: 1)
-                  .padding(.horizontal, -4)
-                  .padding(.vertical, -2)
-              }
-              .padding(5)
-              .onTapGesture {
-                edit.toggle()
-              }
-              .sheet(
-                isPresented: $edit,
-                content: {
-                  SubjectCollectionBox(subjectId: subjectId, collection: nil)
-                    .presentationDragIndicator(.visible)
-                    .presentationDetents(.init([.medium, .large]))
+          Label("未收藏", systemImage: "plus")
+            .font(.callout)
+            .foregroundStyle(.secondary)
+            .overlay {
+              RoundedRectangle(cornerRadius: 5)
+                .stroke(.secondary, lineWidth: 1)
+                .padding(.horizontal, -4)
+                .padding(.vertical, -2)
+            }
+            .padding(5)
+            .onTapGesture {
+              edit.toggle()
+            }
+            .sheet(
+              isPresented: $edit,
+              content: {
+                SubjectCollectionBox(subjectId: subjectId, collection: nil)
+                  .presentationDragIndicator(.visible)
+                  .presentationDetents(.init([.medium, .large]))
 
-                })
-            Spacer()
-          } else {
-            ProgressView().padding(5)
-          }
+              })
+          Spacer()
         }
       }.padding(.horizontal, 4)
     }
-    .animation(.default, value: page.empty)
     .task(priority: .background) {
       await updateCollection()
     }

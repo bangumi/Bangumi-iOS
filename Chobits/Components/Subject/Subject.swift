@@ -16,8 +16,6 @@ struct SubjectView: View {
   @EnvironmentObject var chii: ChiiClient
   @Environment(\.modelContext) var modelContext
 
-  @StateObject private var page: PageStatus = PageStatus()
-
   @Query
   private var subjects: [Subject]
   var subject: Subject? { subjects.first }
@@ -31,9 +29,6 @@ struct SubjectView: View {
   }
 
   func updateSubject() async {
-    if !self.page.start() {
-      return
-    }
     Logger.subject.info("updating subject: \(self.subjectId)")
     let actor = BackgroundActor(container: modelContext.container)
     do {
@@ -44,7 +39,6 @@ struct SubjectView: View {
       // 后面可以考虑直接跳转到页面
       if self.subjectId != item.id {
         Logger.subject.warning("subject id mismatch: \(self.subjectId) != \(item.id)")
-        self.page.missing()
         return
       }
 
@@ -52,15 +46,12 @@ struct SubjectView: View {
       let subject = Subject(item: item)
       await actor.insert(data: subject)
       try await actor.save()
-      self.page.success()
     } catch ChiiError.notFound(_) {
       if let subject = subject {
         await actor.delete(data: subject)
       }
-      self.page.missing()
     } catch {
       notifier.alert(error: error)
-      self.page.finish()
     }
   }
 
@@ -84,19 +75,14 @@ struct SubjectView: View {
               EmptyView()
             }
 
-            if !subject.summary.isEmpty {
-              Divider()
-              SubjectSummaryView(subjectId: subject.id)
-            }
+            Divider()
+            SubjectSummaryView(subjectId: subject.id)
+
             Spacer()
           }
         }.padding()
       } else {
-        if page.empty {
-          NotFoundView()
-        } else {
-          ProgressView()
-        }
+        NotFoundView()
       }
     }.task(priority: .background) {
       await updateSubject()
