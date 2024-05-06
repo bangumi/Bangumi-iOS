@@ -36,7 +36,7 @@ final class UserSubjectCollection {
       subjectId: subjectId, subjectType: SubjectType(value: subjectType),
       rate: rate, type: CollectionType(value: type), comment: comment,
       tags: tags, epStatus: epStatus, volStatus: volStatus,
-      updatedAt: updatedAt.description, private: priv
+      updatedAt:  updatedAt.formatCollectionDate, private: priv
     )
   }
 
