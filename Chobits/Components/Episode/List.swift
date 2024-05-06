@@ -108,10 +108,12 @@ struct EpisodeListView: View {
         }
       }
       Spacer()
-      Toggle(isOn: $sortDesc) {
+      Image(systemName: sortDesc ? "arrow.down.circle.fill" : "arrow.up.circle.fill")
+        .foregroundStyle(sortDesc ? .accent : .secondary)
+        .font(.title)
+      .onTapGesture {
+        self.sortDesc.toggle()
       }
-      .frame(width: 50)
-      .toggleStyle(.switch)
       .onChange(of: sortDesc) {
         Task {
           await load()
@@ -197,7 +199,7 @@ struct EpisodeListView: View {
     .sheet(
       item: $selected,
       content: { episode in
-        EpisodeInfobox(subjectId:subjectId, episodeId: episode.id)
+        EpisodeInfobox(subjectId: subjectId, episodeId: episode.id)
           .presentationDragIndicator(.visible)
           .presentationDetents(.init([.medium, .large]))
       }

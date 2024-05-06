@@ -20,7 +20,7 @@ struct EpisodeInfobox: View {
   @State private var updating: Bool = false
   @State private var episode: Episode?
 
-  init(subjectId:UInt, episodeId: UInt) {
+  init(subjectId: UInt, episodeId: UInt) {
     self.subjectId = subjectId
     self.episodeId = episodeId
   }

@@ -171,7 +171,7 @@ struct EpisodeGridView: View {
     .sheet(
       item: $selected,
       content: { episode in
-        EpisodeInfobox(subjectId:subjectId, episodeId: episode.id)
+        EpisodeInfobox(subjectId: subjectId, episodeId: episode.id)
           .presentationDragIndicator(.visible)
           .presentationDetents(.init([.medium, .large]))
       }
