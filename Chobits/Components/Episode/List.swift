@@ -111,6 +111,7 @@ struct EpisodeListView: View {
       Image(systemName: sortDesc ? "arrow.down.circle.fill" : "arrow.up.circle.fill")
         .foregroundStyle(sortDesc ? .accent : .secondary)
         .font(.title)
+        .sensoryFeedback(.selection, trigger: sortDesc)
         .onTapGesture {
           self.sortDesc.toggle()
         }

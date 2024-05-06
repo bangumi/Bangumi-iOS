@@ -105,6 +105,7 @@ struct SubjectCollectionBox: View {
           .toggleStyle(.button)
           .buttonStyle(.borderedProminent)
           .frame(width: 40)
+          .sensoryFeedback(.selection, trigger: priv)
         }.padding(.vertical, 5)
         if let collection = collection {
           Text("上次更新：\(collection.updatedAt)").font(.caption).foregroundStyle(.secondary)
