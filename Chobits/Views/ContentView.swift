@@ -86,7 +86,7 @@ enum ContentViewTab: String, CaseIterable, Identifiable {
 
 class NavState: ObservableObject, Observable {
   @Published var selected: ContentViewTab = .progress
-  @Published var timelineNavigation = NavigationPath()
-  @Published var progressNavigation = NavigationPath()
-  @Published var discoverNavigation = NavigationPath()
+  @Published var timelineNavigation: [NavDestination] = []
+  @Published var progressNavigation: [NavDestination] = []
+  @Published var discoverNavigation: [NavDestination] = []
 }

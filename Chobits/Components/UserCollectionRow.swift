@@ -77,7 +77,7 @@ struct UserCollectionRow: View {
             case .book:
               Text("\(collection.epStatus)").foregroundStyle(epsColor).font(.callout)
               Text("\(chapters)").foregroundStyle(epsColor)
-              Text("\(collection.volStatus)").foregroundStyle(epsColor).font(.callout)
+              Text("\(collection.volStatus)").foregroundStyle(volsColor).font(.callout)
               Text("\(volumes)").foregroundStyle(volsColor)
             case .real:
               Text("\(collection.epStatus)").foregroundStyle(epsColor).font(.callout)

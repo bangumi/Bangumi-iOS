@@ -104,7 +104,7 @@ struct SubjectCollectionView: View {
         } else {
           if self.page.empty {
             Label("未收藏", systemImage: "plus")
-              .font(.footnote)
+              .font(.callout)
               .foregroundStyle(.secondary)
               .overlay {
                 RoundedRectangle(cornerRadius: 5)
