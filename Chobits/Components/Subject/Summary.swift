@@ -36,7 +36,7 @@ struct SubjectSummaryView: View {
 
   var body: some View {
     Text(subject?.summary ?? "")
-      .font(.footnote)
+      .font(.callout)
       .multilineTextAlignment(.leading)
       .lineLimit(collapsed ? 5 : nil)
       .animation(.default, value: collapsed)
@@ -59,7 +59,7 @@ struct SubjectSummaryView: View {
       ForEach(tags, id: \.name) { tag in
         HStack {
           Text(tag.name)
-            .font(.caption)
+            .font(.footnote)
             .foregroundStyle(Color("LinkTextColor"))
             .lineLimit(1)
           Text("\(tag.count)")

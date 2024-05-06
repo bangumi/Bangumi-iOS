@@ -36,18 +36,18 @@ struct UserCollectionRow: View {
   var chapters: String {
     guard let subject = subject else { return "" }
     if subject.eps > 0 {
-      return "\(collection.epStatus) / \(subject.eps) 话"
+      return "/ \(subject.eps) 话"
     } else {
-      return "\(collection.epStatus) / ? 话"
+      return "/ ? 话"
     }
   }
 
   var volumes: String {
     guard let subject = subject else { return "" }
     if subject.volumes > 0 {
-      return "\(collection.volStatus) / \(subject.volumes) 卷"
+      return "/ \(subject.volumes) 卷"
     } else {
-      return "\(collection.volStatus) / ? 卷"
+      return "/ ? 卷"
     }
   }
 
@@ -59,7 +59,7 @@ struct UserCollectionRow: View {
         .frame(height: 64)
         .clipShape(RoundedRectangle(cornerRadius: 10))
         .shadow(color: .accent, radius: 1, x: 1, y: 1)
-      HStack {
+      HStack(alignment: .top) {
         ImageView(img: subject?.images.common, width: 60, height: 60)
         VStack(alignment: .leading) {
           Text(subject?.name ?? "").font(.headline)
@@ -72,44 +72,16 @@ struct UserCollectionRow: View {
             Spacer()
             switch collection.subjectType {
             case .anime:
-              Text(chapters)
-                .foregroundStyle(epsColor)
-                .overlay {
-                  RoundedRectangle(cornerRadius: 5)
-                    .stroke(epsColor, lineWidth: 1)
-                    .padding(.horizontal, -4)
-                    .padding(.vertical, -2)
-                }
-                .padding(.horizontal, 2)
+              Text("\(collection.epStatus)").foregroundStyle(epsColor).font(.callout)
+              Text(chapters).foregroundStyle(epsColor)
             case .book:
-              Text("\(chapters)")
-                .foregroundStyle(epsColor)
-                .overlay {
-                  RoundedRectangle(cornerRadius: 5)
-                    .stroke(epsColor, lineWidth: 1)
-                    .padding(.horizontal, -4)
-                    .padding(.vertical, -2)
-                }
-                .padding(.horizontal, 4)
-              Text("\(volumes)")
-                .foregroundStyle(volsColor)
-                .overlay {
-                  RoundedRectangle(cornerRadius: 5)
-                    .stroke(volsColor, lineWidth: 1)
-                    .padding(.horizontal, -4)
-                    .padding(.vertical, -2)
-                }
-                .padding(.horizontal, 2)
+              Text("\(collection.epStatus)").foregroundStyle(epsColor).font(.callout)
+              Text("\(chapters)").foregroundStyle(epsColor)
+              Text("\(collection.volStatus)").foregroundStyle(epsColor).font(.callout)
+              Text("\(volumes)").foregroundStyle(volsColor)
             case .real:
-              Text(chapters)
-                .foregroundStyle(epsColor)
-                .overlay {
-                  RoundedRectangle(cornerRadius: 5)
-                    .stroke(epsColor, lineWidth: 1)
-                    .padding(.horizontal, -4)
-                    .padding(.vertical, -2)
-                }
-                .padding(.horizontal, 2)
+              Text("\(collection.epStatus)").foregroundStyle(epsColor).font(.callout)
+              Text(chapters).foregroundStyle(epsColor)
             default:
               Label(
                 collection.subjectType.description,

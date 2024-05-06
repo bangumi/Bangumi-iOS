@@ -60,7 +60,7 @@ struct SubjectHeaderView: View {
           }.font(.footnote)
           Spacer()
           Text(subject.name)
-            .font(.title3.bold())
+            .font(.title2.bold())
             .multilineTextAlignment(.leading)
             .lineLimit(2)
           Spacer()
@@ -83,7 +83,7 @@ struct SubjectHeaderView: View {
                 .accent)
             }
           }
-          .font(.subheadline)
+          .font(.callout)
           .padding(.top, 4)
           .padding(.bottom, 8)
           .onTapGesture {

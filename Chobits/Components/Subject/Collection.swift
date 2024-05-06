@@ -69,7 +69,7 @@ struct SubjectCollectionView: View {
           Label(
             collection.typeEnum.message(type: collection.subjectTypeEnum), systemImage: "pencil"
           )
-          .font(.footnote)
+          .font(.callout)
           .foregroundStyle(Color("LinkTextColor"))
           .overlay {
             RoundedRectangle(cornerRadius: 5)
@@ -97,7 +97,7 @@ struct SubjectCollectionView: View {
               )
               .resizable()
               .foregroundStyle(.orange)
-              .frame(width: 16, height: 16)
+              .frame(width: 20, height: 20)
               .padding(.horizontal, -2)
             }
           }
@@ -129,7 +129,7 @@ struct SubjectCollectionView: View {
             ProgressView().padding(5)
           }
         }
-      }
+      }.padding(.horizontal, 4)
     }
     .animation(.default, value: page.empty)
     .task(priority: .background) {
