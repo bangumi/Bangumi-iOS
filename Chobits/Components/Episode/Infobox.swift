@@ -9,6 +9,7 @@ import SwiftData
 import SwiftUI
 
 struct EpisodeInfobox: View {
+  let subjectId: UInt
   let episodeId: UInt
 
   @Environment(\.dismiss) private var dismiss
@@ -17,30 +18,31 @@ struct EpisodeInfobox: View {
   @Environment(\.modelContext) private var modelContext
 
   @State private var updating: Bool = false
+  @State private var episode: Episode?
 
-  @Query
-  private var episodes: [Episode]
-  private var episode: Episode? { episodes.first }
-
-  init(episodeId: UInt) {
+  init(subjectId:UInt, episodeId: UInt) {
+    self.subjectId = subjectId
     self.episodeId = episodeId
-    _episodes = Query(
-      filter: #Predicate<Episode> {
-        $0.id == episodeId
-      })
+  }
+
+  func fetchEpisode() async {
+    let actor = BackgroundActor(container: modelContext.container)
+    self.episode = try? await actor.fetchOne(predicate: #Predicate<Episode> { $0.id == episodeId })
   }
 
   func updateSingle(type: EpisodeCollectionType) async {
     updating = true
-    guard let episode = episode else {
-      updating = false
-      notifier.alert(message: "Episode not found")
-      return
-    }
+    let actor = BackgroundActor(container: modelContext.container)
     do {
-      try await chii.updateEpisodeCollection(episodeId: episode.id, type: type)
+      let episode = try await actor.fetchOne(predicate: #Predicate<Episode> { $0.id == episodeId })
+      guard let episode = episode else {
+        updating = false
+        notifier.alert(message: "Episode not found")
+        return
+      }
+      try await chii.updateEpisodeCollection(episodeId: episodeId, type: type)
       episode.collection = type.rawValue
-      try modelContext.save()
+      try await actor.save()
       updating = false
       dismiss()
     } catch {
@@ -53,11 +55,9 @@ struct EpisodeInfobox: View {
     updating = true
     guard let episode = episode else {
       updating = false
-      notifier.alert(message: "Episode not found")
       return
     }
     let sort = episode.sort
-    let subjectId = episode.subjectId
     let actor = BackgroundActor(container: modelContext.container)
     let predicate = #Predicate<Episode> {
       $0.subjectId == subjectId && $0.sort <= sort
@@ -86,7 +86,7 @@ struct EpisodeInfobox: View {
         if let episode = episode {
           HStack {
             Text(episode.title).font(.headline).lineLimit(1)
-            Text(episode.type.description)
+            Text(episode.typeEnum.description)
               .font(.footnote)
               .foregroundStyle(.secondary)
               .overlay {
@@ -148,6 +148,10 @@ struct EpisodeInfobox: View {
             Text(episode.desc).foregroundStyle(.secondary)
           }
           Spacer()
+        } else {
+          ProgressView().task {
+            await fetchEpisode()
+          }
         }
       }
     }.padding()
@@ -169,7 +173,7 @@ struct EpisodeInfobox: View {
     container.mainContext.insert(episode)
   }
 
-  return EpisodeInfobox(episodeId: episodes.first!.id)
+  return EpisodeInfobox(subjectId: subject.id, episodeId: episodes.first!.id)
     .environmentObject(Notifier())
     .environment(ChiiClient(mock: .anime))
     .modelContainer(container)

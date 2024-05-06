@@ -575,6 +575,9 @@ func safeParseDate(str: String?) -> Date {
   guard let str = str else {
     return Date(timeIntervalSince1970: 0)
   }
+  if str.isEmpty {
+    return Date(timeIntervalSince1970: 0)
+  }
 
   let dateFormatter = DateFormatter()
   dateFormatter.locale = Locale(identifier: "en_US_POSIX")
@@ -591,6 +594,9 @@ func safeParseDate(str: String?) -> Date {
 
 func safeParseRFC3339Date(str: String?) -> Date {
   guard let str = str else {
+    return Date(timeIntervalSince1970: 0)
+  }
+  if str.isEmpty {
     return Date(timeIntervalSince1970: 0)
   }
 

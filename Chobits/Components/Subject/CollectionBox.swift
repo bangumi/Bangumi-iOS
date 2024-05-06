@@ -17,12 +17,12 @@ struct SubjectCollectionBox: View {
   @EnvironmentObject var chii: ChiiClient
   @Environment(\.modelContext) private var modelContext
 
-  @State private var collectionType: CollectionType = .do
-  @State private var rate: UInt8 = 0
-  @State private var comment: String = ""
-  @State private var priv: Bool = false
-  @State private var tags: [String] = []
-  @State private var tagsInput: String = ""
+  @State private var collectionType: CollectionType
+  @State private var rate: UInt8
+  @State private var comment: String
+  @State private var priv: Bool
+  @State private var tags: [String]
+  @State private var tagsInput: String
   @State private var updating: Bool = false
 
   @Query
@@ -39,6 +39,13 @@ struct SubjectCollectionBox: View {
       self.priv = collection.private
       self.tags = collection.tags
       self.tagsInput = collection.tags.joined(separator: ",")
+    } else {
+      self.collectionType = .do
+      self.rate = 0
+      self.comment = ""
+      self.priv = false
+      self.tags = []
+      self.tagsInput = ""
     }
     _subjects = Query(
       filter: #Predicate<Subject> {
