@@ -13,7 +13,6 @@ struct SubjectCollectionView: View {
 
   @EnvironmentObject var notifier: Notifier
   @EnvironmentObject var chii: ChiiClient
-  @Environment(\.modelContext) var modelContext
 
   @State private var refreshed: Bool = false
   @State private var edit: Bool = false
@@ -30,41 +29,16 @@ struct SubjectCollectionView: View {
       })
   }
 
-  func updateCollection() async {
-    if refreshed { return }
-    let actor = BackgroundActor(container: modelContext.container)
-    do {
-      let item = try await chii.getSubjectCollection(sid: subjectId)
-      let collection = UserSubjectCollection(item: item)
-      await actor.insert(data: collection)
-      try await actor.save()
-      refreshed = true
-    } catch ChiiError.notFound(_) {
-      do {
-        try await actor.remove(
-          predicate: #Predicate<UserSubjectCollection> { collection in
-            collection.subjectId == subjectId
-          })
-        try await actor.save()
-      } catch {
-        notifier.alert(message: "could not clear collection: \(error)")
-      }
-      refreshed = true
-    } catch {
-      notifier.alert(error: error)
-    }
-  }
-
   var body: some View {
     VStack(alignment: .leading) {
-      Divider()
       HStack {
         if let collection = collection {
           if collection.priv {
             Image(systemName: "lock.fill").foregroundStyle(.accent)
           }
           Label(
-            collection.typeEnum.message(type: collection.subjectTypeEnum), systemImage: "pencil"
+            collection.typeEnum.message(type: collection.subjectTypeEnum),
+            systemImage: "pencil"
           )
           .font(.callout)
           .foregroundStyle(Color("LinkTextColor"))
@@ -118,16 +92,10 @@ struct SubjectCollectionView: View {
                 SubjectCollectionBox(subjectId: subjectId, collection: nil)
                   .presentationDragIndicator(.visible)
                   .presentationDetents(.init([.medium, .large]))
-
               })
           Spacer()
         }
       }.padding(.horizontal, 4)
-    }
-    .onAppear{
-      Task(priority: .background) {
-        await updateCollection()
-      }
     }
   }
 }
@@ -145,7 +113,7 @@ struct SubjectCollectionView: View {
     LazyVStack(alignment: .leading) {
       SubjectCollectionView(subjectId: collection.subjectId)
         .environmentObject(Notifier())
-        .environmentObject(ChiiClient(mock: .book))
+        .environmentObject(ChiiClient(container: container, mock: .book))
     }
   }
   .padding()

@@ -13,7 +13,6 @@ struct SubjectBookChaptersView: View {
 
   @EnvironmentObject var notifier: Notifier
   @EnvironmentObject var chii: ChiiClient
-  @Environment(\.modelContext) private var modelContext
 
   @State private var eps: UInt?
   @State private var vols: UInt?
@@ -48,13 +47,9 @@ struct SubjectBookChaptersView: View {
 
   func update() {
     self.updating = true
-    let actor = BackgroundActor(container: modelContext.container)
     Task {
       do {
-        let item = try await chii.updateSubjectCollection(sid: subjectId, eps: eps, vols: vols)
-        let collect = UserSubjectCollection(item: item)
-        await actor.insert(data: collect)
-        try await actor.save()
+        try await chii.updateBookCollection(sid: subjectId, eps: eps, vols: vols)
       } catch {
         notifier.alert(error: error)
       }
@@ -148,7 +143,7 @@ struct SubjectBookChaptersView: View {
     LazyVStack(alignment: .leading) {
       SubjectBookChaptersView(subjectId: subject.id)
         .environmentObject(Notifier())
-        .environmentObject(ChiiClient(mock: .book))
+        .environmentObject(ChiiClient(container: container, mock: .book))
         .modelContainer(container)
     }
   }

@@ -54,7 +54,7 @@ public actor BackgroundActor {
     return list
   }
 
-  public func fetchData<T: PersistentModel>(descriptor: FetchDescriptor<T>) throws -> [T] {
+  public func fetchData<T: PersistentModel>(_ descriptor: FetchDescriptor<T>) throws -> [T] {
     let list: [T] = try context.fetch(descriptor)
     return list
   }
@@ -68,8 +68,7 @@ public actor BackgroundActor {
     return count
   }
 
-  public func insert<T: PersistentModel>(data: T, background: Bool = true) {
-    let context = background ? context : data.modelContext ?? context
+  public func insert<T: PersistentModel>(_ data: T) {
     context.insert(data)
   }
 
@@ -85,9 +84,8 @@ public actor BackgroundActor {
   }
 
   public func insertOrGet<T: PersistentModel>(
-    data: T, predicate: Predicate<T>? = nil, background: Bool = true
+    data: T, predicate: Predicate<T>? = nil
   ) throws -> T {
-    let context = background ? context : data.modelContext ?? context
     var fetchDescriptor = FetchDescriptor<T>(predicate: predicate)
     fetchDescriptor.fetchLimit = 1
     let list: [T] = try context.fetch(fetchDescriptor)
@@ -100,9 +98,8 @@ public actor BackgroundActor {
   }
 
   public func createOrGet<T: PersistentModel>(
-    data: T, predicate: Predicate<T>? = nil, background: Bool = true
+    data: T, predicate: Predicate<T>? = nil
   ) throws -> T {
-    let context = background ? context : data.modelContext ?? context
     var fetchDescriptor = FetchDescriptor<T>(predicate: predicate)
     fetchDescriptor.fetchLimit = 1
     let list: [T] = try context.fetch(fetchDescriptor)
@@ -113,23 +110,19 @@ public actor BackgroundActor {
     }
   }
 
-  public func delete<T: PersistentModel>(data: T, background: Bool = true) {
-    let context = background ? context : data.modelContext ?? context
+  public func delete<T: PersistentModel>(_ data: T) {
     context.delete(data)
+  }
+
+  public func delete<T: PersistentModel>(model: T.Type) throws {
+    try context.delete(model: T.self)
   }
 
   public func save() throws {
     try context.save()
   }
 
-  public func remove<T: PersistentModel>(predicate: Predicate<T>? = nil) throws {
+  public func remove<T: PersistentModel>(_ predicate: Predicate<T>? = nil) throws {
     try context.delete(model: T.self, where: predicate)
-  }
-
-  func insertBatch<T: PersistentModel>(data: [T]) throws {
-    for row in data {
-      context.insert(row)
-    }
-    try context.save()
   }
 }

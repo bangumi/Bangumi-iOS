@@ -14,75 +14,32 @@ struct EpisodeGridView: View {
 
   @EnvironmentObject var notifier: Notifier
   @EnvironmentObject var chii: ChiiClient
-  @Environment(\.modelContext) private var modelContext
 
-  @State private var refreshed: Bool = false
   @State private var selected: Episode? = nil
-  @State private var episodes: [EpisodeType: [Episode]] = [:]
 
-  func fetch() async {
-    let actor = BackgroundActor(container: modelContext.container)
-    do {
-      for type in EpisodeType.gridTypes() {
-        let typeValue = type.rawValue
-        var descripter = FetchDescriptor<Episode>(
-          predicate: #Predicate<Episode> {
-            $0.subjectId == subjectId && $0.type == typeValue
-          }, sortBy: [SortDescriptor(\.sort)])
-        if type == .main {
-          descripter.fetchLimit = 50
-        } else {
-          descripter.fetchLimit = 10
-        }
-        let eps = try await actor.fetchData(descriptor: descripter)
-        episodes[type] = eps
-      }
-    } catch {
-      notifier.alert(error: error)
-    }
-  }
+  @Query
+  private var episodeMains: [Episode]
+  @Query
+  private var episodeSps: [Episode]
 
-  func update(authenticated: Bool) async {
-    if refreshed { return }
-    let actor = BackgroundActor(container: modelContext.container)
-    do {
-      var offset: Int = 0
-      let limit: Int = 1000
-      while true {
-        var total: Int = 0
-        if authenticated {
-          let response = try await chii.getEpisodeCollections(
-            subjectId: subjectId, type: nil, limit: limit, offset: offset)
-          if response.data.isEmpty {
-            break
-          }
-          for item in response.data {
-            let episode = Episode(collection: item, subjectId: subjectId)
-            await actor.insert(data: episode)
-          }
-          total = response.total
-        } else {
-          let response = try await chii.getSubjectEpisodes(
-            subjectId: subjectId, type: nil, limit: limit, offset: offset)
-          if response.data.isEmpty {
-            break
-          }
-          for item in response.data {
-            let episode = Episode(item: item, subjectId: subjectId)
-            await actor.insert(data: episode)
-          }
-          total = response.total
-        }
-        offset += limit
-        if offset > total {
-          break
-        }
-      }
-      try await actor.save()
-      refreshed = true
-    } catch {
-      notifier.alert(error: error)
-    }
+  init(subjectId: UInt) {
+    self.subjectId = subjectId
+
+    let mainType = EpisodeType.main.rawValue
+    var mainDescriptor = FetchDescriptor<Episode>(
+      predicate: #Predicate<Episode> {
+        $0.type == mainType
+      }, sortBy: [SortDescriptor(\.sort)])
+    mainDescriptor.fetchLimit = 50
+    _episodeMains = Query(mainDescriptor)
+
+    let spType = EpisodeType.sp.rawValue
+    var spDescriptor = FetchDescriptor<Episode>(
+      predicate: #Predicate<Episode> {
+        $0.type == spType
+      }, sortBy: [SortDescriptor(\.sort)])
+    spDescriptor.fetchLimit = 10
+    _episodeSps = Query(spDescriptor)
   }
 
   var body: some View {
@@ -98,19 +55,8 @@ struct EpisodeGridView: View {
       Spacer()
     }
     .font(.callout)
-    .onAppear {
-      Task(priority: .background) {
-        await update(authenticated: chii.isAuthenticated)
-        await fetch()
-      }
-    }
-    if episodes.isEmpty {
-      ProgressView().task {
-        await fetch()
-      }
-    }
     FlowStack {
-      ForEach(episodes[.main, default: []]) { episode in
+      ForEach(episodeMains) { episode in
         Button {
           selected = episode
         } label: {
@@ -125,42 +71,41 @@ struct EpisodeGridView: View {
             .strikethrough(episode.collection == EpisodeCollectionType.dropped.rawValue)
         }
       }
-      ForEach(EpisodeType.gridOtherTypes()) { type in
-        if !episodes[type, default: []].isEmpty {
-          Text(type.description)
-            .foregroundStyle(Color(hex: 0x8EB021))
-            .font(.callout)
-            .padding(.vertical, 3)
-            .padding(.leading, 5)
-            .padding(.trailing, 1)
-            .overlay(
-              Rectangle()
-                .frame(width: 3)
-                .foregroundColor(Color(hex: 0x8EB021))
-                .offset(x: -12, y: 0)
-            )
-            .padding(2)
-            .bold()
-            .monospaced()
-          ForEach(episodes[type, default: []]) { episode in
-            Button {
-              selected = episode
-            } label: {
-              Text("\(episode.sort.episodeDisplay)")
-                .foregroundStyle(Color(hex: episode.textColor))
-                .font(.callout)
-                .padding(3)
-                .background(Color(hex: episode.backgroundColor))
-                .border(Color(hex: episode.borderColor), width: 1)
-                .padding(2)
-                .monospaced()
-                .strikethrough(episode.collection == EpisodeCollectionType.dropped.rawValue)
-            }
+      if !episodeSps.isEmpty {
+        Text("SP")
+          .foregroundStyle(Color(hex: 0x8EB021))
+          .font(.callout)
+          .padding(.vertical, 3)
+          .padding(.leading, 5)
+          .padding(.trailing, 1)
+          .overlay(
+            Rectangle()
+              .frame(width: 3)
+              .foregroundColor(Color(hex: 0x8EB021))
+              .offset(x: -12, y: 0)
+          )
+          .padding(2)
+          .bold()
+          .monospaced()
+        ForEach(episodeSps) { episode in
+          Button {
+            selected = episode
+          } label: {
+            Text("\(episode.sort.episodeDisplay)")
+              .foregroundStyle(Color(hex: episode.textColor))
+              .font(.callout)
+              .padding(3)
+              .background(Color(hex: episode.backgroundColor))
+              .border(Color(hex: episode.borderColor), width: 1)
+              .padding(2)
+              .monospaced()
+              .strikethrough(episode.collection == EpisodeCollectionType.dropped.rawValue)
           }
         }
       }
     }
-    .animation(.default, value: episodes)
+    .animation(.default, value: episodeMains)
+    .animation(.default, value: episodeSps)
     .animation(.default, value: selected)
     .sheet(
       item: $selected,
@@ -192,7 +137,7 @@ struct EpisodeGridView: View {
     LazyVStack(alignment: .leading) {
       EpisodeGridView(subjectId: subject.id)
         .environmentObject(Notifier())
-        .environmentObject(ChiiClient(mock: .anime))
+        .environmentObject(ChiiClient(container: container, mock: .anime))
         .modelContainer(container)
     }
   }.padding()

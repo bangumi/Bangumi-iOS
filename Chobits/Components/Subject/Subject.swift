@@ -10,11 +10,11 @@ import SwiftData
 import SwiftUI
 
 struct SubjectView: View {
-  let subjectId: UInt
+  var subjectId: UInt
 
   @EnvironmentObject var notifier: Notifier
   @EnvironmentObject var chii: ChiiClient
-  @Environment(\.modelContext) var modelContext
+  @EnvironmentObject var navState: NavState
 
   @State private var refreshed: Bool = false
 
@@ -30,31 +30,13 @@ struct SubjectView: View {
     _subjects = Query(filter: predicate, sort: \Subject.id)
   }
 
-  func updateSubject() async {
+  func refresh() async {
     if refreshed { return }
-    Logger.subject.info("updating subject: \(self.subjectId)")
-    let actor = BackgroundActor(container: modelContext.container)
+    refreshed = true
     do {
-      let item = try await chii.getSubject(sid: self.subjectId)
-
-      // 对于合并的条目，可能搜索返回的 ID 跟 API 拿到的 ID 不同
-      // 我们直接返回 404 防止其他问题
-      // 后面可以考虑直接跳转到页面
-      if self.subjectId != item.id {
-        Logger.subject.warning("subject id mismatch: \(self.subjectId) != \(item.id)")
-        return
-      }
-
-      Logger.subject.info("fetched subject: \(item.id)")
-      let subject = Subject(item: item)
-      await actor.insert(data: subject)
-      try await actor.save()
-      refreshed = true
-    } catch ChiiError.notFound(_) {
-      if let subject = subject {
-        await actor.delete(data: subject)
-      }
-      refreshed = true
+      try await chii.loadSubject(subjectId)
+      try await chii.loadUserCollection(subjectId)
+      try await chii.loadEpisodes(subjectId)
     } catch {
       notifier.alert(error: error)
     }
@@ -65,10 +47,10 @@ struct SubjectView: View {
       if let subject = subject {
         ScrollView {
           LazyVStack(alignment: .leading) {
-            SubjectHeaderView(subjectId: subject.id)
+            SubjectHeaderView(subjectId: subjectId)
 
             if chii.isAuthenticated {
-              SubjectCollectionView(subjectId: subject.id)
+              SubjectCollectionView(subjectId: subjectId)
             }
 
             switch subject.typeEnum {
@@ -81,7 +63,7 @@ struct SubjectView: View {
             }
 
             Divider()
-            SubjectSummaryView(subjectId: subject.id)
+            SubjectSummaryView(subjectId: subjectId)
 
             Spacer()
           }
@@ -89,9 +71,10 @@ struct SubjectView: View {
       } else {
         NotFoundView()
       }
-    }.onAppear {
+    }
+    .onAppear {
       Task(priority: .background) {
-        await updateSubject()
+        await refresh()
       }
     }
   }
@@ -115,6 +98,6 @@ struct SubjectView: View {
 
   return SubjectView(subjectId: subject.id)
     .environmentObject(Notifier())
-    .environmentObject(ChiiClient(mock: .anime))
+    .environmentObject(ChiiClient(container: container, mock: .anime))
     .modelContainer(container)
 }

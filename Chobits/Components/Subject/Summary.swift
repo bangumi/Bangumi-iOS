@@ -13,7 +13,6 @@ struct SubjectSummaryView: View {
 
   @EnvironmentObject var notifier: Notifier
   @EnvironmentObject var chii: ChiiClient
-  @Environment(\.modelContext) private var modelContext
 
   @State private var collapsed = true
 
@@ -92,7 +91,7 @@ struct SubjectSummaryView: View {
     LazyVStack(alignment: .leading) {
       SubjectSummaryView(subjectId: subject.id)
         .environmentObject(Notifier())
-        .environmentObject(ChiiClient(mock: .book))
+        .environmentObject(ChiiClient(container: container, mock: .book))
         .modelContainer(container)
     }
   }.padding()

@@ -13,8 +13,8 @@ struct ChiiProgressView: View {
   @EnvironmentObject var notifier: Notifier
   @EnvironmentObject var chii: ChiiClient
   @EnvironmentObject var navState: NavState
-  @Environment(\.modelContext) private var modelContext
 
+  @State private var loaded: Bool = false
   @State private var subjectType = SubjectType.unknown
   @State private var offset: Int = 0
   @State private var exhausted: Bool = false
@@ -22,20 +22,19 @@ struct ChiiProgressView: View {
   @State private var collections: [EnumerateItem<(UserSubjectCollection)>] = []
 
   func loadCounts() async {
-    let actor = BackgroundActor(container: modelContext.container)
     let doingType = CollectionType.do.rawValue
     do {
       for type in SubjectType.progressTypes() {
         if type == .unknown {
           continue
         }
-        let count = try await actor.fetchCount(
+        let count = try await chii.db.fetchCount(
           predicate: #Predicate<UserSubjectCollection> {
             $0.type == doingType && $0.subjectType == type.rawValue
           })
         counts[type] = count
       }
-      let totalCount = try await actor.fetchCount(
+      let totalCount = try await chii.db.fetchCount(
         predicate: #Predicate<UserSubjectCollection> {
           $0.type == doingType
         })
@@ -47,7 +46,6 @@ struct ChiiProgressView: View {
   }
 
   func fetch(limit: Int = 20) async -> [EnumerateItem<UserSubjectCollection>] {
-    let actor = BackgroundActor(container: modelContext.container)
     let stype = subjectType.rawValue
     let doingType = CollectionType.do.rawValue
     var descriptor = FetchDescriptor<UserSubjectCollection>(
@@ -60,7 +58,7 @@ struct ChiiProgressView: View {
     descriptor.fetchLimit = limit
     descriptor.fetchOffset = offset
     do {
-      let collections = try await actor.fetchData(descriptor: descriptor)
+      let collections = try await chii.db.fetchData(descriptor)
       if collections.count < limit {
         exhausted = true
       }
@@ -95,48 +93,27 @@ struct ChiiProgressView: View {
   }
 
   func updateCollections(type: SubjectType?) async {
-    Logger.collection.info("start update collection for \(type?.name ?? "all")")
-    let actor = BackgroundActor(container: modelContext.container)
-    var offset: Int = 0
-    let limit: Int = 1000
     do {
-      while true {
-        let response = try await chii.getSubjectCollections(
-          subjectType: type, limit: limit, offset: offset)
-        if response.data.isEmpty {
-          break
-        }
-        for collect in response.data {
-          let collection = UserSubjectCollection(item: collect)
-          await actor.insert(data: collection)
-          if let slim = collect.subject {
-            try await actor.insertIfNeeded(
-              data: Subject(slim: slim),
-              predicate: #Predicate<Subject> {
-                $0.id == slim.id
-              })
-          }
-        }
-        offset += limit
-        if offset > response.total {
-          break
-        }
-      }
-      try await actor.save()
+      try await chii.loadUserCollections(type: type)
     } catch {
       notifier.alert(error: error)
     }
-    Logger.collection.info("finish update collection for \(type?.name ?? "all")")
   }
 
   var body: some View {
     if chii.isAuthenticated {
       NavigationStack(path: $navState.progressNavigation) {
         if counts.isEmpty {
-          ProgressView().task {
-            Logger.collection.info("loading progress")
-            await load()
-            await loadCounts()
+          ProgressView().onAppear {
+            Task {
+              if loaded {
+                return
+              }
+              loaded = true
+              Logger.collection.info("initial loading progress")
+              await load()
+              await loadCounts()
+            }
           }
         } else {
           VStack {
@@ -165,8 +142,8 @@ struct ChiiProgressView: View {
                     UserCollectionRow(collection: item.inner.item)
                   }
                   .buttonStyle(PlainButtonStyle())
-                  .onAppear() {
-                    Task{
+                  .onAppear {
+                    Task {
                       await loadNextPage(idx: item.idx)
                     }
                   }

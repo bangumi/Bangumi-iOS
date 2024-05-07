@@ -35,8 +35,9 @@ struct SubjectSearchRow: View {
                 .accent)
             }
             if subject.rating.score > 0 {
-              Label("\(subject.rating.score.rateDisplay)", systemImage: "star.fill").foregroundStyle(
-                .accent)
+              Label("\(subject.rating.score.rateDisplay)", systemImage: "star.fill")
+                .foregroundStyle(
+                  .accent)
             }
           }.font(.caption)
         }

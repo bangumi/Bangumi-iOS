@@ -12,7 +12,6 @@ import SwiftUI
 struct ContentView: View {
   @EnvironmentObject var notifier: Notifier
   @EnvironmentObject var chii: ChiiClient
-  @Environment(\.modelContext) private var modelContext
 
   @State private var waiting = true
   @StateObject var navState = NavState()

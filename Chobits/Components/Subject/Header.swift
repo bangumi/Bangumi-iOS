@@ -13,7 +13,6 @@ struct SubjectHeaderView: View {
 
   @EnvironmentObject var notifier: Notifier
   @EnvironmentObject var chii: ChiiClient
-  @Environment(\.modelContext) var modelContext
 
   @State private var coverDetail = false
   @State private var collectionDetail = false
@@ -79,8 +78,9 @@ struct SubjectHeaderView: View {
                 .accent)
             }
             if subject.rating.score > 0 {
-              Label("\(subject.rating.score.rateDisplay)", systemImage: "star.fill").foregroundStyle(
-                .accent)
+              Label("\(subject.rating.score.rateDisplay)", systemImage: "star.fill")
+                .foregroundStyle(
+                  .accent)
             }
           }
           .font(.callout)
@@ -114,7 +114,7 @@ struct SubjectHeaderView: View {
     LazyVStack(alignment: .leading) {
       SubjectHeaderView(subjectId: subject.id)
         .environmentObject(Notifier())
-        .environmentObject(ChiiClient(mock: .anime))
+        .environmentObject(ChiiClient(container: container, mock: .anime))
         .modelContainer(container)
     }
   }.padding()

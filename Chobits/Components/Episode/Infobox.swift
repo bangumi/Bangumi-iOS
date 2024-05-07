@@ -15,68 +15,48 @@ struct EpisodeInfobox: View {
   @Environment(\.dismiss) private var dismiss
   @EnvironmentObject var notifier: Notifier
   @EnvironmentObject var chii: ChiiClient
-  @Environment(\.modelContext) private var modelContext
 
   @State private var updating: Bool = false
-  @State private var episode: Episode?
+
+  @Query
+  private var episodes: [Episode]
+  private var episode: Episode? { episodes.first }
 
   init(subjectId: UInt, episodeId: UInt) {
     self.subjectId = subjectId
     self.episodeId = episodeId
-  }
 
-  func fetchEpisode() async {
-    let actor = BackgroundActor(container: modelContext.container)
-    self.episode = try? await actor.fetchOne(predicate: #Predicate<Episode> { $0.id == episodeId })
+    _episodes = Query(filter: #Predicate<Episode> { $0.id == episodeId })
   }
 
   func updateSingle(type: EpisodeCollectionType) async {
+    if updating { return }
     updating = true
-    let actor = BackgroundActor(container: modelContext.container)
     do {
-      let episode = try await actor.fetchOne(predicate: #Predicate<Episode> { $0.id == episodeId })
-      guard let episode = episode else {
-        updating = false
-        notifier.alert(message: "Episode not found")
-        return
-      }
       try await chii.updateEpisodeCollection(episodeId: episodeId, type: type)
-      episode.collection = type.rawValue
-      try await actor.save()
-      updating = false
       dismiss()
     } catch {
-      updating = false
       notifier.alert(error: error)
     }
+    updating = false
   }
 
   func updateBatch() async {
-    updating = true
+    if updating { return }
     guard let episode = episode else {
-      updating = false
+      notifier.alert(message: "Episode not found")
       return
     }
-    let sort = episode.sort
-    let actor = BackgroundActor(container: modelContext.container)
-    let predicate = #Predicate<Episode> {
-      $0.subjectId == subjectId && $0.sort <= sort
-    }
-    do {
-      let previous = try await actor.fetchData(predicate: predicate)
-      let episodeIds = previous.map { $0.id }
-      try await chii.updateSubjectEpisodeCollection(
-        subjectId: subjectId, episodeIds: episodeIds, type: EpisodeCollectionType.collect
-      )
-      for ep in previous {
-        ep.collection = EpisodeCollectionType.collect.rawValue
+    updating = true
+    Task {
+      do {
+        try await chii.updateSubjectEpisodeCollection(
+          subjectId: subjectId, updateTo: episode.sort, type: .collect)
+        dismiss()
+      } catch {
+        notifier.alert(error: error)
       }
-      try await actor.save()
       updating = false
-      dismiss()
-    } catch {
-      updating = false
-      notifier.alert(error: error)
     }
   }
 
@@ -148,10 +128,6 @@ struct EpisodeInfobox: View {
             Text(episode.desc).foregroundStyle(.secondary)
           }
           Spacer()
-        } else {
-          ProgressView().task {
-            await fetchEpisode()
-          }
         }
       }
     }.padding()
@@ -175,6 +151,6 @@ struct EpisodeInfobox: View {
 
   return EpisodeInfobox(subjectId: subject.id, episodeId: episodes.first!.id)
     .environmentObject(Notifier())
-    .environment(ChiiClient(mock: .anime))
+    .environmentObject(ChiiClient(container: container, mock: .anime))
     .modelContainer(container)
 }

@@ -103,7 +103,7 @@ extension ChiiClient {
     return resp
   }
 
-  func getSubjectCollection(sid: UInt) async throws -> UserSubjectCollectionItem {
+  func getSubjectCollection(_ sid: UInt) async throws -> UserSubjectCollectionItem {
     if let mock = self.mock {
       return loadFixture(
         fixture: "user_collection_\(mock.name).json", target: UserSubjectCollectionItem.self)
@@ -124,7 +124,7 @@ extension ChiiClient {
     return collection
   }
 
-  func getSubject(sid: UInt) async throws -> SubjectItem {
+  func getSubject(_ sid: UInt) async throws -> SubjectItem {
     if let mock = self.mock {
       return loadFixture(fixture: "subject_\(mock.name).json", target: SubjectItem.self)
     }

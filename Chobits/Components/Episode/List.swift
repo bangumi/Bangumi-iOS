@@ -14,7 +14,6 @@ struct EpisodeListView: View {
 
   @EnvironmentObject var notifier: Notifier
   @EnvironmentObject var chii: ChiiClient
-  @Environment(\.modelContext) var modelContext
 
   @State private var now: Date = Date()
   @State private var offset: Int = 0
@@ -26,38 +25,44 @@ struct EpisodeListView: View {
   @State private var countMain: Int = 0
   @State private var countOther: Int = 0
 
+  init(subjectId: UInt) {
+    self.subjectId = subjectId
+  }
+
   func loadCounts() async {
-    let actor = BackgroundActor(container: modelContext.container)
     do {
-      countMain = try await actor.fetchCount(
+      let mainType = EpisodeType.main.rawValue
+      let countMain = try await chii.db.fetchCount(
         predicate: #Predicate<Episode> {
-          $0.subjectId == subjectId && $0.type == 0
+          $0.subjectId == subjectId && $0.type == mainType
         })
-      countOther = try await actor.fetchCount(
+      let countOther = try await chii.db.fetchCount(
         predicate: #Predicate<Episode> {
-          $0.subjectId == subjectId && $0.type != 0
+          $0.subjectId == subjectId && $0.type != mainType
         })
+      self.countMain = countMain
+      self.countOther = countOther
     } catch {
       notifier.alert(error: error)
     }
   }
 
   func fetch(limit: Int = 100) async -> [EnumerateItem<Episode>] {
-    let actor = BackgroundActor(container: modelContext.container)
     let sortBy =
       sortDesc ? SortDescriptor<Episode>(\.sort, order: .reverse) : SortDescriptor<Episode>(\.sort)
+    let mainType = EpisodeType.main.rawValue
     var descriptor = FetchDescriptor<Episode>(
-      predicate: #Predicate {
+      predicate: #Predicate<Episode> {
         if main {
-          $0.subjectId == subjectId && $0.type == 0
+          $0.subjectId == subjectId && $0.type == mainType
         } else {
-          $0.subjectId == subjectId && $0.type != 0
+          $0.subjectId == subjectId && $0.type != mainType
         }
       }, sortBy: [sortBy])
     descriptor.fetchLimit = limit
     descriptor.fetchOffset = offset
     do {
-      let episodes = try await actor.fetchData(descriptor: descriptor)
+      let episodes = try await chii.db.fetchData(descriptor)
       if episodes.count < limit {
         exhausted = true
       }
@@ -84,7 +89,7 @@ struct EpisodeListView: View {
     if exhausted {
       return
     }
-    if idx != episodes.count - 10 {
+    if idx != offset - 10 {
       return
     }
     let episodes = await fetch()
@@ -183,9 +188,15 @@ struct EpisodeListView: View {
                       .font(.subheadline)
                       .foregroundStyle(.secondary)
                   }
-                  Text("时长:\(episode.duration) / 首播:\(episode.airdateStr) / 讨论:+\(episode.comment)")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
+                  HStack {
+                    Text("时长:\(episode.duration)")
+                    Spacer()
+                    Text("首播:\(episode.airdateStr)")
+                    Spacer()
+                    Text("讨论:+\(episode.comment)")
+                  }
+                  .font(.footnote)
+                  .foregroundStyle(.secondary)
                 }
                 Spacer()
               }
@@ -204,7 +215,7 @@ struct EpisodeListView: View {
     .buttonStyle(.plain)
     .animation(.default, value: episodes)
     .onAppear {
-      Task{
+      Task {
         await loadCounts()
         await load()
       }
@@ -235,6 +246,6 @@ struct EpisodeListView: View {
 
   return EpisodeListView(subjectId: subject.id)
     .environmentObject(Notifier())
-    .environment(ChiiClient(mock: .anime))
+    .environmentObject(ChiiClient(container: container, mock: .anime))
     .modelContainer(container)
 }

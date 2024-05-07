@@ -13,8 +13,6 @@ struct ChiiTimelineView: View {
   @EnvironmentObject var chii: ChiiClient
   @EnvironmentObject var navState: NavState
 
-  @Environment(\.modelContext) private var modelContext
-
   @State var profile: Profile?
 
   func updateProfile() {
@@ -32,12 +30,12 @@ struct ChiiTimelineView: View {
     profile = nil
     Task {
       await chii.logout()
-    }
-    do {
-      try modelContext.delete(model: UserSubjectCollection.self)
-      try modelContext.delete(model: Episode.self)
-    } catch {
-      notifier.alert(error: error)
+      do {
+        try await chii.db.delete(model: UserSubjectCollection.self)
+        try await chii.db.delete(model: Episode.self)
+      } catch {
+        notifier.alert(error: error)
+      }
     }
   }
 
@@ -79,7 +77,7 @@ struct ChiiTimelineView: View {
 
   return ChiiTimelineView()
     .environmentObject(Notifier())
-    .environmentObject(ChiiClient(mock: .anime))
+    .environmentObject(ChiiClient(container: container, mock: .anime))
     .environmentObject(NavState())
     .modelContainer(container)
 }

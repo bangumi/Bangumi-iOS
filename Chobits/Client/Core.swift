@@ -22,6 +22,7 @@ class ChiiClient: ObservableObject, Observable {
   var profile: Profile?
   var anonymousSession: URLSession?
   var authorizedSession: URLSession?
+  var db: BackgroundActor
 
   var mock: SubjectType?
 
@@ -37,7 +38,8 @@ class ChiiClient: ObservableObject, Observable {
     return baseURL.appending(queryItems: queries)
   }
 
-  init(mock: SubjectType? = nil) {
+  init(container: ModelContainer, mock: SubjectType? = nil) {
+    self.db = BackgroundActor(container: container)
     self.keychain = KeychainSwift(keyPrefix: "com.everpcpc.chobits.")
     guard let plist = Bundle.main.infoDictionary else {
       fatalError("Could not find Info.plist")

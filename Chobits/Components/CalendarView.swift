@@ -12,7 +12,8 @@ import SwiftUI
 struct CalendarView: View {
   @EnvironmentObject var notifier: Notifier
   @EnvironmentObject var chii: ChiiClient
-  @Environment(\.modelContext) private var modelContext
+
+  @State private var refreshed: Bool = false
 
   @Query(sort: \BangumiCalendar.id)
   private var calendars: [BangumiCalendar]
@@ -37,23 +38,10 @@ struct CalendarView: View {
   }
 
   func refreshCalendar() async {
-    let actor = BackgroundActor(container: modelContext.container)
+    if refreshed { return }
+    refreshed = true
     do {
-      let items = try await chii.getCalendar()
-      for item in items {
-        Logger.subject.info("processing calendar: \(item.weekday.en)")
-        let cal = BangumiCalendar(item: item)
-        await actor.insert(data: cal)
-        for small in item.items {
-          let subject = Subject(small: small)
-          try await actor.insertIfNeeded(
-            data: subject,
-            predicate: #Predicate<Subject> {
-              $0.id == small.id
-            })
-        }
-      }
-      try await actor.save()
+      try await chii.loadCalendar()
     } catch {
       notifier.alert(error: error)
     }
@@ -72,6 +60,7 @@ struct CalendarView: View {
           }
         }
       }.refreshable {
+        refreshed = false
         await refreshCalendar()
       }
     }

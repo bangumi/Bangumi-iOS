@@ -7,14 +7,12 @@
 
 import Foundation
 import OSLog
+import SwiftData
 
 extension ChiiClient {
-  // update progress for books
-  func updateSubjectCollection(sid: UInt, eps: UInt?, vols: UInt?) async throws
-    -> UserSubjectCollectionItem
-  {
+  func updateBookCollection(sid: UInt, eps: UInt?, vols: UInt?) async throws {
     if self.mock != nil {
-      return try await getSubjectCollection(sid: sid)
+      return
     }
     Logger.api.info(
       "start update subject collection: \(sid), eps: \(eps.debugDescription), vols: \(vols.debugDescription)"
@@ -33,14 +31,18 @@ extension ChiiClient {
     Logger.api.info(
       "finish update subject collection: \(sid), eps: \(eps.debugDescription), vols: \(vols.debugDescription)"
     )
-    return try await getSubjectCollection(sid: sid)
+    let item = try await getSubjectCollection(sid)
+    let collect = UserSubjectCollection(item: item)
+    await self.db.insert(collect)
+    try await self.db.save()
   }
 
   func updateSubjectCollection(
-    sid: UInt, type: CollectionType?, rate: UInt8?, comment: String?, priv: Bool?, tags: [String]?
-  ) async throws -> UserSubjectCollectionItem {
+    sid: UInt, type: CollectionType?, rate: UInt8?, comment: String?,
+    priv: Bool?, tags: [String]?
+  ) async throws {
     if self.mock != nil {
-      return try await getSubjectCollection(sid: sid)
+      return
     }
     Logger.api.info("start update subject collection: \(sid)")
     let url = self.apiBase.appendingPathComponent("v0/users/-/collections/\(sid)")
@@ -64,16 +66,26 @@ extension ChiiClient {
       _ = try await self.request(url: url, method: "POST", body: body, authorized: true)
     }
     Logger.api.info("finish update subject collection: \(sid)")
-    return try await getSubjectCollection(sid: sid)
+    let item = try await getSubjectCollection(sid)
+    let collect = UserSubjectCollection(item: item)
+    await self.db.insert(collect)
+    try await self.db.save()
   }
 
   func updateSubjectEpisodeCollection(
-    subjectId: UInt, episodeIds: [UInt], type: EpisodeCollectionType
+    subjectId: UInt, updateTo: Float, type: EpisodeCollectionType
   ) async throws {
     if self.mock != nil {
       return
     }
-    Logger.api.info("start update subject episode collection: \(subjectId), \(episodeIds)")
+    Logger.api.info(
+      "start update subject episode collection: \(subjectId), -> \(updateTo) to \(type.description)"
+    )
+    let predicate = #Predicate<Episode> {
+      $0.subjectId == subjectId && $0.sort <= updateTo
+    }
+    let episodes = try await db.fetchData(predicate: predicate)
+    let episodeIds = episodes.map { $0.id }
     let url = self.apiBase
       .appendingPathComponent("v0/users/-/collections/\(subjectId)/episodes")
     let body: [String: Any] = [
@@ -82,19 +94,33 @@ extension ChiiClient {
     ]
     _ = try await self.request(url: url, method: "PATCH", body: body, authorized: true)
     Logger.api.info("finish update subject episode collection: \(subjectId), \(episodeIds)")
+    for ep in episodes {
+      ep.collection = type.rawValue
+    }
+    try await db.save()
   }
 
-  func updateEpisodeCollection(episodeId: UInt, type: EpisodeCollectionType) async throws {
+  func updateEpisodeCollection(episodeId: UInt, type: EpisodeCollectionType)
+    async throws
+  {
     if self.mock != nil {
       return
     }
     Logger.api.info("start update episode collection: \(episodeId)")
+    guard
+      let episode = try await db.fetchOne(
+        predicate: #Predicate<Episode> { $0.id == episodeId }
+      )
+    else {
+      throw ChiiError(message: "Episode not found for update")
+    }
     let url = self.apiBase.appendingPathComponent("v0/users/-/collections/-/episodes/\(episodeId)")
     let body: [String: Any] = [
       "type": type.rawValue
     ]
     _ = try await self.request(url: url, method: "PUT", body: body, authorized: true)
     Logger.api.info("finish update episode collection: \(episodeId)")
+    episode.collection = type.rawValue
+    try await db.save()
   }
-
 }

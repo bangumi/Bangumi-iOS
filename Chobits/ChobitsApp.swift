@@ -26,13 +26,12 @@ struct ChobitsApp: App {
   }()
 
   @StateObject var notifier = Notifier()
-  @StateObject var chii = ChiiClient()
 
   var body: some Scene {
     WindowGroup {
       ContentView()
         .environmentObject(notifier)
-        .environment(chii)
+        .environmentObject(ChiiClient(container: sharedModelContainer))
         .alert("ERROR", isPresented: $notifier.showAlert) {
           Button("OK") {
             notifier.currentError = nil

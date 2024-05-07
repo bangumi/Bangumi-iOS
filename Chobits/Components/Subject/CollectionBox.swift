@@ -15,7 +15,6 @@ struct SubjectCollectionBox: View {
   @Environment(\.dismiss) private var dismiss
   @EnvironmentObject var notifier: Notifier
   @EnvironmentObject var chii: ChiiClient
-  @Environment(\.modelContext) private var modelContext
 
   @State private var collectionType: CollectionType
   @State private var rate: UInt8
@@ -60,10 +59,9 @@ struct SubjectCollectionBox: View {
 
   func update() {
     self.updating = true
-    let actor = BackgroundActor(container: modelContext.container)
     Task {
       do {
-        let item = try await chii.updateSubjectCollection(
+        try await chii.updateSubjectCollection(
           sid: subjectId,
           type: collectionType,
           rate: rate,
@@ -71,9 +69,6 @@ struct SubjectCollectionBox: View {
           priv: priv,
           tags: tags
         )
-        let collect = UserSubjectCollection(item: item)
-        await actor.insert(data: collect)
-        try await actor.save()
         dismiss()
       } catch {
         notifier.alert(error: error)
@@ -233,6 +228,6 @@ struct SubjectCollectionBox: View {
     collection: collection.item
   )
   .environmentObject(Notifier())
-  .environmentObject(ChiiClient(mock: .anime))
+  .environmentObject(ChiiClient(container: container, mock: .anime))
   .modelContainer(container)
 }

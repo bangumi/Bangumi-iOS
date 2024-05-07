@@ -12,7 +12,6 @@ struct ChiiDiscoverView: View {
   @EnvironmentObject var notifier: Notifier
   @EnvironmentObject var chii: ChiiClient
   @EnvironmentObject var navState: NavState
-  @Environment(\.modelContext) private var modelContext
 
   @State private var searching = false
   @State private var query = ""
@@ -24,14 +23,13 @@ struct ChiiDiscoverView: View {
   @State private var subjects: [EnumerateItem<Subject>] = []
 
   func localSearch(limit: Int = 50) async -> [EnumerateItem<Subject>] {
-    let actor = BackgroundActor(container: modelContext.container)
     let predicate = #Predicate<Subject> {
       return (subjectType.rawValue == 0 || subjectType.rawValue == $0.type)
         && ($0.name.localizedStandardContains(query)
           || $0.nameCn.localizedStandardContains(query))
     }
     do {
-      let subjects = try await actor.fetchData(
+      let subjects = try await chii.db.fetchData(
         predicate: predicate, limit: limit, offset: offset)
       if subjects.count < limit {
         exhausted = true
@@ -68,7 +66,6 @@ struct ChiiDiscoverView: View {
   }
 
   func remoteSearch(limit: Int = 50) async -> [EnumerateItem<Subject>] {
-    let actor = BackgroundActor(container: modelContext.container)
     do {
       let resp = try await chii.search(
         keyword: query, type: subjectType, limit: limit, offset: offset)
@@ -80,14 +77,14 @@ struct ChiiDiscoverView: View {
       for item in resp.data.enumerated() {
         let subject = Subject(search: item.element)
         let subjectId = item.element.id
-        try await actor.insertIfNeeded(
+        try await chii.db.insertIfNeeded(
           data: subject,
           predicate: #Predicate<Subject> {
             $0.id == subjectId
           })
         result.append(EnumerateItem(idx: item.offset, inner: subject))
       }
-      try await actor.save()
+      try await chii.db.save()
       if result.count < limit {
         exhausted = true
       }
