@@ -21,7 +21,7 @@ struct EpisodeListView: View {
   @State private var sortDesc: Bool = false
   @State private var exhausted: Bool = false
   @State private var selected: Episode? = nil
-  @State private var loadedIdx: [Int:Bool] = [:]
+  @State private var loadedIdx: [Int: Bool] = [:]
   @State private var episodes: [EnumerateItem<Episode>] = []
   @State private var countMain: Int = 0
   @State private var countOther: Int = 0

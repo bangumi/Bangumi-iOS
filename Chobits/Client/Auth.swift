@@ -5,13 +5,15 @@
 //  Created by Chuan Chuan on 2024/5/4.
 //
 
-import OSLog
 import Foundation
+import OSLog
 
 extension ChiiClient {
-  func logout() {
+  func logout() async {
     Logger.app.info("start logout")
-    self.isAuthenticated = false
+    await MainActor.run {
+      self.isAuthenticated = false
+    }
     Logger.app.info("clear keychain")
     self.keychain.delete("auth")
     Logger.app.info("clear auth session")
@@ -37,7 +39,6 @@ extension ChiiClient {
     let value = try encoder.encode(auth)
     self.keychain.set(value, forKey: "auth")
     self.auth = auth
-    self.isAuthenticated = true
     return auth
   }
 
@@ -52,6 +53,9 @@ extension ChiiClient {
     ]
     let data = try await self.request(url: url, method: "POST", body: body, authorized: false)
     _ = try self.saveAuthResponse(data: data)
+    await MainActor.run {
+      self.isAuthenticated = true
+    }
   }
 
   func refreshAccessToken(auth: Auth) async throws -> Auth {

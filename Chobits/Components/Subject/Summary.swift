@@ -15,6 +15,7 @@ struct SubjectSummaryView: View {
   @EnvironmentObject var chii: ChiiClient
 
   @State private var collapsed = true
+  @State private var summaryLines: Int = 0
 
   @Query
   private var subjects: [Subject]
@@ -34,25 +35,40 @@ struct SubjectSummaryView: View {
   }
 
   var body: some View {
-    Text(subject?.summary ?? "")
-      .font(.callout)
-      .multilineTextAlignment(.leading)
-      .lineLimit(collapsed ? 5 : nil)
-      .animation(.default, value: collapsed)
-    HStack {
-      Spacer()
-      Button {
-        collapsed.toggle()
-      } label: {
-        if collapsed {
-          Text("more")
-        } else {
-          Text("close")
+    VStack(alignment: .leading) {
+      Text(subject?.summary ?? "")
+        .font(.callout)
+        .multilineTextAlignment(.leading)
+        .lineLimit(collapsed ? 5 : nil)
+        .background(
+          GeometryReader { geometry in
+            Color.clear
+              .onAppear {
+                summaryLines = Int(
+                  geometry.size.height / UIFont.preferredFont(forTextStyle: .callout).lineHeight)
+              }
+          }
+        )
+    }
+    .animation(.default, value: collapsed)
+    if summaryLines == 5 && !collapsed {
+      EmptyView()
+    } else if summaryLines > 5 {
+      HStack {
+        Spacer()
+        Button {
+          collapsed.toggle()
+        } label: {
+          if collapsed {
+            Text("more")
+          } else {
+            Text("close")
+          }
         }
+        .buttonStyle(PlainButtonStyle())
+        .font(.caption)
+        .foregroundStyle(Color("LinkTextColor"))
       }
-      .buttonStyle(PlainButtonStyle())
-      .font(.caption)
-      .foregroundStyle(Color("LinkTextColor"))
     }
     FlowStack {
       ForEach(tags, id: \.name) { tag in

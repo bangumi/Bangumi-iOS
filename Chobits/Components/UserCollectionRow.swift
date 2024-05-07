@@ -22,12 +22,14 @@ struct UserCollectionRow: View {
   init(subjectId: UInt) {
     self.subjectId = subjectId
 
-    _subjects = Query(filter: #Predicate<Subject> {
-      $0.id == subjectId
-    })
-    _collections = Query(filter: #Predicate<UserSubjectCollection> {
-      $0.subjectId == subjectId
-    })
+    _subjects = Query(
+      filter: #Predicate<Subject> {
+        $0.id == subjectId
+      })
+    _collections = Query(
+      filter: #Predicate<UserSubjectCollection> {
+        $0.subjectId == subjectId
+      })
   }
 
   var epsColor: Color {

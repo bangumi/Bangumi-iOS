@@ -21,7 +21,7 @@ struct ChiiDiscoverView: View {
   @State private var offset = 0
   @State private var exhausted = false
 
-  @State private var loadedIdx: [Int:Bool] = [:]
+  @State private var loadedIdx: [Int: Bool] = [:]
   @State private var subjects: [EnumerateItem<Subject>] = []
 
   func localSearch(limit: Int = 50) async -> [EnumerateItem<Subject>] {
@@ -90,7 +90,7 @@ struct ChiiDiscoverView: View {
           predicate: #Predicate<Subject> {
             $0.id == subjectId
           })
-        result.append(EnumerateItem(idx: item.offset+offset, inner: subject))
+        result.append(EnumerateItem(idx: item.offset + offset, inner: subject))
       }
       try await chii.db.save()
       if result.count < limit {

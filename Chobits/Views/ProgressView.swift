@@ -18,7 +18,7 @@ struct ChiiProgressView: View {
   @State private var subjectType = SubjectType.unknown
   @State private var offset: Int = 0
   @State private var exhausted: Bool = false
-  @State private var loadedIdx: [Int:Bool] = [:]
+  @State private var loadedIdx: [Int: Bool] = [:]
   @State private var counts: [SubjectType: Int] = [:]
   @State private var collections: [EnumerateItem<(UserSubjectCollection)>] = []
 

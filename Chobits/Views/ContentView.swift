@@ -64,7 +64,7 @@ struct ContentView: View {
     if !initialized {
       VStack {
         LoadingView().onAppear {
-          Task{
+          Task {
             await refreshProfile()
           }
         }
