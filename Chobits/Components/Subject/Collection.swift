@@ -124,8 +124,10 @@ struct SubjectCollectionView: View {
         }
       }.padding(.horizontal, 4)
     }
-    .task(priority: .background) {
-      await updateCollection()
+    .onAppear{
+      Task(priority: .background) {
+        await updateCollection()
+      }
     }
   }
 }

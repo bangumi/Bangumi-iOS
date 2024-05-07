@@ -5,7 +5,7 @@
 //  Created by Chuan Chuan on 2024/4/26.
 //
 
-import CachedAsyncImage
+import Kingfisher
 import SwiftUI
 
 struct ImageView: View {
@@ -13,41 +13,25 @@ struct ImageView: View {
   let width: CGFloat
   let height: CGFloat
 
+  var imageURL: URL? {
+    guard let img = img else { return nil }
+    let icon = img.replacing("http://", with: "https://")
+    return URL(string: icon)
+  }
+
   var body: some View {
-    if let img = img {
-      if img.isEmpty {
-        if width > 0, height > 0 {
-          Image(systemName: "photo").frame(width: width, height: height)
-        } else {
-          Image(systemName: "photo")
-        }
+    if let imageURL = imageURL {
+      if width > 0, height > 0 {
+        KFImage(imageURL)
+          .resizable()
+          .scaledToFill()
+          .frame(width: width, height: height)
+          .clipShape(RoundedRectangle(cornerRadius: 10))
       } else {
-        let iconURL = img.replacing("http://", with: "https://")
-        CachedAsyncImage(
-          url: iconURL,
-          placeholder: { _ in
-            if width > 0, height > 0 {
-              ProgressView().frame(width: width, height: height)
-            } else {
-              ProgressView()
-            }
-          },
-          image: {
-            if width > 0, height > 0 {
-              Image(uiImage: $0)
-                .resizable()
-                .scaledToFill()
-                .frame(width: width, height: height)
-                .clipped()
-            } else {
-              Image(uiImage: $0)
-                .resizable()
-                .scaledToFit()
-            }
-          }
-        )
-        .symbolEffect(.variableColor.iterative.dimInactiveLayers)
-        .clipShape(RoundedRectangle(cornerRadius: 10))
+        KFImage(imageURL)
+          .resizable()
+          .scaledToFit()
+          .clipShape(RoundedRectangle(cornerRadius: 10))
       }
     } else {
       if width > 0, height > 0 {

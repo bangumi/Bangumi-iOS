@@ -18,7 +18,7 @@ struct SubjectSearchRow: View {
         .frame(height: 64)
         .clipShape(RoundedRectangle(cornerRadius: 10))
         .shadow(color: .accent, radius: 1, x: 1, y: 1)
-      HStack {
+      HStack(alignment: .top) {
         ImageView(img: subject.images.common, width: 60, height: 60)
         VStack(alignment: .leading) {
           Text(subject.name).font(.headline)
@@ -35,8 +35,8 @@ struct SubjectSearchRow: View {
                 .accent)
             }
             if subject.rating.score > 0 {
-              Label("\(subject.rating.score.rateDisplay)", systemImage: "star").foregroundStyle(
-                .secondary)
+              Label("\(subject.rating.score.rateDisplay)", systemImage: "star.fill").foregroundStyle(
+                .accent)
             }
           }.font(.caption)
         }

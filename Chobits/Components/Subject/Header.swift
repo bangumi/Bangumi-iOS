@@ -79,7 +79,7 @@ struct SubjectHeaderView: View {
                 .accent)
             }
             if subject.rating.score > 0 {
-              Label("\(subject.rating.score.rateDisplay)", systemImage: "star").foregroundStyle(
+              Label("\(subject.rating.score.rateDisplay)", systemImage: "star.fill").foregroundStyle(
                 .accent)
             }
           }

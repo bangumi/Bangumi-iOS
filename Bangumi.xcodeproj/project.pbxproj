@@ -35,7 +35,6 @@
 		19671C6E2BDEB55D000B4D99 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 19671C4E2BDEB55D000B4D99 /* Assets.xcassets */; };
 		19671C6F2BDEB55D000B4D99 /* ChobitsApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19671C4F2BDEB55D000B4D99 /* ChobitsApp.swift */; };
 		19671C732BDEB8B1000B4D99 /* KeychainSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 19671C722BDEB8B1000B4D99 /* KeychainSwift */; };
-		19671C752BDEB8BD000B4D99 /* CachedAsyncImage in Frameworks */ = {isa = PBXBuildFile; productRef = 19671C742BDEB8BD000B4D99 /* CachedAsyncImage */; };
 		19671C782BE1BB72000B4D99 /* search_subject_book.json in Resources */ = {isa = PBXBuildFile; fileRef = 19671C772BE1BB72000B4D99 /* search_subject_book.json */; };
 		197A19CB2BE5E59900804B13 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 197A19CA2BE5E59900804B13 /* Logger.swift */; };
 		197A19CF2BE5E5E700804B13 /* Notifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 197A19CE2BE5E5E700804B13 /* Notifier.swift */; };
@@ -50,6 +49,7 @@
 		1980EE002BE418C800E013EA /* episodes.json in Resources */ = {isa = PBXBuildFile; fileRef = 1980EDFF2BE418C800E013EA /* episodes.json */; };
 		1980EE022BE419D500E013EA /* episode_collections.json in Resources */ = {isa = PBXBuildFile; fileRef = 1980EE012BE419D500E013EA /* episode_collections.json */; };
 		19AB93CB2BE4F0F4007531A4 /* BackgroundActor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19AB93CA2BE4F0F4007531A4 /* BackgroundActor.swift */; };
+		19BD24262BE9C53800595973 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 19BD24252BE9C53800595973 /* Kingfisher */; };
 		19C2CE5D2BE1E7B10080A056 /* NotFoundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19C2CE5C2BE1E7B10080A056 /* NotFoundView.swift */; };
 		19C2CE5F2BE2536D0080A056 /* user_collection_book.json in Resources */ = {isa = PBXBuildFile; fileRef = 19C2CE5E2BE2536D0080A056 /* user_collection_book.json */; };
 		19C2CE612BE2538A0080A056 /* subject_book.json in Resources */ = {isa = PBXBuildFile; fileRef = 19C2CE602BE2538A0080A056 /* subject_book.json */; };
@@ -120,8 +120,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				19BD24262BE9C53800595973 /* Kingfisher in Frameworks */,
 				19671C732BDEB8B1000B4D99 /* KeychainSwift in Frameworks */,
-				19671C752BDEB8BD000B4D99 /* CachedAsyncImage in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -276,7 +276,7 @@
 			name = Chobits;
 			packageProductDependencies = (
 				19671C722BDEB8B1000B4D99 /* KeychainSwift */,
-				19671C742BDEB8BD000B4D99 /* CachedAsyncImage */,
+				19BD24252BE9C53800595973 /* Kingfisher */,
 			);
 			productName = Chobits;
 			productReference = 19BB342B2BD239AB00E5C295 /* Chobits.app */;
@@ -309,6 +309,7 @@
 			packageReferences = (
 				191FEF1C2BDBE3FA0047162A /* XCRemoteSwiftPackageReference "CachedAsyncImage" */,
 				191FEF252BDCF59B0047162A /* XCRemoteSwiftPackageReference "keychain-swift" */,
+				19BD24242BE9C53800595973 /* XCRemoteSwiftPackageReference "Kingfisher" */,
 			);
 			productRefGroup = 19BB342C2BD239AB00E5C295 /* Products */;
 			projectDirPath = "";
@@ -618,6 +619,14 @@
 				minimumVersion = 24.0.0;
 			};
 		};
+		19BD24242BE9C53800595973 /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/onevcat/Kingfisher.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 7.11.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -626,10 +635,10 @@
 			package = 191FEF252BDCF59B0047162A /* XCRemoteSwiftPackageReference "keychain-swift" */;
 			productName = KeychainSwift;
 		};
-		19671C742BDEB8BD000B4D99 /* CachedAsyncImage */ = {
+		19BD24252BE9C53800595973 /* Kingfisher */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 191FEF1C2BDBE3FA0047162A /* XCRemoteSwiftPackageReference "CachedAsyncImage" */;
-			productName = CachedAsyncImage;
+			package = 19BD24242BE9C53800595973 /* XCRemoteSwiftPackageReference "Kingfisher" */;
+			productName = Kingfisher;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
