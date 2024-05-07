@@ -15,6 +15,7 @@ struct SubjectCollectionView: View {
   @EnvironmentObject var chii: ChiiClient
   @Environment(\.modelContext) var modelContext
 
+  @State private var refreshed: Bool = false
   @State private var edit: Bool = false
 
   @Query
@@ -30,12 +31,14 @@ struct SubjectCollectionView: View {
   }
 
   func updateCollection() async {
+    if refreshed { return }
     let actor = BackgroundActor(container: modelContext.container)
     do {
       let item = try await chii.getSubjectCollection(sid: subjectId)
       let collection = UserSubjectCollection(item: item)
       await actor.insert(data: collection)
       try await actor.save()
+      refreshed = true
     } catch ChiiError.notFound(_) {
       do {
         try await actor.remove(
@@ -46,6 +49,7 @@ struct SubjectCollectionView: View {
       } catch {
         notifier.alert(message: "could not clear collection: \(error)")
       }
+      refreshed = true
     } catch {
       notifier.alert(error: error)
     }

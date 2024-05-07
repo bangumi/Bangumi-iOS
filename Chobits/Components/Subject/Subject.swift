@@ -16,6 +16,8 @@ struct SubjectView: View {
   @EnvironmentObject var chii: ChiiClient
   @Environment(\.modelContext) var modelContext
 
+  @State private var refreshed: Bool = false
+
   @Query
   private var subjects: [Subject]
   var subject: Subject? { subjects.first }
@@ -29,6 +31,7 @@ struct SubjectView: View {
   }
 
   func updateSubject() async {
+    if refreshed { return }
     Logger.subject.info("updating subject: \(self.subjectId)")
     let actor = BackgroundActor(container: modelContext.container)
     do {
@@ -46,10 +49,12 @@ struct SubjectView: View {
       let subject = Subject(item: item)
       await actor.insert(data: subject)
       try await actor.save()
+      refreshed = true
     } catch ChiiError.notFound(_) {
       if let subject = subject {
         await actor.delete(data: subject)
       }
+      refreshed = true
     } catch {
       notifier.alert(error: error)
     }
@@ -84,8 +89,10 @@ struct SubjectView: View {
       } else {
         NotFoundView()
       }
-    }.task(priority: .background) {
-      await updateSubject()
+    }.onAppear {
+      Task(priority: .background) {
+        await updateSubject()
+      }
     }
   }
 }

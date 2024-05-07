@@ -16,6 +16,7 @@ struct EpisodeGridView: View {
   @EnvironmentObject var chii: ChiiClient
   @Environment(\.modelContext) private var modelContext
 
+  @State private var refreshed: Bool = false
   @State private var selected: Episode? = nil
   @State private var episodes: [EpisodeType: [Episode]] = [:]
 
@@ -42,6 +43,7 @@ struct EpisodeGridView: View {
   }
 
   func update(authenticated: Bool) async {
+    if refreshed { return }
     let actor = BackgroundActor(container: modelContext.container)
     do {
       var offset: Int = 0
@@ -77,6 +79,7 @@ struct EpisodeGridView: View {
         }
       }
       try await actor.save()
+      refreshed = true
     } catch {
       notifier.alert(error: error)
     }
@@ -95,9 +98,11 @@ struct EpisodeGridView: View {
       Spacer()
     }
     .font(.callout)
-    .task(priority: .background) {
-      await update(authenticated: chii.isAuthenticated)
-      await fetch()
+    .onAppear {
+      Task(priority: .background) {
+        await update(authenticated: chii.isAuthenticated)
+        await fetch()
+      }
     }
     if episodes.isEmpty {
       ProgressView().task {

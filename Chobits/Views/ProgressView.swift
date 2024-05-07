@@ -165,8 +165,10 @@ struct ChiiProgressView: View {
                     UserCollectionRow(collection: item.inner.item)
                   }
                   .buttonStyle(PlainButtonStyle())
-                  .task(priority: .background) {
-                    await loadNextPage(idx: item.idx)
+                  .onAppear() {
+                    Task{
+                      await loadNextPage(idx: item.idx)
+                    }
                   }
                 }
               }

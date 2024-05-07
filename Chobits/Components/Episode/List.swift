@@ -184,8 +184,10 @@ struct EpisodeListView: View {
             }
           }
           .padding(5)
-          .task(priority: .background) {
-            await loadNextPage(idx: item.idx)
+          .onAppear {
+            Task {
+              await loadNextPage(idx: item.idx)
+            }
           }
         }
       }
@@ -193,9 +195,11 @@ struct EpisodeListView: View {
     .padding(.horizontal, 16)
     .buttonStyle(.plain)
     .animation(.default, value: episodes)
-    .task(priority: .background) {
-      await loadCounts()
-      await load()
+    .onAppear {
+      Task{
+        await loadCounts()
+        await load()
+      }
     }
     .sheet(
       item: $selected,
