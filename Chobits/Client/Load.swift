@@ -111,10 +111,14 @@ extension ChiiClient {
       if self.isAuthenticated {
         let response = try await self.getEpisodeCollections(
           subjectId: subjectId, type: nil, limit: limit, offset: offset)
-        if response.data.isEmpty {
+        total = response.total
+        guard let data = response.data else {
           break
         }
-        for item in response.data {
+        if data.isEmpty {
+          break
+        }
+        for item in data {
           let episode = Episode(collection: item, subjectId: subjectId)
           await db.insert(episode)
         }

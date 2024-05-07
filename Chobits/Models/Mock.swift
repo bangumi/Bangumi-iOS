@@ -61,7 +61,7 @@ extension Episode {
   static var previewList: [Episode] {
     let collections = loadFixture(
       fixture: "episode_collections.json", target: EpisodeCollectionResponse.self
-    ).data
+    ).data ?? []
     return collections.map { Episode(collection: $0) }
   }
 

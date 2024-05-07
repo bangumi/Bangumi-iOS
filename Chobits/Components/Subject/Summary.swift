@@ -35,9 +35,15 @@ struct SubjectSummaryView: View {
   }
 
   func shouldShowToggle(geometry: GeometryProxy) -> Bool {
-    let numberOfLines = Int(
+    let lines = Int(
       geometry.size.height / UIFont.preferredFont(forTextStyle: .body).lineHeight)
-    return numberOfLines >= 5
+    if lines < 5 {
+      return false
+    }
+    if lines == 5 && !collapsed {
+      return false
+    }
+    return true
   }
 
   var body: some View {
