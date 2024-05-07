@@ -34,7 +34,6 @@ struct ChiiDiscoverView: View {
       let subjects = try await chii.db.fetchData(
         predicate: predicate, limit: limit, offset: offset)
       if subjects.count < limit {
-        Logger.app.info("local search exhausted")
         exhausted = true
       }
       let result = subjects.enumerated().map { (idx, subject) in
@@ -78,7 +77,6 @@ struct ChiiDiscoverView: View {
     do {
       let resp = try await chii.search(
         keyword: query, type: subjectType, limit: limit, offset: offset)
-      offset += limit
       if offset > resp.total {
         Logger.app.info("remote search exhausted at total count: \(resp.total)")
         exhausted = true
@@ -98,6 +96,7 @@ struct ChiiDiscoverView: View {
       if result.count < limit {
         exhausted = true
       }
+      offset += limit
       return result
     } catch {
       notifier.alert(error: error)
