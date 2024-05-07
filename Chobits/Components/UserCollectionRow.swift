@@ -9,28 +9,35 @@ import SwiftData
 import SwiftUI
 
 struct UserCollectionRow: View {
-  let collection: UserSubjectCollectionItem
+  let subjectId: UInt
 
   @Query
   private var subjects: [Subject]
-  var subject: Subject? { subjects.first }
+  private var subject: Subject? { subjects.first }
 
-  init(collection: UserSubjectCollectionItem) {
-    self.collection = collection
+  @Query
+  private var collections: [UserSubjectCollection]
+  private var collection: UserSubjectCollection? { collections.first }
 
-    let subjectId = collection.subjectId
-    let predicate = #Predicate<Subject> {
+  init(subjectId: UInt) {
+    self.subjectId = subjectId
+
+    _subjects = Query(filter: #Predicate<Subject> {
       $0.id == subjectId
-    }
-    _subjects = Query(filter: predicate, sort: \Subject.id)
+    })
+    _collections = Query(filter: #Predicate<UserSubjectCollection> {
+      $0.subjectId == subjectId
+    })
   }
 
   var epsColor: Color {
-    collection.epStatus == 0 ? .secondary : .accent
+    guard let collection = collection else { return .secondary }
+    return collection.epStatus == 0 ? .secondary : .accent
   }
 
   var volsColor: Color {
-    collection.volStatus == 0 ? .secondary : .accent
+    guard let collection = collection else { return .secondary }
+    return collection.volStatus == 0 ? .secondary : .accent
   }
 
   var chapters: String {
@@ -64,32 +71,34 @@ struct UserCollectionRow: View {
         VStack(alignment: .leading) {
           Text(subject?.name ?? "").font(.headline)
           Text(subject?.nameCn ?? "").font(.footnote).foregroundStyle(.secondary)
-          HStack(alignment: .bottom) {
-            Text(collection.updatedAt).foregroundStyle(.secondary)
-            if collection.private {
-              Image(systemName: "lock.fill").foregroundStyle(.accent)
-            }
-            Spacer()
-            switch collection.subjectType {
-            case .anime:
-              Text("\(collection.epStatus)").foregroundStyle(epsColor).font(.callout)
-              Text(chapters).foregroundStyle(epsColor)
-            case .book:
-              Text("\(collection.epStatus)").foregroundStyle(epsColor).font(.callout)
-              Text("\(chapters)").foregroundStyle(epsColor)
-              Text("\(collection.volStatus)").foregroundStyle(volsColor).font(.callout)
-              Text("\(volumes)").foregroundStyle(volsColor)
-            case .real:
-              Text("\(collection.epStatus)").foregroundStyle(epsColor).font(.callout)
-              Text(chapters).foregroundStyle(epsColor)
-            default:
-              Label(
-                collection.subjectType.description,
-                systemImage: collection.subjectType.icon
-              )
-              .foregroundStyle(.accent)
-            }
-          }.font(.caption)
+          if let collection = collection {
+            HStack(alignment: .bottom) {
+              Text(collection.updatedAt.formatCollectionDate).foregroundStyle(.secondary)
+              if collection.priv {
+                Image(systemName: "lock.fill").foregroundStyle(.accent)
+              }
+              Spacer()
+              switch collection.subjectTypeEnum {
+              case .anime:
+                Text("\(collection.epStatus)").foregroundStyle(epsColor).font(.callout)
+                Text(chapters).foregroundStyle(epsColor)
+              case .book:
+                Text("\(collection.epStatus)").foregroundStyle(epsColor).font(.callout)
+                Text("\(chapters)").foregroundStyle(epsColor)
+                Text("\(collection.volStatus)").foregroundStyle(volsColor).font(.callout)
+                Text("\(volumes)").foregroundStyle(volsColor)
+              case .real:
+                Text("\(collection.epStatus)").foregroundStyle(epsColor).font(.callout)
+                Text(chapters).foregroundStyle(epsColor)
+              default:
+                Label(
+                  collection.subjectTypeEnum.description,
+                  systemImage: collection.subjectTypeEnum.icon
+                )
+                .foregroundStyle(.accent)
+              }
+            }.font(.caption)
+          }
         }
         Spacer()
       }
@@ -113,7 +122,7 @@ struct UserCollectionRow: View {
 
   return ScrollView {
     LazyVStack(alignment: .leading) {
-      UserCollectionRow(collection: collection.item)
+      UserCollectionRow(subjectId: subject.id)
         .environmentObject(Notifier())
     }
   }

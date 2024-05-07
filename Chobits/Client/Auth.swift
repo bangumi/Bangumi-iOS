@@ -37,6 +37,7 @@ extension ChiiClient {
     let value = try encoder.encode(auth)
     self.keychain.set(value, forKey: "auth")
     self.auth = auth
+    self.isAuthenticated = true
     return auth
   }
 
