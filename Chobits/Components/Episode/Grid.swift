@@ -23,7 +23,7 @@ struct EpisodeGridView: View {
   func fetch() async {
     let actor = BackgroundActor(container: modelContext.container)
     do {
-      for type in EpisodeType.otherTypes() {
+      for type in EpisodeType.gridTypes() {
         let typeValue = type.rawValue
         var descripter = FetchDescriptor<Episode>(
           predicate: #Predicate<Episode> {
@@ -125,7 +125,7 @@ struct EpisodeGridView: View {
             .strikethrough(episode.collection == EpisodeCollectionType.dropped.rawValue)
         }
       }
-      ForEach(EpisodeType.otherTypes()) { type in
+      ForEach(EpisodeType.gridOtherTypes()) { type in
         if !episodes[type, default: []].isEmpty {
           Text(type.description)
             .foregroundStyle(Color(hex: 0x8EB021))

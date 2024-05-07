@@ -511,7 +511,11 @@ enum EpisodeType: UInt8, Codable, Identifiable {
     }
   }
 
-  static func otherTypes() -> [Self] {
+  static func gridTypes() -> [Self] {
+    return [.main, .sp, .op, .ed]
+  }
+
+  static func gridOtherTypes() -> [Self] {
     return [.sp, .op, .ed]
   }
 }
