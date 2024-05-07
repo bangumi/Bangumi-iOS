@@ -186,6 +186,12 @@ struct EpisodeItem: Codable, Identifiable {
       return "op.\(self.sort.episodeDisplay) \(self.name)"
     case .ed:
       return "ed.\(self.sort.episodeDisplay) \(self.name)"
+    case .trailer:
+      return "trailer.\(self.sort.episodeDisplay) \(self.name)"
+    case .mad:
+      return "mad.\(self.sort.episodeDisplay) \(self.name)"
+    case .other:
+      return "other.\(self.sort.episodeDisplay) \(self.name)"
     }
   }
 }

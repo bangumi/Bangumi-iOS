@@ -18,23 +18,25 @@ struct EpisodeListView: View {
 
   @State private var now: Date = Date()
   @State private var offset: Int = 0
-  @State private var type: EpisodeType = .main
+  @State private var main: Bool = true
   @State private var sortDesc: Bool = false
   @State private var exhausted: Bool = false
   @State private var selected: Episode? = nil
   @State private var episodes: [EnumerateItem<Episode>] = []
-  @State private var counts: [EpisodeType: Int] = [:]
+  @State private var countMain: Int = 0
+  @State private var countOther: Int = 0
 
   func loadCounts() async {
     let actor = BackgroundActor(container: modelContext.container)
     do {
-      for type in EpisodeType.allTypes() {
-        let count = try await actor.fetchCount(
-          predicate: #Predicate<Episode> {
-            $0.subjectId == subjectId && $0.type == type.rawValue
-          })
-        counts[type] = count
-      }
+      countMain = try await actor.fetchCount(
+        predicate: #Predicate<Episode> {
+          $0.subjectId == subjectId && $0.type == 0
+        })
+      countOther = try await actor.fetchCount(
+        predicate: #Predicate<Episode> {
+          $0.subjectId == subjectId && $0.type != 0
+        })
     } catch {
       notifier.alert(error: error)
     }
@@ -46,7 +48,11 @@ struct EpisodeListView: View {
       sortDesc ? SortDescriptor<Episode>(\.sort, order: .reverse) : SortDescriptor<Episode>(\.sort)
     var descriptor = FetchDescriptor<Episode>(
       predicate: #Predicate {
-        $0.subjectId == subjectId && $0.type == type.rawValue
+        if main {
+          $0.subjectId == subjectId && $0.type == 0
+        } else {
+          $0.subjectId == subjectId && $0.type != 0
+        }
       }, sortBy: [sortBy])
     descriptor.fetchLimit = limit
     descriptor.fetchOffset = offset
@@ -85,24 +91,14 @@ struct EpisodeListView: View {
     self.episodes.append(contentsOf: episodes)
   }
 
-  func pickerHeader(type: EpisodeType) -> String {
-    let count = counts[type, default: 0]
-    if count == 0 {
-      return "\(type.description)"
-    } else {
-      return "\(type.description)(\(count))"
-    }
-  }
-
   var body: some View {
     HStack {
-      Picker("Episode Type", selection: $type) {
-        ForEach(EpisodeType.allTypes()) { et in
-          Text(pickerHeader(type: et)).tag(et)
-        }
+      Picker("Episode Type", selection: $main) {
+        Text("本篇(\(countMain))").tag(true)
+        Text("其他(\(countOther))").tag(false)
       }
       .pickerStyle(.segmented)
-      .onChange(of: type) {
+      .onChange(of: main) {
         Task {
           await load()
         }
@@ -146,22 +142,34 @@ struct EpisodeListView: View {
                     .padding(.horizontal, 2)
                     .strikethrough(episode.collection == EpisodeCollectionType.dropped.rawValue)
                 } else {
-                  if episode.airdate > now {
-                    RoundedRectangle(cornerRadius: 5)
-                      .stroke(.secondary, lineWidth: 1)
-                      .frame(width: 40, height: 24)
-                      .overlay {
-                        Text("未播")
-                          .foregroundStyle(.secondary)
-                          .font(.callout)
-                      }
-                      .padding(.horizontal, 2)
+                  if main {
+                    if episode.airdate > now {
+                      RoundedRectangle(cornerRadius: 5)
+                        .stroke(.secondary, lineWidth: 1)
+                        .frame(width: 40, height: 24)
+                        .overlay {
+                          Text("未播")
+                            .foregroundStyle(.secondary)
+                            .font(.callout)
+                        }
+                        .padding(.horizontal, 2)
+                    } else {
+                      RoundedRectangle(cornerRadius: 5)
+                        .stroke(.primary, lineWidth: 1)
+                        .frame(width: 40, height: 24)
+                        .overlay {
+                          Text("已播")
+                            .foregroundStyle(.primary)
+                            .font(.callout)
+                        }
+                        .padding(.horizontal, 2)
+                    }
                   } else {
                     RoundedRectangle(cornerRadius: 5)
                       .stroke(.primary, lineWidth: 1)
                       .frame(width: 40, height: 24)
                       .overlay {
-                        Text("已播")
+                        Text(episode.typeEnum.description)
                           .foregroundStyle(.primary)
                           .font(.callout)
                       }

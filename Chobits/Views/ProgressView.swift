@@ -98,7 +98,7 @@ struct ChiiProgressView: View {
     Logger.collection.info("start update collection for \(type?.name ?? "all")")
     let actor = BackgroundActor(container: modelContext.container)
     var offset: Int = 0
-    let limit: Int = 100
+    let limit: Int = 1000
     do {
       while true {
         let response = try await chii.getSubjectCollections(

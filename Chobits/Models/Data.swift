@@ -312,7 +312,7 @@ final class Episode {
   }
 
   var title: String {
-    switch EpisodeType(value: self.type) {
+    switch self.typeEnum {
     case .main:
       if let ep = self.ep {
         return "ep.\(ep.episodeDisplay) \(self.name)"
@@ -325,6 +325,12 @@ final class Episode {
       return "op.\(self.sort.episodeDisplay) \(self.name)"
     case .ed:
       return "ed.\(self.sort.episodeDisplay) \(self.name)"
+    case .trailer:
+      return "trailer.\(self.sort.episodeDisplay) \(self.name)"
+    case .mad:
+      return "mad.\(self.sort.episodeDisplay) \(self.name)"
+    case .other:
+      return "other.\(self.sort.episodeDisplay) \(self.name)"
     }
   }
 

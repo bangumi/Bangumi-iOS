@@ -23,7 +23,7 @@ struct EpisodeGridView: View {
   func fetch() async {
     let actor = BackgroundActor(container: modelContext.container)
     do {
-      for type in EpisodeType.allTypes() {
+      for type in EpisodeType.otherTypes() {
         let typeValue = type.rawValue
         var descripter = FetchDescriptor<Episode>(
           predicate: #Predicate<Episode> {

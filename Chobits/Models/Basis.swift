@@ -463,15 +463,21 @@ enum CharacterType: UInt8, Codable, Identifiable {
 }
 
 /// 章节类型
-/// 0 为 本篇
-/// 1 为 SP
-/// 2 为 OP
-/// 3 为 ED
+/// 0 = 本篇
+/// 1 = 特别篇
+/// 2 = OP
+/// 3 = ED
+/// 4 = 预告/宣传/广告
+/// 5 = MAD
+/// 6 = 其他
 enum EpisodeType: UInt8, Codable, Identifiable {
   case main = 0
   case sp = 1
   case op = 2
   case ed = 3
+  case trailer = 4
+  case mad = 5
+  case other = 6
 
   var id: Self {
     self
@@ -496,11 +502,13 @@ enum EpisodeType: UInt8, Codable, Identifiable {
       return "OP"
     case .ed:
       return "ED"
+    case .trailer:
+      return "预告"
+    case .mad:
+      return "MAD"
+    case .other:
+      return "其他"
     }
-  }
-
-  static func allTypes() -> [Self] {
-    return [.main, .sp, .op, .ed]
   }
 
   static func otherTypes() -> [Self] {
