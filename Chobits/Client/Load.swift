@@ -73,6 +73,15 @@ extension ChiiClient {
       for item in response.data {
         let collection = UserSubjectCollection(item: item)
         await self.db.insert(collection)
+        if let slim = item.subject {
+          let subject = Subject(slim: slim)
+          let subjectId = subject.id
+          try await self.db.insertIfNeeded(
+            data: subject,
+            predicate: #Predicate<Subject> {
+              $0.id == subjectId
+            })
+        }
       }
       offset += limit
       if offset > response.total {
