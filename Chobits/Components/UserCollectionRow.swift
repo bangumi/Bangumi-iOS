@@ -64,7 +64,7 @@ struct UserCollectionRow: View {
         VStack(alignment: .leading) {
           Text(subject?.name ?? "").font(.headline)
           Text(subject?.nameCn ?? "").font(.footnote).foregroundStyle(.secondary)
-          HStack {
+          HStack(alignment: .bottom) {
             Text(collection.updatedAt).foregroundStyle(.secondary)
             if collection.private {
               Image(systemName: "lock.fill").foregroundStyle(.accent)
