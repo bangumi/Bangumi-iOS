@@ -29,11 +29,11 @@ extension ChiiClient {
       try await self.db.save()
     } catch ChiiError.notFound(_) {
       Logger.subject.warning("subject not found: \(sid)")
-      try await self.db.remove(
-        #Predicate<Subject> {
-          $0.id == sid
-        })
-      try await self.db.save()
+//      try await self.db.remove(
+//        #Predicate<Subject> {
+//          $0.id == sid
+//        })
+//      try await self.db.save()
     } catch {
       throw error
     }
@@ -49,12 +49,12 @@ extension ChiiClient {
       await self.db.insert(collection)
       try await self.db.save()
     } catch ChiiError.notFound(_) {
-      Logger.collection.warning("collection not found: \(subjectId)")
-      try await self.db.remove(
-        #Predicate<UserSubjectCollection> {
-          $0.subjectId == subjectId
-        })
-      try await self.db.save()
+      Logger.collection.warning("collection not found for subject: \(subjectId)")
+//      try await self.db.remove(
+//        #Predicate<UserSubjectCollection> {
+//          $0.subjectId == subjectId
+//        })
+//      try await self.db.save()
     } catch {
       throw error
     }

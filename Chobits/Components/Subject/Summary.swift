@@ -5,6 +5,7 @@
 //  Created by Chuan Chuan on 2024/4/28.
 //
 
+import OSLog
 import SwiftData
 import SwiftUI
 
@@ -15,7 +16,6 @@ struct SubjectSummaryView: View {
   @EnvironmentObject var chii: ChiiClient
 
   @State private var collapsed = true
-  @State private var summaryLines: Int = 0
 
   @Query
   private var subjects: [Subject]
@@ -34,42 +34,35 @@ struct SubjectSummaryView: View {
     return Array(subject.tags.sorted { $0.count > $1.count }.prefix(20))
   }
 
+  func shouldShowToggle(geometry: GeometryProxy) -> Bool {
+    let numberOfLines = Int(
+      geometry.size.height / UIFont.preferredFont(forTextStyle: .body).lineHeight)
+    return numberOfLines >= 5
+  }
+
   var body: some View {
     VStack(alignment: .leading) {
       Text(subject?.summary ?? "")
         .font(.callout)
+        .padding(.bottom, 16)
         .multilineTextAlignment(.leading)
         .lineLimit(collapsed ? 5 : nil)
-        .background(
+        .overlay(
           GeometryReader { geometry in
-            Color.clear
-              .onAppear {
-                summaryLines = Int(
-                  geometry.size.height / UIFont.preferredFont(forTextStyle: .callout).lineHeight)
+            if shouldShowToggle(geometry: geometry) {
+              Button(action: {
+                collapsed.toggle()
+              }) {
+                Text(collapsed ? "more..." : "X close")
+                  .font(.caption)
+                  .foregroundColor(.blue)
               }
+              .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
+            }
           }
         )
     }
     .animation(.default, value: collapsed)
-    if summaryLines == 5 && !collapsed {
-      EmptyView()
-    } else if summaryLines > 5 {
-      HStack {
-        Spacer()
-        Button {
-          collapsed.toggle()
-        } label: {
-          if collapsed {
-            Text("more")
-          } else {
-            Text("close")
-          }
-        }
-        .buttonStyle(PlainButtonStyle())
-        .font(.caption)
-        .foregroundStyle(Color("LinkTextColor"))
-      }
-    }
     FlowStack {
       ForEach(tags, id: \.name) { tag in
         HStack {
