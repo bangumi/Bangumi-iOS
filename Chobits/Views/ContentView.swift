@@ -27,11 +27,11 @@ struct ContentView: View {
         }
         switch selectedTab {
         case .timeline:
-          self.navState.timelineNavigation.removeLast(self.navState.timelineNavigation.count)
+          self.navState.timelineNavigation.removeAll()
         case .progress:
-          self.navState.progressNavigation.removeLast(self.navState.progressNavigation.count)
+          self.navState.progressNavigation.removeAll()
         case .discover:
-          self.navState.discoverNavigation.removeLast(self.navState.discoverNavigation.count)
+          self.navState.discoverNavigation.removeAll()
         }
       }
     )
