@@ -28,6 +28,7 @@ extension ChiiClient {
       await self.db.insert(subject)
       try await self.db.save()
     } catch ChiiError.notFound(_) {
+      Logger.subject.warning("subject not found: \(sid)")
       try await self.db.remove(
         #Predicate<Subject> {
           $0.id == sid
@@ -48,6 +49,7 @@ extension ChiiClient {
       await self.db.insert(collection)
       try await self.db.save()
     } catch ChiiError.notFound(_) {
+      Logger.collection.warning("collection not found: \(subjectId)")
       try await self.db.remove(
         #Predicate<UserSubjectCollection> {
           $0.subjectId == subjectId
@@ -82,7 +84,16 @@ extension ChiiClient {
   }
 
   func loadEpisodes(_ subjectId: UInt) async throws {
-
+    guard let subject = try await db.fetchOne(predicate: #Predicate<Subject> { $0.id == subjectId }) else {
+      Logger.subject.error("subject \(subjectId) not found for loading episode")
+      return
+    }
+    switch subject.typeEnum {
+    case .anime, .real:
+      break
+    default:
+      return
+    }
     var offset: Int = 0
     let limit: Int = 1000
     while true {

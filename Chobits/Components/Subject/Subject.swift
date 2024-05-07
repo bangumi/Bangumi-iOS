@@ -55,7 +55,9 @@ struct SubjectView: View {
 
             switch subject.typeEnum {
             case .book:
-              SubjectBookChaptersView(subjectId: subjectId)
+              if chii.isAuthenticated {
+                SubjectBookChaptersView(subjectId: subjectId)
+              }
             case .anime, .real:
               EpisodeGridView(subjectId: subjectId)
             default:

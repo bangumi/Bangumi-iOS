@@ -5,6 +5,7 @@
 //  Created by Chuan Chuan on 2024/4/19.
 //
 
+import OSLog
 import SwiftData
 import SwiftUI
 
@@ -20,6 +21,7 @@ struct ChiiDiscoverView: View {
   @State private var offset = 0
   @State private var exhausted = false
 
+  @State private var loadedIdx: [Int:Bool] = [:]
   @State private var subjects: [EnumerateItem<Subject>] = []
 
   func localSearch(limit: Int = 50) async -> [EnumerateItem<Subject>] {
@@ -32,6 +34,7 @@ struct ChiiDiscoverView: View {
       let subjects = try await chii.db.fetchData(
         predicate: predicate, limit: limit, offset: offset)
       if subjects.count < limit {
+        Logger.app.info("local search exhausted")
         exhausted = true
       }
       let result = subjects.enumerated().map { (idx, subject) in
@@ -46,9 +49,11 @@ struct ChiiDiscoverView: View {
   }
 
   func newLocalSearch() async {
+    Logger.app.info("new local search")
     local = true
     offset = 0
     exhausted = false
+    loadedIdx.removeAll()
     subjects.removeAll()
     let subjects = await localSearch()
     self.subjects.append(contentsOf: subjects)
@@ -58,9 +63,13 @@ struct ChiiDiscoverView: View {
     if exhausted {
       return
     }
-    if idx != subjects.count - 10 {
+    if idx != offset - 10 {
       return
     }
+    if loadedIdx[idx, default: false] {
+      return
+    }
+    loadedIdx[idx] = true
     let subjects = await localSearch()
     self.subjects.append(contentsOf: subjects)
   }
@@ -71,6 +80,7 @@ struct ChiiDiscoverView: View {
         keyword: query, type: subjectType, limit: limit, offset: offset)
       offset += limit
       if offset > resp.total {
+        Logger.app.info("remote search exhausted at total count: \(resp.total)")
         exhausted = true
       }
       var result: [EnumerateItem<Subject>] = []
@@ -82,7 +92,7 @@ struct ChiiDiscoverView: View {
           predicate: #Predicate<Subject> {
             $0.id == subjectId
           })
-        result.append(EnumerateItem(idx: item.offset, inner: subject))
+        result.append(EnumerateItem(idx: item.offset+offset, inner: subject))
       }
       try await chii.db.save()
       if result.count < limit {
@@ -96,9 +106,11 @@ struct ChiiDiscoverView: View {
   }
 
   func newRemoteSearch() async {
+    Logger.app.info("new remote search")
     local = false
     offset = 0
     exhausted = false
+    loadedIdx.removeAll()
     subjects.removeAll()
     let subjects = await remoteSearch()
     self.subjects.append(contentsOf: subjects)
@@ -108,9 +120,13 @@ struct ChiiDiscoverView: View {
     if exhausted {
       return
     }
-    if idx != subjects.count - 10 {
+    if idx != offset - 10 {
       return
     }
+    if loadedIdx[idx, default: false] {
+      return
+    }
+    loadedIdx[idx] = true
     let subjects = await remoteSearch()
     self.subjects.append(contentsOf: subjects)
   }

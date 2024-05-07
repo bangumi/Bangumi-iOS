@@ -492,6 +492,25 @@ enum EpisodeType: UInt8, Codable, Identifiable {
     self = Self.main
   }
 
+  var name: String {
+    switch self {
+    case .main:
+      return "ep"
+    case .sp:
+      return "sp"
+    case .op:
+      return "op"
+    case .ed:
+      return "ed"
+    case .trailer:
+      return "trailer"
+    case .mad:
+      return "mad"
+    case .other:
+      return "other"
+    }
+  }
+
   var description: String {
     switch self {
     case .main:
@@ -588,6 +607,9 @@ func safeParseDate(str: String?) -> Date {
     return Date(timeIntervalSince1970: 0)
   }
   if str.isEmpty {
+    return Date(timeIntervalSince1970: 0)
+  }
+  if str == "2099" {
     return Date(timeIntervalSince1970: 0)
   }
 

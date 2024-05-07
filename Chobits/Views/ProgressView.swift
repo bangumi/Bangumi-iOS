@@ -18,6 +18,7 @@ struct ChiiProgressView: View {
   @State private var subjectType = SubjectType.unknown
   @State private var offset: Int = 0
   @State private var exhausted: Bool = false
+  @State private var loadedIdx: [Int:Bool] = [:]
   @State private var counts: [SubjectType: Int] = [:]
   @State private var collections: [EnumerateItem<(UserSubjectCollection)>] = []
 
@@ -76,6 +77,7 @@ struct ChiiProgressView: View {
   func load() async {
     offset = 0
     exhausted = false
+    loadedIdx.removeAll()
     collections.removeAll()
     let collections = await fetch()
     self.collections.append(contentsOf: collections)
@@ -85,9 +87,13 @@ struct ChiiProgressView: View {
     if exhausted {
       return
     }
-    if idx != collections.count - 10 {
+    if idx != offset - 10 {
       return
     }
+    if loadedIdx[idx, default: false] {
+      return
+    }
+    loadedIdx[idx] = true
     let collections = await fetch()
     self.collections.append(contentsOf: collections)
   }

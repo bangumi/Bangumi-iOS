@@ -21,6 +21,7 @@ struct EpisodeListView: View {
   @State private var sortDesc: Bool = false
   @State private var exhausted: Bool = false
   @State private var selected: Episode? = nil
+  @State private var loadedIdx: [Int:Bool] = [:]
   @State private var episodes: [EnumerateItem<Episode>] = []
   @State private var countMain: Int = 0
   @State private var countOther: Int = 0
@@ -80,6 +81,7 @@ struct EpisodeListView: View {
   func load() async {
     offset = 0
     exhausted = false
+    loadedIdx.removeAll()
     episodes.removeAll()
     let episodes = await fetch()
     self.episodes.append(contentsOf: episodes)
@@ -92,6 +94,10 @@ struct EpisodeListView: View {
     if idx != offset - 10 {
       return
     }
+    if loadedIdx[idx, default: false] {
+      return
+    }
+    loadedIdx[idx] = true
     let episodes = await fetch()
     self.episodes.append(contentsOf: episodes)
   }
@@ -181,12 +187,12 @@ struct EpisodeListView: View {
                       .padding(.horizontal, 2)
                   }
                 }
+
                 VStack(alignment: .leading) {
                   if !episode.nameCn.isEmpty {
                     Text(episode.nameCn)
                       .lineLimit(1)
                       .font(.subheadline)
-                      .foregroundStyle(.secondary)
                   }
                   HStack {
                     Text("时长:\(episode.duration)")
@@ -200,7 +206,7 @@ struct EpisodeListView: View {
                 }
                 Spacer()
               }
-            }
+            }.padding(.vertical, 5)
           }
           .padding(5)
           .onAppear {

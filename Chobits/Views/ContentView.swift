@@ -13,7 +13,7 @@ struct ContentView: View {
   @EnvironmentObject var notifier: Notifier
   @EnvironmentObject var chii: ChiiClient
 
-  @State private var waiting = true
+  @State private var initialized = false
   @StateObject var navState = NavState()
 
   private func createTabViewBinding() -> Binding<ContentViewTab> {
@@ -37,20 +37,36 @@ struct ContentView: View {
   }
 
   func refreshProfile() async {
-    self.waiting = true
-    do {
-      _ = try await chii.getProfile()
-    } catch {
-      Logger.api.warning("refresh profile failed: \(error)")
+    var tries = 0
+    while true {
+      if tries > 3 {
+        break
+      }
+      tries += 1
+      do {
+        _ = try await chii.getProfile()
+        chii.isAuthenticated = true
+        self.initialized = true
+        return
+      } catch ChiiError.requireLogin {
+        chii.isAuthenticated = false
+        self.initialized = true
+        return
+      } catch {
+        Logger.api.warning("refresh profile failed: \(error)")
+      }
     }
-    self.waiting = false
+    chii.isAuthenticated = false
+    self.initialized = true
   }
 
   var body: some View {
-    if waiting {
+    if !initialized {
       VStack {
-        LoadingView().task {
-          await refreshProfile()
+        LoadingView().onAppear {
+          Task{
+            await refreshProfile()
+          }
         }
       }
     } else {

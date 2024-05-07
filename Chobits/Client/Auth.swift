@@ -5,12 +5,16 @@
 //  Created by Chuan Chuan on 2024/5/4.
 //
 
+import OSLog
 import Foundation
 
 extension ChiiClient {
-  func logout() async {
+  func logout() {
+    Logger.app.info("start logout")
+    self.isAuthenticated = false
+    Logger.app.info("clear keychain")
     self.keychain.delete("auth")
-    await self.setAuthed(authed: false)
+    Logger.app.info("clear auth session")
     self.auth = nil
     self.profile = nil
     self.authorizedSession = nil
@@ -47,7 +51,6 @@ extension ChiiClient {
     ]
     let data = try await self.request(url: url, method: "POST", body: body, authorized: false)
     _ = try self.saveAuthResponse(data: data)
-    await self.setAuthed(authed: true)
   }
 
   func refreshAccessToken(auth: Auth) async throws -> Auth {
@@ -61,7 +64,6 @@ extension ChiiClient {
     ]
     let data = try await self.request(url: url, method: "POST", body: body, authorized: false)
     let auth = try self.saveAuthResponse(data: data)
-    await self.setAuthed(authed: true)
     return auth
   }
 

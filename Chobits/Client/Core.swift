@@ -61,12 +61,6 @@ class ChiiClient: ObservableObject, Observable {
     }
   }
 
-  func setAuthed(authed: Bool) async {
-    await MainActor.run {
-      self.isAuthenticated = authed
-    }
-  }
-
   func request(url: URL, method: String, body: Any? = nil, authorized: Bool = true) async throws
     -> Data
   {
@@ -161,11 +155,10 @@ class ChiiClient: ObservableObject, Observable {
           headers["Authorization"] = "Bearer \(auth.accessToken)"
         }
       } else {
-        throw ChiiError(message: "Please login with Bangumi")
+        throw ChiiError.requireLogin
       }
     }
     sessionConfig.httpAdditionalHeaders = headers
-    await self.setAuthed(authed: true)
     return URLSession(configuration: sessionConfig)
   }
 

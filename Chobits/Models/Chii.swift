@@ -173,26 +173,7 @@ struct EpisodeItem: Codable, Identifiable {
   var durationSeconds: UInt?
 
   var title: String {
-    switch self.type {
-    case .main:
-      if let ep = self.ep {
-        return "ep.\(ep.episodeDisplay) \(self.name)"
-      } else {
-        return "ep.\(self.sort.episodeDisplay) \(self.name)"
-      }
-    case .sp:
-      return "sp.\(self.sort.episodeDisplay) \(self.name)"
-    case .op:
-      return "op.\(self.sort.episodeDisplay) \(self.name)"
-    case .ed:
-      return "ed.\(self.sort.episodeDisplay) \(self.name)"
-    case .trailer:
-      return "trailer.\(self.sort.episodeDisplay) \(self.name)"
-    case .mad:
-      return "mad.\(self.sort.episodeDisplay) \(self.name)"
-    case .other:
-      return "other.\(self.sort.episodeDisplay) \(self.name)"
-    }
+    return "\(self.type.name).\(self.sort.episodeDisplay) \(self.name)"
   }
 }
 

@@ -28,7 +28,7 @@ struct EpisodeGridView: View {
     let mainType = EpisodeType.main.rawValue
     var mainDescriptor = FetchDescriptor<Episode>(
       predicate: #Predicate<Episode> {
-        $0.type == mainType
+        $0.type == mainType && $0.subjectId == subjectId
       }, sortBy: [SortDescriptor(\.sort)])
     mainDescriptor.fetchLimit = 50
     _episodeMains = Query(mainDescriptor)
@@ -36,7 +36,7 @@ struct EpisodeGridView: View {
     let spType = EpisodeType.sp.rawValue
     var spDescriptor = FetchDescriptor<Episode>(
       predicate: #Predicate<Episode> {
-        $0.type == spType
+        $0.type == spType && $0.subjectId == subjectId
       }, sortBy: [SortDescriptor(\.sort)])
     spDescriptor.fetchLimit = 10
     _episodeSps = Query(spDescriptor)

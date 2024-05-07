@@ -79,6 +79,7 @@ struct ResponseError: Codable, CustomStringConvertible {
 }
 
 enum ChiiError: Error, CustomStringConvertible {
+  case requireLogin
   case request(String)
   case badRequest(ResponseError)
   case notAuthorized(ResponseError)
@@ -113,6 +114,8 @@ enum ChiiError: Error, CustomStringConvertible {
 
   var description: String {
     switch self {
+    case .requireLogin:
+      return "Please login with Bangumi"
     case .request(let message):
       return "Request Error!\n\(message)"
     case .badRequest(let error):
