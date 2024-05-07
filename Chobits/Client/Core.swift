@@ -39,6 +39,7 @@ class ChiiClient: ObservableObject, Observable {
   }
 
   init(container: ModelContainer, mock: SubjectType? = nil) {
+    Logger.app.info("new init chii client")
     self.db = BackgroundActor(container: container)
     self.keychain = KeychainSwift(keyPrefix: "com.everpcpc.chobits.")
     guard let plist = Bundle.main.infoDictionary else {

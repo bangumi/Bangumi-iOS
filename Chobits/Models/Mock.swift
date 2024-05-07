@@ -59,9 +59,10 @@ extension UserSubjectCollection {
 
 extension Episode {
   static var previewList: [Episode] {
-    let collections = loadFixture(
-      fixture: "episode_collections.json", target: EpisodeCollectionResponse.self
-    ).data ?? []
+    let collections =
+      loadFixture(
+        fixture: "episode_collections.json", target: EpisodeCollectionResponse.self
+      ).data ?? []
     return collections.map { Episode(collection: $0) }
   }
 
