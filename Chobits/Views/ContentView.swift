@@ -45,18 +45,18 @@ struct ContentView: View {
       tries += 1
       do {
         _ = try await chii.getProfile()
-        chii.isAuthenticated = true
+        await chii.setAuthStatus(true)
         self.initialized = true
         return
       } catch ChiiError.requireLogin {
-        chii.isAuthenticated = false
+        await chii.setAuthStatus(false)
         self.initialized = true
         return
       } catch {
         Logger.api.warning("refresh profile failed: \(error)")
       }
     }
-    chii.isAuthenticated = false
+    await chii.setAuthStatus(false)
     self.initialized = true
   }
 

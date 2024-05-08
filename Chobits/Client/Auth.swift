@@ -11,9 +11,7 @@ import OSLog
 extension ChiiClient {
   func logout() async {
     Logger.app.info("start logout")
-    await MainActor.run {
-      self.isAuthenticated = false
-    }
+    await self.setAuthStatus(false)
     Logger.app.info("clear keychain")
     self.keychain.delete("auth")
     Logger.app.info("clear auth session")
@@ -53,9 +51,7 @@ extension ChiiClient {
     ]
     let data = try await self.request(url: url, method: "POST", body: body, authorized: false)
     _ = try self.saveAuthResponse(data: data)
-    await MainActor.run {
-      self.isAuthenticated = true
-    }
+    await self.setAuthStatus(true)
   }
 
   func refreshAccessToken(auth: Auth) async throws -> Auth {

@@ -62,6 +62,12 @@ class ChiiClient: ObservableObject, Observable {
     }
   }
 
+  func setAuthStatus(_ isAuthenticated: Bool) async {
+    await MainActor.run {
+      self.isAuthenticated = isAuthenticated
+    }
+  }
+
   func request(url: URL, method: String, body: Any? = nil, authorized: Bool = true) async throws
     -> Data
   {
