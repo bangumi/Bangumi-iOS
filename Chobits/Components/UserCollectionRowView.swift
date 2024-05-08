@@ -1,5 +1,5 @@
 //
-//  UserCollectionRow.swift
+//  UserCollectionRowView.swift
 //  Chobits
 //
 //  Created by Chuan Chuan on 2024/4/21.
@@ -9,7 +9,7 @@ import OSLog
 import SwiftData
 import SwiftUI
 
-struct UserCollectionRow: View {
+struct UserCollectionRowView: View {
   let subjectId: UInt
 
   @EnvironmentObject var notifier: Notifier
@@ -154,7 +154,7 @@ struct UserCollectionRow: View {
         isPresented: $showEpisodeBox,
         content: {
           if let episode = nextEpisode {
-            EpisodeInfobox(subjectId: subjectId, episodeId: episode.id)
+            EpisodeInfoboxView(subjectId: subjectId, episodeId: episode.id)
               .presentationDragIndicator(.visible)
               .presentationDetents(.init([.medium, .large]))
           }
@@ -180,7 +180,7 @@ struct UserCollectionRow: View {
 
   return ScrollView {
     LazyVStack(alignment: .leading) {
-      UserCollectionRow(subjectId: subject.id)
+      UserCollectionRowView(subjectId: subject.id)
         .environmentObject(Notifier())
         .environment(ChiiClient(container: container, mock: .anime))
     }

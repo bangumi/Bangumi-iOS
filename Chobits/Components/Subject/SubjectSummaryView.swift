@@ -1,5 +1,5 @@
 //
-//  Summary.swift
+//  SubjectSummaryView.swift
 //  Chobits
 //
 //  Created by Chuan Chuan on 2024/4/28.

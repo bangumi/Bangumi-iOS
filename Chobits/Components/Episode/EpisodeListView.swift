@@ -1,5 +1,5 @@
 //
-//  Episode.swift
+//  EpisodeListView.swift
 //  Chobits
 //
 //  Created by Chuan Chuan on 2024/5/5.
@@ -226,7 +226,7 @@ struct EpisodeListView: View {
     .sheet(
       item: $selected,
       content: { episode in
-        EpisodeInfobox(subjectId: subjectId, episodeId: episode.id)
+        EpisodeInfoboxView(subjectId: subjectId, episodeId: episode.id)
           .presentationDragIndicator(.visible)
           .presentationDetents(.init([.medium, .large]))
       }

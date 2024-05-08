@@ -1,5 +1,5 @@
 //
-//  Infobox.swift
+//  EpisodeInfoboxView.swift
 //  Chobits
 //
 //  Created by Chuan Chuan on 2024/5/4.
@@ -8,7 +8,7 @@
 import SwiftData
 import SwiftUI
 
-struct EpisodeInfobox: View {
+struct EpisodeInfoboxView: View {
   let subjectId: UInt
   let episodeId: UInt
 
@@ -148,7 +148,7 @@ struct EpisodeInfobox: View {
     container.mainContext.insert(episode)
   }
 
-  return EpisodeInfobox(subjectId: subject.id, episodeId: episodes.first!.id)
+  return EpisodeInfoboxView(subjectId: subject.id, episodeId: episodes.first!.id)
     .environmentObject(Notifier())
     .environment(ChiiClient(container: container, mock: .anime))
     .modelContainer(container)

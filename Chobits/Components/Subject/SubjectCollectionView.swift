@@ -1,5 +1,5 @@
 //
-//  Collection.swift
+//  SubjectCollectionView.swift
 //  Chobits
 //
 //  Created by Chuan Chuan on 2024/4/28.
@@ -85,7 +85,7 @@ struct SubjectCollectionView: View {
             .sheet(
               isPresented: $edit,
               content: {
-                SubjectCollectionBox(subjectId: subjectId, collection: collection.item)
+                SubjectCollectionBoxView(subjectId: subjectId, collection: collection.item)
                   .presentationDragIndicator(.visible)
                   .presentationDetents(.init([.medium, .large]))
               })
@@ -119,7 +119,7 @@ struct SubjectCollectionView: View {
               .sheet(
                 isPresented: $edit,
                 content: {
-                  SubjectCollectionBox(subjectId: subjectId, collection: nil)
+                  SubjectCollectionBoxView(subjectId: subjectId, collection: nil)
                     .presentationDragIndicator(.visible)
                     .presentationDetents(.init([.medium, .large]))
                 })

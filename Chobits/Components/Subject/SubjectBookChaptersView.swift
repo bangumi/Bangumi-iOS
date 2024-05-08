@@ -1,5 +1,5 @@
 //
-//  CollectionBook.swift
+//  SubjectBookChaptersView.swift
 //  Chobits
 //
 //  Created by Chuan Chuan on 2024/5/2.

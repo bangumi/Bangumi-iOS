@@ -1,5 +1,5 @@
 //
-//  Header.swift
+//  SubjectHeaderView.swift
 //  Chobits
 //
 //  Created by Chuan Chuan on 2024/4/28.
@@ -91,7 +91,7 @@ struct SubjectHeaderView: View {
           .sheet(
             isPresented: $collectionDetail,
             content: {
-              SubjectRatingBox(subject: subject.item)
+              SubjectRatingBoxView(subject: subject.item)
                 .presentationDragIndicator(.visible)
                 .presentationDetents(.init([.medium]))
             })

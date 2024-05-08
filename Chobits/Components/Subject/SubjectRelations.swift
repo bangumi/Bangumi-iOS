@@ -1,5 +1,5 @@
 //
-//  SubjectRelations.swift
+//  SubjectRelationsView.swift
 //  Chobits
 //
 //  Created by Chuan Chuan on 2024/5/8.
@@ -8,7 +8,7 @@
 import SwiftData
 import SwiftUI
 
-struct SubjectRelations: View {
+struct SubjectRelationsView: View {
   let subjectId: UInt
 
   @EnvironmentObject var notifier: Notifier
@@ -34,7 +34,7 @@ struct SubjectRelations: View {
 
   return ScrollView {
     LazyVStack(alignment: .leading) {
-      SubjectRelations(subjectId: subject.id)
+      SubjectRelationsView(subjectId: subject.id)
         .environmentObject(Notifier())
         .environment(ChiiClient(container: container, mock: .book))
     }

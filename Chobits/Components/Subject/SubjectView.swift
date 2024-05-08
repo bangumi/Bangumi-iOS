@@ -1,5 +1,5 @@
 //
-//  Subject.swift
+//  SubjectView.swift
 //  Chobits
 //
 //  Created by Chuan Chuan on 2024/4/27.
@@ -75,7 +75,7 @@ struct SubjectView: View {
             SubjectSummaryView(subjectId: subjectId)
 
             Divider()
-            SubjectRelations(subjectId: subjectId)
+            SubjectRelationsView(subjectId: subjectId)
 
             Spacer()
           }

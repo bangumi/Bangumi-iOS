@@ -1,5 +1,5 @@
 //
-//  Rating.swift
+//  SubjectRatingBoxView.swift
 //  Chobits
 //
 //  Created by Chuan Chuan on 2024/4/28.
@@ -12,7 +12,7 @@ struct ScoreInfo {
   var offset: Int
 }
 
-struct SubjectRatingBox: View {
+struct SubjectRatingBoxView: View {
   let subject: SubjectItem
 
   var collectionDesc: [String] {
@@ -158,5 +158,5 @@ struct ChartView: View {
 }
 
 #Preview {
-  SubjectRatingBox(subject: Subject.previewAnime.item)
+  SubjectRatingBoxView(subject: Subject.previewAnime.item)
 }

@@ -1,5 +1,5 @@
 //
-//  CollectionBox.swift
+//  SubjectCollectionBoxView.swift
 //  Chobits
 //
 //  Created by Chuan Chuan on 2024/5/2.
@@ -8,7 +8,7 @@
 import SwiftData
 import SwiftUI
 
-struct SubjectCollectionBox: View {
+struct SubjectCollectionBoxView: View {
   let subjectId: UInt
   let collection: UserSubjectCollectionItem?
 
@@ -219,7 +219,7 @@ struct SubjectCollectionBox: View {
   container.mainContext.insert(collection)
   container.mainContext.insert(subject)
 
-  return SubjectCollectionBox(
+  return SubjectCollectionBoxView(
     subjectId: subject.id,
     collection: collection.item
   )

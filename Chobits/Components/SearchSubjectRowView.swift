@@ -1,5 +1,5 @@
 //
-//  SearchRow.swift
+//  SearchSubjectRowView.swift
 //  Chobits
 //
 //  Created by Chuan Chuan on 2024/4/26.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct SubjectSearchRow: View {
+struct SearchSubjectRowView: View {
   let subject: SubjectItem
 
   var body: some View {
@@ -53,7 +53,7 @@ struct SubjectSearchRow: View {
 #Preview {
   ScrollView {
     LazyVStack(alignment: .leading, spacing: 10) {
-      SubjectSearchRow(subject: Subject.previewAnime.item)
+      SearchSubjectRowView(subject: Subject.previewAnime.item)
     }
   }
   .padding(.horizontal, 16)
