@@ -16,6 +16,7 @@ struct EpisodeGridView: View {
   @EnvironmentObject var chii: ChiiClient
 
   @State private var selected: Episode? = nil
+  @State private var refreshed: Bool = false
 
   @Query
   private var episodeMains: [Episode]
@@ -42,6 +43,18 @@ struct EpisodeGridView: View {
     _episodeSps = Query(spDescriptor)
   }
 
+  func refresh() async {
+    if refreshed { return }
+    refreshed = true
+
+    do {
+      try await chii.loadEpisodes(subjectId)
+      try await chii.db.save()
+    } catch {
+      notifier.alert(error: error)
+    }
+  }
+
   var body: some View {
     HStack {
       if chii.isAuthenticated {
@@ -53,6 +66,10 @@ struct EpisodeGridView: View {
         Text("[全部]").foregroundStyle(Color("LinkTextColor"))
       }.buttonStyle(.plain)
       Spacer()
+    }.onAppear {
+      Task(priority: .background) {
+        await refresh()
+      }
     }
     FlowStack {
       ForEach(episodeMains) { episode in
