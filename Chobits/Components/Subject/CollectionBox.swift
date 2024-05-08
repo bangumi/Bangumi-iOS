@@ -80,13 +80,6 @@ struct SubjectCollectionBox: View {
   var body: some View {
     ScrollView {
       VStack {
-        Picker("Collection Type", selection: $collectionType) {
-          ForEach(CollectionType.boxTypes()) { ct in
-            Text("\(ct.description(type: subject?.typeEnum))").tag(ct)
-          }
-        }
-        .pickerStyle(.segmented)
-
         HStack {
           Button(action: update) {
             Spacer()
@@ -105,6 +98,13 @@ struct SubjectCollectionBox: View {
         if let collection = collection {
           Text("上次更新：\(collection.updatedAt)").font(.caption).foregroundStyle(.secondary)
         }
+
+        Picker("Collection Type", selection: $collectionType) {
+          ForEach(CollectionType.boxTypes()) { ct in
+            Text("\(ct.description(type: subject?.typeEnum))").tag(ct)
+          }
+        }
+        .pickerStyle(.segmented)
 
         VStack(alignment: .leading) {
           HStack(alignment: .top) {
