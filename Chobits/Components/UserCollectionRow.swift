@@ -15,7 +15,6 @@ struct UserCollectionRow: View {
   @EnvironmentObject var notifier: Notifier
   @EnvironmentObject var chii: ChiiClient
 
-  @State private var nextEpisodeLoaded: Bool = false
   @State private var showEpisodeBox: Bool = false
   @State private var nextEpisode: Episode?
 
@@ -41,8 +40,6 @@ struct UserCollectionRow: View {
   }
 
   func loadNextEpisode() async {
-    if nextEpisodeLoaded { return }
-    nextEpisodeLoaded = true
     guard let subject = subject else { return }
     switch subject.typeEnum {
     case .anime, .real:
