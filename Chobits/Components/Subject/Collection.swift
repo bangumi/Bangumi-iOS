@@ -94,7 +94,8 @@ struct SubjectCollectionView: View {
               ForEach(1..<6) { idx in
                 Image(
                   systemName: idx * 2 <= collection.rate
-                  ? "star.fill" : idx * 2 - 1 == collection.rate ? "star.leadinghalf.fill" : "star"
+                    ? "star.fill"
+                    : idx * 2 - 1 == collection.rate ? "star.leadinghalf.fill" : "star"
                 )
                 .resizable()
                 .foregroundStyle(.orange)

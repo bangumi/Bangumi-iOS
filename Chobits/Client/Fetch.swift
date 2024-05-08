@@ -194,7 +194,7 @@ extension ChiiClient {
     return resp
   }
 
-  func getSubjectCharacters(_ sid:UInt) async throws -> [SubjectCharacterItem] {
+  func getSubjectCharacters(_ sid: UInt) async throws -> [SubjectCharacterItem] {
     Logger.api.info("start get subject characters: \(sid)")
     let url = self.apiBase.appendingPathComponent("v0/subjects/\(sid)/characters")
     let data = try await request(url: url, method: "GET", authorized: self.isAuthenticated)
@@ -205,7 +205,7 @@ extension ChiiClient {
     return characters
   }
 
-  func getSubjectPersons(_ sid:UInt) async throws -> [SubjectPersonItem] {
+  func getSubjectPersons(_ sid: UInt) async throws -> [SubjectPersonItem] {
     Logger.api.info("start get subject persons: \(sid)")
     let url = self.apiBase.appendingPathComponent("v0/subjects/\(sid)/persons")
     let data = try await request(url: url, method: "GET", authorized: self.isAuthenticated)

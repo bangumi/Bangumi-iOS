@@ -5,8 +5,8 @@
 //  Created by Chuan Chuan on 2024/5/8.
 //
 
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 struct SettingsView: View {
   @AppStorage("appearance") var appearance: String = AppearanceType.system.label
@@ -60,14 +60,14 @@ struct SettingsView: View {
       }
 
       Section(header: Text("外观设置")) {
-          Picker(selection: $selectedAppearance, label: Text("主题")) {
-            ForEach(AppearanceType.allCases, id: \.self) { appearance in
-              Text(appearance.desc).tag(appearance)
-            }
+        Picker(selection: $selectedAppearance, label: Text("主题")) {
+          ForEach(AppearanceType.allCases, id: \.self) { appearance in
+            Text(appearance.desc).tag(appearance)
           }
-          .onChange(of: selectedAppearance) { _, _ in
-            appearance = selectedAppearance.label
-          }
+        }
+        .onChange(of: selectedAppearance) { _, _ in
+          appearance = selectedAppearance.label
+        }
       }
 
       Section(header: Text("关于")) {
@@ -78,7 +78,7 @@ struct SettingsView: View {
         }
       }
 
-      Section{
+      Section {
         HStack {
           Spacer()
           if chii.isAuthenticated {
@@ -86,7 +86,7 @@ struct SettingsView: View {
               Text("退出登录")
             }.foregroundColor(.red)
           } else {
-            Button{
+            Button {
               SignInViewModel(notifier: notifier, chii: chii).signIn()
             } label: {
               Text("使用 Bangumi 登录")
@@ -104,7 +104,6 @@ struct SettingsView: View {
 #Preview {
   let config = ModelConfiguration(isStoredInMemoryOnly: true)
   let container = try! ModelContainer(for: UserSubjectCollection.self, configurations: config)
-
 
   return SettingsView()
     .environmentObject(Notifier())

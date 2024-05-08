@@ -120,23 +120,13 @@ struct SmallSubject: Codable {
   // var collection: SubjectCollection?
 }
 
-struct SubjectPersonItem: Codable, Identifiable {
+struct SubjectRelationItem: Codable, Identifiable {
   var id: UInt
+  var type: SubjectType
   var name: String
-  var type: PersonType
-  var career: PersonCareer
-  var images: Images?
+  var nameCn: String
+  var images: SubjectImages?
   var relation: String
-}
-
-struct PersonItem: Codable, Identifiable {
-  var id: UInt
-  var name: String
-  var type: PersonType
-  var career: PersonCareer
-  var images: Images?
-  var shortSummary: String
-  var locked: Bool
 }
 
 struct SubjectCharacterItem: Codable, Identifiable {
@@ -148,12 +138,12 @@ struct SubjectCharacterItem: Codable, Identifiable {
   var actors: [PersonItem]?
 }
 
-struct SubjectRelationItem: Codable, Identifiable {
+struct SubjectPersonItem: Codable, Identifiable {
   var id: UInt
-  var type: SubjectType
   var name: String
-  var nameCn: String
-  var images: SubjectImages?
+  var type: PersonType
+  var career: PersonCareer
+  var images: Images?
   var relation: String
 }
 
@@ -180,4 +170,76 @@ struct EpisodeItem: Codable, Identifiable {
 struct EpisodeCollectionItem: Codable {
   var episode: EpisodeItem
   var type: EpisodeCollectionType
+}
+
+struct CharacterItem: Codable, Identifiable {
+  var id: UInt
+  var name: String
+  var type: CharacterType
+  var images: Images?
+  var shortSummary: String
+  var locked: Bool
+  var infobox: [InfoboxItem]
+  var gender: String?
+  var bloodType: BloodType?
+  var birthYear: UInt?
+  var birthMonth: UInt?
+  var birthDay: UInt?
+  var stat: Stat
+}
+
+struct CharacterSubjectItem: Codable, Identifiable {
+  var id: UInt
+  var staff: String
+  var name: String?
+  var nameCn: String
+  var image: String
+}
+
+struct CharacterPersonItem: Codable, Identifiable {
+  var id: UInt
+  var name: String
+  var type: CharacterType
+  var images: Images?
+  var subjectId: UInt
+  var subjectName: String
+  var subjectNameCn: String
+  var staff: String?
+}
+
+struct PersonItem: Codable, Identifiable {
+  var id: UInt
+  var name: String
+  var type: PersonType
+  var career: [PersonCareer]
+  var images: Images?
+  var summary: String
+  var locked: Bool
+  var lastModified: String
+  var infobox: [InfoboxItem]
+  var gender: String?
+  var bloodType: BloodType?
+  var birthYear: UInt?
+  var birthMonth: UInt?
+  var birthDay: UInt?
+  var stat: Stat
+}
+
+struct PersonSubjectItem: Codable, Identifiable {
+  var id: UInt
+  var staff: String
+  var name: String?
+  var nameCn: String
+  var image: String?
+}
+
+struct PersonCharacterItem: Codable, Identifiable {
+  var id: UInt
+  var name: String
+  var type: CharacterType
+  var images: Images?
+  var subjectId: UInt
+  var subjectName: String
+  var subjectNameCn: String
+  var staff: String?
 }

@@ -83,7 +83,7 @@ struct ChiiDiscoverView: View {
       }
       var result: [EnumerateItem<Subject>] = []
       for item in resp.data.enumerated() {
-        let subject = Subject(search: item.element)
+        let subject = Subject(item.element)
         let subjectId = item.element.id
         try await chii.db.insertIfNeeded(
           data: subject,

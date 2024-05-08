@@ -24,7 +24,7 @@ extension ChiiClient {
     }
 
     Logger.subject.info("fetched subject: \(item.id)")
-    let subject = Subject(item: item)
+    let subject = Subject(item)
     await self.db.insert(subject)
   }
 
@@ -33,7 +33,7 @@ extension ChiiClient {
       return
     }
     let item = try await self.getSubjectCollection(subjectId)
-    let collection = UserSubjectCollection(item: item)
+    let collection = UserSubjectCollection(item)
     await self.db.insert(collection)
   }
 
@@ -48,10 +48,10 @@ extension ChiiClient {
         break
       }
       for item in response.data {
-        let collection = UserSubjectCollection(item: item)
+        let collection = UserSubjectCollection(item)
         await self.db.insert(collection)
         if let slim = item.subject {
-          let subject = Subject(slim: slim)
+          let subject = Subject(slim)
           let subjectId = subject.id
           try await self.db.insertIfNeeded(
             data: subject,
@@ -95,7 +95,7 @@ extension ChiiClient {
           break
         }
         for item in data {
-          let episode = Episode(collection: item, subjectId: subjectId)
+          let episode = Episode(item, subjectId: subjectId)
           await db.insert(episode)
         }
         total = response.total
@@ -106,7 +106,7 @@ extension ChiiClient {
           break
         }
         for item in response.data {
-          let episode = Episode(item: item, subjectId: subjectId)
+          let episode = Episode(item, subjectId: subjectId)
           await db.insert(episode)
         }
         total = response.total
@@ -122,10 +122,10 @@ extension ChiiClient {
     let response = try await self.getCalendar()
     for item in response {
       Logger.api.info("processing calendar: \(item.weekday.en)")
-      let cal = BangumiCalendar(item: item)
+      let cal = BangumiCalendar(item)
       await db.insert(cal)
       for small in item.items {
-        let subject = Subject(small: small)
+        let subject = Subject(small)
         try await db.insertIfNeeded(
           data: subject,
           predicate: #Predicate<Subject> {

@@ -32,7 +32,7 @@ extension ChiiClient {
       "finish update subject collection: \(sid), eps: \(eps.debugDescription), vols: \(vols.debugDescription)"
     )
     let item = try await getSubjectCollection(sid)
-    let collect = UserSubjectCollection(item: item)
+    let collect = UserSubjectCollection(item)
     await self.db.insert(collect)
     try await self.db.save()
   }
@@ -67,7 +67,7 @@ extension ChiiClient {
     }
     Logger.api.info("finish update subject collection: \(sid)")
     let item = try await getSubjectCollection(sid)
-    let collect = UserSubjectCollection(item: item)
+    let collect = UserSubjectCollection(item)
     await self.db.insert(collect)
     try await self.db.save()
   }

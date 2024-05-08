@@ -5,8 +5,8 @@
 //  Created by Chuan Chuan on 2024/5/8.
 //
 
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 struct SubjectRelations: View {
   let subjectId: UInt
@@ -14,13 +14,15 @@ struct SubjectRelations: View {
   @EnvironmentObject var notifier: Notifier
   @EnvironmentObject var chii: ChiiClient
 
-    var body: some View {
-      VStack {
-        Text("关联条目").font(.title3)
-      }
+  @Query
+  private var subjects: [Subject]
+  private var subject: Subject? { subjects.first }
 
-        Text("Hello, World!")
+  var body: some View {
+    VStack {
+      Text("关联条目").font(.title3)
     }
+  }
 }
 
 #Preview {
@@ -32,9 +34,9 @@ struct SubjectRelations: View {
 
   return ScrollView {
     LazyVStack(alignment: .leading) {
-    SubjectRelations(subjectId: subject.id)
-    .environmentObject(Notifier())
-    .environment(ChiiClient(container: container, mock: .book))
+      SubjectRelations(subjectId: subject.id)
+        .environmentObject(Notifier())
+        .environment(ChiiClient(container: container, mock: .book))
     }
   }.padding()
 }

@@ -57,13 +57,12 @@ enum AppearanceType: Codable, CaseIterable, Identifiable {
     case .system:
       nil
     case .dark:
-        .dark
+      .dark
     case .light:
-        .light
+      .light
     }
   }
 }
-
 
 enum ShareDomain: Codable, CaseIterable, Identifiable {
   case chii

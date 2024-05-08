@@ -23,14 +23,13 @@ struct SubjectImages: Codable {
     self.grid = ""
   }
 
-  init(large: String, common: String, medium: String, small: String, grid: String) {
-    self.large = large
-    self.common = common
-    self.medium = medium
-    self.small = small
-    self.grid = grid
+  init(image: String) {
+    self.large = image
+    self.common = image
+    self.medium = image
+    self.small = image
+    self.grid = image
   }
-
 }
 
 struct Images: Codable {
@@ -38,6 +37,13 @@ struct Images: Codable {
   var medium: String
   var small: String
   var grid: String
+
+  init() {
+    self.large = ""
+    self.medium = ""
+    self.small = ""
+    self.grid = ""
+  }
 }
 
 struct Avatar: Codable {
@@ -161,6 +167,16 @@ enum InfoboxValue: Codable {
 struct InfoboxItem: Codable {
   var key: String
   var value: InfoboxValue
+}
+
+struct Stat: Codable {
+  var comments: UInt
+  var collects: UInt
+
+  init() {
+    self.comments = 0
+    self.collects = 0
+  }
 }
 
 struct SubjectCollection: Codable {
@@ -358,6 +374,44 @@ enum PersonCareer: String, Codable {
   case writer
   case illustrator
   case actor
+
+  var description: String {
+    switch self {
+    case .producer:
+      return "导演"
+    case .mangaka:
+      return "漫画家"
+    case .artist:
+      return "原创音乐人"
+    case .seiyu:
+      return "演员"
+    case .writer:
+      return "编剧"
+    case .illustrator:
+      return "插画家"
+    case .actor:
+      return "演员"
+    }
+  }
+
+  var label: String {
+    switch self {
+    case .producer:
+      return "producer"
+    case .mangaka:
+      return "mangaka"
+    case .artist:
+      return "artist"
+    case .seiyu:
+      return "seiyu"
+    case .writer:
+      return "writer"
+    case .illustrator:
+      return "illustrator"
+    case .actor:
+      return "actor"
+    }
+  }
 }
 
 /// 人物类型
@@ -462,6 +516,42 @@ enum CharacterType: UInt8, Codable, Identifiable {
       return "ship"
     case .organization:
       return "building.2"
+    }
+  }
+}
+
+enum BloodType: UInt8, Codable, Identifiable {
+  case unknown = 0
+  case a = 1
+  case b = 2
+  case ab = 3
+  case o = 4
+
+  var id: Self {
+    self
+  }
+
+  init(value: UInt8 = 0) {
+    let tmp = Self(rawValue: value)
+    if let out = tmp {
+      self = out
+      return
+    }
+    self = Self.unknown
+  }
+
+  var name: String {
+    switch self {
+    case .unknown:
+      return "unknown"
+    case .a:
+      return "A"
+    case .b:
+      return "B"
+    case .ab:
+      return "AB"
+    case .o:
+      return "O"
     }
   }
 }
