@@ -83,7 +83,6 @@ struct SubjectHeaderView: View {
                   .accent)
             }
           }
-          .font(.callout)
           .padding(.top, 4)
           .padding(.bottom, 8)
           .onTapGesture {

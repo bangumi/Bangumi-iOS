@@ -65,7 +65,7 @@ struct EpisodeInfobox: View {
       VStack(alignment: .leading) {
         if let episode = episode {
           HStack {
-            Text(episode.title).font(.headline).lineLimit(1)
+            Text(episode.title).font(.title3).lineLimit(1)
             Text(episode.typeEnum.description)
               .font(.footnote)
               .foregroundStyle(.secondary)
@@ -104,7 +104,6 @@ struct EpisodeInfobox: View {
               Spacer()
               Text(episode.collectionTypeEnum.description).foregroundStyle(.red)
             }
-            .font(.callout)
             .disabled(updating)
           }
           Divider()

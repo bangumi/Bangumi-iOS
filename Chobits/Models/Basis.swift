@@ -93,9 +93,13 @@ enum UserGroup: UInt8, Codable {
   }
 }
 
-struct Tag: Codable {
+struct Tag: Codable, Equatable {
   var name: String
   var count: UInt
+
+  static func == (lhs: Tag, rhs: Tag) -> Bool {
+    return lhs.name == rhs.name && lhs.count == rhs.count
+  }
 }
 
 struct Weekday: Codable {

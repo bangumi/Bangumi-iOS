@@ -40,7 +40,6 @@ struct SubjectCollectionView: View {
             collection.typeEnum.message(type: collection.subjectTypeEnum),
             systemImage: "pencil"
           )
-          .font(.callout)
           .foregroundStyle(Color("LinkTextColor"))
           .overlay {
             RoundedRectangle(cornerRadius: 5)
@@ -74,7 +73,6 @@ struct SubjectCollectionView: View {
           }
         } else {
           Label("未收藏", systemImage: "plus")
-            .font(.callout)
             .foregroundStyle(.secondary)
             .overlay {
               RoundedRectangle(cornerRadius: 5)

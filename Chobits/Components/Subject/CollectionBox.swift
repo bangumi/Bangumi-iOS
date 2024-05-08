@@ -116,7 +116,6 @@ struct SubjectCollectionBox: View {
               Text("(请谨慎评价)").foregroundStyle(.red)
             }
           }
-          .font(.callout)
           .padding(.top, 10)
           HStack {
             Image(systemName: "star.slash")
@@ -138,7 +137,6 @@ struct SubjectCollectionBox: View {
           }
 
           Text("标签 (使用半角空格或逗号隔开，至多10个)")
-            .font(.footnote)
             .padding(.top, 10)
           TextField("标签", text: $tagsInput)
             .onChange(of: tagsInput) { _, new in
@@ -153,7 +151,6 @@ struct SubjectCollectionBox: View {
                 tags = Array(tags[0..<10])
               }
             }
-            .font(.callout)
             .monospaced()
             .padding(.horizontal, 5)
             .padding(.vertical, 5)
@@ -187,9 +184,8 @@ struct SubjectCollectionBox: View {
             }
           }
 
-          Text("吐槽").font(.footnote)
+          Text("吐槽")
           TextField("吐槽", text: $comment, axis: .vertical)
-            .font(.callout)
             .multilineTextAlignment(.leading)
             .lineLimit(5, reservesSpace: true)
             .padding(.horizontal, 5)

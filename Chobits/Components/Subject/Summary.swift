@@ -49,7 +49,7 @@ struct SubjectSummaryView: View {
   var body: some View {
     VStack(alignment: .leading) {
       Text(subject?.summary ?? "")
-        .font(.callout)
+        .frame(maxWidth: .infinity)
         .padding(.bottom, 16)
         .multilineTextAlignment(.leading)
         .lineLimit(collapsed ? 5 : nil)
@@ -59,7 +59,7 @@ struct SubjectSummaryView: View {
               Button(action: {
                 collapsed.toggle()
               }) {
-                Text(collapsed ? "more..." : "X close")
+                Text(collapsed ? "more..." : "close")
                   .font(.caption)
                   .foregroundColor(Color("LinkTextColor"))
               }
@@ -77,7 +77,7 @@ struct SubjectSummaryView: View {
             .foregroundStyle(Color("LinkTextColor"))
             .lineLimit(1)
           Text("\(tag.count)")
-            .font(.caption2)
+            .font(.caption)
             .foregroundStyle(.secondary)
         }
         .padding(.horizontal, 6)
@@ -89,7 +89,7 @@ struct SubjectSummaryView: View {
             .padding(.vertical, 2)
         }
       }
-    }
+    }.animation(.default, value: tags)
   }
 }
 

@@ -79,7 +79,7 @@ struct SubjectRatingView: View {
             HStack {
               Text(desc).foregroundStyle(Color("LinkTextColor"))
               Text("/  ").foregroundStyle(.secondary)
-            }.font(.footnote)
+            }
           }
         }.padding(.horizontal, 8)
         Spacer()
@@ -142,7 +142,7 @@ struct ChartView: View {
               .fill(.secondary.opacity(0.8))
               .frame(width: barWidth, height: barHeight(value))
               .clipShape(RoundedRectangle(cornerRadius: 5))
-            Text(key).font(.footnote)
+            Text(key)
           }
         }
       }

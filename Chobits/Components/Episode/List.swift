@@ -148,7 +148,6 @@ struct EpisodeListView: View {
                     .overlay {
                       Text("\(episode.collectionTypeEnum.description)")
                         .foregroundStyle(Color(hex: episode.textColor))
-                        .font(.callout)
                     }
                     .padding(.horizontal, 2)
                     .strikethrough(episode.collection == EpisodeCollectionType.dropped.rawValue)
@@ -161,7 +160,6 @@ struct EpisodeListView: View {
                         .overlay {
                           Text("未播")
                             .foregroundStyle(.secondary)
-                            .font(.callout)
                         }
                         .padding(.horizontal, 2)
                     } else {
@@ -171,7 +169,6 @@ struct EpisodeListView: View {
                         .overlay {
                           Text("已播")
                             .foregroundStyle(.primary)
-                            .font(.callout)
                         }
                         .padding(.horizontal, 2)
                     }
@@ -182,7 +179,6 @@ struct EpisodeListView: View {
                       .overlay {
                         Text(episode.typeEnum.description)
                           .foregroundStyle(.primary)
-                          .font(.callout)
                       }
                       .padding(.horizontal, 2)
                   }

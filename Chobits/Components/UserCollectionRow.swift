@@ -142,7 +142,7 @@ struct UserCollectionRow: View {
                 )
                 .foregroundStyle(.accent)
               }
-            }.font(.caption)
+            }.font(.footnote)
           }
         }
         Spacer()

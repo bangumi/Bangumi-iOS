@@ -54,7 +54,6 @@ struct EpisodeGridView: View {
       }.buttonStyle(.plain)
       Spacer()
     }
-    .font(.callout)
     FlowStack {
       ForEach(episodeMains) { episode in
         Button {
@@ -62,7 +61,6 @@ struct EpisodeGridView: View {
         } label: {
           Text("\(episode.sort.episodeDisplay)")
             .foregroundStyle(Color(hex: episode.textColor))
-            .font(.callout)
             .padding(3)
             .background(Color(hex: episode.backgroundColor))
             .border(Color(hex: episode.borderColor), width: 1)
@@ -74,7 +72,6 @@ struct EpisodeGridView: View {
       if !episodeSps.isEmpty {
         Text("SP")
           .foregroundStyle(Color(hex: 0x8EB021))
-          .font(.callout)
           .padding(.vertical, 3)
           .padding(.leading, 5)
           .padding(.trailing, 1)
@@ -93,7 +90,6 @@ struct EpisodeGridView: View {
           } label: {
             Text("\(episode.sort.episodeDisplay)")
               .foregroundStyle(Color(hex: episode.textColor))
-              .font(.callout)
               .padding(3)
               .background(Color(hex: episode.backgroundColor))
               .border(Color(hex: episode.borderColor), width: 1)
