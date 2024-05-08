@@ -12,52 +12,31 @@ import SwiftData
 extension ChiiClient {
   func loadSubject(_ sid: UInt) async throws {
     Logger.api.info("loading subject: \(sid)")
-    do {
-      let item = try await self.getSubject(sid)
 
-      // 对于合并的条目，可能搜索返回的 ID 跟 API 拿到的 ID 不同
-      // 我们直接返回 404 防止其他问题
-      // 后面可以考虑直接跳转到页面
-      if sid != item.id {
-        Logger.subject.warning("subject id mismatch: \(sid) != \(item.id)")
-        throw ChiiError(message: "这是一个被合并的条目")
-      }
+    let item = try await self.getSubject(sid)
 
-      Logger.subject.info("fetched subject: \(item.id)")
-      let subject = Subject(item: item)
-      await self.db.insert(subject)
-      try await self.db.save()
-    } catch ChiiError.notFound(_) {
-      Logger.subject.warning("subject not found: \(sid)")
-      //      try await self.db.remove(
-      //        #Predicate<Subject> {
-      //          $0.id == sid
-      //        })
-      //      try await self.db.save()
-    } catch {
-      throw error
+    // 对于合并的条目，可能搜索返回的 ID 跟 API 拿到的 ID 不同
+    // 我们直接返回 404 防止其他问题
+    // 后面可以考虑直接跳转到页面
+    if sid != item.id {
+      Logger.subject.warning("subject id mismatch: \(sid) != \(item.id)")
+      throw ChiiError(message: "这是一个被合并的条目")
     }
+
+    Logger.subject.info("fetched subject: \(item.id)")
+    let subject = Subject(item: item)
+    await self.db.insert(subject)
+    try await self.db.save()
   }
 
   func loadUserCollection(_ subjectId: UInt) async throws {
     if !self.isAuthenticated {
       return
     }
-    do {
-      let item = try await self.getSubjectCollection(subjectId)
-      let collection = UserSubjectCollection(item: item)
-      await self.db.insert(collection)
-      try await self.db.save()
-    } catch ChiiError.notFound(_) {
-      Logger.collection.warning("collection not found for subject: \(subjectId)")
-      //      try await self.db.remove(
-      //        #Predicate<UserSubjectCollection> {
-      //          $0.subjectId == subjectId
-      //        })
-      //      try await self.db.save()
-    } catch {
-      throw error
-    }
+    let item = try await self.getSubjectCollection(subjectId)
+    let collection = UserSubjectCollection(item: item)
+    await self.db.insert(collection)
+    try await self.db.save()
   }
 
   func loadUserCollections(type: SubjectType?) async throws {

@@ -12,6 +12,7 @@ struct ChiiTimelineView: View {
   @EnvironmentObject var notifier: Notifier
   @EnvironmentObject var chii: ChiiClient
   @EnvironmentObject var navState: NavState
+  @Environment(\.modelContext) var modelContext
 
   @State var profile: Profile?
 
@@ -31,8 +32,8 @@ struct ChiiTimelineView: View {
     Task {
       await chii.logout()
       do {
-        try await chii.db.delete(model: UserSubjectCollection.self)
-        try await chii.db.delete(model: Episode.self)
+        try modelContext.delete(model: UserSubjectCollection.self)
+        try modelContext.delete(model: Episode.self)
       } catch {
         notifier.alert(error: error)
       }

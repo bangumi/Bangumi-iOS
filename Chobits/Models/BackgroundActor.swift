@@ -110,19 +110,19 @@ public actor BackgroundActor {
     }
   }
 
-  public func delete<T: PersistentModel>(_ data: T) {
-    context.delete(data)
-  }
-
-  public func delete<T: PersistentModel>(model: T.Type) throws {
-    try context.delete(model: T.self)
-  }
-
   public func save() throws {
     try context.save()
   }
 
-  public func remove<T: PersistentModel>(_ predicate: Predicate<T>? = nil) throws {
-    try context.delete(model: T.self, where: predicate)
-  }
+  //  public func delete<T: PersistentModel>(_ data: T) {
+  //    context.delete(data)
+  //  }
+  //
+  //  public func delete<T: PersistentModel>(model: T.Type) throws {
+  //    try context.delete(model: T.self)
+  //  }
+
+  //  public func remove<T: PersistentModel>(_ predicate: Predicate<T>? = nil) throws {
+  //    try context.delete(model: T.self, where: predicate)
+  //  }
 }

@@ -61,7 +61,7 @@ struct SubjectSummaryView: View {
               }) {
                 Text(collapsed ? "more..." : "X close")
                   .font(.caption)
-                  .foregroundColor(.blue)
+                  .foregroundColor(Color("LinkTextColor"))
               }
               .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
             }

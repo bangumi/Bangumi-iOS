@@ -15,6 +15,7 @@ struct SubjectView: View {
   @EnvironmentObject var notifier: Notifier
   @EnvironmentObject var chii: ChiiClient
   @EnvironmentObject var navState: NavState
+  @Environment(\.modelContext) var modelContext
 
   @State private var refreshed: Bool = false
 
@@ -33,12 +34,37 @@ struct SubjectView: View {
   func refresh() async {
     if refreshed { return }
     refreshed = true
+
     do {
       try await chii.loadSubject(subjectId)
+    } catch {
+      notifier.alert(error: error)
+      return
+    }
+
+    do {
       try await chii.loadUserCollection(subjectId)
+    } catch ChiiError.notFound(_) {
+      Logger.collection.warning("collection not found for subject: \(subjectId)")
+      do {
+        try modelContext.delete(
+          model: UserSubjectCollection.self,
+          where: #Predicate<UserSubjectCollection> {
+            $0.subjectId == subjectId
+          })
+      } catch {
+        Logger.collection.error("clear collection error: \(error)")
+      }
+    } catch {
+      notifier.alert(error: error)
+      return
+    }
+
+    do {
       try await chii.loadEpisodes(subjectId)
     } catch {
       notifier.alert(error: error)
+      return
     }
   }
 
