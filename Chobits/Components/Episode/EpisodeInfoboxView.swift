@@ -34,6 +34,7 @@ struct EpisodeInfoboxView: View {
     updating = true
     do {
       try await chii.updateEpisodeCollection(episodeId: episodeId, type: type)
+      UIImpactFeedbackGenerator(style: .light).impactOccurred()
       dismiss()
     } catch {
       notifier.alert(error: error)

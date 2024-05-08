@@ -69,6 +69,7 @@ struct SubjectCollectionBoxView: View {
           priv: priv,
           tags: tags
         )
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
         dismiss()
       } catch {
         notifier.alert(error: error)
