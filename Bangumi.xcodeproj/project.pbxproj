@@ -230,10 +230,10 @@
 			children = (
 				19671C492BDEB55D000B4D99 /* ContentView.swift */,
 				19671C482BDEB55D000B4D99 /* AuthView.swift */,
-				19671C4A2BDEB55D000B4D99 /* DiscoverView.swift */,
-				19671C4B2BDEB55D000B4D99 /* ProgressView.swift */,
-				19BD242F2BEB3C3B00595973 /* SettingsView.swift */,
 				19671C4C2BDEB55D000B4D99 /* TimelineView.swift */,
+				19671C4B2BDEB55D000B4D99 /* ProgressView.swift */,
+				19671C4A2BDEB55D000B4D99 /* DiscoverView.swift */,
+				19BD242F2BEB3C3B00595973 /* SettingsView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
