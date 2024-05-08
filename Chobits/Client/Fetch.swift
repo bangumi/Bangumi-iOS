@@ -194,4 +194,36 @@ extension ChiiClient {
     return resp
   }
 
+  func getSubjectCharacters(_ sid:UInt) async throws -> [SubjectCharacterItem] {
+    Logger.api.info("start get subject characters: \(sid)")
+    let url = self.apiBase.appendingPathComponent("v0/subjects/\(sid)/characters")
+    let data = try await request(url: url, method: "GET", authorized: self.isAuthenticated)
+    let decoder = JSONDecoder()
+    decoder.keyDecodingStrategy = .convertFromSnakeCase
+    let characters = try decoder.decode([SubjectCharacterItem].self, from: data)
+    Logger.api.info("finish get subject characters: \(sid)")
+    return characters
+  }
+
+  func getSubjectPersons(_ sid:UInt) async throws -> [SubjectPersonItem] {
+    Logger.api.info("start get subject persons: \(sid)")
+    let url = self.apiBase.appendingPathComponent("v0/subjects/\(sid)/persons")
+    let data = try await request(url: url, method: "GET", authorized: self.isAuthenticated)
+    let decoder = JSONDecoder()
+    decoder.keyDecodingStrategy = .convertFromSnakeCase
+    let persons = try decoder.decode([SubjectPersonItem].self, from: data)
+    Logger.api.info("finish get subject persons: \(sid)")
+    return persons
+  }
+
+  func getSubjectRelations(_ sid: UInt) async throws -> [SubjectRelationItem] {
+    Logger.api.info("start get subject relations: \(sid)")
+    let url = self.apiBase.appendingPathComponent("v0/subjects/\(sid)/subjects")
+    let data = try await request(url: url, method: "GET", authorized: self.isAuthenticated)
+    let decoder = JSONDecoder()
+    decoder.keyDecodingStrategy = .convertFromSnakeCase
+    let relations = try decoder.decode([SubjectRelationItem].self, from: data)
+    Logger.api.info("finish get subject relations: \(sid)")
+    return relations
+  }
 }

@@ -120,7 +120,7 @@ struct SmallSubject: Codable {
   // var collection: SubjectCollection?
 }
 
-struct SubjectPerson: Codable, Identifiable {
+struct SubjectPersonItem: Codable, Identifiable {
   var id: UInt
   var name: String
   var type: PersonType
@@ -129,7 +129,7 @@ struct SubjectPerson: Codable, Identifiable {
   var relation: String
 }
 
-struct Actor: Codable, Identifiable {
+struct PersonItem: Codable, Identifiable {
   var id: UInt
   var name: String
   var type: PersonType
@@ -139,16 +139,16 @@ struct Actor: Codable, Identifiable {
   var locked: Bool
 }
 
-struct SubjectCharactor: Codable, Identifiable {
+struct SubjectCharacterItem: Codable, Identifiable {
   var id: UInt
   var name: String
   var type: CharacterType
   var images: Images?
   var relation: String
-  var actors: [Actor]?
+  var actors: [PersonItem]?
 }
 
-struct SubjectRelation: Codable, Identifiable {
+struct SubjectRelationItem: Codable, Identifiable {
   var id: UInt
   var type: SubjectType
   var name: String

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1909F39C2BEB98F600E3B8F0 /* SubjectRelations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1909F39B2BEB98F600E3B8F0 /* SubjectRelations.swift */; };
 		19671C542BDEB55D000B4D99 /* SearchRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19671C2E2BDEB55D000B4D99 /* SearchRow.swift */; };
 		19671C552BDEB55D000B4D99 /* Collection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19671C302BDEB55D000B4D99 /* Collection.swift */; };
 		19671C562BDEB55D000B4D99 /* Header.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19671C312BDEB55D000B4D99 /* Header.swift */; };
@@ -64,6 +65,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1909F39B2BEB98F600E3B8F0 /* SubjectRelations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubjectRelations.swift; sourceTree = "<group>"; };
 		19671C2E2BDEB55D000B4D99 /* SearchRow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchRow.swift; sourceTree = "<group>"; };
 		19671C302BDEB55D000B4D99 /* Collection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Collection.swift; sourceTree = "<group>"; };
 		19671C312BDEB55D000B4D99 /* Header.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Header.swift; sourceTree = "<group>"; };
@@ -144,6 +146,7 @@
 				19C2CE622BE2A4F10080A056 /* BookChapters.swift */,
 				19671C342BDEB55D000B4D99 /* Summary.swift */,
 				19671C322BDEB55D000B4D99 /* RatingBox.swift */,
+				1909F39B2BEB98F600E3B8F0 /* SubjectRelations.swift */,
 			);
 			path = Subject;
 			sourceTree = "<group>";
@@ -357,6 +360,7 @@
 			files = (
 				197A19CB2BE5E59900804B13 /* Logger.swift in Sources */,
 				197A19CF2BE5E5E700804B13 /* Notifier.swift in Sources */,
+				1909F39C2BEB98F600E3B8F0 /* SubjectRelations.swift in Sources */,
 				19671C652BDEB55D000B4D99 /* Response.swift in Sources */,
 				19F8C3D82BE73B830037D723 /* Navigation.swift in Sources */,
 				19671C6A2BDEB55D000B4D99 /* ContentView.swift in Sources */,

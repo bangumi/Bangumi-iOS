@@ -47,7 +47,6 @@ struct SubjectView: View {
       notifier.alert(error: error)
       return
     }
-
   }
 
   var body: some View {
@@ -74,6 +73,9 @@ struct SubjectView: View {
 
             Divider()
             SubjectSummaryView(subjectId: subjectId)
+
+            Divider()
+            SubjectRelations(subjectId: subjectId)
 
             Spacer()
           }
