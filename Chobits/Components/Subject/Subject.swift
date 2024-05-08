@@ -12,6 +12,8 @@ import SwiftUI
 struct SubjectView: View {
   var subjectId: UInt
 
+  @AppStorage("shareDomain") var shareDomain: String = ShareDomain.chii.label
+
   @EnvironmentObject var notifier: Notifier
   @EnvironmentObject var chii: ChiiClient
   @EnvironmentObject var navState: NavState
@@ -29,6 +31,10 @@ struct SubjectView: View {
       $0.id == subjectId
     }
     _subjects = Query(filter: predicate, sort: \Subject.id)
+  }
+
+  var shareLink: URL {
+    URL(string: "https://\(shareDomain)/subject/\(subjectId)")!
   }
 
   func refresh() async {
@@ -98,6 +104,13 @@ struct SubjectView: View {
         }.padding()
       } else {
         NotFoundView()
+      }
+    }
+    .toolbar {
+      ToolbarItem(placement: .navigationBarTrailing) {
+        ShareLink(item: shareLink) {
+          Label("Share", systemImage: "square.and.arrow.up")
+        }
       }
     }
     .navigationBarTitle("条目")
