@@ -14,12 +14,10 @@ struct ChobitsApp: App {
   @State var chii: ChiiClient
   @StateObject var notifier = Notifier()
 
-  init() {
-    UserDefaults.standard.register(defaults: [
-      "name": "Taylor Swift",
-      "highScore": 10
-    ])
+  @AppStorage("appearance") var appearance: String = "system"
+  @AppStorage("shareDomain") var shareDomain: String = "https://chii.in"
 
+  init() {
     let schema = Schema([
       BangumiCalendar.self,
       UserSubjectCollection.self,
@@ -41,6 +39,9 @@ struct ChobitsApp: App {
       ContentView()
         .environmentObject(notifier)
         .environment(chii)
+        .preferredColorScheme(
+          appearance == "system" ? nil : (appearance == "dark" ? .dark : .light)
+        )
         .alert("ERROR", isPresented: $notifier.showAlert) {
           Button("OK") {
             notifier.currentError = nil

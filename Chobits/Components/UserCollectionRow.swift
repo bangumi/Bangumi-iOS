@@ -52,9 +52,10 @@ struct UserCollectionRow: View {
     }
     let zero: UInt8 = 0
     do {
-      let episode = try await chii.db.fetchOne(predicate: #Predicate<Episode> {
-        $0.subjectId == subjectId && $0.type == zero && $0.collection == zero
-      }, sortBy: [SortDescriptor<Episode>(\.sort, order: .forward)])
+      let episode = try await chii.db.fetchOne(
+        predicate: #Predicate<Episode> {
+          $0.subjectId == subjectId && $0.type == zero && $0.collection == zero
+        }, sortBy: [SortDescriptor<Episode>(\.sort, order: .forward)])
       if let episode = episode {
         Logger.episode.info("subject \(subjectId) next episode: \(episode.sort.episodeDisplay)")
       }
@@ -119,7 +120,8 @@ struct UserCollectionRow: View {
               case .anime, .real:
                 if let episode = nextEpisode {
                   if episode.airdate > Date() {
-                    Text("EP.\(episode.sort.episodeDisplay) ~ \(episode.waitDays) days").foregroundStyle(.secondary)
+                    Text("EP.\(episode.sort.episodeDisplay) ~ \(episode.waitDays) days")
+                      .foregroundStyle(.secondary)
                   } else {
                     Button {
                       showEpisodeBox = true
