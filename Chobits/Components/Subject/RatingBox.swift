@@ -12,7 +12,7 @@ struct ScoreInfo {
   var offset: Int
 }
 
-struct SubjectRatingView: View {
+struct SubjectRatingBox: View {
   let subject: SubjectItem
 
   var collectionDesc: [String] {
@@ -158,5 +158,5 @@ struct ChartView: View {
 }
 
 #Preview {
-  SubjectRatingView(subject: Subject.previewAnime.item)
+  SubjectRatingBox(subject: Subject.previewAnime.item)
 }

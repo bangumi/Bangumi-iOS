@@ -49,26 +49,26 @@ struct SubjectSummaryView: View {
   var body: some View {
     VStack(alignment: .leading) {
       Text(subject?.summary ?? "")
-        .frame(maxWidth: .infinity)
         .padding(.bottom, 16)
         .multilineTextAlignment(.leading)
         .lineLimit(collapsed ? 5 : nil)
-        .overlay(
-          GeometryReader { geometry in
-            if shouldShowToggle(geometry: geometry) {
-              Button(action: {
-                collapsed.toggle()
-              }) {
-                Text(collapsed ? "more..." : "close")
-                  .font(.caption)
-                  .foregroundColor(Color("LinkTextColor"))
-              }
-              .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
-            }
-          }
-        )
     }
     .animation(.default, value: collapsed)
+    .overlay(
+      GeometryReader { geometry in
+        if shouldShowToggle(geometry: geometry) {
+          Button(action: {
+            collapsed.toggle()
+          }) {
+            Text(collapsed ? "more..." : "close")
+              .font(.caption)
+              .foregroundColor(Color("LinkTextColor"))
+          }
+          .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
+        }
+      }
+    )
+
     FlowStack {
       ForEach(tags, id: \.name) { tag in
         HStack {
