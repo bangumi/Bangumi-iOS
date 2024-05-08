@@ -47,27 +47,25 @@ struct SubjectSummaryView: View {
   }
 
   var body: some View {
-    VStack(alignment: .leading) {
-      Text(subject?.summary ?? "")
-        .padding(.bottom, 16)
-        .multilineTextAlignment(.leading)
-        .lineLimit(collapsed ? 5 : nil)
-    }
-    .animation(.default, value: collapsed)
-    .overlay(
-      GeometryReader { geometry in
-        if shouldShowToggle(geometry: geometry) {
-          Button(action: {
-            collapsed.toggle()
-          }) {
-            Text(collapsed ? "more..." : "close")
-              .font(.caption)
-              .foregroundColor(Color("LinkTextColor"))
+    Text(subject?.summary ?? "")
+      .padding(.bottom, 16)
+      .multilineTextAlignment(.leading)
+      .lineLimit(collapsed ? 5 : nil)
+      .animation(.default, value: collapsed)
+      .overlay(
+        GeometryReader { geometry in
+          if shouldShowToggle(geometry: geometry) {
+            Button(action: {
+              collapsed.toggle()
+            }) {
+              Text(collapsed ? "more..." : "close")
+                .font(.caption)
+                .foregroundColor(Color("LinkTextColor"))
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
           }
-          .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
         }
-      }
-    )
+      )
 
     FlowStack {
       ForEach(tags, id: \.name) { tag in
