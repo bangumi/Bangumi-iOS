@@ -5,11 +5,19 @@
 //  Created by Chuan Chuan on 2024/4/21.
 //
 
+import OSLog
 import SwiftData
 import SwiftUI
 
 struct UserCollectionRow: View {
   let subjectId: UInt
+
+  @EnvironmentObject var notifier: Notifier
+  @EnvironmentObject var chii: ChiiClient
+
+  @State private var nextEpisodeLoaded: Bool = false
+  @State private var showEpisodeBox: Bool = false
+  @State private var nextEpisode: Episode?
 
   @Query
   private var subjects: [Subject]
@@ -30,6 +38,30 @@ struct UserCollectionRow: View {
       filter: #Predicate<UserSubjectCollection> {
         $0.subjectId == subjectId
       })
+  }
+
+  func loadNextEpisode() async {
+    if nextEpisodeLoaded { return }
+    nextEpisodeLoaded = true
+    guard let subject = subject else { return }
+    switch subject.typeEnum {
+    case .anime, .real:
+      break
+    default:
+      return
+    }
+    let zero: UInt8 = 0
+    do {
+      let episode = try await chii.db.fetchOne(predicate: #Predicate<Episode> {
+        $0.subjectId == subjectId && $0.type == zero && $0.collection == zero
+      }, sortBy: [SortDescriptor<Episode>(\.sort, order: .forward)])
+      if let episode = episode {
+        Logger.episode.info("subject \(subjectId) next episode: \(episode.sort.episodeDisplay)")
+      }
+      nextEpisode = episode
+    } catch {
+      Logger.episode.error("fetch next episode error: \(error)")
+    }
   }
 
   var epsColor: Color {
@@ -68,6 +100,9 @@ struct UserCollectionRow: View {
         .frame(height: 64)
         .clipShape(RoundedRectangle(cornerRadius: 10))
         .shadow(color: .accent, radius: 1, x: 1, y: 1)
+        .task {
+          await loadNextEpisode()
+        }
       HStack(alignment: .top) {
         ImageView(img: subject?.images.common, width: 60, height: 60)
         VStack(alignment: .leading) {
@@ -81,17 +116,26 @@ struct UserCollectionRow: View {
               }
               Spacer()
               switch collection.subjectTypeEnum {
-              case .anime:
-                Text("\(collection.epStatus)").foregroundStyle(epsColor).font(.callout)
-                Text(chapters).foregroundStyle(epsColor)
+              case .anime, .real:
+                if let episode = nextEpisode {
+                  if episode.airdate > Date() {
+                    Text("EP.\(episode.sort.episodeDisplay) ~ \(episode.waitDays) days").foregroundStyle(.secondary)
+                  } else {
+                    Button {
+                      showEpisodeBox = true
+                    } label: {
+                      Label("EP.\(episode.sort.episodeDisplay)", systemImage: "eyes").font(.callout)
+                    }
+                  }
+                } else {
+                  Text("\(collection.epStatus)").foregroundStyle(epsColor).font(.callout)
+                  Text(chapters).foregroundStyle(epsColor)
+                }
               case .book:
                 Text("\(collection.epStatus)").foregroundStyle(epsColor).font(.callout)
                 Text("\(chapters)").foregroundStyle(epsColor)
                 Text("\(collection.volStatus)").foregroundStyle(volsColor).font(.callout)
                 Text("\(volumes)").foregroundStyle(volsColor)
-              case .real:
-                Text("\(collection.epStatus)").foregroundStyle(epsColor).font(.callout)
-                Text(chapters).foregroundStyle(epsColor)
               default:
                 Label(
                   collection.subjectTypeEnum.description,
@@ -107,6 +151,16 @@ struct UserCollectionRow: View {
       .frame(height: 60)
       .padding(2)
       .clipShape(RoundedRectangle(cornerRadius: 10))
+      .sheet(
+        isPresented: $showEpisodeBox,
+        content: {
+          if let episode = nextEpisode {
+            EpisodeInfobox(subjectId: subjectId, episodeId: episode.id)
+              .presentationDragIndicator(.visible)
+              .presentationDetents(.init([.medium, .large]))
+          }
+        }
+      )
     }
   }
 }
@@ -114,18 +168,22 @@ struct UserCollectionRow: View {
 #Preview {
   let config = ModelConfiguration(isStoredInMemoryOnly: true)
   let container = try! ModelContainer(
-    for: Subject.self, UserSubjectCollection.self, configurations: config)
+    for: Subject.self, UserSubjectCollection.self, Episode.self, configurations: config)
 
-  let collection = UserSubjectCollection.previewBook
-  let subject = Subject.previewBook
-
-  container.mainContext.insert(collection)
+  let collection = UserSubjectCollection.previewAnime
+  let subject = Subject.previewAnime
+  let episodes = Episode.previewList
   container.mainContext.insert(subject)
+  container.mainContext.insert(collection)
+  for episode in episodes {
+    container.mainContext.insert(episode)
+  }
 
   return ScrollView {
     LazyVStack(alignment: .leading) {
       UserCollectionRow(subjectId: subject.id)
         .environmentObject(Notifier())
+        .environmentObject(ChiiClient(container: container, mock: .anime))
     }
   }
   .padding()

@@ -315,6 +315,13 @@ final class Episode {
     return "\(self.typeEnum.name).\(self.sort.episodeDisplay) \(self.name)"
   }
 
+  var waitDays: Int {
+    let calendar = Calendar.current
+    let now = Date()
+    let components = calendar.dateComponents([.day], from: now, to: airdate)
+    return components.day ?? 0
+  }
+
   var borderColor: Int {
     switch EpisodeCollectionType(value: self.collection) {
     case .none:
