@@ -151,6 +151,6 @@ struct EpisodeInfobox: View {
 
   return EpisodeInfobox(subjectId: subject.id, episodeId: episodes.first!.id)
     .environmentObject(Notifier())
-    .environmentObject(ChiiClient(container: container, mock: .anime))
+    .environment(ChiiClient(container: container, mock: .anime))
     .modelContainer(container)
 }

@@ -106,7 +106,7 @@ struct SubjectSummaryView: View {
     LazyVStack(alignment: .leading) {
       SubjectSummaryView(subjectId: subject.id)
         .environmentObject(Notifier())
-        .environmentObject(ChiiClient(container: container, mock: .book))
+        .environment(ChiiClient(container: container, mock: .book))
         .modelContainer(container)
     }
   }.padding()

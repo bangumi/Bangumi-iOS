@@ -113,7 +113,7 @@ struct SubjectCollectionView: View {
     LazyVStack(alignment: .leading) {
       SubjectCollectionView(subjectId: collection.subjectId)
         .environmentObject(Notifier())
-        .environmentObject(ChiiClient(container: container, mock: .book))
+        .environment(ChiiClient(container: container, mock: .book))
     }
   }
   .padding()

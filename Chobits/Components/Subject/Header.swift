@@ -114,7 +114,7 @@ struct SubjectHeaderView: View {
     LazyVStack(alignment: .leading) {
       SubjectHeaderView(subjectId: subject.id)
         .environmentObject(Notifier())
-        .environmentObject(ChiiClient(container: container, mock: .anime))
+        .environment(ChiiClient(container: container, mock: .anime))
         .modelContainer(container)
     }
   }.padding()

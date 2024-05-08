@@ -78,7 +78,7 @@ struct ChiiTimelineView: View {
 
   return ChiiTimelineView()
     .environmentObject(Notifier())
-    .environmentObject(ChiiClient(container: container, mock: .anime))
+    .environment(ChiiClient(container: container, mock: .anime))
     .environmentObject(NavState())
     .modelContainer(container)
 }

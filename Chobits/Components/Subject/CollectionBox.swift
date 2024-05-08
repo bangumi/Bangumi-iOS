@@ -228,6 +228,6 @@ struct SubjectCollectionBox: View {
     collection: collection.item
   )
   .environmentObject(Notifier())
-  .environmentObject(ChiiClient(container: container, mock: .anime))
+  .environment(ChiiClient(container: container, mock: .anime))
   .modelContainer(container)
 }

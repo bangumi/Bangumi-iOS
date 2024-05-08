@@ -10,7 +10,16 @@ import SwiftUI
 
 @main
 struct ChobitsApp: App {
-  var sharedModelContainer: ModelContainer = {
+  @State var sharedModelContainer: ModelContainer
+  @State var chii: ChiiClient
+  @StateObject var notifier = Notifier()
+
+  init() {
+    UserDefaults.standard.register(defaults: [
+      "name": "Taylor Swift",
+      "highScore": 10
+    ])
+
     let schema = Schema([
       BangumiCalendar.self,
       UserSubjectCollection.self,
@@ -19,19 +28,19 @@ struct ChobitsApp: App {
     ])
     let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
     do {
-      return try ModelContainer(for: schema, configurations: [modelConfiguration])
+      let container = try ModelContainer(for: schema, configurations: [modelConfiguration])
+      sharedModelContainer = container
+      chii = ChiiClient(container: container)
     } catch {
       fatalError("Could not create ModelContainer: \(error)")
     }
-  }()
-
-  @StateObject var notifier = Notifier()
+  }
 
   var body: some Scene {
     WindowGroup {
       ContentView()
         .environmentObject(notifier)
-        .environmentObject(ChiiClient(container: sharedModelContainer))
+        .environment(chii)
         .alert("ERROR", isPresented: $notifier.showAlert) {
           Button("OK") {
             notifier.currentError = nil

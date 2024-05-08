@@ -183,7 +183,7 @@ struct UserCollectionRow: View {
     LazyVStack(alignment: .leading) {
       UserCollectionRow(subjectId: subject.id)
         .environmentObject(Notifier())
-        .environmentObject(ChiiClient(container: container, mock: .anime))
+        .environment(ChiiClient(container: container, mock: .anime))
     }
   }
   .padding()
