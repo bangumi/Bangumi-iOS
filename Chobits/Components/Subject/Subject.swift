@@ -100,6 +100,7 @@ struct SubjectView: View {
         NotFoundView()
       }
     }
+    .navigationBarTitle("条目")
     .onAppear {
       Task(priority: .background) {
         await refresh()

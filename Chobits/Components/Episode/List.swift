@@ -213,6 +213,7 @@ struct EpisodeListView: View {
         }
       }
     }
+    .navigationBarTitle("章节列表")
     .padding(.horizontal, 16)
     .buttonStyle(.plain)
     .animation(.default, value: episodes)

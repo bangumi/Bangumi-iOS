@@ -27,19 +27,6 @@ struct ChiiTimelineView: View {
     }
   }
 
-  func logout() {
-    profile = nil
-    Task {
-      await chii.logout()
-      do {
-        try modelContext.delete(model: UserSubjectCollection.self)
-        try modelContext.delete(model: Episode.self)
-      } catch {
-        notifier.alert(error: error)
-      }
-    }
-  }
-
   var body: some View {
     if chii.isAuthenticated {
       NavigationStack(path: $navState.timelineNavigation) {
@@ -56,9 +43,6 @@ struct ChiiTimelineView: View {
                   .padding(.horizontal, -4)
                   .padding(.vertical, -2)
               }.padding(2)
-            Button(action: logout) {
-              Text("退出登录")
-            }.buttonStyle(.borderedProminent)
             Text(me.sign)
               .font(.callout)
               .foregroundStyle(.secondary)
@@ -66,7 +50,17 @@ struct ChiiTimelineView: View {
           } else {
             ProgressView().onAppear(perform: updateProfile)
           }
-        }.navigationDestination(for: NavDestination.self) { nav in
+        }
+        .toolbar {
+          ToolbarItem(placement: .navigationBarTrailing) {
+            Button {
+              navState.timelineNavigation.append(.setting)
+            } label: {
+              Image(systemName: "gearshape")
+            }
+          }
+        }
+        .navigationDestination(for: NavDestination.self) { nav in
           switch nav {
           case .subject(let sid):
             SubjectView(subjectId: sid)

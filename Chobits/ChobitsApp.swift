@@ -39,9 +39,7 @@ struct ChobitsApp: App {
       ContentView()
         .environmentObject(notifier)
         .environment(chii)
-        .preferredColorScheme(
-          appearance == "system" ? nil : (appearance == "dark" ? .dark : .light)
-        )
+        .preferredColorScheme(AppearanceType(appearance).colorScheme)
         .alert("ERROR", isPresented: $notifier.showAlert) {
           Button("OK") {
             notifier.currentError = nil
