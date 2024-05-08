@@ -177,6 +177,8 @@ struct ChiiProgressView: View {
               SubjectView(subjectId: sid)
             case .episodeList(let sid):
               EpisodeListView(subjectId: sid)
+            case .setting:
+              SettingsView()
             }
           }
         }

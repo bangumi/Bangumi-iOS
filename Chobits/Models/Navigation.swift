@@ -10,6 +10,7 @@ import Foundation
 enum NavDestination: Hashable {
   case subject(subjectId: UInt)
   case episodeList(subjectId: UInt)
+  case setting
 }
 
 struct EnumerateItem<T: Equatable>: Equatable {
