@@ -37,17 +37,28 @@ struct SubjectView: View {
     URL(string: "https://\(shareDomain)/subject/\(subjectId)")!
   }
 
+  func save() async {
+    do {
+      try await chii.db.save()
+    } catch {
+      notifier.alert(error: error)
+    }
+  }
+
   func refresh() async {
     if refreshed { return }
     refreshed = true
 
+    /// update subject
     do {
       try await chii.loadSubject(subjectId)
     } catch {
       notifier.alert(error: error)
+      await save()
       return
     }
 
+    /// update user collection
     do {
       try await chii.loadUserCollection(subjectId)
     } catch ChiiError.notFound(_) {
@@ -63,15 +74,20 @@ struct SubjectView: View {
       }
     } catch {
       notifier.alert(error: error)
+      await save()
       return
     }
 
+    /// update episodes
     do {
       try await chii.loadEpisodes(subjectId)
     } catch {
       notifier.alert(error: error)
+      await save()
       return
     }
+
+    await save()
   }
 
   var body: some View {

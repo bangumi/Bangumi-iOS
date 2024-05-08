@@ -42,6 +42,7 @@ struct CalendarView: View {
     refreshed = true
     do {
       try await chii.loadCalendar()
+      try await chii.db.save()
     } catch {
       notifier.alert(error: error)
     }

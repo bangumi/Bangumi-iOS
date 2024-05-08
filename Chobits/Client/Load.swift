@@ -26,7 +26,6 @@ extension ChiiClient {
     Logger.subject.info("fetched subject: \(item.id)")
     let subject = Subject(item: item)
     await self.db.insert(subject)
-    try await self.db.save()
   }
 
   func loadUserCollection(_ subjectId: UInt) async throws {
@@ -36,7 +35,6 @@ extension ChiiClient {
     let item = try await self.getSubjectCollection(subjectId)
     let collection = UserSubjectCollection(item: item)
     await self.db.insert(collection)
-    try await self.db.save()
   }
 
   func loadUserCollections(type: SubjectType?) async throws {
@@ -67,7 +65,6 @@ extension ChiiClient {
         break
       }
     }
-    try await self.db.save()
     Logger.collection.info("finish update collection for \(type?.name ?? "all")")
   }
 
@@ -101,7 +98,6 @@ extension ChiiClient {
           let episode = Episode(collection: item, subjectId: subjectId)
           await db.insert(episode)
         }
-        try await db.save()
         total = response.total
       } else {
         let response = try await self.getSubjectEpisodes(
@@ -113,7 +109,6 @@ extension ChiiClient {
           let episode = Episode(item: item, subjectId: subjectId)
           await db.insert(episode)
         }
-        try await db.save()
         total = response.total
       }
       offset += limit
@@ -138,6 +133,5 @@ extension ChiiClient {
           })
       }
     }
-    try await db.save()
   }
 }

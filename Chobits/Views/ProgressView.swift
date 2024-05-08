@@ -101,6 +101,7 @@ struct ChiiProgressView: View {
   func updateCollections(type: SubjectType?) async {
     do {
       try await chii.loadUserCollections(type: type)
+      try await chii.db.save()
     } catch {
       notifier.alert(error: error)
     }
