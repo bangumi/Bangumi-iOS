@@ -76,7 +76,7 @@ struct SubjectCharactersView: View {
           }
           .lineLimit(1)
           .font(.caption2)
-          .frame(width: 80, height: 150)
+          .frame(width: 80, height: 160)
         }
       }
     }

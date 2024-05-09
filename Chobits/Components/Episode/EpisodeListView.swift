@@ -148,6 +148,7 @@ struct EpisodeListView: View {
                     .overlay {
                       Text("\(episode.collectionTypeEnum.description)")
                         .foregroundStyle(Color(hex: episode.textColor))
+                        .font(.footnote)
                     }
                     .padding(.horizontal, 2)
                     .strikethrough(episode.collection == EpisodeCollectionType.dropped.rawValue)
@@ -160,6 +161,7 @@ struct EpisodeListView: View {
                         .overlay {
                           Text("未播")
                             .foregroundStyle(.secondary)
+                            .font(.footnote)
                         }
                         .padding(.horizontal, 2)
                     } else {
@@ -169,6 +171,7 @@ struct EpisodeListView: View {
                         .overlay {
                           Text("已播")
                             .foregroundStyle(.primary)
+                            .font(.footnote)
                         }
                         .padding(.horizontal, 2)
                     }
@@ -179,6 +182,7 @@ struct EpisodeListView: View {
                       .overlay {
                         Text(episode.typeEnum.description)
                           .foregroundStyle(.primary)
+                          .font(.footnote)
                       }
                       .padding(.horizontal, 2)
                   }
@@ -191,11 +195,10 @@ struct EpisodeListView: View {
                       .font(.subheadline)
                   }
                   HStack {
-                    Text("时长:\(episode.duration)")
+                    Label("\(episode.duration)", systemImage: "clock")
+                    Label("\(episode.airdateStr)", systemImage: "calendar")
                     Spacer()
-                    Text("首播:\(episode.airdateStr)")
-                    Spacer()
-                    Text("讨论:+\(episode.comment)")
+                    Label("+\(episode.comment)", systemImage: "bubble")
                   }
                   .font(.footnote)
                   .foregroundStyle(.secondary)
