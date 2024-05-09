@@ -148,7 +148,7 @@ struct ChiiProgressView: View {
                   NavigationLink(value: NavDestination.subject(subjectId: item.inner.subjectId)) {
                     UserCollectionRowView(subjectId: item.inner.subjectId)
                   }
-                  .buttonStyle(PlainButtonStyle())
+                  .buttonStyle(.plain)
                   .onAppear {
                     Task {
                       await loadNextPage(idx: item.idx)

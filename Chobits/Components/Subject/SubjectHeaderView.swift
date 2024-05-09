@@ -42,22 +42,27 @@ struct SubjectHeaderView: View {
               .presentationDetents([.fraction(0.8)])
           }
         VStack(alignment: .leading) {
-          HStack {
-            Text(subject.platform).foregroundStyle(.secondary)
-            Label(subject.typeEnum.description, systemImage: subject.typeEnum.icon).foregroundStyle(
-              .accent)
-            if subject.date.timeIntervalSince1970 > 0 {
-              Label(subject.date.formatAirdate, systemImage: "calendar").foregroundStyle(.secondary)
+          NavigationLink(value: NavDestination.subjectInfobox(subjectId: subjectId)) {
+            HStack {
+              Text(subject.platform).foregroundStyle(.secondary)
+              Label(subject.typeEnum.description, systemImage: subject.typeEnum.icon)
+                .foregroundStyle(
+                  .accent)
+              if subject.date.timeIntervalSince1970 > 0 {
+                Label(subject.date.formatAirdate, systemImage: "calendar").foregroundStyle(
+                  .secondary
+                )
                 .lineLimit(1)
-            }
-            Spacer()
-            if subject.nsfw {
-              Label("", systemImage: "18.circle").foregroundStyle(.red)
-            }
-            if subject.locked {
-              Label("", systemImage: "lock").foregroundStyle(.red)
-            }
-          }.font(.footnote)
+              }
+              Spacer()
+              if subject.nsfw {
+                Label("", systemImage: "18.circle").foregroundStyle(.red)
+              }
+              if subject.locked {
+                Label("", systemImage: "lock").foregroundStyle(.red)
+              }
+            }.font(.footnote)
+          }.buttonStyle(.plain)
           Spacer()
           Text(subject.name)
             .font(.title2.bold())
@@ -70,6 +75,7 @@ struct SubjectHeaderView: View {
             .multilineTextAlignment(.leading)
             .lineLimit(2)
           Spacer()
+
           HStack {
             Label("\(subject.rating.total)", systemImage: "bookmark").foregroundStyle(
               Color("LinkTextColor"))

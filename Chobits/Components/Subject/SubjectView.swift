@@ -69,8 +69,8 @@ struct SubjectView: View {
             default:
               EmptyView()
             }
-
             Divider()
+
             SubjectSummaryView(subjectId: subjectId)
 
             SubjectCharactersView(subjectId: subjectId)
@@ -114,8 +114,10 @@ struct SubjectView: View {
     container.mainContext.insert(episode)
   }
 
-  return SubjectView(subjectId: subject.id)
-    .environmentObject(Notifier())
-    .environment(ChiiClient(container: container, mock: .anime))
-    .modelContainer(container)
+  return NavigationStack {
+    SubjectView(subjectId: subject.id)
+      .environmentObject(Notifier())
+      .environment(ChiiClient(container: container, mock: .anime))
+      .modelContainer(container)
+  }
 }

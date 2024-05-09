@@ -128,9 +128,13 @@ struct Rating: Codable {
   var score: Float
 }
 
-struct InfoboxValueListValue: Codable {
+struct InfoboxValueListValue: Codable, Identifiable {
   var k: String?
   var v: String
+
+  var id: String {
+    self.k ?? self.v
+  }
 }
 
 enum InfoboxValue: Codable {
@@ -164,9 +168,13 @@ enum InfoboxValue: Codable {
   }
 }
 
-struct InfoboxItem: Codable {
+struct InfoboxItem: Codable, Identifiable {
   var key: String
   var value: InfoboxValue
+
+  var id: String {
+    self.key
+  }
 }
 
 struct Stat: Codable {

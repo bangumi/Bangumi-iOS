@@ -10,20 +10,26 @@ import SwiftUI
 
 enum NavDestination: Hashable, View {
   case subject(subjectId: UInt)
+  case subjectInfobox(subjectId: UInt)
   case episodeList(subjectId: UInt)
   case character(characterId: UInt)
+  case person(personId: UInt)
   case setting
 
   var body: some View {
     switch self {
+    case .setting:
+      SettingsView()
     case .subject(let subjectId):
       SubjectView(subjectId: subjectId)
+    case .subjectInfobox(let subjectId):
+      SubjectInfoboxView(subjectId: subjectId)
     case .episodeList(let subjectId):
       EpisodeListView(subjectId: subjectId)
     case .character(let characterId):
       CharacterView(characterId: characterId)
-    case .setting:
-      SettingsView()
+    case .person(let personId):
+      PersonView(personId: personId)
     }
   }
 }

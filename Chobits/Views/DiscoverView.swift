@@ -176,7 +176,7 @@ struct ChiiDiscoverView: View {
                             }
                           }
                         }
-                    }.buttonStyle(PlainButtonStyle())
+                    }.buttonStyle(.plain)
                   }
                 }
               }

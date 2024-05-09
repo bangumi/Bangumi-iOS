@@ -86,7 +86,7 @@ struct CalendarWeekdayView: View {
               ImageView(img: subject.images?.common, width: 80, height: 80)
               Text(subject.name).font(.caption).multilineTextAlignment(.leading).lineLimit(1)
             }
-          }.buttonStyle(PlainButtonStyle())
+          }.buttonStyle(.plain)
         }
       }
     }

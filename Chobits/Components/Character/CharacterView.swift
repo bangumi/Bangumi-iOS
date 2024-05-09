@@ -102,7 +102,8 @@ struct CharacterView: View {
                     .foregroundStyle(.secondary)
                 }
                 if !character.birthday.isEmpty {
-                  Label("生日: \(character.birthday)", systemImage: "calendar").foregroundStyle(.secondary)
+                  Label("生日: \(character.birthday)", systemImage: "calendar").foregroundStyle(
+                    .secondary)
                 }
 
                 Spacer()

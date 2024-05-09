@@ -102,7 +102,8 @@ struct PersonView: View {
                     .foregroundStyle(.secondary)
                 }
                 if !person.birthday.isEmpty {
-                  Label("生日: \(person.birthday)", systemImage: "calendar").foregroundStyle(.secondary)
+                  Label("生日: \(person.birthday)", systemImage: "calendar").foregroundStyle(
+                    .secondary)
                 }
 
                 Spacer()
@@ -120,7 +121,7 @@ struct PersonView: View {
               ForEach(person.career, id: \.self) { career in
                 Text(PersonCareer(career).description)
                   .padding(.horizontal, 4)
-                  .overlay{
+                  .overlay {
                     RoundedRectangle(cornerRadius: 4)
                       .stroke(.gray, lineWidth: 1)
                       .padding(.horizontal, -2)

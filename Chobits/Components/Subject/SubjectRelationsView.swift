@@ -81,8 +81,8 @@ struct SubjectRelationsView: View {
                 .truncationMode(.middle)
                 .lineLimit(3)
               Spacer()
-            }.font(.caption2).frame(width: 60, height: 132)
-          }.buttonStyle(PlainButtonStyle())
+            }.font(.caption2).frame(width: 60, height: 150)
+          }.buttonStyle(.plain)
         }
       }
     }
