@@ -195,4 +195,14 @@ extension ChiiClient {
     let character = Character(item)
     await self.db.insert(character)
   }
+
+  func loadPerson(_ pid: UInt) async throws {
+    let item = try await self.getPerson(pid)
+    if pid != item.id {
+      Logger.subject.warning("person id mismatch: \(pid) != \(item.id)")
+      throw ChiiError(message: "这是一个被合并的人物")
+    }
+    let person = Person(item)
+    await self.db.insert(person)
+  }
 }

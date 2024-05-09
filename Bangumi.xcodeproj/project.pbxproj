@@ -61,6 +61,8 @@
 		1980EE002BE418C800E013EA /* episodes.json in Resources */ = {isa = PBXBuildFile; fileRef = 1980EDFF2BE418C800E013EA /* episodes.json */; };
 		1980EE022BE419D500E013EA /* episode_collections.json in Resources */ = {isa = PBXBuildFile; fileRef = 1980EE012BE419D500E013EA /* episode_collections.json */; };
 		19AB93CB2BE4F0F4007531A4 /* BackgroundActor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19AB93CA2BE4F0F4007531A4 /* BackgroundActor.swift */; };
+		19B9002E2BED15B600405F0F /* PersonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19B9002D2BED15B600405F0F /* PersonView.swift */; };
+		19B900302BED16FE00405F0F /* person.json in Resources */ = {isa = PBXBuildFile; fileRef = 19B9002F2BED16FE00405F0F /* person.json */; };
 		19BD24262BE9C53800595973 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 19BD24252BE9C53800595973 /* Kingfisher */; };
 		19BD24282BE9F22B00595973 /* Load.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19BD24272BE9F22B00595973 /* Load.swift */; };
 		19BD242E2BEB2F3400595973 /* Setting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19BD242D2BEB2F3400595973 /* Setting.swift */; };
@@ -131,6 +133,8 @@
 		1980EDFF2BE418C800E013EA /* episodes.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = episodes.json; sourceTree = "<group>"; };
 		1980EE012BE419D500E013EA /* episode_collections.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = episode_collections.json; sourceTree = "<group>"; };
 		19AB93CA2BE4F0F4007531A4 /* BackgroundActor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundActor.swift; sourceTree = "<group>"; };
+		19B9002D2BED15B600405F0F /* PersonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonView.swift; sourceTree = "<group>"; };
+		19B9002F2BED16FE00405F0F /* person.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = person.json; sourceTree = "<group>"; };
 		19BB342B2BD239AB00E5C295 /* Chobits.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Chobits.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		19BD24272BE9F22B00595973 /* Load.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Load.swift; sourceTree = "<group>"; };
 		19BD242D2BEB2F3400595973 /* Setting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Setting.swift; sourceTree = "<group>"; };
@@ -201,13 +205,14 @@
 				197A19E52BE69B0600804B13 /* Episode */,
 				19671C362BDEB55D000B4D99 /* Subject */,
 				1909F3B22BECF9A900E3B8F0 /* Character */,
-				19671C372BDEB55D000B4D99 /* CalendarView.swift */,
-				19671C2E2BDEB55D000B4D99 /* SearchSubjectRowView.swift */,
+				19B9002C2BED158700405F0F /* Person */,
 				19671C382BDEB55D000B4D99 /* FlowStack.swift */,
 				19671C392BDEB55D000B4D99 /* ImageView.swift */,
 				19671C3A2BDEB55D000B4D99 /* LoadingView.swift */,
-				19671C3B2BDEB55D000B4D99 /* UserCollectionRowView.swift */,
 				19C2CE5C2BE1E7B10080A056 /* NotFoundView.swift */,
+				19671C372BDEB55D000B4D99 /* CalendarView.swift */,
+				19671C2E2BDEB55D000B4D99 /* SearchSubjectRowView.swift */,
+				19671C3B2BDEB55D000B4D99 /* UserCollectionRowView.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -240,6 +245,7 @@
 				1909F3AC2BEC43D000E3B8F0 /* subject_characters.json */,
 				1909F3AE2BEC444500E3B8F0 /* subject_relations.json */,
 				1909F3B52BECFAC400E3B8F0 /* character.json */,
+				19B9002F2BED16FE00405F0F /* person.json */,
 				19C2CE5E2BE2536D0080A056 /* user_collection_book.json */,
 				19671C462BDEB55D000B4D99 /* user_collection_anime.json */,
 				19671C772BE1BB72000B4D99 /* search_subject_book.json */,
@@ -301,6 +307,14 @@
 				197A19E32BE699CF00804B13 /* EpisodeListView.swift */,
 			);
 			path = Episode;
+			sourceTree = "<group>";
+		};
+		19B9002C2BED158700405F0F /* Person */ = {
+			isa = PBXGroup;
+			children = (
+				19B9002D2BED15B600405F0F /* PersonView.swift */,
+			);
+			path = Person;
 			sourceTree = "<group>";
 		};
 		19BB34222BD239AB00E5C295 = {
@@ -390,6 +404,7 @@
 				19671C782BE1BB72000B4D99 /* search_subject_book.json in Resources */,
 				19671C682BDEB55D000B4D99 /* user_collection_anime.json in Resources */,
 				1980EE002BE418C800E013EA /* episodes.json in Resources */,
+				19B900302BED16FE00405F0F /* person.json in Resources */,
 				1909F3AD2BEC43D000E3B8F0 /* subject_characters.json in Resources */,
 				19C2CE652BE2ACE60080A056 /* profile.json in Resources */,
 				19C2CE612BE2538A0080A056 /* subject_book.json in Resources */,
@@ -436,6 +451,7 @@
 				19C2CE632BE2A4F10080A056 /* SubjectBookChaptersView.swift in Sources */,
 				197A19DA2BE6733A00804B13 /* Error.swift in Sources */,
 				19BD24302BEB3C3B00595973 /* SettingsView.swift in Sources */,
+				19B9002E2BED15B600405F0F /* PersonView.swift in Sources */,
 				1909F3A92BEBC9F000E3B8F0 /* DataPerson.swift in Sources */,
 				1909F39F2BEBC28F00E3B8F0 /* DataCollection.swift in Sources */,
 				1909F3B42BECF9D100E3B8F0 /* CharacterView.swift in Sources */,

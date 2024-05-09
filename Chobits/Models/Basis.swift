@@ -375,6 +375,15 @@ enum PersonCareer: String, Codable {
   case illustrator
   case actor
 
+  init(_ value: String) {
+    let tmp = Self(rawValue: value)
+    if let out = tmp {
+      self = out
+      return
+    }
+    self = Self.actor
+  }
+
   var description: String {
     switch self {
     case .producer:
@@ -382,7 +391,7 @@ enum PersonCareer: String, Codable {
     case .mangaka:
       return "漫画家"
     case .artist:
-      return "原创音乐人"
+      return "音乐人"
     case .seiyu:
       return "演员"
     case .writer:

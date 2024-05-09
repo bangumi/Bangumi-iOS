@@ -30,6 +30,20 @@ final class Character {
     return CharacterType(type)
   }
 
+  var birthday: String {
+    var text = ""
+    if let year = birthYear {
+      text += "\(year)年"
+    }
+    if let month = birthMonth {
+      text += "\(month)月"
+    }
+    if let day = birthDay {
+      text += "\(day)日"
+    }
+    return text
+  }
+
   init(
     id: UInt, name: String, type: UInt8, images: Images, summary: String, locked: Bool,
     infobox: [InfoboxItem], gender: String? = nil, bloodType: UInt8? = nil, birthYear: UInt? = nil,

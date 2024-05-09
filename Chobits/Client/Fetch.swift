@@ -249,4 +249,18 @@ extension ChiiClient {
     Logger.api.info("finish get characters: \(cid)")
     return character
   }
+
+  func getPerson(_ pid: UInt) async throws -> PersonItem {
+    if self.mock != nil {
+      return loadFixture(fixture: "person.json", target: PersonItem.self)
+    }
+    Logger.api.info("start get persons: \(pid)")
+    let url = self.apiBase.appendingPathComponent("v0/persons/\(pid)")
+    let data = try await request(url: url, method: "GET", authorized: self.isAuthenticated)
+    let decoder = JSONDecoder()
+    decoder.keyDecodingStrategy = .convertFromSnakeCase
+    let person = try decoder.decode(PersonItem.self, from: data)
+    Logger.api.info("finish get persons: \(pid)")
+    return person
+  }
 }

@@ -31,6 +31,20 @@ final class Person {
     return PersonType(type)
   }
 
+  var birthday: String {
+    var text = ""
+    if let year = birthYear {
+      text += "\(year)年"
+    }
+    if let month = birthMonth {
+      text += "\(month)月"
+    }
+    if let day = birthDay {
+      text += "\(day)日"
+    }
+    return text
+  }
+
   init(
     id: UInt, name: String, type: UInt8, career: [String], images: Images, summary: String,
     locked: Bool, lastModified: Date, infobox: [InfoboxItem], gender: String? = nil,

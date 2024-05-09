@@ -121,3 +121,10 @@ extension Character {
     return Character(item)
   }
 }
+
+extension Person {
+  static var preview: Person {
+    let item = loadFixture(fixture: "person.json", target: PersonItem.self)
+    return Person(item)
+  }
+}
