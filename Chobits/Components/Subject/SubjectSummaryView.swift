@@ -92,9 +92,7 @@ struct SubjectSummaryView: View {
 }
 
 #Preview {
-  let config = ModelConfiguration(isStoredInMemoryOnly: true)
-  let container = try! ModelContainer(
-    for: UserSubjectCollection.self, Subject.self, configurations: config)
+  let container = mockContainer()
 
   let subject = Subject.previewBook
 

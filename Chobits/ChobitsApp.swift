@@ -22,7 +22,12 @@ struct ChobitsApp: App {
       BangumiCalendar.self,
       UserSubjectCollection.self,
       Subject.self,
+      SubjectRelation.self,
+      SubjectRelatedCharacter.self,
+      SubjectRelatedPerson.self,
       Episode.self,
+      Character.self,
+      Person.self,
     ])
     let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
     do {

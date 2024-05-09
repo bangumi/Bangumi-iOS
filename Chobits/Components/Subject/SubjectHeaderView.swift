@@ -102,10 +102,8 @@ struct SubjectHeaderView: View {
 }
 
 #Preview {
-  let config = ModelConfiguration(isStoredInMemoryOnly: true)
-  let container = try! ModelContainer(
-    for: UserSubjectCollection.self, Subject.self, Episode.self,
-    configurations: config)
+  let container = mockContainer()
+
   let subject = Subject.previewAnime
   container.mainContext.insert(subject)
 

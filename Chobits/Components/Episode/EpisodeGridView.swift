@@ -132,10 +132,8 @@ struct EpisodeGridView: View {
 }
 
 #Preview {
-  let config = ModelConfiguration(isStoredInMemoryOnly: true)
-  let container = try! ModelContainer(
-    for: UserSubjectCollection.self, Subject.self, Episode.self,
-    configurations: config)
+  let container = mockContainer()
+
   container.mainContext.insert(UserSubjectCollection.previewAnime)
 
   let subject = Subject.previewAnime

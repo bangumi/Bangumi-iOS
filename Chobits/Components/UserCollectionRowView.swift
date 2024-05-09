@@ -165,9 +165,7 @@ struct UserCollectionRowView: View {
 }
 
 #Preview {
-  let config = ModelConfiguration(isStoredInMemoryOnly: true)
-  let container = try! ModelContainer(
-    for: Subject.self, UserSubjectCollection.self, Episode.self, configurations: config)
+  let container = mockContainer()
 
   let collection = UserSubjectCollection.previewAnime
   let subject = Subject.previewAnime

@@ -152,6 +152,26 @@ final class Subject {
     self.collection = SubjectCollection()
     self.tags = []
   }
+
+  init(_ relation: SubjectRelationItem) {
+    self.id = relation.id
+    self.type = relation.type.rawValue
+    self.name = relation.name
+    self.nameCn = relation.nameCn
+    self.summary = ""
+    self.nsfw = false
+    self.locked = false
+    self.date = Date()
+    self.platform = ""
+    self.images = relation.images ?? SubjectImages()
+    self.infobox = []
+    self.volumes = 0
+    self.eps = 0
+    self.totalEpisodes = 0
+    self.rating = Rating(rank: 0, total: 0, count: [:], score: 0)
+    self.collection = SubjectCollection()
+    self.tags = []
+  }
 }
 
 @Model
@@ -204,11 +224,11 @@ final class SubjectRelatedCharacter {
   var name: String
   var images: Images
   var relation: String
-  var actors: [PersonItem]
+  var actors: [SubjectCharacterActorItem]
 
   init(
     uk: String, subjectId: UInt, characterId: UInt, type: UInt8, name: String, images: Images,
-    relation: String, actors: [PersonItem]
+    relation: String, actors: [SubjectCharacterActorItem]
   ) {
     self.uk = uk
     self.subjectId = subjectId

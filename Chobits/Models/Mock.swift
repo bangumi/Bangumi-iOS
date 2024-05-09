@@ -6,6 +6,23 @@
 //
 
 import Foundation
+import SwiftData
+
+func mockContainer() -> ModelContainer {
+  let config = ModelConfiguration(isStoredInMemoryOnly: true)
+  let container = try! ModelContainer(
+    for: BangumiCalendar.self,
+    UserSubjectCollection.self,
+    Subject.self,
+    SubjectRelation.self,
+    SubjectRelatedCharacter.self,
+    SubjectRelatedPerson.self,
+    Episode.self,
+    Character.self,
+    Person.self,
+    configurations: config)
+  return container
+}
 
 func loadFixture<T: Decodable>(fixture: String, target: T.Type) -> T {
   guard let url = Bundle.main.url(forResource: fixture, withExtension: nil) else {
@@ -63,10 +80,37 @@ extension Episode {
       loadFixture(
         fixture: "episode_collections.json", target: EpisodeCollectionResponse.self
       ).data ?? []
-    return collections.map { Episode($0) }
+    return collections.map { Episode($0, subjectId:12) }
   }
 
   static var preview: Episode {
     return self.previewList.first!
+  }
+}
+
+extension SubjectRelatedPerson {
+  static var preview: [SubjectRelatedPerson] {
+    let items = loadFixture(
+      fixture: "subject_persons.json", target: [SubjectPersonItem].self
+    )
+    return items.map { SubjectRelatedPerson($0, subjectId: 12) }
+  }
+}
+
+extension SubjectRelatedCharacter {
+  static var preview: [SubjectRelatedCharacter] {
+    let items = loadFixture(
+      fixture: "subject_characters.json", target: [SubjectCharacterItem].self
+    )
+    return items.map { SubjectRelatedCharacter($0, subjectId: 12) }
+  }
+}
+
+extension SubjectRelation {
+  static var preview: [SubjectRelation] {
+    let items = loadFixture(
+      fixture: "subject_relations.json", target: [SubjectRelationItem].self
+    )
+    return items.map { SubjectRelation($0, subjectId: 12) }
   }
 }

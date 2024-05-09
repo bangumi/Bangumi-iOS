@@ -11,8 +11,6 @@ import SwiftData
 
 extension ChiiClient {
   func loadSubject(_ sid: UInt) async throws {
-    Logger.api.info("loading subject: \(sid)")
-
     let item = try await self.getSubject(sid)
 
     // 对于合并的条目，可能搜索返回的 ID 跟 API 拿到的 ID 不同
@@ -23,7 +21,6 @@ extension ChiiClient {
       throw ChiiError(message: "这是一个被合并的条目")
     }
 
-    Logger.subject.info("fetched subject: \(item.id)")
     let subject = Subject(item)
     await self.db.insert(subject)
   }
@@ -38,7 +35,6 @@ extension ChiiClient {
   }
 
   func loadUserCollections(type: SubjectType?) async throws {
-    Logger.collection.info("start update collection for \(type?.name ?? "all")")
     var offset: Int = 0
     let limit: Int = 1000
     while true {
@@ -65,7 +61,6 @@ extension ChiiClient {
         break
       }
     }
-    Logger.collection.info("finish update collection for \(type?.name ?? "all")")
   }
 
   func loadEpisodes(_ subjectId: UInt) async throws {
@@ -115,6 +110,62 @@ extension ChiiClient {
       if offset > total {
         break
       }
+    }
+  }
+
+  func loadSubjectCharacters(_ subjectId: UInt) async throws {
+    let response = try await self.getSubjectCharacters(subjectId)
+    for item in response {
+      let related = SubjectRelatedCharacter(item, subjectId: subjectId)
+      await self.db.insert(related)
+      let character = Character(item)
+      let characterId = character.id
+      try await self.db.insertIfNeeded(
+        data: character,
+        predicate: #Predicate<Character> {
+          $0.id == characterId
+        })
+      if let actors = item.actors {
+        for actor in actors {
+          let actor = Person(actor)
+          let actorId = actor.id
+          try await self.db.insertIfNeeded(
+            data: actor,
+            predicate: #Predicate<Person> {
+              $0.id == actorId
+            })
+        }
+      }
+    }
+  }
+
+  func loadSubjectRelations(_ subjectId: UInt) async throws {
+    let response = try await self.getSubjectRelations(subjectId)
+    for item in response {
+      let related = SubjectRelation(item, subjectId: subjectId)
+      await self.db.insert(related)
+      let relation = Subject(item)
+      let relationId = relation.id
+      try await self.db.insertIfNeeded(
+        data: relation,
+        predicate: #Predicate<Subject> {
+          $0.id == relationId
+        })
+    }
+  }
+
+  func loadSubjectPersons(_ subjectId: UInt) async throws {
+    let response = try await self.getSubjectPersons(subjectId)
+    for item in response {
+      let related = SubjectRelatedPerson(item, subjectId: subjectId)
+      await self.db.insert(related)
+      let person = Person(item)
+      let personId = person.id
+      try await self.db.insertIfNeeded(
+        data: person,
+        predicate: #Predicate<Person> {
+          $0.id == personId
+        })
     }
   }
 

@@ -135,14 +135,24 @@ struct SubjectCharacterItem: Codable, Identifiable {
   var type: CharacterType
   var images: Images?
   var relation: String
-  var actors: [PersonItem]?
+  var actors: [SubjectCharacterActorItem]?
+}
+
+struct SubjectCharacterActorItem: Codable, Identifiable {
+  var id: UInt
+  var name: String
+  var type: PersonType
+  var career: [PersonCareer]
+  var images: Images?
+  var shortSummary: String
+  var locked: Bool
 }
 
 struct SubjectPersonItem: Codable, Identifiable {
   var id: UInt
   var name: String
   var type: PersonType
-  var career: PersonCareer
+  var career: [PersonCareer]
   var images: Images?
   var relation: String
 }

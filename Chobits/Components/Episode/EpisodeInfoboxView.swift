@@ -135,12 +135,9 @@ struct EpisodeInfoboxView: View {
 }
 
 #Preview {
-  let config = ModelConfiguration(isStoredInMemoryOnly: true)
-  let container = try! ModelContainer(
-    for: UserSubjectCollection.self, Subject.self, Episode.self,
-    configurations: config)
-  container.mainContext.insert(UserSubjectCollection.previewAnime)
+  let container = mockContainer()
 
+  container.mainContext.insert(UserSubjectCollection.previewAnime)
   let subject = Subject.previewAnime
   container.mainContext.insert(subject)
 

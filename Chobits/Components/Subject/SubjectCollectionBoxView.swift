@@ -209,9 +209,8 @@ struct SubjectCollectionBoxView: View {
 }
 
 #Preview {
-  let config = ModelConfiguration(isStoredInMemoryOnly: true)
-  let container = try! ModelContainer(
-    for: UserSubjectCollection.self, Subject.self, configurations: config)
+  let container = mockContainer()
+
   container.mainContext.insert(UserSubjectCollection.previewBook)
 
   let collection = UserSubjectCollection.previewAnime

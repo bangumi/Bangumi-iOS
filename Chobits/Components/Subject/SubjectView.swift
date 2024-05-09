@@ -74,6 +74,8 @@ struct SubjectView: View {
             Divider()
             SubjectSummaryView(subjectId: subjectId)
 
+            SubjectCharactersView(subjectId: subjectId)
+
             Divider()
             SubjectRelationsView(subjectId: subjectId)
 
@@ -101,10 +103,7 @@ struct SubjectView: View {
 }
 
 #Preview {
-  let config = ModelConfiguration(isStoredInMemoryOnly: true)
-  let container = try! ModelContainer(
-    for: UserSubjectCollection.self, Subject.self, Episode.self,
-    configurations: config)
+  let container = mockContainer()
 
   let collection = UserSubjectCollection.previewAnime
   let subject = Subject.previewAnime

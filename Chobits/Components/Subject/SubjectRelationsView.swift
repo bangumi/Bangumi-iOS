@@ -14,9 +14,22 @@ struct SubjectRelationsView: View {
   @EnvironmentObject var notifier: Notifier
   @EnvironmentObject var chii: ChiiClient
 
+  @State private var refreshed: Bool = false
+
   @Query
-  private var subjects: [Subject]
-  private var subject: Subject? { subjects.first }
+  private var relations: [SubjectRelation]
+
+  func refresh() async {
+    if refreshed { return }
+    refreshed = true
+
+    do {
+      try await chii.loadSubjectRelations(subjectId)
+      try await chii.db.save()
+    } catch {
+      notifier.alert(error: error)
+    }
+  }
 
   var body: some View {
     VStack {
@@ -26,9 +39,7 @@ struct SubjectRelationsView: View {
 }
 
 #Preview {
-  let config = ModelConfiguration(isStoredInMemoryOnly: true)
-  let container = try! ModelContainer(
-    for: UserSubjectCollection.self, Subject.self, configurations: config)
+  let container = mockContainer()
 
   let subject = Subject.previewAnime
 
