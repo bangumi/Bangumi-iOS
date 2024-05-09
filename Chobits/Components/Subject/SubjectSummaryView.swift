@@ -52,7 +52,7 @@ struct SubjectSummaryView: View {
         showSummary.toggle()
       }
       .sheet(isPresented: $showSummary) {
-        ScrollView{
+        ScrollView {
           LazyVStack(alignment: .leading) {
             Text("简介").font(.title3).padding(.vertical, 10)
             Text(subject?.summary ?? "")

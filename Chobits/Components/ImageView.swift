@@ -12,6 +12,14 @@ struct ImageView: View {
   let img: String?
   let width: CGFloat
   let height: CGFloat
+  let alignment: Alignment
+
+  init(img: String?, width: CGFloat, height: CGFloat, alignment: Alignment = .center) {
+    self.img = img
+    self.width = width
+    self.height = height
+    self.alignment = alignment
+  }
 
   var imageURL: URL? {
     guard let img = img else { return nil }
@@ -25,7 +33,8 @@ struct ImageView: View {
         KFImage(imageURL)
           .resizable()
           .scaledToFill()
-          .frame(width: width, height: height)
+          .alignmentGuide(.top, computeValue: { _ in 0 })
+          .frame(width: width, height: height, alignment: alignment)
           .clipShape(RoundedRectangle(cornerRadius: 10))
       } else {
         KFImage(imageURL)
@@ -41,4 +50,8 @@ struct ImageView: View {
       }
     }
   }
+}
+
+#Preview {
+  ImageView(img: "https://lain.bgm.tv/pic/crt/l/ce/65/32_crt_0g9f9.jpg", width: 240, height: 240, alignment: .top)
 }
