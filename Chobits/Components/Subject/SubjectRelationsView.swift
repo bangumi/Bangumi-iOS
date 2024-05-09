@@ -19,6 +19,14 @@ struct SubjectRelationsView: View {
   @Query
   private var relations: [SubjectRelation]
 
+  init(subjectId: UInt) {
+    self.subjectId = subjectId
+    _relations = Query(
+      filter: #Predicate<SubjectRelation> {
+        $0.subjectId == subjectId
+      }, sort: \SubjectRelation.sort)
+  }
+
   func refresh() async {
     if refreshed { return }
     refreshed = true
@@ -33,21 +41,36 @@ struct SubjectRelationsView: View {
 
   var body: some View {
     VStack {
-      Text("关联条目").font(.title3)
+      HStack{
+        Text("关联条目").font(.title3)
+        Spacer()
+        Text("更多条目 »").font(.caption)
+      }
     }.onAppear {
       Task(priority: .background) {
         await refresh()
       }
     }
     ScrollView(.horizontal) {
-      HStack {
+      LazyHStack {
         ForEach(relations) { relation in
-          Text(relation.name)
+          VStack {
+            Text(relation.relation).foregroundStyle(.secondary)
+            ImageView(img: relation.images.grid, width: 60, height: 60)
+            Text(relation.name)
+              .multilineTextAlignment(.leading)
+              .lineLimit(3)
+            Spacer()
+          }
+          .font(.caption2)
+          .frame(width: 60, height: 132)
         }
       }
     }
   }
 }
+
+
 
 #Preview {
   let container = mockContainer()

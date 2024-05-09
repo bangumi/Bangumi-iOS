@@ -115,8 +115,8 @@ extension ChiiClient {
 
   func loadSubjectCharacters(_ subjectId: UInt) async throws {
     let response = try await self.getSubjectCharacters(subjectId)
-    for item in response {
-      let related = SubjectRelatedCharacter(item, subjectId: subjectId)
+    for (idx, item) in response.enumerated() {
+      let related = SubjectRelatedCharacter(item, subjectId: subjectId, sort: Float(idx))
       await self.db.insert(related)
       let character = Character(item)
       let characterId = character.id
@@ -141,8 +141,8 @@ extension ChiiClient {
 
   func loadSubjectRelations(_ subjectId: UInt) async throws {
     let response = try await self.getSubjectRelations(subjectId)
-    for item in response {
-      let related = SubjectRelation(item, subjectId: subjectId)
+    for (idx, item) in response.enumerated() {
+      let related = SubjectRelation(item, subjectId: subjectId, sort: Float(idx))
       await self.db.insert(related)
       let relation = Subject(item)
       let relationId = relation.id
@@ -156,8 +156,8 @@ extension ChiiClient {
 
   func loadSubjectPersons(_ subjectId: UInt) async throws {
     let response = try await self.getSubjectPersons(subjectId)
-    for item in response {
-      let related = SubjectRelatedPerson(item, subjectId: subjectId)
+    for (idx,item) in response.enumerated() {
+      let related = SubjectRelatedPerson(item, subjectId: subjectId, sort: Float(idx))
       await self.db.insert(related)
       let person = Person(item)
       let personId = person.id

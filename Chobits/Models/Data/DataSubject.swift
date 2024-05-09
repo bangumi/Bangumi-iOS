@@ -186,10 +186,11 @@ final class SubjectRelation {
   var nameCn: String
   var images: SubjectImages
   var relation: String
+  var sort: Float
 
   init(
     uk: String, subjectId: UInt, relationId: UInt, type: UInt8, name: String, nameCn: String,
-    images: SubjectImages, relation: String
+    images: SubjectImages, relation: String, sort: Float
   ) {
     self.uk = uk
     self.subjectId = subjectId
@@ -199,9 +200,10 @@ final class SubjectRelation {
     self.nameCn = nameCn
     self.images = images
     self.relation = relation
+    self.sort = sort
   }
 
-  init(_ item: SubjectRelationItem, subjectId: UInt) {
+  init(_ item: SubjectRelationItem, subjectId: UInt, sort: Float = 0) {
     self.uk = "\(subjectId)-\(item.id)"
     self.subjectId = subjectId
     self.relationId = item.id
@@ -210,6 +212,7 @@ final class SubjectRelation {
     self.nameCn = item.nameCn
     self.images = item.images ?? SubjectImages()
     self.relation = item.relation
+    self.sort = sort
   }
 }
 
@@ -225,10 +228,11 @@ final class SubjectRelatedCharacter {
   var images: Images
   var relation: String
   var actors: [SubjectCharacterActorItem]
+  var sort: Float
 
   init(
     uk: String, subjectId: UInt, characterId: UInt, type: UInt8, name: String, images: Images,
-    relation: String, actors: [SubjectCharacterActorItem]
+    relation: String, actors: [SubjectCharacterActorItem], sort: Float
   ) {
     self.uk = uk
     self.subjectId = subjectId
@@ -238,9 +242,10 @@ final class SubjectRelatedCharacter {
     self.images = images
     self.relation = relation
     self.actors = actors
+    self.sort = sort
   }
 
-  init(_ item: SubjectCharacterItem, subjectId: UInt) {
+  init(_ item: SubjectCharacterItem, subjectId: UInt, sort: Float = 0) {
     self.uk = "\(subjectId)-\(item.id)"
     self.subjectId = subjectId
     self.characterId = item.id
@@ -249,6 +254,7 @@ final class SubjectRelatedCharacter {
     self.images = item.images ?? Images()
     self.relation = item.relation
     self.actors = item.actors ?? []
+    self.sort = sort
   }
 
   var typeEnum: CharacterType {
@@ -267,10 +273,11 @@ final class SubjectRelatedPerson {
   var name: String
   var images: Images
   var relation: String
+  var sort: Float
 
   init(
     uk: String, subjectId: UInt, personId: UInt, type: UInt8, name: String, images: Images,
-    relation: String
+    relation: String, sort: Float
   ) {
     self.uk = uk
     self.subjectId = subjectId
@@ -279,9 +286,10 @@ final class SubjectRelatedPerson {
     self.name = name
     self.images = images
     self.relation = relation
+    self.sort = sort
   }
 
-  init(_ item: SubjectPersonItem, subjectId: UInt) {
+  init(_ item: SubjectPersonItem, subjectId: UInt, sort: Float = 0) {
     self.uk = "\(subjectId)-\(item.id)"
     self.subjectId = subjectId
     self.personId = item.id
@@ -289,6 +297,7 @@ final class SubjectRelatedPerson {
     self.name = item.name
     self.images = item.images ?? Images()
     self.relation = item.relation
+    self.sort = sort
   }
 
   var typeEnum: PersonType {

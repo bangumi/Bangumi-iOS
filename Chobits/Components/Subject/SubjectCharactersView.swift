@@ -21,10 +21,12 @@ struct SubjectCharactersView: View {
 
   init(subjectId: UInt) {
     self.subjectId = subjectId
-    _characters = Query(
-      filter: #Predicate<SubjectRelatedCharacter> {
+    var descriptor = FetchDescriptor<SubjectRelatedCharacter>(
+      predicate: #Predicate<SubjectRelatedCharacter> {
         $0.subjectId == subjectId
-      })
+      },sortBy: [SortDescriptor<SubjectRelatedCharacter>(\.sort)])
+    descriptor.fetchLimit = 10
+    _characters = Query(descriptor)
   }
 
   func refresh() async {
@@ -41,16 +43,38 @@ struct SubjectCharactersView: View {
 
   var body: some View {
     VStack {
-      Text("角色介绍").font(.title3)
+      HStack{
+        Text("角色介绍").font(.title3)
+        Spacer()
+        Text("更多角色 »").font(.caption)
+      }
     }.onAppear {
       Task(priority: .background) {
         await refresh()
       }
     }
     ScrollView(.horizontal) {
-      HStack {
+      LazyHStack(alignment: .top) {
         ForEach(characters) { character in
-          Text(character.name)
+          VStack{
+            Text(character.relation)
+              .foregroundStyle(.secondary)
+              .overlay{
+                RoundedRectangle(cornerRadius: 5)
+                  .stroke(Color.secondary, lineWidth: 1)
+                  .padding(.horizontal, -4)
+                  .padding(.vertical, -2)
+              }.padding(.top, 4)
+            ImageView(img: character.images.grid, width: 80, height: 80)
+            Text(character.name)
+            if let actor = character.actors.first {
+              Text("CV:\(actor.name)").foregroundStyle(.secondary)
+            }
+            Spacer()
+          }
+          .lineLimit(1)
+          .font(.caption2)
+          .frame(width: 80, height: 150)
         }
       }
     }
