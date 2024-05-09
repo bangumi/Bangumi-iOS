@@ -14,14 +14,20 @@ struct ContentView: View {
   @EnvironmentObject var chii: ChiiClient
 
   @State private var initialized = false
+  @State private var selectedTab: ContentViewTab
   @StateObject var navState = NavState()
+
+  init() {
+    let defaultTab = UserDefaults.standard.string(forKey: "defaultTab") ?? "discover"
+    self.selectedTab = ContentViewTab(defaultTab)
+  }
 
   private func createTabViewBinding() -> Binding<ContentViewTab> {
     Binding<ContentViewTab>(
-      get: { self.navState.selected },
+      get: { self.selectedTab },
       set: { selectedTab in
-        if selectedTab != self.navState.selected {
-          self.navState.selected = selectedTab
+        if selectedTab != self.selectedTab {
+          self.selectedTab = selectedTab
           return
         }
         switch selectedTab {
@@ -91,16 +97,7 @@ struct ContentView: View {
   }
 }
 
-enum ContentViewTab: String, CaseIterable, Identifiable {
-  case timeline
-  case progress
-  case discover
-
-  var id: Self { self }
-}
-
 class NavState: ObservableObject, Observable {
-  @Published var selected: ContentViewTab = .progress
   @Published var timelineNavigation: [NavDestination] = []
   @Published var progressNavigation: [NavDestination] = []
   @Published var discoverNavigation: [NavDestination] = []

@@ -11,6 +11,7 @@ import SwiftUI
 struct SettingsView: View {
   @AppStorage("appearance") var appearance: String = AppearanceType.system.label
   @AppStorage("shareDomain") var shareDomain: String = ShareDomain.chii.label
+  @AppStorage("defaultTab") var defaultTab: String = ContentViewTab.discover.label
 
   @EnvironmentObject var notifier: Notifier
   @EnvironmentObject var chii: ChiiClient
@@ -18,10 +19,12 @@ struct SettingsView: View {
 
   @State private var selectedDomain: ShareDomain = .chii
   @State private var selectedAppearance: AppearanceType = .system
+  @State private var selectedDefaultTab: ContentViewTab = .discover
 
   func load() {
     selectedDomain = ShareDomain(shareDomain)
     selectedAppearance = AppearanceType(appearance)
+    selectedDefaultTab = ContentViewTab(defaultTab)
   }
 
   func logout() {
@@ -60,13 +63,24 @@ struct SettingsView: View {
       }
 
       Section(header: Text("外观设置")) {
-        Picker(selection: $selectedAppearance, label: Text("主题")) {
-          ForEach(AppearanceType.allCases, id: \.self) { appearance in
-            Text(appearance.desc).tag(appearance)
+        VStack{
+          Picker(selection: $selectedAppearance, label: Text("主题")) {
+            ForEach(AppearanceType.allCases, id: \.self) { appearance in
+              Text(appearance.desc).tag(appearance)
+            }
           }
-        }
-        .onChange(of: selectedAppearance) { _, _ in
-          appearance = selectedAppearance.label
+          .onChange(of: selectedAppearance) { _, _ in
+            appearance = selectedAppearance.label
+          }
+
+          Picker(selection: $selectedDefaultTab, label: Text("默认页面")) {
+            ForEach(ContentViewTab.allCases, id: \.self) { tab in
+              Text(tab.title).tag(tab)
+            }
+          }
+          .onChange(of: selectedDefaultTab) { _, _ in
+            defaultTab = selectedDefaultTab.label
+          }
         }
       }
 

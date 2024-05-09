@@ -97,3 +97,46 @@ enum ShareDomain: Codable, CaseIterable, Identifiable {
     }
   }
 }
+
+enum ContentViewTab: Codable, CaseIterable, Identifiable {
+  case timeline
+  case progress
+  case discover
+
+  init(_ label: String) {
+    switch label {
+    case "timeline":
+      self = .timeline
+    case "progress":
+      self = .progress
+    case "discover":
+      self = .discover
+    default:
+      self = .timeline
+    }
+  }
+
+  var id: Self { self }
+
+  var title: String {
+    switch self {
+    case .timeline:
+      "动态"
+    case .progress:
+      "进度管理"
+    case .discover:
+      "发现"
+    }
+  }
+
+  var label: String {
+    switch self {
+    case .timeline:
+      "timeline"
+    case .progress:
+      "progress"
+    case .discover:
+      "discover"
+    }
+  }
+}

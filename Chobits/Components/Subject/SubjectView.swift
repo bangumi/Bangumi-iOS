@@ -16,7 +16,6 @@ struct SubjectView: View {
 
   @EnvironmentObject var notifier: Notifier
   @EnvironmentObject var chii: ChiiClient
-  @EnvironmentObject var navState: NavState
 
   @State private var refreshed: Bool = false
 
