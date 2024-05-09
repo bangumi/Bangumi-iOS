@@ -18,12 +18,12 @@ struct SearchSubjectRowView: View {
         .frame(height: 64)
         .clipShape(RoundedRectangle(cornerRadius: 10))
         .shadow(color: .accent, radius: 1, x: 1, y: 1)
-      HStack(alignment: .top) {
+      HStack {
         ImageView(img: subject.images.common, width: 60, height: 60)
         VStack(alignment: .leading) {
           Text(subject.name).font(.headline)
           Text(subject.nameCn).font(.subheadline).foregroundStyle(.secondary)
-          HStack {
+          HStack(alignment: .bottom) {
             Label(subject.type.description, systemImage: subject.type.icon).foregroundStyle(
               .accent)
             if let airDate = subject.date {

@@ -95,7 +95,7 @@ struct EpisodeGridView: View {
           .overlay(
             Rectangle()
               .frame(width: 3)
-              .foregroundColor(Color(hex: 0x8EB021))
+              .foregroundStyle(Color(hex: 0x8EB021))
               .offset(x: -12, y: 0)
           )
           .padding(2)

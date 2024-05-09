@@ -69,7 +69,7 @@ struct SubjectSummaryView: View {
             }) {
               Text("more...")
                 .font(.caption)
-                .foregroundColor(Color("LinkTextColor"))
+                .foregroundStyle(Color("LinkTextColor"))
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
           }

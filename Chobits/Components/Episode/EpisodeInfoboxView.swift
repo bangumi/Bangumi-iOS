@@ -101,9 +101,11 @@ struct EpisodeInfoboxView: View {
                 Text("看到")
               }
               .buttonStyle(.bordered)
-              .foregroundColor(.red)
+              .foregroundStyle(.accent)
               Spacer()
-              Text(episode.collectionTypeEnum.description).foregroundStyle(.red)
+              Text(episode.collectionTypeEnum.description)
+                .font(.footnote)
+                .foregroundStyle(.accent)
             }
             .disabled(updating)
           }

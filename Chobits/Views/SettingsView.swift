@@ -85,10 +85,13 @@ struct SettingsView: View {
       }
 
       Section(header: Text("关于")) {
-        HStack {
-          Text("版本")
-          Spacer()
-          Text(version).foregroundStyle(.secondary)
+        VStack {
+          HStack {
+            Text("版本")
+            Spacer()
+            Text(version).foregroundStyle(.secondary)
+          }
+          Link("隐私声明", destination: URL(string: "https://www.everpcpc.com/privacy-policy/chobits/")!)
         }
       }
 
@@ -98,7 +101,7 @@ struct SettingsView: View {
           if chii.isAuthenticated {
             Button(action: logout) {
               Text("退出登录")
-            }.foregroundColor(.red)
+            }.foregroundStyle(.red)
           } else {
             Button {
               SignInViewModel(notifier: notifier, chii: chii).signIn()
