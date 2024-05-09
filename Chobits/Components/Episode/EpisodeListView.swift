@@ -117,7 +117,7 @@ struct EpisodeListView: View {
       Image(systemName: filterCollection ? "eye.slash.circle.fill" : "eye.circle.fill")
         .foregroundStyle(filterCollection ? .accent : .secondary)
         .font(.title)
-        .sensoryFeedback(.selection, trigger: sortDesc)
+        .sensoryFeedback(.selection, trigger: filterCollection)
         .onTapGesture {
           self.filterCollection.toggle()
         }
