@@ -48,9 +48,6 @@ struct SubjectSummaryView: View {
       .padding(.bottom, 16)
       .multilineTextAlignment(.leading)
       .lineLimit(5)
-      .onLongPressGesture {
-        showSummary.toggle()
-      }
       .sheet(isPresented: $showSummary) {
         ScrollView {
           LazyVStack(alignment: .leading) {
