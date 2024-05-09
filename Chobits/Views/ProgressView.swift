@@ -172,16 +172,7 @@ struct ChiiProgressView: View {
           }
           .animation(.default, value: collections)
           .padding()
-          .navigationDestination(for: NavDestination.self) { nav in
-            switch nav {
-            case .subject(let sid):
-              SubjectView(subjectId: sid)
-            case .episodeList(let sid):
-              EpisodeListView(subjectId: sid)
-            case .setting:
-              SettingsView()
-            }
-          }
+          .navigationDestination(for: NavDestination.self) { $0 }
         }
       }
     } else {

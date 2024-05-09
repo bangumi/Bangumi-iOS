@@ -15,6 +15,7 @@ struct SubjectCharactersView: View {
   @EnvironmentObject var chii: ChiiClient
 
   @State private var refreshed: Bool = false
+  @State private var counts: Int = 0
 
   @Query
   private var characters: [SubjectRelatedCharacter]
@@ -41,42 +42,57 @@ struct SubjectCharactersView: View {
     }
   }
 
+  func loadCounts() async {
+    do {
+      let counts = try await chii.db.fetchCount(
+        predicate: #Predicate<SubjectRelatedCharacter> {
+          $0.subjectId == subjectId
+        })
+      self.counts = counts
+    } catch {
+      notifier.alert(error: error)
+    }
+  }
+
   var body: some View {
     VStack {
       HStack {
         Text("角色介绍").font(.title3)
         Spacer()
-        if characters.count > 10 {
+        if counts > 10 {
           Text("更多角色 »").font(.caption)
         }
       }
     }.onAppear {
       Task(priority: .background) {
         await refresh()
+        await loadCounts()
       }
     }
     ScrollView(.horizontal) {
       LazyHStack(alignment: .top) {
         ForEach(characters) { character in
-          VStack {
-            Text(character.relation)
-              .foregroundStyle(.secondary)
-              .overlay {
-                RoundedRectangle(cornerRadius: 5)
-                  .stroke(Color.secondary, lineWidth: 1)
-                  .padding(.horizontal, -4)
-                  .padding(.vertical, -2)
-              }.padding(.top, 4)
-            ImageView(img: character.images.grid, width: 80, height: 80,alignment: .top)
-            Text(character.name)
-            if let actor = character.actors.first {
-              Text("CV:\(actor.name)").foregroundStyle(.secondary)
+          NavigationLink(value: NavDestination.character(characterId: character.characterId)) {
+            VStack {
+              Text(character.relation)
+                .foregroundStyle(.secondary)
+                .overlay {
+                  RoundedRectangle(cornerRadius: 5)
+                    .stroke(Color.secondary, lineWidth: 1)
+                    .padding(.horizontal, -4)
+                    .padding(.vertical, -2)
+                }.padding(.top, 4)
+              ImageView(img: character.images.grid, width: 80, height: 80, alignment: .top)
+              Text(character.name)
+              if let actor = character.actors.first {
+                Text("CV:\(actor.name)").foregroundStyle(.secondary)
+              }
+              Spacer()
             }
-            Spacer()
-          }
-          .lineLimit(1)
-          .font(.caption2)
-          .frame(width: 80, height: 160)
+            .lineLimit(1)
+            .font(.caption2)
+            .frame(width: 80, height: 160)
+          }.buttonStyle(PlainButtonStyle())
         }
       }
     }

@@ -47,7 +47,8 @@ struct SubjectHeaderView: View {
             Label(subject.typeEnum.description, systemImage: subject.typeEnum.icon).foregroundStyle(
               .accent)
             if subject.date.timeIntervalSince1970 > 0 {
-              Label(subject.date.formatAirdate, systemImage: "calendar").foregroundStyle(.secondary).lineLimit(1)
+              Label(subject.date.formatAirdate, systemImage: "calendar").foregroundStyle(.secondary)
+                .lineLimit(1)
             }
             Spacer()
             if subject.nsfw {

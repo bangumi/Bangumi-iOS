@@ -53,5 +53,7 @@ struct ImageView: View {
 }
 
 #Preview {
-  ImageView(img: "https://lain.bgm.tv/pic/crt/l/ce/65/32_crt_0g9f9.jpg", width: 240, height: 240, alignment: .top)
+  ImageView(
+    img: "https://lain.bgm.tv/pic/crt/l/ce/65/32_crt_0g9f9.jpg", width: 240, height: 240,
+    alignment: .top)
 }

@@ -26,6 +26,10 @@ final class Character {
   var birthDay: UInt?
   var stat: Stat
 
+  var typeEnum: CharacterType {
+    return CharacterType(type)
+  }
+
   init(
     id: UInt, name: String, type: UInt8, images: Images, summary: String, locked: Bool,
     infobox: [InfoboxItem], gender: String? = nil, bloodType: UInt8? = nil, birthYear: UInt? = nil,
@@ -51,13 +55,13 @@ final class Character {
     self.name = item.name
     self.type = item.type.rawValue
     self.images = item.images ?? Images()
-    self.summary = item.shortSummary
+    self.summary = item.summary
     self.locked = item.locked
     self.infobox = item.infobox
     self.gender = item.gender
     self.bloodType = item.bloodType?.rawValue
     self.birthYear = item.birthYear
-    self.birthMonth = item.birthMonth
+    self.birthMonth = item.birthMon
     self.birthDay = item.birthDay
     self.stat = item.stat
   }

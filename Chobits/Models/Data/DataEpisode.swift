@@ -28,11 +28,11 @@ final class Episode {
   var collection: UInt8
 
   var typeEnum: EpisodeType {
-    return EpisodeType(value: type)
+    return EpisodeType(type)
   }
 
   var collectionTypeEnum: EpisodeCollectionType {
-    return EpisodeCollectionType(value: collection)
+    return EpisodeCollectionType(collection)
   }
 
   init(
@@ -92,7 +92,7 @@ final class Episode {
   }
 
   var borderColor: Int {
-    switch EpisodeCollectionType(value: self.collection) {
+    switch EpisodeCollectionType(self.collection) {
     case .none:
       if airdate > Date() {
         return 0x909090
@@ -109,7 +109,7 @@ final class Episode {
   }
 
   var backgroundColor: Int {
-    switch EpisodeCollectionType(value: self.collection) {
+    switch EpisodeCollectionType(self.collection) {
     case .none:
       if airdate > Date() {
         return 0xe0e0e0
@@ -126,7 +126,7 @@ final class Episode {
   }
 
   var textColor: Int {
-    switch EpisodeCollectionType(value: self.collection) {
+    switch EpisodeCollectionType(self.collection) {
     case .none:
       if airdate > Date() {
         return 0x909090

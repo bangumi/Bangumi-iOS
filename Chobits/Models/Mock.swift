@@ -114,3 +114,10 @@ extension SubjectRelation {
     return items.map { SubjectRelation($0, subjectId: 12) }
   }
 }
+
+extension Character {
+  static var preview: Character {
+    let item = loadFixture(fixture: "character.json", target: CharacterItem.self)
+    return Character(item)
+  }
+}

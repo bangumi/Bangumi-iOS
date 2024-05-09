@@ -64,7 +64,7 @@ enum UserGroup: UInt8, Codable {
   case user = 10
   case wikipedians = 11
 
-  init(value: UInt8 = 0) {
+  init(_ value: UInt8 = 0) {
     let tmp = Self(rawValue: value)
     if let out = tmp {
       self = out
@@ -214,7 +214,7 @@ enum CollectionType: UInt8, Codable, Identifiable {
     self
   }
 
-  init(value: UInt8 = 0) {
+  init(_ value: UInt8 = 0) {
     let tmp = Self(rawValue: value)
     if let out = tmp {
       self = out
@@ -297,7 +297,7 @@ enum SubjectType: UInt8, Codable, Identifiable {
     self
   }
 
-  init(value: UInt8 = 0) {
+  init(_ value: UInt8 = 0) {
     let tmp = Self(rawValue: value)
     if let out = tmp {
       self = out
@@ -428,7 +428,7 @@ enum PersonType: UInt8, Codable, Identifiable {
     self
   }
 
-  init(value: UInt8 = 0) {
+  init(_ value: UInt8 = 0) {
     let tmp = Self(rawValue: value)
     if let out = tmp {
       self = out
@@ -480,7 +480,7 @@ enum CharacterType: UInt8, Codable, Identifiable {
     self
   }
 
-  init(value: UInt8 = 0) {
+  init(_ value: UInt8 = 0) {
     let tmp = Self(rawValue: value)
     if let out = tmp {
       self = out
@@ -531,7 +531,7 @@ enum BloodType: UInt8, Codable, Identifiable {
     self
   }
 
-  init(value: UInt8 = 0) {
+  init(_ value: UInt8 = 0) {
     let tmp = Self(rawValue: value)
     if let out = tmp {
       self = out
@@ -577,7 +577,7 @@ enum EpisodeType: UInt8, Codable, Identifiable {
     self
   }
 
-  init(value: UInt8 = 0) {
+  init(_ value: UInt8 = 0) {
     let tmp = Self(rawValue: value)
     if let out = tmp {
       self = out
@@ -647,7 +647,7 @@ enum EpisodeCollectionType: UInt8, Codable, Identifiable {
     self
   }
 
-  init(value: UInt8 = 0) {
+  init(_ value: UInt8 = 0) {
     let tmp = Self(rawValue: value)
     if let out = tmp {
       self = out

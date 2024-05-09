@@ -6,11 +6,26 @@
 //
 
 import Foundation
+import SwiftUI
 
-enum NavDestination: Hashable {
+enum NavDestination: Hashable, View {
   case subject(subjectId: UInt)
   case episodeList(subjectId: UInt)
+  case character(characterId: UInt)
   case setting
+
+  var body: some View {
+    switch self {
+    case .subject(let subjectId):
+      SubjectView(subjectId: subjectId)
+    case .episodeList(let subjectId):
+      EpisodeListView(subjectId: subjectId)
+    case .character(let characterId):
+      CharacterView(characterId: characterId)
+    case .setting:
+      SettingsView()
+    }
+  }
 }
 
 struct EnumerateItem<T: Equatable>: Equatable {

@@ -15,6 +15,7 @@ struct SubjectRelationsView: View {
   @EnvironmentObject var chii: ChiiClient
 
   @State private var refreshed: Bool = false
+  @State private var counts: Int = 0
 
   @Query
   private var relations: [SubjectRelation]
@@ -41,18 +42,31 @@ struct SubjectRelationsView: View {
     }
   }
 
+  func loadCounts() async {
+    do {
+      let counts = try await chii.db.fetchCount(
+        predicate: #Predicate<SubjectRelation> {
+          $0.subjectId == subjectId
+        })
+      self.counts = counts
+    } catch {
+      notifier.alert(error: error)
+    }
+  }
+
   var body: some View {
     VStack {
       HStack {
         Text("关联条目").font(.title3)
         Spacer()
-        if relations.count > 10 {
+        if counts > 10 {
           Text("更多条目 »").font(.caption)
         }
       }
     }.onAppear {
       Task(priority: .background) {
         await refresh()
+        await loadCounts()
       }
     }
     ScrollView(.horizontal) {

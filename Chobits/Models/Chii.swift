@@ -187,13 +187,13 @@ struct CharacterItem: Codable, Identifiable {
   var name: String
   var type: CharacterType
   var images: Images?
-  var shortSummary: String
+  var summary: String
   var locked: Bool
   var infobox: [InfoboxItem]
   var gender: String?
   var bloodType: BloodType?
   var birthYear: UInt?
-  var birthMonth: UInt?
+  var birthMon: UInt?
   var birthDay: UInt?
   var stat: Stat
 }

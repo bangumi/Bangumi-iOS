@@ -192,16 +192,7 @@ struct ChiiDiscoverView: View {
             .padding(.horizontal, 16)
         }
       }
-      .navigationDestination(for: NavDestination.self) { nav in
-        switch nav {
-        case .subject(let sid):
-          SubjectView(subjectId: sid)
-        case .episodeList(let sid):
-          EpisodeListView(subjectId: sid)
-        case .setting:
-          SettingsView()
-        }
-      }
+      .navigationDestination(for: NavDestination.self) { $0 }
     }
     .searchable(text: $query, isPresented: $searching)
     .onChange(of: query) { _, _ in

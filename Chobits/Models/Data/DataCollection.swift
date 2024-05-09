@@ -23,17 +23,17 @@ final class UserSubjectCollection {
   var priv: Bool
 
   var subjectTypeEnum: SubjectType {
-    SubjectType(value: subjectType)
+    SubjectType(subjectType)
   }
 
   var typeEnum: CollectionType {
-    CollectionType(value: type)
+    CollectionType(type)
   }
 
   var item: UserSubjectCollectionItem {
     UserSubjectCollectionItem(
-      subjectId: subjectId, subjectType: SubjectType(value: subjectType),
-      rate: rate, type: CollectionType(value: type), comment: comment,
+      subjectId: subjectId, subjectType: SubjectType(subjectType),
+      rate: rate, type: CollectionType(type), comment: comment,
       tags: tags, epStatus: epStatus, volStatus: volStatus,
       updatedAt: updatedAt.formatCollectionDate, private: priv
     )

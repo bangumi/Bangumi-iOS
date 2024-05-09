@@ -27,6 +27,10 @@ final class Person {
   var birthDay: UInt?
   var stat: Stat
 
+  var typeEnum: PersonType {
+    return PersonType(type)
+  }
+
   init(
     id: UInt, name: String, type: UInt8, career: [String], images: Images, summary: String,
     locked: Bool, lastModified: Date, infobox: [InfoboxItem], gender: String? = nil,

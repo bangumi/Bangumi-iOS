@@ -10,6 +10,23 @@ import OSLog
 import SwiftData
 
 extension ChiiClient {
+  func loadCalendar() async throws {
+    let response = try await self.getCalendar()
+    for item in response {
+      Logger.api.info("processing calendar: \(item.weekday.en)")
+      let cal = BangumiCalendar(item)
+      await db.insert(cal)
+      for small in item.items {
+        let subject = Subject(small)
+        try await db.insertIfNeeded(
+          data: subject,
+          predicate: #Predicate<Subject> {
+            $0.id == small.id
+          })
+      }
+    }
+  }
+
   func loadSubject(_ sid: UInt) async throws {
     let item = try await self.getSubject(sid)
 
@@ -169,20 +186,13 @@ extension ChiiClient {
     }
   }
 
-  func loadCalendar() async throws {
-    let response = try await self.getCalendar()
-    for item in response {
-      Logger.api.info("processing calendar: \(item.weekday.en)")
-      let cal = BangumiCalendar(item)
-      await db.insert(cal)
-      for small in item.items {
-        let subject = Subject(small)
-        try await db.insertIfNeeded(
-          data: subject,
-          predicate: #Predicate<Subject> {
-            $0.id == small.id
-          })
-      }
+  func loadCharacter(_ cid: UInt) async throws {
+    let item = try await self.getCharacter(cid)
+    if cid != item.id {
+      Logger.subject.warning("character id mismatch: \(cid) != \(item.id)")
+      throw ChiiError(message: "这是一个被合并的角色")
     }
+    let character = Character(item)
+    await self.db.insert(character)
   }
 }

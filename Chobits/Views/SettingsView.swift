@@ -63,7 +63,7 @@ struct SettingsView: View {
       }
 
       Section(header: Text("外观设置")) {
-        VStack{
+        VStack {
           Picker(selection: $selectedAppearance, label: Text("主题")) {
             ForEach(AppearanceType.allCases, id: \.self) { appearance in
               Text(appearance.desc).tag(appearance)
@@ -91,7 +91,8 @@ struct SettingsView: View {
             Spacer()
             Text(version).foregroundStyle(.secondary)
           }
-          Link("隐私声明", destination: URL(string: "https://www.everpcpc.com/privacy-policy/chobits/")!)
+          Link(
+            "隐私声明", destination: URL(string: "https://www.everpcpc.com/privacy-policy/chobits/")!)
         }
       }
 

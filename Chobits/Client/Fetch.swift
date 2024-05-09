@@ -235,4 +235,18 @@ extension ChiiClient {
     Logger.api.info("finish get subject relations: \(sid)")
     return relations
   }
+
+  func getCharacter(_ cid: UInt) async throws -> CharacterItem {
+    if self.mock != nil {
+      return loadFixture(fixture: "character.json", target: CharacterItem.self)
+    }
+    Logger.api.info("start get characters: \(cid)")
+    let url = self.apiBase.appendingPathComponent("v0/characters/\(cid)")
+    let data = try await request(url: url, method: "GET", authorized: self.isAuthenticated)
+    let decoder = JSONDecoder()
+    decoder.keyDecodingStrategy = .convertFromSnakeCase
+    let character = try decoder.decode(CharacterItem.self, from: data)
+    Logger.api.info("finish get characters: \(cid)")
+    return character
+  }
 }

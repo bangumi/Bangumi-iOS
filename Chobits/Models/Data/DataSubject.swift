@@ -30,12 +30,12 @@ final class Subject {
   var tags: [Tag]
 
   var typeEnum: SubjectType {
-    return SubjectType(value: type)
+    return SubjectType(type)
   }
 
   var item: SubjectItem {
     return SubjectItem(
-      id: id, type: SubjectType(value: type), name: name, nameCn: nameCn,
+      id: id, type: SubjectType(type), name: name, nameCn: nameCn,
       summary: summary, nsfw: nsfw, locked: locked,
       date: date.formatAirdate, platform: platform,
       images: images, infobox: infobox, volumes: volumes, eps: eps,
@@ -230,6 +230,10 @@ final class SubjectRelatedCharacter {
   var actors: [SubjectCharacterActorItem]
   var sort: Float
 
+  var typeEnum: CharacterType {
+    return CharacterType(type)
+  }
+
   init(
     uk: String, subjectId: UInt, characterId: UInt, type: UInt8, name: String, images: Images,
     relation: String, actors: [SubjectCharacterActorItem], sort: Float
@@ -256,10 +260,6 @@ final class SubjectRelatedCharacter {
     self.actors = item.actors ?? []
     self.sort = sort
   }
-
-  var typeEnum: CharacterType {
-    return CharacterType(value: self.type)
-  }
 }
 
 @Model
@@ -274,6 +274,10 @@ final class SubjectRelatedPerson {
   var images: Images
   var relation: String
   var sort: Float
+
+  var typeEnum: PersonType {
+    return PersonType(type)
+  }
 
   init(
     uk: String, subjectId: UInt, personId: UInt, type: UInt8, name: String, images: Images,
@@ -298,9 +302,5 @@ final class SubjectRelatedPerson {
     self.images = item.images ?? Images()
     self.relation = item.relation
     self.sort = sort
-  }
-
-  var typeEnum: PersonType {
-    return PersonType(value: self.type)
   }
 }

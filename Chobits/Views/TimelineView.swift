@@ -60,16 +60,7 @@ struct ChiiTimelineView: View {
             }
           }
         }
-        .navigationDestination(for: NavDestination.self) { nav in
-          switch nav {
-          case .subject(let sid):
-            SubjectView(subjectId: sid)
-          case .episodeList(let sid):
-            EpisodeListView(subjectId: sid)
-          case .setting:
-            SettingsView()
-          }
-        }
+        .navigationDestination(for: NavDestination.self) { $0 }
       }
     } else {
       AuthView(slogan: "Bangumi 让你的 ACG 生活更美好")
