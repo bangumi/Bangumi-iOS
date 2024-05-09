@@ -101,7 +101,7 @@ struct UserCollectionRowView: View {
         .task {
           await loadNextEpisode()
         }
-      HStack(alignment: .top) {
+      HStack {
         ImageView(img: subject?.images.common, width: 60, height: 60)
         VStack(alignment: .leading) {
           Text(subject?.name ?? "").font(.headline)
