@@ -195,6 +195,9 @@ extension ChiiClient {
   }
 
   func getSubjectCharacters(_ sid: UInt) async throws -> [SubjectCharacterItem] {
+    if self.mock != nil {
+      return loadFixture(fixture: "subject_characters.json", target: [SubjectCharacterItem].self)
+    }
     Logger.api.info("start get subject characters: \(sid)")
     let url = self.apiBase.appendingPathComponent("v0/subjects/\(sid)/characters")
     let data = try await request(url: url, method: "GET", authorized: self.isAuthenticated)
@@ -206,6 +209,9 @@ extension ChiiClient {
   }
 
   func getSubjectPersons(_ sid: UInt) async throws -> [SubjectPersonItem] {
+    if self.mock != nil {
+      return loadFixture(fixture: "subject_persons.json", target: [SubjectPersonItem].self)
+    }
     Logger.api.info("start get subject persons: \(sid)")
     let url = self.apiBase.appendingPathComponent("v0/subjects/\(sid)/persons")
     let data = try await request(url: url, method: "GET", authorized: self.isAuthenticated)
@@ -217,6 +223,9 @@ extension ChiiClient {
   }
 
   func getSubjectRelations(_ sid: UInt) async throws -> [SubjectRelationItem] {
+    if self.mock != nil {
+      return loadFixture(fixture: "subject_relations.json", target: [SubjectRelationItem].self)
+    }
     Logger.api.info("start get subject relations: \(sid)")
     let url = self.apiBase.appendingPathComponent("v0/subjects/\(sid)/subjects")
     let data = try await request(url: url, method: "GET", authorized: self.isAuthenticated)

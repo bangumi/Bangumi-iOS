@@ -34,6 +34,17 @@ struct SubjectRelationsView: View {
   var body: some View {
     VStack {
       Text("关联条目").font(.title3)
+    }.onAppear {
+      Task(priority: .background) {
+        await refresh()
+      }
+    }
+    ScrollView(.horizontal) {
+      HStack {
+        ForEach(relations) { relation in
+          Text(relation.name)
+        }
+      }
     }
   }
 }
@@ -47,7 +58,8 @@ struct SubjectRelationsView: View {
     LazyVStack(alignment: .leading) {
       SubjectRelationsView(subjectId: subject.id)
         .environmentObject(Notifier())
-        .environment(ChiiClient(container: container, mock: .book))
+        .environment(ChiiClient(container: container, mock: .anime))
+        .modelContainer(container)
     }
   }.padding()
 }

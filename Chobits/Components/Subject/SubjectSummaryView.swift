@@ -94,15 +94,14 @@ struct SubjectSummaryView: View {
 #Preview {
   let container = mockContainer()
 
-  let subject = Subject.previewBook
-
+  let subject = Subject.previewAnime
   container.mainContext.insert(subject)
 
   return ScrollView {
     LazyVStack(alignment: .leading) {
       SubjectSummaryView(subjectId: subject.id)
         .environmentObject(Notifier())
-        .environment(ChiiClient(container: container, mock: .book))
+        .environment(ChiiClient(container: container, mock: .anime))
         .modelContainer(container)
     }
   }.padding()

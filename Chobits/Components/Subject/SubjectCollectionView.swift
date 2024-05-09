@@ -147,8 +147,8 @@ struct SubjectCollectionView: View {
       SubjectCollectionView(subjectId: collection.subjectId)
         .environmentObject(Notifier())
         .environment(ChiiClient(container: container, mock: .book))
+        .modelContainer(container)
     }
   }
   .padding()
-  .modelContainer(container)
 }

@@ -19,6 +19,14 @@ struct SubjectCharactersView: View {
   @Query
   private var characters: [SubjectRelatedCharacter]
 
+  init(subjectId: UInt) {
+    self.subjectId = subjectId
+    _characters = Query(
+      filter: #Predicate<SubjectRelatedCharacter> {
+        $0.subjectId == subjectId
+      })
+  }
+
   func refresh() async {
     if refreshed { return }
     refreshed = true
@@ -34,6 +42,17 @@ struct SubjectCharactersView: View {
   var body: some View {
     VStack {
       Text("角色介绍").font(.title3)
+    }.onAppear {
+      Task(priority: .background) {
+        await refresh()
+      }
+    }
+    ScrollView(.horizontal) {
+      HStack {
+        ForEach(characters) { character in
+          Text(character.name)
+        }
+      }
     }
   }
 }
@@ -42,13 +61,13 @@ struct SubjectCharactersView: View {
   let container = mockContainer()
 
   let subject = Subject.previewAnime
-  let relatedCharacter = SubjectRelatedCharacter.preview
 
   return ScrollView {
     LazyVStack(alignment: .leading) {
       SubjectCharactersView(subjectId: subject.id)
         .environmentObject(Notifier())
-        .environment(ChiiClient(container: container, mock: .book))
+        .environment(ChiiClient(container: container, mock: .anime))
+        .modelContainer(container)
     }
   }.padding()
 }
