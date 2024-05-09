@@ -21,10 +21,12 @@ struct SubjectRelationsView: View {
 
   init(subjectId: UInt) {
     self.subjectId = subjectId
-    _relations = Query(
-      filter: #Predicate<SubjectRelation> {
+    var descriptor = FetchDescriptor<SubjectRelation>(
+      predicate: #Predicate<SubjectRelation> {
         $0.subjectId == subjectId
-      }, sort: \SubjectRelation.sort)
+      }, sortBy: [SortDescriptor<SubjectRelation>(\.sort)])
+    descriptor.fetchLimit = 10
+    _relations = Query(descriptor)
   }
 
   func refresh() async {
@@ -41,10 +43,12 @@ struct SubjectRelationsView: View {
 
   var body: some View {
     VStack {
-      HStack{
+      HStack {
         Text("关联条目").font(.title3)
         Spacer()
-        Text("更多条目 »").font(.caption)
+        if relations.count > 10 {
+          Text("更多条目 »").font(.caption)
+        }
       }
     }.onAppear {
       Task(priority: .background) {
@@ -54,23 +58,22 @@ struct SubjectRelationsView: View {
     ScrollView(.horizontal) {
       LazyHStack {
         ForEach(relations) { relation in
-          VStack {
-            Text(relation.relation).foregroundStyle(.secondary)
-            ImageView(img: relation.images.grid, width: 60, height: 60)
-            Text(relation.name)
-              .multilineTextAlignment(.leading)
-              .lineLimit(3)
-            Spacer()
-          }
-          .font(.caption2)
-          .frame(width: 60, height: 132)
+          NavigationLink(value: NavDestination.subject(subjectId: relation.relationId)) {
+            VStack {
+              Text(relation.relation).foregroundStyle(.secondary)
+              ImageView(img: relation.images.grid, width: 60, height: 60)
+              Text(relation.name)
+                .multilineTextAlignment(.leading)
+                .truncationMode(.middle)
+                .lineLimit(3)
+              Spacer()
+            }.font(.caption2).frame(width: 60, height: 132)
+          }.buttonStyle(PlainButtonStyle())
         }
       }
     }
   }
 }
-
-
 
 #Preview {
   let container = mockContainer()

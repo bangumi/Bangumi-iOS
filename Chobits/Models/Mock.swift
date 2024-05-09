@@ -80,7 +80,7 @@ extension Episode {
       loadFixture(
         fixture: "episode_collections.json", target: EpisodeCollectionResponse.self
       ).data ?? []
-    return collections.map { Episode($0, subjectId:12) }
+    return collections.map { Episode($0, subjectId: 12) }
   }
 
   static var preview: Episode {

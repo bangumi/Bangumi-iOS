@@ -156,7 +156,7 @@ extension ChiiClient {
 
   func loadSubjectPersons(_ subjectId: UInt) async throws {
     let response = try await self.getSubjectPersons(subjectId)
-    for (idx,item) in response.enumerated() {
+    for (idx, item) in response.enumerated() {
       let related = SubjectRelatedPerson(item, subjectId: subjectId, sort: Float(idx))
       await self.db.insert(related)
       let person = Person(item)

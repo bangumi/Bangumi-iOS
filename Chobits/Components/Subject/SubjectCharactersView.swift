@@ -24,7 +24,7 @@ struct SubjectCharactersView: View {
     var descriptor = FetchDescriptor<SubjectRelatedCharacter>(
       predicate: #Predicate<SubjectRelatedCharacter> {
         $0.subjectId == subjectId
-      },sortBy: [SortDescriptor<SubjectRelatedCharacter>(\.sort)])
+      }, sortBy: [SortDescriptor<SubjectRelatedCharacter>(\.sort)])
     descriptor.fetchLimit = 10
     _characters = Query(descriptor)
   }
@@ -43,10 +43,12 @@ struct SubjectCharactersView: View {
 
   var body: some View {
     VStack {
-      HStack{
+      HStack {
         Text("角色介绍").font(.title3)
         Spacer()
-        Text("更多角色 »").font(.caption)
+        if characters.count > 10 {
+          Text("更多角色 »").font(.caption)
+        }
       }
     }.onAppear {
       Task(priority: .background) {
@@ -56,10 +58,10 @@ struct SubjectCharactersView: View {
     ScrollView(.horizontal) {
       LazyHStack(alignment: .top) {
         ForEach(characters) { character in
-          VStack{
+          VStack {
             Text(character.relation)
               .foregroundStyle(.secondary)
-              .overlay{
+              .overlay {
                 RoundedRectangle(cornerRadius: 5)
                   .stroke(Color.secondary, lineWidth: 1)
                   .padding(.horizontal, -4)
