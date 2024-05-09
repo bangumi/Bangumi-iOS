@@ -18,6 +18,7 @@ struct EpisodeListView: View {
   @State private var now: Date = Date()
   @State private var offset: Int = 0
   @State private var main: Bool = true
+  @State private var filterCollection: Bool = false
   @State private var sortDesc: Bool = false
   @State private var exhausted: Bool = false
   @State private var selected: Episode? = nil
@@ -51,13 +52,22 @@ struct EpisodeListView: View {
   func fetch(limit: Int = 100) async -> [EnumerateItem<Episode>] {
     let sortBy =
       sortDesc ? SortDescriptor<Episode>(\.sort, order: .reverse) : SortDescriptor<Episode>(\.sort)
+    let zero: UInt8 = 0
     let mainType = EpisodeType.main.rawValue
     var descriptor = FetchDescriptor<Episode>(
       predicate: #Predicate<Episode> {
         if main {
-          $0.subjectId == subjectId && $0.type == mainType
+          if filterCollection {
+            $0.subjectId == subjectId && $0.type == mainType && $0.collection == zero
+          } else {
+            $0.subjectId == subjectId && $0.type == mainType
+          }
         } else {
-          $0.subjectId == subjectId && $0.type != mainType
+          if filterCollection {
+            $0.subjectId == subjectId && $0.type != mainType && $0.collection == zero
+          } else {
+            $0.subjectId == subjectId && $0.type != mainType
+          }
         }
       }, sortBy: [sortBy])
     descriptor.fetchLimit = limit
@@ -104,6 +114,19 @@ struct EpisodeListView: View {
 
   var body: some View {
     HStack {
+      Image(systemName: filterCollection ? "eye.slash.circle.fill" : "eye.circle.fill")
+        .foregroundStyle(filterCollection ? .accent : .secondary)
+        .font(.title)
+        .sensoryFeedback(.selection, trigger: sortDesc)
+        .onTapGesture {
+          self.filterCollection.toggle()
+        }
+        .onChange(of: filterCollection) {
+          Task {
+            await load()
+          }
+        }
+      Spacer()
       Picker("Episode Type", selection: $main) {
         Text("本篇(\(countMain))").tag(true)
         Text("其他(\(countOther))").tag(false)
