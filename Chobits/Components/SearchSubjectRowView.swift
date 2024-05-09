@@ -56,5 +56,5 @@ struct SearchSubjectRowView: View {
       SearchSubjectRowView(subject: Subject.previewAnime.item)
     }
   }
-  .padding(.horizontal, 16)
+  .padding(.horizontal, 8)
 }

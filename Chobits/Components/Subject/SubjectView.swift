@@ -80,7 +80,7 @@ struct SubjectView: View {
 
             Spacer()
           }
-        }.padding()
+        }.padding(.horizontal, 8)
       } else {
         NotFoundView()
       }

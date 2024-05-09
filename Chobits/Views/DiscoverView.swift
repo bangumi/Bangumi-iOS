@@ -153,7 +153,7 @@ struct ChiiDiscoverView: View {
             }
           }
           .pickerStyle(.segmented)
-          .padding(.horizontal, 16)
+          .padding(.horizontal, 8)
           if !query.isEmpty {
             if subjects.isEmpty && !local {
               VStack {
@@ -182,14 +182,14 @@ struct ChiiDiscoverView: View {
               }
               .animation(.easeInOut, value: subjectType)
               .navigationBarTitleDisplayMode(.inline)
-              .padding(.horizontal, 16)
+              .padding(.horizontal, 8)
             }
           }
           Spacer()
         } else {
           CalendarView()
             .navigationBarTitleDisplayMode(.inline)
-            .padding(.horizontal, 16)
+            .padding(.horizontal, 8)
         }
       }
       .navigationDestination(for: NavDestination.self) { $0 }

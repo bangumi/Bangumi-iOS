@@ -162,7 +162,7 @@ struct CharacterView: View {
             }
 
           }
-        }.padding()
+        }.padding(.horizontal, 8)
       } else {
         NotFoundView()
       }

@@ -150,7 +150,7 @@ struct EpisodeListView: View {
             await load()
           }
         }
-    }.padding(.horizontal, 16)
+    }.padding(.horizontal, 8)
     ScrollView {
       LazyVStack {
         ForEach(episodes, id: \.idx) { item in
@@ -240,7 +240,7 @@ struct EpisodeListView: View {
       }
     }
     .navigationBarTitle("章节列表")
-    .padding(.horizontal, 16)
+    .padding(.horizontal, 8)
     .buttonStyle(.plain)
     .animation(.default, value: episodes)
     .onAppear {

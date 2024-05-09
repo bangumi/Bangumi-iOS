@@ -84,9 +84,7 @@ struct SubjectRatingBoxView: View {
         }.padding(.horizontal, 8)
         Spacer()
       }
-    }
-    .padding(.vertical, 10)
-    .padding(.horizontal, 20)
+    }.padding()
   }
 }
 
