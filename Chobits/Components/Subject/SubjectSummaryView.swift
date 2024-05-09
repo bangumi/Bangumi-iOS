@@ -15,7 +15,7 @@ struct SubjectSummaryView: View {
   @EnvironmentObject var notifier: Notifier
   @EnvironmentObject var chii: ChiiClient
 
-  @State private var collapsed = true
+  @State private var showSummary = false
 
   @Query
   private var subjects: [Subject]
@@ -40,9 +40,6 @@ struct SubjectSummaryView: View {
     if lines < 5 {
       return false
     }
-    if lines == 5 && !collapsed {
-      return false
-    }
     return true
   }
 
@@ -50,15 +47,30 @@ struct SubjectSummaryView: View {
     Text(subject?.summary ?? "")
       .padding(.bottom, 16)
       .multilineTextAlignment(.leading)
-      .lineLimit(collapsed ? 5 : nil)
-      .animation(.default, value: collapsed)
+      .lineLimit(5)
+      .onLongPressGesture {
+        showSummary.toggle()
+      }
+      .sheet(isPresented: $showSummary) {
+        ScrollView{
+          LazyVStack(alignment: .leading) {
+            Text("简介").font(.title3).padding(.vertical, 10)
+            Text(subject?.summary ?? "")
+              .textSelection(.enabled)
+              .multilineTextAlignment(.leading)
+              .presentationDragIndicator(.visible)
+              .presentationDetents([.medium, .large])
+            Spacer()
+          }
+        }.padding()
+      }
       .overlay(
         GeometryReader { geometry in
           if shouldShowToggle(geometry: geometry) {
             Button(action: {
-              collapsed.toggle()
+              showSummary.toggle()
             }) {
-              Text(collapsed ? "more..." : "close")
+              Text("more...")
                 .font(.caption)
                 .foregroundColor(Color("LinkTextColor"))
             }
