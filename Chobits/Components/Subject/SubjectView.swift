@@ -93,6 +93,7 @@ struct SubjectView: View {
       }
     }
     .navigationTitle(subject?.name ?? "条目")
+    .navigationBarTitleDisplayMode(.inline)
     .onAppear {
       Task(priority: .background) {
         await refresh()

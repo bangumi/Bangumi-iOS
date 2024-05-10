@@ -225,6 +225,7 @@ struct SubjectInfoboxView: View {
     }
     .animation(.default, value: persons)
     .navigationTitle("条目信息")
+    .navigationBarTitleDisplayMode(.inline)
     .toolbar {
       ToolbarItem(placement: .automatic) {
         Image(systemName: "info.circle").foregroundStyle(.secondary)

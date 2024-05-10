@@ -179,6 +179,7 @@ struct PersonView: View {
       }
     }
     .navigationTitle(person?.name ?? "人物")
+    .navigationBarTitleDisplayMode(.inline)
     .toolbar {
       ToolbarItem(placement: .navigationBarTrailing) {
         ShareLink(item: shareLink) {
@@ -186,7 +187,6 @@ struct PersonView: View {
         }
       }
     }
-    .navigationTitle("人物")
     .onAppear {
       Task(priority: .background) {
         await refresh()
