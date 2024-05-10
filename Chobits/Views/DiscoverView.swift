@@ -181,15 +181,12 @@ struct ChiiDiscoverView: View {
                 }
               }
               .animation(.easeInOut, value: subjectType)
-              .navigationBarTitleDisplayMode(.inline)
               .padding(.horizontal, 8)
             }
           }
           Spacer()
         } else {
           CalendarView()
-            .navigationBarTitleDisplayMode(.inline)
-            .padding(.horizontal, 8)
         }
       }
       .navigationDestination(for: NavDestination.self) { $0 }

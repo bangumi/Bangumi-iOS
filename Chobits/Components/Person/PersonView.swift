@@ -178,6 +178,7 @@ struct PersonView: View {
         NotFoundView()
       }
     }
+    .navigationTitle(person?.name ?? "人物")
     .toolbar {
       ToolbarItem(placement: .navigationBarTrailing) {
         ShareLink(item: shareLink) {
@@ -185,7 +186,7 @@ struct PersonView: View {
         }
       }
     }
-    .navigationBarTitle("人物")
+    .navigationTitle("人物")
     .onAppear {
       Task(priority: .background) {
         await refresh()

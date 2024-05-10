@@ -114,7 +114,7 @@ struct SettingsView: View {
         }
       }
     }
-    .navigationBarTitle("设置")
+    .navigationTitle("设置")
     .onAppear(perform: load)
   }
 }

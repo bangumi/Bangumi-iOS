@@ -92,7 +92,7 @@ struct SubjectView: View {
         }
       }
     }
-    .navigationBarTitle("条目")
+    .navigationTitle(subject?.name ?? "条目")
     .onAppear {
       Task(priority: .background) {
         await refresh()

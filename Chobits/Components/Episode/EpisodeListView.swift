@@ -239,10 +239,15 @@ struct EpisodeListView: View {
         }
       }
     }
-    .navigationBarTitle("章节列表")
     .padding(.horizontal, 8)
     .buttonStyle(.plain)
     .animation(.default, value: episodes)
+    .navigationTitle("章节列表")
+    .toolbar{
+      ToolbarItem(placement: .automatic) {
+        Image(systemName: "list.bullet.circle").foregroundStyle(.secondary)
+      }
+    }
     .onAppear {
       Task {
         await loadCounts()

@@ -60,7 +60,9 @@ struct CalendarView: View {
             CalendarWeekdayView(calendar: calendar).padding(.vertical, 10)
           }
         }
-      }.refreshable {
+      }
+      .padding(.horizontal, 8)
+      .refreshable {
         refreshed = false
         await refreshCalendar()
       }

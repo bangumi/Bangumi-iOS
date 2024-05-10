@@ -164,7 +164,7 @@ struct CharacterView: View {
         }
       }
     }
-    .navigationBarTitle("角色")
+    .navigationTitle(character?.name ?? "角色")
     .onAppear {
       Task(priority: .background) {
         await refresh()

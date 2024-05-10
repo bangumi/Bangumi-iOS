@@ -214,7 +214,12 @@ struct SubjectInfoboxView: View {
       }.padding(.horizontal, 8)
     }
     .animation(.default, value: persons)
-    .navigationBarTitle(subject?.name ?? "条目信息")
+    .navigationTitle("条目信息")
+    .toolbar {
+      ToolbarItem(placement: .automatic) {
+        Image(systemName: "info.circle").foregroundStyle(.secondary)
+      }
+    }
     .onAppear {
       Task(priority: .background) {
         await load()
