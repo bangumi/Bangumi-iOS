@@ -13,6 +13,7 @@ struct CharacterView: View {
   var characterId: UInt
 
   @AppStorage("shareDomain") var shareDomain: String = ShareDomain.chii.label
+  @AppStorage("isolationMode") var isolationMode: Bool = false
 
   @EnvironmentObject var notifier: Notifier
   @EnvironmentObject var chii: ChiiClient
@@ -110,7 +111,9 @@ struct CharacterView: View {
                 HStack {
                   Label("收藏: \(character.stat.collects)", systemImage: "heart.fill")
                   Spacer()
-                  Label("评论: \(character.stat.comments)", systemImage: "bubble")
+                  if !isolationMode {
+                    Label("评论: \(character.stat.comments)", systemImage: "bubble")
+                  }
                 }
                 .font(.footnote)
                 .foregroundStyle(.accent)

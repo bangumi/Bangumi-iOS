@@ -12,6 +12,8 @@ struct EpisodeInfoboxView: View {
   let subjectId: UInt
   let episodeId: UInt
 
+  @AppStorage("isolationMode") var isolationMode: Bool = false
+
   @Environment(\.dismiss) private var dismiss
   @EnvironmentObject var notifier: Notifier
   @EnvironmentObject var chii: ChiiClient
@@ -77,7 +79,7 @@ struct EpisodeInfoboxView: View {
                   .padding(.vertical, -2)
               }
             Spacer()
-            if episode.comment > 0 {
+            if episode.comment > 0 && !isolationMode {
               Label("讨论", systemImage: "bubble.fill").font(.caption).foregroundStyle(.secondary)
               Text("(+\(episode.comment))").font(.caption).foregroundStyle(.red)
             }
