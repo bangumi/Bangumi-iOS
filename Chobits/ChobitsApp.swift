@@ -16,6 +16,7 @@ struct ChobitsApp: App {
 
   @AppStorage("appearance") var appearance: String = "system"
   @AppStorage("shareDomain") var shareDomain: String = "https://chii.in"
+  @AppStorage("isolationMode") var isolationMode: Bool = false
 
   init() {
     let schema = Schema([

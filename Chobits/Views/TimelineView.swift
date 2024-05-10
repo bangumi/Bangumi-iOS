@@ -9,6 +9,8 @@ import SwiftData
 import SwiftUI
 
 struct ChiiTimelineView: View {
+  @AppStorage("isolationMode") var isolationMode: Bool = false
+
   @EnvironmentObject var notifier: Notifier
   @EnvironmentObject var chii: ChiiClient
   @EnvironmentObject var navState: NavState
@@ -43,10 +45,12 @@ struct ChiiTimelineView: View {
                   .padding(.horizontal, -4)
                   .padding(.vertical, -2)
               }.padding(2)
-            Text(me.sign)
-              .font(.callout)
-              .foregroundStyle(.secondary)
-              .padding()
+            if !isolationMode {
+              Text(me.sign)
+                .font(.callout)
+                .foregroundStyle(.secondary)
+                .padding()
+            }
           } else {
             ProgressView().onAppear(perform: updateProfile)
           }

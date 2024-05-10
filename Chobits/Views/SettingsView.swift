@@ -12,6 +12,7 @@ struct SettingsView: View {
   @AppStorage("appearance") var appearance: String = AppearanceType.system.label
   @AppStorage("shareDomain") var shareDomain: String = ShareDomain.chii.label
   @AppStorage("defaultTab") var defaultTab: String = ContentViewTab.discover.label
+  @AppStorage("isolationMode") var isolationMode: Bool = false
 
   @EnvironmentObject var notifier: Notifier
   @EnvironmentObject var chii: ChiiClient
@@ -20,11 +21,13 @@ struct SettingsView: View {
   @State private var selectedDomain: ShareDomain = .chii
   @State private var selectedAppearance: AppearanceType = .system
   @State private var selectedDefaultTab: ContentViewTab = .discover
+  @State private var isolationModeEnabled: Bool = false
 
   func load() {
     selectedDomain = ShareDomain(shareDomain)
     selectedAppearance = AppearanceType(appearance)
     selectedDefaultTab = ContentViewTab(defaultTab)
+    isolationModeEnabled = isolationMode
   }
 
   func logout() {
@@ -81,6 +84,15 @@ struct SettingsView: View {
           .onChange(of: selectedDefaultTab) { _, _ in
             defaultTab = selectedDefaultTab.label
           }
+        }
+      }
+
+      Section(header: Text("其他设置")) {
+        Toggle(isOn: $isolationModeEnabled) {
+          Text("社恐模式")
+        }
+        .onChange(of: isolationModeEnabled) { _, _ in
+          isolationMode = isolationModeEnabled
         }
       }
 
