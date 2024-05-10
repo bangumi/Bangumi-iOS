@@ -73,10 +73,16 @@ struct SubjectInfoboxView: View {
     }
   }
 
-  func refresh() async {
+  func checkRefresh() async {
     if refreshed { return }
     refreshed = true
+    if persons.count > 0 {
+      return
+    }
+    await refresh()
+  }
 
+  func refresh() async {
     do {
       try await chii.loadSubjectPersons(subjectId)
       try await chii.db.save()
@@ -211,7 +217,11 @@ struct SubjectInfoboxView: View {
             Divider()
           }
         }
-      }.padding(.horizontal, 8)
+      }
+      .refreshable {
+        await refresh()
+      }
+      .padding(.horizontal, 8)
     }
     .animation(.default, value: persons)
     .navigationTitle("条目信息")
@@ -223,7 +233,7 @@ struct SubjectInfoboxView: View {
     .onAppear {
       Task(priority: .background) {
         await load()
-        await refresh()
+        await checkRefresh()
       }
     }
   }

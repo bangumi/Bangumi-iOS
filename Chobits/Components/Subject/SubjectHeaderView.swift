@@ -76,19 +76,16 @@ struct SubjectHeaderView: View {
           Spacer()
 
           HStack {
-            Label("\(subject.rating.total)", systemImage: "bookmark").foregroundStyle(
-              Color("LinkTextColor"))
             Spacer()
             if subject.rating.rank > 0 {
-              Label("\(subject.rating.rank)", systemImage: "chart.bar.xaxis").foregroundStyle(
-                .secondary)
+              Label("\(subject.rating.rank)", systemImage: "chart.bar.xaxis")
             }
             if subject.rating.score > 0 {
               Label("\(subject.rating.score.rateDisplay)", systemImage: "star.fill")
-                .foregroundStyle(
-                  .secondary)
             }
+            Label("\(subject.rating.total)", systemImage: "heart.fill")
           }
+          .foregroundStyle(Color("LinkTextColor"))
           .padding(.top, 4)
           .padding(.bottom, 8)
           .onTapGesture {
