@@ -170,6 +170,7 @@ struct ChiiProgressView: View {
               }
             }
           }
+          .animation(.default, value: counts)
           .animation(.default, value: collections)
           .padding(.horizontal, 8)
           .navigationDestination(for: NavDestination.self) { $0 }

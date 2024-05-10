@@ -59,6 +59,12 @@ struct PersonView: View {
     return true
   }
 
+  var careers: [String] {
+    guard let person = person else { return [] }
+    let vals = Set(person.career).sorted().map { PersonCareer($0).description }
+    return Array(vals)
+  }
+
   var body: some View {
     Section {
       if let person = person {
@@ -118,8 +124,8 @@ struct PersonView: View {
             }
 
             HStack {
-              ForEach(person.career, id: \.self) { career in
-                Text(PersonCareer(career).description)
+              ForEach(careers, id: \.self) { career in
+                Text(career)
                   .padding(.horizontal, 4)
                   .overlay {
                     RoundedRectangle(cornerRadius: 4)

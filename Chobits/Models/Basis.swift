@@ -395,17 +395,17 @@ enum PersonCareer: String, Codable {
   var description: String {
     switch self {
     case .producer:
-      return "导演"
+      return "制作人员"
     case .mangaka:
       return "漫画家"
     case .artist:
       return "音乐人"
     case .seiyu:
-      return "演员"
+      return "声优"
     case .writer:
-      return "编剧"
+      return "作家"
     case .illustrator:
-      return "插画家"
+      return "绘师"
     case .actor:
       return "演员"
     }

@@ -110,6 +110,17 @@ public actor BackgroundActor {
     }
   }
 
+  public func update<T: PersistentModel>(
+    predicate: Predicate<T>,
+    update: (T) -> Void
+  ) throws {
+    let descriptor = FetchDescriptor<T>(predicate: predicate)
+    let list: [T] = try context.fetch(descriptor)
+    for item in list {
+      update(item)
+    }
+  }
+
   public func save() throws {
     try context.save()
   }

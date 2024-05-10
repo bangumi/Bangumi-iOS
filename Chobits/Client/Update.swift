@@ -94,9 +94,11 @@ extension ChiiClient {
     ]
     _ = try await self.request(url: url, method: "PATCH", body: body, authorized: true)
     Logger.api.info("finish update subject episode collection: \(subjectId), \(episodeIds)")
-    for ep in episodes {
-      ep.collection = type.rawValue
-    }
+    try await db.update(
+      predicate: predicate,
+      update: {
+        $0.collection = type.rawValue
+      })
     try await db.save()
   }
 
@@ -107,20 +109,19 @@ extension ChiiClient {
       return
     }
     Logger.api.info("start update episode collection: \(episodeId)")
-    guard
-      let episode = try await db.fetchOne(
-        predicate: #Predicate<Episode> { $0.id == episodeId }
-      )
-    else {
-      throw ChiiError(message: "Episode not found for update")
-    }
     let url = self.apiBase.appendingPathComponent("v0/users/-/collections/-/episodes/\(episodeId)")
     let body: [String: Any] = [
       "type": type.rawValue
     ]
     _ = try await self.request(url: url, method: "PUT", body: body, authorized: true)
     Logger.api.info("finish update episode collection: \(episodeId)")
-    episode.collection = type.rawValue
+    try await db.update(
+      predicate: #Predicate<Episode> {
+        $0.id == episodeId
+      },
+      update: {
+        $0.collection = type.rawValue
+      })
     try await db.save()
   }
 }

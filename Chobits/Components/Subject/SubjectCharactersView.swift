@@ -40,6 +40,7 @@ struct SubjectCharactersView: View {
     } catch {
       notifier.alert(error: error)
     }
+    await loadCounts()
   }
 
   func loadCounts() async {
@@ -65,8 +66,8 @@ struct SubjectCharactersView: View {
       }
     }.onAppear {
       Task(priority: .background) {
-        await refresh()
         await loadCounts()
+        await refresh()
       }
     }
     ScrollView(.horizontal) {

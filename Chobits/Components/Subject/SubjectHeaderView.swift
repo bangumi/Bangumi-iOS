@@ -46,8 +46,7 @@ struct SubjectHeaderView: View {
             HStack {
               Text(subject.platform).foregroundStyle(.secondary)
               Label(subject.typeEnum.description, systemImage: subject.typeEnum.icon)
-                .foregroundStyle(
-                  .accent)
+                .foregroundStyle(Color("LinkTextColor"))
               if subject.date.timeIntervalSince1970 > 0 {
                 Label(subject.date.formatAirdate, systemImage: "calendar").foregroundStyle(
                   .secondary
@@ -82,12 +81,12 @@ struct SubjectHeaderView: View {
             Spacer()
             if subject.rating.rank > 0 {
               Label("\(subject.rating.rank)", systemImage: "chart.bar.xaxis").foregroundStyle(
-                .accent)
+                .secondary)
             }
             if subject.rating.score > 0 {
               Label("\(subject.rating.score.rateDisplay)", systemImage: "star.fill")
                 .foregroundStyle(
-                  .accent)
+                  .secondary)
             }
           }
           .padding(.top, 4)

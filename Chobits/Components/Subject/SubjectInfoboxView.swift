@@ -46,13 +46,11 @@ struct SubjectInfoboxView: View {
   @EnvironmentObject var chii: ChiiClient
 
   @State private var refreshed: Bool = false
+  @State private var persons: [SubjectRelatedPerson] = []
 
   @Query
   private var subjects: [Subject]
   var subject: Subject? { subjects.first }
-
-  @Query
-  private var persons: [SubjectRelatedPerson]
 
   init(subjectId: UInt) {
     self.subjectId = subjectId
@@ -60,11 +58,19 @@ struct SubjectInfoboxView: View {
       filter: #Predicate<Subject> {
         $0.id == subjectId
       }, sort: \Subject.id)
+  }
+
+  func load() async {
     let descriptor = FetchDescriptor<SubjectRelatedPerson>(
       predicate: #Predicate<SubjectRelatedPerson> {
         $0.subjectId == subjectId
       }, sortBy: [SortDescriptor<SubjectRelatedPerson>(\.sort)])
-    _persons = Query(descriptor)
+
+    do {
+      self.persons = try await chii.db.fetchData(descriptor)
+    } catch {
+      notifier.alert(error: error)
+    }
   }
 
   func refresh() async {
@@ -77,6 +83,7 @@ struct SubjectInfoboxView: View {
     } catch {
       notifier.alert(error: error)
     }
+    await load()
   }
 
   var subjectStaffs: [String: [SubjectRelatedPerson]] {
@@ -206,9 +213,11 @@ struct SubjectInfoboxView: View {
         }
       }.padding(.horizontal, 8)
     }
+    .animation(.default, value: persons)
     .navigationBarTitle(subject?.name ?? "条目信息")
     .onAppear {
       Task(priority: .background) {
+        await load()
         await refresh()
       }
     }

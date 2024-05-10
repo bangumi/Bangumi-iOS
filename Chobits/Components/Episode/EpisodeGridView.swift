@@ -18,21 +18,20 @@ struct EpisodeGridView: View {
   @State private var selected: Episode? = nil
   @State private var refreshed: Bool = false
 
-  @Query
-  private var episodeMains: [Episode]
-  @Query
-  private var episodeSps: [Episode]
+  @State private var episodeMains: [Episode] = []
+  @State private var episodeSps: [Episode] = []
 
   init(subjectId: UInt) {
     self.subjectId = subjectId
+  }
 
+  func load() async {
     let mainType = EpisodeType.main.rawValue
     var mainDescriptor = FetchDescriptor<Episode>(
       predicate: #Predicate<Episode> {
         $0.type == mainType && $0.subjectId == subjectId
       }, sortBy: [SortDescriptor(\.sort)])
     mainDescriptor.fetchLimit = 50
-    _episodeMains = Query(mainDescriptor)
 
     let spType = EpisodeType.sp.rawValue
     var spDescriptor = FetchDescriptor<Episode>(
@@ -40,7 +39,12 @@ struct EpisodeGridView: View {
         $0.type == spType && $0.subjectId == subjectId
       }, sortBy: [SortDescriptor(\.sort)])
     spDescriptor.fetchLimit = 10
-    _episodeSps = Query(spDescriptor)
+    do {
+      self.episodeMains = try await chii.db.fetchData(mainDescriptor)
+      self.episodeSps = try await chii.db.fetchData(spDescriptor)
+    } catch {
+      notifier.alert(error: error)
+    }
   }
 
   func refresh() async {
@@ -53,6 +57,7 @@ struct EpisodeGridView: View {
     } catch {
       notifier.alert(error: error)
     }
+    await load()
   }
 
   var body: some View {
@@ -68,6 +73,7 @@ struct EpisodeGridView: View {
       Spacer()
     }.onAppear {
       Task(priority: .background) {
+        await load()
         await refresh()
       }
     }
