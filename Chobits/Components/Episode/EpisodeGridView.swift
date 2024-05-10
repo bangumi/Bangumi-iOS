@@ -67,10 +67,10 @@ struct EpisodeGridView: View {
       } else {
         Text("章节列表:")
       }
-      NavigationLink(value: NavDestination.episodeList(subjectId: subjectId)) {
-        Text("[全部]").foregroundStyle(Color("LinkTextColor"))
-      }.buttonStyle(.plain)
       Spacer()
+      NavigationLink(value: NavDestination.episodeList(subjectId: subjectId)) {
+        Text("全部章节 »").font(.caption).foregroundStyle(Color("LinkTextColor"))
+      }.buttonStyle(.plain)
     }.onAppear {
       Task(priority: .background) {
         await load()

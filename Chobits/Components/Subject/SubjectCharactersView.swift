@@ -86,7 +86,7 @@ struct SubjectCharactersView: View {
               ImageView(img: character.images.grid, width: 80, height: 80, alignment: .top)
               Text(character.name)
               if let actor = character.actors.first {
-                Text("CV:\(actor.name)").foregroundStyle(.secondary)
+                Text("CV: \(actor.name)").foregroundStyle(.secondary)
               }
               Spacer()
             }

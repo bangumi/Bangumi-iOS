@@ -48,10 +48,9 @@ struct SubjectHeaderView: View {
               Label(subject.typeEnum.description, systemImage: subject.typeEnum.icon)
                 .foregroundStyle(Color("LinkTextColor"))
               if subject.date.timeIntervalSince1970 > 0 {
-                Label(subject.date.formatAirdate, systemImage: "calendar").foregroundStyle(
-                  .secondary
-                )
-                .lineLimit(1)
+                Label(subject.date.formatAirdate, systemImage: "calendar")
+                  .foregroundStyle(.secondary)
+                  .lineLimit(1)
               }
               Spacer()
             }.font(.footnote)
@@ -61,9 +60,9 @@ struct SubjectHeaderView: View {
             .font(.title2.bold())
             .multilineTextAlignment(.leading)
             .lineLimit(2)
-          Spacer()
+            .padding(.vertical, 2)
           Text(subject.nameCn)
-            .font(.subheadline)
+            .font(.body)
             .foregroundStyle(.secondary)
             .multilineTextAlignment(.leading)
             .lineLimit(2)
@@ -71,12 +70,13 @@ struct SubjectHeaderView: View {
 
           HStack {
             if subject.rating.score > 0 {
-              Label("\(subject.rating.score.rateDisplay)", systemImage: "star.fill")
-                .foregroundStyle(.secondary)
+              Text("站内评分：\(subject.rating.score.rateDisplay)")
+                .foregroundStyle(Color("LinkTextColor"))
             }
+            Spacer()
             if subject.rating.rank > 0 {
-              Label("\(subject.rating.rank)", systemImage: "chart.bar.xaxis").foregroundStyle(
-                .secondary)
+              Text("站内排名：\(subject.rating.rank)")
+                .foregroundStyle(.secondary)
             }
             if subject.nsfw {
               Label("", systemImage: "18.circle").foregroundStyle(.red)
@@ -84,10 +84,8 @@ struct SubjectHeaderView: View {
             if subject.locked {
               Label("", systemImage: "lock").foregroundStyle(.red)
             }
-            Spacer()
-            Label("\(subject.rating.total)", systemImage: "heart.fill").foregroundStyle(
-              Color("LinkTextColor"))
           }
+          .font(.footnote)
           .padding(.top, 4)
           .padding(.bottom, 8)
           .onTapGesture {
