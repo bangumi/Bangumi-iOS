@@ -54,12 +54,6 @@ struct SubjectHeaderView: View {
                 .lineLimit(1)
               }
               Spacer()
-              if subject.nsfw {
-                Label("", systemImage: "18.circle").foregroundStyle(.red)
-              }
-              if subject.locked {
-                Label("", systemImage: "lock").foregroundStyle(.red)
-              }
             }.font(.footnote)
           }.buttonStyle(.plain)
           Spacer()
@@ -76,16 +70,24 @@ struct SubjectHeaderView: View {
           Spacer()
 
           HStack {
-            Spacer()
-            if subject.rating.rank > 0 {
-              Label("\(subject.rating.rank)", systemImage: "chart.bar.xaxis")
-            }
             if subject.rating.score > 0 {
               Label("\(subject.rating.score.rateDisplay)", systemImage: "star.fill")
+                .foregroundStyle(.secondary)
             }
-            Label("\(subject.rating.total)", systemImage: "heart.fill")
+            if subject.rating.rank > 0 {
+              Label("\(subject.rating.rank)", systemImage: "chart.bar.xaxis").foregroundStyle(
+                .secondary)
+            }
+            if subject.nsfw {
+              Label("", systemImage: "18.circle").foregroundStyle(.red)
+            }
+            if subject.locked {
+              Label("", systemImage: "lock").foregroundStyle(.red)
+            }
+            Spacer()
+            Label("\(subject.rating.total)", systemImage: "heart.fill").foregroundStyle(
+              Color("LinkTextColor"))
           }
-          .foregroundStyle(Color("LinkTextColor"))
           .padding(.top, 4)
           .padding(.bottom, 8)
           .onTapGesture {
