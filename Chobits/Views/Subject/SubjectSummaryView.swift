@@ -46,6 +46,7 @@ struct SubjectSummaryView: View {
   var body: some View {
     Text(subject?.summary ?? "")
       .padding(.bottom, 16)
+      .font(.footnote)
       .multilineTextAlignment(.leading)
       .lineLimit(5)
       .sheet(isPresented: $showSummary) {

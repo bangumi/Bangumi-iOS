@@ -76,6 +76,7 @@ struct SubjectCharactersView: View {
           NavigationLink(value: NavDestination.character(characterId: character.characterId)) {
             VStack {
               Text(character.relation)
+                .font(.caption)
                 .foregroundStyle(.secondary)
                 .overlay {
                   RoundedRectangle(cornerRadius: 5)
@@ -84,14 +85,14 @@ struct SubjectCharactersView: View {
                     .padding(.vertical, -2)
                 }.padding(.top, 4)
               ImageView(img: character.images.grid, width: 80, height: 80, alignment: .top)
-              Text(character.name)
+              Text(character.name).font(.caption)
               if let actor = character.actors.first {
-                Text("CV: \(actor.name)").foregroundStyle(.secondary)
+                Text("CV: \(actor.name)").foregroundStyle(.secondary).font(.caption2)
               }
               Spacer()
             }
             .lineLimit(1)
-            .font(.caption2)
+
             .frame(width: 80, height: 160)
           }.buttonStyle(.plain)
         }
