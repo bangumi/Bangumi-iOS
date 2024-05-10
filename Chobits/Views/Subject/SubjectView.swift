@@ -51,7 +51,7 @@ struct SubjectView: View {
   var body: some View {
     Section {
       if let subject = subject {
-        ScrollView {
+        ScrollView(showsIndicators: false) {
           LazyVStack(alignment: .leading) {
             SubjectHeaderView(subjectId: subjectId)
 

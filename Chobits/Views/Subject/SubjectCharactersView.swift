@@ -70,7 +70,7 @@ struct SubjectCharactersView: View {
         await refresh()
       }
     }
-    ScrollView(.horizontal) {
+    ScrollView(.horizontal, showsIndicators: false) {
       LazyHStack(alignment: .top) {
         ForEach(characters) { character in
           NavigationLink(value: NavDestination.character(characterId: character.characterId)) {
@@ -84,7 +84,7 @@ struct SubjectCharactersView: View {
                     .padding(.horizontal, -4)
                     .padding(.vertical, -2)
                 }.padding(.top, 4)
-              ImageView(img: character.images.grid, width: 80, height: 80, alignment: .top)
+              ImageView(img: character.images.grid, width: 60, height: 80, alignment: .top)
               Text(character.name).font(.caption)
               if let actor = character.actors.first {
                 Text("CV: \(actor.name)").foregroundStyle(.secondary).font(.caption2)

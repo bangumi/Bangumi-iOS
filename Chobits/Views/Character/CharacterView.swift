@@ -63,7 +63,7 @@ struct CharacterView: View {
   var body: some View {
     Section {
       if let character = character {
-        ScrollView {
+        ScrollView(showsIndicators: false) {
           LazyVStack(alignment: .leading) {
 
             /// header

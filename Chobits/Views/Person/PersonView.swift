@@ -69,7 +69,7 @@ struct PersonView: View {
   var body: some View {
     Section {
       if let person = person {
-        ScrollView {
+        ScrollView(showsIndicators: false) {
           LazyVStack(alignment: .leading) {
 
             /// header

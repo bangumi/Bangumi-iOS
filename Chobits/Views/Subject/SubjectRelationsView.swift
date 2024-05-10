@@ -70,7 +70,7 @@ struct SubjectRelationsView: View {
         await refresh()
       }
     }
-    ScrollView(.horizontal) {
+    ScrollView(.horizontal, showsIndicators: false) {
       LazyHStack {
         ForEach(relations) { relation in
           NavigationLink(value: NavDestination.subject(subjectId: relation.relationId)) {
