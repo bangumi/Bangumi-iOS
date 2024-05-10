@@ -1,5 +1,5 @@
 //
-//  UserCollectionRowView.swift
+//  ProgressRowView.swift
 //  Chobits
 //
 //  Created by Chuan Chuan on 2024/4/21.
@@ -9,7 +9,7 @@ import OSLog
 import SwiftData
 import SwiftUI
 
-struct UserCollectionRowView: View {
+struct ProgressRowView: View {
   let subjectId: UInt
 
   @EnvironmentObject var notifier: Notifier
@@ -178,7 +178,7 @@ struct UserCollectionRowView: View {
 
   return ScrollView {
     LazyVStack(alignment: .leading) {
-      UserCollectionRowView(subjectId: subject.id)
+      ProgressRowView(subjectId: subject.id)
         .environmentObject(Notifier())
         .environment(ChiiClient(container: container, mock: .anime))
     }

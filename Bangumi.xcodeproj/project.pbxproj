@@ -30,7 +30,7 @@
 		19671C5C2BDEB55D000B4D99 /* FlowStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19671C382BDEB55D000B4D99 /* FlowStack.swift */; };
 		19671C5D2BDEB55D000B4D99 /* ImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19671C392BDEB55D000B4D99 /* ImageView.swift */; };
 		19671C5E2BDEB55D000B4D99 /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19671C3A2BDEB55D000B4D99 /* LoadingView.swift */; };
-		19671C5F2BDEB55D000B4D99 /* UserCollectionRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19671C3B2BDEB55D000B4D99 /* UserCollectionRowView.swift */; };
+		19671C5F2BDEB55D000B4D99 /* ProgressRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19671C3B2BDEB55D000B4D99 /* ProgressRowView.swift */; };
 		19671C602BDEB55D000B4D99 /* Basis.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19671C3D2BDEB55D000B4D99 /* Basis.swift */; };
 		19671C612BDEB55D000B4D99 /* Chii.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19671C3E2BDEB55D000B4D99 /* Chii.swift */; };
 		19671C622BDEB55D000B4D99 /* Core.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19671C3F2BDEB55D000B4D99 /* Core.swift */; };
@@ -64,6 +64,8 @@
 		19B9002E2BED15B600405F0F /* PersonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19B9002D2BED15B600405F0F /* PersonView.swift */; };
 		19B900302BED16FE00405F0F /* person.json in Resources */ = {isa = PBXBuildFile; fileRef = 19B9002F2BED16FE00405F0F /* person.json */; };
 		19B900322BED1EF300405F0F /* SubjectInfoboxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19B900312BED1EF300405F0F /* SubjectInfoboxView.swift */; };
+		19B9003C2BEEE07B00405F0F /* ProgressTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19B9003B2BEEE07B00405F0F /* ProgressTabView.swift */; };
+		19B900402BEEE23600405F0F /* ChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19B9003F2BEEE23600405F0F /* ChartView.swift */; };
 		19BD24262BE9C53800595973 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 19BD24252BE9C53800595973 /* Kingfisher */; };
 		19BD24282BE9F22B00595973 /* Load.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19BD24272BE9F22B00595973 /* Load.swift */; };
 		19BD242E2BEB2F3400595973 /* Setting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19BD242D2BEB2F3400595973 /* Setting.swift */; };
@@ -102,7 +104,7 @@
 		19671C382BDEB55D000B4D99 /* FlowStack.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlowStack.swift; sourceTree = "<group>"; };
 		19671C392BDEB55D000B4D99 /* ImageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageView.swift; sourceTree = "<group>"; };
 		19671C3A2BDEB55D000B4D99 /* LoadingView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
-		19671C3B2BDEB55D000B4D99 /* UserCollectionRowView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserCollectionRowView.swift; sourceTree = "<group>"; };
+		19671C3B2BDEB55D000B4D99 /* ProgressRowView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProgressRowView.swift; sourceTree = "<group>"; };
 		19671C3D2BDEB55D000B4D99 /* Basis.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Basis.swift; sourceTree = "<group>"; };
 		19671C3E2BDEB55D000B4D99 /* Chii.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Chii.swift; sourceTree = "<group>"; };
 		19671C3F2BDEB55D000B4D99 /* Core.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Core.swift; sourceTree = "<group>"; };
@@ -137,6 +139,8 @@
 		19B9002D2BED15B600405F0F /* PersonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonView.swift; sourceTree = "<group>"; };
 		19B9002F2BED16FE00405F0F /* person.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = person.json; sourceTree = "<group>"; };
 		19B900312BED1EF300405F0F /* SubjectInfoboxView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubjectInfoboxView.swift; sourceTree = "<group>"; };
+		19B9003B2BEEE07B00405F0F /* ProgressTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressTabView.swift; sourceTree = "<group>"; };
+		19B9003F2BEEE23600405F0F /* ChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartView.swift; sourceTree = "<group>"; };
 		19BB342B2BD239AB00E5C295 /* Chobits.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Chobits.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		19BD24272BE9F22B00595973 /* Load.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Load.swift; sourceTree = "<group>"; };
 		19BD242D2BEB2F3400595973 /* Setting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Setting.swift; sourceTree = "<group>"; };
@@ -205,17 +209,11 @@
 		19671C3C2BDEB55D000B4D99 /* Components */ = {
 			isa = PBXGroup;
 			children = (
-				197A19E52BE69B0600804B13 /* Episode */,
-				19671C362BDEB55D000B4D99 /* Subject */,
-				1909F3B22BECF9A900E3B8F0 /* Character */,
-				19B9002C2BED158700405F0F /* Person */,
 				19671C382BDEB55D000B4D99 /* FlowStack.swift */,
 				19671C392BDEB55D000B4D99 /* ImageView.swift */,
+				19B9003F2BEEE23600405F0F /* ChartView.swift */,
 				19671C3A2BDEB55D000B4D99 /* LoadingView.swift */,
 				19C2CE5C2BE1E7B10080A056 /* NotFoundView.swift */,
-				19671C372BDEB55D000B4D99 /* CalendarView.swift */,
-				19671C2E2BDEB55D000B4D99 /* SearchSubjectRowView.swift */,
-				19671C3B2BDEB55D000B4D99 /* UserCollectionRowView.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -263,6 +261,12 @@
 		19671C4D2BDEB55D000B4D99 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				19B9003E2BEEE20500405F0F /* Discover */,
+				19B9003D2BEEE1C400405F0F /* Progress */,
+				197A19E52BE69B0600804B13 /* Episode */,
+				19671C362BDEB55D000B4D99 /* Subject */,
+				1909F3B22BECF9A900E3B8F0 /* Character */,
+				19B9002C2BED158700405F0F /* Person */,
 				19671C492BDEB55D000B4D99 /* ContentView.swift */,
 				19671C482BDEB55D000B4D99 /* AuthView.swift */,
 				19671C4C2BDEB55D000B4D99 /* TimelineView.swift */,
@@ -318,6 +322,24 @@
 				19B9002D2BED15B600405F0F /* PersonView.swift */,
 			);
 			path = Person;
+			sourceTree = "<group>";
+		};
+		19B9003D2BEEE1C400405F0F /* Progress */ = {
+			isa = PBXGroup;
+			children = (
+				19B9003B2BEEE07B00405F0F /* ProgressTabView.swift */,
+				19671C3B2BDEB55D000B4D99 /* ProgressRowView.swift */,
+			);
+			path = Progress;
+			sourceTree = "<group>";
+		};
+		19B9003E2BEEE20500405F0F /* Discover */ = {
+			isa = PBXGroup;
+			children = (
+				19671C2E2BDEB55D000B4D99 /* SearchSubjectRowView.swift */,
+				19671C372BDEB55D000B4D99 /* CalendarView.swift */,
+			);
+			path = Discover;
 			sourceTree = "<group>";
 		};
 		19BB34222BD239AB00E5C295 = {
@@ -441,10 +463,11 @@
 				1909F3A72BEBC35A00E3B8F0 /* DataCharacter.swift in Sources */,
 				19671C6F2BDEB55D000B4D99 /* ChobitsApp.swift in Sources */,
 				19671C552BDEB55D000B4D99 /* SubjectCollectionView.swift in Sources */,
-				19671C5F2BDEB55D000B4D99 /* UserCollectionRowView.swift in Sources */,
+				19671C5F2BDEB55D000B4D99 /* ProgressRowView.swift in Sources */,
 				1909F3A12BEBC2B600E3B8F0 /* DataCalendar.swift in Sources */,
 				19671C6D2BDEB55D000B4D99 /* TimelineView.swift in Sources */,
 				19671C692BDEB55D000B4D99 /* AuthView.swift in Sources */,
+				19B900402BEEE23600405F0F /* ChartView.swift in Sources */,
 				19671C642BDEB55D000B4D99 /* Mock.swift in Sources */,
 				19AB93CB2BE4F0F4007531A4 /* BackgroundActor.swift in Sources */,
 				1909F3A32BEBC2E600E3B8F0 /* DataSubject.swift in Sources */,
@@ -452,6 +475,7 @@
 				19671C622BDEB55D000B4D99 /* Core.swift in Sources */,
 				19BD24282BE9F22B00595973 /* Load.swift in Sources */,
 				19C2CE632BE2A4F10080A056 /* SubjectBookChaptersView.swift in Sources */,
+				19B9003C2BEEE07B00405F0F /* ProgressTabView.swift in Sources */,
 				197A19DA2BE6733A00804B13 /* Error.swift in Sources */,
 				19BD24302BEB3C3B00595973 /* SettingsView.swift in Sources */,
 				19B9002E2BED15B600405F0F /* PersonView.swift in Sources */,
