@@ -243,7 +243,7 @@ struct EpisodeListView: View {
     .buttonStyle(.plain)
     .animation(.default, value: episodes)
     .navigationTitle("章节列表")
-    .toolbar{
+    .toolbar {
       ToolbarItem(placement: .automatic) {
         Image(systemName: "list.bullet.circle").foregroundStyle(.secondary)
       }
