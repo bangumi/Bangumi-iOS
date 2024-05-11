@@ -168,19 +168,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		1909F39D2BEBC27B00E3B8F0 /* Data */ = {
-			isa = PBXGroup;
-			children = (
-				1909F3A02BEBC2B600E3B8F0 /* DataCalendar.swift */,
-				1909F39E2BEBC28F00E3B8F0 /* DataCollection.swift */,
-				1909F3A22BEBC2E600E3B8F0 /* DataSubject.swift */,
-				1909F3A42BEBC30300E3B8F0 /* DataEpisode.swift */,
-				1909F3A62BEBC35A00E3B8F0 /* DataCharacter.swift */,
-				1909F3A82BEBC9F000E3B8F0 /* DataPerson.swift */,
-			);
-			path = Data;
-			sourceTree = "<group>";
-		};
 		1909F3B22BECF9A900E3B8F0 /* Character */ = {
 			isa = PBXGroup;
 			children = (
@@ -221,17 +208,13 @@
 		19671C432BDEB55D000B4D99 /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				1909F39D2BEBC27B00E3B8F0 /* Data */,
-				19671C3D2BDEB55D000B4D99 /* Basis.swift */,
-				19671C3E2BDEB55D000B4D99 /* Chii.swift */,
 				19671C412BDEB55D000B4D99 /* Mock.swift */,
-				19AB93CA2BE4F0F4007531A4 /* BackgroundActor.swift */,
-				197A19CA2BE5E59900804B13 /* Logger.swift */,
-				197A19CE2BE5E5E700804B13 /* Notifier.swift */,
-				197A19D72BE672E000804B13 /* Extension.swift */,
-				197A19D92BE6733A00804B13 /* Error.swift */,
-				19F8C3D72BE73B820037D723 /* Navigation.swift */,
-				19BD242D2BEB2F3400595973 /* Setting.swift */,
+				1909F3A02BEBC2B600E3B8F0 /* DataCalendar.swift */,
+				1909F39E2BEBC28F00E3B8F0 /* DataCollection.swift */,
+				1909F3A22BEBC2E600E3B8F0 /* DataSubject.swift */,
+				1909F3A42BEBC30300E3B8F0 /* DataEpisode.swift */,
+				1909F3A62BEBC35A00E3B8F0 /* DataCharacter.swift */,
+				1909F3A82BEBC9F000E3B8F0 /* DataPerson.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -283,6 +266,7 @@
 				197A19D22BE671DA00804B13 /* Client */,
 				19671C3C2BDEB55D000B4D99 /* Components */,
 				19671C432BDEB55D000B4D99 /* Models */,
+				19B900412BEF035500405F0F /* Helpers */,
 				19671C4D2BDEB55D000B4D99 /* Views */,
 				19671C472BDEB55D000B4D99 /* Preview Content */,
 				19671C4F2BDEB55D000B4D99 /* ChobitsApp.swift */,
@@ -296,11 +280,13 @@
 		197A19D22BE671DA00804B13 /* Client */ = {
 			isa = PBXGroup;
 			children = (
+				19671C3D2BDEB55D000B4D99 /* Basis.swift */,
+				19671C3E2BDEB55D000B4D99 /* Chii.swift */,
+				19671C422BDEB55D000B4D99 /* Response.swift */,
 				19671C3F2BDEB55D000B4D99 /* Core.swift */,
 				197A19D52BE6729A00804B13 /* Auth.swift */,
 				197A19D32BE6721500804B13 /* Fetch.swift */,
 				197A19DB2BE674ED00804B13 /* Update.swift */,
-				19671C422BDEB55D000B4D99 /* Response.swift */,
 				19BD24272BE9F22B00595973 /* Load.swift */,
 			);
 			path = Client;
@@ -340,6 +326,20 @@
 				19671C372BDEB55D000B4D99 /* CalendarView.swift */,
 			);
 			path = Discover;
+			sourceTree = "<group>";
+		};
+		19B900412BEF035500405F0F /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				197A19D92BE6733A00804B13 /* Error.swift */,
+				19AB93CA2BE4F0F4007531A4 /* BackgroundActor.swift */,
+				19F8C3D72BE73B820037D723 /* Navigation.swift */,
+				197A19CA2BE5E59900804B13 /* Logger.swift */,
+				197A19CE2BE5E5E700804B13 /* Notifier.swift */,
+				19BD242D2BEB2F3400595973 /* Setting.swift */,
+				197A19D72BE672E000804B13 /* Extension.swift */,
+			);
+			path = Helpers;
 			sourceTree = "<group>";
 		};
 		19BB34222BD239AB00E5C295 = {
