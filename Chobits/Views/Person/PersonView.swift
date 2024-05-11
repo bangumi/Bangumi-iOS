@@ -101,18 +101,6 @@ struct PersonView: View {
                   .lineLimit(2)
                 Spacer()
 
-                if let gender = person.gender {
-                  Label("性别: \(gender)", systemImage: "person.fill").foregroundStyle(.secondary)
-                }
-                if let bloodType = person.bloodType {
-                  Label("血型: \(BloodType(bloodType).name)", systemImage: "heart.fill")
-                    .foregroundStyle(.secondary)
-                }
-                if !person.birthday.isEmpty {
-                  Label("生日: \(person.birthday)", systemImage: "calendar").foregroundStyle(
-                    .secondary)
-                }
-
                 Spacer()
                 HStack {
                   Label("收藏: \(person.stat.collects)", systemImage: "heart.fill")

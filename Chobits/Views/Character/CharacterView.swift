@@ -95,18 +95,6 @@ struct CharacterView: View {
                   .lineLimit(2)
                 Spacer()
 
-                if let gender = character.gender {
-                  Label("性别: \(gender)", systemImage: "person.fill").foregroundStyle(.secondary)
-                }
-                if let bloodType = character.bloodType {
-                  Label("血型: \(BloodType(bloodType).name)", systemImage: "heart.fill")
-                    .foregroundStyle(.secondary)
-                }
-                if !character.birthday.isEmpty {
-                  Label("生日: \(character.birthday)", systemImage: "calendar").foregroundStyle(
-                    .secondary)
-                }
-
                 Spacer()
                 HStack {
                   Label("收藏: \(character.stat.collects)", systemImage: "heart.fill")
