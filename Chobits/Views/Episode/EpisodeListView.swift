@@ -153,7 +153,7 @@ struct EpisodeListView: View {
     }.padding(.horizontal, 8)
     ScrollView {
       LazyVStack {
-        ForEach(episodes, id: \.idx) { item in
+        ForEach(episodes, id: \.inner.id) { item in
           let episode = item.inner
           Button {
             selected = episode

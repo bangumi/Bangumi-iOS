@@ -144,7 +144,7 @@ struct ChiiProgressView: View {
             }
             ScrollView {
               LazyVStack(alignment: .leading, spacing: 10) {
-                ForEach(collections, id: \.idx) { item in
+                ForEach(collections, id: \.inner.id) { item in
                   NavigationLink(value: NavDestination.subject(subjectId: item.inner.subjectId)) {
                     ProgressRowView(subjectId: item.inner.subjectId)
                   }

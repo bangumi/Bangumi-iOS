@@ -164,7 +164,7 @@ struct ChiiDiscoverView: View {
             } else {
               ScrollView {
                 LazyVStack(alignment: .leading, spacing: 10) {
-                  ForEach(subjects, id: \.idx) { item in
+                  ForEach(subjects, id: \.inner.id) { item in
                     NavigationLink(value: NavDestination.subject(subjectId: item.inner.id)) {
                       SearchSubjectRowView(subject: item.inner.item)
                         .onAppear {
