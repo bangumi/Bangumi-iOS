@@ -69,9 +69,9 @@ struct SubjectRatingBoxView: View {
             }
           }
         }.padding(.top, 10)
-        ChartView(data: subject.rating.count, width: geometry.size.width, height: 150)
-          .frame(width: geometry.size.width, height: 150)
-          .padding(.vertical, 20)
+        ChartView(title: "评分分布", data: subject.rating.count,
+                  width: geometry.size.width, height: 240)
+          .frame(width: geometry.size.width, height: 240)
           .background(Color.secondary.opacity(0.02))
           .clipShape(RoundedRectangle(cornerRadius: 10))
         FlowStack {

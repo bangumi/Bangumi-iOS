@@ -68,21 +68,25 @@ struct SubjectHeaderView: View {
             .lineLimit(2)
           Spacer()
 
-          HStack {
+          HStack(alignment: .bottom) {
             if subject.rating.score > 0 {
-              Text("站内评分：\(subject.rating.score.rateDisplay)")
+              Text("站内评分:").foregroundStyle(Color("LinkTextColor"))
+              Text("\(subject.rating.score.rateDisplay)")
                 .foregroundStyle(Color("LinkTextColor"))
+                .font(.callout)
             }
             Spacer()
-            if subject.rating.rank > 0 {
-              Text("站内排名：\(subject.rating.rank)")
-                .foregroundStyle(.secondary)
-            }
             if subject.nsfw {
               Label("", systemImage: "18.circle").foregroundStyle(.red)
             }
             if subject.locked {
               Label("", systemImage: "lock").foregroundStyle(.red)
+            }
+            if subject.rating.rank > 0 {
+              Text("站内排名:").foregroundStyle(.secondary)
+              Text("\(subject.rating.rank)")
+                .foregroundStyle(.secondary)
+                .font(.callout)
             }
           }
           .font(.footnote)

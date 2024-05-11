@@ -8,11 +8,11 @@
 import SwiftUI
 
 struct ProgressTabView: View {
-    var body: some View {
-        Text("Hello, World!")
-    }
+  var body: some View {
+    Text("Hello, World!")
+  }
 }
 
 #Preview {
-    ProgressTabView()
+  ProgressTabView()
 }
