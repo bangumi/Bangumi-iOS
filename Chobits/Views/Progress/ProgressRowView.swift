@@ -91,76 +91,68 @@ struct ProgressRowView: View {
   }
 
   var body: some View {
-    ZStack {
-      Rectangle()
-        .fill(.accent)
-        .opacity(0.01)
-        .frame(height: 64)
-        .clipShape(RoundedRectangle(cornerRadius: 10))
-        .shadow(color: .accent, radius: 1, x: 1, y: 1)
-        .task {
-          await loadNextEpisode()
-        }
-      HStack {
-        ImageView(img: subject?.images.common, width: 60, height: 60)
-        VStack(alignment: .leading) {
-          Text(subject?.name ?? "").font(.headline)
-          Text(subject?.nameCn ?? "").font(.footnote).foregroundStyle(.secondary)
-          if let collection = collection {
-            HStack(alignment: .bottom) {
-              Text(collection.updatedAt.formatCollectionDate).foregroundStyle(.secondary)
-              if collection.priv {
-                Image(systemName: "lock.fill").foregroundStyle(.accent)
-              }
-              Spacer()
-              switch collection.subjectTypeEnum {
-              case .anime, .real:
-                if let episode = nextEpisode {
-                  if episode.airdate > Date() {
-                    Text("EP.\(episode.sort.episodeDisplay) ~ \(episode.waitDays) days")
-                      .foregroundStyle(.secondary)
-                  } else {
-                    Button {
-                      showEpisodeBox = true
-                    } label: {
-                      Label("EP.\(episode.sort.episodeDisplay)", systemImage: "eyes").font(.callout)
-                    }
-                  }
+    HStack {
+      ImageView(img: subject?.images.common, width: 60, height: 60)
+      VStack(alignment: .leading) {
+        Text(subject?.name ?? "").font(.headline)
+        Text(subject?.nameCn ?? "").font(.footnote).foregroundStyle(.secondary)
+        if let collection = collection {
+          HStack(alignment: .bottom) {
+            Text(collection.updatedAt.formatCollectionDate).foregroundStyle(.secondary)
+            if collection.priv {
+              Image(systemName: "lock.fill").foregroundStyle(.accent)
+            }
+            Spacer()
+            switch collection.subjectTypeEnum {
+            case .anime, .real:
+              if let episode = nextEpisode {
+                if episode.airdate > Date() {
+                  Text("EP.\(episode.sort.episodeDisplay) ~ \(episode.waitDays) days")
+                    .foregroundStyle(.secondary)
                 } else {
-                  Text("\(collection.epStatus)").foregroundStyle(epsColor).font(.callout)
-                  Text(chapters).foregroundStyle(epsColor)
+                  Button {
+                    showEpisodeBox = true
+                  } label: {
+                    Label("EP.\(episode.sort.episodeDisplay)", systemImage: "eyes").font(.callout)
+                  }
                 }
-              case .book:
+              } else {
                 Text("\(collection.epStatus)").foregroundStyle(epsColor).font(.callout)
-                Text("\(chapters)").foregroundStyle(epsColor)
-                Text("\(collection.volStatus)").foregroundStyle(volsColor).font(.callout)
-                Text("\(volumes)").foregroundStyle(volsColor)
-              default:
-                Label(
-                  collection.subjectTypeEnum.description,
-                  systemImage: collection.subjectTypeEnum.icon
-                )
-                .foregroundStyle(.accent)
+                Text(chapters).foregroundStyle(epsColor)
               }
-            }.font(.footnote)
-          }
+            case .book:
+              Text("\(collection.epStatus)").foregroundStyle(epsColor).font(.callout)
+              Text("\(chapters)").foregroundStyle(epsColor)
+              Text("\(collection.volStatus)").foregroundStyle(volsColor).font(.callout)
+              Text("\(volumes)").foregroundStyle(volsColor)
+            default:
+              Label(
+                collection.subjectTypeEnum.description,
+                systemImage: collection.subjectTypeEnum.icon
+              )
+              .foregroundStyle(.accent)
+            }
+          }.font(.footnote)
         }
-        Spacer()
       }
-      .frame(height: 60)
-      .padding(2)
-      .clipShape(RoundedRectangle(cornerRadius: 10))
-      .sheet(
-        isPresented: $showEpisodeBox,
-        content: {
-          if let episode = nextEpisode {
-            EpisodeInfoboxView(subjectId: subjectId, episodeId: episode.id)
-              .presentationDragIndicator(.visible)
-              .presentationDetents(.init([.medium, .large]))
-          }
-        }
-      )
+      Spacer()
     }
+    .frame(height: 60)
+    .padding(2)
+    .clipShape(RoundedRectangle(cornerRadius: 10))
+    .task {
+      await loadNextEpisode()
+    }
+    .sheet(
+      isPresented: $showEpisodeBox,
+      content: {
+        if let episode = nextEpisode {
+          EpisodeInfoboxView(subjectId: subjectId, episodeId: episode.id)
+            .presentationDragIndicator(.visible)
+            .presentationDetents(.init([.medium, .large]))
+        }
+      }
+    )
   }
 }
 

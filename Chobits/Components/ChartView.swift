@@ -72,7 +72,7 @@ struct ChartView: View {
         return BarItem(name: name, value: value)
       }
       let percent = String(format: "%.1f%%", 100 * CGFloat(value) / CGFloat(dataTotal))
-      let barHeight = (height-64) * CGFloat(value) / CGFloat(maxValue)
+      let barHeight = (height - 64) * CGFloat(value) / CGFloat(maxValue)
       return BarItem(name: name, value: value, height: barHeight, percent: percent)
     }
     return BarItem(name: name, value: value)
@@ -88,7 +88,7 @@ struct ChartView: View {
   }
 
   var body: some View {
-    VStack{
+    VStack {
       Spacer()
       if let item = tappedItem {
         Text("\(item.percent)(\(item.value))")
@@ -97,7 +97,7 @@ struct ChartView: View {
       }
       if show {
         HStack(alignment: .bottom, spacing: barSpacing) {
-          ForEach(barList, id: \.name) {item in
+          ForEach(barList, id: \.name) { item in
             VStack {
               Spacer()
               ZStack {
@@ -109,8 +109,11 @@ struct ChartView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 2))
                 }
                 Rectangle()
-                  .fill(tappedItem?.name == item.name ? Color.secondary.opacity(0.2) : Color.secondary.opacity(0.01))
-                  .frame(width: barWidth, height: height-60)
+                  .fill(
+                    tappedItem?.name == item.name
+                      ? Color.secondary.opacity(0.2) : Color.secondary.opacity(0.01)
+                  )
+                  .frame(width: barWidth, height: height - 60)
                   .clipShape(RoundedRectangle(cornerRadius: 2))
               }
               Text(item.name).font(.footnote)
@@ -139,8 +142,10 @@ struct ChartView: View {
 #Preview {
   let subject = Subject.previewAnime
   return VStack {
-    ChartView(title: "数据统计", data: subject.rating.count, 
-              width: 360, height: 240)
+    ChartView(
+      title: "数据统计", data: subject.rating.count,
+      width: 360, height: 240
+    )
     .frame(width: 360, height: 240)
     .clipped()
   }
