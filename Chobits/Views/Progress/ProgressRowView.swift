@@ -147,7 +147,7 @@ struct ProgressRowView: View {
       isPresented: $showEpisodeBox,
       content: {
         if let episode = nextEpisode {
-          EpisodeInfoboxView(subjectId: subjectId, episodeId: episode.id)
+          EpisodeCollectionBoxView(subjectId: subjectId, episodeId: episode.id)
             .presentationDragIndicator(.visible)
             .presentationDetents(.init([.medium, .large]))
         }
