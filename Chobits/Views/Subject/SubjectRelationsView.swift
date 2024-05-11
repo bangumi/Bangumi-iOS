@@ -56,34 +56,38 @@ struct SubjectRelationsView: View {
   }
 
   var body: some View {
-    VStack {
-      HStack {
-        Text("关联条目").font(.title3)
-        Spacer()
-        if counts > 10 {
-          Text("更多条目 »").font(.caption)
+    Section {
+      VStack {
+        HStack {
+          Text("关联条目").font(.title3)
+          Spacer()
+          if counts > 10 {
+            Text("更多条目 »").font(.caption)
+          }
         }
       }
+      ScrollView(.horizontal, showsIndicators: false) {
+        LazyHStack {
+          ForEach(relations) { relation in
+            NavigationLink(value: NavDestination.subject(subjectId: relation.relationId)) {
+              VStack {
+                Text(relation.relation).foregroundStyle(.secondary)
+                ImageView(img: relation.images.grid, width: 60, height: 60)
+                Text(relation.name)
+                  .multilineTextAlignment(.leading)
+                  .truncationMode(.middle)
+                  .lineLimit(3)
+                Spacer()
+              }.font(.caption2).frame(width: 60, height: 150)
+            }.buttonStyle(.plain)
+          }
+        }
+      }.animation(.default, value: relations)
     }.onAppear {
       Task(priority: .background) {
         await loadCounts()
-        await refresh()
-      }
-    }
-    ScrollView(.horizontal, showsIndicators: false) {
-      LazyHStack {
-        ForEach(relations) { relation in
-          NavigationLink(value: NavDestination.subject(subjectId: relation.relationId)) {
-            VStack {
-              Text(relation.relation).foregroundStyle(.secondary)
-              ImageView(img: relation.images.grid, width: 60, height: 60)
-              Text(relation.name)
-                .multilineTextAlignment(.leading)
-                .truncationMode(.middle)
-                .lineLimit(3)
-              Spacer()
-            }.font(.caption2).frame(width: 60, height: 150)
-          }.buttonStyle(.plain)
+        if counts == 0 {
+          await refresh()
         }
       }
     }

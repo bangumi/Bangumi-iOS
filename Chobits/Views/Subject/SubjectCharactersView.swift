@@ -56,45 +56,48 @@ struct SubjectCharactersView: View {
   }
 
   var body: some View {
-    VStack {
-      HStack {
-        Text("角色介绍").font(.title3)
-        Spacer()
-        if counts > 10 {
-          Text("更多角色 »").font(.caption)
+    Section {
+      VStack {
+        HStack {
+          Text("角色介绍").font(.title3)
+          Spacer()
+          if counts > 10 {
+            Text("更多角色 »").font(.caption)
+          }
         }
       }
+      ScrollView(.horizontal, showsIndicators: false) {
+        LazyHStack(alignment: .top) {
+          ForEach(characters) { character in
+            NavigationLink(value: NavDestination.character(characterId: character.characterId)) {
+              VStack {
+                Text(character.relation)
+                  .font(.caption)
+                  .foregroundStyle(.secondary)
+                  .overlay {
+                    RoundedRectangle(cornerRadius: 5)
+                      .stroke(Color.secondary, lineWidth: 1)
+                      .padding(.horizontal, -4)
+                      .padding(.vertical, -2)
+                  }.padding(.top, 4)
+                ImageView(img: character.images.grid, width: 60, height: 80, alignment: .top)
+                Text(character.name).font(.caption)
+                if let actor = character.actors.first {
+                  Text("CV: \(actor.name)").foregroundStyle(.secondary).font(.caption2)
+                }
+                Spacer()
+              }
+              .lineLimit(1)
+              .frame(width: 80, height: 160)
+            }.buttonStyle(.plain)
+          }
+        }
+      }.animation(.default, value: characters)
     }.onAppear {
       Task(priority: .background) {
         await loadCounts()
-        await refresh()
-      }
-    }
-    ScrollView(.horizontal, showsIndicators: false) {
-      LazyHStack(alignment: .top) {
-        ForEach(characters) { character in
-          NavigationLink(value: NavDestination.character(characterId: character.characterId)) {
-            VStack {
-              Text(character.relation)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .overlay {
-                  RoundedRectangle(cornerRadius: 5)
-                    .stroke(Color.secondary, lineWidth: 1)
-                    .padding(.horizontal, -4)
-                    .padding(.vertical, -2)
-                }.padding(.top, 4)
-              ImageView(img: character.images.grid, width: 60, height: 80, alignment: .top)
-              Text(character.name).font(.caption)
-              if let actor = character.actors.first {
-                Text("CV: \(actor.name)").foregroundStyle(.secondary).font(.caption2)
-              }
-              Spacer()
-            }
-            .lineLimit(1)
-
-            .frame(width: 80, height: 160)
-          }.buttonStyle(.plain)
+        if counts == 0 {
+          await refresh()
         }
       }
     }
