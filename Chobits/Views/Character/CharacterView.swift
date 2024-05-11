@@ -123,6 +123,7 @@ struct CharacterView: View {
             /// summary
             Section {
               Text(character.summary)
+                .font(.footnote)
                 .padding(.bottom, 16)
                 .multilineTextAlignment(.leading)
                 .lineLimit(5)

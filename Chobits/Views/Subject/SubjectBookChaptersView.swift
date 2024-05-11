@@ -5,6 +5,7 @@
 //  Created by Chuan Chuan on 2024/5/2.
 //
 
+import Foundation
 import SwiftData
 import SwiftUI
 
@@ -14,8 +15,10 @@ struct SubjectBookChaptersView: View {
   @EnvironmentObject var notifier: Notifier
   @EnvironmentObject var chii: ChiiClient
 
-  @State private var eps: UInt?
-  @State private var vols: UInt?
+  @State private var inputEps: String = ""
+  @State private var eps: UInt? = nil
+  @State private var inputVols: String = ""
+  @State private var vols: UInt? = nil
   @State private var updating: Bool = false
 
   @Query
@@ -55,6 +58,8 @@ struct SubjectBookChaptersView: View {
       }
       self.eps = nil
       self.vols = nil
+      self.inputEps = ""
+      self.inputVols = ""
       self.updating = false
     }
   }
@@ -84,40 +89,58 @@ struct SubjectBookChaptersView: View {
       HStack(alignment: .firstTextBaseline, spacing: 0) {
         Button {
           if let value = eps {
-            self.eps = value + 1
+            self.inputEps = "\(value+1)"
           } else {
-            self.eps = collectionEps + 1
+            self.inputEps = "\(collectionEps+1)"
           }
         } label: {
-          Image(systemName: "plus.circle").foregroundStyle(.secondary).padding(.trailing, 5)
+          Image(systemName: "plus.circle")
+            .foregroundStyle(.secondary)
+            .padding(.trailing, 5)
         }.buttonStyle(.plain)
-        TextField("\(collectionEps)", value: $eps, formatter: NumberFormatter())
+        TextField("\(collectionEps)", text: $inputEps)
           .keyboardType(.numberPad)
           .frame(width: 48)
           .multilineTextAlignment(.trailing)
           .fixedSize(horizontal: true, vertical: false)
           .padding(.trailing, 2)
           .textFieldStyle(.roundedBorder)
+          .onChange(of: inputEps) {
+            if let newEps = UInt(inputEps) {
+              self.eps = newEps
+            } else {
+              self.eps = nil
+            }
+          }
         Text(epsDesc).foregroundStyle(.secondary)
       }.monospaced()
       Spacer()
       HStack(alignment: .firstTextBaseline, spacing: 0) {
         Button {
           if let value = vols {
-            self.vols = value + 1
+            self.inputVols = "\(value+1)"
           } else {
-            self.vols = collectionVols + 1
+            self.inputVols = "\(collectionVols+1)"
           }
         } label: {
-          Image(systemName: "plus.circle").foregroundStyle(.secondary).padding(.trailing, 5)
+          Image(systemName: "plus.circle")
+            .foregroundStyle(.secondary)
+            .padding(.trailing, 5)
         }.buttonStyle(.plain)
-        TextField("\(collectionVols)", value: $vols, formatter: NumberFormatter())
+        TextField("\(collectionVols)", text: $inputVols)
           .keyboardType(.numberPad)
           .frame(width: 36)
           .multilineTextAlignment(.trailing)
           .fixedSize(horizontal: true, vertical: false)
           .padding(.trailing, 2)
           .textFieldStyle(.roundedBorder)
+          .onChange(of: inputVols) {
+            if let newVols = UInt(inputVols) {
+              self.vols = newVols
+            } else {
+              self.vols = nil
+            }
+          }
         Text(volumesDesc).foregroundStyle(.secondary)
       }.monospaced()
       Spacer()

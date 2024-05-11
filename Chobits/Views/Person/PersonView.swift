@@ -144,6 +144,7 @@ struct PersonView: View {
             /// summary
             Section {
               Text(person.summary)
+                .font(.footnote)
                 .padding(.bottom, 16)
                 .multilineTextAlignment(.leading)
                 .lineLimit(5)
