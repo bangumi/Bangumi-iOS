@@ -216,6 +216,7 @@ extension ChiiClient {
     for item in response {
       let related = CharacterRelatedPerson(item, characterId: cid)
       await self.db.insert(related)
+
       let person = Person(item)
       let personId = person.id
       try await self.db.insertIfNeeded(
@@ -223,6 +224,15 @@ extension ChiiClient {
         predicate: #Predicate<Person> {
           $0.id == personId
         })
+
+      let subject = Subject(item)
+      let subjectId = subject.id
+      try await self.db.insertIfNeeded(
+        data: subject,
+        predicate: #Predicate<Subject> {
+          $0.id == subjectId
+        })
+
     }
   }
 
@@ -256,12 +266,21 @@ extension ChiiClient {
     for item in response {
       let related = PersonRelatedCharacter(item, personId: pid)
       await self.db.insert(related)
+
       let character = Character(item)
       let characterId = character.id
       try await self.db.insertIfNeeded(
         data: character,
         predicate: #Predicate<Character> {
           $0.id == characterId
+        })
+
+      let subject = Subject(item)
+      let subjectId = subject.id
+      try await self.db.insertIfNeeded(
+        data: subject,
+        predicate: #Predicate<Subject> {
+          $0.id == subjectId
         })
     }
   }

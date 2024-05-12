@@ -266,6 +266,9 @@ struct PersonView: View {
                 )
             }
 
+            /// characters
+            PersonCharactersView(personId: personId)
+
             /// subjects
             PersonSubjectsView(personId: personId)
           }

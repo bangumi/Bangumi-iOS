@@ -150,3 +150,21 @@ extension Person {
     return Person(item)
   }
 }
+
+extension PersonRelatedCharacter {
+  static var preview: [PersonRelatedCharacter] {
+    let items = loadFixture(
+      fixture: "person_characters.json", target: [PersonCharacterItem].self
+    )
+    return items.map { PersonRelatedCharacter($0, personId: 3862) }
+  }
+}
+
+extension PersonRelatedSubject {
+  static var preview: [PersonRelatedSubject] {
+    let items = loadFixture(
+      fixture: "person_subjects.json", target: [PersonSubjectItem].self
+    )
+    return items.map { PersonRelatedSubject($0, personId: 3862) }
+  }
+}
