@@ -13,12 +13,14 @@ func mockContainer() -> ModelContainer {
   let container = try! ModelContainer(
     for: BangumiCalendar.self,
     UserSubjectCollection.self,
+    Episode.self,
     Subject.self,
     SubjectRelation.self,
     SubjectRelatedCharacter.self,
     SubjectRelatedPerson.self,
-    Episode.self,
     Character.self,
+    CharacterRelatedSubject.self,
+    CharacterRelatedPerson.self,
     Person.self,
     configurations: config)
   return container
@@ -119,6 +121,24 @@ extension Character {
   static var preview: Character {
     let item = loadFixture(fixture: "character.json", target: CharacterItem.self)
     return Character(item)
+  }
+}
+
+extension CharacterRelatedSubject {
+  static var preview: [CharacterRelatedSubject] {
+    let items = loadFixture(
+      fixture: "character_subjects.json", target: [CharacterSubjectItem].self
+    )
+    return items.map { CharacterRelatedSubject($0, characterId: 32) }
+  }
+}
+
+extension CharacterRelatedPerson {
+  static var preview: [CharacterRelatedPerson] {
+    let items = loadFixture(
+      fixture: "character_persons.json", target: [CharacterPersonItem].self
+    )
+    return items.map { CharacterRelatedPerson($0, characterId: 32) }
   }
 }
 

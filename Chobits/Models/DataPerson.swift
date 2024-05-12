@@ -121,4 +121,22 @@ final class Person {
     self.birthDay = nil
     self.stat = Stat()
   }
+
+  init(_ item: CharacterPersonItem) {
+    self.id = item.id
+    self.name = item.name
+    self.type = 0
+    self.career = []
+    self.images = item.images ?? Images()
+    self.summary = ""
+    self.locked = false
+    self.lastModified = Date()
+    self.infobox = []
+    self.gender = nil
+    self.bloodType = nil
+    self.birthYear = nil
+    self.birthMonth = nil
+    self.birthDay = nil
+    self.stat = Stat()
+  }
 }

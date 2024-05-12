@@ -80,7 +80,7 @@ struct SubjectCharactersView: View {
                       .padding(.horizontal, -4)
                       .padding(.vertical, -2)
                   }.padding(.top, 4)
-                ImageView(img: character.images.grid, width: 60, height: 80, alignment: .top)
+                ImageView(img: character.images.medium, width: 60, height: 80, alignment: .top)
                 Text(character.name).font(.caption)
                 if let actor = character.actors.first {
                   Text("CV: \(actor.name)").foregroundStyle(.secondary).font(.caption2)

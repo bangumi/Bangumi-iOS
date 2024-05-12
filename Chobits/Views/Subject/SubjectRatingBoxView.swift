@@ -79,7 +79,7 @@ struct SubjectRatingBoxView: View {
         FlowStack {
           ForEach(collectionDesc, id: \.self) { desc in
             HStack {
-              Text(desc).foregroundStyle(Color("LinkTextColor"))
+              Text(desc)
               Text("/  ").foregroundStyle(.secondary)
             }.font(.footnote)
           }

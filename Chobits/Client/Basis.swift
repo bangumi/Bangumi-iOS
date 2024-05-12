@@ -530,7 +530,7 @@ enum CharacterType: UInt8, Codable, Identifiable {
     case .vehicle:
       return "car"
     case .ship:
-      return "ship"
+      return "ferry"
     case .organization:
       return "building.2"
     }

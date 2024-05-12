@@ -96,3 +96,87 @@ final class Character {
     self.stat = Stat()
   }
 }
+
+@Model
+final class CharacterRelatedSubject {
+  @Attribute(.unique)
+  var uk: String
+
+  var characterId: UInt
+  var subjectId: UInt
+  var staff: String
+  var name: String
+  var nameCn: String
+  var image: String
+  var sort: Float
+
+  init(
+    uk: String, characterId: UInt, subjectId: UInt, staff: String, name: String, nameCn: String,
+    image: String, sort: Float
+  ) {
+    self.uk = uk
+    self.characterId = characterId
+    self.subjectId = subjectId
+    self.staff = staff
+    self.name = name
+    self.nameCn = nameCn
+    self.image = image
+    self.sort = sort
+  }
+
+  init(_ item: CharacterSubjectItem, characterId: UInt, sort: Float = 0) {
+    self.uk = "\(characterId)-\(item.id)"
+    self.characterId = characterId
+    self.subjectId = item.id
+    self.staff = item.staff
+    self.name = item.name ?? ""
+    self.nameCn = item.nameCn
+    self.image = item.image
+    self.sort = sort
+  }
+}
+
+@Model
+final class CharacterRelatedPerson {
+  @Attribute(.unique)
+  var uk: String
+
+  var characterId: UInt
+  var personId: UInt
+  var name: String
+  var type: UInt8
+  var images: Images
+  var subjectId: UInt
+  var subjectName: String
+  var subjectNameCn: String
+  var staff: String
+
+  init(
+    uk: String, characterId: UInt, personId: UInt, name: String, type: UInt8, images: Images,
+    subjectId: UInt, subjectName: String, subjectNameCn: String, staff: String
+  ) {
+    self.uk = uk
+    self.characterId = characterId
+    self.personId = personId
+    self.name = name
+    self.type = type
+    self.images = images
+    self.subjectId = subjectId
+    self.subjectName = subjectName
+    self.subjectNameCn = subjectNameCn
+    self.staff = staff
+  }
+
+  init(_ item: CharacterPersonItem, characterId: UInt, sort: Float = 0) {
+    self.uk = "\(characterId)-\(item.id)"
+    self.characterId = characterId
+    self.personId = item.id
+    self.name = item.name
+    self.type = item.type.rawValue
+    self.images = item.images ?? Images()
+    self.subjectId = item.subjectId
+    self.subjectName = item.subjectName
+    self.subjectNameCn = item.subjectNameCn
+    self.staff = item.staff ?? ""
+  }
+}

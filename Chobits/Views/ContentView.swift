@@ -92,7 +92,8 @@ struct ContentView: View {
           .tabItem {
             Image(systemName: "magnifyingglass")
           }
-      }.environment(navState)
+      }
+      .environment(navState)
     }
   }
 }

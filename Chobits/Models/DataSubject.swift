@@ -172,6 +172,26 @@ final class Subject {
     self.collection = SubjectCollection()
     self.tags = []
   }
+
+  init(_ item: CharacterSubjectItem) {
+    self.id = item.id
+    self.type = 0
+    self.name = item.name ?? ""
+    self.nameCn = item.nameCn
+    self.summary = ""
+    self.nsfw = false
+    self.locked = false
+    self.date = Date()
+    self.platform = ""
+    self.images = SubjectImages(image: item.image)
+    self.infobox = []
+    self.volumes = 0
+    self.eps = 0
+    self.totalEpisodes = 0
+    self.rating = Rating(rank: 0, total: 0, count: [:], score: 0)
+    self.collection = SubjectCollection()
+    self.tags = []
+  }
 }
 
 @Model

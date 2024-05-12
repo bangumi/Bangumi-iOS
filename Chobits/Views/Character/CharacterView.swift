@@ -9,6 +9,9 @@ import OSLog
 import SwiftData
 import SwiftUI
 
+let INFOBOX_NAME_CN_KEYS: [String] = ["简体中文名", "中文名"]
+let INFOBOX_IGNORE_KEYS: [String] = ["简体中文名", "中文名", "声优"]
+
 struct CharacterView: View {
   var characterId: UInt
 
@@ -24,7 +27,7 @@ struct CharacterView: View {
 
   @Query
   private var characters: [Character]
-  var character: Character? { characters.first }
+  private var character: Character? { characters.first }
 
   init(characterId: UInt) {
     self.characterId = characterId
@@ -36,6 +39,20 @@ struct CharacterView: View {
 
   var shareLink: URL {
     URL(string: "https://\(shareDomain)/character/\(characterId)")!
+  }
+
+  var nameCn: String {
+    guard let character = character else {
+      return ""
+    }
+    for item in character.infobox {
+      if INFOBOX_NAME_CN_KEYS.contains(item.key) {
+        if case .string(let val) = item.value {
+          return val
+        }
+      }
+    }
+    return ""
   }
 
   func refresh() async {
@@ -66,6 +83,29 @@ struct CharacterView: View {
         ScrollView(showsIndicators: false) {
           LazyVStack(alignment: .leading) {
 
+            /// title
+            Text(character.name)
+              .font(.title2.bold())
+              .multilineTextAlignment(.leading)
+            HStack(alignment: .bottom) {
+              if !nameCn.isEmpty {
+                Text(nameCn)
+                  .font(.footnote)
+                  .foregroundStyle(.secondary)
+                  .lineLimit(1)
+              }
+              if character.locked {
+                Label("", systemImage: "lock")
+                  .foregroundStyle(.red)
+              }
+              Spacer()
+              if !isolationMode {
+                Label("评论: \(character.stat.comments)", systemImage: "bubble")
+                  .font(.footnote)
+                  .foregroundStyle(Color("LinkTextColor"))
+              }
+            }
+
             /// header
             HStack(alignment: .top) {
               ImageView(img: character.images.medium, width: 100, height: 150, alignment: .top)
@@ -78,35 +118,47 @@ struct CharacterView: View {
                     .presentationDetents([.fraction(0.8)])
                 }
               VStack(alignment: .leading) {
-                HStack {
+                HStack{
                   Label(character.typeEnum.description, systemImage: character.typeEnum.icon)
-                    .foregroundStyle(
-                      .accent)
+                    .foregroundStyle(.secondary)
                   Spacer()
-                  if character.locked {
-                    Label("", systemImage: "lock").foregroundStyle(.red)
+                  Text("收藏: \(character.stat.collects)").foregroundStyle(.secondary)
+                }
+                ForEach(character.infobox, id: \.key) { item in
+                  HStack(alignment: .top) {
+                    if !INFOBOX_IGNORE_KEYS.contains(item.key) {
+                      Text("\(item.key):")
+                      switch item.value {
+                      case .string(let val):
+                        Text(val).foregroundStyle(.secondary)
+                      case .list(let vals):
+                        VStack(alignment: .leading) {
+                          if item.key == "别名" {
+                            ForEach(vals, id: \.k) { val in
+                              if let valk = val.k {
+                                Text("\(valk): \(val.v)").foregroundStyle(.secondary)
+                              } else {
+                                Text("\(val.v)").foregroundStyle(.secondary)
+                              }
+                            }
+                          } else {
+                            ForEach(vals, id: \.v) { val in
+                              if let valk = val.k {
+                                Text("\(valk): \(val.v)").foregroundStyle(.secondary)
+                              } else {
+                                Text("\(val.v)").foregroundStyle(.secondary)
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
                   }
                 }
-
-                Spacer()
-                Text(character.name)
-                  .font(.title2.bold())
-                  .multilineTextAlignment(.leading)
-                  .lineLimit(2)
-                Spacer()
-
-                Spacer()
-                HStack {
-                  Label("收藏: \(character.stat.collects)", systemImage: "heart.fill")
-                  Spacer()
-                  if !isolationMode {
-                    Label("评论: \(character.stat.comments)", systemImage: "bubble")
-                  }
-                }
-                .font(.footnote)
-                .foregroundStyle(.accent)
               }
-            }.padding(.bottom, 16)
+              .padding(.leading, 2)
+              .font(.footnote)
+            }
 
             /// summary
             Section {
@@ -143,6 +195,9 @@ struct CharacterView: View {
                   }
                 )
             }
+
+            /// related subjects
+            CharacterSubjectsView(characterId: characterId)
           }
         }.padding(.horizontal, 8)
       } else {
@@ -171,9 +226,13 @@ struct CharacterView: View {
 
   let character = Character.preview
   container.mainContext.insert(character)
+  container.mainContext.insert(Subject.previewAnime)
+  container.mainContext.insert(Subject.previewBook)
 
-  return CharacterView(characterId: character.id)
-    .environmentObject(Notifier())
-    .environment(ChiiClient(container: container, mock: .anime))
-    .modelContainer(container)
+  return NavigationStack {
+    CharacterView(characterId: character.id)
+      .environmentObject(Notifier())
+      .environment(ChiiClient(container: container, mock: .anime))
+      .modelContainer(container)
+  }
 }
