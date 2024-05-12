@@ -132,8 +132,15 @@ struct InfoboxValueListValue: Codable, Identifiable {
   var k: String?
   var v: String
 
+  var desc: String {
+    if let k = self.k {
+      return "\(k): \(self.v)"
+    }
+    return self.v
+  }
+
   var id: String {
-    self.k ?? self.v
+    self.desc
   }
 }
 

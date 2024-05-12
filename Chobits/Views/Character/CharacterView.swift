@@ -130,22 +130,8 @@ struct CharacterView: View {
                         Text(val).foregroundStyle(.secondary)
                       case .list(let vals):
                         VStack(alignment: .leading) {
-                          if item.key == "别名" {
-                            ForEach(vals, id: \.k) { val in
-                              if let valk = val.k {
-                                Text("\(valk): \(val.v)").foregroundStyle(.secondary)
-                              } else {
-                                Text("\(val.v)").foregroundStyle(.secondary)
-                              }
-                            }
-                          } else {
-                            ForEach(vals, id: \.v) { val in
-                              if let valk = val.k {
-                                Text("\(valk): \(val.v)").foregroundStyle(.secondary)
-                              } else {
-                                Text("\(val.v)").foregroundStyle(.secondary)
-                              }
-                            }
+                          ForEach(vals, id: \.desc) { val in
+                            Text(val.desc).foregroundStyle(.secondary)
                           }
                         }
                       }
