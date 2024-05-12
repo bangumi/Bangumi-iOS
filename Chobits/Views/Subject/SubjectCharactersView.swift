@@ -57,7 +57,7 @@ struct SubjectCharactersView: View {
 
   var body: some View {
     Section {
-      VStack {
+      if counts > 0 {
         HStack {
           Text("角色介绍").font(.title3)
           Spacer()

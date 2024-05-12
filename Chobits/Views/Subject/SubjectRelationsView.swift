@@ -57,7 +57,7 @@ struct SubjectRelationsView: View {
 
   var body: some View {
     Section {
-      VStack {
+      if counts > 0 {
         HStack {
           Text("关联条目").font(.title3)
           Spacer()

@@ -118,7 +118,7 @@ struct CharacterView: View {
                     .presentationDetents([.fraction(0.8)])
                 }
               VStack(alignment: .leading) {
-                HStack{
+                HStack {
                   Label(character.typeEnum.description, systemImage: character.typeEnum.icon)
                     .foregroundStyle(.secondary)
                   Spacer()
