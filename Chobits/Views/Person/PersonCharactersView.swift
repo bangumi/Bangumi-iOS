@@ -43,8 +43,8 @@ struct PersonCharactersView: View {
 
   var body: some View {
     VStack(alignment: .leading) {
-      Divider()
       if characters.count > 0 {
+        Divider()
         HStack {
           Text("最近演出角色").font(.title3)
           Spacer()

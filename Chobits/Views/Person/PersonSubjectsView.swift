@@ -43,8 +43,8 @@ struct PersonSubjectsView: View {
 
   var body: some View {
     VStack(alignment: .leading) {
-      Divider()
       if subjects.count > 0 {
+        Divider()
         HStack {
           Text("最近参与").font(.title3)
           Spacer()
