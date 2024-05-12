@@ -25,9 +25,10 @@ struct SubjectCharactersView: View {
     var descriptor = FetchDescriptor<SubjectRelatedCharacter>(
       predicate: #Predicate<SubjectRelatedCharacter> {
         $0.subjectId == subjectId
-      }, sortBy: [
+      },
+      sortBy: [
         SortDescriptor<SubjectRelatedCharacter>(\.relation),
-        SortDescriptor<SubjectRelatedCharacter>(\.characterId)
+        SortDescriptor<SubjectRelatedCharacter>(\.characterId),
       ])
     descriptor.fetchLimit = 10
     _characters = Query(descriptor)

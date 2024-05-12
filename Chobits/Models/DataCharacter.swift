@@ -168,7 +168,7 @@ final class CharacterRelatedPerson {
   }
 
   init(_ item: CharacterPersonItem, characterId: UInt, sort: Float = 0) {
-    self.uk = "\(characterId)-\(item.id)"
+    self.uk = "\(characterId)-\(item.id)-\(item.subjectId)"
     self.characterId = characterId
     self.personId = item.id
     self.name = item.name
