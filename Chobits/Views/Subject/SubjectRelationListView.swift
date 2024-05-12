@@ -22,7 +22,7 @@ struct SubjectRelationListView: View {
     let descriptor = FetchDescriptor<SubjectRelation>(
       predicate: #Predicate<SubjectRelation> {
         $0.subjectId == subjectId
-      }, sortBy: [SortDescriptor<SubjectRelation>(\.sort)])
+      }, sortBy: [SortDescriptor<SubjectRelation>(\.relationId)])
     _relations = Query(descriptor)
   }
 

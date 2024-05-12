@@ -61,7 +61,7 @@ struct CharacterSubjectItemView: View {
 
   var body: some View {
     if let subject = subject {
-      HStack {
+      HStack(alignment: .bottom) {
         NavigationLink(value: NavDestination.subject(subjectId: subjectId)) {
           ImageView(img: subject.images.common, width: 60, height: 60)
           VStack(alignment: .leading) {
@@ -97,20 +97,14 @@ struct CharacterSubjectItemView: View {
         Spacer()
         if let person = person {
           NavigationLink(value: NavDestination.person(personId: person.personId)) {
-            HStack {
+            HStack(alignment: .bottom) {
               VStack(alignment: .trailing) {
-                Text(person.name)
-                  .font(.footnote)
-                  .foregroundStyle(Color("LinkTextColor"))
                 Text("CV")
                   .font(.caption)
                   .foregroundStyle(.secondary)
-                  .overlay {
-                    RoundedRectangle(cornerRadius: 4)
-                      .stroke(Color.secondary, lineWidth: 1)
-                      .padding(.horizontal, -2)
-                      .padding(.vertical, 1)
-                  }
+                Text(person.name)
+                  .font(.footnote)
+                  .foregroundStyle(Color("LinkTextColor"))
               }
               ImageView(img: person.images.grid, width: 40, height: 40, alignment: .top)
             }

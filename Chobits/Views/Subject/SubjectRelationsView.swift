@@ -25,7 +25,7 @@ struct SubjectRelationsView: View {
     var descriptor = FetchDescriptor<SubjectRelation>(
       predicate: #Predicate<SubjectRelation> {
         $0.subjectId == subjectId
-      }, sortBy: [SortDescriptor<SubjectRelation>(\.sort)])
+      }, sortBy: [SortDescriptor<SubjectRelation>(\.relationId)])
     descriptor.fetchLimit = 10
     _relations = Query(descriptor)
   }
