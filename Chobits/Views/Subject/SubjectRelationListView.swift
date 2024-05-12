@@ -17,10 +17,6 @@ struct SubjectRelationListView: View {
   @State private var subjectType: SubjectType = .unknown
   @State private var relations: [SubjectRelation] = []
 
-  init(subjectId: UInt) {
-    self.subjectId = subjectId
-  }
-
   func load() async {
     let stype = subjectType.rawValue
     let zero: UInt8 = 0
@@ -41,14 +37,13 @@ struct SubjectRelationListView: View {
 
   var body: some View {
     Picker("Subject Type", selection: $subjectType) {
-      Text("全部").tag(SubjectType.unknown)
-      ForEach(SubjectType.searchTypes()) { type in
+      ForEach(SubjectType.allCases) { type in
         Text(type.description).tag(type)
       }
     }
     .padding(.horizontal, 8)
     .pickerStyle(.segmented)
-    .onAppear() {
+    .onAppear {
       Task {
         await load()
       }

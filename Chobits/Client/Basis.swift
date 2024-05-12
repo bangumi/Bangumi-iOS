@@ -303,7 +303,7 @@ enum CollectionType: UInt8, Codable, Identifiable {
 /// 6 为 三次元
 ///
 /// 没有 5
-enum SubjectType: UInt8, Codable, Identifiable {
+enum SubjectType: UInt8, Codable, Identifiable, CaseIterable {
   case unknown = 0
   case book = 1
   case anime = 2
@@ -380,6 +380,43 @@ enum SubjectType: UInt8, Codable, Identifiable {
       return "gamecontroller"
     case .real:
       return "play.tv"
+    }
+  }
+}
+
+enum SubjectCharacterRelationType: String, Identifiable, CaseIterable {
+  case unknown
+  case main
+  case secondary
+  case cameo
+
+  var id: Self {
+    self
+  }
+
+  init(_ value: String) {
+    switch value {
+    case "主角":
+      self = .main
+    case "配角":
+      self = .secondary
+    case "客串":
+      self = .cameo
+    default:
+      self = .unknown
+    }
+  }
+
+  var description: String {
+    switch self {
+    case .unknown:
+      return "全部"
+    case .main:
+      return "主角"
+    case .secondary:
+      return "配角"
+    case .cameo:
+      return "客串"
     }
   }
 }

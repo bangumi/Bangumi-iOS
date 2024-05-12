@@ -21,7 +21,10 @@ struct ImageView: View {
   let alignment: Alignment
   let type: ImageType
 
-  init(img: String?, width: CGFloat, height: CGFloat, alignment: Alignment = .center, type: ImageType = .common) {
+  init(
+    img: String?, width: CGFloat, height: CGFloat, alignment: Alignment = .center,
+    type: ImageType = .common
+  ) {
     self.img = img
     self.width = width
     self.height = height

@@ -14,19 +14,48 @@ struct SubjectCharacterListView: View {
   @EnvironmentObject var notifier: Notifier
   @EnvironmentObject var chii: ChiiClient
 
-  @Query
-  private var characters: [SubjectRelatedCharacter]
+  @State private var relationType: SubjectCharacterRelationType = .unknown
+  @State private var characters: [SubjectRelatedCharacter] = []
 
-  init(subjectId: UInt) {
-    self.subjectId = subjectId
+  func load() async {
+    let rtype = relationType.description
     let descriptor = FetchDescriptor<SubjectRelatedCharacter>(
       predicate: #Predicate<SubjectRelatedCharacter> {
-        $0.subjectId == subjectId
-      }, sortBy: [SortDescriptor<SubjectRelatedCharacter>(\.characterId)])
-    _characters = Query(descriptor)
+        if rtype == "全部" {
+          return $0.subjectId == subjectId
+        } else {
+          return $0.subjectId == subjectId && $0.relation == rtype
+        }
+      },
+      sortBy: [
+        SortDescriptor<SubjectRelatedCharacter>(\.relation),
+        SortDescriptor<SubjectRelatedCharacter>(\.characterId),
+      ])
+    do {
+      characters = try await chii.db.fetchData(descriptor)
+    } catch {
+      notifier.alert(error: error)
+    }
   }
 
   var body: some View {
+    Picker("Relation Type", selection: $relationType) {
+      ForEach(SubjectCharacterRelationType.allCases) { type in
+        Text(type.description).tag(type)
+      }
+    }
+    .padding(.horizontal, 8)
+    .pickerStyle(.segmented)
+    .onAppear {
+      Task {
+        await load()
+      }
+    }
+    .onChange(of: relationType) { _, _ in
+      Task {
+        await load()
+      }
+    }
     ScrollView {
       LazyVStack(alignment: .leading) {
         ForEach(characters) { character in
