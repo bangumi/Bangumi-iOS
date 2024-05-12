@@ -53,22 +53,20 @@ struct PersonCharactersView: View {
           //        }.buttonStyle(.plain)
           Text("更多角色 »").font(.caption).foregroundStyle(Color("LinkTextColor"))
         }
+      } else if !refreshed {
+        ProgressView()
+          .onAppear {
+            Task(priority: .background) {
+              await refresh()
+            }
+          }
       }
 
       ForEach(characters) { item in
-        PersonCharacterItemView(personId: personId, characterId: item.characterId, subjectId: item.subjectId)
+        PersonCharacterItemView(
+          personId: personId, characterId: item.characterId, subjectId: item.subjectId)
       }
-
-      Spacer()
-    }
-    .animation(.default, value: characters)
-    .onAppear {
-      Task(priority: .background) {
-        if characters.count == 0 {
-          await refresh()
-        }
-      }
-    }
+    }.animation(.default, value: characters)
   }
 }
 

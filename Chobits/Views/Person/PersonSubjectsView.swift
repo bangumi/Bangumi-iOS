@@ -53,6 +53,13 @@ struct PersonSubjectsView: View {
           //        }.buttonStyle(.plain)
           Text("更多作品 »").font(.caption).foregroundStyle(Color("LinkTextColor"))
         }
+      } else if !refreshed {
+        ProgressView()
+          .onAppear {
+            Task(priority: .background) {
+              await refresh()
+            }
+          }
       }
 
       ForEach(subjects, id: \.subjectId) { subject in
@@ -87,17 +94,7 @@ struct PersonSubjectsView: View {
           }
         }.buttonStyle(.plain)
       }
-
-      Spacer()
-    }
-    .animation(.default, value: subjects)
-    .onAppear {
-      Task(priority: .background) {
-        if subjects.count == 0 {
-          await refresh()
-        }
-      }
-    }
+    }.animation(.default, value: subjects)
   }
 }
 

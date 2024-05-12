@@ -43,23 +43,21 @@ struct CharacterSubjectsView: View {
 
   var body: some View {
     VStack(alignment: .leading) {
-      Divider()
-      Text("出演").font(.title3)
-
+      if subjects.count > 0 {
+        Divider()
+        Text("出演").font(.title3)
+      } else if !refreshed {
+        ProgressView()
+          .onAppear {
+            Task(priority: .background) {
+              await refresh()
+            }
+          }
+      }
       ForEach(subjects) { item in
         CharacterSubjectItemView(characterId: characterId, subjectId: item.subjectId)
       }
-
-      Spacer()
-    }
-    .animation(.default, value: subjects)
-    .onAppear {
-      Task(priority: .background) {
-        if subjects.count == 0 {
-          await refresh()
-        }
-      }
-    }
+    }.animation(.default, value: subjects)
   }
 }
 

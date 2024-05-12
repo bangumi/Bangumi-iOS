@@ -48,6 +48,7 @@ struct SubjectCharactersView: View {
 
   var body: some View {
     if characters.count > 0 {
+      Divider()
       HStack {
         Text("角色介绍").font(.title3)
         Spacer()
@@ -63,6 +64,7 @@ struct SubjectCharactersView: View {
           }
         }
     }
+
     ScrollView(.horizontal, showsIndicators: false) {
       LazyHStack(alignment: .top) {
         ForEach(characters) { character in

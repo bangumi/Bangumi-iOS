@@ -5,8 +5,8 @@
 //  Created by Chuan Chuan on 2024/5/12.
 //
 
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 struct PersonCharacterItemView: View {
   var personId: UInt
@@ -44,47 +44,47 @@ struct PersonCharacterItemView: View {
     _subjects = Query(subjectDescriptor)
   }
 
-    var body: some View {
-      if let character = character {
-        HStack(alignment: .bottom) {
-          NavigationLink(value: NavDestination.character(characterId: characterId)) {
-            ImageView(img: character.images.medium, width: 60, height: 60, alignment: .top)
-            VStack(alignment: .leading) {
-                Text(character.name)
+  var body: some View {
+    if let character = character {
+      HStack(alignment: .bottom) {
+        NavigationLink(value: NavDestination.character(characterId: characterId)) {
+          ImageView(img: character.images.medium, width: 60, height: 60, alignment: .top)
+          VStack(alignment: .leading) {
+            Text(character.name)
+              .foregroundStyle(Color("LinkTextColor"))
+              .lineLimit(1)
+            Text(character.staff)
+              .font(.footnote)
+              .foregroundStyle(.secondary)
+              .overlay {
+                RoundedRectangle(cornerRadius: 4)
+                  .stroke(Color.secondary, lineWidth: 1)
+                  .padding(.horizontal, -2)
+                  .padding(.vertical, -1)
+              }
+          }
+        }.buttonStyle(.plain)
+        Spacer()
+        if let subject = subject {
+          NavigationLink(value: NavDestination.subject(subjectId: subjectId)) {
+            HStack(alignment: .bottom) {
+              VStack(alignment: .trailing) {
+                Text(subject.nameCn)
+                  .font(.caption)
+                  .foregroundStyle(.secondary)
+                  .lineLimit(1)
+                Text(subject.name)
+                  .font(.footnote)
                   .foregroundStyle(Color("LinkTextColor"))
                   .lineLimit(1)
-                Text(character.staff)
-                  .font(.footnote)
-                  .foregroundStyle(.secondary)
-                  .overlay {
-                    RoundedRectangle(cornerRadius: 4)
-                      .stroke(Color.secondary, lineWidth: 1)
-                      .padding(.horizontal, -2)
-                      .padding(.vertical, -1)
-                  }
+              }
+              ImageView(img: subject.images.common, width: 40, height: 40, type: .subject)
             }
           }.buttonStyle(.plain)
-          Spacer()
-          if let subject = subject {
-            NavigationLink(value: NavDestination.subject(subjectId: subjectId)) {
-              HStack(alignment: .bottom) {
-                VStack(alignment: .trailing) {
-                  Text(subject.nameCn)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
-                  Text(subject.name)
-                    .font(.footnote)
-                    .foregroundStyle(Color("LinkTextColor"))
-                    .lineLimit(1)
-                }
-                ImageView(img: subject.images.common, width: 40, height: 40, type: .subject)
-              }
-            }.buttonStyle(.plain)
-          }
         }
       }
     }
+  }
 }
 
 #Preview {

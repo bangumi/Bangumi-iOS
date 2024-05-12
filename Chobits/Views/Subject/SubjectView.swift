@@ -48,6 +48,18 @@ struct SubjectView: View {
     }
   }
 
+  func refreshAll() async {
+    do {
+      try await chii.loadSubject(subjectId)
+      try await chii.loadEpisodes(subjectId)
+      try await chii.loadSubjectCharacters(subjectId)
+      try await chii.loadSubjectRelations(subjectId)
+      try await chii.db.save()
+    } catch {
+      notifier.alert(error: error)
+    }
+  }
+
   var body: some View {
     Section {
       if let subject = subject {
@@ -75,13 +87,15 @@ struct SubjectView: View {
 
             SubjectCharactersView(subjectId: subjectId)
 
-            Divider()
             SubjectRelationsView(subjectId: subjectId)
 
             Spacer()
           }
         }
         .padding(.horizontal, 8)
+        .refreshable {
+          await refreshAll()
+        }
         .toolbar {
           ToolbarItem(placement: .navigationBarTrailing) {
             ShareLink(item: shareLink) {
