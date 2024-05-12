@@ -71,7 +71,6 @@ struct SubjectCharacterListView: View {
               }.buttonStyle(.plain)
             }
           }
-          Divider()
         }
       }
     }

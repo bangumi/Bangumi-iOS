@@ -14,23 +14,70 @@ struct SubjectRelationListView: View {
   @EnvironmentObject var notifier: Notifier
   @EnvironmentObject var chii: ChiiClient
 
-  @Query
-  private var relations: [SubjectRelation]
+  @State private var subjectType: SubjectType = .unknown
+  @State private var relations: [SubjectRelation] = []
 
   init(subjectId: UInt) {
     self.subjectId = subjectId
+  }
+
+  func load() async {
+    let stype = subjectType.rawValue
+    let zero: UInt8 = 0
     let descriptor = FetchDescriptor<SubjectRelation>(
       predicate: #Predicate<SubjectRelation> {
-        $0.subjectId == subjectId
+        if stype == zero {
+          return $0.subjectId == subjectId
+        } else {
+          return $0.subjectId == subjectId && $0.type == stype
+        }
       }, sortBy: [SortDescriptor<SubjectRelation>(\.relationId)])
-    _relations = Query(descriptor)
+    do {
+      relations = try await chii.db.fetchData(descriptor)
+    } catch {
+      notifier.alert(error: error)
+    }
   }
 
   var body: some View {
+    Picker("Subject Type", selection: $subjectType) {
+      Text("全部").tag(SubjectType.unknown)
+      ForEach(SubjectType.searchTypes()) { type in
+        Text(type.description).tag(type)
+      }
+    }
+    .padding(.horizontal, 8)
+    .pickerStyle(.segmented)
+    .onAppear() {
+      Task {
+        await load()
+      }
+    }
+    .onChange(of: subjectType) { _, _ in
+      Task {
+        await load()
+      }
+    }
     ScrollView {
       LazyVStack(alignment: .leading) {
         ForEach(relations) { subject in
-          Text(subject.name)
+          NavigationLink(value: NavDestination.subject(subjectId: subject.relationId)) {
+            HStack {
+              ImageView(img: subject.images.common, width: 60, height: 60)
+              VStack(alignment: .leading) {
+                Text(subject.name)
+                  .foregroundStyle(Color("LinkTextColor"))
+                  .lineLimit(1)
+                Text(subject.nameCn)
+                  .font(.footnote)
+                  .foregroundStyle(.secondary)
+                  .lineLimit(1)
+                Label(subject.relation, systemImage: subject.typeEnum.icon)
+                  .font(.footnote)
+                  .foregroundStyle(.secondary)
+              }
+            }
+          }.buttonStyle(.plain)
         }
       }
     }

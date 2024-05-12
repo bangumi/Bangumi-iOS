@@ -208,6 +208,10 @@ final class SubjectRelation {
   var relation: String
   var sort: Float
 
+  var typeEnum: SubjectType {
+    return SubjectType(type)
+  }
+
   init(
     uk: String, subjectId: UInt, relationId: UInt, type: UInt8, name: String, nameCn: String,
     images: SubjectImages, relation: String, sort: Float
