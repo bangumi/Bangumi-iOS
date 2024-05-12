@@ -21,6 +21,7 @@ struct CharacterView: View {
   @State private var refreshed: Bool = false
   @State private var coverDetail = false
   @State private var showSummary: Bool = false
+  @State private var showInfobox: Bool = false
 
   @Query
   private var characters: [Character]
@@ -128,36 +129,83 @@ struct CharacterView: View {
               VStack(alignment: .leading) {
                 HStack {
                   Label(character.typeEnum.description, systemImage: character.typeEnum.icon)
-                    .foregroundStyle(.secondary)
+
                   Spacer()
-                  Text("收藏: \(character.stat.collects)").foregroundStyle(.secondary)
+                  Text("收藏: \(character.stat.collects)")
                 }
-                ForEach(character.infobox, id: \.key) { item in
-                  HStack(alignment: .top) {
-                    if !INFOBOX_IGNORE_KEYS.contains(item.key) {
-                      Text("\(item.key):")
-                      switch item.value {
-                      case .string(let val):
-                        Text(val)
-                          .foregroundStyle(.secondary)
-                          .textSelection(.enabled)
-                          .lineLimit(1)
-                      case .list(let vals):
-                        VStack(alignment: .leading) {
-                          ForEach(vals, id: \.desc) { val in
-                            Text(val.desc)
-                              .foregroundStyle(.secondary)
-                              .textSelection(.enabled)
-                              .lineLimit(1)
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+                VStack(alignment: .leading) {
+                  ForEach(character.infobox, id: \.key) { item in
+                    HStack(alignment: .top) {
+                      if !INFOBOX_IGNORE_KEYS.contains(item.key) {
+                        Text("\(item.key):").fixedSize(horizontal: false, vertical: true)
+                        switch item.value {
+                        case .string(let val):
+                          Text(val)
+                            .foregroundStyle(.secondary)
+                            .textSelection(.enabled)
+                            .lineLimit(1)
+                        case .list(let vals):
+                          VStack(alignment: .leading) {
+                            ForEach(vals, id: \.desc) { val in
+                              Text(val.desc)
+                                .foregroundStyle(.secondary)
+                                .textSelection(.enabled)
+                                .lineLimit(1)
+                            }
                           }
                         }
                       }
                     }
                   }
                 }
-              }
-              .padding(.leading, 2)
-              .font(.footnote)
+                .font(.footnote)
+                .frame(maxHeight: 108, alignment: .top)
+                .clipped()
+                .sheet(isPresented: $showInfobox) {
+                  ScrollView {
+                    LazyVStack(alignment: .leading) {
+                      Text("资料").font(.title3).padding(.vertical, 10)
+                      VStack(alignment: .leading) {
+                        ForEach(character.infobox, id: \.key) { item in
+                          HStack(alignment: .top) {
+                            Text("\(item.key):")
+                            switch item.value {
+                            case .string(let val):
+                              Text(val)
+                                .foregroundStyle(.secondary)
+                                .textSelection(.enabled)
+                                .lineLimit(1)
+                            case .list(let vals):
+                              VStack(alignment: .leading) {
+                                ForEach(vals, id: \.desc) { val in
+                                  Text(val.desc)
+                                    .foregroundStyle(.secondary)
+                                    .textSelection(.enabled)
+                                    .lineLimit(1)
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                      .presentationDragIndicator(.visible)
+                      .presentationDetents([.medium, .large])
+                      Spacer()
+                    }
+                  }.padding()
+                }
+                Spacer()
+                Button(action: {
+                  showInfobox.toggle()
+                }) {
+                  Text("more...")
+                    .font(.caption)
+                    .foregroundStyle(Color("LinkTextColor"))
+                }
+
+              }.padding(.leading, 2)
             }
 
             /// summary

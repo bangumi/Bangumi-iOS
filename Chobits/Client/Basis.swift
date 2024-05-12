@@ -185,7 +185,7 @@ struct InfoboxItem: Codable, Identifiable {
 }
 
 let INFOBOX_NAME_CN_KEYS: [String] = ["简体中文名", "中文名"]
-let INFOBOX_IGNORE_KEYS: [String] = ["简体中文名", "中文名", "声优"]
+let INFOBOX_IGNORE_KEYS: [String] = ["简体中文名", "中文名", "别名", "声优", "CV"]
 
 struct Stat: Codable {
   var comments: UInt
