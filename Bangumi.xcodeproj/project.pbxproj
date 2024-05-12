@@ -24,6 +24,8 @@
 		1915A8982BEFB6CA003DB76D /* character_persons.json in Resources */ = {isa = PBXBuildFile; fileRef = 1915A8972BEFB6CA003DB76D /* character_persons.json */; };
 		1915A89A2BEFB942003DB76D /* CharacterSubjectsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1915A8992BEFB942003DB76D /* CharacterSubjectsView.swift */; };
 		1915A89C2BF04BD4003DB76D /* CharacterSubjectItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1915A89B2BF04BD4003DB76D /* CharacterSubjectItemView.swift */; };
+		1915A89E2BF09E6B003DB76D /* SubjectRelationListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1915A89D2BF09E6B003DB76D /* SubjectRelationListView.swift */; };
+		1915A8A02BF09F4D003DB76D /* SubjectCharacterListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1915A89F2BF09F4D003DB76D /* SubjectCharacterListView.swift */; };
 		19671C542BDEB55D000B4D99 /* SearchSubjectRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19671C2E2BDEB55D000B4D99 /* SearchSubjectRowView.swift */; };
 		19671C552BDEB55D000B4D99 /* SubjectCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19671C302BDEB55D000B4D99 /* SubjectCollectionView.swift */; };
 		19671C562BDEB55D000B4D99 /* SubjectHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19671C312BDEB55D000B4D99 /* SubjectHeaderView.swift */; };
@@ -101,6 +103,8 @@
 		1915A8972BEFB6CA003DB76D /* character_persons.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = character_persons.json; sourceTree = "<group>"; };
 		1915A8992BEFB942003DB76D /* CharacterSubjectsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterSubjectsView.swift; sourceTree = "<group>"; };
 		1915A89B2BF04BD4003DB76D /* CharacterSubjectItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterSubjectItemView.swift; sourceTree = "<group>"; };
+		1915A89D2BF09E6B003DB76D /* SubjectRelationListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubjectRelationListView.swift; sourceTree = "<group>"; };
+		1915A89F2BF09F4D003DB76D /* SubjectCharacterListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubjectCharacterListView.swift; sourceTree = "<group>"; };
 		19671C2E2BDEB55D000B4D99 /* SearchSubjectRowView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchSubjectRowView.swift; sourceTree = "<group>"; };
 		19671C302BDEB55D000B4D99 /* SubjectCollectionView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubjectCollectionView.swift; sourceTree = "<group>"; };
 		19671C312BDEB55D000B4D99 /* SubjectHeaderView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubjectHeaderView.swift; sourceTree = "<group>"; };
@@ -196,7 +200,9 @@
 				19671C342BDEB55D000B4D99 /* SubjectSummaryView.swift */,
 				19671C322BDEB55D000B4D99 /* SubjectRatingBoxView.swift */,
 				1909F3AA2BEC406500E3B8F0 /* SubjectCharactersView.swift */,
+				1915A89F2BF09F4D003DB76D /* SubjectCharacterListView.swift */,
 				1909F39B2BEB98F600E3B8F0 /* SubjectRelationsView.swift */,
+				1915A89D2BF09E6B003DB76D /* SubjectRelationListView.swift */,
 			);
 			path = Subject;
 			sourceTree = "<group>";
@@ -499,6 +505,7 @@
 				19C2CE5D2BE1E7B10080A056 /* NotFoundView.swift in Sources */,
 				19671C6B2BDEB55D000B4D99 /* DiscoverView.swift in Sources */,
 				19671C5B2BDEB55D000B4D99 /* CalendarView.swift in Sources */,
+				1915A89E2BF09E6B003DB76D /* SubjectRelationListView.swift in Sources */,
 				19671C5C2BDEB55D000B4D99 /* FlowStack.swift in Sources */,
 				19671C542BDEB55D000B4D99 /* SearchSubjectRowView.swift in Sources */,
 				197A19E42BE699CF00804B13 /* EpisodeListView.swift in Sources */,
@@ -506,6 +513,7 @@
 				19BD242E2BEB2F3400595973 /* Setting.swift in Sources */,
 				197A19E02BE696E200804B13 /* EpisodeGridView.swift in Sources */,
 				1909F3A52BEBC30300E3B8F0 /* DataEpisode.swift in Sources */,
+				1915A8A02BF09F4D003DB76D /* SubjectCharacterListView.swift in Sources */,
 				19671C602BDEB55D000B4D99 /* Basis.swift in Sources */,
 				19671C612BDEB55D000B4D99 /* Chii.swift in Sources */,
 				19B900322BED1EF300405F0F /* SubjectInfoboxView.swift in Sources */,

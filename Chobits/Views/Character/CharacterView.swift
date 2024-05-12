@@ -9,9 +9,6 @@ import OSLog
 import SwiftData
 import SwiftUI
 
-let INFOBOX_NAME_CN_KEYS: [String] = ["简体中文名", "中文名"]
-let INFOBOX_IGNORE_KEYS: [String] = ["简体中文名", "中文名", "声优"]
-
 struct CharacterView: View {
   var characterId: UInt
 

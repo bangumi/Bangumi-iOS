@@ -40,57 +40,42 @@ struct SubjectRelationsView: View {
     } catch {
       notifier.alert(error: error)
     }
-    await loadCounts()
-  }
-
-  func loadCounts() async {
-    do {
-      let counts = try await chii.db.fetchCount(
-        predicate: #Predicate<SubjectRelation> {
-          $0.subjectId == subjectId
-        })
-      self.counts = counts
-    } catch {
-      notifier.alert(error: error)
-    }
   }
 
   var body: some View {
-    Section {
-      if counts > 0 {
-        HStack {
-          Text("关联条目").font(.title3)
-          Spacer()
-          if counts > 10 {
-            Text("更多条目 »").font(.caption)
+    if relations.count > 0 {
+      HStack {
+        Text("关联条目").font(.title3)
+        Spacer()
+        NavigationLink(value: NavDestination.subjectRelationList(subjectId: subjectId)) {
+          Text("更多条目 »").font(.caption).foregroundStyle(Color("LinkTextColor"))
+        }.buttonStyle(.plain)
+      }
+    } else if !refreshed {
+      ProgressView()
+        .onAppear {
+          Task(priority: .background) {
+            await refresh()
           }
         }
-      }
-      ScrollView(.horizontal, showsIndicators: false) {
-        LazyHStack {
-          ForEach(relations) { relation in
-            NavigationLink(value: NavDestination.subject(subjectId: relation.relationId)) {
-              VStack {
-                Text(relation.relation).foregroundStyle(.secondary)
-                ImageView(img: relation.images.grid, width: 60, height: 60)
-                Text(relation.name)
-                  .multilineTextAlignment(.leading)
-                  .truncationMode(.middle)
-                  .lineLimit(3)
-                Spacer()
-              }.font(.caption2).frame(width: 60, height: 150)
-            }.buttonStyle(.plain)
-          }
-        }
-      }.animation(.default, value: relations)
-    }.onAppear {
-      Task(priority: .background) {
-        await loadCounts()
-        if counts == 0 {
-          await refresh()
-        }
-      }
     }
+    ScrollView(.horizontal, showsIndicators: false) {
+      LazyHStack {
+        ForEach(relations) { relation in
+          NavigationLink(value: NavDestination.subject(subjectId: relation.relationId)) {
+            VStack {
+              Text(relation.relation).foregroundStyle(.secondary)
+              ImageView(img: relation.images.grid, width: 60, height: 60)
+              Text(relation.name)
+                .multilineTextAlignment(.leading)
+                .truncationMode(.middle)
+                .lineLimit(3)
+              Spacer()
+            }.font(.caption2).frame(width: 60, height: 150)
+          }.buttonStyle(.plain)
+        }
+      }
+    }.animation(.default, value: relations)
   }
 }
 
@@ -98,6 +83,7 @@ struct SubjectRelationsView: View {
   let container = mockContainer()
 
   let subject = Subject.previewAnime
+  container.mainContext.insert(subject)
 
   return ScrollView {
     LazyVStack(alignment: .leading) {

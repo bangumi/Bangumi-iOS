@@ -103,7 +103,7 @@ struct SubjectCollectionView: View {
                 .padding(.horizontal, -2)
               }
             }
-          } else {
+          } else if refreshed {
             Label("未收藏", systemImage: "plus")
               .foregroundStyle(.secondary)
               .overlay {
@@ -124,6 +124,8 @@ struct SubjectCollectionView: View {
                     .presentationDetents(.init([.medium, .large]))
                 })
             Spacer()
+          } else {
+            ProgressView()
           }
         }.padding(.horizontal, 4)
       }

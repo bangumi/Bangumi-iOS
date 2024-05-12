@@ -80,20 +80,23 @@ struct SubjectView: View {
 
             Spacer()
           }
-        }.padding(.horizontal, 8)
-      } else {
-        NotFoundView()
-      }
-    }
-    .toolbar {
-      ToolbarItem(placement: .navigationBarTrailing) {
-        ShareLink(item: shareLink) {
-          Label("Share", systemImage: "square.and.arrow.up")
         }
+        .padding(.horizontal, 8)
+        .toolbar {
+          ToolbarItem(placement: .navigationBarTrailing) {
+            ShareLink(item: shareLink) {
+              Label("Share", systemImage: "square.and.arrow.up")
+            }
+          }
+        }
+        .navigationTitle(subject.name)
+        .navigationBarTitleDisplayMode(.inline)
+      } else if refreshed {
+        NotFoundView()
+      } else {
+        ProgressView()
       }
     }
-    .navigationTitle(subject?.name ?? "条目")
-    .navigationBarTitleDisplayMode(.inline)
     .onAppear {
       Task(priority: .background) {
         await refresh()
