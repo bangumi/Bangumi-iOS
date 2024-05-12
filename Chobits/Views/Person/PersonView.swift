@@ -38,6 +38,20 @@ struct PersonView: View {
     URL(string: "https://\(shareDomain)/person/\(personId)")!
   }
 
+  var nameCn: String {
+    guard let person = person else {
+      return ""
+    }
+    for item in person.infobox {
+      if INFOBOX_NAME_CN_KEYS.contains(item.key) {
+        if case .string(let val) = item.value {
+          return val
+        }
+      }
+    }
+    return ""
+  }
+
   func refresh() async {
     if refreshed { return }
     refreshed = true
@@ -72,6 +86,29 @@ struct PersonView: View {
         ScrollView(showsIndicators: false) {
           LazyVStack(alignment: .leading) {
 
+            /// title
+            Text(person.name)
+              .font(.title2.bold())
+              .multilineTextAlignment(.leading)
+            HStack(alignment: .bottom) {
+              if !nameCn.isEmpty {
+                Text(nameCn)
+                  .font(.footnote)
+                  .foregroundStyle(.secondary)
+                  .lineLimit(1)
+              }
+              if person.locked {
+                Label("", systemImage: "lock")
+                  .foregroundStyle(.red)
+              }
+              Spacer()
+              if !isolationMode {
+                Label("评论: \(person.stat.comments)", systemImage: "bubble")
+                  .font(.footnote)
+                  .foregroundStyle(Color("LinkTextColor"))
+              }
+            }
+
             /// header
             HStack(alignment: .top) {
               ImageView(img: person.images.medium, width: 100, height: 150, alignment: .top)
@@ -86,38 +123,44 @@ struct PersonView: View {
               VStack(alignment: .leading) {
                 HStack {
                   Label(person.typeEnum.description, systemImage: person.typeEnum.icon)
-                    .foregroundStyle(
-                      .accent)
+                    .foregroundStyle(.secondary)
                   Spacer()
-                  if person.locked {
-                    Label("", systemImage: "lock").foregroundStyle(.red)
+                  Text("收藏: \(person.stat.collects)").foregroundStyle(.secondary)
+                }
+                ForEach(person.infobox, id: \.key) { item in
+                  HStack(alignment: .top) {
+                    if !INFOBOX_IGNORE_KEYS.contains(item.key) {
+                      Text("\(item.key):")
+                      switch item.value {
+                      case .string(let val):
+                        Text(val)
+                          .foregroundStyle(.secondary)
+                          .textSelection(.enabled)
+                          .lineLimit(1)
+                      case .list(let vals):
+                        VStack(alignment: .leading) {
+                          ForEach(vals, id: \.desc) { val in
+                            Text(val.desc)
+                              .foregroundStyle(.secondary)
+                              .textSelection(.enabled)
+                              .lineLimit(1)
+                          }
+                        }
+                      }
+                    }
                   }
                 }
-
-                Spacer()
-                Text(person.name)
-                  .font(.title2.bold())
-                  .multilineTextAlignment(.leading)
-                  .lineLimit(2)
-                Spacer()
-
-                Spacer()
-                HStack {
-                  Label("收藏: \(person.stat.collects)", systemImage: "heart.fill")
-                  Spacer()
-                  if !isolationMode {
-                    Label("评论: \(person.stat.comments)", systemImage: "bubble")
-                  }
-                }
-                .font(.footnote)
-                .foregroundStyle(.accent)
               }
+              .padding(.leading, 2)
+              .font(.footnote)
             }
 
+            /// career
             HStack {
               ForEach(careers, id: \.self) { career in
                 Text(career)
-                  .padding(.horizontal, 4)
+                  .padding(.horizontal, 2)
+                  .font(.subheadline)
                   .overlay {
                     RoundedRectangle(cornerRadius: 4)
                       .stroke(.gray, lineWidth: 1)
@@ -126,7 +169,7 @@ struct PersonView: View {
                   }
               }
             }
-            .padding(.horizontal, 8)
+            .padding(.horizontal, 4)
             .padding(.bottom, 8)
 
             /// summary

@@ -138,11 +138,17 @@ struct CharacterView: View {
                       Text("\(item.key):")
                       switch item.value {
                       case .string(let val):
-                        Text(val).foregroundStyle(.secondary)
+                        Text(val)
+                          .foregroundStyle(.secondary)
+                          .textSelection(.enabled)
+                          .lineLimit(1)
                       case .list(let vals):
                         VStack(alignment: .leading) {
                           ForEach(vals, id: \.desc) { val in
-                            Text(val.desc).foregroundStyle(.secondary)
+                            Text(val.desc)
+                              .foregroundStyle(.secondary)
+                              .textSelection(.enabled)
+                              .lineLimit(1)
                           }
                         }
                       }
