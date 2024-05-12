@@ -24,7 +24,7 @@ struct CharacterSubjectsView: View {
     let descriptor = FetchDescriptor<CharacterRelatedSubject>(
       predicate: #Predicate<CharacterRelatedSubject> {
         $0.characterId == characterId
-      }, sortBy: [SortDescriptor<CharacterRelatedSubject>(\.sort)])
+      }, sortBy: [SortDescriptor<CharacterRelatedSubject>(\.subjectId)])
     _subjects = Query(descriptor)
   }
 

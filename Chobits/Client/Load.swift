@@ -198,8 +198,8 @@ extension ChiiClient {
 
   func loadCharacterSubjects(_ cid: UInt) async throws {
     let response = try await self.getCharacterSubjects(cid)
-    for (idx, item) in response.enumerated() {
-      let related = CharacterRelatedSubject(item, characterId: cid, sort: Float(idx))
+    for item in response {
+      let related = CharacterRelatedSubject(item, characterId: cid)
       await self.db.insert(related)
       let subject = Subject(item)
       let subjectId = subject.id
@@ -213,8 +213,8 @@ extension ChiiClient {
 
   func loadCharacterPersons(_ cid: UInt) async throws {
     let response = try await self.getCharacterPersons(cid)
-    for (idx, item) in response.enumerated() {
-      let related = CharacterRelatedPerson(item, characterId: cid, sort: Float(idx))
+    for item in response {
+      let related = CharacterRelatedPerson(item, characterId: cid)
       await self.db.insert(related)
       let person = Person(item)
       let personId = person.id
@@ -236,4 +236,33 @@ extension ChiiClient {
     await self.db.insert(person)
   }
 
+  func loadPersonSubjects(_ pid: UInt) async throws {
+    let response = try await self.getPersonSubjects(pid)
+    for item in response {
+      let related = PersonRelatedSubject(item, personId: pid)
+      await self.db.insert(related)
+      let subject = Subject(item)
+      let subjectId = subject.id
+      try await self.db.insertIfNeeded(
+        data: subject,
+        predicate: #Predicate<Subject> {
+          $0.id == subjectId
+        })
+    }
+  }
+
+  func loadPersonCharacters(_ pid: UInt) async throws {
+    let response = try await self.getPersonCharacters(pid)
+    for item in response {
+      let related = PersonRelatedCharacter(item, personId: pid)
+      await self.db.insert(related)
+      let character = Character(item)
+      let characterId = character.id
+      try await self.db.insertIfNeeded(
+        data: character,
+        predicate: #Predicate<Character> {
+          $0.id == characterId
+        })
+    }
+  }
 }

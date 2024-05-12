@@ -95,6 +95,22 @@ final class Character {
     self.birthDay = nil
     self.stat = Stat()
   }
+
+  init(_ item: PersonCharacterItem) {
+    self.id = item.id
+    self.name = item.name
+    self.type = item.type.rawValue
+    self.images = item.images ?? Images()
+    self.summary = ""
+    self.locked = false
+    self.infobox = []
+    self.gender = nil
+    self.bloodType = nil
+    self.birthYear = nil
+    self.birthMonth = nil
+    self.birthDay = nil
+    self.stat = Stat()
+  }
 }
 
 @Model
@@ -107,12 +123,16 @@ final class CharacterRelatedSubject {
   var staff: String
   var name: String
   var nameCn: String
+  var type: UInt8
   var image: String
-  var sort: Float
+
+  var typeEnum: SubjectType {
+    return SubjectType(type)
+  }
 
   init(
     uk: String, characterId: UInt, subjectId: UInt, staff: String, name: String, nameCn: String,
-    image: String, sort: Float
+    type: UInt8, image: String
   ) {
     self.uk = uk
     self.characterId = characterId
@@ -120,19 +140,19 @@ final class CharacterRelatedSubject {
     self.staff = staff
     self.name = name
     self.nameCn = nameCn
+    self.type = type
     self.image = image
-    self.sort = sort
   }
 
-  init(_ item: CharacterSubjectItem, characterId: UInt, sort: Float = 0) {
+  init(_ item: CharacterSubjectItem, characterId: UInt) {
     self.uk = "\(characterId)-\(item.id)"
     self.characterId = characterId
     self.subjectId = item.id
     self.staff = item.staff
     self.name = item.name ?? ""
     self.nameCn = item.nameCn
+    self.type = 0 // TODO: add in API
     self.image = item.image
-    self.sort = sort
   }
 }
 

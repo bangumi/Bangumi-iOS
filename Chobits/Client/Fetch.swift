@@ -291,4 +291,32 @@ extension ChiiClient {
     Logger.api.info("finish get persons: \(pid)")
     return person
   }
+
+  func getPersonSubjects(_ pid: UInt) async throws -> [PersonSubjectItem] {
+    if self.mock != nil {
+      return loadFixture(fixture: "person_subjects.json", target: [PersonSubjectItem].self)
+    }
+    Logger.api.info("start get person subjects: \(pid)")
+    let url = self.apiBase.appendingPathComponent("v0/persons/\(pid)/subjects")
+    let data = try await request(url: url, method: "GET", authorized: self.isAuthenticated)
+    let decoder = JSONDecoder()
+    decoder.keyDecodingStrategy = .convertFromSnakeCase
+    let subjects = try decoder.decode([PersonSubjectItem].self, from: data)
+    Logger.api.info("finish get person subjects: \(pid)")
+    return subjects
+  }
+
+  func getPersonCharacters(_ pid: UInt) async throws -> [PersonCharacterItem] {
+    if self.mock != nil {
+      return loadFixture(fixture: "person_characters.json", target: [PersonCharacterItem].self)
+    }
+    Logger.api.info("start get person characters: \(pid)")
+    let url = self.apiBase.appendingPathComponent("v0/persons/\(pid)/characters")
+    let data = try await request(url: url, method: "GET", authorized: self.isAuthenticated)
+    let decoder = JSONDecoder()
+    decoder.keyDecodingStrategy = .convertFromSnakeCase
+    let characters = try decoder.decode([PersonCharacterItem].self, from: data)
+    Logger.api.info("finish get person characters: \(pid)")
+    return characters
+  }
 }
