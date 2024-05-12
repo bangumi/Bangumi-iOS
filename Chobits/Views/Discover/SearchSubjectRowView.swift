@@ -12,7 +12,7 @@ struct SearchSubjectRowView: View {
 
   var body: some View {
     HStack {
-      ImageView(img: subject.images.common, width: 60, height: 60)
+      ImageView(img: subject.images.common, width: 60, height: 60, type: .subject)
       VStack(alignment: .leading) {
         Text(subject.name).font(.headline)
         Text(subject.nameCn).font(.subheadline).foregroundStyle(.secondary)

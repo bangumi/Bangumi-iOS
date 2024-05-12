@@ -63,7 +63,7 @@ struct CharacterSubjectItemView: View {
     if let subject = subject {
       HStack(alignment: .bottom) {
         NavigationLink(value: NavDestination.subject(subjectId: subjectId)) {
-          ImageView(img: subject.images.common, width: 60, height: 60)
+          ImageView(img: subject.images.common, width: 60, height: 60, type: .subject)
           VStack(alignment: .leading) {
             HStack {
               if !subject.typeEnum.icon.isEmpty {

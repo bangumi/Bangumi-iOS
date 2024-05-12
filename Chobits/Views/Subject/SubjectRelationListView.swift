@@ -63,7 +63,7 @@ struct SubjectRelationListView: View {
         ForEach(relations) { subject in
           NavigationLink(value: NavDestination.subject(subjectId: subject.relationId)) {
             HStack {
-              ImageView(img: subject.images.common, width: 60, height: 60)
+              ImageView(img: subject.images.common, width: 60, height: 60, type: .subject)
               VStack(alignment: .leading) {
                 Text(subject.name)
                   .foregroundStyle(Color("LinkTextColor"))

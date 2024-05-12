@@ -8,17 +8,25 @@
 import Kingfisher
 import SwiftUI
 
+enum ImageType: String {
+  case common
+  case subject
+  case avatar
+}
+
 struct ImageView: View {
   let img: String?
   let width: CGFloat
   let height: CGFloat
   let alignment: Alignment
+  let type: ImageType
 
-  init(img: String?, width: CGFloat, height: CGFloat, alignment: Alignment = .center) {
+  init(img: String?, width: CGFloat, height: CGFloat, alignment: Alignment = .center, type: ImageType = .common) {
     self.img = img
     self.width = width
     self.height = height
     self.alignment = alignment
+    self.type = type
   }
 
   var imageURL: URL? {
@@ -44,7 +52,18 @@ struct ImageView: View {
       }
     } else {
       if width > 0, height > 0 {
-        Image(systemName: "photo").frame(width: width, height: height)
+        switch type {
+        case .subject:
+          Image("noIconSubject")
+            .resizable()
+            .scaledToFit()
+            .frame(width: width, height: height)
+            .clipShape(RoundedRectangle(cornerRadius: 10))
+        default:
+          Image(systemName: "photo")
+            .frame(width: width, height: height)
+            .clipShape(RoundedRectangle(cornerRadius: 10))
+        }
       } else {
         Image(systemName: "photo")
       }

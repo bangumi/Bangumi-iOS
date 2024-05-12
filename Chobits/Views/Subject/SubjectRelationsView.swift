@@ -65,7 +65,7 @@ struct SubjectRelationsView: View {
           NavigationLink(value: NavDestination.subject(subjectId: relation.relationId)) {
             VStack {
               Text(relation.relation).foregroundStyle(.secondary)
-              ImageView(img: relation.images.grid, width: 60, height: 60)
+              ImageView(img: relation.images.grid, width: 60, height: 60, type: .subject)
               Text(relation.name)
                 .multilineTextAlignment(.leading)
                 .truncationMode(.middle)
