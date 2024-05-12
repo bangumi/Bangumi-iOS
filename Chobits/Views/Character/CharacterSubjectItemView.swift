@@ -27,10 +27,6 @@ struct CharacterSubjectItemView: View {
   private var persons: [CharacterRelatedPerson]
   private var person: CharacterRelatedPerson? { persons.first }
 
-  private var subjectIcon: String {
-    return subject?.typeEnum.icon ?? "gamecontroller"
-  }
-
   init(characterId: UInt, subjectId: UInt) {
     self.characterId = characterId
     self.subjectId = subjectId

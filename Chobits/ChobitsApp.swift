@@ -31,6 +31,8 @@ struct ChobitsApp: App {
       CharacterRelatedSubject.self,
       CharacterRelatedPerson.self,
       Person.self,
+      PersonRelatedSubject.self,
+      PersonRelatedCharacter.self,
     ])
     let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
     do {

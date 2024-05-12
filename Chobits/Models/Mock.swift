@@ -22,6 +22,8 @@ func mockContainer() -> ModelContainer {
     CharacterRelatedSubject.self,
     CharacterRelatedPerson.self,
     Person.self,
+    PersonRelatedSubject.self,
+    PersonRelatedCharacter.self,
     configurations: config)
   return container
 }

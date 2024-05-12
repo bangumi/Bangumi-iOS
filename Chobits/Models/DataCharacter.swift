@@ -151,7 +151,7 @@ final class CharacterRelatedSubject {
     self.staff = item.staff
     self.name = item.name ?? ""
     self.nameCn = item.nameCn
-    self.type = 0 // TODO: add in API
+    self.type = 0  // TODO: add in API
     self.image = item.image
   }
 }

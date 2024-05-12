@@ -1,0 +1,118 @@
+//
+//  PersonSubjectsView.swift
+//  Chobits
+//
+//  Created by Chuan Chuan on 2024/5/12.
+//
+
+import SwiftData
+import SwiftUI
+
+struct PersonSubjectsView: View {
+  var personId: UInt
+
+  @EnvironmentObject var notifier: Notifier
+  @EnvironmentObject var chii: ChiiClient
+
+  @Query
+  private var subjects: [PersonRelatedSubject]
+
+  @State private var refreshed: Bool = false
+
+  init(personId: UInt) {
+    self.personId = personId
+    var descriptor = FetchDescriptor<PersonRelatedSubject>(
+      predicate: #Predicate<PersonRelatedSubject> {
+        $0.personId == personId
+      }, sortBy: [SortDescriptor<PersonRelatedSubject>(\.subjectId, order: .reverse)])
+    descriptor.fetchLimit = 5
+    _subjects = Query(descriptor)
+  }
+
+  func refresh() async {
+    if refreshed { return }
+    refreshed = true
+
+    do {
+      try await chii.loadPersonSubjects(personId)
+      try await chii.db.save()
+    } catch {
+      notifier.alert(error: error)
+    }
+  }
+
+  var body: some View {
+    VStack(alignment: .leading) {
+      Divider()
+      if subjects.count > 0 {
+        HStack {
+          Text("最近参与").font(.title3)
+          Spacer()
+          //        NavigationLink(value: NavDestination.personSubjectList(subjectId: 0)) {
+          //          Text("更多作品 »").font(.caption).foregroundStyle(Color("LinkTextColor"))
+          //        }.buttonStyle(.plain)
+          Text("更多作品 »").font(.caption).foregroundStyle(Color("LinkTextColor"))
+        }
+      }
+
+      ForEach(subjects, id: \.subjectId) { subject in
+        NavigationLink(value: NavDestination.subject(subjectId: subject.subjectId)) {
+          ImageView(img: subject.image, width: 60, height: 60, type: .subject)
+          VStack(alignment: .leading) {
+            HStack {
+              if !subject.typeEnum.icon.isEmpty {
+                Image(systemName: subject.typeEnum.icon)
+                  .font(.footnote)
+                  .foregroundStyle(.secondary)
+              }
+              Text(subject.name)
+                .foregroundStyle(Color("LinkTextColor"))
+                .lineLimit(1)
+            }
+            HStack(alignment: .bottom) {
+              Text(subject.staff)
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+                .overlay {
+                  RoundedRectangle(cornerRadius: 4)
+                    .stroke(Color.secondary, lineWidth: 1)
+                    .padding(.horizontal, -2)
+                    .padding(.vertical, -1)
+                }
+              Text(subject.nameCn)
+                .font(.footnote)
+                .lineLimit(1)
+                .foregroundStyle(.secondary)
+            }
+          }
+        }.buttonStyle(.plain)
+      }
+
+      Spacer()
+    }
+    .animation(.default, value: subjects)
+    .onAppear {
+      Task(priority: .background) {
+        if subjects.count == 0 {
+          await refresh()
+        }
+      }
+    }
+  }
+}
+
+#Preview {
+  let container = mockContainer()
+
+  let person = Person.preview
+  container.mainContext.insert(person)
+
+  return ScrollView(showsIndicators: false) {
+    LazyVStack(alignment: .leading) {
+      PersonSubjectsView(personId: person.id)
+        .environmentObject(Notifier())
+        .environment(ChiiClient(container: container, mock: .anime))
+        .modelContainer(container)
+    }.padding(.horizontal, 8)
+  }
+}

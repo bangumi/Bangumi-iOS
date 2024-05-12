@@ -51,7 +51,9 @@ struct CharacterSubjectsView: View {
       }
 
       Spacer()
-    }.onAppear {
+    }
+    .animation(.default, value: subjects)
+    .onAppear {
       Task(priority: .background) {
         if subjects.count == 0 {
           await refresh()

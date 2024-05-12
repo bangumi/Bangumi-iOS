@@ -66,6 +66,18 @@ struct PersonView: View {
     }
   }
 
+  func refreshAll() async {
+    do {
+      try await chii.loadPerson(personId)
+      try await chii.loadPersonSubjects(personId)
+      try await chii.loadPersonCharacters(personId)
+      try await chii.db.save()
+    } catch {
+      notifier.alert(error: error)
+      return
+    }
+  }
+
   func shouldShowToggle(geometry: GeometryProxy, limits: Int) -> Bool {
     let lines = Int(
       geometry.size.height / UIFont.preferredFont(forTextStyle: .body).lineHeight)
@@ -253,8 +265,15 @@ struct PersonView: View {
                   }
                 )
             }
+
+            /// subjects
+            PersonSubjectsView(personId: personId)
           }
-        }.padding(.horizontal, 8)
+        }
+        .padding(.horizontal, 8)
+        .refreshable {
+          await refreshAll()
+        }
       } else {
         NotFoundView()
       }
@@ -282,8 +301,10 @@ struct PersonView: View {
   let person = Person.preview
   container.mainContext.insert(person)
 
-  return PersonView(personId: person.id)
-    .environmentObject(Notifier())
-    .environment(ChiiClient(container: container, mock: .anime))
-    .modelContainer(container)
+  return NavigationStack {
+    PersonView(personId: person.id)
+      .environmentObject(Notifier())
+      .environment(ChiiClient(container: container, mock: .anime))
+      .modelContainer(container)
+  }
 }

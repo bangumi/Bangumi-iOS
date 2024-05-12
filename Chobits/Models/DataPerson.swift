@@ -154,6 +154,10 @@ final class PersonRelatedSubject {
   var type: UInt8
   var image: String
 
+  var typeEnum: SubjectType {
+    return SubjectType(type)
+  }
+
   init(
     uk: String, personId: UInt, subjectId: UInt, staff: String, name: String, nameCn: String,
     type: UInt8, image: String
@@ -175,7 +179,7 @@ final class PersonRelatedSubject {
     self.staff = item.staff
     self.name = item.name ?? ""
     self.nameCn = item.nameCn
-    self.type = 0 // TODO: add in API
+    self.type = 0  // TODO: add in API
     self.image = item.image ?? ""
   }
 }
