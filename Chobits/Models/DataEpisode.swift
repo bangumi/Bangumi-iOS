@@ -84,11 +84,20 @@ final class Episode {
     return "\(self.typeEnum.name).\(self.sort.episodeDisplay) \(self.name)"
   }
 
-  var waitDays: Int {
+  var waitDesc: String {
+    if airdate.timeIntervalSince1970 == 0 {
+      return "未知"
+    }
+
     let calendar = Calendar.current
     let now = Date()
     let components = calendar.dateComponents([.day], from: now, to: airdate)
-    return components.day ?? 0
+
+    if components.day == 0 {
+      return "明天"
+    } else {
+      return "\(components.day ?? 0) 天后"
+    }
   }
 
   var borderColor: Int {

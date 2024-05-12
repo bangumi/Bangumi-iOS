@@ -107,7 +107,7 @@ struct ProgressRowView: View {
             case .anime, .real:
               if let episode = nextEpisode {
                 if episode.airdate > Date() {
-                  Text("EP.\(episode.sort.episodeDisplay) ~ \(episode.waitDays) days")
+                  Text("EP.\(episode.sort.episodeDisplay) ~ \(episode.waitDesc)")
                     .foregroundStyle(.secondary)
                 } else {
                   Button {
