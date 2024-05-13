@@ -13,6 +13,7 @@ struct ChiiDiscoverView: View {
   @EnvironmentObject var notifier: Notifier
   @EnvironmentObject var chii: ChiiClient
   @EnvironmentObject var navState: NavState
+  @Environment(\.modelContext) var modelContext
 
   @State private var searching = false
   @State private var query = ""
@@ -25,13 +26,14 @@ struct ChiiDiscoverView: View {
   @State private var subjects: [EnumerateItem<Subject>] = []
 
   func localSearch(limit: Int = 50) async -> [EnumerateItem<Subject>] {
+    let fetcher = BackgroundFetcher(modelContext.container)
     let predicate = #Predicate<Subject> {
       return (subjectType.rawValue == 0 || subjectType.rawValue == $0.type)
         && ($0.name.localizedStandardContains(query)
           || $0.nameCn.localizedStandardContains(query))
     }
     do {
-      let subjects = try await chii.db.fetchData(
+      let subjects = try await fetcher.fetchData(
         predicate: predicate, limit: limit, offset: offset)
       if subjects.count < limit {
         exhausted = true

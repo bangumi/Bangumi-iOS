@@ -13,6 +13,7 @@ struct SubjectRelationListView: View {
 
   @EnvironmentObject var notifier: Notifier
   @EnvironmentObject var chii: ChiiClient
+  @Environment(\.modelContext) var modelContext
 
   @State private var subjectType: SubjectType = .unknown
   @State private var relations: [SubjectRelation] = []
@@ -20,6 +21,7 @@ struct SubjectRelationListView: View {
   func load() async {
     let stype = subjectType.rawValue
     let zero: UInt8 = 0
+    let fetcher = BackgroundFetcher(modelContext.container)
     let descriptor = FetchDescriptor<SubjectRelation>(
       predicate: #Predicate<SubjectRelation> {
         if stype == zero {
@@ -29,7 +31,7 @@ struct SubjectRelationListView: View {
         }
       }, sortBy: [SortDescriptor<SubjectRelation>(\.relationId)])
     do {
-      relations = try await chii.db.fetchData(descriptor)
+      relations = try await fetcher.fetchData(descriptor)
     } catch {
       notifier.alert(error: error)
     }

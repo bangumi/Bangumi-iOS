@@ -44,6 +44,7 @@ struct SubjectInfoboxView: View {
 
   @EnvironmentObject var notifier: Notifier
   @EnvironmentObject var chii: ChiiClient
+  @Environment(\.modelContext) var modelContext
 
   @State private var refreshed: Bool = false
   @State private var persons: [SubjectRelatedPerson] = []
@@ -61,13 +62,13 @@ struct SubjectInfoboxView: View {
   }
 
   func load() async {
+    let fetcher = BackgroundFetcher(modelContext.container)
     let descriptor = FetchDescriptor<SubjectRelatedPerson>(
       predicate: #Predicate<SubjectRelatedPerson> {
         $0.subjectId == subjectId
       }, sortBy: [SortDescriptor<SubjectRelatedPerson>(\.sort)])
-
     do {
-      self.persons = try await chii.db.fetchData(descriptor)
+      self.persons = try await fetcher.fetchData(descriptor)
     } catch {
       notifier.alert(error: error)
     }

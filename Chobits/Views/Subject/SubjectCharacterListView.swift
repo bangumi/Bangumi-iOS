@@ -13,12 +13,14 @@ struct SubjectCharacterListView: View {
 
   @EnvironmentObject var notifier: Notifier
   @EnvironmentObject var chii: ChiiClient
+  @Environment(\.modelContext) var modelContext
 
   @State private var relationType: SubjectCharacterRelationType = .unknown
   @State private var characters: [SubjectRelatedCharacter] = []
 
   func load() async {
     let rtype = relationType.description
+    let fetcher = BackgroundFetcher(modelContext.container)
     let descriptor = FetchDescriptor<SubjectRelatedCharacter>(
       predicate: #Predicate<SubjectRelatedCharacter> {
         if rtype == "全部" {
@@ -32,7 +34,7 @@ struct SubjectCharacterListView: View {
         SortDescriptor<SubjectRelatedCharacter>(\.characterId),
       ])
     do {
-      characters = try await chii.db.fetchData(descriptor)
+      characters = try await fetcher.fetchData(descriptor)
     } catch {
       notifier.alert(error: error)
     }

@@ -14,6 +14,7 @@ struct EpisodeGridView: View {
 
   @EnvironmentObject var notifier: Notifier
   @EnvironmentObject var chii: ChiiClient
+  @Environment(\.modelContext) var modelContext
 
   @State private var selected: Episode? = nil
   @State private var refreshed: Bool = false
@@ -27,6 +28,7 @@ struct EpisodeGridView: View {
 
   func load() async {
     let mainType = EpisodeType.main.rawValue
+    let fetcher = BackgroundFetcher(modelContext.container)
     var mainDescriptor = FetchDescriptor<Episode>(
       predicate: #Predicate<Episode> {
         $0.type == mainType && $0.subjectId == subjectId
@@ -40,8 +42,8 @@ struct EpisodeGridView: View {
       }, sortBy: [SortDescriptor(\.sort)])
     spDescriptor.fetchLimit = 10
     do {
-      self.episodeMains = try await chii.db.fetchData(mainDescriptor)
-      self.episodeSps = try await chii.db.fetchData(spDescriptor)
+      self.episodeMains = try await fetcher.fetchData(mainDescriptor)
+      self.episodeSps = try await fetcher.fetchData(spDescriptor)
     } catch {
       notifier.alert(error: error)
     }

@@ -14,6 +14,7 @@ struct ProgressRowView: View {
 
   @EnvironmentObject var notifier: Notifier
   @EnvironmentObject var chii: ChiiClient
+  @Environment(\.modelContext) var modelContext
 
   @State private var showEpisodeBox: Bool = false
   @State private var nextEpisode: Episode?
@@ -48,8 +49,9 @@ struct ProgressRowView: View {
       return
     }
     let zero: UInt8 = 0
+    let fetcher = BackgroundFetcher(modelContext.container)
     do {
-      let episode = try await chii.db.fetchOne(
+      let episode = try await fetcher.fetchOne(
         predicate: #Predicate<Episode> {
           $0.subjectId == subjectId && $0.type == zero && $0.collection == zero
         }, sortBy: [SortDescriptor<Episode>(\.sort, order: .forward)])

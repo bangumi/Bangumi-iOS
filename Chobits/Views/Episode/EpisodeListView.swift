@@ -14,6 +14,7 @@ struct EpisodeListView: View {
 
   @EnvironmentObject var notifier: Notifier
   @EnvironmentObject var chii: ChiiClient
+  @Environment(\.modelContext) var modelContext
 
   @State private var now: Date = Date()
   @State private var offset: Int = 0
@@ -32,17 +33,17 @@ struct EpisodeListView: View {
   }
 
   func loadCounts() async {
+    let fetcher = BackgroundFetcher(modelContext.container)
+    let mainType = EpisodeType.main.rawValue
     do {
-      let mainType = EpisodeType.main.rawValue
-      let countMain = try await chii.db.fetchCount(
-        predicate: #Predicate<Episode> {
-          $0.subjectId == subjectId && $0.type == mainType
-        })
-      let countOther = try await chii.db.fetchCount(
-        predicate: #Predicate<Episode> {
-          $0.subjectId == subjectId && $0.type != mainType
-        })
+      let countMain = try await fetcher.fetchCount(#Predicate<Episode> {
+        $0.subjectId == subjectId && $0.type == mainType
+      })
       self.countMain = countMain
+
+      let countOther = try await fetcher.fetchCount(#Predicate<Episode> {
+        $0.subjectId == subjectId && $0.type != mainType
+      })
       self.countOther = countOther
     } catch {
       notifier.alert(error: error)
@@ -50,6 +51,7 @@ struct EpisodeListView: View {
   }
 
   func fetch(limit: Int = 100) async -> [EnumerateItem<Episode>] {
+    let fetcher = BackgroundFetcher(modelContext.container)
     let sortBy =
       sortDesc ? SortDescriptor<Episode>(\.sort, order: .reverse) : SortDescriptor<Episode>(\.sort)
     let zero: UInt8 = 0
@@ -73,7 +75,7 @@ struct EpisodeListView: View {
     descriptor.fetchLimit = limit
     descriptor.fetchOffset = offset
     do {
-      let episodes = try await chii.db.fetchData(descriptor)
+      let episodes = try await fetcher.fetchData(descriptor)
       if episodes.count < limit {
         exhausted = true
       }

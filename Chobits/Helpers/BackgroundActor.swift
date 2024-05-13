@@ -54,20 +54,6 @@ public actor BackgroundActor {
     return list
   }
 
-  public func fetchData<T: PersistentModel>(_ descriptor: FetchDescriptor<T>) throws -> [T] {
-    let list: [T] = try context.fetch(descriptor)
-    return list
-  }
-
-  public func fetchCount<T: PersistentModel>(
-    predicate: Predicate<T>? = nil,
-    sortBy: [SortDescriptor<T>] = []
-  ) throws -> Int {
-    let fetchDescriptor = FetchDescriptor<T>(predicate: predicate, sortBy: sortBy)
-    let count = try context.fetchCount(fetchDescriptor)
-    return count
-  }
-
   public func insert<T: PersistentModel>(_ data: T) {
     context.insert(data)
   }
@@ -80,33 +66,6 @@ public actor BackgroundActor {
     let savedCount = try context.fetchCount(descriptor)
     if savedCount == 0 {
       context.insert(data)
-    }
-  }
-
-  public func insertOrGet<T: PersistentModel>(
-    data: T, predicate: Predicate<T>? = nil
-  ) throws -> T {
-    var fetchDescriptor = FetchDescriptor<T>(predicate: predicate)
-    fetchDescriptor.fetchLimit = 1
-    let list: [T] = try context.fetch(fetchDescriptor)
-    if let item = list.first {
-      return item
-    } else {
-      context.insert(data)
-      return data
-    }
-  }
-
-  public func createOrGet<T: PersistentModel>(
-    data: T, predicate: Predicate<T>? = nil
-  ) throws -> T {
-    var fetchDescriptor = FetchDescriptor<T>(predicate: predicate)
-    fetchDescriptor.fetchLimit = 1
-    let list: [T] = try context.fetch(fetchDescriptor)
-    if let item = list.first {
-      return item
-    } else {
-      return data
     }
   }
 
@@ -136,4 +95,50 @@ public actor BackgroundActor {
   //  public func remove<T: PersistentModel>(_ predicate: Predicate<T>? = nil) throws {
   //    try context.delete(model: T.self, where: predicate)
   //  }
+}
+
+public actor BackgroundFetcher {
+  public let modelContainer: ModelContainer
+  public let modelExecutor: any ModelExecutor
+  private var context: ModelContext { modelExecutor.modelContext }
+
+  public init(_ container: ModelContainer) {
+    self.modelContainer = container
+    let context = ModelContext(modelContainer)
+    modelExecutor = DefaultSerialModelExecutor(modelContext: context)
+  }
+
+  public func fetchOne<T: PersistentModel>(
+    predicate: Predicate<T>? = nil,
+    sortBy: [SortDescriptor<T>] = []
+  ) throws -> T? {
+    var fetchDescriptor = FetchDescriptor<T>(predicate: predicate, sortBy: sortBy)
+    fetchDescriptor.fetchLimit = 1
+    let list: [T] = try context.fetch(fetchDescriptor)
+    return list.first
+  }
+
+  public func fetchData<T: PersistentModel>(
+    predicate: Predicate<T>? = nil,
+    sortBy: [SortDescriptor<T>] = [],
+    limit: Int? = nil,
+    offset: Int? = nil
+  ) throws -> [T] {
+    var fetchDescriptor = FetchDescriptor<T>(predicate: predicate, sortBy: sortBy)
+    fetchDescriptor.fetchLimit = limit
+    fetchDescriptor.fetchOffset = offset
+    let list: [T] = try context.fetch(fetchDescriptor)
+    return list
+  }
+
+  public func fetchData<T: PersistentModel>(_ descriptor: FetchDescriptor<T>) throws -> [T] {
+    let list: [T] = try context.fetch(descriptor)
+    return list
+  }
+
+  public func fetchCount<T: PersistentModel>(_ predicate: Predicate<T>? = nil) throws -> Int {
+    let fetchDescriptor = FetchDescriptor<T>(predicate: predicate)
+    let count = try context.fetchCount(fetchDescriptor)
+    return count
+  }
 }
