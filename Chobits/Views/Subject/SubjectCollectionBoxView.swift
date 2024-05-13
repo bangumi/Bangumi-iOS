@@ -57,6 +57,14 @@ struct SubjectCollectionBoxView: View {
     return subject.tags.sorted(by: { $0.count > $1.count }).prefix(15).map { $0.name }
   }
 
+  var buttonText: String {
+    if collection == nil {
+      return priv ? "悄悄地添加" : "添加"
+    } else {
+      return priv ? "悄悄地更新" : "更新"
+    }
+  }
+
   func update() {
     self.updating = true
     Task {
@@ -84,7 +92,7 @@ struct SubjectCollectionBoxView: View {
         HStack {
           Button(action: update) {
             Spacer()
-            Text(priv ? "悄悄地更新" : "更新")
+            Text(buttonText)
             Spacer()
           }
           .buttonStyle(.borderedProminent)
