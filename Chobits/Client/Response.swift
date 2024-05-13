@@ -16,7 +16,7 @@ struct SubjectCollectionResponse: Codable {
   var total: Int
   var limit: Int
   var offset: Int
-  var data: [UserSubjectCollectionItem]
+  var data: [UserSubjectCollectionDTO]
 }
 
 struct SubjectSearchResponse: Codable {
@@ -30,12 +30,12 @@ struct EpisodeResponse: Codable {
   var total: Int
   var limit: Int
   var offset: Int
-  var data: [EpisodeItem]
+  var data: [EpisodeDTO]
 }
 
 struct EpisodeCollectionResponse: Codable {
   var total: Int
   var limit: Int
   var offset: Int
-  var data: [EpisodeCollectionItem]?
+  var data: [EpisodeCollectionDTO]?
 }

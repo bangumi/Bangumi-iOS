@@ -166,7 +166,7 @@ struct ChiiDiscoverView: View {
                 LazyVStack(alignment: .leading, spacing: 10) {
                   ForEach(subjects, id: \.inner.self) { item in
                     NavigationLink(value: NavDestination.subject(subjectId: item.inner.subjectId)) {
-                      SearchSubjectRowView(subject: item.inner.item)
+                      SearchSubjectRowView(subject: item.inner)
                         .onAppear {
                           Task {
                             if local {

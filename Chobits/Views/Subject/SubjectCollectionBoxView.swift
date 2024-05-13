@@ -10,7 +10,7 @@ import SwiftUI
 
 struct SubjectCollectionBoxView: View {
   let subjectId: UInt
-  let collection: UserSubjectCollectionItem?
+  let collection: UserSubjectCollectionDTO?
 
   @Environment(\.dismiss) private var dismiss
   @EnvironmentObject var notifier: Notifier
@@ -28,7 +28,7 @@ struct SubjectCollectionBoxView: View {
   private var subjects: [Subject]
   private var subject: Subject? { subjects.first }
 
-  init(subjectId: UInt, collection: UserSubjectCollectionItem?) {
+  init(subjectId: UInt, collection: UserSubjectCollectionDTO?) {
     self.subjectId = subjectId
     self.collection = collection
     if let collection = collection {

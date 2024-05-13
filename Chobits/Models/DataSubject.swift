@@ -33,18 +33,9 @@ final class Subject {
     return SubjectType(type)
   }
 
-  var item: SubjectItem {
-    return SubjectItem(
-      id: subjectId, type: SubjectType(type), name: name, nameCn: nameCn,
-      summary: summary, nsfw: nsfw, locked: locked,
-      date: date.formatAirdate, platform: platform,
-      images: images, infobox: infobox, volumes: volumes, eps: eps,
-      totalEpisodes: totalEpisodes, rating: rating, collection: collection, tags: tags
-    )
-  }
-
   init(
-    subjectId: UInt, type: UInt8, name: String, nameCn: String, summary: String, nsfw: Bool, locked: Bool,
+    subjectId: UInt, type: UInt8, name: String, nameCn: String, summary: String, nsfw: Bool,
+    locked: Bool,
     date: Date, platform: String, images: SubjectImages, infobox: [InfoboxItem], volumes: UInt,
     eps: UInt, totalEpisodes: UInt, rating: Rating, collection: SubjectCollection, tags: [Tag]
   ) {
@@ -67,7 +58,7 @@ final class Subject {
     self.tags = tags
   }
 
-  init(_ item: SubjectItem) {
+  init(_ item: SubjectDTO) {
     self.subjectId = item.id
     self.type = item.type.rawValue
     self.name = item.name
@@ -153,7 +144,7 @@ final class Subject {
     self.tags = []
   }
 
-  init(_ relation: SubjectRelationItem) {
+  init(_ relation: SubjectRelationDTO) {
     self.subjectId = relation.id
     self.type = relation.type.rawValue
     self.name = relation.name
@@ -173,7 +164,7 @@ final class Subject {
     self.tags = []
   }
 
-  init(_ item: CharacterSubjectItem) {
+  init(_ item: CharacterSubjectDTO) {
     self.subjectId = item.id
     self.type = 0
     self.name = item.name ?? ""
@@ -193,7 +184,7 @@ final class Subject {
     self.tags = []
   }
 
-  init(_ item: CharacterPersonItem) {
+  init(_ item: CharacterPersonDTO) {
     self.subjectId = item.subjectId
     self.type = 0
     self.name = item.subjectName
@@ -213,7 +204,7 @@ final class Subject {
     self.tags = []
   }
 
-  init(_ item: PersonSubjectItem) {
+  init(_ item: PersonSubjectDTO) {
     self.subjectId = item.id
     self.type = 0
     self.name = item.name ?? ""
@@ -233,7 +224,7 @@ final class Subject {
     self.tags = []
   }
 
-  init(_ item: PersonCharacterItem) {
+  init(_ item: PersonCharacterDTO) {
     self.subjectId = item.subjectId
     self.type = 0
     self.name = item.subjectName
@@ -287,7 +278,7 @@ final class SubjectRelation {
     self.sort = sort
   }
 
-  init(_ item: SubjectRelationItem, subjectId: UInt, sort: Float = 0) {
+  init(_ item: SubjectRelationDTO, subjectId: UInt, sort: Float = 0) {
     self.uk = "\(subjectId)-\(item.id)"
     self.subjectId = subjectId
     self.relationId = item.id
@@ -333,7 +324,7 @@ final class SubjectRelatedCharacter {
     self.sort = sort
   }
 
-  init(_ item: SubjectCharacterItem, subjectId: UInt, sort: Float = 0) {
+  init(_ item: SubjectCharacterDTO, subjectId: UInt, sort: Float = 0) {
     self.uk = "\(subjectId)-\(item.id)"
     self.subjectId = subjectId
     self.characterId = item.id
@@ -377,7 +368,7 @@ final class SubjectRelatedPerson {
     self.sort = sort
   }
 
-  init(_ item: SubjectPersonItem, subjectId: UInt, sort: Float = 0) {
+  init(_ item: SubjectPersonDTO, subjectId: UInt, sort: Float = 0) {
     self.uk = "\(subjectId)-\(item.id)"
     self.subjectId = subjectId
     self.personId = item.id

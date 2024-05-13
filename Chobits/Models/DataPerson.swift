@@ -68,7 +68,7 @@ final class Person {
     self.stat = stat
   }
 
-  init(_ item: PersonItem) {
+  init(_ item: PersonDTO) {
     self.personId = item.id
     self.name = item.name
     self.type = item.type.rawValue
@@ -86,7 +86,7 @@ final class Person {
     self.stat = item.stat
   }
 
-  init(_ item: SubjectPersonItem) {
+  init(_ item: SubjectPersonDTO) {
     self.personId = item.id
     self.name = item.name
     self.type = item.type.rawValue
@@ -122,7 +122,7 @@ final class Person {
     self.stat = Stat()
   }
 
-  init(_ item: CharacterPersonItem) {
+  init(_ item: CharacterPersonDTO) {
     self.personId = item.id
     self.name = item.name
     self.type = 0
@@ -172,7 +172,7 @@ final class PersonRelatedSubject {
     self.image = image
   }
 
-  init(_ item: PersonSubjectItem, personId: UInt) {
+  init(_ item: PersonSubjectDTO, personId: UInt) {
     self.uk = "\(personId)-\(item.id)"
     self.personId = personId
     self.subjectId = item.id
@@ -219,7 +219,7 @@ final class PersonRelatedCharacter {
     self.staff = staff
   }
 
-  init(_ item: PersonCharacterItem, personId: UInt) {
+  init(_ item: PersonCharacterDTO, personId: UInt) {
     self.uk = "\(personId)-\(item.id)-\(item.subjectId)"
     self.personId = personId
     self.characterId = item.id

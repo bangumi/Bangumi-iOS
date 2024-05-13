@@ -81,7 +81,9 @@ extension ChiiClient {
   }
 
   func loadEpisodes(_ subjectId: UInt) async throws {
-    guard let subject = try await db.fetchOne(predicate: #Predicate<Subject> { $0.subjectId == subjectId })
+    guard
+      let subject = try await db.fetchOne(
+        predicate: #Predicate<Subject> { $0.subjectId == subjectId })
     else {
       Logger.subject.error("subject \(subjectId) not found for loading episode")
       return

@@ -57,13 +57,13 @@ extension ChiiClient {
     return response
   }
 
-  func getCalendar() async throws -> [BangumiCalendarItem] {
+  func getCalendar() async throws -> [BangumiCalendarDTO] {
     Logger.api.info("start get calendar")
     let url = self.apiBase.appendingPathComponent("calendar")
     let data = try await request(url: url, method: "GET", authorized: false)
     let decoder = JSONDecoder()
     decoder.keyDecodingStrategy = .convertFromSnakeCase
-    let calendars = try decoder.decode([BangumiCalendarItem].self, from: data)
+    let calendars = try decoder.decode([BangumiCalendarDTO].self, from: data)
     Logger.api.info("finish get calendar")
     return calendars
   }
@@ -104,10 +104,10 @@ extension ChiiClient {
     return resp
   }
 
-  func getSubjectCollection(_ sid: UInt) async throws -> UserSubjectCollectionItem {
+  func getSubjectCollection(_ sid: UInt) async throws -> UserSubjectCollectionDTO {
     if let mock = self.mock {
       return loadFixture(
-        fixture: "user_collection_\(mock.name).json", target: UserSubjectCollectionItem.self)
+        fixture: "user_collection_\(mock.name).json", target: UserSubjectCollectionDTO.self)
     }
     Logger.api.info("start get subject collection: \(sid)")
     let profile = try await self.getProfile()
@@ -120,21 +120,21 @@ extension ChiiClient {
     let data = try await request(url: url, method: "GET")
     let decoder = JSONDecoder()
     decoder.keyDecodingStrategy = .convertFromSnakeCase
-    let collection = try decoder.decode(UserSubjectCollectionItem.self, from: data)
+    let collection = try decoder.decode(UserSubjectCollectionDTO.self, from: data)
     Logger.api.info("finish get subject collection: \(sid)")
     return collection
   }
 
-  func getSubject(_ sid: UInt) async throws -> SubjectItem {
+  func getSubject(_ sid: UInt) async throws -> SubjectDTO {
     if let mock = self.mock {
-      return loadFixture(fixture: "subject_\(mock.name).json", target: SubjectItem.self)
+      return loadFixture(fixture: "subject_\(mock.name).json", target: SubjectDTO.self)
     }
     Logger.api.info("start get subject: \(sid)")
     let url = self.apiBase.appendingPathComponent("v0/subjects/\(sid)")
     let data = try await request(url: url, method: "GET", authorized: self.isAuthenticated)
     let decoder = JSONDecoder()
     decoder.keyDecodingStrategy = .convertFromSnakeCase
-    let subject = try decoder.decode(SubjectItem.self, from: data)
+    let subject = try decoder.decode(SubjectDTO.self, from: data)
     Logger.api.info("finish get subject: \(sid)")
     return subject
   }
@@ -195,128 +195,128 @@ extension ChiiClient {
     return resp
   }
 
-  func getSubjectCharacters(_ sid: UInt) async throws -> [SubjectCharacterItem] {
+  func getSubjectCharacters(_ sid: UInt) async throws -> [SubjectCharacterDTO] {
     if self.mock != nil {
-      return loadFixture(fixture: "subject_characters.json", target: [SubjectCharacterItem].self)
+      return loadFixture(fixture: "subject_characters.json", target: [SubjectCharacterDTO].self)
     }
     Logger.api.info("start get subject characters: \(sid)")
     let url = self.apiBase.appendingPathComponent("v0/subjects/\(sid)/characters")
     let data = try await request(url: url, method: "GET", authorized: self.isAuthenticated)
     let decoder = JSONDecoder()
     decoder.keyDecodingStrategy = .convertFromSnakeCase
-    let characters = try decoder.decode([SubjectCharacterItem].self, from: data)
+    let characters = try decoder.decode([SubjectCharacterDTO].self, from: data)
     Logger.api.info("finish get subject characters: \(sid)")
     return characters
   }
 
-  func getSubjectPersons(_ sid: UInt) async throws -> [SubjectPersonItem] {
+  func getSubjectPersons(_ sid: UInt) async throws -> [SubjectPersonDTO] {
     if self.mock != nil {
-      return loadFixture(fixture: "subject_persons.json", target: [SubjectPersonItem].self)
+      return loadFixture(fixture: "subject_persons.json", target: [SubjectPersonDTO].self)
     }
     Logger.api.info("start get subject persons: \(sid)")
     let url = self.apiBase.appendingPathComponent("v0/subjects/\(sid)/persons")
     let data = try await request(url: url, method: "GET", authorized: self.isAuthenticated)
     let decoder = JSONDecoder()
     decoder.keyDecodingStrategy = .convertFromSnakeCase
-    let persons = try decoder.decode([SubjectPersonItem].self, from: data)
+    let persons = try decoder.decode([SubjectPersonDTO].self, from: data)
     Logger.api.info("finish get subject persons: \(sid)")
     return persons
   }
 
-  func getSubjectRelations(_ sid: UInt) async throws -> [SubjectRelationItem] {
+  func getSubjectRelations(_ sid: UInt) async throws -> [SubjectRelationDTO] {
     if self.mock != nil {
-      return loadFixture(fixture: "subject_relations.json", target: [SubjectRelationItem].self)
+      return loadFixture(fixture: "subject_relations.json", target: [SubjectRelationDTO].self)
     }
     Logger.api.info("start get subject relations: \(sid)")
     let url = self.apiBase.appendingPathComponent("v0/subjects/\(sid)/subjects")
     let data = try await request(url: url, method: "GET", authorized: self.isAuthenticated)
     let decoder = JSONDecoder()
     decoder.keyDecodingStrategy = .convertFromSnakeCase
-    let relations = try decoder.decode([SubjectRelationItem].self, from: data)
+    let relations = try decoder.decode([SubjectRelationDTO].self, from: data)
     Logger.api.info("finish get subject relations: \(sid)")
     return relations
   }
 
-  func getCharacter(_ cid: UInt) async throws -> CharacterItem {
+  func getCharacter(_ cid: UInt) async throws -> CharacterDTO {
     if self.mock != nil {
-      return loadFixture(fixture: "character.json", target: CharacterItem.self)
+      return loadFixture(fixture: "character.json", target: CharacterDTO.self)
     }
     Logger.api.info("start get characters: \(cid)")
     let url = self.apiBase.appendingPathComponent("v0/characters/\(cid)")
     let data = try await request(url: url, method: "GET", authorized: self.isAuthenticated)
     let decoder = JSONDecoder()
     decoder.keyDecodingStrategy = .convertFromSnakeCase
-    let character = try decoder.decode(CharacterItem.self, from: data)
+    let character = try decoder.decode(CharacterDTO.self, from: data)
     Logger.api.info("finish get characters: \(cid)")
     return character
   }
 
-  func getCharacterSubjects(_ cid: UInt) async throws -> [CharacterSubjectItem] {
+  func getCharacterSubjects(_ cid: UInt) async throws -> [CharacterSubjectDTO] {
     if self.mock != nil {
-      return loadFixture(fixture: "character_subjects.json", target: [CharacterSubjectItem].self)
+      return loadFixture(fixture: "character_subjects.json", target: [CharacterSubjectDTO].self)
     }
     Logger.api.info("start get character subjects: \(cid)")
     let url = self.apiBase.appendingPathComponent("v0/characters/\(cid)/subjects")
     let data = try await request(url: url, method: "GET", authorized: self.isAuthenticated)
     let decoder = JSONDecoder()
     decoder.keyDecodingStrategy = .convertFromSnakeCase
-    let subjects = try decoder.decode([CharacterSubjectItem].self, from: data)
+    let subjects = try decoder.decode([CharacterSubjectDTO].self, from: data)
     Logger.api.info("finish get character subjects: \(cid)")
     return subjects
   }
 
-  func getCharacterPersons(_ cid: UInt) async throws -> [CharacterPersonItem] {
+  func getCharacterPersons(_ cid: UInt) async throws -> [CharacterPersonDTO] {
     if self.mock != nil {
-      return loadFixture(fixture: "character_persons.json", target: [CharacterPersonItem].self)
+      return loadFixture(fixture: "character_persons.json", target: [CharacterPersonDTO].self)
     }
     Logger.api.info("start get character persons: \(cid)")
     let url = self.apiBase.appendingPathComponent("v0/characters/\(cid)/persons")
     let data = try await request(url: url, method: "GET", authorized: self.isAuthenticated)
     let decoder = JSONDecoder()
     decoder.keyDecodingStrategy = .convertFromSnakeCase
-    let persons = try decoder.decode([CharacterPersonItem].self, from: data)
+    let persons = try decoder.decode([CharacterPersonDTO].self, from: data)
     Logger.api.info("finish get character persons: \(cid)")
     return persons
   }
 
-  func getPerson(_ pid: UInt) async throws -> PersonItem {
+  func getPerson(_ pid: UInt) async throws -> PersonDTO {
     if self.mock != nil {
-      return loadFixture(fixture: "person.json", target: PersonItem.self)
+      return loadFixture(fixture: "person.json", target: PersonDTO.self)
     }
     Logger.api.info("start get persons: \(pid)")
     let url = self.apiBase.appendingPathComponent("v0/persons/\(pid)")
     let data = try await request(url: url, method: "GET", authorized: self.isAuthenticated)
     let decoder = JSONDecoder()
     decoder.keyDecodingStrategy = .convertFromSnakeCase
-    let person = try decoder.decode(PersonItem.self, from: data)
+    let person = try decoder.decode(PersonDTO.self, from: data)
     Logger.api.info("finish get persons: \(pid)")
     return person
   }
 
-  func getPersonSubjects(_ pid: UInt) async throws -> [PersonSubjectItem] {
+  func getPersonSubjects(_ pid: UInt) async throws -> [PersonSubjectDTO] {
     if self.mock != nil {
-      return loadFixture(fixture: "person_subjects.json", target: [PersonSubjectItem].self)
+      return loadFixture(fixture: "person_subjects.json", target: [PersonSubjectDTO].self)
     }
     Logger.api.info("start get person subjects: \(pid)")
     let url = self.apiBase.appendingPathComponent("v0/persons/\(pid)/subjects")
     let data = try await request(url: url, method: "GET", authorized: self.isAuthenticated)
     let decoder = JSONDecoder()
     decoder.keyDecodingStrategy = .convertFromSnakeCase
-    let subjects = try decoder.decode([PersonSubjectItem].self, from: data)
+    let subjects = try decoder.decode([PersonSubjectDTO].self, from: data)
     Logger.api.info("finish get person subjects: \(pid)")
     return subjects
   }
 
-  func getPersonCharacters(_ pid: UInt) async throws -> [PersonCharacterItem] {
+  func getPersonCharacters(_ pid: UInt) async throws -> [PersonCharacterDTO] {
     if self.mock != nil {
-      return loadFixture(fixture: "person_characters.json", target: [PersonCharacterItem].self)
+      return loadFixture(fixture: "person_characters.json", target: [PersonCharacterDTO].self)
     }
     Logger.api.info("start get person characters: \(pid)")
     let url = self.apiBase.appendingPathComponent("v0/persons/\(pid)/characters")
     let data = try await request(url: url, method: "GET", authorized: self.isAuthenticated)
     let decoder = JSONDecoder()
     decoder.keyDecodingStrategy = .convertFromSnakeCase
-    let characters = try decoder.decode([PersonCharacterItem].self, from: data)
+    let characters = try decoder.decode([PersonCharacterDTO].self, from: data)
     Logger.api.info("finish get person characters: \(pid)")
     return characters
   }

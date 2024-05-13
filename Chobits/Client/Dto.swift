@@ -1,5 +1,5 @@
 //
-//  Chii.swift
+//  Dto.swift
 //  Chobits
 //
 //  Created by Chuan Chuan on 2024/4/21.
@@ -38,12 +38,12 @@ struct Profile: Codable {
   var sign: String
 }
 
-struct BangumiCalendarItem: Codable {
+struct BangumiCalendarDTO: Codable {
   var weekday: Weekday
   var items: [SmallSubject]
 }
 
-struct UserSubjectCollectionItem: Codable {
+struct UserSubjectCollectionDTO: Codable {
   var subjectId: UInt
   var subjectType: SubjectType
   var rate: UInt8
@@ -57,7 +57,7 @@ struct UserSubjectCollectionItem: Codable {
   var subject: SlimSubject?
 }
 
-struct SubjectItem: Codable {
+struct SubjectDTO: Codable {
   var id: UInt
   var type: SubjectType
   var name: String
@@ -120,7 +120,7 @@ struct SmallSubject: Codable {
   // var collection: SubjectCollection?
 }
 
-struct SubjectRelationItem: Codable, Identifiable {
+struct SubjectRelationDTO: Codable, Identifiable {
   var id: UInt
   var type: SubjectType
   var name: String
@@ -129,7 +129,7 @@ struct SubjectRelationItem: Codable, Identifiable {
   var relation: String
 }
 
-struct SubjectCharacterItem: Codable, Identifiable {
+struct SubjectCharacterDTO: Codable, Identifiable {
   var id: UInt
   var name: String
   var type: CharacterType
@@ -148,7 +148,7 @@ struct SubjectCharacterActorItem: Codable, Identifiable {
   var locked: Bool
 }
 
-struct SubjectPersonItem: Codable, Identifiable {
+struct SubjectPersonDTO: Codable, Identifiable {
   var id: UInt
   var name: String
   var type: PersonType
@@ -157,7 +157,7 @@ struct SubjectPersonItem: Codable, Identifiable {
   var relation: String
 }
 
-struct EpisodeItem: Codable, Identifiable {
+struct EpisodeDTO: Codable, Identifiable {
   var id: UInt
   var type: EpisodeType
   var name: String
@@ -177,12 +177,12 @@ struct EpisodeItem: Codable, Identifiable {
   }
 }
 
-struct EpisodeCollectionItem: Codable {
-  var episode: EpisodeItem
+struct EpisodeCollectionDTO: Codable {
+  var episode: EpisodeDTO
   var type: EpisodeCollectionType
 }
 
-struct CharacterItem: Codable, Identifiable {
+struct CharacterDTO: Codable, Identifiable {
   var id: UInt
   var name: String
   var type: CharacterType
@@ -198,7 +198,7 @@ struct CharacterItem: Codable, Identifiable {
   var stat: Stat
 }
 
-struct CharacterSubjectItem: Codable, Identifiable {
+struct CharacterSubjectDTO: Codable, Identifiable {
   var id: UInt
   var staff: String
   var name: String?
@@ -206,7 +206,7 @@ struct CharacterSubjectItem: Codable, Identifiable {
   var image: String
 }
 
-struct CharacterPersonItem: Codable, Identifiable {
+struct CharacterPersonDTO: Codable, Identifiable {
   var id: UInt
   var name: String
   var type: CharacterType
@@ -217,7 +217,7 @@ struct CharacterPersonItem: Codable, Identifiable {
   var staff: String?
 }
 
-struct PersonItem: Codable, Identifiable {
+struct PersonDTO: Codable, Identifiable {
   var id: UInt
   var name: String
   var type: PersonType
@@ -235,7 +235,7 @@ struct PersonItem: Codable, Identifiable {
   var stat: Stat
 }
 
-struct PersonSubjectItem: Codable, Identifiable {
+struct PersonSubjectDTO: Codable, Identifiable {
   var id: UInt
   var staff: String
   var name: String?
@@ -243,7 +243,7 @@ struct PersonSubjectItem: Codable, Identifiable {
   var image: String?
 }
 
-struct PersonCharacterItem: Codable, Identifiable {
+struct PersonCharacterDTO: Codable, Identifiable {
   var id: UInt
   var name: String
   var type: CharacterType

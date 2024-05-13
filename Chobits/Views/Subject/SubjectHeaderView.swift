@@ -98,7 +98,7 @@ struct SubjectHeaderView: View {
           .sheet(
             isPresented: $collectionDetail,
             content: {
-              SubjectRatingBoxView(subject: subject.item)
+              SubjectRatingBoxView(subject: subject)
                 .presentationDragIndicator(.visible)
                 .presentationDetents(.init([.medium]))
             })

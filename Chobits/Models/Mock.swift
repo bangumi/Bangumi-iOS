@@ -45,12 +45,12 @@ func loadFixture<T: Decodable>(fixture: String, target: T.Type) -> T {
 
 extension Subject {
   static var previewAnime: Subject {
-    let item = loadFixture(fixture: "subject_anime.json", target: SubjectItem.self)
+    let item = loadFixture(fixture: "subject_anime.json", target: SubjectDTO.self)
     return Subject(item)
   }
 
   static var previewBook: Subject {
-    let item = loadFixture(fixture: "subject_book.json", target: SubjectItem.self)
+    let item = loadFixture(fixture: "subject_book.json", target: SubjectDTO.self)
     return Subject(item)
   }
 }
@@ -67,13 +67,13 @@ extension SearchSubject {
 extension UserSubjectCollection {
   static var previewAnime: UserSubjectCollection {
     let item = loadFixture(
-      fixture: "user_collection_anime.json", target: UserSubjectCollectionItem.self)
+      fixture: "user_collection_anime.json", target: UserSubjectCollectionDTO.self)
     return UserSubjectCollection(item)
   }
 
   static var previewBook: UserSubjectCollection {
     let item = loadFixture(
-      fixture: "user_collection_book.json", target: UserSubjectCollectionItem.self)
+      fixture: "user_collection_book.json", target: UserSubjectCollectionDTO.self)
     return UserSubjectCollection(item)
   }
 }
@@ -95,7 +95,7 @@ extension Episode {
 extension SubjectRelatedPerson {
   static var preview: [SubjectRelatedPerson] {
     let items = loadFixture(
-      fixture: "subject_persons.json", target: [SubjectPersonItem].self
+      fixture: "subject_persons.json", target: [SubjectPersonDTO].self
     )
     return items.map { SubjectRelatedPerson($0, subjectId: 12) }
   }
@@ -104,7 +104,7 @@ extension SubjectRelatedPerson {
 extension SubjectRelatedCharacter {
   static var preview: [SubjectRelatedCharacter] {
     let items = loadFixture(
-      fixture: "subject_characters.json", target: [SubjectCharacterItem].self
+      fixture: "subject_characters.json", target: [SubjectCharacterDTO].self
     )
     return items.map { SubjectRelatedCharacter($0, subjectId: 12) }
   }
@@ -113,7 +113,7 @@ extension SubjectRelatedCharacter {
 extension SubjectRelation {
   static var preview: [SubjectRelation] {
     let items = loadFixture(
-      fixture: "subject_relations.json", target: [SubjectRelationItem].self
+      fixture: "subject_relations.json", target: [SubjectRelationDTO].self
     )
     return items.map { SubjectRelation($0, subjectId: 12) }
   }
@@ -121,7 +121,7 @@ extension SubjectRelation {
 
 extension Character {
   static var preview: Character {
-    let item = loadFixture(fixture: "character.json", target: CharacterItem.self)
+    let item = loadFixture(fixture: "character.json", target: CharacterDTO.self)
     return Character(item)
   }
 }
@@ -129,7 +129,7 @@ extension Character {
 extension CharacterRelatedSubject {
   static var preview: [CharacterRelatedSubject] {
     let items = loadFixture(
-      fixture: "character_subjects.json", target: [CharacterSubjectItem].self
+      fixture: "character_subjects.json", target: [CharacterSubjectDTO].self
     )
     return items.map { CharacterRelatedSubject($0, characterId: 32) }
   }
@@ -138,7 +138,7 @@ extension CharacterRelatedSubject {
 extension CharacterRelatedPerson {
   static var preview: [CharacterRelatedPerson] {
     let items = loadFixture(
-      fixture: "character_persons.json", target: [CharacterPersonItem].self
+      fixture: "character_persons.json", target: [CharacterPersonDTO].self
     )
     return items.map { CharacterRelatedPerson($0, characterId: 32) }
   }
@@ -146,7 +146,7 @@ extension CharacterRelatedPerson {
 
 extension Person {
   static var preview: Person {
-    let item = loadFixture(fixture: "person.json", target: PersonItem.self)
+    let item = loadFixture(fixture: "person.json", target: PersonDTO.self)
     return Person(item)
   }
 }
@@ -154,7 +154,7 @@ extension Person {
 extension PersonRelatedCharacter {
   static var preview: [PersonRelatedCharacter] {
     let items = loadFixture(
-      fixture: "person_characters.json", target: [PersonCharacterItem].self
+      fixture: "person_characters.json", target: [PersonCharacterDTO].self
     )
     return items.map { PersonRelatedCharacter($0, personId: 3862) }
   }
@@ -163,7 +163,7 @@ extension PersonRelatedCharacter {
 extension PersonRelatedSubject {
   static var preview: [PersonRelatedSubject] {
     let items = loadFixture(
-      fixture: "person_subjects.json", target: [PersonSubjectItem].self
+      fixture: "person_subjects.json", target: [PersonSubjectDTO].self
     )
     return items.map { PersonRelatedSubject($0, personId: 3862) }
   }

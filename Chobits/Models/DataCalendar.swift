@@ -21,7 +21,7 @@ final class BangumiCalendar {
     self.items = items
   }
 
-  init(_ item: BangumiCalendarItem) {
+  init(_ item: BangumiCalendarDTO) {
     self.weekdayId = item.weekday.id
     self.weekday = item.weekday
     self.items = item.items

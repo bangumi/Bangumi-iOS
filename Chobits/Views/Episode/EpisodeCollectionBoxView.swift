@@ -150,8 +150,10 @@ struct EpisodeCollectionBoxView: View {
     container.mainContext.insert(episode)
   }
 
-  return EpisodeCollectionBoxView(subjectId: subject.subjectId, episodeId: episodes.first!.episodeId)
-    .environmentObject(Notifier())
-    .environment(ChiiClient(container: container, mock: .anime))
-    .modelContainer(container)
+  return EpisodeCollectionBoxView(
+    subjectId: subject.subjectId, episodeId: episodes.first!.episodeId
+  )
+  .environmentObject(Notifier())
+  .environment(ChiiClient(container: container, mock: .anime))
+  .modelContainer(container)
 }

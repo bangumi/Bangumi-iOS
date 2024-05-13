@@ -13,19 +13,19 @@ struct ScoreInfo {
 }
 
 struct SubjectRatingBoxView: View {
-  let subject: SubjectItem
+  let subject: Subject
 
   var collectionDesc: [String] {
     var text: [String] = []
     text.append(
-      "\(subject.collection.wish) 人\(CollectionType.wish.description(type: subject.type))")
+      "\(subject.collection.wish) 人\(CollectionType.wish.description(type: subject.typeEnum))")
     text.append(
-      "\(subject.collection.collect) 人\(CollectionType.collect.description(type: subject.type))")
-    text.append("\(subject.collection.doing) 人\(CollectionType.do.description(type: subject.type))")
+      "\(subject.collection.collect) 人\(CollectionType.collect.description(type: subject.typeEnum))")
+    text.append("\(subject.collection.doing) 人\(CollectionType.do.description(type: subject.typeEnum))")
     text.append(
-      "\(subject.collection.onHold) 人\(CollectionType.onHold.description(type: subject.type))")
+      "\(subject.collection.onHold) 人\(CollectionType.onHold.description(type: subject.typeEnum))")
     text.append(
-      "\(subject.collection.dropped) 人\(CollectionType.dropped.description(type: subject.type))")
+      "\(subject.collection.dropped) 人\(CollectionType.dropped.description(type: subject.typeEnum))")
     return text
   }
 
@@ -62,7 +62,7 @@ struct SubjectRatingBoxView: View {
             }
             if subject.rating.rank > 0 {
               HStack {
-                Text("Bangumi \(subject.type.name.capitalized) Ranked:").foregroundStyle(
+                Text("Bangumi \(subject.typeEnum.name.capitalized) Ranked:").foregroundStyle(
                   .secondary)
                 Text("#\(subject.rating.rank)")
               }
@@ -91,5 +91,5 @@ struct SubjectRatingBoxView: View {
 }
 
 #Preview {
-  SubjectRatingBoxView(subject: Subject.previewAnime.item)
+  SubjectRatingBoxView(subject: Subject.previewAnime)
 }

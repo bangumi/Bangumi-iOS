@@ -58,7 +58,7 @@ final class Episode {
     self.collection = collection
   }
 
-  init(_ item: EpisodeItem, subjectId: UInt? = 0, collection: UInt8? = 0) {
+  init(_ item: EpisodeDTO, subjectId: UInt? = 0, collection: UInt8? = 0) {
     self.episodeId = item.id
     self.type = item.type.rawValue
     self.name = item.name
@@ -76,7 +76,7 @@ final class Episode {
     self.collection = collection ?? 0
   }
 
-  convenience init(_ collection: EpisodeCollectionItem, subjectId: UInt? = 0) {
+  convenience init(_ collection: EpisodeCollectionDTO, subjectId: UInt? = 0) {
     self.init(collection.episode, subjectId: subjectId, collection: collection.type.rawValue)
   }
 

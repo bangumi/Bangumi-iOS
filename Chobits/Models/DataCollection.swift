@@ -30,8 +30,8 @@ final class UserSubjectCollection {
     CollectionType(type)
   }
 
-  var item: UserSubjectCollectionItem {
-    UserSubjectCollectionItem(
+  var item: UserSubjectCollectionDTO {
+    UserSubjectCollectionDTO(
       subjectId: subjectId, subjectType: SubjectType(subjectType),
       rate: rate, type: CollectionType(type), comment: comment,
       tags: tags, epStatus: epStatus, volStatus: volStatus,
@@ -55,7 +55,7 @@ final class UserSubjectCollection {
     self.priv = priv
   }
 
-  init(_ item: UserSubjectCollectionItem) {
+  init(_ item: UserSubjectCollectionDTO) {
     self.subjectId = item.subjectId
     self.subjectType = item.subjectType.rawValue
     self.rate = item.rate
