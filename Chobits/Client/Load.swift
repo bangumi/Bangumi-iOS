@@ -53,10 +53,9 @@ extension ChiiClient {
 
   func loadUserCollections(type: SubjectType?) async throws {
     var offset: Int = 0
-    let limit: Int = 1000
     while true {
       let response = try await self.getSubjectCollections(
-        subjectType: type, limit: limit, offset: offset)
+        subjectType: type, offset: offset)
       if response.data.isEmpty {
         break
       }
@@ -73,8 +72,9 @@ extension ChiiClient {
             })
         }
       }
-      offset += limit
-      if offset > response.total {
+      Logger.api.info("loaded user collection: \(response.data.count), total: \(response.total)")
+      offset += response.data.count
+      if offset >= response.total {
         break
       }
     }

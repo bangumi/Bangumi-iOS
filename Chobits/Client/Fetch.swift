@@ -28,7 +28,7 @@ extension ChiiClient {
     return profile
   }
 
-  func getSubjectCollections(subjectType: SubjectType?, limit: Int, offset: Int) async throws
+  func getSubjectCollections(subjectType: SubjectType?, offset: Int) async throws
     -> SubjectCollectionResponse
   {
     Logger.api.info("start get subject collections")
@@ -41,6 +41,7 @@ extension ChiiClient {
       }
     var queryItems = [
       URLQueryItem(name: "type", value: "3"),
+      // limit should less equal than 100
       URLQueryItem(name: "limit", value: "100"),
       URLQueryItem(name: "offset", value: String(offset)),
     ]
