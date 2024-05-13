@@ -31,12 +31,15 @@ struct ChiiProgressView: View {
         if type == .unknown {
           continue
         }
-        let count = try await fetcher.fetchCount(#Predicate<UserSubjectCollection> {
-            $0.type == doingType && $0.subjectType == type.rawValue
+        let tvalue = type.rawValue
+        let count = try await fetcher.fetchCount(
+          #Predicate<UserSubjectCollection> {
+            $0.type == doingType && $0.subjectType == tvalue
           })
         counts[type] = count
       }
-      let totalCount = try await fetcher.fetchCount(#Predicate<UserSubjectCollection> {
+      let totalCount = try await fetcher.fetchCount(
+        #Predicate<UserSubjectCollection> {
           $0.type == doingType
         })
       Logger.collection.info("load progress total count: \(totalCount)")

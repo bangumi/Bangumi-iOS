@@ -18,10 +18,11 @@ extension ChiiClient {
       await db.insert(cal)
       for small in item.items {
         let subject = Subject(small)
+        let sid = small.id
         try await db.insertIfNeeded(
           data: subject,
           predicate: #Predicate<Subject> {
-            $0.subjectId == small.id
+            $0.subjectId == sid
           })
       }
     }

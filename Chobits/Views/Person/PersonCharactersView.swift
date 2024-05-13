@@ -48,10 +48,9 @@ struct PersonCharactersView: View {
         HStack {
           Text("最近演出角色").font(.title3)
           Spacer()
-          //        NavigationLink(value: NavDestination.personSubjectList(subjectId: 0)) {
-          //          Text("更多角色 »").font(.caption).foregroundStyle(Color("LinkTextColor"))
-          //        }.buttonStyle(.plain)
-          Text("更多角色 »").font(.caption).foregroundStyle(Color("LinkTextColor"))
+          NavigationLink(value: NavDestination.personCharacterList(personId: personId)) {
+            Text("更多角色 »").font(.caption).foregroundStyle(Color("LinkTextColor"))
+          }.buttonStyle(.plain)
         }
       } else if !refreshed {
         ProgressView()

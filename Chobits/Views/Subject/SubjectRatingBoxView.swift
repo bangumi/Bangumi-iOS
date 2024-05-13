@@ -20,12 +20,15 @@ struct SubjectRatingBoxView: View {
     text.append(
       "\(subject.collection.wish) 人\(CollectionType.wish.description(type: subject.typeEnum))")
     text.append(
-      "\(subject.collection.collect) 人\(CollectionType.collect.description(type: subject.typeEnum))")
-    text.append("\(subject.collection.doing) 人\(CollectionType.do.description(type: subject.typeEnum))")
+      "\(subject.collection.collect) 人\(CollectionType.collect.description(type: subject.typeEnum))"
+    )
+    text.append(
+      "\(subject.collection.doing) 人\(CollectionType.do.description(type: subject.typeEnum))")
     text.append(
       "\(subject.collection.onHold) 人\(CollectionType.onHold.description(type: subject.typeEnum))")
     text.append(
-      "\(subject.collection.dropped) 人\(CollectionType.dropped.description(type: subject.typeEnum))")
+      "\(subject.collection.dropped) 人\(CollectionType.dropped.description(type: subject.typeEnum))"
+    )
     return text
   }
 

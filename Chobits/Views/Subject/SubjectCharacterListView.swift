@@ -20,10 +20,11 @@ struct SubjectCharacterListView: View {
 
   func load() async {
     let rtype = relationType.description
+    let allType = SubjectCharacterRelationType.unknown.description
     let fetcher = BackgroundFetcher(modelContext.container)
     let descriptor = FetchDescriptor<SubjectRelatedCharacter>(
       predicate: #Predicate<SubjectRelatedCharacter> {
-        if rtype == "全部" {
+        if rtype == allType {
           return $0.subjectId == subjectId
         } else {
           return $0.subjectId == subjectId && $0.relation == rtype

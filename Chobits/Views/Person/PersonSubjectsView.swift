@@ -48,10 +48,9 @@ struct PersonSubjectsView: View {
         HStack {
           Text("最近参与").font(.title3)
           Spacer()
-          //        NavigationLink(value: NavDestination.personSubjectList(subjectId: 0)) {
-          //          Text("更多作品 »").font(.caption).foregroundStyle(Color("LinkTextColor"))
-          //        }.buttonStyle(.plain)
-          Text("更多作品 »").font(.caption).foregroundStyle(Color("LinkTextColor"))
+          NavigationLink(value: NavDestination.personSubjectList(personId: personId)) {
+            Text("更多作品 »").font(.caption).foregroundStyle(Color("LinkTextColor"))
+          }.buttonStyle(.plain)
         }
       } else if !refreshed {
         ProgressView()

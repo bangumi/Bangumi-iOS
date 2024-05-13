@@ -36,14 +36,16 @@ struct EpisodeListView: View {
     let fetcher = BackgroundFetcher(modelContext.container)
     let mainType = EpisodeType.main.rawValue
     do {
-      let countMain = try await fetcher.fetchCount(#Predicate<Episode> {
-        $0.subjectId == subjectId && $0.type == mainType
-      })
+      let countMain = try await fetcher.fetchCount(
+        #Predicate<Episode> {
+          $0.subjectId == subjectId && $0.type == mainType
+        })
       self.countMain = countMain
 
-      let countOther = try await fetcher.fetchCount(#Predicate<Episode> {
-        $0.subjectId == subjectId && $0.type != mainType
-      })
+      let countOther = try await fetcher.fetchCount(
+        #Predicate<Episode> {
+          $0.subjectId == subjectId && $0.type != mainType
+        })
       self.countOther = countOther
     } catch {
       notifier.alert(error: error)
