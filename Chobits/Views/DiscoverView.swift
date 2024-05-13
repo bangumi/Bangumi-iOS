@@ -88,7 +88,7 @@ struct ChiiDiscoverView: View {
         try await chii.db.insertIfNeeded(
           data: subject,
           predicate: #Predicate<Subject> {
-            $0.id == subjectId
+            $0.subjectId == subjectId
           })
         result.append(EnumerateItem(idx: item.offset + offset, inner: subject))
       }
@@ -164,8 +164,8 @@ struct ChiiDiscoverView: View {
             } else {
               ScrollView {
                 LazyVStack(alignment: .leading, spacing: 10) {
-                  ForEach(subjects, id: \.inner.id) { item in
-                    NavigationLink(value: NavDestination.subject(subjectId: item.inner.id)) {
+                  ForEach(subjects, id: \.inner.self) { item in
+                    NavigationLink(value: NavDestination.subject(subjectId: item.inner.subjectId)) {
                       SearchSubjectRowView(subject: item.inner.item)
                         .onAppear {
                           Task {

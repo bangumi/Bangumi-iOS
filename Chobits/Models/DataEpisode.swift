@@ -11,7 +11,7 @@ import SwiftData
 @Model
 final class Episode {
   @Attribute(.unique)
-  var id: UInt
+  var episodeId: UInt
   var type: UInt8
   var name: String
   var nameCn: String
@@ -36,12 +36,12 @@ final class Episode {
   }
 
   init(
-    id: UInt, type: UInt8, name: String, nameCn: String, sort: Float, ep: Float?,
+    episodeId: UInt, type: UInt8, name: String, nameCn: String, sort: Float, ep: Float?,
     airdateStr: String,
     airdate: Date, comment: UInt, duration: String, desc: String, disc: UInt,
     durationSeconds: UInt?, subjectId: UInt, collection: UInt8
   ) {
-    self.id = id
+    self.episodeId = episodeId
     self.type = type
     self.name = name
     self.nameCn = nameCn
@@ -59,7 +59,7 @@ final class Episode {
   }
 
   init(_ item: EpisodeItem, subjectId: UInt? = 0, collection: UInt8? = 0) {
-    self.id = item.id
+    self.episodeId = item.id
     self.type = item.type.rawValue
     self.name = item.name
     self.nameCn = item.nameCn

@@ -11,18 +11,18 @@ import SwiftData
 @Model
 final class BangumiCalendar {
   @Attribute(.unique)
-  var id: UInt
+  var weekdayId: UInt
   var weekday: Weekday
   var items: [SmallSubject]
 
-  init(id: UInt, weekday: Weekday, items: [SmallSubject]) {
-    self.id = id
+  init(weekdayId: UInt, weekday: Weekday, items: [SmallSubject]) {
+    self.weekdayId = weekdayId
     self.weekday = weekday
     self.items = items
   }
 
   init(_ item: BangumiCalendarItem) {
-    self.id = item.weekday.id
+    self.weekdayId = item.weekday.id
     self.weekday = item.weekday
     self.items = item.items
   }

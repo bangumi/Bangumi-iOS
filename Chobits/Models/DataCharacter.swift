@@ -11,7 +11,7 @@ import SwiftData
 @Model
 final class Character {
   @Attribute(.unique)
-  var id: UInt
+  var characterId: UInt
 
   var name: String
   var type: UInt8
@@ -45,11 +45,11 @@ final class Character {
   }
 
   init(
-    id: UInt, name: String, type: UInt8, images: Images, summary: String, locked: Bool,
+    characterId: UInt, name: String, type: UInt8, images: Images, summary: String, locked: Bool,
     infobox: [InfoboxItem], gender: String? = nil, bloodType: UInt8? = nil, birthYear: UInt? = nil,
     birthMonth: UInt? = nil, birthDay: UInt? = nil, stat: Stat
   ) {
-    self.id = id
+    self.characterId = characterId
     self.name = name
     self.type = type
     self.images = images
@@ -65,7 +65,7 @@ final class Character {
   }
 
   init(_ item: CharacterItem) {
-    self.id = item.id
+    self.characterId = item.id
     self.name = item.name
     self.type = item.type.rawValue
     self.images = item.images ?? Images()
@@ -81,7 +81,7 @@ final class Character {
   }
 
   init(_ item: SubjectCharacterItem) {
-    self.id = item.id
+    self.characterId = item.id
     self.name = item.name
     self.type = item.type.rawValue
     self.images = item.images ?? Images()
@@ -97,7 +97,7 @@ final class Character {
   }
 
   init(_ item: PersonCharacterItem) {
-    self.id = item.id
+    self.characterId = item.id
     self.name = item.name
     self.type = item.type.rawValue
     self.images = item.images ?? Images()

@@ -30,9 +30,9 @@ struct PersonView: View {
   init(personId: UInt) {
     self.personId = personId
     let predicate = #Predicate<Person> {
-      $0.id == personId
+      $0.personId == personId
     }
-    _persons = Query(filter: predicate, sort: \Person.id)
+    _persons = Query(filter: predicate, sort: \Person.personId)
   }
 
   var shareLink: URL {
@@ -305,7 +305,7 @@ struct PersonView: View {
   container.mainContext.insert(person)
 
   return NavigationStack {
-    PersonView(personId: person.id)
+    PersonView(personId: person.personId)
       .environmentObject(Notifier())
       .environment(ChiiClient(container: container, mock: .anime))
       .modelContainer(container)

@@ -56,8 +56,8 @@ struct SubjectInfoboxView: View {
     self.subjectId = subjectId
     _subjects = Query(
       filter: #Predicate<Subject> {
-        $0.id == subjectId
-      }, sort: \Subject.id)
+        $0.subjectId == subjectId
+      }, sort: \Subject.subjectId)
   }
 
   func load() async {
@@ -248,7 +248,7 @@ struct SubjectInfoboxView: View {
 
   return ScrollView {
     LazyVStack(alignment: .leading) {
-      SubjectInfoboxView(subjectId: subject.id)
+      SubjectInfoboxView(subjectId: subject.subjectId)
         .environmentObject(Notifier())
         .environment(ChiiClient(container: container, mock: .anime))
         .modelContainer(container)

@@ -89,7 +89,7 @@ struct SubjectRelationsView: View {
 
   return ScrollView {
     LazyVStack(alignment: .leading) {
-      SubjectRelationsView(subjectId: subject.id)
+      SubjectRelationsView(subjectId: subject.subjectId)
         .environmentObject(Notifier())
         .environment(ChiiClient(container: container, mock: .anime))
         .modelContainer(container)

@@ -28,7 +28,7 @@ struct EpisodeCollectionBoxView: View {
     self.subjectId = subjectId
     self.episodeId = episodeId
 
-    _episodes = Query(filter: #Predicate<Episode> { $0.id == episodeId })
+    _episodes = Query(filter: #Predicate<Episode> { $0.episodeId == episodeId })
   }
 
   func updateSingle(type: EpisodeCollectionType) async {
@@ -150,7 +150,7 @@ struct EpisodeCollectionBoxView: View {
     container.mainContext.insert(episode)
   }
 
-  return EpisodeCollectionBoxView(subjectId: subject.id, episodeId: episodes.first!.id)
+  return EpisodeCollectionBoxView(subjectId: subject.subjectId, episodeId: episodes.first!.episodeId)
     .environmentObject(Notifier())
     .environment(ChiiClient(container: container, mock: .anime))
     .modelContainer(container)

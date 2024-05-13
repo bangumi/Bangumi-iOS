@@ -71,7 +71,7 @@ struct CharacterSubjectsView: View {
 
   return ScrollView(showsIndicators: false) {
     LazyVStack(alignment: .leading) {
-      CharacterSubjectsView(characterId: character.id)
+      CharacterSubjectsView(characterId: character.characterId)
         .environmentObject(Notifier())
         .environment(ChiiClient(container: container, mock: .anime))
         .modelContainer(container)

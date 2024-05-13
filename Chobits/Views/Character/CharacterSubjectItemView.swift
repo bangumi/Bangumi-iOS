@@ -41,8 +41,8 @@ struct CharacterSubjectItemView: View {
 
     var subjectDescriptor = FetchDescriptor<Subject>(
       predicate: #Predicate<Subject> {
-        $0.id == subjectId
-      }, sortBy: [SortDescriptor<Subject>(\.id)])
+        $0.subjectId == subjectId
+      }, sortBy: [SortDescriptor<Subject>(\Subject.subjectId)])
     subjectDescriptor.fetchLimit = 1
     _subjects = Query(subjectDescriptor)
 
@@ -130,7 +130,7 @@ struct CharacterSubjectItemView: View {
 
   return ScrollView(showsIndicators: false) {
     LazyVStack(alignment: .leading) {
-      CharacterSubjectItemView(characterId: character.id, subjectId: subject.id)
+      CharacterSubjectItemView(characterId: character.characterId, subjectId: subject.subjectId)
         .environmentObject(Notifier())
         .environment(ChiiClient(container: container, mock: .anime))
         .modelContainer(container)

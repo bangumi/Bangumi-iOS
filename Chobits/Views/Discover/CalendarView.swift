@@ -15,7 +15,7 @@ struct CalendarView: View {
 
   @State private var refreshed: Bool = false
 
-  @Query(sort: \BangumiCalendar.id)
+  @Query(sort: \BangumiCalendar.weekdayId)
   private var calendars: [BangumiCalendar]
 
   var sortedCalendars: [BangumiCalendar] {
@@ -27,12 +27,12 @@ struct CalendarView: View {
     }
     let weekday = calendar.component(.weekday, from: yesterday)
     return calendars.sorted { (cal1: BangumiCalendar, cal2: BangumiCalendar) -> Bool in
-      if cal1.id >= weekday && cal2.id < weekday {
+      if cal1.weekdayId >= weekday && cal2.weekdayId < weekday {
         return true
-      } else if cal1.id < weekday && cal2.id >= weekday {
+      } else if cal1.weekdayId < weekday && cal2.weekdayId >= weekday {
         return false
       } else {
-        return cal1.id < cal2.id
+        return cal1.weekdayId < cal2.weekdayId
       }
     }
   }

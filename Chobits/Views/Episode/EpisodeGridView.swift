@@ -129,7 +129,7 @@ struct EpisodeGridView: View {
     .sheet(
       item: $selected,
       content: { episode in
-        EpisodeCollectionBoxView(subjectId: subjectId, episodeId: episode.id)
+        EpisodeCollectionBoxView(subjectId: subjectId, episodeId: episode.episodeId)
           .presentationDragIndicator(.visible)
           .presentationDetents(.init([.medium, .large]))
       }
@@ -152,7 +152,7 @@ struct EpisodeGridView: View {
 
   return ScrollView {
     LazyVStack(alignment: .leading) {
-      EpisodeGridView(subjectId: subject.id)
+      EpisodeGridView(subjectId: subject.subjectId)
         .environmentObject(Notifier())
         .environment(ChiiClient(container: container, mock: .anime))
         .modelContainer(container)

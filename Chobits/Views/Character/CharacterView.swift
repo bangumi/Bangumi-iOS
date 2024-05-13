@@ -30,9 +30,9 @@ struct CharacterView: View {
   init(characterId: UInt) {
     self.characterId = characterId
     let predicate = #Predicate<Character> {
-      $0.id == characterId
+      $0.characterId == characterId
     }
-    _characters = Query(filter: predicate, sort: \Character.id)
+    _characters = Query(filter: predicate, sort: \Character.characterId)
   }
 
   var shareLink: URL {
@@ -282,7 +282,7 @@ struct CharacterView: View {
   container.mainContext.insert(Subject.previewBook)
 
   return NavigationStack {
-    CharacterView(characterId: character.id)
+    CharacterView(characterId: character.characterId)
       .environmentObject(Notifier())
       .environment(ChiiClient(container: container, mock: .anime))
       .modelContainer(container)

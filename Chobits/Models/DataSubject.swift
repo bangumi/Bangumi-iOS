@@ -11,7 +11,7 @@ import SwiftData
 @Model
 final class Subject {
   @Attribute(.unique)
-  var id: UInt
+  var subjectId: UInt
   var type: UInt8
   var name: String
   var nameCn: String
@@ -35,7 +35,7 @@ final class Subject {
 
   var item: SubjectItem {
     return SubjectItem(
-      id: id, type: SubjectType(type), name: name, nameCn: nameCn,
+      id: subjectId, type: SubjectType(type), name: name, nameCn: nameCn,
       summary: summary, nsfw: nsfw, locked: locked,
       date: date.formatAirdate, platform: platform,
       images: images, infobox: infobox, volumes: volumes, eps: eps,
@@ -44,11 +44,11 @@ final class Subject {
   }
 
   init(
-    id: UInt, type: UInt8, name: String, nameCn: String, summary: String, nsfw: Bool, locked: Bool,
+    subjectId: UInt, type: UInt8, name: String, nameCn: String, summary: String, nsfw: Bool, locked: Bool,
     date: Date, platform: String, images: SubjectImages, infobox: [InfoboxItem], volumes: UInt,
     eps: UInt, totalEpisodes: UInt, rating: Rating, collection: SubjectCollection, tags: [Tag]
   ) {
-    self.id = id
+    self.subjectId = subjectId
     self.type = type
     self.name = name
     self.nameCn = nameCn
@@ -68,7 +68,7 @@ final class Subject {
   }
 
   init(_ item: SubjectItem) {
-    self.id = item.id
+    self.subjectId = item.id
     self.type = item.type.rawValue
     self.name = item.name
     self.nameCn = item.nameCn
@@ -88,7 +88,7 @@ final class Subject {
   }
 
   init(_ slim: SlimSubject) {
-    self.id = slim.id
+    self.subjectId = slim.id
     self.type = slim.type.rawValue
     self.name = slim.name
     self.nameCn = slim.nameCn
@@ -108,7 +108,7 @@ final class Subject {
   }
 
   init(_ search: SearchSubject) {
-    self.id = search.id
+    self.subjectId = search.id
     self.type = search.type?.rawValue ?? 0
     self.name = search.name
     self.nameCn = search.nameCn
@@ -128,7 +128,7 @@ final class Subject {
   }
 
   init(_ small: SmallSubject) {
-    self.id = small.id
+    self.subjectId = small.id
     self.type = small.type.rawValue
     self.name = small.name
     self.nameCn = small.nameCn
@@ -154,7 +154,7 @@ final class Subject {
   }
 
   init(_ relation: SubjectRelationItem) {
-    self.id = relation.id
+    self.subjectId = relation.id
     self.type = relation.type.rawValue
     self.name = relation.name
     self.nameCn = relation.nameCn
@@ -174,7 +174,7 @@ final class Subject {
   }
 
   init(_ item: CharacterSubjectItem) {
-    self.id = item.id
+    self.subjectId = item.id
     self.type = 0
     self.name = item.name ?? ""
     self.nameCn = item.nameCn
@@ -194,7 +194,7 @@ final class Subject {
   }
 
   init(_ item: CharacterPersonItem) {
-    self.id = item.subjectId
+    self.subjectId = item.subjectId
     self.type = 0
     self.name = item.subjectName
     self.nameCn = item.subjectNameCn
@@ -214,7 +214,7 @@ final class Subject {
   }
 
   init(_ item: PersonSubjectItem) {
-    self.id = item.id
+    self.subjectId = item.id
     self.type = 0
     self.name = item.name ?? ""
     self.nameCn = item.nameCn
@@ -234,7 +234,7 @@ final class Subject {
   }
 
   init(_ item: PersonCharacterItem) {
-    self.id = item.subjectId
+    self.subjectId = item.subjectId
     self.type = 0
     self.name = item.subjectName
     self.nameCn = item.subjectNameCn

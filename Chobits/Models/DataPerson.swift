@@ -11,7 +11,7 @@ import SwiftData
 @Model
 final class Person {
   @Attribute(.unique)
-  var id: UInt
+  var personId: UInt
   var name: String
   var type: UInt8
   var career: [String]
@@ -46,12 +46,12 @@ final class Person {
   }
 
   init(
-    id: UInt, name: String, type: UInt8, career: [String], images: Images, summary: String,
+    personId: UInt, name: String, type: UInt8, career: [String], images: Images, summary: String,
     locked: Bool, lastModified: Date, infobox: [InfoboxItem], gender: String? = nil,
     bloodType: UInt8? = nil, birthYear: UInt? = nil, birthMonth: UInt? = nil, birthDay: UInt? = nil,
     stat: Stat
   ) {
-    self.id = id
+    self.personId = personId
     self.name = name
     self.type = type
     self.career = career
@@ -69,7 +69,7 @@ final class Person {
   }
 
   init(_ item: PersonItem) {
-    self.id = item.id
+    self.personId = item.id
     self.name = item.name
     self.type = item.type.rawValue
     self.career = item.career.map { $0.label }
@@ -87,7 +87,7 @@ final class Person {
   }
 
   init(_ item: SubjectPersonItem) {
-    self.id = item.id
+    self.personId = item.id
     self.name = item.name
     self.type = item.type.rawValue
     self.career = item.career.map { $0.label }
@@ -105,7 +105,7 @@ final class Person {
   }
 
   init(_ item: SubjectCharacterActorItem) {
-    self.id = item.id
+    self.personId = item.id
     self.name = item.name
     self.type = item.type.rawValue
     self.career = item.career.map { $0.label }
@@ -123,7 +123,7 @@ final class Person {
   }
 
   init(_ item: CharacterPersonItem) {
-    self.id = item.id
+    self.personId = item.id
     self.name = item.name
     self.type = 0
     self.career = []

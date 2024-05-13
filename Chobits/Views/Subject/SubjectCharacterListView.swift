@@ -82,18 +82,18 @@ struct SubjectCharacterListView: View {
               }
             }.buttonStyle(.plain)
             Spacer()
-            if let person = character.actors.first {
-              NavigationLink(value: NavDestination.person(personId: person.id)) {
+            if let actor = character.actors.first {
+              NavigationLink(value: NavDestination.person(personId: actor.id)) {
                 HStack(alignment: .bottom) {
                   VStack(alignment: .trailing) {
                     Text("CV")
                       .font(.caption)
                       .foregroundStyle(.secondary)
-                    Text(person.name)
+                    Text(actor.name)
                       .font(.footnote)
                       .foregroundStyle(Color("LinkTextColor"))
                   }
-                  if let img = person.images?.grid {
+                  if let img = actor.images?.grid {
                     ImageView(img: img, width: 40, height: 40, alignment: .top)
                   }
                 }
@@ -126,7 +126,7 @@ struct SubjectCharacterListView: View {
     container.mainContext.insert(item)
   }
 
-  return SubjectCharacterListView(subjectId: subject.id)
+  return SubjectCharacterListView(subjectId: subject.subjectId)
     .environmentObject(Notifier())
     .environment(ChiiClient(container: container, mock: .anime))
     .modelContainer(container)

@@ -85,7 +85,7 @@ extension ChiiClient {
       $0.subjectId == subjectId && $0.sort <= updateTo
     }
     let episodes = try await db.fetchData(predicate: predicate)
-    let episodeIds = episodes.map { $0.id }
+    let episodeIds = episodes.map { $0.episodeId }
     let url = self.apiBase
       .appendingPathComponent("v0/users/-/collections/\(subjectId)/episodes")
     let body: [String: Any] = [
@@ -117,7 +117,7 @@ extension ChiiClient {
     Logger.api.info("finish update episode collection: \(episodeId)")
     try await db.update(
       predicate: #Predicate<Episode> {
-        $0.id == episodeId
+        $0.episodeId == episodeId
       },
       update: {
         $0.collection = type.rawValue

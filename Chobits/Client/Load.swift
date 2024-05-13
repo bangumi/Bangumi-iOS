@@ -21,7 +21,7 @@ extension ChiiClient {
         try await db.insertIfNeeded(
           data: subject,
           predicate: #Predicate<Subject> {
-            $0.id == small.id
+            $0.subjectId == small.id
           })
       }
     }
@@ -65,11 +65,11 @@ extension ChiiClient {
         await self.db.insert(collection)
         if let slim = item.subject {
           let subject = Subject(slim)
-          let subjectId = subject.id
+          let subjectId = subject.subjectId
           try await self.db.insertIfNeeded(
             data: subject,
             predicate: #Predicate<Subject> {
-              $0.id == subjectId
+              $0.subjectId == subjectId
             })
         }
       }
@@ -81,7 +81,7 @@ extension ChiiClient {
   }
 
   func loadEpisodes(_ subjectId: UInt) async throws {
-    guard let subject = try await db.fetchOne(predicate: #Predicate<Subject> { $0.id == subjectId })
+    guard let subject = try await db.fetchOne(predicate: #Predicate<Subject> { $0.subjectId == subjectId })
     else {
       Logger.subject.error("subject \(subjectId) not found for loading episode")
       return
@@ -136,20 +136,20 @@ extension ChiiClient {
       let related = SubjectRelatedCharacter(item, subjectId: subjectId, sort: Float(idx))
       await self.db.insert(related)
       let character = Character(item)
-      let characterId = character.id
+      let characterId = character.characterId
       try await self.db.insertIfNeeded(
         data: character,
         predicate: #Predicate<Character> {
-          $0.id == characterId
+          $0.characterId == characterId
         })
       if let actors = item.actors {
         for actor in actors {
           let actor = Person(actor)
-          let actorId = actor.id
+          let actorId = actor.personId
           try await self.db.insertIfNeeded(
             data: actor,
             predicate: #Predicate<Person> {
-              $0.id == actorId
+              $0.personId == actorId
             })
         }
       }
@@ -162,11 +162,11 @@ extension ChiiClient {
       let related = SubjectRelation(item, subjectId: subjectId, sort: Float(idx))
       await self.db.insert(related)
       let relation = Subject(item)
-      let relationId = relation.id
+      let relationId = relation.subjectId
       try await self.db.insertIfNeeded(
         data: relation,
         predicate: #Predicate<Subject> {
-          $0.id == relationId
+          $0.subjectId == relationId
         })
     }
   }
@@ -177,11 +177,11 @@ extension ChiiClient {
       let related = SubjectRelatedPerson(item, subjectId: subjectId, sort: Float(idx))
       await self.db.insert(related)
       let person = Person(item)
-      let personId = person.id
+      let personId = person.personId
       try await self.db.insertIfNeeded(
         data: person,
         predicate: #Predicate<Person> {
-          $0.id == personId
+          $0.personId == personId
         })
     }
   }
@@ -202,11 +202,11 @@ extension ChiiClient {
       let related = CharacterRelatedSubject(item, characterId: cid)
       await self.db.insert(related)
       let subject = Subject(item)
-      let subjectId = subject.id
+      let subjectId = subject.subjectId
       try await self.db.insertIfNeeded(
         data: subject,
         predicate: #Predicate<Subject> {
-          $0.id == subjectId
+          $0.subjectId == subjectId
         })
     }
   }
@@ -218,19 +218,19 @@ extension ChiiClient {
       await self.db.insert(related)
 
       let person = Person(item)
-      let personId = person.id
+      let personId = person.personId
       try await self.db.insertIfNeeded(
         data: person,
         predicate: #Predicate<Person> {
-          $0.id == personId
+          $0.personId == personId
         })
 
       let subject = Subject(item)
-      let subjectId = subject.id
+      let subjectId = subject.subjectId
       try await self.db.insertIfNeeded(
         data: subject,
         predicate: #Predicate<Subject> {
-          $0.id == subjectId
+          $0.subjectId == subjectId
         })
 
     }
@@ -252,11 +252,11 @@ extension ChiiClient {
       let related = PersonRelatedSubject(item, personId: pid)
       await self.db.insert(related)
       let subject = Subject(item)
-      let subjectId = subject.id
+      let subjectId = subject.subjectId
       try await self.db.insertIfNeeded(
         data: subject,
         predicate: #Predicate<Subject> {
-          $0.id == subjectId
+          $0.subjectId == subjectId
         })
     }
   }
@@ -268,19 +268,19 @@ extension ChiiClient {
       await self.db.insert(related)
 
       let character = Character(item)
-      let characterId = character.id
+      let characterId = character.characterId
       try await self.db.insertIfNeeded(
         data: character,
         predicate: #Predicate<Character> {
-          $0.id == characterId
+          $0.characterId == characterId
         })
 
       let subject = Subject(item)
-      let subjectId = subject.id
+      let subjectId = subject.subjectId
       try await self.db.insertIfNeeded(
         data: subject,
         predicate: #Predicate<Subject> {
-          $0.id == subjectId
+          $0.subjectId == subjectId
         })
     }
   }

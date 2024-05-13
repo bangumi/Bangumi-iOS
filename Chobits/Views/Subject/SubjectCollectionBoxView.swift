@@ -48,7 +48,7 @@ struct SubjectCollectionBoxView: View {
     }
     _subjects = Query(
       filter: #Predicate<Subject> {
-        $0.id == subjectId
+        $0.subjectId == subjectId
       })
   }
 
@@ -220,7 +220,7 @@ struct SubjectCollectionBoxView: View {
   container.mainContext.insert(subject)
 
   return SubjectCollectionBoxView(
-    subjectId: subject.id,
+    subjectId: subject.subjectId,
     collection: collection.item
   )
   .environmentObject(Notifier())

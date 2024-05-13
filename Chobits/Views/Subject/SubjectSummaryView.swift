@@ -24,9 +24,9 @@ struct SubjectSummaryView: View {
   init(subjectId: UInt) {
     self.subjectId = subjectId
     let predicate = #Predicate<Subject> {
-      $0.id == subjectId
+      $0.subjectId == subjectId
     }
-    _subjects = Query(filter: predicate, sort: \Subject.id)
+    _subjects = Query(filter: predicate, sort: \Subject.subjectId)
   }
 
   var tags: [Tag] {
@@ -87,7 +87,7 @@ struct SubjectSummaryView: View {
 
   return ScrollView {
     LazyVStack(alignment: .leading) {
-      SubjectSummaryView(subjectId: subject.id)
+      SubjectSummaryView(subjectId: subject.subjectId)
         .environmentObject(Notifier())
         .environment(ChiiClient(container: container, mock: .anime))
         .modelContainer(container)

@@ -31,7 +31,7 @@ struct ProgressRowView: View {
 
     _subjects = Query(
       filter: #Predicate<Subject> {
-        $0.id == subjectId
+        $0.subjectId == subjectId
       })
     _collections = Query(
       filter: #Predicate<UserSubjectCollection> {
@@ -147,7 +147,7 @@ struct ProgressRowView: View {
       isPresented: $showEpisodeBox,
       content: {
         if let episode = nextEpisode {
-          EpisodeCollectionBoxView(subjectId: subjectId, episodeId: episode.id)
+          EpisodeCollectionBoxView(subjectId: subjectId, episodeId: episode.episodeId)
             .presentationDragIndicator(.visible)
             .presentationDetents(.init([.medium, .large]))
         }
@@ -170,7 +170,7 @@ struct ProgressRowView: View {
 
   return ScrollView {
     LazyVStack(alignment: .leading) {
-      ProgressRowView(subjectId: subject.id)
+      ProgressRowView(subjectId: subject.subjectId)
         .environmentObject(Notifier())
         .environment(ChiiClient(container: container, mock: .anime))
     }

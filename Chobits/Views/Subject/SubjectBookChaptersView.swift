@@ -33,7 +33,7 @@ struct SubjectBookChaptersView: View {
     self.subjectId = subjectId
     _subjects = Query(
       filter: #Predicate<Subject> {
-        $0.id == subjectId
+        $0.subjectId == subjectId
       })
     _collections = Query(
       filter: #Predicate<UserSubjectCollection> {
@@ -162,7 +162,7 @@ struct SubjectBookChaptersView: View {
 
   return ScrollView {
     LazyVStack(alignment: .leading) {
-      SubjectBookChaptersView(subjectId: subject.id)
+      SubjectBookChaptersView(subjectId: subject.subjectId)
         .environmentObject(Notifier())
         .environment(ChiiClient(container: container, mock: .book))
         .modelContainer(container)

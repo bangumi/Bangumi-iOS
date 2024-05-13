@@ -106,7 +106,7 @@ struct PersonSubjectsView: View {
 
   return ScrollView(showsIndicators: false) {
     LazyVStack(alignment: .leading) {
-      PersonSubjectsView(personId: person.id)
+      PersonSubjectsView(personId: person.personId)
         .environmentObject(Notifier())
         .environment(ChiiClient(container: container, mock: .anime))
         .modelContainer(container)

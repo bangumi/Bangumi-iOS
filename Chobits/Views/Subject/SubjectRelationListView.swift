@@ -99,7 +99,7 @@ struct SubjectRelationListView: View {
     container.mainContext.insert(item)
   }
 
-  return SubjectRelationListView(subjectId: subject.id)
+  return SubjectRelationListView(subjectId: subject.subjectId)
     .environmentObject(Notifier())
     .environment(ChiiClient(container: container, mock: .anime))
     .modelContainer(container)

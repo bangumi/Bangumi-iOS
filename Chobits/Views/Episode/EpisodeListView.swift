@@ -153,7 +153,7 @@ struct EpisodeListView: View {
     }.padding(.horizontal, 8)
     ScrollView {
       LazyVStack {
-        ForEach(episodes, id: \.inner.id) { item in
+        ForEach(episodes, id: \.inner.self) { item in
           let episode = item.inner
           Button {
             selected = episode
@@ -258,7 +258,7 @@ struct EpisodeListView: View {
     .sheet(
       item: $selected,
       content: { episode in
-        EpisodeCollectionBoxView(subjectId: subjectId, episodeId: episode.id)
+        EpisodeCollectionBoxView(subjectId: subjectId, episodeId: episode.episodeId)
           .presentationDragIndicator(.visible)
           .presentationDetents(.init([.medium, .large]))
       }
@@ -276,7 +276,7 @@ struct EpisodeListView: View {
     container.mainContext.insert(episode)
   }
 
-  return EpisodeListView(subjectId: subject.id)
+  return EpisodeListView(subjectId: subject.subjectId)
     .environmentObject(Notifier())
     .environment(ChiiClient(container: container, mock: .anime))
     .modelContainer(container)
