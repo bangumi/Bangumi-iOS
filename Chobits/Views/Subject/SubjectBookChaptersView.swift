@@ -53,6 +53,7 @@ struct SubjectBookChaptersView: View {
     Task {
       do {
         try await chii.updateBookCollection(sid: subjectId, eps: eps, vols: vols)
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
       } catch {
         notifier.alert(error: error)
       }
@@ -144,9 +145,13 @@ struct SubjectBookChaptersView: View {
         Text(volumesDesc).foregroundStyle(.secondary)
       }.monospaced()
       Spacer()
-      Button("更新", action: update)
-        .disabled(updateButtonDisable)
-        .buttonStyle(.borderedProminent)
+      if updating {
+        ProgressView()
+      } else {
+        Button("更新", action: update)
+          .disabled(updateButtonDisable)
+          .buttonStyle(.borderedProminent)
+      }
     }.disabled(updating)
   }
 }
