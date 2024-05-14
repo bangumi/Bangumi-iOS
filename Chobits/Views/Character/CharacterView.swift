@@ -257,7 +257,7 @@ struct CharacterView: View {
       }
     }
     .toolbar {
-      ToolbarItem(placement: .navigationBarTrailing) {
+      ToolbarItem(placement: .topBarTrailing) {
         ShareLink(item: shareLink) {
           Label("Share", systemImage: "square.and.arrow.up")
         }

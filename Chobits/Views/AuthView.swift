@@ -30,7 +30,7 @@ struct AuthView: View {
         .buttonStyle(.borderedProminent)
       }
       .toolbar {
-        ToolbarItem(placement: .navigationBarTrailing) {
+        ToolbarItem(placement: .topBarTrailing) {
           Button {
             navPath.append(.setting)
           } label: {

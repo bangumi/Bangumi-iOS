@@ -16,7 +16,7 @@ struct ChiiTimelineView: View {
   @EnvironmentObject var navState: NavState
   @Environment(\.modelContext) var modelContext
 
-  @State var profile: Profile?
+  @State private var profile: Profile?
 
   func updateProfile() {
     Task {
@@ -32,34 +32,42 @@ struct ChiiTimelineView: View {
   var body: some View {
     if chii.isAuthenticated {
       NavigationStack(path: $navState.timelineNavigation) {
-        VStack {
-          if let me = profile {
-            ImageView(img: me.avatar.large, width: 80, height: 80)
-            Text("\(me.nickname)").font(.title3)
-            Text(me.userGroup.description)
-              .font(.footnote)
-              .foregroundStyle(.accent)
-              .overlay {
-                RoundedRectangle(cornerRadius: 5)
-                  .stroke(.accent, lineWidth: 1)
-                  .padding(.horizontal, -4)
-                  .padding(.vertical, -2)
-              }.padding(2)
-            if !isolationMode {
-              Text(me.sign)
-                .font(.callout)
-                .foregroundStyle(.secondary)
-                .padding()
-            }
-          } else {
-            ProgressView().onAppear(perform: updateProfile)
+        ScrollView {
+          VStack {
+            Text("Timeline")
+            Spacer()
           }
         }
+        .padding(.horizontal, 8)
         .toolbar {
-          ToolbarItem(placement: .navigationBarTrailing) {
-            Button {
-              navState.timelineNavigation.append(.setting)
-            } label: {
+          ToolbarItem(placement: .topBarLeading) {
+            if let me = profile {
+              NavigationLink(value: NavDestination.subject(subjectId:12)) {
+                HStack {
+                  ImageView(img: me.avatar.medium, width: 32, height: 32)
+                  VStack(alignment: .leading) {
+                    Text("\(me.nickname)")
+                      .font(.footnote)
+                      .lineLimit(1)
+                    Text(me.userGroup.description)
+                      .font(.caption)
+                      .foregroundStyle(.secondary)
+                      .overlay {
+                        RoundedRectangle(cornerRadius: 4)
+                          .stroke(.secondary, lineWidth: 1)
+                          .padding(.horizontal, -2)
+                          .padding(.vertical, -1)
+                      }
+                      .padding(.leading, 2)
+                  }
+                }
+              }.buttonStyle(.plain)
+            } else {
+              ProgressView().onAppear(perform: updateProfile)
+            }
+          }
+          ToolbarItem(placement: .topBarTrailing) {
+            NavigationLink(value: NavDestination.setting) {
               Image(systemName: "gearshape")
             }
           }
