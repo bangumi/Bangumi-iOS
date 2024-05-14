@@ -128,7 +128,7 @@ final class Subject {
     self.locked = false
     self.date = safeParseDate(str: small.airDate)
     self.platform = ""
-    self.images = small.images ?? SubjectImages()
+    self.images = small.images ?? SubjectImages(subjectId: small.id)
     self.infobox = []
     self.volumes = 0
     self.eps = 0
@@ -154,7 +154,7 @@ final class Subject {
     self.locked = false
     self.date = Date()
     self.platform = ""
-    self.images = relation.images ?? SubjectImages()
+    self.images = relation.images ?? SubjectImages(subjectId: relation.id)
     self.infobox = []
     self.volumes = 0
     self.eps = 0
@@ -194,7 +194,7 @@ final class Subject {
     self.locked = false
     self.date = Date()
     self.platform = ""
-    self.images = SubjectImages()
+    self.images = SubjectImages(subjectId: item.subjectId)
     self.infobox = []
     self.volumes = 0
     self.eps = 0
@@ -234,7 +234,7 @@ final class Subject {
     self.locked = false
     self.date = Date()
     self.platform = ""
-    self.images = SubjectImages()
+    self.images = SubjectImages(subjectId: item.subjectId)
     self.infobox = []
     self.volumes = 0
     self.eps = 0
@@ -285,7 +285,7 @@ final class SubjectRelation {
     self.type = item.type.rawValue
     self.name = item.name
     self.nameCn = item.nameCn
-    self.images = item.images ?? SubjectImages()
+    self.images = item.images ?? SubjectImages(subjectId: subjectId)
     self.relation = item.relation
     self.sort = sort
   }
@@ -330,7 +330,7 @@ final class SubjectRelatedCharacter {
     self.characterId = item.id
     self.type = item.type.rawValue
     self.name = item.name
-    self.images = item.images ?? Images()
+    self.images = item.images ?? Images(characterId: item.id)
     self.relation = item.relation
     self.actors = item.actors ?? []
     self.sort = sort
@@ -374,7 +374,7 @@ final class SubjectRelatedPerson {
     self.personId = item.id
     self.type = item.type.rawValue
     self.name = item.name
-    self.images = item.images ?? Images()
+    self.images = item.images ?? Images(personId: item.id)
     self.relation = item.relation
     self.sort = sort
   }

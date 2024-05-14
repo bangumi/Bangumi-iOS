@@ -73,7 +73,7 @@ final class Person {
     self.name = item.name
     self.type = item.type.rawValue
     self.career = item.career.map { $0.label }
-    self.images = item.images ?? Images()
+    self.images = item.images ?? Images(personId: item.id)
     self.summary = item.summary
     self.locked = item.locked
     self.lastModified = safeParseRFC3339Date(str: item.lastModified)
@@ -91,7 +91,7 @@ final class Person {
     self.name = item.name
     self.type = item.type.rawValue
     self.career = item.career.map { $0.label }
-    self.images = item.images ?? Images()
+    self.images = item.images ?? Images(personId: item.id)
     self.summary = ""
     self.locked = false
     self.lastModified = Date()
@@ -109,7 +109,7 @@ final class Person {
     self.name = item.name
     self.type = item.type.rawValue
     self.career = item.career.map { $0.label }
-    self.images = item.images ?? Images()
+    self.images = item.images ?? Images(personId: item.id)
     self.summary = item.shortSummary
     self.locked = item.locked
     self.lastModified = Date()
@@ -127,7 +127,7 @@ final class Person {
     self.name = item.name
     self.type = 0
     self.career = []
-    self.images = item.images ?? Images()
+    self.images = item.images ?? Images(personId: item.id)
     self.summary = ""
     self.locked = false
     self.lastModified = Date()
@@ -225,7 +225,7 @@ final class PersonRelatedCharacter {
     self.characterId = item.id
     self.name = item.name
     self.type = item.type.rawValue
-    self.images = item.images ?? Images()
+    self.images = item.images ?? Images(characterId: item.id)
     self.subjectId = item.subjectId
     self.subjectName = item.subjectName
     self.subjectNameCn = item.subjectNameCn

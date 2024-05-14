@@ -68,7 +68,7 @@ final class Character {
     self.characterId = item.id
     self.name = item.name
     self.type = item.type.rawValue
-    self.images = item.images ?? Images()
+    self.images = item.images ?? Images(characterId: item.id)
     self.summary = item.summary
     self.locked = item.locked
     self.infobox = item.infobox
@@ -84,7 +84,7 @@ final class Character {
     self.characterId = item.id
     self.name = item.name
     self.type = item.type.rawValue
-    self.images = item.images ?? Images()
+    self.images = item.images ?? Images(characterId: item.id)
     self.summary = ""
     self.locked = false
     self.infobox = []
@@ -100,7 +100,7 @@ final class Character {
     self.characterId = item.id
     self.name = item.name
     self.type = item.type.rawValue
-    self.images = item.images ?? Images()
+    self.images = item.images ?? Images(characterId: item.id)
     self.summary = ""
     self.locked = false
     self.infobox = []
@@ -193,7 +193,7 @@ final class CharacterRelatedPerson {
     self.personId = item.id
     self.name = item.name
     self.type = item.type.rawValue
-    self.images = item.images ?? Images()
+    self.images = item.images ?? Images(personId: item.id)
     self.subjectId = item.subjectId
     self.subjectName = item.subjectName
     self.subjectNameCn = item.subjectNameCn

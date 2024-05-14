@@ -15,20 +15,20 @@ struct SubjectImages: Codable {
   var small: String
   var grid: String
 
-  init() {
-    self.large = ""
-    self.common = ""
-    self.medium = ""
-    self.small = ""
-    self.grid = ""
-  }
-
   init(image: String) {
     self.large = image
     self.common = image
     self.medium = image
     self.small = image
     self.grid = image
+  }
+
+  init(subjectId: UInt) {
+    self.large = "https://api.bgm.tv/v0/subjects/\(subjectId)/image?type=large"
+    self.common = "https://api.bgm.tv/v0/subjects/\(subjectId)/image?type=common"
+    self.medium = "https://api.bgm.tv/v0/subjects/\(subjectId)/image?type=medium"
+    self.small = "https://api.bgm.tv/v0/subjects/\(subjectId)/image?type=small"
+    self.grid = "https://api.bgm.tv/v0/subjects/\(subjectId)/image?type=grid"
   }
 }
 
@@ -38,11 +38,18 @@ struct Images: Codable {
   var small: String
   var grid: String
 
-  init() {
-    self.large = ""
-    self.medium = ""
-    self.small = ""
-    self.grid = ""
+  init(characterId: UInt) {
+    self.large = "https://api.bgm.tv/v0/characters/\(characterId)/image?type=large"
+    self.medium = "https://api.bgm.tv/v0/characters/\(characterId)/image?type=medium"
+    self.small = "https://api.bgm.tv/v0/characters/\(characterId)/image?type=small"
+    self.grid = "https://api.bgm.tv/v0/characters/\(characterId)/image?type=grid"
+  }
+
+  init(personId: UInt) {
+    self.large = "https://api.bgm.tv/v0/people/\(personId)/image?type=large"
+    self.medium = "https://api.bgm.tv/v0/people/\(personId)/image?type=medium"
+    self.small = "https://api.bgm.tv/v0/people/\(personId)/image?type=small"
+    self.grid = "https://api.bgm.tv/v0/people/\(personId)/image?type=grid"
   }
 }
 
