@@ -81,13 +81,13 @@ struct SubjectCharactersView: View {
                 }.padding(.top, 4)
               ImageView(img: character.images.medium, width: 60, height: 80, alignment: .top)
               Text(character.name).font(.caption)
-              if let actor = character.actors.first {
-                Text("CV: \(actor.name)").foregroundStyle(.secondary).font(.caption2)
+              if let person = character.actors.first {
+                Text(person.name).foregroundStyle(.secondary).font(.caption2)
               }
               Spacer()
             }
             .lineLimit(1)
-            .frame(width: 80, height: 160)
+            .frame(width: 60, height: 160)
           }.buttonStyle(.plain)
         }
       }
