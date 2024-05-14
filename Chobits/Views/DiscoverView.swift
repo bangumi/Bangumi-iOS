@@ -138,7 +138,7 @@ struct ChiiDiscoverView: View {
         if searching {
           Picker("Subject Type", selection: $subjectType) {
             Text("全部").tag(SubjectType.unknown)
-            ForEach(SubjectType.searchTypes()) { type in
+            ForEach(SubjectType.allTypes()) { type in
               Text(type.description).tag(type)
             }
           }

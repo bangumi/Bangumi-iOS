@@ -241,8 +241,12 @@ enum CollectionType: UInt8, Codable, Identifiable {
     self = Self.unknown
   }
 
-  static func boxTypes() -> [Self] {
+  static func allTypes() -> [Self] {
     return [.wish, .collect, .do, .onHold, .dropped]
+  }
+
+  static func timelineTypes() -> [Self] {
+    return [.do, .collect]
   }
 
   func description(type: SubjectType?) -> String {
@@ -328,7 +332,7 @@ enum SubjectType: UInt8, Codable, Identifiable, CaseIterable {
     return [.unknown, .book, .anime, .real]
   }
 
-  static func searchTypes() -> [Self] {
+  static func allTypes() -> [Self] {
     return [.book, .anime, .music, .game, .real]
   }
 

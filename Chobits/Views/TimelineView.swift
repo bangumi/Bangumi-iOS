@@ -14,7 +14,6 @@ struct ChiiTimelineView: View {
   @EnvironmentObject var notifier: Notifier
   @EnvironmentObject var chii: ChiiClient
   @EnvironmentObject var navState: NavState
-  @Environment(\.modelContext) var modelContext
 
   @State private var profile: Profile?
 
@@ -33,16 +32,13 @@ struct ChiiTimelineView: View {
     if chii.isAuthenticated {
       NavigationStack(path: $navState.timelineNavigation) {
         ScrollView {
-          VStack {
-            Text("Timeline")
-            Spacer()
-          }
+          CollectionsView()
         }
         .padding(.horizontal, 8)
         .toolbar {
           ToolbarItem(placement: .topBarLeading) {
             if let me = profile {
-              NavigationLink(value: NavDestination.subject(subjectId:12)) {
+              NavigationLink(value: NavDestination.subject(subjectId: 12)) {
                 HStack {
                   ImageView(img: me.avatar.medium, width: 32, height: 32)
                   VStack(alignment: .leading) {

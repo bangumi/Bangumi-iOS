@@ -109,7 +109,7 @@ struct SubjectCollectionBoxView: View {
         }
 
         Picker("Collection Type", selection: $collectionType) {
-          ForEach(CollectionType.boxTypes()) { ct in
+          ForEach(CollectionType.allTypes()) { ct in
             Text("\(ct.description(type: subject?.typeEnum))").tag(ct)
           }
         }

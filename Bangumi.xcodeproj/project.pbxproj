@@ -89,6 +89,7 @@
 		19C2CE692BE330F60080A056 /* SubjectCollectionBoxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19C2CE682BE330F60080A056 /* SubjectCollectionBoxView.swift */; };
 		19E0E5022BF24D6300066EB7 /* PersonCharacterListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19E0E5012BF24D6300066EB7 /* PersonCharacterListView.swift */; };
 		19E0E5042BF24E0F00066EB7 /* PersonSubjectListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19E0E5032BF24E0F00066EB7 /* PersonSubjectListView.swift */; };
+		19E0E5072BF34F0E00066EB7 /* CollectionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19E0E5062BF34F0E00066EB7 /* CollectionsView.swift */; };
 		19F8C3D82BE73B830037D723 /* Navigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19F8C3D72BE73B820037D723 /* Navigation.swift */; };
 /* End PBXBuildFile section */
 
@@ -176,6 +177,7 @@
 		19C2CE682BE330F60080A056 /* SubjectCollectionBoxView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubjectCollectionBoxView.swift; sourceTree = "<group>"; };
 		19E0E5012BF24D6300066EB7 /* PersonCharacterListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonCharacterListView.swift; sourceTree = "<group>"; };
 		19E0E5032BF24E0F00066EB7 /* PersonSubjectListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonSubjectListView.swift; sourceTree = "<group>"; };
+		19E0E5062BF34F0E00066EB7 /* CollectionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionsView.swift; sourceTree = "<group>"; };
 		19F8C3D72BE73B820037D723 /* Navigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Navigation.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -276,6 +278,7 @@
 		19671C4D2BDEB55D000B4D99 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				19E0E5052BF34EE700066EB7 /* Collection */,
 				19B9003E2BEEE20500405F0F /* Discover */,
 				19B9003D2BEEE1C400405F0F /* Progress */,
 				197A19E52BE69B0600804B13 /* Episode */,
@@ -394,6 +397,14 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		19E0E5052BF34EE700066EB7 /* Collection */ = {
+			isa = PBXGroup;
+			children = (
+				19E0E5062BF34F0E00066EB7 /* CollectionsView.swift */,
+			);
+			path = Collection;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -505,6 +516,7 @@
 				19671C6F2BDEB55D000B4D99 /* ChobitsApp.swift in Sources */,
 				19671C552BDEB55D000B4D99 /* SubjectCollectionView.swift in Sources */,
 				19671C5F2BDEB55D000B4D99 /* ProgressRowView.swift in Sources */,
+				19E0E5072BF34F0E00066EB7 /* CollectionsView.swift in Sources */,
 				1909F3A12BEBC2B600E3B8F0 /* DataCalendar.swift in Sources */,
 				19671C6D2BDEB55D000B4D99 /* TimelineView.swift in Sources */,
 				19671C692BDEB55D000B4D99 /* AuthView.swift in Sources */,
