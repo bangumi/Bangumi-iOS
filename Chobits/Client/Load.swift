@@ -56,7 +56,7 @@ extension ChiiClient {
     var offset: Int = 0
     while true {
       let response = try await self.getSubjectCollections(
-        subjectType: type, offset: offset)
+        collectionType: .do, subjectType: type ?? .unknown, offset: offset)
       if response.data.isEmpty {
         break
       }

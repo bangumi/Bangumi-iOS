@@ -31,10 +31,11 @@ struct ChiiTimelineView: View {
   var body: some View {
     if chii.isAuthenticated {
       NavigationStack(path: $navState.timelineNavigation) {
-        ScrollView {
+        Section {
           CollectionsView()
         }
         .padding(.horizontal, 8)
+        .navigationDestination(for: NavDestination.self) { $0 }
         .toolbar {
           ToolbarItem(placement: .topBarLeading) {
             if let me = profile {
@@ -68,7 +69,6 @@ struct ChiiTimelineView: View {
             }
           }
         }
-        .navigationDestination(for: NavDestination.self) { $0 }
       }
     } else {
       AuthView(slogan: "Bangumi 让你的 ACG 生活更美好")

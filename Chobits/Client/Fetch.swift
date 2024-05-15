@@ -28,7 +28,8 @@ extension ChiiClient {
     return profile
   }
 
-  func getSubjectCollections(subjectType: SubjectType?, offset: Int) async throws
+  func getSubjectCollections(collectionType: CollectionType, subjectType: SubjectType, offset: Int)
+    async throws
     -> SubjectCollectionResponse
   {
     Logger.api.info("start get subject collections")
@@ -40,13 +41,15 @@ extension ChiiClient {
         self.apiBase.appendingPathComponent("v0/users/\(profile.username)/collections")
       }
     var queryItems = [
-      URLQueryItem(name: "type", value: "3"),
       // limit should less equal than 100
       URLQueryItem(name: "limit", value: "100"),
       URLQueryItem(name: "offset", value: String(offset)),
     ]
-    if let sType = subjectType, sType != .unknown {
-      queryItems.append(URLQueryItem(name: "subject_type", value: String(sType.rawValue)))
+    if collectionType != .unknown {
+      queryItems.append(URLQueryItem(name: "type", value: String(collectionType.rawValue)))
+    }
+    if subjectType != .unknown {
+      queryItems.append(URLQueryItem(name: "subject_type", value: String(subjectType.rawValue)))
     }
     let pageURL = url.appending(queryItems: queryItems)
     let data = try await request(url: pageURL, method: "GET")
