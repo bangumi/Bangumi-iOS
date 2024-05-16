@@ -149,7 +149,7 @@ final class CharacterRelatedSubject {
     self.characterId = characterId
     self.subjectId = item.id
     self.staff = item.staff
-    self.name = item.name ?? ""
+    self.name = item.name
     self.nameCn = item.nameCn
     self.type = 0  // TODO: add in API
     self.image = item.image

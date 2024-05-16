@@ -35,32 +35,32 @@ struct ChiiTimelineView: View {
           CollectionsView()
         }
         .padding(.horizontal, 8)
+        .navigationBarTitleDisplayMode(.inline)
         .navigationDestination(for: NavDestination.self) { $0 }
         .toolbar {
           ToolbarItem(placement: .topBarLeading) {
             if let me = profile {
-              NavigationLink(value: NavDestination.subject(subjectId: 12)) {
-                HStack {
-                  ImageView(img: me.avatar.medium, width: 32, height: 32)
-                  VStack(alignment: .leading) {
-                    Text("\(me.nickname)")
-                      .font(.footnote)
-                      .lineLimit(1)
-                    Text(me.userGroup.description)
-                      .font(.caption)
-                      .foregroundStyle(.secondary)
-                      .overlay {
-                        RoundedRectangle(cornerRadius: 4)
-                          .stroke(.secondary, lineWidth: 1)
-                          .padding(.horizontal, -2)
-                          .padding(.vertical, -1)
-                      }
-                      .padding(.leading, 2)
-                  }
-                }
-              }.buttonStyle(.plain)
+              ImageView(img: me.avatar.medium, width: 32, height: 32)
             } else {
               ProgressView().onAppear(perform: updateProfile)
+            }
+          }
+          ToolbarItem(placement: .principal) {
+            if let me = profile {
+              VStack {
+                Text("\(me.nickname)")
+                  .font(.footnote)
+                  .lineLimit(1)
+                Text(me.userGroup.description)
+                  .font(.caption)
+                  .foregroundStyle(.secondary)
+                  .overlay {
+                    RoundedRectangle(cornerRadius: 4)
+                      .stroke(.secondary, lineWidth: 1)
+                      .padding(.horizontal, -2)
+                      .padding(.vertical, -1)
+                  }
+              }
             }
           }
           ToolbarItem(placement: .topBarTrailing) {

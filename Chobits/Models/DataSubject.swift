@@ -167,7 +167,7 @@ final class Subject {
   init(_ item: CharacterSubjectDTO) {
     self.subjectId = item.id
     self.type = 0
-    self.name = item.name ?? ""
+    self.name = item.name
     self.nameCn = item.nameCn
     self.summary = ""
     self.nsfw = false
@@ -207,7 +207,7 @@ final class Subject {
   init(_ item: PersonSubjectDTO) {
     self.subjectId = item.id
     self.type = 0
-    self.name = item.name ?? ""
+    self.name = item.name
     self.nameCn = item.nameCn
     self.summary = ""
     self.nsfw = false

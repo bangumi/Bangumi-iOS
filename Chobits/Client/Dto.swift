@@ -201,7 +201,7 @@ struct CharacterDTO: Codable, Identifiable {
 struct CharacterSubjectDTO: Codable, Identifiable {
   var id: UInt
   var staff: String
-  var name: String?
+  var name: String
   var nameCn: String
   var image: String
 }
@@ -238,7 +238,7 @@ struct PersonDTO: Codable, Identifiable {
 struct PersonSubjectDTO: Codable, Identifiable {
   var id: UInt
   var staff: String
-  var name: String?
+  var name: String
   var nameCn: String
   var image: String?
 }

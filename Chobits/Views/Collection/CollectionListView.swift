@@ -5,8 +5,8 @@
 //  Created by Chuan Chuan on 2024/5/15.
 //
 
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 struct CollectionListView: View {
   let subjectType: SubjectType
@@ -110,7 +110,8 @@ struct CollectionListView: View {
         VStack {
           Picker("Collection Type", selection: $collectionType) {
             ForEach(CollectionType.allTypes()) { ctype in
-              Text("\(ctype.description(type: subjectType))(\(counts[ctype, default: 0]))").tag(ctype)
+              Text("\(ctype.description(type: subjectType))(\(counts[ctype, default: 0]))").tag(
+                ctype)
             }
           }
           .pickerStyle(.segmented)
@@ -155,7 +156,7 @@ struct CollectionListView: View {
   container.mainContext.insert(collection)
 
   return CollectionListView(subjectType: SubjectType.anime)
-        .environmentObject(Notifier())
-        .environment(ChiiClient(container: container, mock: .anime))
-        .modelContainer(container)
+    .environmentObject(Notifier())
+    .environment(ChiiClient(container: container, mock: .anime))
+    .modelContainer(container)
 }
