@@ -52,6 +52,26 @@ struct SubjectSummaryView: View {
       .sheet(isPresented: $showSummary) {
         ScrollView {
           LazyVStack(alignment: .leading) {
+            FlowStack {
+              ForEach(tags, id: \.name) { tag in
+                HStack {
+                  Text(tag.name)
+                    .font(.footnote)
+                    .lineLimit(1)
+                  Text("\(tag.count)")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                }
+                .padding(.horizontal, 6)
+                .padding(.vertical, 4)
+                .overlay {
+                  RoundedRectangle(cornerRadius: 5)
+                    .stroke(Color.secondary, lineWidth: 1)
+                    .padding(.horizontal, 2)
+                    .padding(.vertical, 2)
+                }
+              }
+            }.animation(.default, value: tags)
             Text("简介").font(.title3).padding(.vertical, 10)
             Text(subject?.summary ?? "")
               .textSelection(.enabled)
