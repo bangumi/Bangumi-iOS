@@ -145,12 +145,20 @@ struct SubjectBookChaptersView: View {
         Text(volumesDesc).foregroundStyle(.secondary)
       }.monospaced()
       Spacer()
-      if updating {
-        ProgressView()
-      } else {
-        Button("更新", action: update)
-          .disabled(updateButtonDisable)
-          .buttonStyle(.borderedProminent)
+      VStack {
+        if updating {
+          ZStack {
+            Button("更新", action: {})
+              .disabled(true)
+              .hidden()
+              .buttonStyle(.borderedProminent)
+            ProgressView()
+          }
+        } else {
+          Button("更新", action: update)
+            .disabled(updateButtonDisable)
+            .buttonStyle(.borderedProminent)
+        }
       }
     }.disabled(updating)
   }
