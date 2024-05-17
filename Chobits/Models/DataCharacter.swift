@@ -151,8 +151,8 @@ final class CharacterRelatedSubject {
     self.staff = item.staff
     self.name = item.name
     self.nameCn = item.nameCn
-    self.type = 0  // TODO: add in API
-    self.image = item.image
+    self.type = item.type.rawValue
+    self.image = SubjectImages(subjectId: item.id).common
   }
 }
 
@@ -167,13 +167,11 @@ final class CharacterRelatedPerson {
   var type: UInt8
   var images: Images
   var subjectId: UInt
-  var subjectName: String
-  var subjectNameCn: String
   var staff: String
 
   init(
     uk: String, characterId: UInt, personId: UInt, name: String, type: UInt8, images: Images,
-    subjectId: UInt, subjectName: String, subjectNameCn: String, staff: String
+    subjectId: UInt, staff: String
   ) {
     self.uk = uk
     self.characterId = characterId
@@ -182,8 +180,6 @@ final class CharacterRelatedPerson {
     self.type = type
     self.images = images
     self.subjectId = subjectId
-    self.subjectName = subjectName
-    self.subjectNameCn = subjectNameCn
     self.staff = staff
   }
 
@@ -195,8 +191,6 @@ final class CharacterRelatedPerson {
     self.type = item.type.rawValue
     self.images = item.images ?? Images(personId: item.id)
     self.subjectId = item.subjectId
-    self.subjectName = item.subjectName
-    self.subjectNameCn = item.subjectNameCn
     self.staff = item.staff ?? ""
   }
 }

@@ -15,14 +15,6 @@ struct SubjectImages: Codable {
   var small: String
   var grid: String
 
-  init(image: String) {
-    self.large = image
-    self.common = image
-    self.medium = image
-    self.small = image
-    self.grid = image
-  }
-
   init(subjectId: UInt) {
     self.large = "https://api.bgm.tv/v0/subjects/\(subjectId)/image?type=large"
     self.common = "https://api.bgm.tv/v0/subjects/\(subjectId)/image?type=common"

@@ -108,7 +108,7 @@ final class Subject {
     self.locked = false
     self.date = safeParseDate(str: search.date)
     self.platform = ""
-    self.images = SubjectImages(image: search.image)
+    self.images = SubjectImages(subjectId: search.id)
     self.infobox = []
     self.volumes = 0
     self.eps = 0
@@ -166,7 +166,7 @@ final class Subject {
 
   init(_ item: CharacterSubjectDTO) {
     self.subjectId = item.id
-    self.type = 0
+    self.type = item.type.rawValue
     self.name = item.name
     self.nameCn = item.nameCn
     self.summary = ""
@@ -174,7 +174,7 @@ final class Subject {
     self.locked = false
     self.date = Date()
     self.platform = ""
-    self.images = SubjectImages(image: item.image)
+    self.images = SubjectImages(subjectId: item.id)
     self.infobox = []
     self.volumes = 0
     self.eps = 0
@@ -186,7 +186,7 @@ final class Subject {
 
   init(_ item: CharacterPersonDTO) {
     self.subjectId = item.subjectId
-    self.type = 0
+    self.type = item.subjectType.rawValue
     self.name = item.subjectName
     self.nameCn = item.subjectNameCn
     self.summary = ""
@@ -206,7 +206,7 @@ final class Subject {
 
   init(_ item: PersonSubjectDTO) {
     self.subjectId = item.id
-    self.type = 0
+    self.type = item.type.rawValue
     self.name = item.name
     self.nameCn = item.nameCn
     self.summary = ""
@@ -214,7 +214,7 @@ final class Subject {
     self.locked = false
     self.date = Date()
     self.platform = ""
-    self.images = SubjectImages(image: item.image ?? "")
+    self.images = SubjectImages(subjectId: item.id)
     self.infobox = []
     self.volumes = 0
     self.eps = 0
@@ -226,7 +226,7 @@ final class Subject {
 
   init(_ item: PersonCharacterDTO) {
     self.subjectId = item.subjectId
-    self.type = 0
+    self.type = item.subjectType.rawValue
     self.name = item.subjectName
     self.nameCn = item.subjectNameCn
     self.summary = ""

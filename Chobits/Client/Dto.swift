@@ -200,10 +200,10 @@ struct CharacterDTO: Codable, Identifiable {
 
 struct CharacterSubjectDTO: Codable, Identifiable {
   var id: UInt
+  var type: SubjectType
   var staff: String
   var name: String
   var nameCn: String
-  var image: String
 }
 
 struct CharacterPersonDTO: Codable, Identifiable {
@@ -212,6 +212,7 @@ struct CharacterPersonDTO: Codable, Identifiable {
   var type: CharacterType
   var images: Images?
   var subjectId: UInt
+  var subjectType: SubjectType
   var subjectName: String
   var subjectNameCn: String
   var staff: String?
@@ -237,10 +238,10 @@ struct PersonDTO: Codable, Identifiable {
 
 struct PersonSubjectDTO: Codable, Identifiable {
   var id: UInt
+  var type: SubjectType
   var staff: String
   var name: String
   var nameCn: String
-  var image: String?
 }
 
 struct PersonCharacterDTO: Codable, Identifiable {
@@ -249,6 +250,7 @@ struct PersonCharacterDTO: Codable, Identifiable {
   var type: CharacterType
   var images: Images?
   var subjectId: UInt
+  var subjectType: SubjectType
   var subjectName: String
   var subjectNameCn: String
   var staff: String?
