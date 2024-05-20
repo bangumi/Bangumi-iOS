@@ -34,15 +34,6 @@ struct SubjectSummaryView: View {
     return Array(subject.tags.sorted { $0.count > $1.count }.prefix(20))
   }
 
-  func shouldShowToggle(geometry: GeometryProxy) -> Bool {
-    let lines = Int(
-      geometry.size.height / UIFont.preferredFont(forTextStyle: .body).lineHeight)
-    if lines < 5 {
-      return false
-    }
-    return true
-  }
-
   var body: some View {
     Text(subject?.summary ?? "")
       .padding(.bottom, 16)
@@ -72,6 +63,7 @@ struct SubjectSummaryView: View {
                 }
               }
             }.animation(.default, value: tags)
+            Divider()
             Text("简介").font(.title3).padding(.vertical, 10)
             Text(subject?.summary ?? "")
               .textSelection(.enabled)
@@ -83,18 +75,14 @@ struct SubjectSummaryView: View {
         }.padding()
       }
       .overlay(
-        GeometryReader { geometry in
-          if shouldShowToggle(geometry: geometry) {
-            Button(action: {
-              showSummary.toggle()
-            }) {
-              Text("more...")
-                .font(.caption)
-                .foregroundStyle(Color("LinkTextColor"))
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
-          }
+        Button(action: {
+          showSummary.toggle()
+        }) {
+          Text("more...")
+            .font(.caption)
+            .foregroundStyle(Color("LinkTextColor"))
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
       )
   }
 }
