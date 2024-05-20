@@ -15,23 +15,6 @@ struct ScoreInfo {
 struct SubjectRatingBoxView: View {
   let subject: Subject
 
-  var collectionDesc: [String] {
-    var text: [String] = []
-    text.append(
-      "\(subject.collection.wish) 人\(CollectionType.wish.description(type: subject.typeEnum))")
-    text.append(
-      "\(subject.collection.collect) 人\(CollectionType.collect.description(type: subject.typeEnum))"
-    )
-    text.append(
-      "\(subject.collection.doing) 人\(CollectionType.do.description(type: subject.typeEnum))")
-    text.append(
-      "\(subject.collection.onHold) 人\(CollectionType.onHold.description(type: subject.typeEnum))")
-    text.append(
-      "\(subject.collection.dropped) 人\(CollectionType.dropped.description(type: subject.typeEnum))"
-    )
-    return text
-  }
-
   var scoreInfo: ScoreInfo {
     let score = UInt8(subject.rating.score.rounded())
     let offset = score >= 4 ? Int(score - 4) : 0
@@ -80,13 +63,33 @@ struct SubjectRatingBoxView: View {
         .background(Color.secondary.opacity(0.02))
         .clipShape(RoundedRectangle(cornerRadius: 10))
         FlowStack {
-          ForEach(collectionDesc, id: \.self) { desc in
-            HStack {
-              Text(desc)
-              Text("/  ").foregroundStyle(.secondary)
-            }.font(.footnote)
+          Section {
+            Text("\(subject.collection.wish)人")
+            Text(CollectionType.wish.description(type: subject.typeEnum))
           }
-        }.padding(.horizontal, 8)
+          Text("/").foregroundStyle(.secondary).padding(.horizontal, 5)
+          Section {
+            Text("\(subject.collection.collect)人")
+            Text(CollectionType.collect.description(type: subject.typeEnum))
+          }
+          Text("/").foregroundStyle(.secondary).padding(.horizontal, 5)
+          Section {
+            Text("\(subject.collection.doing)人")
+            Text(CollectionType.do.description(type: subject.typeEnum))
+          }
+          Text("/").foregroundStyle(.secondary).padding(.horizontal, 5)
+          Section {
+            Text("\(subject.collection.onHold)人")
+            Text(CollectionType.onHold.description(type: subject.typeEnum))
+          }
+          Text("/").foregroundStyle(.secondary).padding(.horizontal, 5)
+          Section {
+            Text("\(subject.collection.dropped)人")
+            Text(CollectionType.dropped.description(type: subject.typeEnum))
+          }
+        }
+        .font(.footnote)
+        .padding(.horizontal, 8)
         Spacer()
       }
     }.padding()
