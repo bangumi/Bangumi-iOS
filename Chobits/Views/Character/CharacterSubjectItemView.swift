@@ -70,7 +70,7 @@ struct CharacterSubjectItemView: View {
               Text(subject.name)
                 .foregroundStyle(Color("LinkTextColor"))
                 .lineLimit(1)
-            }
+            }.padding(.bottom, 2)
             HStack(alignment: .bottom) {
               if let relation = relation {
                 Text(relation.staff)

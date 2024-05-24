@@ -15,37 +15,8 @@ struct CollectionsView: View {
   @EnvironmentObject var navState: NavState
   @Environment(\.modelContext) var modelContext
 
-  @State private var collections: [SubjectType: [CollectionType: [UserSubjectCollection]]] = [:]
   @State private var refreshing: Bool = false
   @State private var refreshProgress: CGFloat = 0
-
-  func loadCollections() async {
-    let fetcher = BackgroundFetcher(modelContext.container)
-    for stype in SubjectType.allTypes() {
-      for ctype in CollectionType.timelineTypes() {
-        let stypeVal = stype.rawValue
-        let ctypeVal = ctype.rawValue
-        var descriptor = FetchDescriptor<UserSubjectCollection>(
-          predicate: #Predicate<UserSubjectCollection> {
-            $0.subjectType == stypeVal && $0.type == ctypeVal
-          },
-          sortBy: [
-            SortDescriptor<UserSubjectCollection>(\.updatedAt, order: .reverse)
-          ])
-        descriptor.fetchLimit = 7
-        do {
-          let collects = try await fetcher.fetchData(descriptor)
-          if collections[stype] == nil {
-            collections[stype] = [ctype: collects]
-          } else {
-            collections[stype]?[ctype] = collects
-          }
-        } catch {
-          notifier.alert(error: error)
-        }
-      }
-    }
-  }
 
   func refreshCollections() async {
     refreshing = true
@@ -85,43 +56,32 @@ struct CollectionsView: View {
       }
     }
     refreshing = false
-    await loadCollections()
   }
 
   var body: some View {
     ScrollView(showsIndicators: false) {
       LazyVStack(alignment: .leading) {
-        ForEach(SubjectType.allTypes()) { stype in
-          HStack {
-            NavigationLink(value: NavDestination.collectionList(subjectType: stype)) {
-              Text("我的\(stype.description)")
-                .font(.headline)
-                .foregroundStyle(Color("LinkTextColor"))
-            }.buttonStyle(.plain)
-            Spacer()
-          }.padding(.top, 8)
-          Divider()
-          ForEach(CollectionType.timelineTypes()) { ctype in
-            if let collects = collections[stype]?[ctype], !collects.isEmpty {
-              ScrollView(.horizontal, showsIndicators: false) {
-                HStack(alignment: .top) {
-                  VStack {
-                    Spacer()
-                    Text(ctype.description(type: stype)).foregroundStyle(.secondary)
-                    Spacer()
-                    Spacer()
-                  }
-                  ForEach(collects) { collect in
-                    CollectionItemView(subjectId: collect.subjectId)
-                  }
-                }
-              }
-            }
-          }
-        }
         if refreshing {
-          ProgressView(value: refreshProgress)
+          VStack{
+            Spacer().containerRelativeFrame([.vertical])
+            ProgressView(value: refreshProgress)
+            Spacer().containerRelativeFrame([.vertical])
+          }.padding()
         } else {
+          ForEach(SubjectType.allTypes()) { stype in
+            VStack{
+              HStack {
+                Text("我的\(stype.description)").font(.title3)
+                Spacer()
+                NavigationLink(value: NavDestination.collectionList(subjectType: stype)) {
+                  Text("更多 »")
+                    .font(.caption)
+                    .foregroundStyle(Color("LinkTextColor"))
+                }.buttonStyle(.plain)
+              }.padding(.top, 8)
+              CollectionSubjectTypeView(stype: stype)
+            }.padding(.top, 5)
+          }
           Button {
             Task {
               await refreshCollections()
@@ -135,11 +95,6 @@ struct CollectionsView: View {
           }
         }
         Spacer()
-      }
-    }
-    .onAppear {
-      Task {
-        await loadCollections()
       }
     }
   }
