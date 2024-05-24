@@ -99,10 +99,15 @@ extension ChiiClient {
       update: {
         $0.collection = type.rawValue
       })
+    try await db.update(predicate: #Predicate<UserSubjectCollection> {
+      $0.subjectId == subjectId
+    }, update: {
+      $0.updatedAt = Date()
+    })
     try await db.save()
   }
 
-  func updateEpisodeCollection(episodeId: UInt, type: EpisodeCollectionType)
+  func updateEpisodeCollection(subjectId: UInt, episodeId: UInt, type: EpisodeCollectionType)
     async throws
   {
     if self.mock != nil {
@@ -122,6 +127,11 @@ extension ChiiClient {
       update: {
         $0.collection = type.rawValue
       })
+    try await db.update(predicate: #Predicate<UserSubjectCollection> {
+      $0.subjectId == subjectId
+    }, update: {
+      $0.updatedAt = Date()
+    })
     try await db.save()
   }
 }
