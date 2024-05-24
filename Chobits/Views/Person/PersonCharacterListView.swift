@@ -16,7 +16,7 @@ struct PersonCharacterListView: View {
   @Environment(\.modelContext) var modelContext
 
   @State private var relationType: SubjectCharacterRelationType = .unknown
-  @State private var characters: [PersonRelatedCharacter] = []
+  @State private var characterIds: [UInt] = []
 
   func load() async {
     let rtype = relationType.description
@@ -31,25 +31,16 @@ struct PersonCharacterListView: View {
         }
       },
       sortBy: [
-        SortDescriptor<PersonRelatedCharacter>(\.staff),
         SortDescriptor<PersonRelatedCharacter>(\.characterId, order: .reverse),
+        SortDescriptor<PersonRelatedCharacter>(\.subjectId, order: .reverse),
       ])
     do {
-      characters = try await fetcher.fetchData(descriptor)
+      let characters = try await fetcher.fetchData(descriptor)
+      let chars = Dictionary(grouping: characters, by: { $0.characterId })
+      characterIds = chars.keys.sorted()
     } catch {
       notifier.alert(error: error)
     }
-  }
-
-  var characterList: [(PersonRelatedCharacter, [PersonRelatedCharacter])] {
-    let chars = Dictionary(grouping: characters, by: { $0.characterId })
-    var groupedResults: [(PersonRelatedCharacter, [PersonRelatedCharacter])] = []
-    for (_, sublist) in chars {
-      if let firstCharacter = sublist.first {
-        groupedResults.append((firstCharacter, sublist))
-      }
-    }
-    return groupedResults
   }
 
   var body: some View {
@@ -72,63 +63,140 @@ struct PersonCharacterListView: View {
     }
     ScrollView {
       LazyVStack(alignment: .leading) {
-        ForEach(characterList, id: \.0.self) { character, subjects in
+        ForEach(characterIds, id: \.self) { cid in
+          PersonCharacterListItemView(characterId: cid)
           Divider()
-          HStack(alignment: .top) {
-            NavigationLink(value: NavDestination.character(characterId: character.characterId)) {
-              ImageView(img: character.images.medium, width: 60, height: 60, alignment: .top)
-              VStack(alignment: .leading) {
-                HStack {
-                  Text(character.name)
-                    .foregroundStyle(Color("LinkTextColor"))
-                    .lineLimit(1)
-                }
-              }
-            }.buttonStyle(.plain)
-            Spacer()
-            VStack(alignment: .trailing) {
-              ForEach(subjects) { subject in
-                NavigationLink(value: NavDestination.subject(subjectId: character.subjectId)) {
-                  HStack(alignment: .bottom) {
-                    VStack(alignment: .trailing) {
-                      HStack(alignment: .bottom) {
-                        Text(subject.subjectNameCn)
-                          .font(.caption)
-                          .foregroundStyle(.secondary)
-                          .lineLimit(1)
-                        Text(subject.staff)
-                          .font(.footnote)
-                          .foregroundStyle(.secondary)
-                          .overlay {
-                            RoundedRectangle(cornerRadius: 4)
-                              .stroke(Color.secondary, lineWidth: 1)
-                              .padding(.horizontal, -2)
-                              .padding(.vertical, -1)
-                          }
-                      }.padding(.trailing, 2)
-                      Text(subject.subjectName)
-                        .font(.footnote)
-                        .foregroundStyle(Color("LinkTextColor"))
-                        .lineLimit(1)
-                    }
-                  }
-                }
-                .padding(.vertical, 2)
-                .buttonStyle(.plain)
-              }
-            }
-          }
         }
       }
     }
     .padding(.horizontal, 8)
     .buttonStyle(.plain)
-    .animation(.default, value: characters)
+    .animation(.default, value: characterIds)
     .navigationTitle("出演角色")
     .navigationBarTitleDisplayMode(.inline)
     .toolbar {
       ToolbarItem(placement: .automatic) {
         Image(systemName: "list.bullet.circle").foregroundStyle(.secondary)
+      }
+    }
+  }
+}
+
+struct PersonCharacterListItemView: View {
+  let characterId: UInt
+
+  @EnvironmentObject var notifier: Notifier
+  @EnvironmentObject var chii: ChiiClient
+  @Environment(\.modelContext) var modelContext
+
+  @State private var character: Character? = nil
+  @State private var relations: [PersonRelatedCharacter] = []
+
+  func load() async {
+    let fetcher = BackgroundFetcher(modelContext.container)
+    do {
+      character = try await fetcher.fetchOne(
+        predicate: #Predicate<Character> {
+          $0.characterId == characterId
+        })
+      relations = try await fetcher.fetchData(
+        predicate: #Predicate<PersonRelatedCharacter> {
+          $0.characterId == characterId
+        }, sortBy: [SortDescriptor<PersonRelatedCharacter>(\.subjectId, order: .reverse)])
+    } catch {
+      notifier.alert(error: error)
+    }
+  }
+  var body: some View {
+    HStack(alignment: .top) {
+      if let character = character {
+        NavigationLink(value: NavDestination.character(characterId: character.characterId)) {
+          ImageView(img: character.images.medium, width: 60, height: 60, alignment: .top)
+          VStack(alignment: .leading) {
+            HStack {
+              Text(character.name)
+                .foregroundStyle(Color("LinkTextColor"))
+                .lineLimit(1)
+            }
+          }
+        }.buttonStyle(.plain)
+      }
+      Spacer()
+      VStack(alignment: .trailing) {
+        ForEach(relations) { relation in
+          NavigationLink(value: NavDestination.subject(subjectId: relation.subjectId)) {
+            PersonCharacterListItemSubjectItemView(
+              subjectId: relation.subjectId, staff: relation.staff)
+          }
+          .padding(.vertical, 2)
+          .buttonStyle(.plain)
+        }
+      }
+    }
+    .onAppear {
+      Task {
+        await load()
+      }
+    }
+  }
+}
+
+struct PersonCharacterListItemSubjectItemView: View {
+  let subjectId: UInt
+  let staff: String
+
+  @EnvironmentObject var notifier: Notifier
+  @EnvironmentObject var chii: ChiiClient
+  @Environment(\.modelContext) var modelContext
+
+  @State private var subject: Subject? = nil
+
+  func load() async {
+    let fetcher = BackgroundFetcher(modelContext.container)
+    do {
+      subject = try await fetcher.fetchOne(
+        predicate: #Predicate<Subject> {
+          $0.subjectId == subjectId
+        })
+    } catch {
+      notifier.alert(error: error)
+    }
+  }
+  var body: some View {
+    HStack(alignment: .bottom) {
+      VStack(alignment: .trailing) {
+        HStack(alignment: .bottom) {
+          Text(subject?.name ?? "")
+            .foregroundStyle(Color("LinkTextColor"))
+            .truncationMode(.middle)
+            .lineLimit(1)
+          if let icon = subject?.typeEnum.icon {
+            Image(systemName: icon).foregroundStyle(.secondary)
+          }
+        }
+        .font(.footnote)
+        .padding(.bottom, 2)
+        HStack(alignment: .bottom) {
+          Text(subject?.nameCn ?? "")
+            .truncationMode(.middle)
+            .foregroundStyle(.secondary)
+            .lineLimit(1)
+          Text(staff)
+            .foregroundStyle(.secondary)
+            .overlay {
+              RoundedRectangle(cornerRadius: 4)
+                .stroke(Color.secondary, lineWidth: 1)
+                .padding(.horizontal, -2)
+                .padding(.vertical, -1)
+            }
+        }.font(.caption)
+          .padding(.trailing, 2)
+      }
+      ImageView(img: subject?.images.small, width: 40, height: 40, type: .subject)
+    }
+    .onAppear {
+      Task {
+        await load()
       }
     }
   }
@@ -141,6 +209,14 @@ struct PersonCharacterListView: View {
   let personCharacters = PersonRelatedCharacter.preview
   container.mainContext.insert(person)
   for item in personCharacters {
+    container.mainContext.insert(item)
+  }
+  let characters = PersonRelatedCharacter.previewCharacters
+  for item in characters {
+    container.mainContext.insert(item)
+  }
+  let subjects = PersonRelatedCharacter.previewSubjects
+  for item in subjects {
     container.mainContext.insert(item)
   }
 

@@ -68,17 +68,14 @@ struct PersonSubjectsView: View {
             HStack {
               if !subject.typeEnum.icon.isEmpty {
                 Image(systemName: subject.typeEnum.icon)
-                  .font(.footnote)
                   .foregroundStyle(.secondary)
               }
               Text(subject.name)
                 .foregroundStyle(Color("LinkTextColor"))
                 .lineLimit(1)
-            }
+            }.padding(.bottom, 2)
             HStack(alignment: .bottom) {
               Text(subject.staff)
-                .font(.footnote)
-                .foregroundStyle(.secondary)
                 .overlay {
                   RoundedRectangle(cornerRadius: 4)
                     .stroke(Color.secondary, lineWidth: 1)
@@ -86,10 +83,10 @@ struct PersonSubjectsView: View {
                     .padding(.vertical, -1)
                 }
               Text(subject.nameCn)
-                .font(.footnote)
                 .lineLimit(1)
-                .foregroundStyle(.secondary)
             }
+            .font(.footnote)
+            .foregroundStyle(.secondary)
           }
         }.buttonStyle(.plain)
       }

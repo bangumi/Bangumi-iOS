@@ -15,45 +15,38 @@ struct PersonCharacterItemView: View {
 
   @EnvironmentObject var notifier: Notifier
   @EnvironmentObject var chii: ChiiClient
+  @Environment(\.modelContext) var modelContext
 
-  @Query
-  private var characters: [PersonRelatedCharacter]
-  private var character: PersonRelatedCharacter? { characters.first }
+  @State private var character: PersonRelatedCharacter? = nil
+  @State private var subject: Subject? = nil
 
-  @Query
-  private var subjects: [Subject]
-  private var subject: Subject? { subjects.first }
-
-  init(personId: UInt, characterId: UInt, subjectId: UInt) {
-    self.personId = personId
-    self.characterId = characterId
-    self.subjectId = subjectId
-
-    var characterDescriptor = FetchDescriptor<PersonRelatedCharacter>(
-      predicate: #Predicate<PersonRelatedCharacter> {
-        $0.personId == personId && $0.characterId == characterId
-      }, sortBy: [SortDescriptor<PersonRelatedCharacter>(\.characterId)])
-    characterDescriptor.fetchLimit = 1
-    _characters = Query(characterDescriptor)
-
-    var subjectDescriptor = FetchDescriptor<Subject>(
-      predicate: #Predicate<Subject> {
-        $0.subjectId == subjectId
-      }, sortBy: [SortDescriptor<Subject>(\Subject.subjectId)])
-    subjectDescriptor.fetchLimit = 1
-    _subjects = Query(subjectDescriptor)
+  func load() async {
+    let fetcher = BackgroundFetcher(modelContext.container)
+    do {
+      character = try await fetcher.fetchOne(
+        predicate: #Predicate<PersonRelatedCharacter> {
+          $0.personId == personId && $0.characterId == characterId
+        })
+      subject = try await fetcher.fetchOne(
+        predicate: #Predicate<Subject> {
+          $0.subjectId == subjectId
+        })
+    } catch {
+      notifier.alert(error: error)
+    }
   }
 
   var body: some View {
-    if let character = character {
-      HStack(alignment: .bottom) {
-        NavigationLink(value: NavDestination.character(characterId: characterId)) {
-          ImageView(img: character.images.medium, width: 60, height: 60, alignment: .top)
-          VStack(alignment: .leading) {
-            Text(character.name)
-              .foregroundStyle(Color("LinkTextColor"))
-              .lineLimit(1)
-            Text(character.staff)
+    HStack(alignment: .bottom) {
+      NavigationLink(value: NavDestination.character(characterId: characterId)) {
+        ImageView(img: character?.images.medium, width: 60, height: 60, alignment: .top)
+        VStack(alignment: .leading) {
+          Text(character?.name ?? "")
+            .foregroundStyle(Color("LinkTextColor"))
+            .lineLimit(1)
+            .padding(.bottom, 2)
+          if let staff = character?.staff {
+            Text(staff)
               .font(.footnote)
               .foregroundStyle(.secondary)
               .overlay {
@@ -63,25 +56,37 @@ struct PersonCharacterItemView: View {
                   .padding(.vertical, -1)
               }
           }
-        }.buttonStyle(.plain)
-        Spacer()
-        if let subject = subject {
-          NavigationLink(value: NavDestination.subject(subjectId: subjectId)) {
-            HStack(alignment: .bottom) {
-              VStack(alignment: .trailing) {
-                Text(subject.nameCn)
-                  .font(.caption)
-                  .foregroundStyle(.secondary)
-                  .lineLimit(1)
-                Text(subject.name)
-                  .font(.footnote)
-                  .foregroundStyle(Color("LinkTextColor"))
-                  .lineLimit(1)
-              }
-              ImageView(img: subject.images.common, width: 40, height: 40, type: .subject)
-            }
-          }.buttonStyle(.plain)
         }
+      }.buttonStyle(.plain)
+      Spacer()
+      NavigationLink(value: NavDestination.subject(subjectId: subjectId)) {
+        HStack(alignment: .bottom) {
+          VStack(alignment: .trailing) {
+            Text(subject?.name ?? "")
+              .foregroundStyle(Color("LinkTextColor"))
+              .truncationMode(.middle)
+              .lineLimit(1)
+              .font(.footnote)
+              .padding(.bottom, 2)
+            HStack(alignment: .bottom) {
+              Text(subject?.nameCn ?? "")
+                .truncationMode(.middle)
+                .foregroundStyle(.secondary)
+                .lineLimit(1)
+              if let icon = subject?.typeEnum.icon {
+                Image(systemName: icon).foregroundStyle(.secondary)
+              }
+            }
+            .font(.caption)
+            .padding(.trailing, 2)
+          }
+          ImageView(img: subject?.images.small, width: 40, height: 40, type: .subject)
+        }
+      }.buttonStyle(.plain)
+    }
+    .onAppear {
+      Task {
+        await load()
       }
     }
   }
