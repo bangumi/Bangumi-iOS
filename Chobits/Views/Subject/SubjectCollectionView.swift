@@ -78,7 +78,7 @@ struct SubjectCollectionView: View {
                 .padding(.horizontal, -4)
                 .padding(.vertical, -2)
             }
-            .padding(5)
+            .padding(3)
             .onTapGesture {
               edit.toggle()
             }

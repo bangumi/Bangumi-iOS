@@ -219,7 +219,7 @@ struct SubjectCollection: Codable {
 /// 3: 在看
 /// 4: 搁置
 /// 5: 抛弃
-enum CollectionType: UInt8, Codable, Identifiable {
+enum CollectionType: UInt8, Codable, Identifiable, CaseIterable {
   case unknown = 0
   case wish = 1
   case collect = 2
@@ -424,7 +424,7 @@ enum SubjectCharacterRelationType: String, Identifiable, CaseIterable {
   }
 }
 
-enum PersonCareer: String, Codable {
+enum PersonCareer: String, Codable, CaseIterable {
   case producer
   case mangaka
   case artist
@@ -485,7 +485,7 @@ enum PersonCareer: String, Codable {
 /// 1 为 个人
 /// 2 为 公司
 /// 3 为 组合
-enum PersonType: UInt8, Codable, Identifiable {
+enum PersonType: UInt8, Codable, Identifiable, CaseIterable {
   case unknown = 0
   case individual = 1
   case company = 2
@@ -536,7 +536,7 @@ enum PersonType: UInt8, Codable, Identifiable {
 /// 2 为 机体
 /// 3 为 舰船
 /// 4 为 组织
-enum CharacterType: UInt8, Codable, Identifiable {
+enum CharacterType: UInt8, Codable, Identifiable, CaseIterable {
   case unknown = 0
   case character = 1
   case vehicle = 2
@@ -631,7 +631,7 @@ enum BloodType: UInt8, Codable, Identifiable {
 /// 4 = 预告/宣传/广告
 /// 5 = MAD
 /// 6 = 其他
-enum EpisodeType: UInt8, Codable, Identifiable {
+enum EpisodeType: UInt8, Codable, Identifiable, CaseIterable {
   case main = 0
   case sp = 1
   case op = 2
@@ -704,7 +704,7 @@ enum EpisodeType: UInt8, Codable, Identifiable {
 /// 1: 想看
 /// 2: 看过
 /// 3: 抛弃
-enum EpisodeCollectionType: UInt8, Codable, Identifiable {
+enum EpisodeCollectionType: UInt8, Codable, Identifiable, CaseIterable {
   case none = 0
   case wish = 1
   case collect = 2
@@ -752,13 +752,13 @@ enum EpisodeCollectionType: UInt8, Codable, Identifiable {
   func otherTypes() -> [Self] {
     switch self {
     case .none:
-      return [.wish, .collect, .dropped]
+      return [.collect, .wish, .dropped]
     case .wish:
       return [.none, .collect, .dropped]
     case .collect:
       return [.none, .wish, .dropped]
     case .dropped:
-      return [.none, .wish, .collect]
+      return [.none, .collect, .wish]
     }
   }
 }
