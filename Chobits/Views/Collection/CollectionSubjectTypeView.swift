@@ -16,7 +16,7 @@ struct CollectionSubjectTypeView: View {
   @EnvironmentObject var navState: NavState
   @Environment(\.modelContext) var modelContext
 
-  @State private var collectionType: CollectionType = .do
+  @State private var collectionType: CollectionType = .collect
   @State private var counts: [CollectionType: Int] = [:]
   @State private var collections: [UserSubjectCollection] = []
 
