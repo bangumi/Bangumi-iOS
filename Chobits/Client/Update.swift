@@ -99,11 +99,13 @@ extension ChiiClient {
       update: {
         $0.collection = type.rawValue
       })
-    try await db.update(predicate: #Predicate<UserSubjectCollection> {
-      $0.subjectId == subjectId
-    }, update: {
-      $0.updatedAt = Date()
-    })
+    try await db.update(
+      predicate: #Predicate<UserSubjectCollection> {
+        $0.subjectId == subjectId
+      },
+      update: {
+        $0.updatedAt = Date()
+      })
     try await db.save()
   }
 
@@ -127,11 +129,13 @@ extension ChiiClient {
       update: {
         $0.collection = type.rawValue
       })
-    try await db.update(predicate: #Predicate<UserSubjectCollection> {
-      $0.subjectId == subjectId
-    }, update: {
-      $0.updatedAt = Date()
-    })
+    try await db.update(
+      predicate: #Predicate<UserSubjectCollection> {
+        $0.subjectId == subjectId
+      },
+      update: {
+        $0.updatedAt = Date()
+      })
     try await db.save()
   }
 }

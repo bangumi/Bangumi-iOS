@@ -36,7 +36,6 @@ struct SubjectSummaryView: View {
 
   var body: some View {
     Text(subject?.summary ?? "")
-      .padding(.bottom, 16)
       .font(.footnote)
       .multilineTextAlignment(.leading)
       .lineLimit(5)
@@ -74,16 +73,16 @@ struct SubjectSummaryView: View {
           }
         }.padding()
       }
-      .overlay(
-        Button(action: {
-          showSummary.toggle()
-        }) {
-          Text("more...")
-            .font(.caption)
-            .foregroundStyle(Color("LinkTextColor"))
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
-      )
+    HStack {
+      Spacer()
+      Button(action: {
+        showSummary.toggle()
+      }) {
+        Text("more...")
+          .font(.caption)
+          .foregroundStyle(Color("LinkTextColor"))
+      }
+    }
   }
 }
 

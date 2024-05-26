@@ -56,44 +56,46 @@ struct CollectionSubjectTypeView: View {
     }
   }
 
-    var body: some View {
-      VStack {
-        Picker("Collection Type", selection: $collectionType) {
-          ForEach(CollectionType.allTypes()) { ctype in
-            Text("\(ctype.description(type: stype))(\(counts[ctype, default: 0]))").tag(
-              ctype)
-          }
+  var body: some View {
+    VStack {
+      Picker("Collection Type", selection: $collectionType) {
+        ForEach(CollectionType.allTypes()) { ctype in
+          Text("\(ctype.description(type: stype))(\(counts[ctype, default: 0]))").tag(
+            ctype)
         }
-        .pickerStyle(.segmented)
-        .onChange(of: collectionType) { _, _ in
-          Task {
-            await load()
-          }
+      }
+      .pickerStyle(.segmented)
+      .onChange(of: collectionType) { _, _ in
+        Task {
+          await load()
         }
-        .onAppear() {
-          Task {
-            await load()
-            await loadCounts()
-          }
+      }
+      .onAppear {
+        Task {
+          await load()
+          await loadCounts()
         }
-        if collections.count > 0 {
-          LazyVGrid(columns: [
-            GridItem(.flexible()),
-            GridItem(.flexible()),
-            GridItem(.flexible()),
-            GridItem(.flexible()),
-            GridItem(.flexible()),
-          ]) {
-            ForEach(collections) { collection in
-              NavigationLink(value: NavDestination.subject(subjectId: collection.subjectId)) {
-                ImageView(img: SubjectImages(subjectId: collection.subjectId).common, width: 60, height: 60, type: .subject)
-              }.buttonStyle(.plain)
-            }
+      }
+      if collections.count > 0 {
+        LazyVGrid(columns: [
+          GridItem(.flexible()),
+          GridItem(.flexible()),
+          GridItem(.flexible()),
+          GridItem(.flexible()),
+          GridItem(.flexible()),
+        ]) {
+          ForEach(collections) { collection in
+            NavigationLink(value: NavDestination.subject(subjectId: collection.subjectId)) {
+              ImageView(
+                img: SubjectImages(subjectId: collection.subjectId).common, width: 60, height: 60,
+                type: .subject)
+            }.buttonStyle(.plain)
           }
         }
       }
-      .animation(.default, value: collections)
     }
+    .animation(.default, value: collections)
+  }
 }
 
 #Preview {

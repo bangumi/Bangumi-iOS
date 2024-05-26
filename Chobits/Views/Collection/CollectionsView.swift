@@ -62,14 +62,14 @@ struct CollectionsView: View {
     ScrollView(showsIndicators: false) {
       LazyVStack(alignment: .leading) {
         if refreshing {
-          VStack{
+          VStack {
             Spacer().containerRelativeFrame([.vertical])
             ProgressView(value: refreshProgress)
             Spacer().containerRelativeFrame([.vertical])
           }.padding()
         } else {
           ForEach(SubjectType.allTypes()) { stype in
-            VStack{
+            VStack {
               HStack {
                 Text("我的\(stype.description)").font(.title3)
                 Spacer()
