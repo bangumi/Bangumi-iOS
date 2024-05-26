@@ -69,7 +69,7 @@ struct SubjectCollectionView: View {
             }
             Label(
               collection.typeEnum.message(type: collection.subjectTypeEnum),
-              systemImage: "pencil"
+              systemImage: "pencil.line"
             )
             .foregroundStyle(Color("LinkTextColor"))
             .overlay {

@@ -42,30 +42,52 @@ struct SubjectHeaderView: View {
               .presentationDetents([.fraction(0.8)])
           }
         VStack(alignment: .leading) {
-          NavigationLink(value: NavDestination.subjectInfobox(subjectId: subjectId)) {
-            HStack {
-              Text(subject.platform).foregroundStyle(.secondary)
-              Label(subject.typeEnum.description, systemImage: subject.typeEnum.icon)
-                .foregroundStyle(Color("LinkTextColor"))
+          HStack {
+            VStack(alignment: .leading) {
+              HStack {
+                Label(subject.typeEnum.description, systemImage: subject.typeEnum.icon)
+                Text(subject.platform)
+                  .padding(.horizontal, 2)
+                  .overlay {
+                    RoundedRectangle(cornerRadius: 4)
+                      .stroke(Color.secondary, lineWidth: 1)
+                  }
+                if subject.nsfw {
+                  Label("", systemImage: "18.circle").foregroundStyle(.red)
+                }
+                if subject.locked {
+                  Label("", systemImage: "lock").foregroundStyle(.red)
+                }
+              }
               if subject.date.timeIntervalSince1970 > 0 {
                 Label(subject.date.formatAirdate, systemImage: "calendar")
-                  .foregroundStyle(.secondary)
                   .lineLimit(1)
+                  .font(.caption)
               }
-              Spacer()
-            }.font(.footnote)
-          }.buttonStyle(.plain)
+            }
+            .font(.caption)
+            .foregroundStyle(.secondary)
+            Spacer()
+            NavigationLink(value: NavDestination.subjectInfobox(subjectId: subjectId)) {
+              Image(systemName: "info.circle")
+                .font(.title3)
+                .foregroundStyle(Color("LinkTextColor"))
+            }.buttonStyle(.plain)
+          }
+
           Spacer()
           Text(subject.name)
             .font(.title2.bold())
             .multilineTextAlignment(.leading)
+            .truncationMode(.middle)
             .lineLimit(2)
-            .padding(.vertical, 2)
+            .padding(.bottom, 1)
           Text(subject.nameCn)
             .font(.body)
             .foregroundStyle(.secondary)
             .multilineTextAlignment(.leading)
-            .lineLimit(2)
+            .truncationMode(.middle)
+            .lineLimit(1)
           Spacer()
 
           HStack(alignment: .bottom) {
@@ -76,12 +98,6 @@ struct SubjectHeaderView: View {
                 .font(.callout)
             }
             Spacer()
-            if subject.nsfw {
-              Label("", systemImage: "18.circle").foregroundStyle(.red)
-            }
-            if subject.locked {
-              Label("", systemImage: "lock").foregroundStyle(.red)
-            }
             if subject.rating.rank > 0 {
               Text("站内排名:").foregroundStyle(.secondary)
               Text("\(subject.rating.rank)")
@@ -90,8 +106,6 @@ struct SubjectHeaderView: View {
             }
           }
           .font(.footnote)
-          .padding(.top, 4)
-          .padding(.bottom, 8)
           .onTapGesture {
             collectionDetail.toggle()
           }

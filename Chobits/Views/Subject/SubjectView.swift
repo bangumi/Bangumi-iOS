@@ -81,12 +81,13 @@ struct SubjectView: View {
             default:
               EmptyView()
             }
+
+            SubjectSummaryView(subjectId: subjectId).padding(.vertical, 2)
+
             Divider()
-
-            SubjectSummaryView(subjectId: subjectId)
-
             SubjectCharactersView(subjectId: subjectId)
 
+            Divider()
             SubjectRelationsView(subjectId: subjectId)
 
             Spacer()

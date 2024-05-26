@@ -48,7 +48,6 @@ struct SubjectCharactersView: View {
 
   var body: some View {
     if characters.count > 0 {
-      Divider()
       HStack {
         Text("角色介绍").font(.title3)
         Spacer()
