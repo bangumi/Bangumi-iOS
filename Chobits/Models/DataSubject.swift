@@ -16,8 +16,9 @@ final class Subject {
   var name: String
   var nameCn: String
   var summary: String
-  var nsfw: Bool
-  var locked: Bool
+  var series: Bool = false
+  var nsfw: Bool = false
+  var locked: Bool = false
   var date: Date
   var platform: String
   var images: SubjectImages
@@ -34,8 +35,8 @@ final class Subject {
   }
 
   init(
-    subjectId: UInt, type: UInt8, name: String, nameCn: String, summary: String, nsfw: Bool,
-    locked: Bool,
+    subjectId: UInt, type: UInt8, name: String, nameCn: String, summary: String,
+    series: Bool, nsfw: Bool , locked: Bool,
     date: Date, platform: String, images: SubjectImages, infobox: [InfoboxItem], volumes: UInt,
     eps: UInt, totalEpisodes: UInt, rating: Rating, collection: SubjectCollection, tags: [Tag]
   ) {
@@ -44,6 +45,7 @@ final class Subject {
     self.name = name
     self.nameCn = nameCn
     self.summary = summary
+    self.series = series
     self.nsfw = nsfw
     self.locked = locked
     self.date = date
@@ -64,6 +66,7 @@ final class Subject {
     self.name = item.name
     self.nameCn = item.nameCn
     self.summary = item.summary
+    self.series = item.series
     self.nsfw = item.nsfw
     self.locked = item.locked
     self.date = safeParseDate(str: item.date)
@@ -84,8 +87,6 @@ final class Subject {
     self.name = slim.name
     self.nameCn = slim.nameCn
     self.summary = ""
-    self.nsfw = false
-    self.locked = false
     self.date = safeParseDate(str: slim.date)
     self.platform = ""
     self.images = slim.images
@@ -104,8 +105,6 @@ final class Subject {
     self.name = search.name
     self.nameCn = search.nameCn
     self.summary = search.summary
-    self.nsfw = false
-    self.locked = false
     self.date = safeParseDate(str: search.date)
     self.platform = ""
     self.images = SubjectImages(subjectId: search.id)
@@ -124,8 +123,6 @@ final class Subject {
     self.name = small.name
     self.nameCn = small.nameCn
     self.summary = small.summary
-    self.nsfw = false
-    self.locked = false
     self.date = safeParseDate(str: small.airDate)
     self.platform = ""
     self.images = small.images ?? SubjectImages(subjectId: small.id)
@@ -150,8 +147,6 @@ final class Subject {
     self.name = relation.name
     self.nameCn = relation.nameCn
     self.summary = ""
-    self.nsfw = false
-    self.locked = false
     self.date = Date()
     self.platform = ""
     self.images = relation.images ?? SubjectImages(subjectId: relation.id)
@@ -170,8 +165,6 @@ final class Subject {
     self.name = item.name
     self.nameCn = item.nameCn
     self.summary = ""
-    self.nsfw = false
-    self.locked = false
     self.date = Date()
     self.platform = ""
     self.images = SubjectImages(subjectId: item.id)
@@ -190,8 +183,6 @@ final class Subject {
     self.name = item.subjectName
     self.nameCn = item.subjectNameCn
     self.summary = ""
-    self.nsfw = false
-    self.locked = false
     self.date = Date()
     self.platform = ""
     self.images = SubjectImages(subjectId: item.subjectId)
@@ -210,8 +201,6 @@ final class Subject {
     self.name = item.name
     self.nameCn = item.nameCn
     self.summary = ""
-    self.nsfw = false
-    self.locked = false
     self.date = Date()
     self.platform = ""
     self.images = SubjectImages(subjectId: item.id)
@@ -230,8 +219,6 @@ final class Subject {
     self.name = item.subjectName
     self.nameCn = item.subjectNameCn
     self.summary = ""
-    self.nsfw = false
-    self.locked = false
     self.date = Date()
     self.platform = ""
     self.images = SubjectImages(subjectId: item.subjectId)

@@ -63,6 +63,7 @@ struct SubjectDTO: Codable {
   var name: String
   var nameCn: String
   var summary: String
+  var series: Bool
   var nsfw: Bool
   var locked: Bool
   var date: String?

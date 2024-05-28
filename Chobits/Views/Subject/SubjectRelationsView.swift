@@ -44,6 +44,7 @@ struct SubjectRelationsView: View {
 
   var body: some View {
     if relations.count > 0 {
+      Divider()
       HStack {
         Text("关联条目").font(.title3)
         Spacer()

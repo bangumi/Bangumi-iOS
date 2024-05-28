@@ -101,7 +101,7 @@ struct SubjectBookChaptersView: View {
         }.buttonStyle(.plain)
         TextField("\(collectionEps)", text: $inputEps)
           .keyboardType(.numberPad)
-          .frame(width: 48)
+          .frame(minWidth: 48)
           .multilineTextAlignment(.trailing)
           .fixedSize(horizontal: true, vertical: false)
           .padding(.trailing, 2)
@@ -115,7 +115,6 @@ struct SubjectBookChaptersView: View {
           }
         Text(epsDesc).foregroundStyle(.secondary)
       }.monospaced()
-      Spacer()
       HStack(alignment: .firstTextBaseline, spacing: 0) {
         Button {
           if let value = vols {
@@ -130,7 +129,7 @@ struct SubjectBookChaptersView: View {
         }.buttonStyle(.plain)
         TextField("\(collectionVols)", text: $inputVols)
           .keyboardType(.numberPad)
-          .frame(width: 36)
+          .frame(minWidth: 36)
           .multilineTextAlignment(.trailing)
           .fixedSize(horizontal: true, vertical: false)
           .padding(.trailing, 2)

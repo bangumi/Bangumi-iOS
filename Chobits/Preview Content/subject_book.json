@@ -208,6 +208,7 @@
   "id": 497,
   "eps": 88,
   "volumes": 8,
+  "series": true,
   "locked": false,
   "nsfw": false,
   "type": 1

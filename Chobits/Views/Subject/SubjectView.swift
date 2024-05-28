@@ -84,10 +84,8 @@ struct SubjectView: View {
 
             SubjectSummaryView(subjectId: subjectId).padding(.vertical, 2)
 
-            Divider()
             SubjectCharactersView(subjectId: subjectId)
 
-            Divider()
             SubjectRelationsView(subjectId: subjectId)
 
             Spacer()

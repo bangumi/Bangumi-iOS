@@ -29,6 +29,19 @@ struct SubjectHeaderView: View {
     _subjects = Query(filter: predicate, sort: \Subject.subjectId)
   }
 
+  var subjectCategory: String {
+    guard let subject = subject else { return "" }
+    if subject.platform.isEmpty {
+      return subject.typeEnum.description
+    } else {
+      if subject.series {
+        return "\(subject.platform)系列"
+      } else {
+        return subject.platform
+      }
+    }
+  }
+
   var body: some View {
     if let subject = subject {
       HStack(alignment: .top) {
@@ -45,13 +58,7 @@ struct SubjectHeaderView: View {
           HStack {
             VStack(alignment: .leading) {
               HStack {
-                Label(subject.typeEnum.description, systemImage: subject.typeEnum.icon)
-                Text(subject.platform)
-                  .padding(.horizontal, 2)
-                  .overlay {
-                    RoundedRectangle(cornerRadius: 4)
-                      .stroke(Color.secondary, lineWidth: 1)
-                  }
+                Label(subjectCategory, systemImage: subject.typeEnum.icon)
                 if subject.nsfw {
                   Label("", systemImage: "18.circle").foregroundStyle(.red)
                 }
@@ -125,14 +132,14 @@ struct SubjectHeaderView: View {
 #Preview {
   let container = mockContainer()
 
-  let subject = Subject.previewAnime
+  let subject = Subject.previewBook
   container.mainContext.insert(subject)
 
   return ScrollView {
     LazyVStack(alignment: .leading) {
       SubjectHeaderView(subjectId: subject.subjectId)
         .environmentObject(Notifier())
-        .environment(ChiiClient(container: container, mock: .anime))
+        .environment(ChiiClient(container: container, mock: .book))
         .modelContainer(container)
     }
   }.padding()
