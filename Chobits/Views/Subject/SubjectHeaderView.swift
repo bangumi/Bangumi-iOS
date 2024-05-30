@@ -42,6 +42,12 @@ struct SubjectHeaderView: View {
     }
   }
 
+  var scoreDescription: String {
+    guard let subject = subject else { return "" }
+    let score = UInt8(subject.rating.score.rounded())
+    return score.ratingDescription
+  }
+
   var body: some View {
     if let subject = subject {
       HStack(alignment: .top) {
@@ -89,30 +95,28 @@ struct SubjectHeaderView: View {
             .truncationMode(.middle)
             .lineLimit(2)
             .padding(.bottom, 1)
+            .textSelection(.enabled)
           Text(subject.nameCn)
             .font(.body)
             .foregroundStyle(.secondary)
             .multilineTextAlignment(.leading)
             .truncationMode(.middle)
             .lineLimit(1)
+            .textSelection(.enabled)
           Spacer()
 
-          HStack(alignment: .bottom) {
+          HStack {
             if subject.rating.score > 0 {
-              Text("站内评分:").foregroundStyle(Color("LinkTextColor"))
+              StarsView(score: Float(subject.rating.score), size: 12)
               Text("\(subject.rating.score.rateDisplay)")
+                .foregroundStyle(.orange)
+              Spacer()
+              Text("\(subject.rating.total) 人评分")
+                .font(.caption)
                 .foregroundStyle(Color("LinkTextColor"))
-                .font(.callout)
-            }
-            Spacer()
-            if subject.rating.rank > 0 {
-              Text("站内排名:").foregroundStyle(.secondary)
-              Text("\(subject.rating.rank)")
-                .foregroundStyle(.secondary)
-                .font(.callout)
             }
           }
-          .font(.footnote)
+          .font(.callout)
           .onTapGesture {
             collectionDetail.toggle()
           }
@@ -124,6 +128,29 @@ struct SubjectHeaderView: View {
                 .presentationDetents(.init([.medium]))
             })
         }.padding(.leading, 5)
+      }
+      if subject.rating.rank > 0 {
+        NavigationLink(value: NavDestination.subject(subjectId: 0)) {
+          HStack {
+            Spacer()
+            Label(
+              "Bangumi \(subject.typeEnum.name.capitalized) Ranked:", systemImage: "chart.bar.xaxis"
+            )
+            Text("#\(subject.rating.rank)")
+            Image(systemName: "chevron.right")
+            Spacer()
+          }
+          .padding(2)
+          .overlay {
+            RoundedRectangle(cornerRadius: 5)
+              .stroke(.secondary, lineWidth: 1)
+              .padding(.horizontal, -2)
+              .padding(.vertical, -1)
+          }
+          .font(.callout)
+          .foregroundStyle(.accent)
+          .padding(4)
+        }
       }
     }
   }

@@ -52,17 +52,7 @@ struct CollectionRowView: View {
               .lineLimit(1)
             Spacer()
             if collection.rate > 0 {
-              ForEach(1..<6) { idx in
-                Image(
-                  systemName: idx * 2 <= collection.rate
-                    ? "star.fill"
-                    : idx * 2 - 1 == collection.rate ? "star.leadinghalf.fill" : "star"
-                )
-                .resizable()
-                .foregroundStyle(.orange)
-                .frame(width: 12, height: 12)
-                .padding(.horizontal, -2)
-              }
+              StarsView(score: Float(collection.rate), size: 12)
             }
           }.font(.footnote)
         }

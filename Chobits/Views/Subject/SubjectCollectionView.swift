@@ -64,19 +64,8 @@ struct SubjectCollectionView: View {
       VStack(alignment: .leading) {
         HStack {
           if let collection = collection {
-
             if collection.rate > 0 {
-              ForEach(1..<6) { idx in
-                Image(
-                  systemName: idx * 2 <= collection.rate
-                    ? "star.fill"
-                    : idx * 2 - 1 == collection.rate ? "star.leadinghalf.fill" : "star"
-                )
-                .resizable()
-                .foregroundStyle(.orange)
-                .frame(width: 20, height: 20)
-                .padding(.horizontal, -2)
-              }
+              StarsView(score: Float(collection.rate), size: 20)
             }
             Spacer()
             if collection.priv {
