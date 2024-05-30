@@ -64,32 +64,7 @@ struct SubjectCollectionView: View {
       VStack(alignment: .leading) {
         HStack {
           if let collection = collection {
-            if collection.priv {
-              Image(systemName: "lock.fill").foregroundStyle(.accent)
-            }
-            Label(
-              collection.typeEnum.message(type: collection.subjectTypeEnum),
-              systemImage: "pencil.line"
-            )
-            .foregroundStyle(Color("LinkTextColor"))
-            .overlay {
-              RoundedRectangle(cornerRadius: 5)
-                .stroke(Color("LinkTextColor"), lineWidth: 1)
-                .padding(.horizontal, -4)
-                .padding(.vertical, -2)
-            }
-            .padding(3)
-            .onTapGesture {
-              edit.toggle()
-            }
-            .sheet(
-              isPresented: $edit,
-              content: {
-                SubjectCollectionBoxView(subjectId: subjectId, collection: collection.item)
-                  .presentationDragIndicator(.visible)
-                  .presentationDetents(.init([.medium, .large]))
-              })
-            Spacer()
+
             if collection.rate > 0 {
               ForEach(1..<6) { idx in
                 Image(
@@ -103,16 +78,45 @@ struct SubjectCollectionView: View {
                 .padding(.horizontal, -2)
               }
             }
+            Spacer()
+            if collection.priv {
+              Image(systemName: "lock.fill").foregroundStyle(.accent)
+            }
+            Label(
+              collection.typeEnum.message(type: collection.subjectTypeEnum),
+              systemImage: "pencil.line"
+            )
+            .font(.callout)
+            .foregroundStyle(Color("LinkTextColor"))
+            .overlay {
+              RoundedRectangle(cornerRadius: 5)
+                .stroke(Color("LinkTextColor"), lineWidth: 1)
+                .padding(.horizontal, -2)
+                .padding(.vertical, -1)
+            }
+            .padding(2)
+            .onTapGesture {
+              edit.toggle()
+            }
+            .sheet(
+              isPresented: $edit,
+              content: {
+                SubjectCollectionBoxView(subjectId: subjectId, collection: collection.item)
+                  .presentationDragIndicator(.visible)
+                  .presentationDetents(.init([.medium, .large]))
+              })
           } else if refreshed {
+            Spacer()
             Label("未收藏", systemImage: "plus")
               .foregroundStyle(.secondary)
+              .font(.callout)
               .overlay {
                 RoundedRectangle(cornerRadius: 5)
                   .stroke(.secondary, lineWidth: 1)
-                  .padding(.horizontal, -4)
-                  .padding(.vertical, -2)
+                  .padding(.horizontal, -2)
+                  .padding(.vertical, -1)
               }
-              .padding(5)
+              .padding(2)
               .onTapGesture {
                 edit.toggle()
               }
@@ -123,7 +127,6 @@ struct SubjectCollectionView: View {
                     .presentationDragIndicator(.visible)
                     .presentationDetents(.init([.medium, .large]))
                 })
-            Spacer()
           } else {
             ProgressView()
           }

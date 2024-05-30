@@ -229,12 +229,13 @@ struct EpisodeListView: View {
                   }
                   .font(.footnote)
                   .foregroundStyle(.secondary)
+                  Divider()
                 }
                 Spacer()
               }
-            }.padding(.vertical, 5)
+            }
           }
-          .padding(5)
+          .padding(.horizontal, 8)
           .onAppear {
             Task {
               await loadNextPage(idx: item.idx)
