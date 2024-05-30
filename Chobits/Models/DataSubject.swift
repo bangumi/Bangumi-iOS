@@ -36,7 +36,7 @@ final class Subject {
 
   init(
     subjectId: UInt, type: UInt8, name: String, nameCn: String, summary: String,
-    series: Bool, nsfw: Bool , locked: Bool,
+    series: Bool, nsfw: Bool, locked: Bool,
     date: Date, platform: String, images: SubjectImages, infobox: [InfoboxItem], volumes: UInt,
     eps: UInt, totalEpisodes: UInt, rating: Rating, collection: SubjectCollection, tags: [Tag]
   ) {

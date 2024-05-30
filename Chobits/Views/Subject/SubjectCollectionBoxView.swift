@@ -160,7 +160,6 @@ struct SubjectCollectionBoxView: View {
                 tags = Array(tags[0..<10])
               }
             }
-            .monospaced()
             .padding(.horizontal, 5)
             .padding(.vertical, 5)
             .overlay {

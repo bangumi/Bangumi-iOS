@@ -98,6 +98,7 @@ struct ProgressRowView: View {
       VStack(alignment: .leading) {
         Text(subject?.name ?? "").font(.headline)
         Text(subject?.nameCn ?? "").font(.footnote).foregroundStyle(.secondary)
+        Spacer()
         if let collection = collection {
           HStack(alignment: .bottom) {
             Text(collection.updatedAt.formatCollectionDate).foregroundStyle(.secondary)
@@ -137,7 +138,6 @@ struct ProgressRowView: View {
           }.font(.footnote)
         }
       }
-      Spacer()
     }
     .frame(height: 60)
     .padding(2)

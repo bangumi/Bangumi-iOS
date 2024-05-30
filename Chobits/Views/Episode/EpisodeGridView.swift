@@ -90,7 +90,6 @@ struct EpisodeGridView: View {
             .background(Color(hex: episode.backgroundColor))
             .border(Color(hex: episode.borderColor), width: 1)
             .padding(2)
-            .monospaced()
             .strikethrough(episode.collection == EpisodeCollectionType.dropped.rawValue)
         }
       }
@@ -108,7 +107,6 @@ struct EpisodeGridView: View {
           )
           .padding(2)
           .bold()
-          .monospaced()
         ForEach(episodeSps) { episode in
           Button {
             selected = episode
@@ -119,7 +117,6 @@ struct EpisodeGridView: View {
               .background(Color(hex: episode.backgroundColor))
               .border(Color(hex: episode.borderColor), width: 1)
               .padding(2)
-              .monospaced()
               .strikethrough(episode.collection == EpisodeCollectionType.dropped.rawValue)
           }
         }

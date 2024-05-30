@@ -59,15 +59,16 @@ struct CollectionsView: View {
   }
 
   var body: some View {
-    ScrollView(showsIndicators: false) {
-      LazyVStack(alignment: .leading) {
-        if refreshing {
-          VStack {
-            Spacer().containerRelativeFrame([.vertical])
-            ProgressView(value: refreshProgress)
-            Spacer().containerRelativeFrame([.vertical])
-          }.padding()
-        } else {
+
+    if refreshing {
+      VStack {
+        Spacer().containerRelativeFrame([.vertical])
+        ProgressView(value: refreshProgress)
+        Spacer().containerRelativeFrame([.vertical])
+      }.padding()
+    } else {
+      ScrollView(showsIndicators: false) {
+        LazyVStack(alignment: .leading) {
           ForEach(SubjectType.allTypes()) { stype in
             VStack {
               HStack {
