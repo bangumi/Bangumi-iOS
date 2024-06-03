@@ -10,47 +10,23 @@ import SwiftUI
 
 struct SubjectCollectionBoxView: View {
   let subjectId: UInt
-  let collection: UserSubjectCollectionDTO?
 
   @Environment(\.dismiss) private var dismiss
   @EnvironmentObject var notifier: Notifier
   @EnvironmentObject var chii: ChiiClient
+  @Environment (\.modelContext) var modelContext
 
-  @State private var collectionType: CollectionType
-  @State private var rate: UInt8
-  @State private var comment: String
-  @State private var priv: Bool
-  @State private var tags: [String]
-  @State private var tagsInput: String
+  @State private var collectionType: CollectionType = .do
+  @State private var rate: UInt8 = 0
+  @State private var comment: String = ""
+  @State private var priv: Bool = false
+  @State private var tags: [String] = []
+  @State private var tagsInput: String = ""
+
   @State private var updating: Bool = false
 
-  @Query
-  private var subjects: [Subject]
-  private var subject: Subject? { subjects.first }
-
-  init(subjectId: UInt, collection: UserSubjectCollectionDTO?) {
-    self.subjectId = subjectId
-    self.collection = collection
-    if let collection = collection {
-      self.collectionType = collection.type
-      self.rate = collection.rate
-      self.comment = collection.comment ?? ""
-      self.priv = collection.private
-      self.tags = collection.tags
-      self.tagsInput = collection.tags.joined(separator: ",")
-    } else {
-      self.collectionType = .do
-      self.rate = 0
-      self.comment = ""
-      self.priv = false
-      self.tags = []
-      self.tagsInput = ""
-    }
-    _subjects = Query(
-      filter: #Predicate<Subject> {
-        $0.subjectId == subjectId
-      })
-  }
+  @State private var subject: Subject? = nil
+  @State private var collection: UserSubjectCollection? = nil
 
   var recommendedTags: [String] {
     guard let subject = subject else { return [] }
@@ -62,6 +38,28 @@ struct SubjectCollectionBoxView: View {
       return priv ? "悄悄地添加" : "添加"
     } else {
       return priv ? "悄悄地更新" : "更新"
+    }
+  }
+
+  func load() async {
+    let fetcher = BackgroundFetcher(modelContext.container)
+    do {
+      subject = try await fetcher.fetchOne(predicate: #Predicate<Subject> {
+        $0.subjectId == subjectId
+      })
+      collection = try await fetcher.fetchOne(predicate: #Predicate<UserSubjectCollection> {
+        $0.subjectId == subjectId
+      })
+    } catch {
+      notifier.alert(error: error)
+    }
+    if let collection = collection {
+      self.collectionType = collection.typeEnum
+      self.rate = collection.rate
+      self.comment = collection.comment
+      self.priv = collection.priv
+      self.tags = collection.tags
+      self.tagsInput = collection.tags.joined(separator: ",")
     }
   }
 
@@ -114,6 +112,9 @@ struct SubjectCollectionBoxView: View {
           }
         }
         .pickerStyle(.segmented)
+        .task {
+          await load()
+        }
 
         VStack(alignment: .leading) {
           HStack(alignment: .top) {
@@ -227,8 +228,7 @@ struct SubjectCollectionBoxView: View {
   container.mainContext.insert(subject)
 
   return SubjectCollectionBoxView(
-    subjectId: subject.subjectId,
-    collection: collection.item
+    subjectId: subject.subjectId
   )
   .environmentObject(Notifier())
   .environment(ChiiClient(container: container, mock: .anime))

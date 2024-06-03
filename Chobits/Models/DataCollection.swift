@@ -30,15 +30,6 @@ final class UserSubjectCollection {
     CollectionType(type)
   }
 
-  var item: UserSubjectCollectionDTO {
-    UserSubjectCollectionDTO(
-      subjectId: subjectId, subjectType: SubjectType(subjectType),
-      rate: rate, type: CollectionType(type), comment: comment,
-      tags: tags, epStatus: epStatus, volStatus: volStatus,
-      updatedAt: updatedAt.formatCollectionDate, private: priv
-    )
-  }
-
   init(
     subjectId: UInt, subjectType: UInt8, rate: UInt8, type: UInt8, comment: String, tags: [String],
     epStatus: UInt, volStatus: UInt, updatedAt: Date, priv: Bool

@@ -147,6 +147,16 @@ enum InfoboxValue: Codable {
   case string(String)
   case list([InfoboxValueListValue])
 
+  var desc: String {
+    switch self {
+    case .string(let s):
+      return s
+    case .list(let l):
+      let vals = l.map({$0.desc})
+      return vals.joined(separator: "、")
+    }
+  }
+
   init(from decoder: Decoder) throws {
     let container = try decoder.singleValueContainer()
     if let string = try? container.decode(String.self) {
@@ -246,6 +256,23 @@ enum CollectionType: UInt8, Codable, Identifiable, CaseIterable {
 
   static func timelineTypes() -> [Self] {
     return [.do, .collect]
+  }
+
+  var icon: String {
+    switch self {
+    case .unknown:
+      return "questionmark"
+    case .wish:
+      return "heart"
+    case .collect:
+      return "checkmark"
+    case .do:
+      return "eye"
+    case .onHold:
+      return "clock"
+    case .dropped:
+      return "trash"
+    }
   }
 
   func description(type: SubjectType?) -> String {
@@ -372,7 +399,7 @@ enum SubjectType: UInt8, Codable, Identifiable, CaseIterable {
   var icon: String {
     switch self {
     case .unknown:
-      return ""
+      return "questionmark"
     case .book:
       return "book"
     case .anime:

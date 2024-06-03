@@ -34,6 +34,97 @@ final class Subject {
     return SubjectType(type)
   }
 
+  var category: String {
+    if platform.isEmpty {
+      return typeEnum.description
+    } else {
+      if series {
+        return "\(platform)系列"
+      } else {
+        return platform
+      }
+    }
+  }
+
+  var authority: String {
+    var items: [String] = []
+    switch typeEnum {
+    case .unknown:
+      return ""
+    case .book:
+      if eps > 0 {
+        items.append("\(eps)话")
+      }
+      if let onShelfDate = infobox.filter({$0.key == "发售日"}).first {
+        items.append(onShelfDate.value.desc)
+      }
+      if let author = infobox.filter({$0.key == "作者"}).first {
+        items.append(author.value.desc)
+      }
+      if let publisher = infobox.filter({$0.key == "出版社"}).first {
+        items.append(publisher.value.desc)
+      }
+    case .anime:
+      if eps > 0 {
+        items.append("\(eps)话")
+      }
+      if let onAirDate = infobox.filter({$0.key == "放送开始"}).first {
+        items.append(onAirDate.value.desc)
+      }
+      if let director = infobox.filter({$0.key == "导演"}).first {
+        items.append(director.value.desc)
+      }
+      if let origin = infobox.filter({$0.key == "原作"}).first {
+        items.append(origin.value.desc)
+      }
+      if let producer = infobox.filter({$0.key == "制作"}).first {
+        items.append(producer.value.desc)
+      }
+    case .music:
+      if let onShelfDate = infobox.filter({$0.key == "发售日期"}).first {
+        items.append(onShelfDate.value.desc)
+      }
+      if let artist = infobox.filter({$0.key == "艺术家"}).first {
+        items.append(artist.value.desc)
+      }
+    case .game:
+      if let onShelfDate = infobox.filter({$0.key == "发行日期"}).first {
+        items.append(onShelfDate.value.desc)
+      }
+      if let platform = infobox.filter({$0.key == "平台"}).first {
+        items.append(platform.value.desc)
+      }
+      if let category = infobox.filter({$0.key == "游戏类型"}).first {
+        items.append(category.value.desc)
+      }
+      if let developer = infobox.filter({$0.key == "游戏开发商"}).first {
+        items.append(developer.value.desc)
+      }
+    case .real:
+      if eps > 0 {
+        items.append("\(eps)话")
+      }
+      if let startDate = infobox.filter({$0.key == "开始"}).first {
+        items.append(startDate.value.desc)
+      }
+      if let director = infobox.filter({$0.key == "导演"}).first {
+        items.append(director.value.desc)
+      }
+      if let origin = infobox.filter({$0.key == "编剧"}).first {
+        items.append(origin.value.desc)
+      }
+      if let actors = infobox.filter({$0.key == "主演"}).first {
+        items.append(actors.value.desc)
+      }
+    }
+
+    if items.count > 0 {
+      return items.joined(separator: " / ")
+    } else {
+      return ""
+    }
+  }
+
   init(
     subjectId: UInt, type: UInt8, name: String, nameCn: String, summary: String,
     series: Bool, nsfw: Bool, locked: Bool,

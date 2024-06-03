@@ -29,19 +29,6 @@ struct SubjectHeaderView: View {
     _subjects = Query(filter: predicate, sort: \Subject.subjectId)
   }
 
-  var subjectCategory: String {
-    guard let subject = subject else { return "" }
-    if subject.platform.isEmpty {
-      return subject.typeEnum.description
-    } else {
-      if subject.series {
-        return "\(subject.platform)系列"
-      } else {
-        return subject.platform
-      }
-    }
-  }
-
   var scoreDescription: String {
     guard let subject = subject else { return "" }
     let score = UInt8(subject.rating.score.rounded())
@@ -64,7 +51,9 @@ struct SubjectHeaderView: View {
           HStack {
             VStack(alignment: .leading) {
               HStack {
-                Label(subjectCategory, systemImage: subject.typeEnum.icon)
+                if subject.typeEnum != .unknown {
+                  Label(subject.category, systemImage: subject.typeEnum.icon)
+                }
                 if subject.nsfw {
                   Label("", systemImage: "18.circle").foregroundStyle(.red)
                 }
@@ -110,10 +99,12 @@ struct SubjectHeaderView: View {
               StarsView(score: Float(subject.rating.score), size: 12)
               Text("\(subject.rating.score.rateDisplay)")
                 .foregroundStyle(.orange)
+              if subject.rating.total > 0 {
+                Text("(\(subject.rating.total) 人评分)")
+                  .font(.footnote)
+                  .foregroundStyle(.secondary)
+              }
               Spacer()
-              Text("\(subject.rating.total) 人评分")
-                .font(.caption)
-                .foregroundStyle(Color("LinkTextColor"))
             }
           }
           .font(.callout)
