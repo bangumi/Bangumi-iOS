@@ -8,11 +8,12 @@
 import SwiftUI
 
 struct SubjectBrowsingView: View {
-    var body: some View {
-        Text("Hello, World!")
-    }
+  let subjectType: SubjectType
+  var body: some View {
+    Text("Hello, World!")
+  }
 }
 
 #Preview {
-    SubjectBrowsingView()
+  SubjectBrowsingView(subjectType: .anime)
 }

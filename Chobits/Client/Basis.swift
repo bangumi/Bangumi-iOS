@@ -152,7 +152,7 @@ enum InfoboxValue: Codable {
     case .string(let s):
       return s
     case .list(let l):
-      let vals = l.map({$0.desc})
+      let vals = l.map({ $0.desc })
       return vals.joined(separator: "、")
     }
   }

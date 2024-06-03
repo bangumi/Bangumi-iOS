@@ -19,6 +19,7 @@ enum NavDestination: Hashable, View {
   case personCharacterList(personId: UInt)
   case personSubjectList(personId: UInt)
   case collectionList(subjectType: SubjectType)
+  case subjectBrowsing(subjectType: SubjectType)
   case setting
 
   var body: some View {
@@ -45,6 +46,8 @@ enum NavDestination: Hashable, View {
       PersonSubjectListView(personId: personId)
     case .collectionList(let subjectType):
       CollectionListView(subjectType: subjectType)
+    case .subjectBrowsing(let subjectType):
+      SubjectBrowsingView(subjectType: subjectType)
     }
   }
 }

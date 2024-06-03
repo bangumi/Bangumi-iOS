@@ -14,7 +14,7 @@ struct SubjectCollectionBoxView: View {
   @Environment(\.dismiss) private var dismiss
   @EnvironmentObject var notifier: Notifier
   @EnvironmentObject var chii: ChiiClient
-  @Environment (\.modelContext) var modelContext
+  @Environment(\.modelContext) var modelContext
 
   @State private var collectionType: CollectionType = .do
   @State private var rate: UInt8 = 0
@@ -44,12 +44,14 @@ struct SubjectCollectionBoxView: View {
   func load() async {
     let fetcher = BackgroundFetcher(modelContext.container)
     do {
-      subject = try await fetcher.fetchOne(predicate: #Predicate<Subject> {
-        $0.subjectId == subjectId
-      })
-      collection = try await fetcher.fetchOne(predicate: #Predicate<UserSubjectCollection> {
-        $0.subjectId == subjectId
-      })
+      subject = try await fetcher.fetchOne(
+        predicate: #Predicate<Subject> {
+          $0.subjectId == subjectId
+        })
+      collection = try await fetcher.fetchOne(
+        predicate: #Predicate<UserSubjectCollection> {
+          $0.subjectId == subjectId
+        })
     } catch {
       notifier.alert(error: error)
     }

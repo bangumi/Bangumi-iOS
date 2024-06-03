@@ -49,35 +49,24 @@ struct SubjectHeaderView: View {
           }
         VStack(alignment: .leading) {
           HStack {
-            VStack(alignment: .leading) {
-              HStack {
-                if subject.typeEnum != .unknown {
-                  Label(subject.category, systemImage: subject.typeEnum.icon)
-                }
-                if subject.nsfw {
-                  Label("", systemImage: "18.circle").foregroundStyle(.red)
-                }
-                if subject.locked {
-                  Label("", systemImage: "lock").foregroundStyle(.red)
-                }
-              }
-              if subject.date.timeIntervalSince1970 > 0 {
-                Label(subject.date.formatAirdate, systemImage: "calendar")
-                  .lineLimit(1)
-                  .font(.caption)
-              }
+            if subject.typeEnum != .unknown {
+              Label(subject.category, systemImage: subject.typeEnum.icon)
             }
-            .font(.caption)
-            .foregroundStyle(.secondary)
+            if subject.date.timeIntervalSince1970 > 0 {
+              Label(subject.date.formatAirdate, systemImage: "calendar")
+                .lineLimit(1)
+            }
             Spacer()
-            NavigationLink(value: NavDestination.subjectInfobox(subjectId: subjectId)) {
-              Image(systemName: "info.circle")
-                .font(.title3)
-                .foregroundStyle(Color("LinkTextColor"))
-            }.buttonStyle(.plain)
+            if subject.nsfw {
+              Label("", systemImage: "18.circle").foregroundStyle(.red)
+            }
+            if subject.locked {
+              Label("", systemImage: "lock").foregroundStyle(.red)
+            }
           }
+          .font(.caption)
+          .foregroundStyle(.secondary)
 
-          Spacer()
           Text(subject.name)
             .font(.title2.bold())
             .multilineTextAlignment(.leading)
@@ -93,6 +82,18 @@ struct SubjectHeaderView: View {
             .lineLimit(1)
             .textSelection(.enabled)
           Spacer()
+
+          NavigationLink(value: NavDestination.subjectInfobox(subjectId: subjectId)) {
+            HStack {
+              Text(subject.authority)
+                .font(.caption)
+                .lineLimit(2)
+              Spacer()
+              Image(systemName: "chevron.right")
+            }
+          }
+          .buttonStyle(.plain)
+          .foregroundStyle(Color("LinkTextColor"))
 
           HStack {
             if subject.rating.score > 0 {
@@ -121,7 +122,7 @@ struct SubjectHeaderView: View {
         }.padding(.leading, 5)
       }
       if subject.rating.rank > 0 {
-        NavigationLink(value: NavDestination.subject(subjectId: 0)) {
+        NavigationLink(value: NavDestination.subjectBrowsing(subjectType: subject.typeEnum)) {
           HStack {
             Spacer()
             Label(

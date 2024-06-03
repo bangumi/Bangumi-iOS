@@ -5,8 +5,8 @@
 //  Created by Chuan Chuan on 2024/4/26.
 //
 
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 struct SubjectLargeRowView: View {
   let subjectId: UInt
@@ -75,8 +75,11 @@ struct SubjectLargeRowView: View {
           }
           Spacer()
           if let collection = collection, collection.typeEnum != .unknown {
-            Label(collection.typeEnum.description(type: collection.subjectTypeEnum), systemImage: collection.typeEnum.icon)
-              .foregroundStyle(.accent)
+            Label(
+              collection.typeEnum.description(type: collection.subjectTypeEnum),
+              systemImage: collection.typeEnum.icon
+            )
+            .foregroundStyle(.accent)
           }
         }.font(.caption)
         HStack {
