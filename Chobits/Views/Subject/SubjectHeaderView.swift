@@ -37,7 +37,11 @@ struct SubjectHeaderView: View {
 
   var body: some View {
     if let subject = subject {
-      HStack(alignment: .top) {
+      Text(subject.name)
+        .font(.title2.bold())
+        .multilineTextAlignment(.leading)
+        .textSelection(.enabled)
+      HStack {
         ImageView(img: subject.images.common, width: 100, height: 150)
           .onTapGesture {
             coverDetail.toggle()
@@ -52,10 +56,6 @@ struct SubjectHeaderView: View {
             if subject.typeEnum != .unknown {
               Label(subject.category, systemImage: subject.typeEnum.icon)
             }
-            if subject.date.timeIntervalSince1970 > 0 {
-              Label(subject.date.formatAirdate, systemImage: "calendar")
-                .lineLimit(1)
-            }
             Spacer()
             if subject.nsfw {
               Label("", systemImage: "18.circle").foregroundStyle(.red)
@@ -67,19 +67,18 @@ struct SubjectHeaderView: View {
           .font(.caption)
           .foregroundStyle(.secondary)
 
-          Text(subject.name)
-            .font(.title2.bold())
+          if subject.date.timeIntervalSince1970 > 0 {
+            Label(subject.date.formatAirdate, systemImage: "calendar")
+              .font(.caption)
+              .foregroundStyle(.secondary)
+              .lineLimit(1)
+          }
+
+          Spacer()
+          Text(subject.nameCn)
             .multilineTextAlignment(.leading)
             .truncationMode(.middle)
             .lineLimit(2)
-            .padding(.bottom, 1)
-            .textSelection(.enabled)
-          Text(subject.nameCn)
-            .font(.body)
-            .foregroundStyle(.secondary)
-            .multilineTextAlignment(.leading)
-            .truncationMode(.middle)
-            .lineLimit(1)
             .textSelection(.enabled)
           Spacer()
 

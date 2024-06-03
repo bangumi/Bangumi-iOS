@@ -55,11 +55,14 @@ final class Subject {
       if eps > 0 {
         items.append("\(eps)话")
       }
-      if let onShelfDate = infobox.filter({ $0.key == "发售日" }).first {
+      if let onShelfDate = infobox.filter({ ["发售日", "开始"].contains($0.key) }).first {
         items.append(onShelfDate.value.desc)
       }
-      if let author = infobox.filter({ $0.key == "作者" }).first {
+      if let author = infobox.filter({ ["作者", "作画"].contains($0.key) }).first {
         items.append(author.value.desc)
+      }
+      if let origin = infobox.filter({ $0.key == "原作" }).first {
+        items.append(origin.value.desc)
       }
       if let publisher = infobox.filter({ $0.key == "出版社" }).first {
         items.append(publisher.value.desc)
@@ -68,7 +71,7 @@ final class Subject {
       if eps > 0 {
         items.append("\(eps)话")
       }
-      if let onAirDate = infobox.filter({ $0.key == "放送开始" }).first {
+      if let onAirDate = infobox.filter({ ["放送开始", "上映年度"].contains($0.key) }).first {
         items.append(onAirDate.value.desc)
       }
       if let director = infobox.filter({ $0.key == "导演" }).first {
@@ -77,7 +80,7 @@ final class Subject {
       if let origin = infobox.filter({ $0.key == "原作" }).first {
         items.append(origin.value.desc)
       }
-      if let producer = infobox.filter({ $0.key == "制作" }).first {
+      if let producer = infobox.filter({ ["制作", "製作"].contains($0.key) }).first {
         items.append(producer.value.desc)
       }
     case .music:
