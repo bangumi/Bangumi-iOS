@@ -142,6 +142,44 @@ extension ChiiClient {
     return subject
   }
 
+  func getSubjects(type: SubjectType, filter: SubjectsBrowseFilter, limit: Int = 10, offset: Int = 0) async throws -> SubjectsResponse {
+    if self.mock != nil {
+      return loadFixture(fixture: "subjects.json", target: SubjectsResponse.self)
+    }
+    Logger.api.info("start browsing subjects: \(type.description), \(limit), \(offset), \(filter.description)")
+    var queries: [URLQueryItem] = [
+      URLQueryItem(name: "type", value: String(type.rawValue)),
+      URLQueryItem(name: "limit", value: String(limit)),
+      URLQueryItem(name: "offset", value: String(offset)),
+    ]
+    if let cat = filter.cat {
+      queries.append(URLQueryItem(name: "cat", value: String(cat.id)))
+    }
+    if type == .book, let series = filter.series {
+      queries.append(URLQueryItem(name: "series", value: String(series)))
+    }
+    if type == .game, !filter.platform.isEmpty {
+      queries.append(URLQueryItem(name: "platform", value: filter.platform))
+    }
+    if !filter.sort.isEmpty {
+      queries.append(URLQueryItem(name: "sort", value: filter.sort))
+    }
+    if filter.year > 0 {
+      queries.append(URLQueryItem(name: "year", value: String(filter.year)))
+      if filter.month > 0 {
+        queries.append(URLQueryItem(name: "month", value: String(filter.month)))
+      }
+    }
+    let url = self.apiBase.appendingPathComponent("v0/subjects")
+      .appending(queryItems: queries)
+    let data = try await request(url: url, method: "GET", authorized: self.isAuthenticated)
+    let decoder = JSONDecoder()
+    decoder.keyDecodingStrategy = .convertFromSnakeCase
+    let response = try decoder.decode(SubjectsResponse.self, from: data)
+    Logger.api.info("finish browsing subjects: \(type.description), \(limit), \(offset), \(filter.description)")
+    return response
+  }
+
   func getSubjectEpisodes(subjectId: UInt, type: EpisodeType?, limit: Int = 10, offset: Int = 0)
     async throws -> EpisodeResponse
   {

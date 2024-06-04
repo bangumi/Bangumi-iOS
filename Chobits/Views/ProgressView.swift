@@ -159,6 +159,16 @@ struct ChiiProgressView: View {
                     }
                   }
                 }
+                if exhausted {
+                  Divider()
+                  HStack {
+                    Spacer()
+                    Text("没有更多了")
+                      .font(.footnote)
+                      .foregroundStyle(.secondary)
+                    Spacer()
+                  }
+                }
               }
             }
             .animation(.easeInOut, value: subjectType)

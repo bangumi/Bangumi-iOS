@@ -76,6 +76,8 @@
 		197A19E42BE699CF00804B13 /* EpisodeListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 197A19E32BE699CF00804B13 /* EpisodeListView.swift */; };
 		1980EE002BE418C800E013EA /* episodes.json in Resources */ = {isa = PBXBuildFile; fileRef = 1980EDFF2BE418C800E013EA /* episodes.json */; };
 		1980EE022BE419D500E013EA /* episode_collections.json in Resources */ = {isa = PBXBuildFile; fileRef = 1980EE012BE419D500E013EA /* episode_collections.json */; };
+		19AA1FCB2C100A1200FA4E18 /* subjects.json in Resources */ = {isa = PBXBuildFile; fileRef = 19AA1FCA2C100A1200FA4E18 /* subjects.json */; };
+		19AA1FCD2C100D3100FA4E18 /* Request.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19AA1FCC2C100D3100FA4E18 /* Request.swift */; };
 		19AB93CB2BE4F0F4007531A4 /* BackgroundActor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19AB93CA2BE4F0F4007531A4 /* BackgroundActor.swift */; };
 		19B9002E2BED15B600405F0F /* PersonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19B9002D2BED15B600405F0F /* PersonView.swift */; };
 		19B900302BED16FE00405F0F /* person.json in Resources */ = {isa = PBXBuildFile; fileRef = 19B9002F2BED16FE00405F0F /* person.json */; };
@@ -169,6 +171,8 @@
 		197A19E32BE699CF00804B13 /* EpisodeListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EpisodeListView.swift; sourceTree = "<group>"; };
 		1980EDFF2BE418C800E013EA /* episodes.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = episodes.json; sourceTree = "<group>"; };
 		1980EE012BE419D500E013EA /* episode_collections.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = episode_collections.json; sourceTree = "<group>"; };
+		19AA1FCA2C100A1200FA4E18 /* subjects.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = subjects.json; sourceTree = "<group>"; };
+		19AA1FCC2C100D3100FA4E18 /* Request.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Request.swift; sourceTree = "<group>"; };
 		19AB93CA2BE4F0F4007531A4 /* BackgroundActor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundActor.swift; sourceTree = "<group>"; };
 		19B9002D2BED15B600405F0F /* PersonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonView.swift; sourceTree = "<group>"; };
 		19B9002F2BED16FE00405F0F /* person.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = person.json; sourceTree = "<group>"; };
@@ -266,6 +270,7 @@
 			isa = PBXGroup;
 			children = (
 				19671C442BDEB55D000B4D99 /* Preview Assets.xcassets */,
+				19AA1FCA2C100A1200FA4E18 /* subjects.json */,
 				19C2CE602BE2538A0080A056 /* subject_book.json */,
 				19671C452BDEB55D000B4D99 /* subject_anime.json */,
 				1909F3B02BEC47B200E3B8F0 /* subject_persons.json */,
@@ -330,6 +335,7 @@
 			children = (
 				19671C3D2BDEB55D000B4D99 /* Basis.swift */,
 				19671C3E2BDEB55D000B4D99 /* Dto.swift */,
+				19AA1FCC2C100D3100FA4E18 /* Request.swift */,
 				19671C422BDEB55D000B4D99 /* Response.swift */,
 				19671C3F2BDEB55D000B4D99 /* Core.swift */,
 				197A19D52BE6729A00804B13 /* Auth.swift */,
@@ -492,6 +498,7 @@
 				19671C682BDEB55D000B4D99 /* user_collection_anime.json in Resources */,
 				1980EE002BE418C800E013EA /* episodes.json in Resources */,
 				19B900302BED16FE00405F0F /* person.json in Resources */,
+				19AA1FCB2C100A1200FA4E18 /* subjects.json in Resources */,
 				1915A8A22BF0D83F003DB76D /* person_subjects.json in Resources */,
 				1909F3AD2BEC43D000E3B8F0 /* subject_characters.json in Resources */,
 				19C2CE652BE2ACE60080A056 /* profile.json in Resources */,
@@ -558,6 +565,7 @@
 				197A19DC2BE674ED00804B13 /* Update.swift in Sources */,
 				19671C572BDEB55D000B4D99 /* SubjectRatingBoxView.swift in Sources */,
 				19C2CE5D2BE1E7B10080A056 /* NotFoundView.swift in Sources */,
+				19AA1FCD2C100D3100FA4E18 /* Request.swift in Sources */,
 				19671C6B2BDEB55D000B4D99 /* DiscoverView.swift in Sources */,
 				1915A8AA2BF0E8C4003DB76D /* PersonCharacterItemView.swift in Sources */,
 				19671C5B2BDEB55D000B4D99 /* CalendarView.swift in Sources */,

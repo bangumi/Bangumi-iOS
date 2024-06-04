@@ -242,6 +242,16 @@ struct EpisodeListView: View {
             }
           }
         }
+        if exhausted {
+          Divider()
+          HStack {
+            Spacer()
+            Text("没有更多了")
+              .font(.footnote)
+              .foregroundStyle(.secondary)
+            Spacer()
+          }
+        }
       }
     }
     .padding(.horizontal, 8)

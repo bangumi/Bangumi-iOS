@@ -414,6 +414,243 @@ enum SubjectType: UInt8, Codable, Identifiable, CaseIterable {
   }
 }
 
+struct SubjectCategory: Identifiable {
+  let id: UInt16
+  let name: String
+
+  init(_ id: UInt16, _ name: String) {
+    self.id = id
+    self.name = name
+  }
+}
+
+enum SubjectCategoryAnime: UInt16, Identifiable, CaseIterable {
+  case other = 0
+  case tv = 1
+  case ova = 2
+  case movie = 3
+  case web = 5
+
+  var id: Self {
+    self
+  }
+
+  init(_ value: UInt16 = 0) {
+    let tmp = Self(rawValue: value)
+    if let out = tmp {
+      self = out
+      return
+    }
+    self = Self.other
+  }
+
+  var description: String {
+    switch self {
+    case .other:
+      return "其他"
+    case .tv:
+      return "TV"
+    case .ova:
+      return "OVA"
+    case .movie:
+      return "剧场版"
+    case .web:
+      return "WEB"
+    }
+  }
+
+  static func categories() -> [SubjectCategory] {
+    return [
+      SubjectCategory(1, "TV"),
+      SubjectCategory(2, "OVA"),
+      SubjectCategory(3, "剧场版"),
+      SubjectCategory(5, "WEB"),
+      SubjectCategory(0, "其他"),
+    ]
+  }
+}
+
+enum SubjectCategoryBook: UInt16, Identifiable, CaseIterable {
+  case other = 0
+  case comic = 1001
+  case novel = 1002
+  case illustration = 1003
+
+  var id: Self {
+    self
+  }
+
+  init(_ value: UInt16 = 0) {
+    let tmp = Self(rawValue: value)
+    if let out = tmp {
+      self = out
+      return
+    }
+    self = Self.other
+  }
+
+  var description: String {
+    switch self {
+    case .other:
+      return "其他"
+    case .comic:
+      return "漫画"
+    case .novel:
+      return "小说"
+    case .illustration:
+      return "画集"
+    }
+  }
+
+  static func categories() -> [SubjectCategory] {
+    return [
+      SubjectCategory(1001, "漫画"),
+      SubjectCategory(1002, "小说"),
+      SubjectCategory(1003, "画集"),
+      SubjectCategory(0, "其他"),
+    ]
+  }
+}
+
+enum SubjectCategoryGame: UInt16, Identifiable, CaseIterable {
+  case other = 0
+  case game = 4001
+  case software = 4002
+  case dlc = 4003
+  case tabletop = 4005
+
+  var id: Self {
+    self
+  }
+
+  init(_ value: UInt16 = 0) {
+    let tmp = Self(rawValue: value)
+    if let out = tmp {
+      self = out
+      return
+    }
+    self = Self.other
+  }
+
+  var description: String {
+    switch self {
+    case .other:
+      return "其他"
+    case .game:
+      return "游戏"
+    case .software:
+      return "软件"
+    case .dlc:
+      return "扩展包"
+    case .tabletop:
+      return "桌游"
+    }
+  }
+
+  static func categories() -> [SubjectCategory] {
+    return [
+      SubjectCategory(4001, "游戏"),
+      SubjectCategory(4002, "软件"),
+      SubjectCategory(4003, "扩展包"),
+      SubjectCategory(4005, "桌游"),
+      SubjectCategory(0, "其他"),
+    ]
+  }
+}
+
+enum SubjectCategoryReal: UInt16, Identifiable, CaseIterable {
+  case other = 0
+  case jp = 1
+  case en = 2
+  case cn = 3
+  case tv = 6001
+  case movie = 6002
+  case live = 6003
+  case show = 6004
+
+  var id: Self {
+    self
+  }
+
+  init(_ value: UInt16 = 0) {
+    let tmp = Self(rawValue: value)
+    if let out = tmp {
+      self = out
+      return
+    }
+    self = Self.other
+  }
+
+  var description: String {
+    switch self {
+    case .other:
+      return "其他"
+    case .jp:
+      return "日剧"
+    case .en:
+      return "欧美剧"
+    case .cn:
+      return "华语剧"
+    case .tv:
+      return "电视剧"
+    case .movie:
+      return "电影"
+    case .live:
+      return "演出"
+    case .show:
+      return "综艺"
+    }
+  }
+
+  static func categories() -> [SubjectCategory] {
+    return [
+      SubjectCategory(1, "日剧"),
+      SubjectCategory(2, "欧美剧"),
+      SubjectCategory(3, "华语剧"),
+      SubjectCategory(6001, "电视剧"),
+      SubjectCategory(6002, "电影"),
+      SubjectCategory(6003, "演出"),
+      SubjectCategory(6004, "综艺"),
+      SubjectCategory(0, "其他"),
+    ]
+  }
+}
+
+let GAME_PLATFORMS: [String] = [
+  "PC",
+  "Mac OS",
+  "PS5",
+  "Xbox Series X/S",
+  "PS4",
+  "Xbox One",
+  "Nintendo Switch",
+  "Wii U",
+  "PS3",
+  "Xbox360",
+  "Wii",
+  "PS Vita",
+  "3DS",
+  "iOS",
+  "Android",
+  "街机",
+  "NDS",
+  "PSP",
+  "PS2",
+  "XBOX",
+  "GameCube",
+  "Dreamcast",
+  "Nintendo 64",
+  "PlayStation",
+  "SFC",
+  "FC",
+  "WonderSwan",
+  "WonderSwan Color",
+  "NEOGEO Pocket Color",
+  "GBA",
+  "GB",
+  "Virtual Boy",
+]
+
 enum SubjectCharacterRelationType: String, Identifiable, CaseIterable {
   case unknown
   case main

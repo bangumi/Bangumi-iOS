@@ -5,15 +5,407 @@
 //  Created by Chuan Chuan on 2024/6/3.
 //
 
+import SwiftData
 import SwiftUI
 
 struct SubjectBrowsingView: View {
   let subjectType: SubjectType
+  let categories: [SubjectCategory]
+
+  @State private var filterExpand: String = ""
+  @State private var filter: SubjectsBrowseFilter = SubjectsBrowseFilter()
+  @State var years: [Int32]
+
+  @State private var fetching: Bool = false
+  @State private var offset: Int = 0
+  @State private var exhausted: Bool = false
+  @State private var loadedIdx: [Int: Bool] = [:]
+  @State private var subjects: [EnumerateItem<(UInt)>] = []
+
+  init(subjectType: SubjectType) {
+    self.subjectType = subjectType
+    switch subjectType {
+    case .anime:
+      self.categories = SubjectCategoryAnime.categories()
+    case .book:
+      self.categories = SubjectCategoryBook.categories()
+    case .game:
+      self.categories = SubjectCategoryGame.categories()
+    case .real:
+      self.categories = SubjectCategoryReal.categories()
+      default:
+      self.categories = []
+    }
+    let date = Date()
+    let calendar = Calendar.current
+    let currentYear = calendar.component(.year, from: date)
+    var years: [Int32] = []
+    for idx in 0...9 {
+      years.append(Int32(currentYear - idx))
+    }
+    self.years = years
+  }
+
+  func updateYears(modifier: Int32) {
+    years = years.map { $0 + modifier }
+  }
+
   var body: some View {
-    Text("Hello, World!")
+    ScrollView {
+      LazyVStack {
+        HStack {
+          Label("筛选", systemImage: "square.and.pencil")
+          // cat
+          if categories.count > 0 {
+            Button {
+              if filterExpand == "cat" {
+                filterExpand = ""
+              } else {
+                filterExpand = "cat"
+              }
+            } label: {
+              if let cat = filter.cat {
+                Text(cat.name).foregroundStyle(.accent)
+              } else {
+                Text("类型").foregroundStyle(Color("LinkTextColor"))
+              }
+              Image(systemName: filterExpand == "cat" ? "chevron.up" : "chevron.down").foregroundStyle(filter.cat == nil ? Color("LinkTextColor") : .accent).padding(.horizontal, -5)
+            }.padding(.horizontal, 5)
+          }
+
+          // series
+          if subjectType == .book {
+            Button {
+              if filterExpand == "series" {
+                filterExpand = ""
+              } else {
+                filterExpand = "series"
+              }
+            } label: {
+              if let series = filter.series {
+                Text(series ? "系列" : "单行本").foregroundStyle(.accent)
+              } else {
+                Text("系列").foregroundStyle(Color("LinkTextColor"))
+              }
+              Image(systemName: filterExpand == "series" ? "chevron.up" : "chevron.down").foregroundStyle(filter.series == nil ? Color("LinkTextColor") : .accent).padding(.horizontal, -5)
+            }.padding(.horizontal, 5)
+          }
+
+          // platform
+          if subjectType == .game {
+            Button {
+              if filterExpand == "platform" {
+                filterExpand = ""
+              } else {
+                filterExpand = "platform"
+              }
+            } label: {
+              if filter.platform.isEmpty {
+                Text("平台").foregroundStyle(Color("LinkTextColor"))
+              } else {
+                Text(filter.platform).foregroundStyle(.accent)
+              }
+              Image(systemName: filterExpand == "platform" ? "chevron.up" : "chevron.down").foregroundStyle(filter.platform.isEmpty ? Color("LinkTextColor") : .accent).padding(.horizontal, -5)
+            }.padding(.horizontal, 5)
+          }
+
+          // date
+          Button {
+            if filterExpand == "year" || filterExpand == "month" {
+              filterExpand = ""
+            } else {
+              filterExpand = "year"
+            }
+          } label: {
+            if filter.year == 0 {
+              Text("日期").foregroundStyle(Color("LinkTextColor"))
+            } else {
+              if filter.month == 0 {
+                Text("\(String(filter.year))年").foregroundStyle(.accent)
+              } else {
+                Text("\(String(filter.year))年\(String(filter.month))月").foregroundStyle(.accent)
+              }
+            }
+            Image(systemName: filterExpand == "year" || filterExpand == "month" ? "chevron.up" : "chevron.down").foregroundStyle(filter.year == 0 ? Color("LinkTextColor") : .accent).padding(.horizontal, -5)
+          }.padding(.horizontal, 5)
+
+          Spacer()
+        }
+        .disabled(fetching)
+        .font(.footnote)
+        .padding(.vertical, 2)
+
+        Section {
+          switch filterExpand {
+          case "cat":
+            Button {
+              filter.cat = nil
+              filterExpand = ""
+            } label: {
+              if filter.cat == nil {
+                Text("不限").foregroundStyle(.accent)
+              } else {
+                Text("不限").foregroundStyle(Color("LinkTextColor"))
+              }
+            }
+            .buttonStyle(.plain)
+            FlowStack(spacing: CGSize(width: 15, height: 10)) {
+              ForEach(categories, id: \.id) { category in
+                Button {
+                  filter.cat = category
+                  filterExpand = ""
+                } label: {
+                  if let cat = filter.cat, cat.id == category.id {
+                    Text(category.name).foregroundStyle(.accent)
+                  } else {
+                    Text(category.name).foregroundStyle(Color("LinkTextColor"))
+                  }
+                }
+                .buttonStyle(.plain)
+              }
+            }
+          case "series":
+            Button {
+              filter.series = nil
+              filterExpand = ""
+            } label: {
+              if filter.series == nil {
+                Text("不限").foregroundStyle(.accent)
+              } else {
+                Text("不限").foregroundStyle(Color("LinkTextColor"))
+              }
+            }
+            .buttonStyle(.plain)
+            FlowStack(spacing: CGSize(width: 15, height: 10)) {
+              Button {
+                filter.series = true
+                filterExpand = ""
+              } label: {
+                if let series = filter.series, series {
+                  Text("系列").foregroundStyle(.accent)
+                } else {
+                  Text("系列").foregroundStyle(Color("LinkTextColor"))
+                }
+              }
+              .buttonStyle(.plain)
+              Button {
+                filter.series = false
+                filterExpand = ""
+              } label: {
+                if let series = filter.series, !series {
+                  Text("单行本").foregroundStyle(.accent)
+                } else {
+                  Text("单行本").foregroundStyle(Color("LinkTextColor"))
+                }
+              }
+              .buttonStyle(.plain)
+            }
+          case "platform":
+            Button {
+              filter.platform = ""
+              filterExpand = ""
+            } label: {
+              if filter.platform.isEmpty {
+                Text("不限").foregroundStyle(.accent)
+              } else {
+                Text("不限").foregroundStyle(Color("LinkTextColor"))
+              }
+            }
+            .buttonStyle(.plain)
+            FlowStack(spacing: CGSize(width: 15, height: 10)) {
+              ForEach(GAME_PLATFORMS, id: \.self) { platform in
+                Button {
+                  filter.platform = platform
+                  filterExpand = ""
+                } label: {
+                  if filter.platform == platform {
+                    Text(platform).foregroundStyle(.accent)
+                  } else {
+                    Text(platform).foregroundStyle(Color("LinkTextColor"))
+                  }
+                }
+                .buttonStyle(.plain)
+              }
+            }
+          case "year":
+            Button {
+              filter.year = 0
+              filter.month = 0
+              filterExpand = ""
+            } label: {
+              if filter.year == 0 {
+                Text("不限").foregroundStyle(.accent)
+              } else {
+                Text("不限").foregroundStyle(Color("LinkTextColor"))
+              }
+            }
+            .buttonStyle(.plain)
+            .padding(2)
+            LazyVGrid(columns: [
+              GridItem(.flexible()),
+              GridItem(.flexible()),
+              GridItem(.flexible()),
+              GridItem(.flexible()),
+            ]) {
+              Button {
+                updateYears(modifier: 10)
+              } label: {
+                Text("来年们").foregroundStyle(Color("LinkTextColor"))
+              }
+              .buttonStyle(.plain)
+              .padding(2)
+              ForEach(years, id: \.self) { year in
+                Button {
+                  filter.year = year
+                  filterExpand = "month"
+                } label: {
+                  if filter.year == year {
+                    Text("\(String(year))年").foregroundStyle(.accent)
+                  } else {
+                    Text("\(String(year))年").foregroundStyle(Color("LinkTextColor"))
+                  }
+                }
+                .buttonStyle(.plain)
+                .padding(2)
+              }
+              Button {
+                updateYears(modifier: -10)
+              } label: {
+                Text("往年们").foregroundStyle(Color("LinkTextColor"))
+              }
+              .buttonStyle(.plain)
+              .padding(2)
+            }.animation(.default, value: years)
+          case "month":
+            Button {
+              filter.month = 0
+              filterExpand = ""
+            } label: {
+              if filter.month == 0 {
+                Text("不限").foregroundStyle(.accent)
+              } else {
+                Text("不限").foregroundStyle(Color("LinkTextColor"))
+              }
+            }
+            .buttonStyle(.plain)
+            .padding(2)
+            LazyVGrid(columns: [
+              GridItem(.flexible()),
+              GridItem(.flexible()),
+              GridItem(.flexible()),
+              GridItem(.flexible()),
+            ]) {
+              ForEach(1..<13) { month in
+                Button {
+                  filter.month = Int8(month)
+                  filterExpand = ""
+                } label: {
+                  if filter.month == month {
+                    Text("\(month)月").foregroundStyle(.accent)
+                  } else {
+                    Text("\(month)月").foregroundStyle(Color("LinkTextColor"))
+                  }
+                }
+                .buttonStyle(.plain)
+                .padding(2)
+              }
+            }
+          default:
+            EmptyView()
+          }
+        }
+
+        HStack {
+          Image(systemName: "line.3.horizontal.decrease.circle")
+          Text("按")
+          Button {
+            if filterExpand == "sort" {
+              filterExpand = ""
+            } else {
+              filterExpand = "sort"
+            }
+          } label: {
+            switch filter.sort {
+            case "rank":
+              Label("排名", systemImage: "chart.bar.xaxis")
+            case "date":
+              Label("日期", systemImage: "calendar")
+            default:
+              Text("未知")
+            }
+            Image(systemName: filterExpand == "sort" ? "chevron.up" : "chevron.down").padding(.horizontal, -5)
+          }.padding(.horizontal, 5)
+          Text("排序")
+          Spacer()
+        }
+        .disabled(fetching)
+        .font(.footnote)
+        .padding(.vertical, 2)
+
+        Section {
+          switch filterExpand {
+          case "sort":
+            FlowStack(spacing: CGSize(width: 15, height: 10)) {
+              Button {
+                filter.sort = "rank"
+                filterExpand = ""
+              } label: {
+                Label("排名", systemImage: "chart.bar.xaxis")
+                  .foregroundStyle(filter.sort == "rank" ? .accent : Color("LinkTextColor"))
+              }.buttonStyle(.plain)
+              Button {
+                filter.sort = "date"
+                filterExpand = ""
+              } label: {
+                Label("日期", systemImage: "calendar")
+                  .foregroundStyle(filter.sort == "date" ? .accent : Color("LinkTextColor"))
+              }.buttonStyle(.plain)
+            }
+          default:
+            EmptyView()
+          }
+        }
+
+        Divider()
+
+        ForEach(subjects, id: \.idx) { item in
+          NavigationLink(value: NavDestination.subject(subjectId: item.inner)) {
+            SubjectLargeRowView(subjectId: item.inner)
+          }.buttonStyle(.plain)
+        }
+
+        if fetching {
+          HStack {
+            Spacer()
+            ProgressView()
+            Spacer()
+          }
+        }
+        if exhausted {
+          Divider()
+          HStack {
+            Spacer()
+            Text("没有更多了")
+              .font(.footnote)
+              .foregroundStyle(.secondary)
+            Spacer()
+          }
+        }
+      }
+    }
+    .padding(.horizontal, 8)
+    .navigationTitle("全部\(subjectType.description)")
+    .navigationBarTitleDisplayMode(.inline)
   }
 }
 
 #Preview {
-  SubjectBrowsingView(subjectType: .anime)
+  let container = mockContainer()
+
+  return NavigationStack {
+    SubjectBrowsingView(subjectType: .anime)
+      .environmentObject(Notifier())
+      .environment(ChiiClient(container: container, mock: .anime))
+      .modelContainer(container)
+  }
 }
