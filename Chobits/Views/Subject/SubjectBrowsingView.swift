@@ -201,7 +201,6 @@ struct SubjectBrowsingView: View {
           Spacer()
         }
         .disabled(fetching)
-        .font(.footnote)
         .padding(.vertical, 2)
 
         Section {
@@ -455,7 +454,6 @@ struct SubjectBrowsingView: View {
           Spacer()
         }
         .disabled(fetching)
-        .font(.footnote)
         .padding(.vertical, 2)
 
         Section {
