@@ -110,7 +110,7 @@ struct SubjectHeaderView: View {
               if subject.rating.total > 0 {
                 Text("(\(subject.rating.total) 人评分)")
                   .font(.footnote)
-                  .foregroundStyle(.secondary)
+                  .foregroundStyle(Color("LinkTextColor"))
               }
               Spacer()
             }
