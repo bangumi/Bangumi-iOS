@@ -97,12 +97,6 @@ struct CharacterView: View {
               .font(.title2.bold())
               .multilineTextAlignment(.leading)
             HStack(alignment: .bottom) {
-              if !nameCn.isEmpty {
-                Text(nameCn)
-                  .font(.footnote)
-                  .foregroundStyle(.secondary)
-                  .lineLimit(1)
-              }
               if character.locked {
                 Label("", systemImage: "lock")
                   .foregroundStyle(.red)
@@ -138,22 +132,20 @@ struct CharacterView: View {
                 VStack(alignment: .leading) {
                   ForEach(character.infobox, id: \.key) { item in
                     HStack(alignment: .top) {
-                      if !INFOBOX_IGNORE_KEYS.contains(item.key) {
                         Text("\(item.key):").fixedSize(horizontal: false, vertical: true)
-                        switch item.value {
-                        case .string(let val):
-                          Text(val)
-                            .foregroundStyle(.secondary)
-                            .textSelection(.enabled)
-                            .lineLimit(1)
-                        case .list(let vals):
-                          VStack(alignment: .leading) {
-                            ForEach(vals, id: \.desc) { val in
-                              Text(val.desc)
-                                .foregroundStyle(.secondary)
-                                .textSelection(.enabled)
-                                .lineLimit(1)
-                            }
+                      switch item.value {
+                      case .string(let val):
+                        Text(val)
+                          .foregroundStyle(.secondary)
+                          .textSelection(.enabled)
+                          .lineLimit(1)
+                      case .list(let vals):
+                        VStack(alignment: .leading) {
+                          ForEach(vals, id: \.desc) { val in
+                            Text(val.desc)
+                              .foregroundStyle(.secondary)
+                              .textSelection(.enabled)
+                              .lineLimit(1)
                           }
                         }
                       }
