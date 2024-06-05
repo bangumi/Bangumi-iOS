@@ -22,6 +22,7 @@ struct SubjectBrowsingView: View {
 
   @State private var fetching: Bool = false
   @State private var offset: Int = 0
+  @State private var total: Int = 0
   @State private var exhausted: Bool = false
   @State private var subjects: [EnumerateItem<(UInt)>] = []
 
@@ -61,6 +62,7 @@ struct SubjectBrowsingView: View {
     do {
       let resp = try await chii.getSubjects(
         type: subjectType, filter: filter, limit: limit, offset: offset)
+      total = resp.total
       if offset >= resp.total {
         exhausted = true
       }
@@ -452,6 +454,10 @@ struct SubjectBrowsingView: View {
           }.padding(.horizontal, 5)
           Text("排序")
           Spacer()
+          if total > 0 {
+            Text("共\(total)条")
+              .foregroundStyle(.secondary)
+          }
         }
         .disabled(fetching)
         .padding(.vertical, 2)

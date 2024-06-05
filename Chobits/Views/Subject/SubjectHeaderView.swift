@@ -102,6 +102,7 @@ struct SubjectHeaderView: View {
           .buttonStyle(.plain)
           .foregroundStyle(Color("LinkTextColor"))
 
+          Spacer()
           HStack {
             if subject.rating.score > 0 {
               StarsView(score: Float(subject.rating.score), size: 12)
