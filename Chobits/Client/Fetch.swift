@@ -142,11 +142,14 @@ extension ChiiClient {
     return subject
   }
 
-  func getSubjects(type: SubjectType, filter: SubjectsBrowseFilter, limit: Int = 10, offset: Int = 0) async throws -> SubjectsResponse {
+  func getSubjects(
+    type: SubjectType, filter: SubjectsBrowseFilter, limit: Int = 10, offset: Int = 0
+  ) async throws -> SubjectsResponse {
     if self.mock != nil {
       return loadFixture(fixture: "subjects.json", target: SubjectsResponse.self)
     }
-    Logger.api.info("start browsing subjects: \(type.description), \(limit), \(offset), \(filter.description)")
+    Logger.api.info(
+      "start browsing subjects: \(type.description), \(limit), \(offset), \(filter.description)")
     var queries: [URLQueryItem] = [
       URLQueryItem(name: "type", value: String(type.rawValue)),
       URLQueryItem(name: "limit", value: String(limit)),
@@ -176,7 +179,8 @@ extension ChiiClient {
     let decoder = JSONDecoder()
     decoder.keyDecodingStrategy = .convertFromSnakeCase
     let response = try decoder.decode(SubjectsResponse.self, from: data)
-    Logger.api.info("finish browsing subjects: \(type.description), \(limit), \(offset), \(filter.description)")
+    Logger.api.info(
+      "finish browsing subjects: \(type.description), \(limit), \(offset), \(filter.description)")
     return response
   }
 

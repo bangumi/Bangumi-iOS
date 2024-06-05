@@ -39,4 +39,3 @@ class SubjectsBrowseFilter {
     return result
   }
 }
-

@@ -12,6 +12,11 @@ struct SubjectBrowsingView: View {
   let subjectType: SubjectType
   let categories: [SubjectCategory]
 
+  @EnvironmentObject var notifier: Notifier
+  @EnvironmentObject var chii: ChiiClient
+  @EnvironmentObject var navState: NavState
+  @Environment(\.modelContext) var modelContext
+
   @State private var filterExpand: String = ""
   @State private var filter: SubjectsBrowseFilter = SubjectsBrowseFilter()
   @State var years: [Int32]
@@ -19,7 +24,6 @@ struct SubjectBrowsingView: View {
   @State private var fetching: Bool = false
   @State private var offset: Int = 0
   @State private var exhausted: Bool = false
-  @State private var loadedIdx: [Int: Bool] = [:]
   @State private var subjects: [EnumerateItem<(UInt)>] = []
 
   init(subjectType: SubjectType) {
@@ -33,7 +37,7 @@ struct SubjectBrowsingView: View {
       self.categories = SubjectCategoryGame.categories()
     case .real:
       self.categories = SubjectCategoryReal.categories()
-      default:
+    default:
       self.categories = []
     }
     let date = Date()
@@ -50,11 +54,67 @@ struct SubjectBrowsingView: View {
     years = years.map { $0 + modifier }
   }
 
+  func browse(limit: Int = 20) async -> [EnumerateItem<(UInt)>] {
+    if fetching {
+      return []
+    }
+    fetching = true
+    do {
+      let resp = try await chii.getSubjects(
+        type: subjectType, filter: filter, limit: limit, offset: offset)
+      if offset >= resp.total {
+        exhausted = true
+      }
+      var result: [EnumerateItem<(UInt)>] = []
+      for item in resp.data.enumerated() {
+        let subject = Subject(item.element)
+        await chii.db.insert(subject)
+        result.append(EnumerateItem(idx: item.offset + offset, inner: (item.element.id)))
+      }
+      try await chii.db.save()
+      if result.count < limit {
+        exhausted = true
+      }
+      offset += limit
+      fetching = false
+      return result
+    } catch {
+      notifier.alert(error: error)
+    }
+    fetching = false
+    return []
+  }
+
+  func newBrowse() async {
+    offset = 0
+    exhausted = false
+    subjects.removeAll()
+    let subjects = await browse()
+    self.subjects.append(contentsOf: subjects)
+    fetching = false
+  }
+
+  func browseNextPage(idx: Int) async {
+    if exhausted {
+      return
+    }
+    if idx != offset - 5 {
+      return
+    }
+    let subjects = await browse()
+    self.subjects.append(contentsOf: subjects)
+  }
+
   var body: some View {
     ScrollView {
       LazyVStack {
         HStack {
           Label("筛选", systemImage: "square.and.pencil")
+            .task {
+              if subjects.count == 0, !exhausted {
+                await newBrowse()
+              }
+            }
           // cat
           if categories.count > 0 {
             Button {
@@ -69,7 +129,9 @@ struct SubjectBrowsingView: View {
               } else {
                 Text("类型").foregroundStyle(Color("LinkTextColor"))
               }
-              Image(systemName: filterExpand == "cat" ? "chevron.up" : "chevron.down").foregroundStyle(filter.cat == nil ? Color("LinkTextColor") : .accent).padding(.horizontal, -5)
+              Image(systemName: filterExpand == "cat" ? "chevron.up" : "chevron.down")
+                .foregroundStyle(filter.cat == nil ? Color("LinkTextColor") : .accent).padding(
+                  .horizontal, -5)
             }.padding(.horizontal, 5)
           }
 
@@ -87,7 +149,9 @@ struct SubjectBrowsingView: View {
               } else {
                 Text("系列").foregroundStyle(Color("LinkTextColor"))
               }
-              Image(systemName: filterExpand == "series" ? "chevron.up" : "chevron.down").foregroundStyle(filter.series == nil ? Color("LinkTextColor") : .accent).padding(.horizontal, -5)
+              Image(systemName: filterExpand == "series" ? "chevron.up" : "chevron.down")
+                .foregroundStyle(filter.series == nil ? Color("LinkTextColor") : .accent).padding(
+                  .horizontal, -5)
             }.padding(.horizontal, 5)
           }
 
@@ -105,7 +169,9 @@ struct SubjectBrowsingView: View {
               } else {
                 Text(filter.platform).foregroundStyle(.accent)
               }
-              Image(systemName: filterExpand == "platform" ? "chevron.up" : "chevron.down").foregroundStyle(filter.platform.isEmpty ? Color("LinkTextColor") : .accent).padding(.horizontal, -5)
+              Image(systemName: filterExpand == "platform" ? "chevron.up" : "chevron.down")
+                .foregroundStyle(filter.platform.isEmpty ? Color("LinkTextColor") : .accent)
+                .padding(.horizontal, -5)
             }.padding(.horizontal, 5)
           }
 
@@ -126,7 +192,11 @@ struct SubjectBrowsingView: View {
                 Text("\(String(filter.year))年\(String(filter.month))月").foregroundStyle(.accent)
               }
             }
-            Image(systemName: filterExpand == "year" || filterExpand == "month" ? "chevron.up" : "chevron.down").foregroundStyle(filter.year == 0 ? Color("LinkTextColor") : .accent).padding(.horizontal, -5)
+            Image(
+              systemName: filterExpand == "year" || filterExpand == "month"
+                ? "chevron.up" : "chevron.down"
+            ).foregroundStyle(filter.year == 0 ? Color("LinkTextColor") : .accent).padding(
+              .horizontal, -5)
           }.padding(.horizontal, 5)
 
           Spacer()
@@ -139,8 +209,13 @@ struct SubjectBrowsingView: View {
           switch filterExpand {
           case "cat":
             Button {
-              filter.cat = nil
-              filterExpand = ""
+              if filter.cat != nil {
+                filter.cat = nil
+                filterExpand = ""
+                Task {
+                  await newBrowse()
+                }
+              }
             } label: {
               if filter.cat == nil {
                 Text("不限").foregroundStyle(.accent)
@@ -152,8 +227,13 @@ struct SubjectBrowsingView: View {
             FlowStack(spacing: CGSize(width: 15, height: 10)) {
               ForEach(categories, id: \.id) { category in
                 Button {
-                  filter.cat = category
-                  filterExpand = ""
+                  if filter.cat?.id != category.id {
+                    filter.cat = category
+                    filterExpand = ""
+                    Task {
+                      await newBrowse()
+                    }
+                  }
                 } label: {
                   if let cat = filter.cat, cat.id == category.id {
                     Text(category.name).foregroundStyle(.accent)
@@ -166,8 +246,13 @@ struct SubjectBrowsingView: View {
             }
           case "series":
             Button {
-              filter.series = nil
-              filterExpand = ""
+              if filter.series != nil {
+                filter.series = nil
+                filterExpand = ""
+                Task {
+                  await newBrowse()
+                }
+              }
             } label: {
               if filter.series == nil {
                 Text("不限").foregroundStyle(.accent)
@@ -178,8 +263,13 @@ struct SubjectBrowsingView: View {
             .buttonStyle(.plain)
             FlowStack(spacing: CGSize(width: 15, height: 10)) {
               Button {
-                filter.series = true
-                filterExpand = ""
+                if filter.series != true {
+                  filter.series = true
+                  filterExpand = ""
+                  Task {
+                    await newBrowse()
+                  }
+                }
               } label: {
                 if let series = filter.series, series {
                   Text("系列").foregroundStyle(.accent)
@@ -189,8 +279,13 @@ struct SubjectBrowsingView: View {
               }
               .buttonStyle(.plain)
               Button {
-                filter.series = false
-                filterExpand = ""
+                if filter.series != false {
+                  filter.series = false
+                  filterExpand = ""
+                  Task {
+                    await newBrowse()
+                  }
+                }
               } label: {
                 if let series = filter.series, !series {
                   Text("单行本").foregroundStyle(.accent)
@@ -202,8 +297,13 @@ struct SubjectBrowsingView: View {
             }
           case "platform":
             Button {
-              filter.platform = ""
-              filterExpand = ""
+              if !filter.platform.isEmpty {
+                filter.platform = ""
+                filterExpand = ""
+                Task {
+                  await newBrowse()
+                }
+              }
             } label: {
               if filter.platform.isEmpty {
                 Text("不限").foregroundStyle(.accent)
@@ -215,8 +315,13 @@ struct SubjectBrowsingView: View {
             FlowStack(spacing: CGSize(width: 15, height: 10)) {
               ForEach(GAME_PLATFORMS, id: \.self) { platform in
                 Button {
-                  filter.platform = platform
-                  filterExpand = ""
+                  if filter.platform != platform {
+                    filter.platform = platform
+                    filterExpand = ""
+                    Task {
+                      await newBrowse()
+                    }
+                  }
                 } label: {
                   if filter.platform == platform {
                     Text(platform).foregroundStyle(.accent)
@@ -232,6 +337,9 @@ struct SubjectBrowsingView: View {
               filter.year = 0
               filter.month = 0
               filterExpand = ""
+              Task {
+                await newBrowse()
+              }
             } label: {
               if filter.year == 0 {
                 Text("不限").foregroundStyle(.accent)
@@ -280,6 +388,9 @@ struct SubjectBrowsingView: View {
             Button {
               filter.month = 0
               filterExpand = ""
+              Task {
+                await newBrowse()
+              }
             } label: {
               if filter.month == 0 {
                 Text("不限").foregroundStyle(.accent)
@@ -297,8 +408,13 @@ struct SubjectBrowsingView: View {
             ]) {
               ForEach(1..<13) { month in
                 Button {
-                  filter.month = Int8(month)
-                  filterExpand = ""
+                  if filter.month != month {
+                    filter.month = Int8(month)
+                    filterExpand = ""
+                    Task {
+                      await newBrowse()
+                    }
+                  }
                 } label: {
                   if filter.month == month {
                     Text("\(month)月").foregroundStyle(.accent)
@@ -333,7 +449,8 @@ struct SubjectBrowsingView: View {
             default:
               Text("未知")
             }
-            Image(systemName: filterExpand == "sort" ? "chevron.up" : "chevron.down").padding(.horizontal, -5)
+            Image(systemName: filterExpand == "sort" ? "chevron.up" : "chevron.down").padding(
+              .horizontal, -5)
           }.padding(.horizontal, 5)
           Text("排序")
           Spacer()
@@ -347,15 +464,25 @@ struct SubjectBrowsingView: View {
           case "sort":
             FlowStack(spacing: CGSize(width: 15, height: 10)) {
               Button {
-                filter.sort = "rank"
-                filterExpand = ""
+                if filter.sort != "rank" {
+                  filter.sort = "rank"
+                  filterExpand = ""
+                  Task {
+                    await newBrowse()
+                  }
+                }
               } label: {
                 Label("排名", systemImage: "chart.bar.xaxis")
                   .foregroundStyle(filter.sort == "rank" ? .accent : Color("LinkTextColor"))
               }.buttonStyle(.plain)
               Button {
-                filter.sort = "date"
-                filterExpand = ""
+                if filter.sort != "date" {
+                  filter.sort = "date"
+                  filterExpand = ""
+                  Task {
+                    await newBrowse()
+                  }
+                }
               } label: {
                 Label("日期", systemImage: "calendar")
                   .foregroundStyle(filter.sort == "date" ? .accent : Color("LinkTextColor"))
@@ -371,7 +498,13 @@ struct SubjectBrowsingView: View {
         ForEach(subjects, id: \.idx) { item in
           NavigationLink(value: NavDestination.subject(subjectId: item.inner)) {
             SubjectLargeRowView(subjectId: item.inner)
+              .onAppear {
+                Task {
+                  await browseNextPage(idx: item.idx)
+                }
+              }
           }.buttonStyle(.plain)
+          Divider()
         }
 
         if fetching {
@@ -382,7 +515,6 @@ struct SubjectBrowsingView: View {
           }
         }
         if exhausted {
-          Divider()
           HStack {
             Spacer()
             Text("没有更多了")

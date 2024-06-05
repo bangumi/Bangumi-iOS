@@ -38,7 +38,7 @@ struct SubjectLargeRowView: View {
 
   var body: some View {
     HStack {
-      ImageView(img: subject?.images.common, width: 64, height: 96, type: .subject)
+      ImageView(img: subject?.images.common, width: 72, height: 108, type: .subject)
       VStack(alignment: .leading) {
         HStack {
           VStack(alignment: .leading) {
@@ -53,35 +53,27 @@ struct SubjectLargeRowView: View {
                 .lineLimit(1)
                 .foregroundStyle(Color("LinkTextColor"))
             }
-            if let nameCN = subject?.nameCn, !nameCN.isEmpty {
-              Text(nameCN)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-                .lineLimit(1)
-            }
           }
           Spacer()
           if let rank = subject?.rating.rank, rank > 0 {
             Label(String(rank), systemImage: "chart.bar.xaxis")
               .font(.footnote)
-              .foregroundStyle(.accent)
+              .foregroundStyle(Color("LinkTextColor"))
           }
         }
-        HStack {
-          if let authority = subject?.authority {
-            Text(authority)
-              .foregroundStyle(.secondary)
-              .lineLimit(2)
-          }
-          Spacer()
-          if let collection = collection, collection.typeEnum != .unknown {
-            Label(
-              collection.typeEnum.description(type: collection.subjectTypeEnum),
-              systemImage: collection.typeEnum.icon
-            )
-            .foregroundStyle(.accent)
-          }
-        }.font(.caption)
+        if let nameCN = subject?.nameCn, !nameCN.isEmpty {
+          Text(nameCN)
+            .font(.subheadline)
+            .foregroundStyle(.secondary)
+            .lineLimit(1)
+        }
+        Spacer()
+        if let authority = subject?.authority {
+          Text(authority)
+            .font(.caption)
+            .foregroundStyle(.secondary)
+            .lineLimit(2)
+        }
         HStack {
           if let score = subject?.rating.score, score > 0 {
             StarsView(score: score, size: 12)
@@ -99,11 +91,18 @@ struct SubjectLargeRowView: View {
           if subject?.locked ?? false {
             Label("", systemImage: "lock.fill").foregroundStyle(.red)
           }
+          if let collection = collection, collection.typeEnum != .unknown {
+            Label(
+              collection.typeEnum.description(type: collection.subjectTypeEnum),
+              systemImage: collection.typeEnum.icon
+            )
+            .foregroundStyle(.accent)
+          }
         }
         .font(.caption)
       }.padding(.leading, 2)
     }
-    .frame(height: 96)
+    .frame(height: 108)
     .padding(2)
     .clipShape(RoundedRectangle(cornerRadius: 10))
   }
