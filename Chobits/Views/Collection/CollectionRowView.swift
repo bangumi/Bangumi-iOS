@@ -11,8 +11,8 @@ import SwiftUI
 struct CollectionRowView: View {
   let subjectId: UInt
 
-  @EnvironmentObject var notifier: Notifier
-  @EnvironmentObject var chii: ChiiClient
+  @Environment(Notifier.self) private var notifier
+  @Environment(ChiiClient.self) private var chii
   @Environment(\.modelContext) var modelContext
 
   @Query
@@ -75,7 +75,7 @@ struct CollectionRowView: View {
   return ScrollView {
     LazyVStack(alignment: .leading) {
       CollectionRowView(subjectId: subject.subjectId)
-        .environmentObject(Notifier())
+        .environment(Notifier())
         .environment(ChiiClient(container: container, mock: .anime))
     }
   }

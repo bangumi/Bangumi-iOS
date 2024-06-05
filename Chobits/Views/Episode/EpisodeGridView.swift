@@ -12,8 +12,8 @@ import SwiftUI
 struct EpisodeGridView: View {
   let subjectId: UInt
 
-  @EnvironmentObject var notifier: Notifier
-  @EnvironmentObject var chii: ChiiClient
+  @Environment(Notifier.self) private var notifier
+  @Environment(ChiiClient.self) private var chii
   @Environment(\.modelContext) var modelContext
 
   @State private var selected: Episode? = nil
@@ -152,7 +152,7 @@ struct EpisodeGridView: View {
   return ScrollView {
     LazyVStack(alignment: .leading) {
       EpisodeGridView(subjectId: subject.subjectId)
-        .environmentObject(Notifier())
+        .environment(Notifier())
         .environment(ChiiClient(container: container, mock: .anime))
         .modelContainer(container)
     }

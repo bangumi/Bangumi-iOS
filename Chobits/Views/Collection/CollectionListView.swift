@@ -11,8 +11,8 @@ import SwiftUI
 struct CollectionListView: View {
   let subjectType: SubjectType
 
-  @EnvironmentObject var notifier: Notifier
-  @EnvironmentObject var chii: ChiiClient
+  @Environment(Notifier.self) private var notifier
+  @Environment(ChiiClient.self) private var chii
   @Environment(\.modelContext) var modelContext
 
   @State private var loaded: Bool = false
@@ -166,7 +166,7 @@ struct CollectionListView: View {
   container.mainContext.insert(collection)
 
   return CollectionListView(subjectType: SubjectType.anime)
-    .environmentObject(Notifier())
+    .environment(Notifier())
     .environment(ChiiClient(container: container, mock: .anime))
     .modelContainer(container)
 }

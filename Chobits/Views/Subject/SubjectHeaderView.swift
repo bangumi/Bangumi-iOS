@@ -11,8 +11,8 @@ import SwiftUI
 struct SubjectHeaderView: View {
   let subjectId: UInt
 
-  @EnvironmentObject var notifier: Notifier
-  @EnvironmentObject var chii: ChiiClient
+  @Environment(Notifier.self) private var notifier
+  @Environment(ChiiClient.self) private var chii
 
   @State private var coverDetail = false
   @State private var collectionDetail = false
@@ -156,7 +156,7 @@ struct SubjectHeaderView: View {
   return ScrollView {
     LazyVStack(alignment: .leading) {
       SubjectHeaderView(subjectId: subject.subjectId)
-        .environmentObject(Notifier())
+        .environment(Notifier())
         .environment(ChiiClient(container: container, mock: .book))
         .modelContainer(container)
     }

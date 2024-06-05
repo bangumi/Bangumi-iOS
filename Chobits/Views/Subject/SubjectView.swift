@@ -14,8 +14,8 @@ struct SubjectView: View {
 
   @AppStorage("shareDomain") var shareDomain: String = ShareDomain.chii.label
 
-  @EnvironmentObject var notifier: Notifier
-  @EnvironmentObject var chii: ChiiClient
+  @Environment(Notifier.self) private var notifier
+  @Environment(ChiiClient.self) private var chii
 
   @State private var refreshed: Bool = false
 
@@ -72,10 +72,6 @@ struct SubjectView: View {
             }
 
             switch subject.typeEnum {
-            case .book:
-              if chii.isAuthenticated {
-                SubjectBookChaptersView(subjectId: subjectId)
-              }
             case .anime, .real:
               EpisodeGridView(subjectId: subjectId)
             default:
@@ -133,7 +129,7 @@ struct SubjectView: View {
 
   return NavigationStack {
     SubjectView(subjectId: subject.subjectId)
-      .environmentObject(Notifier())
+      .environment(Notifier())
       .environment(ChiiClient(container: container, mock: .anime))
       .modelContainer(container)
   }

@@ -12,9 +12,8 @@ struct SubjectBrowsingView: View {
   let subjectType: SubjectType
   let categories: [SubjectCategory]
 
-  @EnvironmentObject var notifier: Notifier
-  @EnvironmentObject var chii: ChiiClient
-  @EnvironmentObject var navState: NavState
+  @Environment(Notifier.self) private var notifier
+  @Environment(ChiiClient.self) private var chii
   @Environment(\.modelContext) var modelContext
 
   @State private var filterExpand: String = ""
@@ -536,7 +535,7 @@ struct SubjectBrowsingView: View {
 
   return NavigationStack {
     SubjectBrowsingView(subjectType: .anime)
-      .environmentObject(Notifier())
+      .environment(Notifier())
       .environment(ChiiClient(container: container, mock: .anime))
       .modelContainer(container)
   }

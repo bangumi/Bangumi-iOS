@@ -14,9 +14,9 @@ struct EpisodeCollectionBoxView: View {
 
   @AppStorage("isolationMode") var isolationMode: Bool = false
 
+  @Environment(Notifier.self) private var notifier
+  @Environment(ChiiClient.self) private var chii
   @Environment(\.dismiss) private var dismiss
-  @EnvironmentObject var notifier: Notifier
-  @EnvironmentObject var chii: ChiiClient
 
   @State private var updating: Bool = false
 
@@ -36,7 +36,7 @@ struct EpisodeCollectionBoxView: View {
     updating = true
     do {
       try await chii.updateEpisodeCollection(subjectId: subjectId, episodeId: episodeId, type: type)
-      UIImpactFeedbackGenerator(style: .light).impactOccurred()
+      await UIImpactFeedbackGenerator(style: .light).impactOccurred()
       dismiss()
     } catch {
       notifier.alert(error: error)
@@ -153,7 +153,7 @@ struct EpisodeCollectionBoxView: View {
   return EpisodeCollectionBoxView(
     subjectId: subject.subjectId, episodeId: episodes.first!.episodeId
   )
-  .environmentObject(Notifier())
+  .environment(Notifier())
   .environment(ChiiClient(container: container, mock: .anime))
   .modelContainer(container)
 }

@@ -11,8 +11,8 @@ import SwiftUI
 struct SubjectCharactersView: View {
   let subjectId: UInt
 
-  @EnvironmentObject var notifier: Notifier
-  @EnvironmentObject var chii: ChiiClient
+  @Environment(Notifier.self) private var notifier
+  @Environment(ChiiClient.self) private var chii
 
   @State private var refreshed: Bool = false
   @State private var counts: Int = 0
@@ -104,7 +104,7 @@ struct SubjectCharactersView: View {
   return ScrollView {
     LazyVStack(alignment: .leading) {
       SubjectCharactersView(subjectId: subject.subjectId)
-        .environmentObject(Notifier())
+        .environment(Notifier())
         .environment(ChiiClient(container: container, mock: .anime))
         .modelContainer(container)
     }

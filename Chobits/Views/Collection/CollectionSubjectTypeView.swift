@@ -11,9 +11,8 @@ import SwiftUI
 struct CollectionSubjectTypeView: View {
   let stype: SubjectType
 
-  @EnvironmentObject var notifier: Notifier
-  @EnvironmentObject var chii: ChiiClient
-  @EnvironmentObject var navState: NavState
+  @Environment(Notifier.self) private var notifier
+  @Environment(ChiiClient.self) private var chii
   @Environment(\.modelContext) var modelContext
 
   @State private var collectionType: CollectionType = .collect
@@ -104,9 +103,8 @@ struct CollectionSubjectTypeView: View {
   return NavigationStack {
     ScrollView {
       CollectionSubjectTypeView(stype: .anime)
-        .environmentObject(Notifier())
+        .environment(Notifier())
         .environment(ChiiClient(container: container, mock: .anime))
-        .environmentObject(NavState())
         .modelContainer(container)
     }
     .padding(.horizontal, 8)

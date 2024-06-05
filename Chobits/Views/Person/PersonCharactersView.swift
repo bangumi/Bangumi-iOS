@@ -11,8 +11,8 @@ import SwiftUI
 struct PersonCharactersView: View {
   var personId: UInt
 
-  @EnvironmentObject var notifier: Notifier
-  @EnvironmentObject var chii: ChiiClient
+  @Environment(Notifier.self) private var notifier
+  @Environment(ChiiClient.self) private var chii
 
   @Query
   private var characters: [PersonRelatedCharacter]
@@ -78,7 +78,7 @@ struct PersonCharactersView: View {
   return ScrollView(showsIndicators: false) {
     LazyVStack(alignment: .leading) {
       PersonCharactersView(personId: person.personId)
-        .environmentObject(Notifier())
+        .environment(Notifier())
         .environment(ChiiClient(container: container, mock: .anime))
         .modelContainer(container)
     }.padding(.horizontal, 8)

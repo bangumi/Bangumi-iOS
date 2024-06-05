@@ -8,12 +8,13 @@
 import Foundation
 import OSLog
 
-class Notifier: ObservableObject {
-  @Published var currentError: ChiiError?
-  @Published var showAlert: Bool = false
+@Observable
+class Notifier {
+  var currentError: ChiiError?
+  var showAlert: Bool = false
 
-  @Published var notification: String?
-  @Published var showNotification: Bool = false
+  var notification: String?
+  var showNotification: Bool = false
 
   func alert(error: ChiiError) {
     switch error {

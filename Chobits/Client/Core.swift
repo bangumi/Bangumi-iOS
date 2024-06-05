@@ -11,7 +11,8 @@ import OSLog
 import SwiftData
 import SwiftUI
 
-class ChiiClient: ObservableObject, Observable {
+@Observable
+class ChiiClient {
   let keychain: KeychainSwift
   let appInfo: AppInfo
 
@@ -26,7 +27,7 @@ class ChiiClient: ObservableObject, Observable {
 
   var mock: SubjectType?
 
-  @Published var isAuthenticated: Bool = false
+  var isAuthenticated: Bool = false
 
   var oauthURL: URL {
     let baseURL = URL(string: "https://bgm.tv/oauth/authorize")!

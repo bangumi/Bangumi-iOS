@@ -15,8 +15,8 @@ struct CharacterView: View {
   @AppStorage("shareDomain") var shareDomain: String = ShareDomain.chii.label
   @AppStorage("isolationMode") var isolationMode: Bool = false
 
-  @EnvironmentObject var notifier: Notifier
-  @EnvironmentObject var chii: ChiiClient
+  @Environment(Notifier.self) private var notifier
+  @Environment(ChiiClient.self) private var chii
 
   @State private var refreshed: Bool = false
   @State private var coverDetail = false
@@ -283,7 +283,7 @@ struct CharacterView: View {
 
   return NavigationStack {
     CharacterView(characterId: character.characterId)
-      .environmentObject(Notifier())
+      .environment(Notifier())
       .environment(ChiiClient(container: container, mock: .anime))
       .modelContainer(container)
   }

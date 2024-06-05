@@ -10,9 +10,10 @@ import SwiftData
 import SwiftUI
 
 struct ChiiDiscoverView: View {
-  @EnvironmentObject var notifier: Notifier
-  @EnvironmentObject var chii: ChiiClient
-  @EnvironmentObject var navState: NavState
+  @Bindable var navState: NavState
+
+  @Environment(Notifier.self) private var notifier
+  @Environment(ChiiClient.self) private var chii
   @Environment(\.modelContext) var modelContext
 
   @State private var searching = false

@@ -10,12 +10,12 @@ import SwiftData
 import SwiftUI
 
 struct ContentView: View {
-  @EnvironmentObject var notifier: Notifier
-  @EnvironmentObject var chii: ChiiClient
+  @Environment(Notifier.self) private var notifier
+  @Environment(ChiiClient.self) private var chii
 
   @State private var initialized = false
   @State private var selectedTab: ContentViewTab
-  @StateObject var navState = NavState()
+  @State private var navState = NavState()
 
   init() {
     let defaultTab = UserDefaults.standard.string(forKey: "defaultTab") ?? "discover"
@@ -77,17 +77,17 @@ struct ContentView: View {
       }
     } else {
       TabView(selection: createTabViewBinding()) {
-        ChiiTimelineView()
+        ChiiTimelineView(navState: navState)
           .tag(ContentViewTab.timeline)
           .tabItem {
             Image(systemName: "person")
           }
-        ChiiProgressView()
+        ChiiProgressView(navState: navState)
           .tag(ContentViewTab.progress)
           .tabItem {
             Image(systemName: "square.grid.3x2.fill")
           }
-        ChiiDiscoverView()
+        ChiiDiscoverView(navState: navState)
           .tag(ContentViewTab.discover)
           .tabItem {
             Image(systemName: "magnifyingglass")
@@ -98,8 +98,9 @@ struct ContentView: View {
   }
 }
 
-class NavState: ObservableObject, Observable {
-  @Published var timelineNavigation: [NavDestination] = []
-  @Published var progressNavigation: [NavDestination] = []
-  @Published var discoverNavigation: [NavDestination] = []
+@Observable
+class NavState{
+  var timelineNavigation: [NavDestination] = []
+  var progressNavigation: [NavDestination] = []
+  var discoverNavigation: [NavDestination] = []
 }

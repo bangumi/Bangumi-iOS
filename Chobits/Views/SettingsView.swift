@@ -14,8 +14,8 @@ struct SettingsView: View {
   @AppStorage("defaultTab") var defaultTab: String = ContentViewTab.discover.label
   @AppStorage("isolationMode") var isolationMode: Bool = false
 
-  @EnvironmentObject var notifier: Notifier
-  @EnvironmentObject var chii: ChiiClient
+  @Environment(Notifier.self) private var notifier
+  @Environment(ChiiClient.self) private var chii
   @Environment(\.modelContext) var modelContext
 
   @State private var selectedDomain: ShareDomain = .chii
@@ -136,7 +136,7 @@ struct SettingsView: View {
   let container = mockContainer()
 
   return SettingsView()
-    .environmentObject(Notifier())
+    .environment(Notifier())
     .environment(ChiiClient(container: container, mock: .anime))
     .modelContainer(container)
 }

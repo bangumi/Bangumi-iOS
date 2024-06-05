@@ -12,8 +12,8 @@ import SwiftUI
 struct SubjectSummaryView: View {
   let subjectId: UInt
 
-  @EnvironmentObject var notifier: Notifier
-  @EnvironmentObject var chii: ChiiClient
+  @Environment(Notifier.self) private var notifier
+  @Environment(ChiiClient.self) private var chii
 
   @State private var showSummary = false
 
@@ -95,7 +95,7 @@ struct SubjectSummaryView: View {
   return ScrollView {
     LazyVStack(alignment: .leading) {
       SubjectSummaryView(subjectId: subject.subjectId)
-        .environmentObject(Notifier())
+        .environment(Notifier())
         .environment(ChiiClient(container: container, mock: .anime))
         .modelContainer(container)
     }

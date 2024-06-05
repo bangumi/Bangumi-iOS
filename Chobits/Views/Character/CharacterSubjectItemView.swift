@@ -12,8 +12,8 @@ struct CharacterSubjectItemView: View {
   var characterId: UInt
   var subjectId: UInt
 
-  @EnvironmentObject var notifier: Notifier
-  @EnvironmentObject var chii: ChiiClient
+  @Environment(Notifier.self) private var notifier
+  @Environment(ChiiClient.self) private var chii
 
   @Query
   private var relations: [CharacterRelatedSubject]
@@ -131,7 +131,7 @@ struct CharacterSubjectItemView: View {
   return ScrollView(showsIndicators: false) {
     LazyVStack(alignment: .leading) {
       CharacterSubjectItemView(characterId: character.characterId, subjectId: subject.subjectId)
-        .environmentObject(Notifier())
+        .environment(Notifier())
         .environment(ChiiClient(container: container, mock: .anime))
         .modelContainer(container)
     }.padding(.horizontal, 8)

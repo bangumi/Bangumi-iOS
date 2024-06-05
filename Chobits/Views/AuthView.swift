@@ -11,34 +11,36 @@ import SwiftUI
 import UIKit
 
 struct AuthView: View {
-  @EnvironmentObject var notifier: Notifier
-  @EnvironmentObject var chii: ChiiClient
+  @Environment(Notifier.self) private var notifier
+  @Environment(ChiiClient.self) private var chii
 
   var slogan: String
 
   @State private var navPath: [NavDestination] = []
 
   var body: some View {
+
     NavigationStack(path: $navPath) {
-      VStack {
-        Text(slogan)
-        Button {
-          signInView.signIn()
-        } label: {
-          Text("登录")
-        }
-        .buttonStyle(.borderedProminent)
-      }
-      .toolbar {
-        ToolbarItem(placement: .topBarTrailing) {
+      Section {
+        VStack {
+          Text(slogan)
           Button {
-            navPath.append(.setting)
+            signInView.signIn()
           } label: {
-            Image(systemName: "gearshape")
+            Text("登录")
+          }
+          .buttonStyle(.borderedProminent)
+        }
+        .toolbar {
+          ToolbarItem(placement: .topBarTrailing) {
+            Button {
+              navPath.append(.setting)
+            } label: {
+              Image(systemName: "gearshape")
+            }
           }
         }
-      }
-      .navigationDestination(for: NavDestination.self) { $0 }
+      }.navigationDestination(for: NavDestination.self) { $0 }
     }
   }
 
@@ -47,7 +49,8 @@ struct AuthView: View {
   }
 }
 
-class SignInViewModel: NSObject, ObservableObject, ASWebAuthenticationPresentationContextProviding {
+
+class SignInViewModel: NSObject, ASWebAuthenticationPresentationContextProviding {
   let notifier: Notifier
   let chii: ChiiClient
 

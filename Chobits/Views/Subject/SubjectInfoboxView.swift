@@ -42,8 +42,8 @@ struct SubjectInfoboxItem: Identifiable {
 struct SubjectInfoboxView: View {
   let subjectId: UInt
 
-  @EnvironmentObject var notifier: Notifier
-  @EnvironmentObject var chii: ChiiClient
+  @Environment(Notifier.self) private var notifier
+  @Environment(ChiiClient.self) private var chii
   @Environment(\.modelContext) var modelContext
 
   @State private var refreshed: Bool = false
@@ -250,7 +250,7 @@ struct SubjectInfoboxView: View {
   return ScrollView {
     LazyVStack(alignment: .leading) {
       SubjectInfoboxView(subjectId: subject.subjectId)
-        .environmentObject(Notifier())
+        .environment(Notifier())
         .environment(ChiiClient(container: container, mock: .anime))
         .modelContainer(container)
     }

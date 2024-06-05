@@ -12,8 +12,8 @@ import SwiftUI
 struct ProgressRowView: View {
   let subjectId: UInt
 
-  @EnvironmentObject var notifier: Notifier
-  @EnvironmentObject var chii: ChiiClient
+  @Environment(Notifier.self) private var notifier
+  @Environment(ChiiClient.self) private var chii
   @Environment(\.modelContext) var modelContext
 
   @State private var showEpisodeBox: Bool = false
@@ -173,7 +173,7 @@ struct ProgressRowView: View {
   return ScrollView {
     LazyVStack(alignment: .leading) {
       ProgressRowView(subjectId: subject.subjectId)
-        .environmentObject(Notifier())
+        .environment(Notifier())
         .environment(ChiiClient(container: container, mock: .anime))
     }
   }

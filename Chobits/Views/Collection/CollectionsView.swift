@@ -10,9 +10,8 @@ import SwiftData
 import SwiftUI
 
 struct CollectionsView: View {
-  @EnvironmentObject var notifier: Notifier
-  @EnvironmentObject var chii: ChiiClient
-  @EnvironmentObject var navState: NavState
+  @Environment(Notifier.self) private var notifier
+  @Environment(ChiiClient.self) private var chii
   @Environment(\.modelContext) var modelContext
 
   @State private var refreshing: Bool = false
@@ -42,13 +41,13 @@ struct CollectionsView: View {
               })
           }
         }
+        try await chii.db.save()
         Logger.collection.info(
           "loaded user collection: \(resp.data.count), offset: \(offset), total: \(resp.total)")
         offset += resp.data.count
         if offset >= resp.total {
           break
         }
-        try await chii.db.save()
         refreshProgress = CGFloat(offset) / CGFloat(resp.total)
       } catch {
         notifier.alert(error: error)
@@ -107,9 +106,8 @@ struct CollectionsView: View {
   return NavigationStack {
     ScrollView {
       CollectionsView()
-        .environmentObject(Notifier())
+        .environment(Notifier())
         .environment(ChiiClient(container: container, mock: .anime))
-        .environmentObject(NavState())
         .modelContainer(container)
     }
     .padding(.horizontal, 8)

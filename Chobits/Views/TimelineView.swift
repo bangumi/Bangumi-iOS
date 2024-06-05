@@ -9,11 +9,12 @@ import SwiftData
 import SwiftUI
 
 struct ChiiTimelineView: View {
+  @Bindable var navState: NavState
+
   @AppStorage("isolationMode") var isolationMode: Bool = false
 
-  @EnvironmentObject var notifier: Notifier
-  @EnvironmentObject var chii: ChiiClient
-  @EnvironmentObject var navState: NavState
+  @Environment(Notifier.self) private var notifier
+  @Environment(ChiiClient.self) private var chii
 
   @State private var profile: Profile?
 
@@ -79,9 +80,8 @@ struct ChiiTimelineView: View {
 #Preview {
   let container = mockContainer()
 
-  return ChiiTimelineView()
-    .environmentObject(Notifier())
+  return ChiiTimelineView(navState: NavState())
+    .environment(Notifier())
     .environment(ChiiClient(container: container, mock: .anime))
-    .environmentObject(NavState())
     .modelContainer(container)
 }

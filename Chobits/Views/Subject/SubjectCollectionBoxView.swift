@@ -11,10 +11,10 @@ import SwiftUI
 struct SubjectCollectionBoxView: View {
   let subjectId: UInt
 
-  @Environment(\.dismiss) private var dismiss
-  @EnvironmentObject var notifier: Notifier
-  @EnvironmentObject var chii: ChiiClient
+  @Environment(Notifier.self) private var notifier
+  @Environment(ChiiClient.self) private var chii
   @Environment(\.modelContext) var modelContext
+  @Environment(\.dismiss) private var dismiss
 
   @State private var collectionType: CollectionType = .do
   @State private var rate: UInt8 = 0
@@ -77,7 +77,7 @@ struct SubjectCollectionBoxView: View {
           priv: priv,
           tags: tags
         )
-        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        await UIImpactFeedbackGenerator(style: .light).impactOccurred()
         dismiss()
       } catch {
         notifier.alert(error: error)
@@ -232,7 +232,7 @@ struct SubjectCollectionBoxView: View {
   return SubjectCollectionBoxView(
     subjectId: subject.subjectId
   )
-  .environmentObject(Notifier())
+  .environment(Notifier())
   .environment(ChiiClient(container: container, mock: .anime))
   .modelContainer(container)
 }

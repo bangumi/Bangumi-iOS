@@ -12,8 +12,8 @@ import SwiftUI
 struct SubjectCollectionView: View {
   let subjectId: UInt
 
-  @EnvironmentObject var notifier: Notifier
-  @EnvironmentObject var chii: ChiiClient
+  @Environment(Notifier.self) private var notifier
+  @Environment(ChiiClient.self) private var chii
   @Environment(\.modelContext) var modelContext
 
   @State private var refreshed: Bool = false
@@ -39,15 +39,15 @@ struct SubjectCollectionView: View {
       try await chii.loadUserCollection(subjectId)
     } catch ChiiError.notFound(_) {
       Logger.collection.warning("collection not found for subject: \(subjectId)")
-      do {
-        try modelContext.delete(
-          model: UserSubjectCollection.self,
-          where: #Predicate<UserSubjectCollection> {
-            $0.subjectId == subjectId
-          })
-      } catch {
-        Logger.collection.error("clear collection error: \(error)")
-      }
+//      do {
+//        try modelContext.delete(
+//          model: UserSubjectCollection.self,
+//          where: #Predicate<UserSubjectCollection> {
+//            $0.subjectId == subjectId
+//          })
+//      } catch {
+//        Logger.collection.error("clear collection error: \(error)")
+//      }
     } catch {
       notifier.alert(error: error)
       return
@@ -64,9 +64,7 @@ struct SubjectCollectionView: View {
       VStack(alignment: .leading) {
         HStack {
           if let collection = collection {
-            if collection.rate > 0 {
-              StarsView(score: Float(collection.rate), size: 20)
-            }
+            StarsView(score: Float(collection.rate), size: 20)
             Spacer()
             if collection.priv {
               Image(systemName: "lock.fill").foregroundStyle(.accent)
@@ -120,6 +118,9 @@ struct SubjectCollectionView: View {
             ProgressView()
           }
         }.padding(.horizontal, 4)
+        if let collection = collection, collection.subjectTypeEnum == .book {
+          SubjectBookChaptersView(subjectId: subjectId)
+        }
       }
     }
     .onAppear {
@@ -139,7 +140,7 @@ struct SubjectCollectionView: View {
   return ScrollView {
     LazyVStack(alignment: .leading) {
       SubjectCollectionView(subjectId: collection.subjectId)
-        .environmentObject(Notifier())
+        .environment(Notifier())
         .environment(ChiiClient(container: container, mock: .book))
         .modelContainer(container)
     }

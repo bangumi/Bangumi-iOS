@@ -12,7 +12,7 @@ import SwiftUI
 struct ChobitsApp: App {
   @State var sharedModelContainer: ModelContainer
   @State var chii: ChiiClient
-  @StateObject var notifier = Notifier()
+  @State var notifier = Notifier()
 
   @AppStorage("appearance") var appearance: String = "system"
   @AppStorage("shareDomain") var shareDomain: String = "https://chii.in"
@@ -47,7 +47,7 @@ struct ChobitsApp: App {
   var body: some Scene {
     WindowGroup {
       ContentView()
-        .environmentObject(notifier)
+        .environment(notifier)
         .environment(chii)
         .preferredColorScheme(AppearanceType(appearance).colorScheme)
         .alert("ERROR", isPresented: $notifier.showAlert) {

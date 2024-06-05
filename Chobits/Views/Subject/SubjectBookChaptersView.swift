@@ -12,8 +12,8 @@ import SwiftUI
 struct SubjectBookChaptersView: View {
   let subjectId: UInt
 
-  @EnvironmentObject var notifier: Notifier
-  @EnvironmentObject var chii: ChiiClient
+  @Environment(Notifier.self) private var notifier
+  @Environment(ChiiClient.self) private var chii
 
   @State private var inputEps: String = ""
   @State private var eps: UInt? = nil
@@ -53,7 +53,7 @@ struct SubjectBookChaptersView: View {
     Task {
       do {
         try await chii.updateBookCollection(sid: subjectId, eps: eps, vols: vols)
-        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        await UIImpactFeedbackGenerator(style: .light).impactOccurred()
       } catch {
         notifier.alert(error: error)
       }
@@ -175,7 +175,7 @@ struct SubjectBookChaptersView: View {
   return ScrollView {
     LazyVStack(alignment: .leading) {
       SubjectBookChaptersView(subjectId: subject.subjectId)
-        .environmentObject(Notifier())
+        .environment(Notifier())
         .environment(ChiiClient(container: container, mock: .book))
         .modelContainer(container)
     }

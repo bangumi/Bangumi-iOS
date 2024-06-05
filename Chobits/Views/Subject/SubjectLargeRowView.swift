@@ -11,8 +11,8 @@ import SwiftUI
 struct SubjectLargeRowView: View {
   let subjectId: UInt
 
-  @EnvironmentObject var notifier: Notifier
-  @EnvironmentObject var chii: ChiiClient
+  @Environment(Notifier.self) private var notifier
+  @Environment(ChiiClient.self) private var chii
   @Environment(\.modelContext) var modelContext
 
   @Query
@@ -123,7 +123,7 @@ struct SubjectLargeRowView: View {
   return ScrollView {
     LazyVStack(alignment: .leading) {
       SubjectLargeRowView(subjectId: subject.subjectId)
-        .environmentObject(Notifier())
+        .environment(Notifier())
         .environment(ChiiClient(container: container, mock: .book))
     }
   }

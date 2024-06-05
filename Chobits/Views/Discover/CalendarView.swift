@@ -10,8 +10,8 @@ import SwiftData
 import SwiftUI
 
 struct CalendarView: View {
-  @EnvironmentObject var notifier: Notifier
-  @EnvironmentObject var chii: ChiiClient
+  @Environment(Notifier.self) private var notifier
+  @Environment(ChiiClient.self) private var chii
 
   @State private var refreshed: Bool = false
 

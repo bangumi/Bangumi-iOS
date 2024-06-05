@@ -12,8 +12,8 @@ import SwiftUI
 struct EpisodeListView: View {
   let subjectId: UInt
 
-  @EnvironmentObject var notifier: Notifier
-  @EnvironmentObject var chii: ChiiClient
+  @Environment(Notifier.self) private var notifier
+  @Environment(ChiiClient.self) private var chii
   @Environment(\.modelContext) var modelContext
 
   @State private var now: Date = Date()
@@ -292,7 +292,7 @@ struct EpisodeListView: View {
   }
 
   return EpisodeListView(subjectId: subject.subjectId)
-    .environmentObject(Notifier())
+    .environment(Notifier())
     .environment(ChiiClient(container: container, mock: .anime))
     .modelContainer(container)
 }
