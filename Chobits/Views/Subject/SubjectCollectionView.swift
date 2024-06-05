@@ -39,15 +39,15 @@ struct SubjectCollectionView: View {
       try await chii.loadUserCollection(subjectId)
     } catch ChiiError.notFound(_) {
       Logger.collection.warning("collection not found for subject: \(subjectId)")
-//      do {
-//        try modelContext.delete(
-//          model: UserSubjectCollection.self,
-//          where: #Predicate<UserSubjectCollection> {
-//            $0.subjectId == subjectId
-//          })
-//      } catch {
-//        Logger.collection.error("clear collection error: \(error)")
-//      }
+      //      do {
+      //        try modelContext.delete(
+      //          model: UserSubjectCollection.self,
+      //          where: #Predicate<UserSubjectCollection> {
+      //            $0.subjectId == subjectId
+      //          })
+      //      } catch {
+      //        Logger.collection.error("clear collection error: \(error)")
+      //      }
     } catch {
       notifier.alert(error: error)
       return

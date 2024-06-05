@@ -18,6 +18,7 @@ struct CollectionSubjectTypeView: View {
   @State private var collectionType: CollectionType = .collect
   @State private var counts: [CollectionType: Int] = [:]
   @State private var collections: [UserSubjectCollection] = []
+  @State private var subjects: [UInt: Subject] = [:]
 
   func load() async {
     let fetcher = BackgroundFetcher(modelContext.container)
@@ -33,6 +34,14 @@ struct CollectionSubjectTypeView: View {
     descriptor.fetchLimit = 10
     do {
       collections = try await fetcher.fetchData(descriptor)
+      for collection in collections {
+        let sid = collection.subjectId
+        let subject = try await fetcher.fetchOne(
+          predicate: #Predicate<Subject> {
+            $0.subjectId == sid
+          })
+        subjects[sid] = subject
+      }
     } catch {
       notifier.alert(error: error)
     }
@@ -86,7 +95,7 @@ struct CollectionSubjectTypeView: View {
           ForEach(collections) { collection in
             NavigationLink(value: NavDestination.subject(subjectId: collection.subjectId)) {
               ImageView(
-                img: SubjectImages(subjectId: collection.subjectId).common, width: 60, height: 60,
+                img: subjects[collection.subjectId]?.images.common, width: 60, height: 60,
                 type: .subject)
             }.buttonStyle(.plain)
           }

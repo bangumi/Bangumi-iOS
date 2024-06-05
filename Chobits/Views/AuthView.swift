@@ -49,7 +49,6 @@ struct AuthView: View {
   }
 }
 
-
 class SignInViewModel: NSObject, ASWebAuthenticationPresentationContextProviding {
   let notifier: Notifier
   let chii: ChiiClient

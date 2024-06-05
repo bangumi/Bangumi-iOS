@@ -99,7 +99,7 @@ struct ContentView: View {
 }
 
 @Observable
-class NavState{
+class NavState {
   var timelineNavigation: [NavDestination] = []
   var progressNavigation: [NavDestination] = []
   var discoverNavigation: [NavDestination] = []
