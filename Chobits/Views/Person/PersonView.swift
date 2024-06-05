@@ -39,20 +39,6 @@ struct PersonView: View {
     URL(string: "https://\(shareDomain)/person/\(personId)")!
   }
 
-  var nameCn: String {
-    guard let person = person else {
-      return ""
-    }
-    for item in person.infobox {
-      if INFOBOX_NAME_CN_KEYS.contains(item.key) {
-        if case .string(let val) = item.value {
-          return val
-        }
-      }
-    }
-    return ""
-  }
-
   func refresh() async {
     if refreshed { return }
     refreshed = true
@@ -137,7 +123,7 @@ struct PersonView: View {
                 VStack(alignment: .leading) {
                   ForEach(person.infobox, id: \.key) { item in
                     HStack(alignment: .top) {
-                        Text("\(item.key):").fixedSize(horizontal: false, vertical: true)
+                      Text("\(item.key):").fixedSize(horizontal: false, vertical: true)
                       switch item.value {
                       case .string(let val):
                         Text(val)

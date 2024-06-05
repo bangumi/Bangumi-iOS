@@ -13,25 +13,43 @@ struct SubjectCharactersView: View {
 
   @Environment(Notifier.self) private var notifier
   @Environment(ChiiClient.self) private var chii
+  @Environment(\.modelContext) var modelContext
 
   @State private var refreshed: Bool = false
-  @State private var counts: Int = 0
+  @State private var loaded: Bool = false
 
-  @Query
-  private var characters: [SubjectRelatedCharacter]
+  @State private var characters: [SubjectRelatedCharacter] = []
 
-  init(subjectId: UInt) {
-    self.subjectId = subjectId
-    var descriptor = FetchDescriptor<SubjectRelatedCharacter>(
-      predicate: #Predicate<SubjectRelatedCharacter> {
-        $0.subjectId == subjectId
-      },
-      sortBy: [
-        SortDescriptor<SubjectRelatedCharacter>(\.relation),
-        SortDescriptor<SubjectRelatedCharacter>(\.characterId),
-      ])
-    descriptor.fetchLimit = 10
-    _characters = Query(descriptor)
+  func load() async {
+    let fetcher = BackgroundFetcher(modelContext.container)
+
+    do {
+      var mainDescriptor = FetchDescriptor<SubjectRelatedCharacter>(
+        predicate: #Predicate<SubjectRelatedCharacter> {
+          $0.subjectId == subjectId && $0.relation == "主角"
+        },
+        sortBy: [
+          SortDescriptor<SubjectRelatedCharacter>(\.characterId)
+        ])
+      mainDescriptor.fetchLimit = 10
+      let mains = try await fetcher.fetchData(mainDescriptor)
+      characters = mains
+      if mains.count < 10 {
+        var sideDescriptor = FetchDescriptor<SubjectRelatedCharacter>(
+          predicate: #Predicate<SubjectRelatedCharacter> {
+            $0.subjectId == subjectId && $0.relation == "配角"
+          },
+          sortBy: [
+            SortDescriptor<SubjectRelatedCharacter>(\.characterId)
+          ])
+        sideDescriptor.fetchLimit = 10 - mains.count
+        let sides = try await fetcher.fetchData(sideDescriptor)
+        characters.append(contentsOf: sides)
+      }
+    } catch {
+      notifier.alert(error: error)
+    }
+    loaded = true
   }
 
   func refresh() async {
@@ -44,6 +62,7 @@ struct SubjectCharactersView: View {
     } catch {
       notifier.alert(error: error)
     }
+    await load()
   }
 
   var body: some View {
@@ -56,6 +75,13 @@ struct SubjectCharactersView: View {
           Text("更多角色 »").font(.caption).foregroundStyle(Color("LinkTextColor"))
         }.buttonStyle(.plain)
       }
+    } else if !loaded {
+      ProgressView()
+        .onAppear {
+          Task {
+            await load()
+          }
+        }
     } else if !refreshed {
       ProgressView()
         .onAppear {

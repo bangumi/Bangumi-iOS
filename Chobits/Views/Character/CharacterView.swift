@@ -39,20 +39,6 @@ struct CharacterView: View {
     URL(string: "https://\(shareDomain)/character/\(characterId)")!
   }
 
-  var nameCn: String {
-    guard let character = character else {
-      return ""
-    }
-    for item in character.infobox {
-      if INFOBOX_NAME_CN_KEYS.contains(item.key) {
-        if case .string(let val) = item.value {
-          return val
-        }
-      }
-    }
-    return ""
-  }
-
   func refresh() async {
     if refreshed { return }
     refreshed = true
@@ -130,7 +116,7 @@ struct CharacterView: View {
                 VStack(alignment: .leading) {
                   ForEach(character.infobox, id: \.key) { item in
                     HStack(alignment: .top) {
-                        Text("\(item.key):").fixedSize(horizontal: false, vertical: true)
+                      Text("\(item.key):").fixedSize(horizontal: false, vertical: true)
                       switch item.value {
                       case .string(let val):
                         Text(val)
