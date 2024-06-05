@@ -64,6 +64,12 @@ struct SubjectHeaderView: View {
             if subject.typeEnum != .unknown {
               Label(subject.category, systemImage: subject.typeEnum.icon)
             }
+            if subject.date.timeIntervalSince1970 > 0 {
+              Label(subject.date.formatAirdate, systemImage: "calendar")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .lineLimit(1)
+            }
             Spacer()
             if subject.nsfw {
               Label("", systemImage: "18.circle").foregroundStyle(.red)
@@ -74,13 +80,6 @@ struct SubjectHeaderView: View {
           }
           .font(.caption)
           .foregroundStyle(.secondary)
-
-          if subject.date.timeIntervalSince1970 > 0 {
-            Label(subject.date.formatAirdate, systemImage: "calendar")
-              .font(.caption)
-              .foregroundStyle(.secondary)
-              .lineLimit(1)
-          }
 
           Spacer()
           Text(nameCN)
