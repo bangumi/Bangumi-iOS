@@ -35,6 +35,14 @@ struct SubjectHeaderView: View {
     return score.ratingDescription
   }
 
+  var nameCN: String {
+    guard let subject = subject else { return "" }
+    if subject.nameCn.isEmpty {
+      return subject.name
+    }
+    return subject.nameCn
+  }
+
   var body: some View {
     if let subject = subject {
       Text(subject.name)
@@ -75,7 +83,7 @@ struct SubjectHeaderView: View {
           }
 
           Spacer()
-          Text(subject.nameCn)
+          Text(nameCN)
             .multilineTextAlignment(.leading)
             .truncationMode(.middle)
             .lineLimit(2)
