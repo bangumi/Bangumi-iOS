@@ -103,18 +103,6 @@ struct PersonView: View {
             Text(person.name)
               .font(.title2.bold())
               .multilineTextAlignment(.leading)
-            HStack(alignment: .bottom) {
-              if person.locked {
-                Label("", systemImage: "lock")
-                  .foregroundStyle(.red)
-              }
-              Spacer()
-              if !isolationMode {
-                Label("评论: \(person.stat.comments)", systemImage: "bubble")
-                  .font(.footnote)
-                  .foregroundStyle(Color("LinkTextColor"))
-              }
-            }
 
             /// header
             HStack(alignment: .top) {
@@ -130,8 +118,19 @@ struct PersonView: View {
               VStack(alignment: .leading) {
                 HStack {
                   Label(person.typeEnum.description, systemImage: person.typeEnum.icon)
+                  if person.stat.collects > 0 {
+                    Text("(\(person.stat.collects)人收藏)")
+                  }
                   Spacer()
-                  Text("收藏: \(person.stat.collects)")
+                  if person.locked {
+                    Label("", systemImage: "lock")
+                      .foregroundStyle(.red)
+                  }
+                  if !isolationMode {
+                    Label("评论: \(person.stat.comments)", systemImage: "bubble")
+                      .font(.footnote)
+                      .foregroundStyle(Color("LinkTextColor"))
+                  }
                 }
                 .font(.footnote)
                 .foregroundStyle(.secondary)

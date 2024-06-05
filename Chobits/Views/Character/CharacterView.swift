@@ -96,18 +96,6 @@ struct CharacterView: View {
             Text(character.name)
               .font(.title2.bold())
               .multilineTextAlignment(.leading)
-            HStack(alignment: .bottom) {
-              if character.locked {
-                Label("", systemImage: "lock")
-                  .foregroundStyle(.red)
-              }
-              Spacer()
-              if !isolationMode {
-                Label("评论: \(character.stat.comments)", systemImage: "bubble")
-                  .font(.footnote)
-                  .foregroundStyle(Color("LinkTextColor"))
-              }
-            }
 
             /// header
             HStack(alignment: .top) {
@@ -123,9 +111,19 @@ struct CharacterView: View {
               VStack(alignment: .leading) {
                 HStack {
                   Label(character.typeEnum.description, systemImage: character.typeEnum.icon)
-
+                  if character.stat.collects > 0 {
+                    Text("(\(character.stat.collects)人收藏)")
+                  }
                   Spacer()
-                  Text("收藏: \(character.stat.collects)")
+                  if character.locked {
+                    Label("", systemImage: "lock")
+                      .foregroundStyle(.red)
+                  }
+                  if !isolationMode {
+                    Label("评论: \(character.stat.comments)", systemImage: "bubble")
+                      .font(.footnote)
+                      .foregroundStyle(Color("LinkTextColor"))
+                  }
                 }
                 .font(.footnote)
                 .foregroundStyle(.secondary)
