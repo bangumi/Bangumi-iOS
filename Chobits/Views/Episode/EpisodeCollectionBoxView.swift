@@ -37,11 +37,12 @@ struct EpisodeCollectionBoxView: View {
     do {
       try await chii.updateEpisodeCollection(subjectId: subjectId, episodeId: episodeId, type: type)
       await UIImpactFeedbackGenerator(style: .light).impactOccurred()
+      updating = false
       dismiss()
     } catch {
+      updating = false
       notifier.alert(error: error)
     }
-    updating = false
   }
 
   func updateBatch() async {
@@ -55,11 +56,13 @@ struct EpisodeCollectionBoxView: View {
       do {
         try await chii.updateSubjectEpisodeCollection(
           subjectId: subjectId, updateTo: episode.sort, type: .collect)
+        await UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        updating = false
         dismiss()
       } catch {
+        updating = false
         notifier.alert(error: error)
       }
-      updating = false
     }
   }
 

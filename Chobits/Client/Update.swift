@@ -95,15 +95,15 @@ extension ChiiClient {
     _ = try await self.request(url: url, method: "PATCH", body: body, authorized: true)
     Logger.api.info("finish update subject episode collection: \(subjectId), \(episodeIds)")
     try await db.update(
-      predicate: predicate,
-      update: {
+      predicate: #Predicate<Episode> {
+        $0.subjectId == subjectId && $0.sort <= updateTo
+      }, update: {
         $0.collection = type.rawValue
       })
     try await db.update(
       predicate: #Predicate<UserSubjectCollection> {
         $0.subjectId == subjectId
-      },
-      update: {
+      }, update: {
         $0.updatedAt = Date()
       })
     try await db.save()
