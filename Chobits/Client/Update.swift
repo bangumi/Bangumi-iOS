@@ -98,12 +98,14 @@ extension ChiiClient {
       predicate: #Predicate<Episode> {
         $0.subjectId == subjectId && $0.sort <= updateTo
       }, update: {
+        Logger.episode.info("update episode collection: \($0.episodeId) -> \(type.description)")
         $0.collection = type.rawValue
       })
     try await db.update(
       predicate: #Predicate<UserSubjectCollection> {
         $0.subjectId == subjectId
       }, update: {
+        Logger.subject.info("update subject collection date: \($0.subjectId)")
         $0.updatedAt = Date()
       })
     try await db.save()
@@ -127,6 +129,7 @@ extension ChiiClient {
         $0.episodeId == episodeId
       },
       update: {
+        Logger.episode.info("update episode collection: \($0.episodeId) -> \(type.description)")
         $0.collection = type.rawValue
       })
     try await db.update(
@@ -134,6 +137,7 @@ extension ChiiClient {
         $0.subjectId == subjectId
       },
       update: {
+        Logger.subject.info("update subject collection date: \($0.subjectId)")
         $0.updatedAt = Date()
       })
     try await db.save()
