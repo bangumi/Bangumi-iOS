@@ -159,9 +159,9 @@ struct ChiiProgressView: View {
                       await loadNextPage(idx: item.idx)
                     }
                   }
+                  Divider()
                 }
                 if exhausted {
-                  Divider()
                   HStack {
                     Spacer()
                     Text("没有更多了")

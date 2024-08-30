@@ -94,17 +94,43 @@ struct ProgressRowView: View {
 
   var body: some View {
     HStack {
-      ImageView(img: subject?.images.common, width: 60, height: 60, type: .subject)
+      ImageView(img: subject?.images.common, width: 72, height: 108, type: .subject)
       VStack(alignment: .leading) {
-        Text(subject?.name ?? "").font(.headline)
-        Text(subject?.nameCn ?? "").font(.footnote).foregroundStyle(.secondary)
+        HStack {
+          if collection?.priv ?? false {
+            Image(systemName: "lock.fill").foregroundStyle(.accent)
+          }
+          Text(subject?.name ?? "").font(.headline)
+        }
+
+        HStack {
+          if let platform = subject?.platform, !platform.isEmpty {
+            Text(platform)
+              .font(.caption)
+              .foregroundStyle(.secondary)
+              .padding(.horizontal, 1)
+              .overlay {
+                RoundedRectangle(cornerRadius: 5)
+                  .stroke(Color.secondary, lineWidth: 1)
+                  .padding(.horizontal, -1)
+                  .padding(.vertical, -1)
+              }
+          }
+          Text(subject?.nameCn ?? "").font(.footnote).foregroundStyle(.secondary)
+        }
+
+        if let authority = subject?.authority {
+          Spacer()
+          Text(authority)
+            .font(.caption)
+            .foregroundStyle(.secondary)
+            .lineLimit(2)
+        }
+
         Spacer()
         if let collection = collection {
           HStack(alignment: .bottom) {
             Text(collection.updatedAt.formatCollectionDate).foregroundStyle(.secondary)
-            if collection.priv {
-              Image(systemName: "lock.fill").foregroundStyle(.accent)
-            }
             Spacer()
             switch collection.subjectTypeEnum {
             case .anime, .real:
@@ -139,7 +165,7 @@ struct ProgressRowView: View {
         }
       }
     }
-    .frame(height: 60)
+    .frame(height: 108)
     .padding(2)
     .clipShape(RoundedRectangle(cornerRadius: 10))
     .task {

@@ -180,9 +180,9 @@ struct ChiiDiscoverView: View {
                           }
                         }
                     }.buttonStyle(.plain)
+                    Divider()
                   }
                   if exhausted {
-                    Divider()
                     HStack {
                       Spacer()
                       Text("没有更多了")
