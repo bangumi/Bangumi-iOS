@@ -98,7 +98,7 @@ struct ProgressRowView: View {
         if collection?.priv ?? false {
           Image(systemName: "lock.fill").foregroundStyle(.accent)
         }
-        Text(subject?.name ?? "")
+        Text(subject?.name ?? "").lineLimit(1)
       }.font(.headline)
       HStack {
         ImageView(img: subject?.images.common, width: 60, height: 90, type: .subject)
@@ -116,7 +116,10 @@ struct ProgressRowView: View {
                     .padding(.vertical, -1)
                 }
             }
-            Text(subject?.nameCn ?? "").font(.subheadline).foregroundStyle(.secondary)
+            Text(subject?.nameCn ?? "")
+              .foregroundStyle(.secondary)
+              .font(.subheadline)
+              .lineLimit(1)
           }
 
           if let authority = subject?.authority {
@@ -130,7 +133,9 @@ struct ProgressRowView: View {
           Spacer()
           if let collection = collection {
             HStack(alignment: .bottom) {
-              Text(collection.updatedAt.formatCollectionDate).foregroundStyle(.secondary)
+              Text(collection.updatedAt.formatCollectionDate)
+                .foregroundStyle(.secondary)
+                .lineLimit(1)
               Spacer()
               switch collection.subjectTypeEnum {
               case .anime, .real:
@@ -142,7 +147,7 @@ struct ProgressRowView: View {
                     Button {
                       showEpisodeBox = true
                     } label: {
-                      Label("EP.\(episode.sort.episodeDisplay)", systemImage: "eyes").font(.callout)
+                      Text("EP.\(episode.sort.episodeDisplay)").font(.callout)
                     }
                   }
                 } else {
