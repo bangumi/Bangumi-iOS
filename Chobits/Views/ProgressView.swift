@@ -92,7 +92,7 @@ struct ChiiProgressView: View {
     if exhausted {
       return
     }
-    if idx != offset - 10 {
+    if idx != offset - 4 {
       return
     }
     if loadedIdx[idx, default: false] {

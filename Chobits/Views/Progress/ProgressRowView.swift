@@ -93,81 +93,79 @@ struct ProgressRowView: View {
   }
 
   var body: some View {
-    HStack {
-      ImageView(img: subject?.images.common, width: 72, height: 108, type: .subject)
-      VStack(alignment: .leading) {
-        HStack {
-          if collection?.priv ?? false {
-            Image(systemName: "lock.fill").foregroundStyle(.accent)
-          }
-          Text(subject?.name ?? "").font(.headline)
+    VStack(alignment: .leading) {
+      HStack {
+        if collection?.priv ?? false {
+          Image(systemName: "lock.fill").foregroundStyle(.accent)
         }
+        Text(subject?.name ?? "")
+      }.font(.headline)
+      HStack {
+        ImageView(img: subject?.images.common, width: 60, height: 90, type: .subject)
+        VStack(alignment: .leading) {
+          HStack {
+            if let platform = subject?.platform, !platform.isEmpty {
+              Text(platform)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .padding(.horizontal, 1)
+                .overlay {
+                  RoundedRectangle(cornerRadius: 5)
+                    .stroke(Color.secondary, lineWidth: 1)
+                    .padding(.horizontal, -1)
+                    .padding(.vertical, -1)
+                }
+            }
+            Text(subject?.nameCn ?? "").font(.subheadline).foregroundStyle(.secondary)
+          }
 
-        HStack {
-          if let platform = subject?.platform, !platform.isEmpty {
-            Text(platform)
+          if let authority = subject?.authority {
+            Spacer()
+            Text(authority)
               .font(.caption)
               .foregroundStyle(.secondary)
-              .padding(.horizontal, 1)
-              .overlay {
-                RoundedRectangle(cornerRadius: 5)
-                  .stroke(Color.secondary, lineWidth: 1)
-                  .padding(.horizontal, -1)
-                  .padding(.vertical, -1)
-              }
+              .lineLimit(2)
           }
-          Text(subject?.nameCn ?? "").font(.footnote).foregroundStyle(.secondary)
-        }
 
-        if let authority = subject?.authority {
           Spacer()
-          Text(authority)
-            .font(.caption)
-            .foregroundStyle(.secondary)
-            .lineLimit(2)
-        }
-
-        Spacer()
-        if let collection = collection {
-          HStack(alignment: .bottom) {
-            Text(collection.updatedAt.formatCollectionDate).foregroundStyle(.secondary)
-            Spacer()
-            switch collection.subjectTypeEnum {
-            case .anime, .real:
-              if let episode = nextEpisode {
-                if episode.airdate > Date() {
-                  Text("EP.\(episode.sort.episodeDisplay) ~ \(episode.waitDesc)")
-                    .foregroundStyle(.secondary)
-                } else {
-                  Button {
-                    showEpisodeBox = true
-                  } label: {
-                    Label("EP.\(episode.sort.episodeDisplay)", systemImage: "eyes").font(.callout)
+          if let collection = collection {
+            HStack(alignment: .bottom) {
+              Text(collection.updatedAt.formatCollectionDate).foregroundStyle(.secondary)
+              Spacer()
+              switch collection.subjectTypeEnum {
+              case .anime, .real:
+                if let episode = nextEpisode {
+                  if episode.airdate > Date() {
+                    Text("EP.\(episode.sort.episodeDisplay) ~ \(episode.waitDesc)")
+                      .foregroundStyle(.secondary)
+                  } else {
+                    Button {
+                      showEpisodeBox = true
+                    } label: {
+                      Label("EP.\(episode.sort.episodeDisplay)", systemImage: "eyes").font(.callout)
+                    }
                   }
+                } else {
+                  Text("\(collection.epStatus)").foregroundStyle(epsColor).font(.callout)
+                  Text(chapters).foregroundStyle(epsColor)
                 }
-              } else {
+              case .book:
                 Text("\(collection.epStatus)").foregroundStyle(epsColor).font(.callout)
-                Text(chapters).foregroundStyle(epsColor)
+                Text("\(chapters)").foregroundStyle(epsColor)
+                Text("\(collection.volStatus)").foregroundStyle(volsColor).font(.callout)
+                Text("\(volumes)").foregroundStyle(volsColor)
+              default:
+                Label(
+                  collection.subjectTypeEnum.description,
+                  systemImage: collection.subjectTypeEnum.icon
+                )
+                .foregroundStyle(.accent)
               }
-            case .book:
-              Text("\(collection.epStatus)").foregroundStyle(epsColor).font(.callout)
-              Text("\(chapters)").foregroundStyle(epsColor)
-              Text("\(collection.volStatus)").foregroundStyle(volsColor).font(.callout)
-              Text("\(volumes)").foregroundStyle(volsColor)
-            default:
-              Label(
-                collection.subjectTypeEnum.description,
-                systemImage: collection.subjectTypeEnum.icon
-              )
-              .foregroundStyle(.accent)
-            }
-          }.font(.footnote)
+            }.font(.footnote)
+          }
         }
       }
     }
-    .frame(height: 108)
-    .padding(2)
-    .clipShape(RoundedRectangle(cornerRadius: 10))
     .task {
       await loadNextEpisode()
     }
