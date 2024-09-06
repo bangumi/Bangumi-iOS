@@ -95,15 +95,13 @@ struct ProgressRowView: View {
   var body: some View {
     VStack(alignment: .leading) {
       HStack {
-        if collection?.priv ?? false {
-          Image(systemName: "lock.fill").foregroundStyle(.accent)
-        }
-        Text(subject?.name ?? "").lineLimit(1)
-      }.font(.headline)
-      HStack {
         ImageView(img: subject?.images.common, width: 60, height: 90, type: .subject)
         VStack(alignment: .leading) {
+
           HStack {
+            if collection?.priv ?? false {
+              Image(systemName: "lock.fill").foregroundStyle(.accent)
+            }
             if let platform = subject?.platform, !platform.isEmpty {
               Text(platform)
                 .font(.caption)
@@ -116,18 +114,22 @@ struct ProgressRowView: View {
                     .padding(.vertical, -1)
                 }
             }
-            Text(subject?.nameCn ?? "")
-              .foregroundStyle(.secondary)
-              .font(.subheadline)
+            Text(subject?.name ?? "")
+              .font(.headline)
               .lineLimit(1)
           }
+
+          Text(subject?.nameCn ?? "")
+            .foregroundStyle(.secondary)
+            .font(.subheadline)
+            .lineLimit(1)
 
           if let authority = subject?.authority {
             Spacer()
             Text(authority)
               .font(.caption)
               .foregroundStyle(.secondary)
-              .lineLimit(2)
+              .lineLimit(1)
           }
 
           Spacer()
