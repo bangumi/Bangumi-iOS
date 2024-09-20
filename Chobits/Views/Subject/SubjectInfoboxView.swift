@@ -62,13 +62,12 @@ struct SubjectInfoboxView: View {
   }
 
   func load() async {
-    let fetcher = BackgroundFetcher(modelContext.container)
     let descriptor = FetchDescriptor<SubjectRelatedPerson>(
       predicate: #Predicate<SubjectRelatedPerson> {
         $0.subjectId == subjectId
       }, sortBy: [SortDescriptor<SubjectRelatedPerson>(\.sort)])
     do {
-      self.persons = try await fetcher.fetchData(descriptor)
+      self.persons = try modelContext.fetch(descriptor)
     } catch {
       notifier.alert(error: error)
     }

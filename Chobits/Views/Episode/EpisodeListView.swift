@@ -33,19 +33,20 @@ struct EpisodeListView: View {
   }
 
   func loadCounts() async {
-    let fetcher = BackgroundFetcher(modelContext.container)
     let mainType = EpisodeType.main.rawValue
     do {
-      let countMain = try await fetcher.fetchCount(
-        #Predicate<Episode> {
+      let mainDesc = FetchDescriptor<Episode>(
+        predicate: #Predicate<Episode> {
           $0.subjectId == subjectId && $0.type == mainType
         })
+      let countMain = try modelContext.fetchCount(mainDesc)
       self.countMain = countMain
 
-      let countOther = try await fetcher.fetchCount(
-        #Predicate<Episode> {
+      let otherDesc = FetchDescriptor<Episode>(
+        predicate: #Predicate<Episode> {
           $0.subjectId == subjectId && $0.type != mainType
         })
+      let countOther = try modelContext.fetchCount(otherDesc)
       self.countOther = countOther
     } catch {
       notifier.alert(error: error)
@@ -53,7 +54,6 @@ struct EpisodeListView: View {
   }
 
   func fetch(limit: Int = 100) async -> [EnumerateItem<Episode>] {
-    let fetcher = BackgroundFetcher(modelContext.container)
     let sortBy =
       sortDesc ? SortDescriptor<Episode>(\.sort, order: .reverse) : SortDescriptor<Episode>(\.sort)
     let zero: UInt8 = 0
@@ -77,7 +77,7 @@ struct EpisodeListView: View {
     descriptor.fetchLimit = limit
     descriptor.fetchOffset = offset
     do {
-      let episodes = try await fetcher.fetchData(descriptor)
+      let episodes = try modelContext.fetch(descriptor)
       if episodes.count < limit {
         exhausted = true
       }

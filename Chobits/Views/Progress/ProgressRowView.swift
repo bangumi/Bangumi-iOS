@@ -49,16 +49,17 @@ struct ProgressRowView: View {
       return
     }
     let zero: UInt8 = 0
-    let fetcher = BackgroundFetcher(modelContext.container)
     do {
-      let episode = try await fetcher.fetchOne(
+      var desc = FetchDescriptor<Episode>(
         predicate: #Predicate<Episode> {
           $0.subjectId == subjectId && $0.type == zero && $0.collection == zero
         }, sortBy: [SortDescriptor<Episode>(\.sort, order: .forward)])
-      if let episode = episode {
+      desc.fetchLimit = 1
+      let episodes = try modelContext.fetch(desc)
+      if let episode = episodes.first {
         Logger.episode.info("subject \(subjectId) next episode: \(episode.sort.episodeDisplay)")
+        nextEpisode = episode
       }
-      nextEpisode = episode
     } catch {
       Logger.episode.error("fetch next episode error: \(error)")
     }

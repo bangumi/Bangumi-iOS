@@ -21,7 +21,6 @@ struct CollectionSubjectTypeView: View {
   @State private var subjects: [UInt: Subject] = [:]
 
   func load() async {
-    let fetcher = BackgroundFetcher(modelContext.container)
     let stypeVal = stype.rawValue
     let ctypeVal = collectionType.rawValue
     var descriptor = FetchDescriptor<UserSubjectCollection>(
@@ -33,13 +32,16 @@ struct CollectionSubjectTypeView: View {
       ])
     descriptor.fetchLimit = 10
     do {
-      collections = try await fetcher.fetchData(descriptor)
+      collections = try modelContext.fetch(descriptor)
       for collection in collections {
         let sid = collection.subjectId
-        let subject = try await fetcher.fetchOne(
+        var desc = FetchDescriptor<Subject>(
           predicate: #Predicate<Subject> {
             $0.subjectId == sid
           })
+        desc.fetchLimit = 1
+        let res = try modelContext.fetch(desc)
+        let subject = res.first
         subjects[sid] = subject
       }
     } catch {
@@ -49,14 +51,14 @@ struct CollectionSubjectTypeView: View {
 
   func loadCounts() async {
     let stypeVal = stype.rawValue
-    let fetcher = BackgroundFetcher(modelContext.container)
     do {
       for type in CollectionType.allTypes() {
         let ctypeVal = type.rawValue
-        let count = try await fetcher.fetchCount(
-          #Predicate<UserSubjectCollection> {
+        let desc = FetchDescriptor<UserSubjectCollection>(
+          predicate: #Predicate<UserSubjectCollection> {
             $0.type == ctypeVal && $0.subjectType == stypeVal
           })
+        let count = try modelContext.fetchCount(desc)
         counts[type] = count
       }
     } catch {

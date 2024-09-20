@@ -21,8 +21,6 @@ struct SubjectCharactersView: View {
   @State private var characters: [SubjectRelatedCharacter] = []
 
   func load() async {
-    let fetcher = BackgroundFetcher(modelContext.container)
-
     do {
       var mainDescriptor = FetchDescriptor<SubjectRelatedCharacter>(
         predicate: #Predicate<SubjectRelatedCharacter> {
@@ -32,7 +30,7 @@ struct SubjectCharactersView: View {
           SortDescriptor<SubjectRelatedCharacter>(\.characterId)
         ])
       mainDescriptor.fetchLimit = 10
-      let mains = try await fetcher.fetchData(mainDescriptor)
+      let mains = try modelContext.fetch(mainDescriptor)
       characters = mains
       if mains.count < 10 {
         var sideDescriptor = FetchDescriptor<SubjectRelatedCharacter>(
@@ -43,7 +41,7 @@ struct SubjectCharactersView: View {
             SortDescriptor<SubjectRelatedCharacter>(\.characterId)
           ])
         sideDescriptor.fetchLimit = 10 - mains.count
-        let sides = try await fetcher.fetchData(sideDescriptor)
+        let sides = try modelContext.fetch(sideDescriptor)
         characters.append(contentsOf: sides)
       }
     } catch {

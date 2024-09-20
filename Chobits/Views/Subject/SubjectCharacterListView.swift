@@ -21,7 +21,6 @@ struct SubjectCharacterListView: View {
   func load() async {
     let rtype = relationType.description
     let allType = SubjectCharacterRelationType.unknown.description
-    let fetcher = BackgroundFetcher(modelContext.container)
     let descriptor = FetchDescriptor<SubjectRelatedCharacter>(
       predicate: #Predicate<SubjectRelatedCharacter> {
         if rtype == allType {
@@ -35,7 +34,7 @@ struct SubjectCharacterListView: View {
         SortDescriptor<SubjectRelatedCharacter>(\.characterId),
       ])
     do {
-      characters = try await fetcher.fetchData(descriptor)
+      characters = try modelContext.fetch(descriptor)
     } catch {
       notifier.alert(error: error)
     }

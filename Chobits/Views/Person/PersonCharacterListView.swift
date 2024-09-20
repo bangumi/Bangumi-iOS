@@ -21,7 +21,6 @@ struct PersonCharacterListView: View {
   func load() async {
     let rtype = relationType.description
     let allType = SubjectCharacterRelationType.unknown.description
-    let fetcher = BackgroundFetcher(modelContext.container)
     let descriptor = FetchDescriptor<PersonRelatedCharacter>(
       predicate: #Predicate<PersonRelatedCharacter> {
         if rtype == allType {
@@ -35,7 +34,7 @@ struct PersonCharacterListView: View {
         SortDescriptor<PersonRelatedCharacter>(\.subjectId, order: .reverse),
       ])
     do {
-      let characters = try await fetcher.fetchData(descriptor)
+      let characters = try modelContext.fetch(descriptor)
       let chars = Dictionary(grouping: characters, by: { $0.characterId })
       characterIds = chars.keys.sorted()
     } catch {
@@ -93,16 +92,22 @@ struct PersonCharacterListItemView: View {
   @State private var relations: [PersonRelatedCharacter] = []
 
   func load() async {
-    let fetcher = BackgroundFetcher(modelContext.container)
     do {
-      character = try await fetcher.fetchOne(
+      var cdesc = FetchDescriptor<Character>(
         predicate: #Predicate<Character> {
           $0.characterId == characterId
         })
-      relations = try await fetcher.fetchData(
+      cdesc.fetchLimit = 1
+      let characters = try modelContext.fetch(cdesc)
+      if let c = characters.first {
+        character = c
+      }
+
+      let rdesc = FetchDescriptor<PersonRelatedCharacter>(
         predicate: #Predicate<PersonRelatedCharacter> {
           $0.characterId == characterId
         }, sortBy: [SortDescriptor<PersonRelatedCharacter>(\.subjectId, order: .reverse)])
+      relations = try modelContext.fetch(rdesc)
     } catch {
       notifier.alert(error: error)
     }
@@ -152,12 +157,16 @@ struct PersonCharacterListItemSubjectItemView: View {
   @State private var subject: Subject? = nil
 
   func load() async {
-    let fetcher = BackgroundFetcher(modelContext.container)
     do {
-      subject = try await fetcher.fetchOne(
+      var desc = FetchDescriptor<Subject>(
         predicate: #Predicate<Subject> {
           $0.subjectId == subjectId
         })
+      desc.fetchLimit = 1
+      let subjects = try modelContext.fetch(desc)
+      if let s = subjects.first {
+        subject = s
+      }
     } catch {
       notifier.alert(error: error)
     }

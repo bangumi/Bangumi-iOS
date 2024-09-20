@@ -42,16 +42,26 @@ struct SubjectCollectionBoxView: View {
   }
 
   func load() async {
-    let fetcher = BackgroundFetcher(modelContext.container)
     do {
-      subject = try await fetcher.fetchOne(
+      var sdesc = FetchDescriptor<Subject>(
         predicate: #Predicate<Subject> {
           $0.subjectId == subjectId
         })
-      collection = try await fetcher.fetchOne(
+      sdesc.fetchLimit = 1
+      let subjects = try modelContext.fetch(sdesc)
+      if let s = subjects.first {
+        subject = s
+      }
+
+      var cdesc = FetchDescriptor<UserSubjectCollection>(
         predicate: #Predicate<UserSubjectCollection> {
           $0.subjectId == subjectId
         })
+      cdesc.fetchLimit = 1
+      let collections = try modelContext.fetch(cdesc)
+      if let c = collections.first {
+        collection = c
+      }
     } catch {
       notifier.alert(error: error)
     }
@@ -77,7 +87,7 @@ struct SubjectCollectionBoxView: View {
           priv: priv,
           tags: tags
         )
-        await UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
         dismiss()
       } catch {
         notifier.alert(error: error)

@@ -26,23 +26,24 @@ struct ChiiProgressView: View {
 
   func loadCounts() async {
     let doingType = CollectionType.do.rawValue
-    let fetcher = BackgroundFetcher(modelContext.container)
     do {
       for type in SubjectType.progressTypes() {
         if type == .unknown {
           continue
         }
         let tvalue = type.rawValue
-        let count = try await fetcher.fetchCount(
-          #Predicate<UserSubjectCollection> {
+        let desc = FetchDescriptor<UserSubjectCollection>(
+          predicate: #Predicate<UserSubjectCollection> {
             $0.type == doingType && $0.subjectType == tvalue
           })
+        let count = try modelContext.fetchCount(desc)
         counts[type] = count
       }
-      let totalCount = try await fetcher.fetchCount(
-        #Predicate<UserSubjectCollection> {
+      let desc = FetchDescriptor<UserSubjectCollection>(
+        predicate: #Predicate<UserSubjectCollection> {
           $0.type == doingType
         })
+      let totalCount = try modelContext.fetchCount(desc)
       Logger.collection.info("load progress total count: \(totalCount)")
       counts[.unknown] = totalCount
     } catch {
@@ -53,7 +54,6 @@ struct ChiiProgressView: View {
   func fetch(limit: Int = 20) async -> [EnumerateItem<UserSubjectCollection>] {
     let stype = subjectType.rawValue
     let doingType = CollectionType.do.rawValue
-    let fetcher = BackgroundFetcher(modelContext.container)
     var descriptor = FetchDescriptor<UserSubjectCollection>(
       predicate: #Predicate<UserSubjectCollection> {
         (stype == 0 || $0.subjectType == stype) && $0.type == doingType
@@ -64,7 +64,7 @@ struct ChiiProgressView: View {
     descriptor.fetchLimit = limit
     descriptor.fetchOffset = offset
     do {
-      let collections = try await fetcher.fetchData(descriptor)
+      let collections = try modelContext.fetch(descriptor)
       if collections.count < limit {
         exhausted = true
       }

@@ -27,15 +27,16 @@ struct ChiiDiscoverView: View {
   @State private var subjects: [EnumerateItem<Subject>] = []
 
   func localSearch(limit: Int = 50) async -> [EnumerateItem<Subject>] {
-    let fetcher = BackgroundFetcher(modelContext.container)
-    let predicate = #Predicate<Subject> {
-      return (subjectType.rawValue == 0 || subjectType.rawValue == $0.type)
-        && ($0.name.localizedStandardContains(query)
-          || $0.nameCn.localizedStandardContains(query))
-    }
+    var desc = FetchDescriptor<Subject>(
+      predicate: #Predicate<Subject> {
+        return (subjectType.rawValue == 0 || subjectType.rawValue == $0.type)
+          && ($0.name.localizedStandardContains(query)
+            || $0.nameCn.localizedStandardContains(query))
+      })
+    desc.fetchLimit = limit
+    desc.fetchOffset = offset
     do {
-      let subjects = try await fetcher.fetchData(
-        predicate: predicate, limit: limit, offset: offset)
+      let subjects = try modelContext.fetch(desc)
       if subjects.count < limit {
         exhausted = true
       }

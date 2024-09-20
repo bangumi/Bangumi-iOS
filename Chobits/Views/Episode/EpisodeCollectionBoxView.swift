@@ -36,7 +36,7 @@ struct EpisodeCollectionBoxView: View {
     updating = true
     do {
       try await chii.updateEpisodeCollection(subjectId: subjectId, episodeId: episodeId, type: type)
-      await UIImpactFeedbackGenerator(style: .light).impactOccurred()
+      UIImpactFeedbackGenerator(style: .light).impactOccurred()
       updating = false
       dismiss()
     } catch {
@@ -56,7 +56,7 @@ struct EpisodeCollectionBoxView: View {
       do {
         try await chii.updateSubjectEpisodeCollection(
           subjectId: subjectId, updateTo: episode.sort, type: .collect)
-        await UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
         updating = false
         dismiss()
       } catch {

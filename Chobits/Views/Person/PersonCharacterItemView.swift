@@ -21,16 +21,26 @@ struct PersonCharacterItemView: View {
   @State private var subject: Subject? = nil
 
   func load() async {
-    let fetcher = BackgroundFetcher(modelContext.container)
     do {
-      character = try await fetcher.fetchOne(
+      var cdesc = FetchDescriptor<PersonRelatedCharacter>(
         predicate: #Predicate<PersonRelatedCharacter> {
           $0.personId == personId && $0.characterId == characterId
         })
-      subject = try await fetcher.fetchOne(
+      cdesc.fetchLimit = 1
+      let characters = try modelContext.fetch(cdesc)
+      if let c = characters.first {
+        character = c
+      }
+
+      var sdesc = FetchDescriptor<Subject>(
         predicate: #Predicate<Subject> {
           $0.subjectId == subjectId
         })
+      sdesc.fetchLimit = 1
+      let subjects = try modelContext.fetch(sdesc)
+      if let s = subjects.first {
+        subject = s
+      }
     } catch {
       notifier.alert(error: error)
     }

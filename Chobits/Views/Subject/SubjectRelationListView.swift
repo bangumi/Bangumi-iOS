@@ -21,7 +21,6 @@ struct SubjectRelationListView: View {
   func load() async {
     let stype = subjectType.rawValue
     let zero: UInt8 = 0
-    let fetcher = BackgroundFetcher(modelContext.container)
     let descriptor = FetchDescriptor<SubjectRelation>(
       predicate: #Predicate<SubjectRelation> {
         if stype == zero {
@@ -31,7 +30,7 @@ struct SubjectRelationListView: View {
         }
       }, sortBy: [SortDescriptor<SubjectRelation>(\.relationId)])
     do {
-      relations = try await fetcher.fetchData(descriptor)
+      relations = try modelContext.fetch(descriptor)
     } catch {
       notifier.alert(error: error)
     }

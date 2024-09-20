@@ -25,14 +25,14 @@ struct CollectionListView: View {
 
   func loadCounts() async {
     let stype = subjectType.rawValue
-    let fetcher = BackgroundFetcher(modelContext.container)
     do {
       for type in CollectionType.allTypes() {
         let ctype = type.rawValue
-        let count = try await fetcher.fetchCount(
-          #Predicate<UserSubjectCollection> {
+        let desc = FetchDescriptor<UserSubjectCollection>(
+          predicate: #Predicate<UserSubjectCollection> {
             $0.type == ctype && $0.subjectType == stype
           })
+        let count = try modelContext.fetchCount(desc)
         counts[type] = count
       }
     } catch {
@@ -43,7 +43,6 @@ struct CollectionListView: View {
   func fetch(limit: Int = 20) async -> [EnumerateItem<UserSubjectCollection>] {
     let stype = subjectType.rawValue
     let ctype = collectionType.rawValue
-    let fetcher = BackgroundFetcher(modelContext.container)
     var descriptor = FetchDescriptor<UserSubjectCollection>(
       predicate: #Predicate<UserSubjectCollection> {
         $0.subjectType == stype && $0.type == ctype
@@ -54,7 +53,7 @@ struct CollectionListView: View {
     descriptor.fetchLimit = limit
     descriptor.fetchOffset = offset
     do {
-      let collections = try await fetcher.fetchData(descriptor)
+      let collections = try modelContext.fetch(descriptor)
       if collections.count < limit {
         exhausted = true
       }

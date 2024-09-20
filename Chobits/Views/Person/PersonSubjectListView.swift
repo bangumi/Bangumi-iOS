@@ -21,7 +21,6 @@ struct PersonSubjectListView: View {
   func load() async {
     let stype = subjectType.rawValue
     let zero: UInt8 = 0
-    let fetcher = BackgroundFetcher(modelContext.container)
     let descriptor = FetchDescriptor<PersonRelatedSubject>(
       predicate: #Predicate<PersonRelatedSubject> {
         if stype == zero {
@@ -31,7 +30,7 @@ struct PersonSubjectListView: View {
         }
       }, sortBy: [SortDescriptor<PersonRelatedSubject>(\.subjectId, order: .reverse)])
     do {
-      subjects = try await fetcher.fetchData(descriptor)
+      subjects = try modelContext.fetch(descriptor)
     } catch {
       notifier.alert(error: error)
     }

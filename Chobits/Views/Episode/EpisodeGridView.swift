@@ -28,7 +28,6 @@ struct EpisodeGridView: View {
 
   func load() async {
     let mainType = EpisodeType.main.rawValue
-    let fetcher = BackgroundFetcher(modelContext.container)
     var mainDescriptor = FetchDescriptor<Episode>(
       predicate: #Predicate<Episode> {
         $0.type == mainType && $0.subjectId == subjectId
@@ -42,8 +41,8 @@ struct EpisodeGridView: View {
       }, sortBy: [SortDescriptor(\.sort)])
     spDescriptor.fetchLimit = 10
     do {
-      self.episodeMains = try await fetcher.fetchData(mainDescriptor)
-      self.episodeSps = try await fetcher.fetchData(spDescriptor)
+      self.episodeMains = try modelContext.fetch(mainDescriptor)
+      self.episodeSps = try modelContext.fetch(spDescriptor)
     } catch {
       notifier.alert(error: error)
     }
