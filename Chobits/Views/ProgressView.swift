@@ -111,83 +111,88 @@ struct ChiiProgressView: View {
   }
 
   var body: some View {
-    if chii.isAuthenticated {
-      if counts.isEmpty {
-        ProgressView().onAppear {
-          Task {
-            if loaded {
-              return
-            }
-            loaded = true
-            Logger.collection.info("initial loading progress")
-            await load()
-            await loadCounts()
-          }
-        }
-      } else {
-        VStack {
-          Picker("Subject Type", selection: $subjectType) {
-            ForEach(SubjectType.progressTypes()) { type in
-              Text("\(type.description)(\(counts[type, default: 0]))").tag(type)
-            }
-          }
-          .pickerStyle(.segmented)
-          .onChange(of: subjectType) {
-            Task {
-              await load()
-            }
-          }
-          .task {
-            if counts.allSatisfy({ $0.value == 0 }) {
-              await updateCollections(type: nil)
-              await loadCounts()
-              await load()
-            }
-          }
-          ScrollView {
-            LazyVStack(alignment: .leading, spacing: 10) {
-              ForEach(collections, id: \.inner.self) { item in
-                NavigationLink(value: NavDestination.subject(subjectId: item.inner.subjectId)) {
-                  ProgressRowView(subjectId: item.inner.subjectId)
+    NavigationStack {
+      VStack {
+        if chii.isAuthenticated {
+          if counts.isEmpty {
+            ProgressView().onAppear {
+              Task {
+                if loaded {
+                  return
                 }
-                .buttonStyle(.plain)
-                .onAppear {
-                  Task {
-                    await loadNextPage(idx: item.idx)
+                loaded = true
+                Logger.collection.info("initial loading progress")
+                await load()
+                await loadCounts()
+              }
+            }
+          } else {
+            VStack {
+              Picker("Subject Type", selection: $subjectType) {
+                ForEach(SubjectType.progressTypes()) { type in
+                  Text("\(type.description)(\(counts[type, default: 0]))").tag(type)
+                }
+              }
+              .pickerStyle(.segmented)
+              .onChange(of: subjectType) {
+                Task {
+                  await load()
+                }
+              }
+              .task {
+                if counts.allSatisfy({ $0.value == 0 }) {
+                  await updateCollections(type: nil)
+                  await loadCounts()
+                  await load()
+                }
+              }
+              ScrollView {
+                LazyVStack(alignment: .leading, spacing: 10) {
+                  ForEach(collections, id: \.inner.self) { item in
+                    NavigationLink(value: NavDestination.subject(subjectId: item.inner.subjectId)) {
+                      ProgressRowView(subjectId: item.inner.subjectId)
+                    }
+                    .buttonStyle(.plain)
+                    .onAppear {
+                      Task {
+                        await loadNextPage(idx: item.idx)
+                      }
+                    }
+                    Divider()
+                  }
+                  if exhausted {
+                    HStack {
+                      Spacer()
+                      Text("没有更多了")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                      Spacer()
+                    }
                   }
                 }
-                Divider()
               }
-              if exhausted {
-                HStack {
-                  Spacer()
-                  Text("没有更多了")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-                  Spacer()
+              .animation(.easeInOut, value: subjectType)
+              .refreshable {
+                Task(priority: .background) {
+                  if counts.isEmpty {
+                    // do not fresh when page loads
+                    return
+                  }
+                  await updateCollections(type: subjectType)
+                  await loadCounts()
+                  await load()
                 }
               }
             }
+            .animation(.default, value: counts)
+            .animation(.default, value: collections)
+            .padding(.horizontal, 8)
           }
-          .animation(.easeInOut, value: subjectType)
-          .refreshable {
-            Task(priority: .background) {
-              if counts.isEmpty {
-                // do not fresh when page loads
-                return
-              }
-              await updateCollections(type: subjectType)
-              await loadCounts()
-              await load()
-            }
-          }
+        } else {
+          AuthView(slogan: "使用 Bangumi 管理观看进度")
         }
-        .animation(.default, value: counts)
-        .animation(.default, value: collections)
-        .padding(.horizontal, 8)
       }
-    } else {
-      AuthView(slogan: "使用 Bangumi 管理观看进度")
+      .navigationDestination(for: NavDestination.self) { $0 }
     }
   }
 }

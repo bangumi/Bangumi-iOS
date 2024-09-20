@@ -14,11 +14,7 @@ struct ContentView: View {
   @Environment(ChiiClient.self) private var chii
 
   @State private var initialized = false
-  @State private var profile: Profile?
   @State private var selectedTab: ContentViewTab
-
-  @State private var searching = false
-  @State private var query = ""
 
   init() {
     let defaultTab = UserDefaults.standard.string(forKey: "defaultTab") ?? "discover"
@@ -33,7 +29,7 @@ struct ContentView: View {
       }
       tries += 1
       do {
-        profile = try await chii.getProfile()
+        _ = try await chii.getProfile()
         await chii.setAuthStatus(true)
         self.initialized = true
         return
@@ -59,62 +55,23 @@ struct ContentView: View {
         }
       }
     } else {
-      NavigationStack {
-        Section {
-          if searching {
-            SearchView(query: $query)
-          } else {
-            TabView(selection: $selectedTab) {
-              ChiiTimelineView()
-                .tag(ContentViewTab.timeline)
-                .tabItem {
-                  Image(systemName: "person")
-                }
-              ChiiProgressView()
-                .tag(ContentViewTab.progress)
-                .tabItem {
-                  Image(systemName: "square.grid.3x2.fill")
-                }
-              ChiiDiscoverView()
-                .tag(ContentViewTab.discover)
-                .tabItem {
-                  Image(systemName: "magnifyingglass")
-                }
-            }
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-              if chii.isAuthenticated, let me = profile {
-                ToolbarItem(placement: .topBarLeading) {
-                  ImageView(img: me.avatar.medium, width: 32, height: 32)
-                }
-                ToolbarItem(placement: .principal) {
-                  VStack {
-                    Text("\(me.nickname)")
-                      .font(.footnote)
-                      .lineLimit(1)
-                    Text(me.userGroup.description)
-                      .font(.caption)
-                      .foregroundStyle(.secondary)
-                      .overlay {
-                        RoundedRectangle(cornerRadius: 4)
-                          .stroke(.secondary, lineWidth: 1)
-                          .padding(.horizontal, -2)
-                          .padding(.vertical, -1)
-                      }
-                  }
-                }
-              }
-              ToolbarItem(placement: .topBarTrailing) {
-                NavigationLink(value: NavDestination.setting) {
-                  Image(systemName: "gearshape")
-                }
-              }
-            }
+      TabView(selection: $selectedTab) {
+        ChiiTimelineView()
+          .tag(ContentViewTab.timeline)
+          .tabItem {
+            Image(systemName: "person")
           }
-        }
-        .navigationDestination(for: NavDestination.self) { $0 }
+        ChiiProgressView()
+          .tag(ContentViewTab.progress)
+          .tabItem {
+            Image(systemName: "square.grid.3x2.fill")
+          }
+        ChiiDiscoverView()
+          .tag(ContentViewTab.discover)
+          .tabItem {
+            Image(systemName: "magnifyingglass")
+          }
       }
-      .searchable(text: $query, isPresented: $searching)
     }
   }
 }

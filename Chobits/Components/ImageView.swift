@@ -62,6 +62,12 @@ struct ImageView: View {
             .scaledToFit()
             .frame(width: width, height: height)
             .clipShape(RoundedRectangle(cornerRadius: 10))
+        case .avatar:
+          Image("noIconAvatar")
+            .resizable()
+            .scaledToFit()
+            .frame(width: width, height: height)
+            .clipShape(RoundedRectangle(cornerRadius: 10))
         default:
           Image(systemName: "photo")
             .frame(width: width, height: height)
