@@ -16,31 +16,17 @@ struct AuthView: View {
 
   var slogan: String
 
-  @State private var navPath: [NavDestination] = []
-
   var body: some View {
-
-    NavigationStack(path: $navPath) {
-      Section {
-        VStack {
-          Text(slogan)
-          Button {
-            signInView.signIn()
-          } label: {
-            Text("登录")
-          }
-          .buttonStyle(.borderedProminent)
+    Section {
+      VStack {
+        Text(slogan)
+        Button {
+          signInView.signIn()
+        } label: {
+          Text("登录")
         }
-        .toolbar {
-          ToolbarItem(placement: .topBarTrailing) {
-            Button {
-              navPath.append(.setting)
-            } label: {
-              Image(systemName: "gearshape")
-            }
-          }
-        }
-      }.navigationDestination(for: NavDestination.self) { $0 }
+        .buttonStyle(.borderedProminent)
+      }
     }
   }
 

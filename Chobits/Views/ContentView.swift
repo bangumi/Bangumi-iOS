@@ -14,32 +14,15 @@ struct ContentView: View {
   @Environment(ChiiClient.self) private var chii
 
   @State private var initialized = false
+  @State private var profile: Profile?
   @State private var selectedTab: ContentViewTab
-  @State private var navState = NavState()
+
+  @State private var searching = false
+  @State private var query = ""
 
   init() {
     let defaultTab = UserDefaults.standard.string(forKey: "defaultTab") ?? "discover"
     self.selectedTab = ContentViewTab(defaultTab)
-  }
-
-  private func createTabViewBinding() -> Binding<ContentViewTab> {
-    Binding<ContentViewTab>(
-      get: { self.selectedTab },
-      set: { selectedTab in
-        if selectedTab != self.selectedTab {
-          self.selectedTab = selectedTab
-          return
-        }
-        switch selectedTab {
-        case .timeline:
-          self.navState.timelineNavigation.removeAll()
-        case .progress:
-          self.navState.progressNavigation.removeAll()
-        case .discover:
-          self.navState.discoverNavigation.removeAll()
-        }
-      }
-    )
   }
 
   func refreshProfile() async {
@@ -50,7 +33,7 @@ struct ContentView: View {
       }
       tries += 1
       do {
-        _ = try await chii.getProfile()
+        profile = try await chii.getProfile()
         await chii.setAuthStatus(true)
         self.initialized = true
         return
@@ -76,31 +59,62 @@ struct ContentView: View {
         }
       }
     } else {
-      TabView(selection: createTabViewBinding()) {
-        ChiiTimelineView(navState: navState)
-          .tag(ContentViewTab.timeline)
-          .tabItem {
-            Image(systemName: "person")
+      NavigationStack {
+        Section {
+          if searching {
+            SearchView(query: $query)
+          } else {
+            TabView(selection: $selectedTab) {
+              ChiiTimelineView()
+                .tag(ContentViewTab.timeline)
+                .tabItem {
+                  Image(systemName: "person")
+                }
+              ChiiProgressView()
+                .tag(ContentViewTab.progress)
+                .tabItem {
+                  Image(systemName: "square.grid.3x2.fill")
+                }
+              ChiiDiscoverView()
+                .tag(ContentViewTab.discover)
+                .tabItem {
+                  Image(systemName: "magnifyingglass")
+                }
+            }
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+              if chii.isAuthenticated, let me = profile {
+                ToolbarItem(placement: .topBarLeading) {
+                  ImageView(img: me.avatar.medium, width: 32, height: 32)
+                }
+                ToolbarItem(placement: .principal) {
+                  VStack {
+                    Text("\(me.nickname)")
+                      .font(.footnote)
+                      .lineLimit(1)
+                    Text(me.userGroup.description)
+                      .font(.caption)
+                      .foregroundStyle(.secondary)
+                      .overlay {
+                        RoundedRectangle(cornerRadius: 4)
+                          .stroke(.secondary, lineWidth: 1)
+                          .padding(.horizontal, -2)
+                          .padding(.vertical, -1)
+                      }
+                  }
+                }
+              }
+              ToolbarItem(placement: .topBarTrailing) {
+                NavigationLink(value: NavDestination.setting) {
+                  Image(systemName: "gearshape")
+                }
+              }
+            }
           }
-        ChiiProgressView(navState: navState)
-          .tag(ContentViewTab.progress)
-          .tabItem {
-            Image(systemName: "square.grid.3x2.fill")
-          }
-        ChiiDiscoverView(navState: navState)
-          .tag(ContentViewTab.discover)
-          .tabItem {
-            Image(systemName: "magnifyingglass")
-          }
+        }
+        .navigationDestination(for: NavDestination.self) { $0 }
       }
-      .environment(navState)
+      .searchable(text: $query, isPresented: $searching)
     }
   }
-}
-
-@Observable
-class NavState {
-  var timelineNavigation: [NavDestination] = []
-  var progressNavigation: [NavDestination] = []
-  var discoverNavigation: [NavDestination] = []
 }
