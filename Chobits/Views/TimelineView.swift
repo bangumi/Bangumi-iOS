@@ -40,24 +40,30 @@ struct ChiiTimelineView: View {
       .navigationDestination(for: NavDestination.self) { $0 }
       .navigationBarTitleDisplayMode(.inline)
       .toolbar {
-        if chii.isAuthenticated, let me = profile {
-          ToolbarItem(placement: .topBarLeading) {
-            ImageView(img: me.avatar.medium, width: 32, height: 32)
-          }
-          ToolbarItem(placement: .principal) {
-            VStack {
-              Text("\(me.nickname)")
-                .font(.footnote)
-                .lineLimit(1)
-              Text(me.userGroup.description)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .overlay {
-                  RoundedRectangle(cornerRadius: 4)
-                    .stroke(.secondary, lineWidth: 1)
-                    .padding(.horizontal, -2)
-                    .padding(.vertical, -1)
-                }
+        if chii.isAuthenticated {
+          if let me = profile {
+            ToolbarItem(placement: .topBarLeading) {
+              ImageView(img: me.avatar.medium, width: 32, height: 32)
+            }
+            ToolbarItem(placement: .principal) {
+              VStack {
+                Text("\(me.nickname)")
+                  .font(.footnote)
+                  .lineLimit(1)
+                Text(me.userGroup.description)
+                  .font(.caption)
+                  .foregroundStyle(.secondary)
+                  .overlay {
+                    RoundedRectangle(cornerRadius: 4)
+                      .stroke(.secondary, lineWidth: 1)
+                      .padding(.horizontal, -2)
+                      .padding(.vertical, -1)
+                  }
+              }
+            }
+          } else {
+            ToolbarItem(placement: .topBarLeading) {
+              ProgressView().onAppear(perform: updateProfile)
             }
           }
         } else {
