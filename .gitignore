@@ -4,3 +4,5 @@
 *.xcuserdatad/
 xcshareddata/
 .vscode/
+
+/apollo-ios-cli
