@@ -1,13 +1,13 @@
 {
-  "originHash" : "e505828dce098a2df2410ffd482e4e69ff303234c8bf23d037bdbd33454d92e3",
+  "originHash" : "37954c7b3fa5f1654edf8905fe9a77c3fb96c9cfe34fc91b2005925fee081db9",
   "pins" : [
     {
-      "identity" : "cachedasyncimage",
+      "identity" : "apollo-ios",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/bullinnyc/CachedAsyncImage",
+      "location" : "https://github.com/apollographql/apollo-ios.git",
       "state" : {
-        "revision" : "cb253e111528c082381af54b67dab7a15eefde16",
-        "version" : "2.6.0"
+        "revision" : "e70850751f6b21acd1c7871dbcd2cee5d6103c7e",
+        "version" : "1.15.1"
       }
     },
     {
@@ -26,6 +26,15 @@
       "state" : {
         "revision" : "5b92f029fab2cce44386d28588098b5be0824ef5",
         "version" : "7.11.0"
+      }
+    },
+    {
+      "identity" : "sqlite.swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/stephencelis/SQLite.swift.git",
+      "state" : {
+        "revision" : "a95fc6df17d108bd99210db5e8a9bac90fe984b8",
+        "version" : "0.15.3"
       }
     }
   ],

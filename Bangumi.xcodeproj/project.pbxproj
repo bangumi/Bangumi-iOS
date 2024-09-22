@@ -94,6 +94,7 @@
 		19C2CE652BE2ACE60080A056 /* profile.json in Resources */ = {isa = PBXBuildFile; fileRef = 19C2CE642BE2ACE60080A056 /* profile.json */; };
 		19C2CE672BE3211B0080A056 /* search_subject_anime.json in Resources */ = {isa = PBXBuildFile; fileRef = 19C2CE662BE3211B0080A056 /* search_subject_anime.json */; };
 		19C2CE692BE330F60080A056 /* SubjectCollectionBoxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19C2CE682BE330F60080A056 /* SubjectCollectionBoxView.swift */; };
+		19C2DD832C9FD7AC00CBEFDE /* Apollo in Frameworks */ = {isa = PBXBuildFile; productRef = 19C2DD822C9FD7AC00CBEFDE /* Apollo */; };
 		19E0E5022BF24D6300066EB7 /* PersonCharacterListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19E0E5012BF24D6300066EB7 /* PersonCharacterListView.swift */; };
 		19E0E5042BF24E0F00066EB7 /* PersonSubjectListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19E0E5032BF24E0F00066EB7 /* PersonSubjectListView.swift */; };
 		19E0E5072BF34F0E00066EB7 /* CollectionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19E0E5062BF34F0E00066EB7 /* CollectionsView.swift */; };
@@ -201,6 +202,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				19BD24262BE9C53800595973 /* Kingfisher in Frameworks */,
+				19C2DD832C9FD7AC00CBEFDE /* Apollo in Frameworks */,
 				19671C732BDEB8B1000B4D99 /* KeychainSwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -445,6 +447,7 @@
 			packageProductDependencies = (
 				19671C722BDEB8B1000B4D99 /* KeychainSwift */,
 				19BD24252BE9C53800595973 /* Kingfisher */,
+				19C2DD822C9FD7AC00CBEFDE /* Apollo */,
 			);
 			productName = Chobits;
 			productReference = 19BB342B2BD239AB00E5C295 /* Chobits.app */;
@@ -475,9 +478,9 @@
 			);
 			mainGroup = 19BB34222BD239AB00E5C295;
 			packageReferences = (
-				191FEF1C2BDBE3FA0047162A /* XCRemoteSwiftPackageReference "CachedAsyncImage" */,
 				191FEF252BDCF59B0047162A /* XCRemoteSwiftPackageReference "keychain-swift" */,
 				19BD24242BE9C53800595973 /* XCRemoteSwiftPackageReference "Kingfisher" */,
+				19C2DD812C9FD7AB00CBEFDE /* XCRemoteSwiftPackageReference "apollo-ios" */,
 			);
 			productRefGroup = 19BB342C2BD239AB00E5C295 /* Products */;
 			projectDirPath = "";
@@ -811,14 +814,6 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		191FEF1C2BDBE3FA0047162A /* XCRemoteSwiftPackageReference "CachedAsyncImage" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/bullinnyc/CachedAsyncImage";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 2.6.0;
-			};
-		};
 		191FEF252BDCF59B0047162A /* XCRemoteSwiftPackageReference "keychain-swift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/evgenyneu/keychain-swift.git";
@@ -835,6 +830,14 @@
 				minimumVersion = 7.11.0;
 			};
 		};
+		19C2DD812C9FD7AB00CBEFDE /* XCRemoteSwiftPackageReference "apollo-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apollographql/apollo-ios.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.15.1;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -847,6 +850,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 19BD24242BE9C53800595973 /* XCRemoteSwiftPackageReference "Kingfisher" */;
 			productName = Kingfisher;
+		};
+		19C2DD822C9FD7AC00CBEFDE /* Apollo */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 19C2DD812C9FD7AB00CBEFDE /* XCRemoteSwiftPackageReference "apollo-ios" */;
+			productName = Apollo;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
