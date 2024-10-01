@@ -7,8 +7,21 @@
 
 import Foundation
 import OSLog
+import SwiftUI
 
 extension ChiiClient {
+  func buildOAuthURL() -> URL {
+    @AppStorage("authDomain") var authDomain: String = AuthDomain.origin.label
+
+    let baseURL = URL(string: "https://\(authDomain)/oauth/authorize")!
+    let queries = [
+      URLQueryItem(name: "client_id", value: self.appInfo.clientId),
+      URLQueryItem(name: "response_type", value: "code"),
+      URLQueryItem(name: "redirect_uri", value: self.appInfo.callbackURL),
+    ]
+    return baseURL.appending(queryItems: queries)
+  }
+
   func logout() async {
     Logger.app.info("start logout")
     await self.setAuthStatus(false)
@@ -41,7 +54,9 @@ extension ChiiClient {
   }
 
   func exchangeForAccessToken(code: String) async throws {
-    let url = URL(string: "https://bgm.tv/oauth/access_token")!
+    @AppStorage("authDomain") var authDomain: String = AuthDomain.origin.label
+
+    let url = URL(string: "https://\(authDomain)/oauth/access_token")!
     let body = [
       "grant_type": "authorization_code",
       "client_id": self.appInfo.clientId,
@@ -55,7 +70,9 @@ extension ChiiClient {
   }
 
   func refreshAccessToken(auth: Auth) async throws -> Auth {
-    let url = URL(string: "https://bgm.tv/oauth/access_token")!
+    @AppStorage("authDomain") var authDomain: String = AuthDomain.origin.label
+
+    let url = URL(string: "https://\(authDomain)/oauth/access_token")!
     let body = [
       "grant_type": "refresh_token",
       "client_id": self.appInfo.clientId,

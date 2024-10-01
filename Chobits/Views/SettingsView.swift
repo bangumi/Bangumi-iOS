@@ -11,6 +11,7 @@ import SwiftUI
 struct SettingsView: View {
   @AppStorage("appearance") var appearance: String = AppearanceType.system.label
   @AppStorage("shareDomain") var shareDomain: String = ShareDomain.chii.label
+  @AppStorage("authDomain") var authDomain: String = AuthDomain.origin.label
   @AppStorage("defaultTab") var defaultTab: String = ContentViewTab.discover.label
   @AppStorage("isolationMode") var isolationMode: Bool = false
 
@@ -18,13 +19,15 @@ struct SettingsView: View {
   @Environment(ChiiClient.self) private var chii
   @Environment(\.modelContext) var modelContext
 
-  @State private var selectedDomain: ShareDomain = .chii
+  @State private var selectedShareDomain: ShareDomain = .chii
+  @State private var selectedAuthDomain: AuthDomain = .origin
   @State private var selectedAppearance: AppearanceType = .system
   @State private var selectedDefaultTab: ContentViewTab = .discover
   @State private var isolationModeEnabled: Bool = false
 
   func load() {
-    selectedDomain = ShareDomain(shareDomain)
+    selectedShareDomain = ShareDomain(shareDomain)
+    selectedAuthDomain = AuthDomain(authDomain)
     selectedAppearance = AppearanceType(appearance)
     selectedDefaultTab = ContentViewTab(defaultTab)
     isolationModeEnabled = isolationMode
@@ -54,14 +57,22 @@ struct SettingsView: View {
 
   var body: some View {
     Form {
-      Section(header: Text("分享设置")) {
-        Picker(selection: $selectedDomain, label: Text("默认域名")) {
+      Section(header: Text("域名设置")) {
+        Picker(selection: $selectedShareDomain, label: Text("分享域名")) {
           ForEach(ShareDomain.allCases, id: \.self) { domain in
             Text(domain.label).tag(domain)
           }
         }
-        .onChange(of: selectedDomain) { _, _ in
-          shareDomain = selectedDomain.label
+        .onChange(of: selectedShareDomain) { _, _ in
+          shareDomain = selectedShareDomain.label
+        }
+        Picker(selection: $selectedAuthDomain, label: Text("认证域名")) {
+          ForEach(AuthDomain.allCases, id: \.self) { domain in
+            Text(domain.label).tag(domain)
+          }
+        }
+        .onChange(of: selectedAuthDomain) { _, _ in
+          authDomain = selectedAuthDomain.label
         }
       }
 

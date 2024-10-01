@@ -98,6 +98,35 @@ enum ShareDomain: Codable, CaseIterable, Identifiable {
   }
 }
 
+enum AuthDomain: Codable, CaseIterable, Identifiable {
+  case origin
+  case next
+
+  init(_ label: String) {
+    switch label {
+    case "bgm.tv":
+      self = .origin
+    case "next.bgm.tv":
+      self = .next
+    default:
+      self = .origin
+    }
+  }
+
+  var id: Self {
+    return self
+  }
+
+  var label: String {
+    switch self {
+    case .origin:
+      "bgm.tv"
+    case .next:
+      "next.bgm.tv"
+    }
+  }
+}
+
 enum ContentViewTab: Codable, CaseIterable, Identifiable {
   case timeline
   case progress

@@ -68,7 +68,7 @@ class SignInViewModel: NSObject, ASWebAuthenticationPresentationContextProviding
   }
 
   func signIn() {
-    let authURL = chii.oauthURL
+    let authURL = chii.buildOAuthURL()
     let session = ASWebAuthenticationSession(url: authURL, callbackURLScheme: "bangumi") {
       callback, error in
       self.handleAuthCallback(callback: callback, error: error)

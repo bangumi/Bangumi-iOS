@@ -17,6 +17,7 @@ class ChiiClient {
   let appInfo: AppInfo
 
   let apiBase = URL(string: "https://api.bgm.tv")!
+
   let userAgent = "everpcpc/Chobits/0.0.1 (iOS)"
 
   var auth: Auth?
@@ -28,16 +29,6 @@ class ChiiClient {
   var mock: SubjectType?
 
   var isAuthenticated: Bool = false
-
-  var oauthURL: URL {
-    let baseURL = URL(string: "https://bgm.tv/oauth/authorize")!
-    let queries = [
-      URLQueryItem(name: "client_id", value: self.appInfo.clientId),
-      URLQueryItem(name: "response_type", value: "code"),
-      URLQueryItem(name: "redirect_uri", value: self.appInfo.callbackURL),
-    ]
-    return baseURL.appending(queryItems: queries)
-  }
 
   init(container: ModelContainer, mock: SubjectType? = nil) {
     Logger.app.info("new init chii client")
