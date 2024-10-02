@@ -7,6 +7,8 @@
 
 import Foundation
 import OSLog
+import BangumiPublicSwiftClient
+import BangumiPrivateSwiftClient
 
 extension ChiiClient {
 

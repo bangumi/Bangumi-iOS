@@ -76,6 +76,8 @@
 		197A19E42BE699CF00804B13 /* EpisodeListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 197A19E32BE699CF00804B13 /* EpisodeListView.swift */; };
 		1980EE002BE418C800E013EA /* episodes.json in Resources */ = {isa = PBXBuildFile; fileRef = 1980EDFF2BE418C800E013EA /* episodes.json */; };
 		1980EE022BE419D500E013EA /* episode_collections.json in Resources */ = {isa = PBXBuildFile; fileRef = 1980EE012BE419D500E013EA /* episode_collections.json */; };
+		1998DCC12CAD7BFC00115E1F /* BangumiPublicSwiftClient in Frameworks */ = {isa = PBXBuildFile; productRef = 1998DCC02CAD7BFC00115E1F /* BangumiPublicSwiftClient */; };
+		1998DCC42CAD888C00115E1F /* BangumiPrivateSwiftClient in Frameworks */ = {isa = PBXBuildFile; productRef = 1998DCC32CAD888C00115E1F /* BangumiPrivateSwiftClient */; };
 		19AA1FCB2C100A1200FA4E18 /* subjects.json in Resources */ = {isa = PBXBuildFile; fileRef = 19AA1FCA2C100A1200FA4E18 /* subjects.json */; };
 		19AA1FCD2C100D3100FA4E18 /* Request.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19AA1FCC2C100D3100FA4E18 /* Request.swift */; };
 		19AB93CB2BE4F0F4007531A4 /* BackgroundActor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19AB93CA2BE4F0F4007531A4 /* BackgroundActor.swift */; };
@@ -203,6 +205,8 @@
 			files = (
 				19BD24262BE9C53800595973 /* Kingfisher in Frameworks */,
 				19C2DD832C9FD7AC00CBEFDE /* Apollo in Frameworks */,
+				1998DCC12CAD7BFC00115E1F /* BangumiPublicSwiftClient in Frameworks */,
+				1998DCC42CAD888C00115E1F /* BangumiPrivateSwiftClient in Frameworks */,
 				19671C732BDEB8B1000B4D99 /* KeychainSwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -358,6 +362,13 @@
 			path = Episode;
 			sourceTree = "<group>";
 		};
+		1998DCBF2CAD7BFC00115E1F /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		19B9002C2BED158700405F0F /* Person */ = {
 			isa = PBXGroup;
 			children = (
@@ -405,6 +416,7 @@
 			isa = PBXGroup;
 			children = (
 				19671C522BDEB55D000B4D99 /* Chobits */,
+				1998DCBF2CAD7BFC00115E1F /* Frameworks */,
 				19BB342C2BD239AB00E5C295 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -448,6 +460,8 @@
 				19671C722BDEB8B1000B4D99 /* KeychainSwift */,
 				19BD24252BE9C53800595973 /* Kingfisher */,
 				19C2DD822C9FD7AC00CBEFDE /* Apollo */,
+				1998DCC02CAD7BFC00115E1F /* BangumiPublicSwiftClient */,
+				1998DCC32CAD888C00115E1F /* BangumiPrivateSwiftClient */,
 			);
 			productName = Chobits;
 			productReference = 19BB342B2BD239AB00E5C295 /* Chobits.app */;
@@ -481,6 +495,8 @@
 				191FEF252BDCF59B0047162A /* XCRemoteSwiftPackageReference "keychain-swift" */,
 				19BD24242BE9C53800595973 /* XCRemoteSwiftPackageReference "Kingfisher" */,
 				19C2DD812C9FD7AB00CBEFDE /* XCRemoteSwiftPackageReference "apollo-ios" */,
+				1998DCBE2CAD793800115E1F /* XCRemoteSwiftPackageReference "bangumi-public-swift-client" */,
+				1998DCC22CAD884000115E1F /* XCRemoteSwiftPackageReference "bangumi-private-swift-client" */,
 			);
 			productRefGroup = 19BB342C2BD239AB00E5C295 /* Products */;
 			projectDirPath = "";
@@ -822,6 +838,22 @@
 				minimumVersion = 24.0.0;
 			};
 		};
+		1998DCBE2CAD793800115E1F /* XCRemoteSwiftPackageReference "bangumi-public-swift-client" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/everpcpc/bangumi-public-swift-client";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
+		1998DCC22CAD884000115E1F /* XCRemoteSwiftPackageReference "bangumi-private-swift-client" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/everpcpc/bangumi-private-swift-client";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
 		19BD24242BE9C53800595973 /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/onevcat/Kingfisher.git";
@@ -845,6 +877,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 191FEF252BDCF59B0047162A /* XCRemoteSwiftPackageReference "keychain-swift" */;
 			productName = KeychainSwift;
+		};
+		1998DCC02CAD7BFC00115E1F /* BangumiPublicSwiftClient */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1998DCBE2CAD793800115E1F /* XCRemoteSwiftPackageReference "bangumi-public-swift-client" */;
+			productName = BangumiPublicSwiftClient;
+		};
+		1998DCC32CAD888C00115E1F /* BangumiPrivateSwiftClient */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1998DCC22CAD884000115E1F /* XCRemoteSwiftPackageReference "bangumi-private-swift-client" */;
+			productName = BangumiPrivateSwiftClient;
 		};
 		19BD24252BE9C53800595973 /* Kingfisher */ = {
 			isa = XCSwiftPackageProductDependency;
