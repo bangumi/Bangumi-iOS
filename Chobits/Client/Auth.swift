@@ -10,10 +10,14 @@ import OSLog
 import SwiftUI
 
 extension ChiiClient {
-  func buildOAuthURL() -> URL {
+  func getOAuthBase() -> String {
     @AppStorage("authDomain") var authDomain: String = AuthDomain.origin.label
+    return "https://\(authDomain)/oauth"
+  }
 
-    let baseURL = URL(string: "https://\(authDomain)/oauth/authorize")!
+  func buildOAuthURL() -> URL {
+    let oauthBase = self.getOAuthBase()
+    let baseURL = URL(string: "\(oauthBase)/authorize")!
     let queries = [
       URLQueryItem(name: "client_id", value: self.appInfo.clientId),
       URLQueryItem(name: "response_type", value: "code"),
@@ -54,9 +58,8 @@ extension ChiiClient {
   }
 
   func exchangeForAccessToken(code: String) async throws {
-    @AppStorage("authDomain") var authDomain: String = AuthDomain.origin.label
-
-    let url = URL(string: "https://\(authDomain)/oauth/access_token")!
+    let oauthBase = self.getOAuthBase()
+    let url = URL(string: "\(oauthBase)/access_token")!
     let body = [
       "grant_type": "authorization_code",
       "client_id": self.appInfo.clientId,
@@ -70,9 +73,8 @@ extension ChiiClient {
   }
 
   func refreshAccessToken(auth: Auth) async throws -> Auth {
-    @AppStorage("authDomain") var authDomain: String = AuthDomain.origin.label
-
-    let url = URL(string: "https://\(authDomain)/oauth/access_token")!
+    let oauthBase = self.getOAuthBase()
+    let url = URL(string: "\(oauthBase)/access_token")!
     let body = [
       "grant_type": "refresh_token",
       "client_id": self.appInfo.clientId,
