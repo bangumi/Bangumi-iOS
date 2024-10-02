@@ -17,7 +17,7 @@ extension ChiiClient {
     Logger.api.info(
       "start update subject collection: \(sid), eps: \(eps.debugDescription), vols: \(vols.debugDescription)"
     )
-    let url = self.apiBase.appendingPathComponent("v0/users/-/collections/\(sid)")
+    let url = self.endpointPublic.appendingPathComponent("v0/users/-/collections/\(sid)")
     var body: [String: Any] = [:]
     if let epStatus = eps {
       body["ep_status"] = epStatus
@@ -45,7 +45,7 @@ extension ChiiClient {
       return
     }
     Logger.api.info("start update subject collection: \(sid)")
-    let url = self.apiBase.appendingPathComponent("v0/users/-/collections/\(sid)")
+    let url = self.endpointPublic.appendingPathComponent("v0/users/-/collections/\(sid)")
     var body: [String: Any] = [:]
     if let type = type {
       body["type"] = type.rawValue
@@ -86,7 +86,7 @@ extension ChiiClient {
     }
     let episodes = try await db.fetchData(predicate: predicate)
     let episodeIds = episodes.map { $0.episodeId }
-    let url = self.apiBase
+    let url = self.endpointPublic
       .appendingPathComponent("v0/users/-/collections/\(subjectId)/episodes")
     let body: [String: Any] = [
       "episode_id": episodeIds,
@@ -120,7 +120,7 @@ extension ChiiClient {
       return
     }
     Logger.api.info("start update episode collection: \(episodeId)")
-    let url = self.apiBase.appendingPathComponent("v0/users/-/collections/-/episodes/\(episodeId)")
+    let url = self.endpointPublic.appendingPathComponent("v0/users/-/collections/-/episodes/\(episodeId)")
     let body: [String: Any] = [
       "type": type.rawValue
     ]

@@ -16,7 +16,8 @@ class ChiiClient {
   let keychain: KeychainSwift
   let appInfo: AppInfo
 
-  let apiBase = URL(string: "https://api.bgm.tv")!
+  let endpointPublic = URL(string: "https://api.bgm.tv")!
+  let endpointPrivate = URL(string: "https://next.bgm.tv")!
 
   let userAgent = "everpcpc/Chobits/0.0.1 (iOS)"
 
