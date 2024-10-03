@@ -45,7 +45,7 @@ struct ChiiTimelineView: View {
             ToolbarItem(placement: .topBarLeading) {
               HStack {
                 ImageView(img: me.avatar.medium, width: 32, height: 32)
-                VStack {
+                VStack(alignment: .leading) {
                   Text("\(me.nickname)")
                     .font(.footnote)
                     .lineLimit(1)
