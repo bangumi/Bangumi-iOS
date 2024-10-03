@@ -5,11 +5,15 @@
 //  Created by Chuan Chuan on 2024/4/21.
 //
 
-import Foundation
-import KeychainSwift
 import OSLog
 import SwiftData
 import SwiftUI
+import Foundation
+
+import KeychainSwift
+import OpenAPIRuntime
+import OpenAPIURLSession
+import BangumiPrivateSwiftClient
 
 @globalActor
 actor Chii {
@@ -130,54 +134,66 @@ extension Chii {
 
   func getSession(authroized: Bool) async throws -> URLSession {
     if !authroized {
-      return await self.getAnoymousSession()
+      return try await self.getAnoymousSession()
     } else {
       return try await self.getAuthorizedSession()
     }
   }
 
-  func getAnoymousSession() async -> URLSession {
-    let sessionConfig = URLSessionConfiguration.default
-    sessionConfig.timeoutIntervalForRequest = 10
-    sessionConfig.timeoutIntervalForResource = 20
-    sessionConfig.httpAdditionalHeaders = [
-      "User-Agent": self.userAgent
-    ]
-    let session = URLSession(configuration: sessionConfig)
+  func getAnoymousSession() async throws -> URLSession {
+    if let session = self.anonymousSession {
+      return session
+    }
+    let config = try await self.buildSessionConfig(authorized: false)
+    let session = URLSession(configuration: config)
     self.anonymousSession = session
     return session
   }
 
   func getAuthorizedSession() async throws -> URLSession {
+    if let auth = self.auth, !auth.isExpired(), let session = self.authorizedSession {
+      return session
+    }
+    let config = try await self.buildSessionConfig(authorized: true)
+    let session = URLSession(configuration: config)
+    self.authorizedSession = session
+    return session
+  }
+
+  func buildSessionConfig(authorized: Bool) async throws -> URLSessionConfiguration {
     let sessionConfig = URLSessionConfiguration.default
     sessionConfig.timeoutIntervalForRequest = 10
     sessionConfig.timeoutIntervalForResource = 20
     var headers: [AnyHashable: Any] = [:]
     headers["User-Agent"] = self.userAgent
+    if authorized {
+      let token = try await self.getAccessToken()
+      headers["Authorization"] = "Bearer \(token)"
+    }
+    sessionConfig.httpAdditionalHeaders = headers
+    return sessionConfig
+  }
+
+  func getAccessToken() async throws -> String {
     if let auth = self.auth {
       if auth.isExpired() {
         let auth = try await self.refreshAccessToken(auth: auth)
-        headers["Authorization"] = "Bearer \(auth.accessToken)"
+        return auth.accessToken
       } else {
-        if let session = self.authorizedSession {
-          return session
-        } else {
-          headers["Authorization"] = "Bearer \(auth.accessToken)"
-        }
+        return auth.accessToken
       }
     } else {
       if let auth = try await self.getAuthFromKeychain() {
         if auth.isExpired() {
           let auth = try await self.refreshAccessToken(auth: auth)
-          headers["Authorization"] = "Bearer \(auth.accessToken)"
+          return auth.accessToken
         } else {
-          headers["Authorization"] = "Bearer \(auth.accessToken)"
+          return auth.accessToken
         }
       } else {
         throw ChiiError.requireLogin
       }
     }
-    sessionConfig.httpAdditionalHeaders = headers
-    return URLSession(configuration: sessionConfig)
   }
+
 }

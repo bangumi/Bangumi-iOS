@@ -1,22 +1,13 @@
 {
-  "originHash" : "87ab95a1d24220f3634c59d446b8c138cf61c1c9b0bd246b51b3296b368d34cc",
+  "originHash" : "eeb6400c41509cef71641d71d555d5080c5d44e6adb192a771ac70e33108f9aa",
   "pins" : [
-    {
-      "identity" : "apollo-ios",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apollographql/apollo-ios.git",
-      "state" : {
-        "revision" : "e70850751f6b21acd1c7871dbcd2cee5d6103c7e",
-        "version" : "1.15.1"
-      }
-    },
     {
       "identity" : "bangumi-private-swift-client",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/everpcpc/bangumi-private-swift-client",
       "state" : {
-        "revision" : "19f90cc2940f19b32b12bfb602090305311c6cea",
-        "version" : "1.0.3"
+        "revision" : "b23fc223c06f771ee1c8946653de700b377f24dd",
+        "version" : "1.0.6"
       }
     },
     {
@@ -24,8 +15,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/everpcpc/bangumi-public-swift-client",
       "state" : {
-        "revision" : "67fb1425a7b942c82ab880ccf286a31fa0d7d202",
-        "version" : "1.0.8"
+        "revision" : "e638b320282013aa273bbf356053acb9decd7859",
+        "version" : "1.0.11"
       }
     },
     {
@@ -51,17 +42,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/mattpolzin/OpenAPIKit",
       "state" : {
-        "revision" : "4991b7e39a19cd1d0d11fe24fc64a601b4820144",
-        "version" : "3.2.0"
-      }
-    },
-    {
-      "identity" : "sqlite.swift",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/stephencelis/SQLite.swift.git",
-      "state" : {
-        "revision" : "a95fc6df17d108bd99210db5e8a9bac90fe984b8",
-        "version" : "0.15.3"
+        "revision" : "03840ad621eda50cb6ed95ebab3f0dd7f82e9e88",
+        "version" : "3.2.1"
       }
     },
     {

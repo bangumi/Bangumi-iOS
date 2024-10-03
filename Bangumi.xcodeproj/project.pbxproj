@@ -80,6 +80,9 @@
 		1998DCC42CAD888C00115E1F /* BangumiPrivateSwiftClient in Frameworks */ = {isa = PBXBuildFile; productRef = 1998DCC32CAD888C00115E1F /* BangumiPrivateSwiftClient */; };
 		1998DCC72CAD8B7C00115E1F /* OpenAPIURLSession in Frameworks */ = {isa = PBXBuildFile; productRef = 1998DCC62CAD8B7C00115E1F /* OpenAPIURLSession */; };
 		1998DCD12CAEFE0000115E1F /* NotificationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1998DCD02CAEFDFB00115E1F /* NotificationView.swift */; };
+		1998DCD92CAF132000115E1F /* OpenAPIRuntime in Frameworks */ = {isa = PBXBuildFile; productRef = 1998DCD82CAF132000115E1F /* OpenAPIRuntime */; };
+		1998DCDB2CAF1E9700115E1F /* Public.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1998DCDA2CAF1E9400115E1F /* Public.swift */; };
+		1998DCDD2CAF25D800115E1F /* Private.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1998DCDC2CAF25D500115E1F /* Private.swift */; };
 		19AA1FCB2C100A1200FA4E18 /* subjects.json in Resources */ = {isa = PBXBuildFile; fileRef = 19AA1FCA2C100A1200FA4E18 /* subjects.json */; };
 		19AA1FCD2C100D3100FA4E18 /* Request.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19AA1FCC2C100D3100FA4E18 /* Request.swift */; };
 		19B9002E2BED15B600405F0F /* PersonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19B9002D2BED15B600405F0F /* PersonView.swift */; };
@@ -97,7 +100,6 @@
 		19C2CE652BE2ACE60080A056 /* profile.json in Resources */ = {isa = PBXBuildFile; fileRef = 19C2CE642BE2ACE60080A056 /* profile.json */; };
 		19C2CE672BE3211B0080A056 /* search_subject_anime.json in Resources */ = {isa = PBXBuildFile; fileRef = 19C2CE662BE3211B0080A056 /* search_subject_anime.json */; };
 		19C2CE692BE330F60080A056 /* SubjectCollectionBoxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19C2CE682BE330F60080A056 /* SubjectCollectionBoxView.swift */; };
-		19C2DD832C9FD7AC00CBEFDE /* Apollo in Frameworks */ = {isa = PBXBuildFile; productRef = 19C2DD822C9FD7AC00CBEFDE /* Apollo */; };
 		19E0E5022BF24D6300066EB7 /* PersonCharacterListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19E0E5012BF24D6300066EB7 /* PersonCharacterListView.swift */; };
 		19E0E5042BF24E0F00066EB7 /* PersonSubjectListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19E0E5032BF24E0F00066EB7 /* PersonSubjectListView.swift */; };
 		19E0E5072BF34F0E00066EB7 /* CollectionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19E0E5062BF34F0E00066EB7 /* CollectionsView.swift */; };
@@ -176,6 +178,8 @@
 		1980EDFF2BE418C800E013EA /* episodes.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = episodes.json; sourceTree = "<group>"; };
 		1980EE012BE419D500E013EA /* episode_collections.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = episode_collections.json; sourceTree = "<group>"; };
 		1998DCD02CAEFDFB00115E1F /* NotificationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationView.swift; sourceTree = "<group>"; };
+		1998DCDA2CAF1E9400115E1F /* Public.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Public.swift; sourceTree = "<group>"; };
+		1998DCDC2CAF25D500115E1F /* Private.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Private.swift; sourceTree = "<group>"; };
 		19AA1FCA2C100A1200FA4E18 /* subjects.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = subjects.json; sourceTree = "<group>"; };
 		19AA1FCC2C100D3100FA4E18 /* Request.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Request.swift; sourceTree = "<group>"; };
 		19B9002D2BED15B600405F0F /* PersonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonView.swift; sourceTree = "<group>"; };
@@ -209,7 +213,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				19BD24262BE9C53800595973 /* Kingfisher in Frameworks */,
-				19C2DD832C9FD7AC00CBEFDE /* Apollo in Frameworks */,
+				1998DCD92CAF132000115E1F /* OpenAPIRuntime in Frameworks */,
 				1998DCC12CAD7BFC00115E1F /* BangumiPublicSwiftClient in Frameworks */,
 				1998DCC42CAD888C00115E1F /* BangumiPrivateSwiftClient in Frameworks */,
 				1998DCC72CAD8B7C00115E1F /* OpenAPIURLSession in Frameworks */,
@@ -347,6 +351,8 @@
 		197A19D22BE671DA00804B13 /* Client */ = {
 			isa = PBXGroup;
 			children = (
+				1998DCDC2CAF25D500115E1F /* Private.swift */,
+				1998DCDA2CAF1E9400115E1F /* Public.swift */,
 				19671C3D2BDEB55D000B4D99 /* Basis.swift */,
 				19671C3E2BDEB55D000B4D99 /* Dto.swift */,
 				19AA1FCC2C100D3100FA4E18 /* Request.swift */,
@@ -368,13 +374,6 @@
 				197A19E32BE699CF00804B13 /* EpisodeListView.swift */,
 			);
 			path = Episode;
-			sourceTree = "<group>";
-		};
-		1998DCBF2CAD7BFC00115E1F /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		19B9002C2BED158700405F0F /* Person */ = {
@@ -423,7 +422,6 @@
 			isa = PBXGroup;
 			children = (
 				19671C522BDEB55D000B4D99 /* Chobits */,
-				1998DCBF2CAD7BFC00115E1F /* Frameworks */,
 				19BB342C2BD239AB00E5C295 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -469,10 +467,10 @@
 			packageProductDependencies = (
 				19671C722BDEB8B1000B4D99 /* KeychainSwift */,
 				19BD24252BE9C53800595973 /* Kingfisher */,
-				19C2DD822C9FD7AC00CBEFDE /* Apollo */,
 				1998DCC02CAD7BFC00115E1F /* BangumiPublicSwiftClient */,
 				1998DCC32CAD888C00115E1F /* BangumiPrivateSwiftClient */,
 				1998DCC62CAD8B7C00115E1F /* OpenAPIURLSession */,
+				1998DCD82CAF132000115E1F /* OpenAPIRuntime */,
 			);
 			productName = Chobits;
 			productReference = 19BB342B2BD239AB00E5C295 /* Chobits.app */;
@@ -505,10 +503,10 @@
 			packageReferences = (
 				191FEF252BDCF59B0047162A /* XCRemoteSwiftPackageReference "keychain-swift" */,
 				19BD24242BE9C53800595973 /* XCRemoteSwiftPackageReference "Kingfisher" */,
-				19C2DD812C9FD7AB00CBEFDE /* XCRemoteSwiftPackageReference "apollo-ios" */,
 				1998DCBE2CAD793800115E1F /* XCRemoteSwiftPackageReference "bangumi-public-swift-client" */,
 				1998DCC22CAD884000115E1F /* XCRemoteSwiftPackageReference "bangumi-private-swift-client" */,
 				1998DCC52CAD8B7C00115E1F /* XCRemoteSwiftPackageReference "swift-openapi-urlsession" */,
+				1998DCD72CAF132000115E1F /* XCRemoteSwiftPackageReference "swift-openapi-runtime" */,
 			);
 			productRefGroup = 19BB342C2BD239AB00E5C295 /* Products */;
 			projectDirPath = "";
@@ -587,6 +585,7 @@
 				1909F3A92BEBC9F000E3B8F0 /* Person.swift in Sources */,
 				1909F39F2BEBC28F00E3B8F0 /* Collection.swift in Sources */,
 				1930110E2C00F08A008DCEBF /* CollectionSubjectTypeView.swift in Sources */,
+				1998DCDB2CAF1E9700115E1F /* Public.swift in Sources */,
 				1909F3B42BECF9D100E3B8F0 /* CharacterView.swift in Sources */,
 				19671C5E2BDEB55D000B4D99 /* LoadingView.swift in Sources */,
 				19E0E5042BF24E0F00066EB7 /* PersonSubjectListView.swift in Sources */,
@@ -599,6 +598,7 @@
 				19671C6B2BDEB55D000B4D99 /* DiscoverView.swift in Sources */,
 				1915A8AA2BF0E8C4003DB76D /* PersonCharacterItemView.swift in Sources */,
 				19671C5B2BDEB55D000B4D99 /* CalendarView.swift in Sources */,
+				1998DCDD2CAF25D800115E1F /* Private.swift in Sources */,
 				19E0E5022BF24D6300066EB7 /* PersonCharacterListView.swift in Sources */,
 				1915A89E2BF09E6B003DB76D /* SubjectRelationListView.swift in Sources */,
 				1915A8A82BF0E668003DB76D /* PersonCharactersView.swift in Sources */,
@@ -874,20 +874,20 @@
 				minimumVersion = 1.0.2;
 			};
 		};
+		1998DCD72CAF132000115E1F /* XCRemoteSwiftPackageReference "swift-openapi-runtime" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-openapi-runtime";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.5.0;
+			};
+		};
 		19BD24242BE9C53800595973 /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/onevcat/Kingfisher.git";
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 7.11.0;
-			};
-		};
-		19C2DD812C9FD7AB00CBEFDE /* XCRemoteSwiftPackageReference "apollo-ios" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/apollographql/apollo-ios.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.15.1;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -913,15 +913,15 @@
 			package = 1998DCC52CAD8B7C00115E1F /* XCRemoteSwiftPackageReference "swift-openapi-urlsession" */;
 			productName = OpenAPIURLSession;
 		};
+		1998DCD82CAF132000115E1F /* OpenAPIRuntime */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1998DCD72CAF132000115E1F /* XCRemoteSwiftPackageReference "swift-openapi-runtime" */;
+			productName = OpenAPIRuntime;
+		};
 		19BD24252BE9C53800595973 /* Kingfisher */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 19BD24242BE9C53800595973 /* XCRemoteSwiftPackageReference "Kingfisher" */;
 			productName = Kingfisher;
-		};
-		19C2DD822C9FD7AC00CBEFDE /* Apollo */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 19C2DD812C9FD7AB00CBEFDE /* XCRemoteSwiftPackageReference "apollo-ios" */;
-			productName = Apollo;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

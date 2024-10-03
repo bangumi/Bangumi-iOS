@@ -27,12 +27,6 @@ extension Chii {
       throw ChiiError.uninitialized
     }
     let item = try await self.getSubject(sid)
-    //
-    //    let client = Client(
-    //      serverURL: URL(string: "https://api.bgm.tv")!,
-    //      transport: URLSessionTransport()
-    //    )
-    //    let response = try await client.getSubjectById(path: .init(subject_id: 12))
 
     // 对于合并的条目，可能搜索返回的 ID 跟 API 拿到的 ID 不同
     // 我们直接返回 404 防止其他问题
