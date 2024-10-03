@@ -15,7 +15,7 @@ struct ProgressRowView: View {
   @Environment(Notifier.self) private var notifier
   @Environment(\.modelContext) var modelContext
 
-  @State private var showEpisodeBox: Bool = false
+  @State private var updating: Bool = false
   @State private var nextEpisode: Episode?
 
   @Query
@@ -61,6 +61,26 @@ struct ProgressRowView: View {
       }
     } catch {
       Logger.episode.error("fetch next episode error: \(error)")
+    }
+  }
+
+  func markNextWatched() {
+    guard let episodeId = nextEpisode?.episodeId else {
+      return
+    }
+    if updating {
+      return
+    }
+    updating = true
+    Task {
+      do {
+        try await Chii.shared.updateEpisodeCollection(subjectId: subjectId, episodeId: episodeId, type: .collect)
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        await loadNextEpisode()
+      } catch {
+        notifier.alert(error: error)
+      }
+      updating = false
     }
   }
 
@@ -146,10 +166,17 @@ struct ProgressRowView: View {
                     Text("EP.\(episode.sort.episodeDisplay) ~ \(episode.waitDesc)")
                       .foregroundStyle(.secondary)
                   } else {
-                    Button {
-                      showEpisodeBox = true
-                    } label: {
-                      Text("EP.\(episode.sort.episodeDisplay)").font(.callout)
+                    if updating {
+                      ZStack {
+                        Button("EP...", action: {})
+                          .font(.callout)
+                          .disabled(true)
+                          .hidden()
+                        ProgressView()
+                      }
+                    } else {
+                      Button("EP.\(episode.sort.episodeDisplay)", action: markNextWatched)
+                        .font(.callout)
                     }
                   }
                 } else {
@@ -176,16 +203,6 @@ struct ProgressRowView: View {
     .task {
       await loadNextEpisode()
     }
-    .sheet(
-      isPresented: $showEpisodeBox,
-      content: {
-        if let episode = nextEpisode {
-          EpisodeCollectionBoxView(subjectId: subjectId, episodeId: episode.episodeId)
-            .presentationDragIndicator(.visible)
-            .presentationDetents(.init([.medium, .large]))
-        }
-      }
-    )
   }
 }
 
