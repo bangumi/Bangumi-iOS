@@ -117,13 +117,9 @@ struct SubjectView: View {
 
   let collection = UserSubjectCollection.previewAnime
   let subject = Subject.previewAnime
-  let episodes = Episode.previewList
 
   container.mainContext.insert(collection)
   container.mainContext.insert(subject)
-  for episode in episodes {
-    container.mainContext.insert(episode)
-  }
 
   return NavigationStack {
     SubjectView(subjectId: subject.subjectId)

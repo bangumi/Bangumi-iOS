@@ -80,13 +80,16 @@ struct SubjectLargeRowView: View {
               .lineLimit(1)
           }
         }
-        Spacer()
+
         if let authority = subject?.authority {
+          Spacer()
           Text(authority)
             .font(.caption)
             .foregroundStyle(.secondary)
             .lineLimit(2)
         }
+
+        Spacer()
         HStack {
           if let score = subject?.rating.score, score > 0 {
             StarsView(score: score, size: 12)

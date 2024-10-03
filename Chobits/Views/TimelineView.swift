@@ -19,8 +19,7 @@ struct ChiiTimelineView: View {
   func updateProfile() {
     Task {
       do {
-        let profile = try await Chii.shared.getProfile()
-        self.profile = profile
+        profile = try await Chii.shared.getProfile()
       } catch {
         notifier.alert(error: error)
       }
@@ -72,8 +71,15 @@ struct ChiiTimelineView: View {
           }
         }
         ToolbarItem(placement: .topBarTrailing) {
-          NavigationLink(value: NavDestination.setting) {
-            Image(systemName: "gearshape")
+          HStack {
+            if isAuthenticated {
+              NavigationLink(value: NavDestination.setting) {
+                Image(systemName: "bell")
+              }
+            }
+            NavigationLink(value: NavDestination.setting) {
+              Image(systemName: "gearshape")
+            }
           }
         }
       }

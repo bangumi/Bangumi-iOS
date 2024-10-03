@@ -79,6 +79,7 @@
 		1998DCC12CAD7BFC00115E1F /* BangumiPublicSwiftClient in Frameworks */ = {isa = PBXBuildFile; productRef = 1998DCC02CAD7BFC00115E1F /* BangumiPublicSwiftClient */; };
 		1998DCC42CAD888C00115E1F /* BangumiPrivateSwiftClient in Frameworks */ = {isa = PBXBuildFile; productRef = 1998DCC32CAD888C00115E1F /* BangumiPrivateSwiftClient */; };
 		1998DCC72CAD8B7C00115E1F /* OpenAPIURLSession in Frameworks */ = {isa = PBXBuildFile; productRef = 1998DCC62CAD8B7C00115E1F /* OpenAPIURLSession */; };
+		1998DCD12CAEFE0000115E1F /* NotificationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1998DCD02CAEFDFB00115E1F /* NotificationView.swift */; };
 		19AA1FCB2C100A1200FA4E18 /* subjects.json in Resources */ = {isa = PBXBuildFile; fileRef = 19AA1FCA2C100A1200FA4E18 /* subjects.json */; };
 		19AA1FCD2C100D3100FA4E18 /* Request.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19AA1FCC2C100D3100FA4E18 /* Request.swift */; };
 		19B9002E2BED15B600405F0F /* PersonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19B9002D2BED15B600405F0F /* PersonView.swift */; };
@@ -174,6 +175,7 @@
 		197A19E32BE699CF00804B13 /* EpisodeListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EpisodeListView.swift; sourceTree = "<group>"; };
 		1980EDFF2BE418C800E013EA /* episodes.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = episodes.json; sourceTree = "<group>"; };
 		1980EE012BE419D500E013EA /* episode_collections.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = episode_collections.json; sourceTree = "<group>"; };
+		1998DCD02CAEFDFB00115E1F /* NotificationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationView.swift; sourceTree = "<group>"; };
 		19AA1FCA2C100A1200FA4E18 /* subjects.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = subjects.json; sourceTree = "<group>"; };
 		19AA1FCC2C100D3100FA4E18 /* Request.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Request.swift; sourceTree = "<group>"; };
 		19B9002D2BED15B600405F0F /* PersonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonView.swift; sourceTree = "<group>"; };
@@ -319,6 +321,7 @@
 				19671C4B2BDEB55D000B4D99 /* ProgressView.swift */,
 				19671C4A2BDEB55D000B4D99 /* DiscoverView.swift */,
 				19BD242F2BEB3C3B00595973 /* SettingsView.swift */,
+				1998DCD02CAEFDFB00115E1F /* NotificationView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -601,6 +604,7 @@
 				1915A8A82BF0E668003DB76D /* PersonCharactersView.swift in Sources */,
 				19671C5C2BDEB55D000B4D99 /* FlowStack.swift in Sources */,
 				19671C542BDEB55D000B4D99 /* SubjectLargeRowView.swift in Sources */,
+				1998DCD12CAEFE0000115E1F /* NotificationView.swift in Sources */,
 				197A19E42BE699CF00804B13 /* EpisodeListView.swift in Sources */,
 				1915A89A2BEFB942003DB76D /* CharacterSubjectsView.swift in Sources */,
 				19BD242E2BEB2F3400595973 /* Setting.swift in Sources */,
