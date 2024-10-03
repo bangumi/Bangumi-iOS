@@ -58,6 +58,8 @@ struct ProgressRowView: View {
       if let episode = episodes.first {
         Logger.episode.info("subject \(subjectId) next episode: \(episode.sort.episodeDisplay)")
         nextEpisode = episode
+      } else {
+        nextEpisode = nil
       }
     } catch {
       Logger.episode.error("fetch next episode error: \(error)")
