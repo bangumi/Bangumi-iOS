@@ -45,16 +45,6 @@ struct SettingsView: View {
     }
   }
 
-  var version: String {
-    guard let ver = Bundle.main.infoDictionary?["CFBundleShortVersionString"] else {
-      return ""
-    }
-    guard let buildVer = Bundle.main.infoDictionary?["CFBundleVersion"] else {
-      return ""
-    }
-    return "v\(ver)(\(buildVer))"
-  }
-
   var body: some View {
     Form {
       Section(header: Text("域名设置")) {
@@ -112,7 +102,7 @@ struct SettingsView: View {
           HStack {
             Text("版本")
             Spacer()
-            Text(version).foregroundStyle(.secondary)
+            Text(Chii.shared.version).foregroundStyle(.secondary)
           }
           Link(
             "隐私声明", destination: URL(string: "https://www.everpcpc.com/privacy-policy/chobits/")!)
