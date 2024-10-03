@@ -83,6 +83,7 @@ struct ChiiProgressView: View {
     exhausted = false
     loadedIdx.removeAll()
     collections.removeAll()
+    await loadCounts()
     let collections = await fetch()
     self.collections.append(contentsOf: collections)
   }
@@ -123,7 +124,6 @@ struct ChiiProgressView: View {
                 loaded = true
                 Logger.collection.info("initial loading progress")
                 await load()
-                await loadCounts()
               }
             }
           } else {
@@ -136,13 +136,6 @@ struct ChiiProgressView: View {
               .pickerStyle(.segmented)
               .onChange(of: subjectType) {
                 Task {
-                  await load()
-                }
-              }
-              .task {
-                if counts.allSatisfy({ $0.value == 0 }) {
-                  await updateCollections(type: nil)
-                  await loadCounts()
                   await load()
                 }
               }
@@ -179,7 +172,6 @@ struct ChiiProgressView: View {
                     return
                   }
                   await updateCollections(type: subjectType)
-                  await loadCounts()
                   await load()
                 }
               }
