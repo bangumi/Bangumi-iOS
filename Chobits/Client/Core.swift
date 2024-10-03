@@ -5,15 +5,14 @@
 //  Created by Chuan Chuan on 2024/4/21.
 //
 
-import OSLog
-import SwiftData
-import SwiftUI
+import BangumiPrivateSwiftClient
 import Foundation
-
 import KeychainSwift
+import OSLog
 import OpenAPIRuntime
 import OpenAPIURLSession
-import BangumiPrivateSwiftClient
+import SwiftData
+import SwiftUI
 
 @globalActor
 actor Chii {

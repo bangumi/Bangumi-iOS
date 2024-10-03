@@ -5,8 +5,8 @@
 //  Created by Chuan Chuan on 2024/10/3.
 //
 
-import OSLog
 import Foundation
+import OSLog
 import SwiftData
 
 @ModelActor
@@ -153,7 +153,8 @@ extension DatabaseOperator {
     modelContext.insert(episode)
   }
 
-  public func saveSubjectCharacter(_ item: SubjectCharacterDTO, subjectId: UInt, sort: Float) throws {
+  public func saveSubjectCharacter(_ item: SubjectCharacterDTO, subjectId: UInt, sort: Float) throws
+  {
     let character = SubjectRelatedCharacter(item, subjectId: subjectId, sort: sort)
     modelContext.insert(character)
   }
@@ -259,14 +260,14 @@ extension DatabaseOperator {
   }
 
   public func getEpisodeIDs(subjectId: UInt, sort: Float) throws -> [UInt] {
-    let descriptor = FetchDescriptor<Episode>(predicate: #Predicate<Episode> {
-      $0.subjectId == subjectId && $0.sort < sort
-    })
+    let descriptor = FetchDescriptor<Episode>(
+      predicate: #Predicate<Episode> {
+        $0.subjectId == subjectId && $0.sort < sort
+      })
     let episodes = try modelContext.fetch(descriptor)
     return episodes.map { $0.episodeId }
   }
 }
-
 
 extension DatabaseOperator {
   public func updateUserCollection(sid: UInt, eps: UInt?, vols: UInt?) throws {
@@ -284,8 +285,10 @@ extension DatabaseOperator {
     collection?.updatedAt = Date()
   }
 
-  public func updateUserCollection(sid: UInt, type: CollectionType?, rate: UInt8?, comment: String?,
-                                   priv: Bool?, tags: [String]?) throws {
+  public func updateUserCollection(
+    sid: UInt, type: CollectionType?, rate: UInt8?, comment: String?,
+    priv: Bool?, tags: [String]?
+  ) throws {
     let collection = try self.fetchOne(
       predicate: #Predicate<UserSubjectCollection> {
         $0.subjectId == sid
@@ -309,10 +312,13 @@ extension DatabaseOperator {
     collection?.updatedAt = Date()
   }
 
-  public func updateEpisodeCollections(subjectId: UInt, sort: Float, type: EpisodeCollectionType) throws {
-    let descriptor = FetchDescriptor<Episode>(predicate: #Predicate<Episode> {
-      $0.subjectId == subjectId && $0.sort < sort
-    })
+  public func updateEpisodeCollections(subjectId: UInt, sort: Float, type: EpisodeCollectionType)
+    throws
+  {
+    let descriptor = FetchDescriptor<Episode>(
+      predicate: #Predicate<Episode> {
+        $0.subjectId == subjectId && $0.sort < sort
+      })
     let episodes = try modelContext.fetch(descriptor)
     for episode in episodes {
       episode.collection = type.rawValue
@@ -325,7 +331,9 @@ extension DatabaseOperator {
     collection?.updatedAt = Date()
   }
 
-  public func updateEpisodeCollection(subjectId: UInt, episodeId: UInt, type: EpisodeCollectionType) throws {
+  public func updateEpisodeCollection(subjectId: UInt, episodeId: UInt, type: EpisodeCollectionType)
+    throws
+  {
     let episode = try self.fetchOne(
       predicate: #Predicate<Episode> {
         $0.episodeId == episodeId

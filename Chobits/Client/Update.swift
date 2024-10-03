@@ -71,7 +71,8 @@ extension Chii {
     }
     Logger.api.info("finish update subject collection: \(sid)")
 
-    try await db.updateUserCollection(sid: sid, type: type, rate: rate, comment: comment, priv: priv, tags: tags)
+    try await db.updateUserCollection(
+      sid: sid, type: type, rate: rate, comment: comment, priv: priv, tags: tags)
     try await db.commit()
   }
 
