@@ -102,6 +102,6 @@ struct SubjectRelationListView: View {
 
   return SubjectRelationListView(subjectId: subject.subjectId)
     .environment(Notifier())
-    .environment(ChiiClient(container: container, mock: .anime))
+    .environment(ChiiClient(modelContainer: container, mock: .anime))
     .modelContainer(container)
 }

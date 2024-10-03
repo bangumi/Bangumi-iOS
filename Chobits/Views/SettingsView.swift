@@ -14,6 +14,7 @@ struct SettingsView: View {
   @AppStorage("authDomain") var authDomain: String = AuthDomain.origin.label
   @AppStorage("defaultTab") var defaultTab: String = ContentViewTab.discover.label
   @AppStorage("isolationMode") var isolationMode: Bool = false
+  @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
 
   @Environment(Notifier.self) private var notifier
   @Environment(ChiiClient.self) private var chii
@@ -122,7 +123,7 @@ struct SettingsView: View {
       Section {
         HStack {
           Spacer()
-          if chii.isAuthenticated {
+          if isAuthenticated {
             Button(action: logout) {
               Text("退出登录")
             }.foregroundStyle(.red)
@@ -148,6 +149,6 @@ struct SettingsView: View {
 
   return SettingsView()
     .environment(Notifier())
-    .environment(ChiiClient(container: container, mock: .anime))
+    .environment(ChiiClient(modelContainer: container, mock: .anime))
     .modelContainer(container)
 }

@@ -540,7 +540,7 @@ struct SubjectBrowsingView: View {
   return NavigationStack {
     SubjectBrowsingView(subjectType: .anime)
       .environment(Notifier())
-      .environment(ChiiClient(container: container, mock: .anime))
+      .environment(ChiiClient(modelContainer: container, mock: .anime))
       .modelContainer(container)
   }
 }

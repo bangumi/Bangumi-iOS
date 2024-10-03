@@ -12,7 +12,7 @@ import SwiftData
 import SwiftUI
 
 @Observable
-class ChiiClient {
+final class ChiiClient {
   let keychain: KeychainSwift
   let appInfo: AppInfo
 
@@ -29,11 +29,10 @@ class ChiiClient {
 
   var mock: SubjectType?
 
-  var isAuthenticated: Bool = false
-
-  init(container: ModelContainer, mock: SubjectType? = nil) {
+  init(modelContainer: ModelContainer, mock: SubjectType? = nil) {
+    @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
     Logger.app.info("new init chii client")
-    self.db = BackgroundActor(container: container)
+
     self.keychain = KeychainSwift(keyPrefix: "com.everpcpc.chobits.")
     guard let plist = Bundle.main.infoDictionary else {
       fatalError("Could not find Info.plist")
@@ -51,14 +50,19 @@ class ChiiClient {
     )
     self.mock = mock
     if mock != nil {
-      self.isAuthenticated = true
+      isAuthenticated = true
     }
+    self.db = BackgroundActor(modelContainer: modelContainer)
   }
 
   func setAuthStatus(_ isAuthenticated: Bool) async {
-    await MainActor.run {
-      self.isAuthenticated = isAuthenticated
-    }
+    @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
+    isAuthenticated = isAuthenticated
+  }
+
+  func isAuthenticated() -> Bool {
+    @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
+    return isAuthenticated
   }
 
   func request(url: URL, method: String, body: Any? = nil, authorized: Bool = true) async throws

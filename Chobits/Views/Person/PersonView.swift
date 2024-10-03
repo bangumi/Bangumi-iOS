@@ -284,7 +284,7 @@ struct PersonView: View {
   return NavigationStack {
     PersonView(personId: person.personId)
       .environment(Notifier())
-      .environment(ChiiClient(container: container, mock: .anime))
+      .environment(ChiiClient(modelContainer: container, mock: .anime))
       .modelContainer(container)
   }
 }

@@ -19,25 +19,15 @@ import SwiftData
 ///  }
 ///  ```
 @available(iOS 17, *)
-public actor BackgroundActor {
-  public let modelContainer: ModelContainer
-  public let modelExecutor: any ModelExecutor
-  private var context: ModelContext { modelExecutor.modelContext }
-
-  public init(container: ModelContainer) {
-    self.modelContainer = container
-    let context = ModelContext(modelContainer)
-    context.autosaveEnabled = false
-    modelExecutor = DefaultSerialModelExecutor(modelContext: context)
-  }
-
+@ModelActor
+actor BackgroundActor {
   public func fetchOne<T: PersistentModel>(
     predicate: Predicate<T>? = nil,
     sortBy: [SortDescriptor<T>] = []
   ) throws -> T? {
     var fetchDescriptor = FetchDescriptor<T>(predicate: predicate, sortBy: sortBy)
     fetchDescriptor.fetchLimit = 1
-    let list: [T] = try context.fetch(fetchDescriptor)
+    let list: [T] = try modelContext.fetch(fetchDescriptor)
     return list.first
   }
 
@@ -50,12 +40,12 @@ public actor BackgroundActor {
     var fetchDescriptor = FetchDescriptor<T>(predicate: predicate, sortBy: sortBy)
     fetchDescriptor.fetchLimit = limit
     fetchDescriptor.fetchOffset = offset
-    let list: [T] = try context.fetch(fetchDescriptor)
+    let list: [T] = try modelContext.fetch(fetchDescriptor)
     return list
   }
 
   public func insert<T: PersistentModel>(_ data: T) {
-    context.insert(data)
+    modelContext.insert(data)
   }
 
   public func insertIfNeeded<T: PersistentModel>(
@@ -63,9 +53,9 @@ public actor BackgroundActor {
     predicate: Predicate<T>
   ) throws {
     let descriptor = FetchDescriptor<T>(predicate: predicate)
-    let savedCount = try context.fetchCount(descriptor)
+    let savedCount = try modelContext.fetchCount(descriptor)
     if savedCount == 0 {
-      context.insert(data)
+      modelContext.insert(data)
     }
   }
 
@@ -74,14 +64,14 @@ public actor BackgroundActor {
     update: (T) -> Void
   ) throws {
     let descriptor = FetchDescriptor<T>(predicate: predicate)
-    let list: [T] = try context.fetch(descriptor)
+    let list: [T] = try modelContext.fetch(descriptor)
     for item in list {
       update(item)
     }
   }
 
   public func save() throws {
-    try context.save()
+    try modelContext.save()
   }
 
   //  public func delete<T: PersistentModel>(_ data: T) {

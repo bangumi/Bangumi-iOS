@@ -8,6 +8,9 @@
 import Foundation
 import OSLog
 import SwiftData
+import OpenAPIRuntime
+import OpenAPIURLSession
+import BangumiPublicSwiftClient
 
 extension ChiiClient {
   func loadCalendar() async throws {
@@ -30,6 +33,12 @@ extension ChiiClient {
 
   func loadSubject(_ sid: UInt) async throws {
     let item = try await self.getSubject(sid)
+//
+//    let client = Client(
+//      serverURL: URL(string: "https://api.bgm.tv")!,
+//      transport: URLSessionTransport()
+//    )
+//    let response = try await client.getSubjectById(path: .init(subject_id: 12))
 
     // 对于合并的条目，可能搜索返回的 ID 跟 API 拿到的 ID 不同
     // 我们直接返回 404 防止其他问题
@@ -44,7 +53,7 @@ extension ChiiClient {
   }
 
   func loadUserCollection(_ subjectId: UInt) async throws {
-    if !self.isAuthenticated {
+    if !self.isAuthenticated() {
       return
     }
     let item = try await self.getSubjectCollection(subjectId)
@@ -99,7 +108,7 @@ extension ChiiClient {
     let limit: Int = 1000
     while true {
       var total: Int = 0
-      if self.isAuthenticated {
+      if self.isAuthenticated() {
         let response = try await self.getEpisodeCollections(
           subjectId: subjectId, type: nil, limit: limit, offset: offset)
         total = response.total

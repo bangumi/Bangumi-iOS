@@ -10,6 +10,8 @@ import SwiftData
 import SwiftUI
 
 struct ChiiProgressView: View {
+  @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
+
   @Environment(Notifier.self) private var notifier
   @Environment(ChiiClient.self) private var chii
   @Environment(\.modelContext) var modelContext
@@ -113,7 +115,7 @@ struct ChiiProgressView: View {
   var body: some View {
     NavigationStack {
       VStack {
-        if chii.isAuthenticated {
+        if isAuthenticated {
           if counts.isEmpty {
             ProgressView().onAppear {
               Task {

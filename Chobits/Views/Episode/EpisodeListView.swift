@@ -12,6 +12,8 @@ import SwiftUI
 struct EpisodeListView: View {
   let subjectId: UInt
 
+  @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
+
   @Environment(Notifier.self) private var notifier
   @Environment(ChiiClient.self) private var chii
   @Environment(\.modelContext) var modelContext
@@ -167,7 +169,7 @@ struct EpisodeListView: View {
                 .font(.headline)
                 .lineLimit(1)
               HStack {
-                if chii.isAuthenticated && episode.collectionTypeEnum != .none {
+                if isAuthenticated && episode.collectionTypeEnum != .none {
                   RoundedRectangle(cornerRadius: 5)
                     .fill(Color(hex: episode.backgroundColor))
                     .stroke(Color(hex: episode.borderColor), lineWidth: 1)
@@ -293,6 +295,6 @@ struct EpisodeListView: View {
 
   return EpisodeListView(subjectId: subject.subjectId)
     .environment(Notifier())
-    .environment(ChiiClient(container: container, mock: .anime))
+    .environment(ChiiClient(modelContainer: container, mock: .anime))
     .modelContainer(container)
 }

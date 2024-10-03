@@ -115,7 +115,7 @@ struct CollectionSubjectTypeView: View {
     ScrollView {
       CollectionSubjectTypeView(stype: .anime)
         .environment(Notifier())
-        .environment(ChiiClient(container: container, mock: .anime))
+        .environment(ChiiClient(modelContainer: container, mock: .anime))
         .modelContainer(container)
     }
     .padding(.horizontal, 8)

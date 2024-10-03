@@ -13,6 +13,7 @@ struct SubjectView: View {
   var subjectId: UInt
 
   @AppStorage("shareDomain") var shareDomain: String = ShareDomain.chii.label
+  @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
 
   @Environment(Notifier.self) private var notifier
   @Environment(ChiiClient.self) private var chii
@@ -67,7 +68,7 @@ struct SubjectView: View {
           LazyVStack(alignment: .leading) {
             SubjectHeaderView(subjectId: subjectId)
 
-            if chii.isAuthenticated {
+            if isAuthenticated {
               SubjectCollectionView(subjectId: subjectId)
             }
 
@@ -130,7 +131,7 @@ struct SubjectView: View {
   return NavigationStack {
     SubjectView(subjectId: subject.subjectId)
       .environment(Notifier())
-      .environment(ChiiClient(container: container, mock: .anime))
+      .environment(ChiiClient(modelContainer: container, mock: .anime))
       .modelContainer(container)
   }
 }

@@ -15,8 +15,6 @@ struct ChobitsApp: App {
   @State var notifier = Notifier()
 
   @AppStorage("appearance") var appearance: String = "system"
-  @AppStorage("shareDomain") var shareDomain: String = "https://chii.in"
-  @AppStorage("isolationMode") var isolationMode: Bool = false
 
   init() {
     let schema = Schema([
@@ -38,7 +36,7 @@ struct ChobitsApp: App {
     do {
       let container = try ModelContainer(for: schema, configurations: [modelConfiguration])
       sharedModelContainer = container
-      chii = ChiiClient(container: container)
+      chii = ChiiClient(modelContainer: container)
     } catch {
       fatalError("Could not create ModelContainer: \(error)")
     }

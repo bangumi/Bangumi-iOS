@@ -250,7 +250,7 @@ struct SubjectInfoboxView: View {
     LazyVStack(alignment: .leading) {
       SubjectInfoboxView(subjectId: subject.subjectId)
         .environment(Notifier())
-        .environment(ChiiClient(container: container, mock: .anime))
+        .environment(ChiiClient(modelContainer: container, mock: .anime))
         .modelContainer(container)
     }
   }.padding()

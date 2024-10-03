@@ -1,5 +1,5 @@
 {
-  "originHash" : "25c5b4c083efea05ad3cc68576083ed3d4e0685f99cb92b37ca6552c99717eaf",
+  "originHash" : "87ab95a1d24220f3634c59d446b8c138cf61c1c9b0bd246b51b3296b368d34cc",
   "pins" : [
     {
       "identity" : "apollo-ios",
@@ -15,8 +15,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/everpcpc/bangumi-private-swift-client",
       "state" : {
-        "revision" : "93ff76f12faca08142f4e9b06f0445f3e9e6ecbf",
-        "version" : "1.0.1"
+        "revision" : "19f90cc2940f19b32b12bfb602090305311c6cea",
+        "version" : "1.0.3"
       }
     },
     {
@@ -24,8 +24,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/everpcpc/bangumi-public-swift-client",
       "state" : {
-        "revision" : "253fbcddec69dd23b1214b11910d7c945a85fbcb",
-        "version" : "1.0.6"
+        "revision" : "67fb1425a7b942c82ab880ccf286a31fa0d7d202",
+        "version" : "1.0.8"
       }
     },
     {
@@ -83,6 +83,15 @@
       }
     },
     {
+      "identity" : "swift-collections",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-collections",
+      "state" : {
+        "revision" : "671108c96644956dddcd89dd59c203dcdb36cec7",
+        "version" : "1.1.4"
+      }
+    },
+    {
       "identity" : "swift-http-types",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-http-types",
@@ -116,6 +125,15 @@
       "state" : {
         "revision" : "26e8ae3515d1ff3607e924ac96fc0094775f55e8",
         "version" : "1.5.0"
+      }
+    },
+    {
+      "identity" : "swift-openapi-urlsession",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-openapi-urlsession",
+      "state" : {
+        "revision" : "9bf4c712ad7989d6a91dbe68748b8829a50837e4",
+        "version" : "1.0.2"
       }
     },
     {

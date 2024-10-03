@@ -166,6 +166,6 @@ struct CollectionListView: View {
 
   return CollectionListView(subjectType: SubjectType.anime)
     .environment(Notifier())
-    .environment(ChiiClient(container: container, mock: .anime))
+    .environment(ChiiClient(modelContainer: container, mock: .anime))
     .modelContainer(container)
 }

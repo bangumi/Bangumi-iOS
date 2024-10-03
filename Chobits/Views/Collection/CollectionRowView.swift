@@ -76,7 +76,7 @@ struct CollectionRowView: View {
     LazyVStack(alignment: .leading) {
       CollectionRowView(subjectId: subject.subjectId)
         .environment(Notifier())
-        .environment(ChiiClient(container: container, mock: .anime))
+        .environment(ChiiClient(modelContainer: container, mock: .anime))
     }
   }
   .padding()

@@ -176,7 +176,7 @@ struct SubjectBookChaptersView: View {
     LazyVStack(alignment: .leading) {
       SubjectBookChaptersView(subjectId: subject.subjectId)
         .environment(Notifier())
-        .environment(ChiiClient(container: container, mock: .book))
+        .environment(ChiiClient(modelContainer: container, mock: .book))
         .modelContainer(container)
     }
   }

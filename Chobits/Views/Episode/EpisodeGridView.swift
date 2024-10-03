@@ -12,6 +12,8 @@ import SwiftUI
 struct EpisodeGridView: View {
   let subjectId: UInt
 
+  @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
+
   @Environment(Notifier.self) private var notifier
   @Environment(ChiiClient.self) private var chii
   @Environment(\.modelContext) var modelContext
@@ -63,7 +65,7 @@ struct EpisodeGridView: View {
 
   var body: some View {
     HStack {
-      if chii.isAuthenticated {
+      if isAuthenticated {
         Text("观看进度管理:")
       } else {
         Text("章节列表:")
@@ -152,7 +154,7 @@ struct EpisodeGridView: View {
     LazyVStack(alignment: .leading) {
       EpisodeGridView(subjectId: subject.subjectId)
         .environment(Notifier())
-        .environment(ChiiClient(container: container, mock: .anime))
+        .environment(ChiiClient(modelContainer: container, mock: .anime))
         .modelContainer(container)
     }
   }.padding()

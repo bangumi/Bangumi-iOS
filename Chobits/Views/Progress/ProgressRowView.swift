@@ -206,7 +206,7 @@ struct ProgressRowView: View {
     LazyVStack(alignment: .leading) {
       ProgressRowView(subjectId: subject.subjectId)
         .environment(Notifier())
-        .environment(ChiiClient(container: container, mock: .anime))
+        .environment(ChiiClient(modelContainer: container, mock: .anime))
     }
   }
   .padding()

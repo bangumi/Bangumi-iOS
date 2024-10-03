@@ -13,6 +13,7 @@ struct EpisodeCollectionBoxView: View {
   let episodeId: UInt
 
   @AppStorage("isolationMode") var isolationMode: Bool = false
+  @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
 
   @Environment(Notifier.self) private var notifier
   @Environment(ChiiClient.self) private var chii
@@ -87,7 +88,7 @@ struct EpisodeCollectionBoxView: View {
               Text("(+\(episode.comment))").font(.caption).foregroundStyle(.red)
             }
           }
-          if chii.isAuthenticated {
+          if isAuthenticated {
             HStack {
               ForEach(episode.collectionTypeEnum.otherTypes()) { type in
                 Button {
@@ -157,6 +158,6 @@ struct EpisodeCollectionBoxView: View {
     subjectId: subject.subjectId, episodeId: episodes.first!.episodeId
   )
   .environment(Notifier())
-  .environment(ChiiClient(container: container, mock: .anime))
+  .environment(ChiiClient(modelContainer: container, mock: .anime))
   .modelContainer(container)
 }

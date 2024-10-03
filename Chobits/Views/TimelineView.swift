@@ -10,6 +10,7 @@ import SwiftUI
 
 struct ChiiTimelineView: View {
   @AppStorage("isolationMode") var isolationMode: Bool = false
+  @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
 
   @Environment(Notifier.self) private var notifier
   @Environment(ChiiClient.self) private var chii
@@ -30,7 +31,7 @@ struct ChiiTimelineView: View {
   var body: some View {
     NavigationStack {
       VStack {
-        if chii.isAuthenticated {
+        if isAuthenticated {
           CollectionsView()
             .padding(.horizontal, 8)
         } else {
@@ -40,7 +41,7 @@ struct ChiiTimelineView: View {
       .navigationDestination(for: NavDestination.self) { $0 }
       .navigationBarTitleDisplayMode(.inline)
       .toolbar {
-        if chii.isAuthenticated {
+        if isAuthenticated {
           if let me = profile {
             ToolbarItem(placement: .topBarLeading) {
               HStack {
@@ -85,6 +86,6 @@ struct ChiiTimelineView: View {
   let container = mockContainer()
   return ChiiTimelineView()
     .environment(Notifier())
-    .environment(ChiiClient(container: container, mock: .anime))
+    .environment(ChiiClient(modelContainer: container, mock: .anime))
     .modelContainer(container)
 }

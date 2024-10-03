@@ -260,7 +260,7 @@ struct CharacterView: View {
   return NavigationStack {
     CharacterView(characterId: character.characterId)
       .environment(Notifier())
-      .environment(ChiiClient(container: container, mock: .anime))
+      .environment(ChiiClient(modelContainer: container, mock: .anime))
       .modelContainer(container)
   }
 }

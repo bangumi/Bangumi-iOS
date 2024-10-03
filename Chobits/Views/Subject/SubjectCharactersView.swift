@@ -129,7 +129,7 @@ struct SubjectCharactersView: View {
     LazyVStack(alignment: .leading) {
       SubjectCharactersView(subjectId: subject.subjectId)
         .environment(Notifier())
-        .environment(ChiiClient(container: container, mock: .anime))
+        .environment(ChiiClient(modelContainer: container, mock: .anime))
         .modelContainer(container)
     }
   }.padding()

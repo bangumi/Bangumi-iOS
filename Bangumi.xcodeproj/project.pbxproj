@@ -78,6 +78,7 @@
 		1980EE022BE419D500E013EA /* episode_collections.json in Resources */ = {isa = PBXBuildFile; fileRef = 1980EE012BE419D500E013EA /* episode_collections.json */; };
 		1998DCC12CAD7BFC00115E1F /* BangumiPublicSwiftClient in Frameworks */ = {isa = PBXBuildFile; productRef = 1998DCC02CAD7BFC00115E1F /* BangumiPublicSwiftClient */; };
 		1998DCC42CAD888C00115E1F /* BangumiPrivateSwiftClient in Frameworks */ = {isa = PBXBuildFile; productRef = 1998DCC32CAD888C00115E1F /* BangumiPrivateSwiftClient */; };
+		1998DCC72CAD8B7C00115E1F /* OpenAPIURLSession in Frameworks */ = {isa = PBXBuildFile; productRef = 1998DCC62CAD8B7C00115E1F /* OpenAPIURLSession */; };
 		19AA1FCB2C100A1200FA4E18 /* subjects.json in Resources */ = {isa = PBXBuildFile; fileRef = 19AA1FCA2C100A1200FA4E18 /* subjects.json */; };
 		19AA1FCD2C100D3100FA4E18 /* Request.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19AA1FCC2C100D3100FA4E18 /* Request.swift */; };
 		19AB93CB2BE4F0F4007531A4 /* BackgroundActor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19AB93CA2BE4F0F4007531A4 /* BackgroundActor.swift */; };
@@ -207,6 +208,7 @@
 				19C2DD832C9FD7AC00CBEFDE /* Apollo in Frameworks */,
 				1998DCC12CAD7BFC00115E1F /* BangumiPublicSwiftClient in Frameworks */,
 				1998DCC42CAD888C00115E1F /* BangumiPrivateSwiftClient in Frameworks */,
+				1998DCC72CAD8B7C00115E1F /* OpenAPIURLSession in Frameworks */,
 				19671C732BDEB8B1000B4D99 /* KeychainSwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -462,6 +464,7 @@
 				19C2DD822C9FD7AC00CBEFDE /* Apollo */,
 				1998DCC02CAD7BFC00115E1F /* BangumiPublicSwiftClient */,
 				1998DCC32CAD888C00115E1F /* BangumiPrivateSwiftClient */,
+				1998DCC62CAD8B7C00115E1F /* OpenAPIURLSession */,
 			);
 			productName = Chobits;
 			productReference = 19BB342B2BD239AB00E5C295 /* Chobits.app */;
@@ -497,6 +500,7 @@
 				19C2DD812C9FD7AB00CBEFDE /* XCRemoteSwiftPackageReference "apollo-ios" */,
 				1998DCBE2CAD793800115E1F /* XCRemoteSwiftPackageReference "bangumi-public-swift-client" */,
 				1998DCC22CAD884000115E1F /* XCRemoteSwiftPackageReference "bangumi-private-swift-client" */,
+				1998DCC52CAD8B7C00115E1F /* XCRemoteSwiftPackageReference "swift-openapi-urlsession" */,
 			);
 			productRefGroup = 19BB342C2BD239AB00E5C295 /* Products */;
 			projectDirPath = "";
@@ -854,6 +858,14 @@
 				minimumVersion = 1.0.0;
 			};
 		};
+		1998DCC52CAD8B7C00115E1F /* XCRemoteSwiftPackageReference "swift-openapi-urlsession" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-openapi-urlsession";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.2;
+			};
+		};
 		19BD24242BE9C53800595973 /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/onevcat/Kingfisher.git";
@@ -887,6 +899,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 1998DCC22CAD884000115E1F /* XCRemoteSwiftPackageReference "bangumi-private-swift-client" */;
 			productName = BangumiPrivateSwiftClient;
+		};
+		1998DCC62CAD8B7C00115E1F /* OpenAPIURLSession */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1998DCC52CAD8B7C00115E1F /* XCRemoteSwiftPackageReference "swift-openapi-urlsession" */;
+			productName = OpenAPIURLSession;
 		};
 		19BD24252BE9C53800595973 /* Kingfisher */ = {
 			isa = XCSwiftPackageProductDependency;
