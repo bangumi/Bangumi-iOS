@@ -5,8 +5,6 @@
 //  Created by Chuan Chuan on 2024/5/4.
 //
 
-import BangumiPrivateSwiftClient
-import BangumiPublicSwiftClient
 import Foundation
 import OSLog
 

@@ -197,6 +197,7 @@
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		1998DCCC2CAE8A9800115E1F /* Database */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Database; sourceTree = "<group>"; };
+		1998DCDE2CAF398800115E1F /* Public */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Public; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -339,6 +340,7 @@
 		197A19D22BE671DA00804B13 /* Client */ = {
 			isa = PBXGroup;
 			children = (
+				1998DCDE2CAF398800115E1F /* Public */,
 				19671C3D2BDEB55D000B4D99 /* Basis.swift */,
 				19671C3E2BDEB55D000B4D99 /* Dto.swift */,
 				19AA1FCC2C100D3100FA4E18 /* Request.swift */,
@@ -448,6 +450,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				1998DCCC2CAE8A9800115E1F /* Database */,
+				1998DCDE2CAF398800115E1F /* Public */,
 			);
 			name = Chobits;
 			packageProductDependencies = (

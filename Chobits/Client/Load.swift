@@ -5,11 +5,8 @@
 //  Created by Chuan Chuan on 2024/5/7.
 //
 
-import BangumiPublicSwiftClient
 import Foundation
 import OSLog
-import OpenAPIRuntime
-import OpenAPIURLSession
 import SwiftData
 
 extension Chii {

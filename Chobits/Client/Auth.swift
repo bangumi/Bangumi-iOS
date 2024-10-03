@@ -26,9 +26,9 @@ extension Chii {
     return baseURL.appending(queryItems: queries)
   }
 
-  func logout() async {
+  func logout() {
     Logger.app.info("start logout")
-    await self.setAuthStatus(false)
+    self.setAuthStatus(false)
     Logger.app.info("clear keychain")
     self.keychain.delete("auth")
     Logger.app.info("clear auth session")
@@ -37,7 +37,7 @@ extension Chii {
     self.authorizedSession = nil
   }
 
-  func getAuthFromKeychain() async throws -> Auth? {
+  func getAuthFromKeychain() throws -> Auth? {
     if let data = self.keychain.getData("auth") {
       let decoder = JSONDecoder()
       return try decoder.decode(Auth.self, from: data)
@@ -67,7 +67,7 @@ extension Chii {
     ]
     let data = try await self.request(url: url, method: "POST", body: body, authorized: false)
     _ = try self.saveAuthResponse(data: data)
-    await self.setAuthStatus(true)
+    self.setAuthStatus(true)
   }
 
   func refreshAccessToken(auth: Auth) async throws -> Auth {

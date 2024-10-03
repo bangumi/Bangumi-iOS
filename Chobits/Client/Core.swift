@@ -5,12 +5,9 @@
 //  Created by Chuan Chuan on 2024/4/21.
 //
 
-import BangumiPrivateSwiftClient
 import Foundation
 import KeychainSwift
 import OSLog
-import OpenAPIRuntime
-import OpenAPIURLSession
 import SwiftData
 import SwiftUI
 
@@ -80,7 +77,7 @@ actor Chii {
 }
 
 extension Chii {
-  func setAuthStatus(_ authroized: Bool) async {
+  func setAuthStatus(_ authroized: Bool) {
     @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
     isAuthenticated = authroized
   }
@@ -193,7 +190,7 @@ extension Chii {
         return auth.accessToken
       }
     } else {
-      if let auth = try await self.getAuthFromKeychain() {
+      if let auth = try self.getAuthFromKeychain() {
         if auth.isExpired() {
           let auth = try await self.refreshAccessToken(auth: auth)
           return auth.accessToken
