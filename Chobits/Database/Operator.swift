@@ -18,7 +18,7 @@ extension DatabaseOperator {
     try modelContext.save()
   }
 
-  func fetchOne<T: PersistentModel>(
+  private func fetchOne<T: PersistentModel>(
     predicate: Predicate<T>? = nil,
     sortBy: [SortDescriptor<T>] = []
   ) throws -> T? {
@@ -28,7 +28,7 @@ extension DatabaseOperator {
     return list.first
   }
 
-  func insertIfNeeded<T: PersistentModel>(
+  private func insertIfNeeded<T: PersistentModel>(
     data: T,
     predicate: Predicate<T>
   ) throws {
@@ -245,6 +245,28 @@ extension DatabaseOperator {
 
 }
 
+extension DatabaseOperator {
+  public func getSubjectType(_ id: UInt) throws -> SubjectType {
+    let subject = try self.fetchOne(
+      predicate: #Predicate<Subject> {
+        $0.subjectId == id
+      }
+    )
+    guard let subject = subject else {
+      throw ChiiError(message: "subject not found: \(id)")
+    }
+    return subject.typeEnum
+  }
+
+  public func getEpisodeIDs(subjectId: UInt, sort: Float) throws -> [UInt] {
+    let descriptor = FetchDescriptor<Episode>(predicate: #Predicate<Episode> {
+      $0.subjectId == subjectId && $0.sort < sort
+    })
+    let episodes = try modelContext.fetch(descriptor)
+    return episodes.map { $0.episodeId }
+  }
+}
+
 
 extension DatabaseOperator {
   public func updateUserCollection(sid: UInt, eps: UInt?, vols: UInt?) throws {
@@ -285,14 +307,6 @@ extension DatabaseOperator {
       collection?.tags = tags
     }
     collection?.updatedAt = Date()
-  }
-
-  public func getEpisodeIDs(subjectId: UInt, sort: Float) throws -> [UInt] {
-    let descriptor = FetchDescriptor<Episode>(predicate: #Predicate<Episode> {
-      $0.subjectId == subjectId && $0.sort < sort
-    })
-    let episodes = try modelContext.fetch(descriptor)
-    return episodes.map { $0.episodeId }
   }
 
   public func updateEpisodeCollections(subjectId: UInt, sort: Float, type: EpisodeCollectionType) throws {

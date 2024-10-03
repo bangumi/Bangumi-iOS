@@ -63,7 +63,7 @@ struct SubjectBrowsingView: View {
         throw ChiiError.uninitialized
       }
       let resp = try await Chii.shared.getSubjects(
-        type: subjectType, filter: filter, limit: limit, offset: offset)
+        type: subjectType, filter: filter.dto(), limit: limit, offset: offset)
       total = resp.total
       if offset >= resp.total {
         exhausted = true

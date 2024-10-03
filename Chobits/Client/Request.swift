@@ -7,8 +7,7 @@
 
 import Foundation
 
-@Observable
-class SubjectsBrowseFilter {
+struct SubjectsBrowseFilterDTO {
   var cat: SubjectCategory? = nil
   var series: Bool? = nil
   var platform: String = ""
@@ -37,5 +36,26 @@ class SubjectsBrowseFilter {
       result += "month:\(month),"
     }
     return result
+  }
+}
+
+@Observable
+final class SubjectsBrowseFilter {
+  var cat: SubjectCategory? = nil
+  var series: Bool? = nil
+  var platform: String = ""
+  var sort: String = "rank"
+  var year: Int32 = 0
+  var month: Int8 = 0
+
+  func dto() -> SubjectsBrowseFilterDTO {
+    return SubjectsBrowseFilterDTO(
+      cat: cat,
+      series: series,
+      platform: platform,
+      sort: sort,
+      year: year,
+      month: month
+    )
   }
 }

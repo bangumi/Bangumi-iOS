@@ -88,14 +88,8 @@ extension Chii {
     guard let db = self.db else {
       throw ChiiError.uninitialized
     }
-    guard
-      let subject = try await db.fetchOne(
-        predicate: #Predicate<Subject> { $0.subjectId == subjectId })
-    else {
-      Logger.subject.error("subject \(subjectId) not found for loading episode")
-      return
-    }
-    switch subject.typeEnum {
+    let type = try await db.getSubjectType(subjectId)
+    switch type {
     case .anime, .real:
       break
     default:

@@ -145,7 +145,7 @@ extension Chii {
   }
 
   func getSubjects(
-    type: SubjectType, filter: SubjectsBrowseFilter, limit: Int = 10, offset: Int = 0
+    type: SubjectType, filter: SubjectsBrowseFilterDTO, limit: Int = 10, offset: Int = 0
   ) async throws -> SubjectsResponse {
     if self.mock {
       return loadFixture(fixture: "subjects.json", target: SubjectsResponse.self)
