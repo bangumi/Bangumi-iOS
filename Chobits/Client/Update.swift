@@ -18,7 +18,7 @@ extension Chii {
     Logger.api.info(
       "start update subject collection: \(sid), eps: \(eps.debugDescription), vols: \(vols.debugDescription)"
     )
-    let url = self.endpointPublic.appendingPathComponent("v0/users/-/collections/\(sid)")
+    let url = BangumiAPI.pub.build("v0/users/-/collections/\(sid)")
     var body: [String: Any] = [:]
     if let epStatus = eps {
       body["ep_status"] = epStatus
@@ -45,7 +45,7 @@ extension Chii {
     }
     let db = try self.getDB()
     Logger.api.info("start update subject collection: \(sid)")
-    let url = self.endpointPublic.appendingPathComponent("v0/users/-/collections/\(sid)")
+    let url = BangumiAPI.pub.build("v0/users/-/collections/\(sid)")
     var body: [String: Any] = [:]
     if let type = type {
       body["type"] = type.rawValue
@@ -84,8 +84,7 @@ extension Chii {
     )
 
     let episodeIds = try await db.getEpisodeIDs(subjectId: subjectId, sort: updateTo)
-    let url = self.endpointPublic
-      .appendingPathComponent("v0/users/-/collections/\(subjectId)/episodes")
+    let url = BangumiAPI.pub.build("v0/users/-/collections/\(subjectId)/episodes")
     let body: [String: Any] = [
       "episode_id": episodeIds,
       "type": type.rawValue,
@@ -105,7 +104,7 @@ extension Chii {
     }
     let db = try self.getDB()
     Logger.api.info("start update episode collection: \(episodeId)")
-    let url = self.endpointPublic.appendingPathComponent(
+    let url = BangumiAPI.pub.build(
       "v0/users/-/collections/-/episodes/\(episodeId)")
     let body: [String: Any] = [
       "type": type.rawValue

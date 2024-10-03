@@ -11,12 +11,27 @@ import OSLog
 import SwiftData
 import SwiftUI
 
+enum BangumiAPI {
+  case pub
+  case priv
+
+  var endpoint: URL {
+    switch self {
+    case .pub:
+      return URL(string: "https://api.bgm.tv")!
+    case .priv:
+      return URL(string: "https://next.bgm.tv")!
+    }
+  }
+
+  func build(_ path: String) -> URL {
+    return self.endpoint.appendingPathComponent(path)
+  }
+}
+
 @globalActor
 actor Chii {
   static let shared = Chii()
-
-  let endpointPublic = URL(string: "https://api.bgm.tv")!
-  let endpointPrivate = URL(string: "https://next.bgm.tv")!
 
   let keychain: KeychainSwift
   let version: String
