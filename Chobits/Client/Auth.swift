@@ -9,7 +9,7 @@ import Foundation
 import OSLog
 import SwiftUI
 
-extension ChiiClient {
+extension Chii {
   func getOAuthBase() -> String {
     @AppStorage("authDomain") var authDomain: String = AuthDomain.origin.label
     return "https://\(authDomain)/oauth"

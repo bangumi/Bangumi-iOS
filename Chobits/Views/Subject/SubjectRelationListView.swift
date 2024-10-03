@@ -12,7 +12,6 @@ struct SubjectRelationListView: View {
   let subjectId: UInt
 
   @Environment(Notifier.self) private var notifier
-  @Environment(ChiiClient.self) private var chii
   @Environment(\.modelContext) var modelContext
 
   @State private var subjectType: SubjectType = .unknown
@@ -102,6 +101,5 @@ struct SubjectRelationListView: View {
 
   return SubjectRelationListView(subjectId: subject.subjectId)
     .environment(Notifier())
-    .environment(ChiiClient(modelContainer: container, mock: .anime))
     .modelContainer(container)
 }

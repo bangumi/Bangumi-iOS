@@ -12,7 +12,6 @@ struct SubjectRelationsView: View {
   let subjectId: UInt
 
   @Environment(Notifier.self) private var notifier
-  @Environment(ChiiClient.self) private var chii
 
   @State private var refreshed: Bool = false
   @State private var counts: Int = 0
@@ -35,8 +34,8 @@ struct SubjectRelationsView: View {
     refreshed = true
 
     do {
-      try await chii.loadSubjectRelations(subjectId)
-      try await chii.db.save()
+      try await Chii.shared.loadSubjectRelations(subjectId)
+      try await Chii.shared.commit()
     } catch {
       notifier.alert(error: error)
     }
@@ -91,7 +90,6 @@ struct SubjectRelationsView: View {
     LazyVStack(alignment: .leading) {
       SubjectRelationsView(subjectId: subject.subjectId)
         .environment(Notifier())
-        .environment(ChiiClient(modelContainer: container, mock: .anime))
         .modelContainer(container)
     }
   }.padding()

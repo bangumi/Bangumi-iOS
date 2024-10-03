@@ -15,7 +15,6 @@ struct EpisodeGridView: View {
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
 
   @Environment(Notifier.self) private var notifier
-  @Environment(ChiiClient.self) private var chii
   @Environment(\.modelContext) var modelContext
 
   @State private var selected: Episode? = nil
@@ -55,8 +54,8 @@ struct EpisodeGridView: View {
     refreshed = true
 
     do {
-      try await chii.loadEpisodes(subjectId)
-      try await chii.db.save()
+      try await Chii.shared.loadEpisodes(subjectId)
+      try await Chii.shared.commit()
     } catch {
       notifier.alert(error: error)
     }
@@ -154,7 +153,6 @@ struct EpisodeGridView: View {
     LazyVStack(alignment: .leading) {
       EpisodeGridView(subjectId: subject.subjectId)
         .environment(Notifier())
-        .environment(ChiiClient(modelContainer: container, mock: .anime))
         .modelContainer(container)
     }
   }.padding()

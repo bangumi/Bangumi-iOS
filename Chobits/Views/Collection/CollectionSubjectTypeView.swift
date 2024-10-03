@@ -12,7 +12,6 @@ struct CollectionSubjectTypeView: View {
   let stype: SubjectType
 
   @Environment(Notifier.self) private var notifier
-  @Environment(ChiiClient.self) private var chii
   @Environment(\.modelContext) var modelContext
 
   @State private var collectionType: CollectionType = .collect
@@ -115,7 +114,6 @@ struct CollectionSubjectTypeView: View {
     ScrollView {
       CollectionSubjectTypeView(stype: .anime)
         .environment(Notifier())
-        .environment(ChiiClient(modelContainer: container, mock: .anime))
         .modelContainer(container)
     }
     .padding(.horizontal, 8)

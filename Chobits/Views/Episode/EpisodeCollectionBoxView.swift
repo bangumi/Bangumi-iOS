@@ -16,7 +16,6 @@ struct EpisodeCollectionBoxView: View {
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
 
   @Environment(Notifier.self) private var notifier
-  @Environment(ChiiClient.self) private var chii
   @Environment(\.dismiss) private var dismiss
 
   @State private var updating: Bool = false
@@ -36,7 +35,7 @@ struct EpisodeCollectionBoxView: View {
     if updating { return }
     updating = true
     do {
-      try await chii.updateEpisodeCollection(subjectId: subjectId, episodeId: episodeId, type: type)
+      try await Chii.shared.updateEpisodeCollection(subjectId: subjectId, episodeId: episodeId, type: type)
       UIImpactFeedbackGenerator(style: .light).impactOccurred()
       updating = false
       dismiss()
@@ -55,7 +54,7 @@ struct EpisodeCollectionBoxView: View {
     updating = true
     Task {
       do {
-        try await chii.updateSubjectEpisodeCollection(
+        try await Chii.shared.updateSubjectEpisodeCollection(
           subjectId: subjectId, updateTo: episode.sort, type: .collect)
         UIImpactFeedbackGenerator(style: .light).impactOccurred()
         updating = false
@@ -158,6 +157,5 @@ struct EpisodeCollectionBoxView: View {
     subjectId: subject.subjectId, episodeId: episodes.first!.episodeId
   )
   .environment(Notifier())
-  .environment(ChiiClient(modelContainer: container, mock: .anime))
   .modelContainer(container)
 }

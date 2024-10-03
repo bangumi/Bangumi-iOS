@@ -79,6 +79,7 @@ struct ResponseError: Codable, CustomStringConvertible {
 }
 
 enum ChiiError: Error, CustomStringConvertible {
+  case uninitialized
   case requireLogin
   case request(String)
   case badRequest(ResponseError)
@@ -114,6 +115,8 @@ enum ChiiError: Error, CustomStringConvertible {
 
   var description: String {
     switch self {
+    case .uninitialized:
+      return "Client not initialized"
     case .requireLogin:
       return "Please login with Bangumi"
     case .request(let message):

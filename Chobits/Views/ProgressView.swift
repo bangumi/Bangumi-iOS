@@ -13,7 +13,6 @@ struct ChiiProgressView: View {
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
 
   @Environment(Notifier.self) private var notifier
-  @Environment(ChiiClient.self) private var chii
   @Environment(\.modelContext) var modelContext
 
   @State private var loaded: Bool = false
@@ -105,8 +104,8 @@ struct ChiiProgressView: View {
 
   func updateCollections(type: SubjectType?) async {
     do {
-      try await chii.loadUserCollections(type: type)
-      try await chii.db.save()
+      try await Chii.shared.loadUserCollections(type: type)
+      try await Chii.shared.commit()
     } catch {
       notifier.alert(error: error)
     }

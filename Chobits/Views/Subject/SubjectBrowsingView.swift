@@ -13,7 +13,6 @@ struct SubjectBrowsingView: View {
   let categories: [SubjectCategory]
 
   @Environment(Notifier.self) private var notifier
-  @Environment(ChiiClient.self) private var chii
   @Environment(\.modelContext) var modelContext
 
   @State private var filterExpand: String = ""
@@ -60,7 +59,10 @@ struct SubjectBrowsingView: View {
     }
     fetching = true
     do {
-      let resp = try await chii.getSubjects(
+      guard let db = await Chii.shared.db else {
+        throw ChiiError.uninitialized
+      }
+      let resp = try await Chii.shared.getSubjects(
         type: subjectType, filter: filter, limit: limit, offset: offset)
       total = resp.total
       if offset >= resp.total {
@@ -69,10 +71,10 @@ struct SubjectBrowsingView: View {
       var result: [EnumerateItem<(UInt)>] = []
       for item in resp.data.enumerated() {
         let subject = Subject(item.element)
-        await chii.db.insert(subject)
+        await db.insert(subject)
         result.append(EnumerateItem(idx: item.offset + offset, inner: (item.element.id)))
       }
-      try await chii.db.save()
+      try await db.save()
       if result.count < limit {
         exhausted = true
       }
@@ -540,7 +542,6 @@ struct SubjectBrowsingView: View {
   return NavigationStack {
     SubjectBrowsingView(subjectType: .anime)
       .environment(Notifier())
-      .environment(ChiiClient(modelContainer: container, mock: .anime))
       .modelContainer(container)
   }
 }

@@ -12,7 +12,6 @@ struct PersonCharacterListView: View {
   let personId: UInt
 
   @Environment(Notifier.self) private var notifier
-  @Environment(ChiiClient.self) private var chii
   @Environment(\.modelContext) var modelContext
 
   @State private var relationType: SubjectCharacterRelationType = .unknown
@@ -85,7 +84,6 @@ struct PersonCharacterListItemView: View {
   let characterId: UInt
 
   @Environment(Notifier.self) private var notifier
-  @Environment(ChiiClient.self) private var chii
   @Environment(\.modelContext) var modelContext
 
   @State private var character: Character? = nil
@@ -151,7 +149,6 @@ struct PersonCharacterListItemSubjectItemView: View {
   let staff: String
 
   @Environment(Notifier.self) private var notifier
-  @Environment(ChiiClient.self) private var chii
   @Environment(\.modelContext) var modelContext
 
   @State private var subject: Subject? = nil
@@ -231,6 +228,5 @@ struct PersonCharacterListItemSubjectItemView: View {
 
   return PersonCharacterListView(personId: person.personId)
     .environment(Notifier())
-    .environment(ChiiClient(modelContainer: container, mock: .anime))
     .modelContainer(container)
 }

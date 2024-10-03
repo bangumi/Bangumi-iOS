@@ -12,7 +12,6 @@ struct SubjectCharactersView: View {
   let subjectId: UInt
 
   @Environment(Notifier.self) private var notifier
-  @Environment(ChiiClient.self) private var chii
   @Environment(\.modelContext) var modelContext
 
   @State private var refreshed: Bool = false
@@ -55,8 +54,8 @@ struct SubjectCharactersView: View {
     refreshed = true
 
     do {
-      try await chii.loadSubjectCharacters(subjectId)
-      try await chii.db.save()
+      try await Chii.shared.loadSubjectCharacters(subjectId)
+      try await Chii.shared.commit()
     } catch {
       notifier.alert(error: error)
     }
@@ -129,7 +128,6 @@ struct SubjectCharactersView: View {
     LazyVStack(alignment: .leading) {
       SubjectCharactersView(subjectId: subject.subjectId)
         .environment(Notifier())
-        .environment(ChiiClient(modelContainer: container, mock: .anime))
         .modelContainer(container)
     }
   }.padding()

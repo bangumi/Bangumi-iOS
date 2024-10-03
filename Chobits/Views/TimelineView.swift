@@ -13,14 +13,13 @@ struct ChiiTimelineView: View {
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
 
   @Environment(Notifier.self) private var notifier
-  @Environment(ChiiClient.self) private var chii
 
   @State private var profile: Profile?
 
   func updateProfile() {
     Task {
       do {
-        let profile = try await chii.getProfile()
+        let profile = try await Chii.shared.getProfile()
         self.profile = profile
       } catch {
         notifier.alert(error: error)
@@ -84,8 +83,8 @@ struct ChiiTimelineView: View {
 
 #Preview {
   let container = mockContainer()
+
   return ChiiTimelineView()
     .environment(Notifier())
-    .environment(ChiiClient(modelContainer: container, mock: .anime))
     .modelContainer(container)
 }

@@ -12,7 +12,6 @@ import UIKit
 
 struct AuthView: View {
   @Environment(Notifier.self) private var notifier
-  @Environment(ChiiClient.self) private var chii
 
   var slogan: String
 
@@ -21,7 +20,9 @@ struct AuthView: View {
       VStack {
         Text(slogan)
         Button {
-          signInView.signIn()
+          Task {
+            await signInView.signIn()
+          }
         } label: {
           Text("登录")
         }
@@ -31,17 +32,15 @@ struct AuthView: View {
   }
 
   private var signInView: SignInViewModel {
-    return SignInViewModel(notifier: notifier, chii: chii)
+    return SignInViewModel(notifier: notifier)
   }
 }
 
 class SignInViewModel: NSObject, ASWebAuthenticationPresentationContextProviding {
   let notifier: Notifier
-  let chii: ChiiClient
 
-  init(notifier: Notifier, chii: ChiiClient) {
+  init(notifier: Notifier) {
     self.notifier = notifier
-    self.chii = chii
   }
 
   func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
@@ -60,15 +59,15 @@ class SignInViewModel: NSObject, ASWebAuthenticationPresentationContextProviding
     }
     Task {
       do {
-        try await self.chii.exchangeForAccessToken(code: authorizationCode)
+        try await Chii.shared.exchangeForAccessToken(code: authorizationCode)
       } catch {
         notifier.alert(message: "failed to exchange for access token")
       }
     }
   }
 
-  func signIn() {
-    let authURL = chii.buildOAuthURL()
+  func signIn() async {
+    let authURL = await Chii.shared.buildOAuthURL()
     let session = ASWebAuthenticationSession(url: authURL, callbackURLScheme: "bangumi") {
       callback, error in
       self.handleAuthCallback(callback: callback, error: error)

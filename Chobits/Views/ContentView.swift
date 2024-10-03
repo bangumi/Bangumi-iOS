@@ -11,7 +11,6 @@ import SwiftUI
 
 struct ContentView: View {
   @Environment(Notifier.self) private var notifier
-  @Environment(ChiiClient.self) private var chii
 
   @State private var initialized = false
   @State private var selectedTab: ContentViewTab
@@ -29,19 +28,19 @@ struct ContentView: View {
       }
       tries += 1
       do {
-        _ = try await chii.getProfile()
-        await chii.setAuthStatus(true)
+        _ = try await Chii.shared.getProfile()
+        await Chii.shared.setAuthStatus(true)
         self.initialized = true
         return
       } catch ChiiError.requireLogin {
-        await chii.setAuthStatus(false)
+        await Chii.shared.setAuthStatus(false)
         self.initialized = true
         return
       } catch {
         Logger.api.warning("refresh profile failed: \(error)")
       }
     }
-    await chii.setAuthStatus(false)
+    await Chii.shared.setAuthStatus(false)
     self.initialized = true
   }
 

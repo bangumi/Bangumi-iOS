@@ -5,15 +5,14 @@
 //  Created by Chuan Chuan on 2024/5/4.
 //
 
+import BangumiPrivateSwiftClient
+import BangumiPublicSwiftClient
 import Foundation
 import OSLog
-import BangumiPublicSwiftClient
-import BangumiPrivateSwiftClient
 
-extension ChiiClient {
-
+extension Chii {
   func getProfile() async throws -> Profile {
-    if mock != nil {
+    if self.mock {
       return loadFixture(fixture: "profile.json", target: Profile.self)
     }
     if let profile = self.profile {
@@ -110,9 +109,9 @@ extension ChiiClient {
   }
 
   func getSubjectCollection(_ sid: UInt) async throws -> UserSubjectCollectionDTO {
-    if let mock = self.mock {
+    if self.mock {
       return loadFixture(
-        fixture: "user_collection_\(mock.name).json", target: UserSubjectCollectionDTO.self)
+        fixture: "user_collection_anime.json", target: UserSubjectCollectionDTO.self)
     }
     Logger.api.info("start get subject collection: \(sid)")
     let profile = try await self.getProfile()
@@ -120,7 +119,8 @@ extension ChiiClient {
       if profile.username.isEmpty {
         self.endpointPublic.appendingPathComponent("v0/users/\(profile.id)/collections/\(sid)")
       } else {
-        self.endpointPublic.appendingPathComponent("v0/users/\(profile.username)/collections/\(sid)")
+        self.endpointPublic.appendingPathComponent(
+          "v0/users/\(profile.username)/collections/\(sid)")
       }
     let data = try await request(url: url, method: "GET")
     let decoder = JSONDecoder()
@@ -131,8 +131,8 @@ extension ChiiClient {
   }
 
   func getSubject(_ sid: UInt) async throws -> SubjectDTO {
-    if let mock = self.mock {
-      return loadFixture(fixture: "subject_\(mock.name).json", target: SubjectDTO.self)
+    if self.mock {
+      return loadFixture(fixture: "subject_anime.json", target: SubjectDTO.self)
     }
     Logger.api.info("start get subject: \(sid)")
     let url = self.endpointPublic.appendingPathComponent("v0/subjects/\(sid)")
@@ -147,7 +147,7 @@ extension ChiiClient {
   func getSubjects(
     type: SubjectType, filter: SubjectsBrowseFilter, limit: Int = 10, offset: Int = 0
   ) async throws -> SubjectsResponse {
-    if self.mock != nil {
+    if self.mock {
       return loadFixture(fixture: "subjects.json", target: SubjectsResponse.self)
     }
     Logger.api.info(
@@ -189,7 +189,7 @@ extension ChiiClient {
   func getSubjectEpisodes(subjectId: UInt, type: EpisodeType?, limit: Int = 10, offset: Int = 0)
     async throws -> EpisodeResponse
   {
-    if self.mock != nil {
+    if self.mock {
       return loadFixture(fixture: "episodes.json", target: EpisodeResponse.self)
     }
     Logger.api.info(
@@ -218,7 +218,7 @@ extension ChiiClient {
   )
     async throws -> EpisodeCollectionResponse
   {
-    if self.mock != nil {
+    if self.mock {
       return loadFixture(
         fixture: "episode_collections.json", target: EpisodeCollectionResponse.self)
     }
@@ -231,8 +231,10 @@ extension ChiiClient {
     if let type = type {
       queries.append(URLQueryItem(name: "episode_type", value: String(type.rawValue)))
     }
-    let url = self.endpointPublic.appendingPathComponent("v0/users/-/collections/\(subjectId)/episodes")
-      .appending(queryItems: queries)
+    let url = self.endpointPublic.appendingPathComponent(
+      "v0/users/-/collections/\(subjectId)/episodes"
+    )
+    .appending(queryItems: queries)
     let data = try await request(url: url, method: "GET", authorized: self.isAuthenticated())
     let decoder = JSONDecoder()
     decoder.keyDecodingStrategy = .convertFromSnakeCase
@@ -243,7 +245,7 @@ extension ChiiClient {
   }
 
   func getSubjectCharacters(_ sid: UInt) async throws -> [SubjectCharacterDTO] {
-    if self.mock != nil {
+    if self.mock {
       return loadFixture(fixture: "subject_characters.json", target: [SubjectCharacterDTO].self)
     }
     Logger.api.info("start get subject characters: \(sid)")
@@ -257,7 +259,7 @@ extension ChiiClient {
   }
 
   func getSubjectPersons(_ sid: UInt) async throws -> [SubjectPersonDTO] {
-    if self.mock != nil {
+    if self.mock {
       return loadFixture(fixture: "subject_persons.json", target: [SubjectPersonDTO].self)
     }
     Logger.api.info("start get subject persons: \(sid)")
@@ -271,7 +273,7 @@ extension ChiiClient {
   }
 
   func getSubjectRelations(_ sid: UInt) async throws -> [SubjectRelationDTO] {
-    if self.mock != nil {
+    if self.mock {
       return loadFixture(fixture: "subject_relations.json", target: [SubjectRelationDTO].self)
     }
     Logger.api.info("start get subject relations: \(sid)")
@@ -285,7 +287,7 @@ extension ChiiClient {
   }
 
   func getCharacter(_ cid: UInt) async throws -> CharacterDTO {
-    if self.mock != nil {
+    if self.mock {
       return loadFixture(fixture: "character.json", target: CharacterDTO.self)
     }
     Logger.api.info("start get characters: \(cid)")
@@ -299,7 +301,7 @@ extension ChiiClient {
   }
 
   func getCharacterSubjects(_ cid: UInt) async throws -> [CharacterSubjectDTO] {
-    if self.mock != nil {
+    if self.mock {
       return loadFixture(fixture: "character_subjects.json", target: [CharacterSubjectDTO].self)
     }
     Logger.api.info("start get character subjects: \(cid)")
@@ -313,7 +315,7 @@ extension ChiiClient {
   }
 
   func getCharacterPersons(_ cid: UInt) async throws -> [CharacterPersonDTO] {
-    if self.mock != nil {
+    if self.mock {
       return loadFixture(fixture: "character_persons.json", target: [CharacterPersonDTO].self)
     }
     Logger.api.info("start get character persons: \(cid)")
@@ -327,7 +329,7 @@ extension ChiiClient {
   }
 
   func getPerson(_ pid: UInt) async throws -> PersonDTO {
-    if self.mock != nil {
+    if self.mock {
       return loadFixture(fixture: "person.json", target: PersonDTO.self)
     }
     Logger.api.info("start get persons: \(pid)")
@@ -341,7 +343,7 @@ extension ChiiClient {
   }
 
   func getPersonSubjects(_ pid: UInt) async throws -> [PersonSubjectDTO] {
-    if self.mock != nil {
+    if self.mock {
       return loadFixture(fixture: "person_subjects.json", target: [PersonSubjectDTO].self)
     }
     Logger.api.info("start get person subjects: \(pid)")
@@ -355,7 +357,7 @@ extension ChiiClient {
   }
 
   func getPersonCharacters(_ pid: UInt) async throws -> [PersonCharacterDTO] {
-    if self.mock != nil {
+    if self.mock {
       return loadFixture(fixture: "person_characters.json", target: [PersonCharacterDTO].self)
     }
     Logger.api.info("start get person characters: \(pid)")

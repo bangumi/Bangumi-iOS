@@ -15,7 +15,6 @@ struct EpisodeListView: View {
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
 
   @Environment(Notifier.self) private var notifier
-  @Environment(ChiiClient.self) private var chii
   @Environment(\.modelContext) var modelContext
 
   @State private var now: Date = Date()
@@ -295,6 +294,5 @@ struct EpisodeListView: View {
 
   return EpisodeListView(subjectId: subject.subjectId)
     .environment(Notifier())
-    .environment(ChiiClient(modelContainer: container, mock: .anime))
     .modelContainer(container)
 }

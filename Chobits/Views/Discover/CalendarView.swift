@@ -11,7 +11,6 @@ import SwiftUI
 
 struct CalendarView: View {
   @Environment(Notifier.self) private var notifier
-  @Environment(ChiiClient.self) private var chii
 
   @State private var refreshed: Bool = false
 
@@ -41,8 +40,8 @@ struct CalendarView: View {
     if refreshed { return }
     refreshed = true
     do {
-      try await chii.loadCalendar()
-      try await chii.db.save()
+      try await Chii.shared.loadCalendar()
+      try await Chii.shared.commit()
     } catch {
       notifier.alert(error: error)
     }

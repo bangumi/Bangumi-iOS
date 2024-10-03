@@ -13,7 +13,6 @@ struct ProgressRowView: View {
   let subjectId: UInt
 
   @Environment(Notifier.self) private var notifier
-  @Environment(ChiiClient.self) private var chii
   @Environment(\.modelContext) var modelContext
 
   @State private var showEpisodeBox: Bool = false
@@ -206,7 +205,6 @@ struct ProgressRowView: View {
     LazyVStack(alignment: .leading) {
       ProgressRowView(subjectId: subject.subjectId)
         .environment(Notifier())
-        .environment(ChiiClient(modelContainer: container, mock: .anime))
     }
   }
   .padding()

@@ -5,15 +5,18 @@
 //  Created by Chuan Chuan on 2024/5/7.
 //
 
+import BangumiPublicSwiftClient
 import Foundation
 import OSLog
-import SwiftData
 import OpenAPIRuntime
 import OpenAPIURLSession
-import BangumiPublicSwiftClient
+import SwiftData
 
-extension ChiiClient {
+extension Chii {
   func loadCalendar() async throws {
+    guard let db = self.db else {
+      throw ChiiError.uninitialized
+    }
     let response = try await self.getCalendar()
     for item in response {
       Logger.api.info("processing calendar: \(item.weekday.en)")
@@ -32,13 +35,16 @@ extension ChiiClient {
   }
 
   func loadSubject(_ sid: UInt) async throws {
+    guard let db = self.db else {
+      throw ChiiError.uninitialized
+    }
     let item = try await self.getSubject(sid)
-//
-//    let client = Client(
-//      serverURL: URL(string: "https://api.bgm.tv")!,
-//      transport: URLSessionTransport()
-//    )
-//    let response = try await client.getSubjectById(path: .init(subject_id: 12))
+    //
+    //    let client = Client(
+    //      serverURL: URL(string: "https://api.bgm.tv")!,
+    //      transport: URLSessionTransport()
+    //    )
+    //    let response = try await client.getSubjectById(path: .init(subject_id: 12))
 
     // 对于合并的条目，可能搜索返回的 ID 跟 API 拿到的 ID 不同
     // 我们直接返回 404 防止其他问题
@@ -49,19 +55,25 @@ extension ChiiClient {
     }
 
     let subject = Subject(item)
-    await self.db.insert(subject)
+    await db.insert(subject)
   }
 
   func loadUserCollection(_ subjectId: UInt) async throws {
     if !self.isAuthenticated() {
       return
     }
+    guard let db = self.db else {
+      throw ChiiError.uninitialized
+    }
     let item = try await self.getSubjectCollection(subjectId)
     let collection = UserSubjectCollection(item)
-    await self.db.insert(collection)
+    await db.insert(collection)
   }
 
   func loadUserCollections(type: SubjectType?) async throws {
+    guard let db = self.db else {
+      throw ChiiError.uninitialized
+    }
     var offset: Int = 0
     while true {
       let response = try await self.getSubjectCollections(
@@ -71,11 +83,11 @@ extension ChiiClient {
       }
       for item in response.data {
         let collection = UserSubjectCollection(item)
-        await self.db.insert(collection)
+        await db.insert(collection)
         if let slim = item.subject {
           let subject = Subject(slim)
           let subjectId = subject.subjectId
-          try await self.db.insertIfNeeded(
+          try await db.insertIfNeeded(
             data: subject,
             predicate: #Predicate<Subject> {
               $0.subjectId == subjectId
@@ -91,6 +103,9 @@ extension ChiiClient {
   }
 
   func loadEpisodes(_ subjectId: UInt) async throws {
+    guard let db = self.db else {
+      throw ChiiError.uninitialized
+    }
     guard
       let subject = try await db.fetchOne(
         predicate: #Predicate<Subject> { $0.subjectId == subjectId })
@@ -143,13 +158,16 @@ extension ChiiClient {
   }
 
   func loadSubjectCharacters(_ subjectId: UInt) async throws {
+    guard let db = self.db else {
+      throw ChiiError.uninitialized
+    }
     let response = try await self.getSubjectCharacters(subjectId)
     for (idx, item) in response.enumerated() {
       let related = SubjectRelatedCharacter(item, subjectId: subjectId, sort: Float(idx))
-      await self.db.insert(related)
+      await db.insert(related)
       let character = Character(item)
       let characterId = character.characterId
-      try await self.db.insertIfNeeded(
+      try await db.insertIfNeeded(
         data: character,
         predicate: #Predicate<Character> {
           $0.characterId == characterId
@@ -158,7 +176,7 @@ extension ChiiClient {
         for actor in actors {
           let actor = Person(actor)
           let actorId = actor.personId
-          try await self.db.insertIfNeeded(
+          try await db.insertIfNeeded(
             data: actor,
             predicate: #Predicate<Person> {
               $0.personId == actorId
@@ -169,13 +187,16 @@ extension ChiiClient {
   }
 
   func loadSubjectRelations(_ subjectId: UInt) async throws {
+    guard let db = self.db else {
+      throw ChiiError.uninitialized
+    }
     let response = try await self.getSubjectRelations(subjectId)
     for (idx, item) in response.enumerated() {
       let related = SubjectRelation(item, subjectId: subjectId, sort: Float(idx))
-      await self.db.insert(related)
+      await db.insert(related)
       let relation = Subject(item)
       let relationId = relation.subjectId
-      try await self.db.insertIfNeeded(
+      try await db.insertIfNeeded(
         data: relation,
         predicate: #Predicate<Subject> {
           $0.subjectId == relationId
@@ -184,13 +205,16 @@ extension ChiiClient {
   }
 
   func loadSubjectPersons(_ subjectId: UInt) async throws {
+    guard let db = self.db else {
+      throw ChiiError.uninitialized
+    }
     let response = try await self.getSubjectPersons(subjectId)
     for (idx, item) in response.enumerated() {
       let related = SubjectRelatedPerson(item, subjectId: subjectId, sort: Float(idx))
-      await self.db.insert(related)
+      await db.insert(related)
       let person = Person(item)
       let personId = person.personId
-      try await self.db.insertIfNeeded(
+      try await db.insertIfNeeded(
         data: person,
         predicate: #Predicate<Person> {
           $0.personId == personId
@@ -199,23 +223,29 @@ extension ChiiClient {
   }
 
   func loadCharacter(_ cid: UInt) async throws {
+    guard let db = self.db else {
+      throw ChiiError.uninitialized
+    }
     let item = try await self.getCharacter(cid)
     if cid != item.id {
       Logger.subject.warning("character id mismatch: \(cid) != \(item.id)")
       throw ChiiError(message: "这是一个被合并的角色")
     }
     let character = Character(item)
-    await self.db.insert(character)
+    await db.insert(character)
   }
 
   func loadCharacterSubjects(_ cid: UInt) async throws {
+    guard let db = self.db else {
+      throw ChiiError.uninitialized
+    }
     let response = try await self.getCharacterSubjects(cid)
     for item in response {
       let related = CharacterRelatedSubject(item, characterId: cid)
-      await self.db.insert(related)
+      await db.insert(related)
       let subject = Subject(item)
       let subjectId = subject.subjectId
-      try await self.db.insertIfNeeded(
+      try await db.insertIfNeeded(
         data: subject,
         predicate: #Predicate<Subject> {
           $0.subjectId == subjectId
@@ -224,14 +254,17 @@ extension ChiiClient {
   }
 
   func loadCharacterPersons(_ cid: UInt) async throws {
+    guard let db = self.db else {
+      throw ChiiError.uninitialized
+    }
     let response = try await self.getCharacterPersons(cid)
     for item in response {
       let related = CharacterRelatedPerson(item, characterId: cid)
-      await self.db.insert(related)
+      await db.insert(related)
 
       let person = Person(item)
       let personId = person.personId
-      try await self.db.insertIfNeeded(
+      try await db.insertIfNeeded(
         data: person,
         predicate: #Predicate<Person> {
           $0.personId == personId
@@ -239,7 +272,7 @@ extension ChiiClient {
 
       let subject = Subject(item)
       let subjectId = subject.subjectId
-      try await self.db.insertIfNeeded(
+      try await db.insertIfNeeded(
         data: subject,
         predicate: #Predicate<Subject> {
           $0.subjectId == subjectId
@@ -249,23 +282,29 @@ extension ChiiClient {
   }
 
   func loadPerson(_ pid: UInt) async throws {
+    guard let db = self.db else {
+      throw ChiiError.uninitialized
+    }
     let item = try await self.getPerson(pid)
     if pid != item.id {
       Logger.subject.warning("person id mismatch: \(pid) != \(item.id)")
       throw ChiiError(message: "这是一个被合并的人物")
     }
     let person = Person(item)
-    await self.db.insert(person)
+    await db.insert(person)
   }
 
   func loadPersonSubjects(_ pid: UInt) async throws {
+    guard let db = self.db else {
+      throw ChiiError.uninitialized
+    }
     let response = try await self.getPersonSubjects(pid)
     for item in response {
       let related = PersonRelatedSubject(item, personId: pid)
-      await self.db.insert(related)
+      await db.insert(related)
       let subject = Subject(item)
       let subjectId = subject.subjectId
-      try await self.db.insertIfNeeded(
+      try await db.insertIfNeeded(
         data: subject,
         predicate: #Predicate<Subject> {
           $0.subjectId == subjectId
@@ -274,14 +313,17 @@ extension ChiiClient {
   }
 
   func loadPersonCharacters(_ pid: UInt) async throws {
+    guard let db = self.db else {
+      throw ChiiError.uninitialized
+    }
     let response = try await self.getPersonCharacters(pid)
     for item in response {
       let related = PersonRelatedCharacter(item, personId: pid)
-      await self.db.insert(related)
+      await db.insert(related)
 
       let character = Character(item)
       let characterId = character.characterId
-      try await self.db.insertIfNeeded(
+      try await db.insertIfNeeded(
         data: character,
         predicate: #Predicate<Character> {
           $0.characterId == characterId
@@ -289,7 +331,7 @@ extension ChiiClient {
 
       let subject = Subject(item)
       let subjectId = subject.subjectId
-      try await self.db.insertIfNeeded(
+      try await db.insertIfNeeded(
         data: subject,
         predicate: #Predicate<Subject> {
           $0.subjectId == subjectId

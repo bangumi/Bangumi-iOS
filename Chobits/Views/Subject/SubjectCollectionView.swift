@@ -13,7 +13,6 @@ struct SubjectCollectionView: View {
   let subjectId: UInt
 
   @Environment(Notifier.self) private var notifier
-  @Environment(ChiiClient.self) private var chii
   @Environment(\.modelContext) var modelContext
 
   @State private var refreshed: Bool = false
@@ -36,7 +35,7 @@ struct SubjectCollectionView: View {
     refreshed = true
 
     do {
-      try await chii.loadUserCollection(subjectId)
+      try await Chii.shared.loadUserCollection(subjectId)
     } catch ChiiError.notFound(_) {
       Logger.collection.warning("collection not found for subject: \(subjectId)")
       //      do {
@@ -53,7 +52,7 @@ struct SubjectCollectionView: View {
       return
     }
     do {
-      try await chii.db.save()
+      try await Chii.shared.commit()
     } catch {
       notifier.alert(error: error)
     }
@@ -141,7 +140,6 @@ struct SubjectCollectionView: View {
     LazyVStack(alignment: .leading) {
       SubjectCollectionView(subjectId: collection.subjectId)
         .environment(Notifier())
-        .environment(ChiiClient(modelContainer: container, mock: .book))
         .modelContainer(container)
     }
   }

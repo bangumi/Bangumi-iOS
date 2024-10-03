@@ -12,7 +12,6 @@ struct SubjectHeaderView: View {
   let subjectId: UInt
 
   @Environment(Notifier.self) private var notifier
-  @Environment(ChiiClient.self) private var chii
 
   @State private var coverDetail = false
   @State private var collectionDetail = false
@@ -165,7 +164,6 @@ struct SubjectHeaderView: View {
     LazyVStack(alignment: .leading) {
       SubjectHeaderView(subjectId: subject.subjectId)
         .environment(Notifier())
-        .environment(ChiiClient(modelContainer: container, mock: .book))
         .modelContainer(container)
     }
   }.padding()

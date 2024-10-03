@@ -9,10 +9,13 @@ import Foundation
 import OSLog
 import SwiftData
 
-extension ChiiClient {
+extension Chii {
   func updateBookCollection(sid: UInt, eps: UInt?, vols: UInt?) async throws {
-    if self.mock != nil {
+    if self.mock {
       return
+    }
+    guard let db = self.db else {
+      throw ChiiError.uninitialized
     }
     Logger.api.info(
       "start update subject collection: \(sid), eps: \(eps.debugDescription), vols: \(vols.debugDescription)"
@@ -33,16 +36,19 @@ extension ChiiClient {
     )
     let item = try await getSubjectCollection(sid)
     let collect = UserSubjectCollection(item)
-    await self.db.insert(collect)
-    try await self.db.save()
+    await db.insert(collect)
+    try await db.save()
   }
 
   func updateSubjectCollection(
     sid: UInt, type: CollectionType?, rate: UInt8?, comment: String?,
     priv: Bool?, tags: [String]?
   ) async throws {
-    if self.mock != nil {
+    if self.mock {
       return
+    }
+    guard let db = self.db else {
+      throw ChiiError.uninitialized
     }
     Logger.api.info("start update subject collection: \(sid)")
     let url = self.endpointPublic.appendingPathComponent("v0/users/-/collections/\(sid)")
@@ -68,15 +74,18 @@ extension ChiiClient {
     Logger.api.info("finish update subject collection: \(sid)")
     let item = try await getSubjectCollection(sid)
     let collect = UserSubjectCollection(item)
-    await self.db.insert(collect)
-    try await self.db.save()
+    await db.insert(collect)
+    try await db.save()
   }
 
   func updateSubjectEpisodeCollection(
     subjectId: UInt, updateTo: Float, type: EpisodeCollectionType
   ) async throws {
-    if self.mock != nil {
+    if self.mock {
       return
+    }
+    guard let db = self.db else {
+      throw ChiiError.uninitialized
     }
     Logger.api.info(
       "start update subject episode collection: \(subjectId), -> \(updateTo) to \(type.description)"
@@ -116,11 +125,15 @@ extension ChiiClient {
   func updateEpisodeCollection(subjectId: UInt, episodeId: UInt, type: EpisodeCollectionType)
     async throws
   {
-    if self.mock != nil {
+    if self.mock {
       return
     }
+    guard let db = self.db else {
+      throw ChiiError.uninitialized
+    }
     Logger.api.info("start update episode collection: \(episodeId)")
-    let url = self.endpointPublic.appendingPathComponent("v0/users/-/collections/-/episodes/\(episodeId)")
+    let url = self.endpointPublic.appendingPathComponent(
+      "v0/users/-/collections/-/episodes/\(episodeId)")
     let body: [String: Any] = [
       "type": type.rawValue
     ]

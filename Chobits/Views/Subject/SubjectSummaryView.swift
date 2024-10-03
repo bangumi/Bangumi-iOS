@@ -13,7 +13,6 @@ struct SubjectSummaryView: View {
   let subjectId: UInt
 
   @Environment(Notifier.self) private var notifier
-  @Environment(ChiiClient.self) private var chii
 
   @State private var showSummary = false
 
@@ -96,7 +95,6 @@ struct SubjectSummaryView: View {
     LazyVStack(alignment: .leading) {
       SubjectSummaryView(subjectId: subject.subjectId)
         .environment(Notifier())
-        .environment(ChiiClient(modelContainer: container, mock: .anime))
         .modelContainer(container)
     }
   }.padding()

@@ -12,7 +12,6 @@ struct SubjectCollectionBoxView: View {
   let subjectId: UInt
 
   @Environment(Notifier.self) private var notifier
-  @Environment(ChiiClient.self) private var chii
   @Environment(\.modelContext) var modelContext
   @Environment(\.dismiss) private var dismiss
 
@@ -79,7 +78,7 @@ struct SubjectCollectionBoxView: View {
     self.updating = true
     Task {
       do {
-        try await chii.updateSubjectCollection(
+        try await Chii.shared.updateSubjectCollection(
           sid: subjectId,
           type: collectionType,
           rate: rate,
@@ -243,6 +242,5 @@ struct SubjectCollectionBoxView: View {
     subjectId: subject.subjectId
   )
   .environment(Notifier())
-  .environment(ChiiClient(modelContainer: container, mock: .anime))
   .modelContainer(container)
 }

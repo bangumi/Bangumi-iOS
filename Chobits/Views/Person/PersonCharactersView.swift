@@ -12,7 +12,6 @@ struct PersonCharactersView: View {
   var personId: UInt
 
   @Environment(Notifier.self) private var notifier
-  @Environment(ChiiClient.self) private var chii
 
   @Query
   private var characters: [PersonRelatedCharacter]
@@ -34,8 +33,8 @@ struct PersonCharactersView: View {
     refreshed = true
 
     do {
-      try await chii.loadPersonCharacters(personId)
-      try await chii.db.save()
+      try await Chii.shared.loadPersonCharacters(personId)
+      try await Chii.shared.commit()
     } catch {
       notifier.alert(error: error)
     }
@@ -79,7 +78,6 @@ struct PersonCharactersView: View {
     LazyVStack(alignment: .leading) {
       PersonCharactersView(personId: person.personId)
         .environment(Notifier())
-        .environment(ChiiClient(modelContainer: container, mock: .anime))
         .modelContainer(container)
     }.padding(.horizontal, 8)
   }

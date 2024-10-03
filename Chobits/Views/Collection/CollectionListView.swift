@@ -12,7 +12,6 @@ struct CollectionListView: View {
   let subjectType: SubjectType
 
   @Environment(Notifier.self) private var notifier
-  @Environment(ChiiClient.self) private var chii
   @Environment(\.modelContext) var modelContext
 
   @State private var loaded: Bool = false
@@ -166,6 +165,5 @@ struct CollectionListView: View {
 
   return CollectionListView(subjectType: SubjectType.anime)
     .environment(Notifier())
-    .environment(ChiiClient(modelContainer: container, mock: .anime))
     .modelContainer(container)
 }

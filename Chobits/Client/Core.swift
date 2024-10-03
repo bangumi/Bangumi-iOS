@@ -11,25 +11,27 @@ import OSLog
 import SwiftData
 import SwiftUI
 
-@Observable
-final class ChiiClient {
-  let keychain: KeychainSwift
-  let appInfo: AppInfo
+@globalActor
+actor Chii {
+  static let shared = Chii()
 
   let endpointPublic = URL(string: "https://api.bgm.tv")!
   let endpointPrivate = URL(string: "https://next.bgm.tv")!
 
-  let userAgent = "everpcpc/Chobits/0.0.1 (iOS)"
+  let keychain: KeychainSwift
+  let version: String
+  let userAgent: String
+  let appInfo: AppInfo
 
   var auth: Auth?
   var profile: Profile?
   var anonymousSession: URLSession?
   var authorizedSession: URLSession?
-  var db: BackgroundActor
 
-  var mock: SubjectType?
+  var db: BackgroundActor?
+  var mock: Bool = false
 
-  init(modelContainer: ModelContainer, mock: SubjectType? = nil) {
+  init() {
     @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
     Logger.app.info("new init chii client")
 
@@ -43,21 +45,41 @@ final class ChiiClient {
     guard let clientSecret = plist["BANGUMI_APP_SECRET"] as? String else {
       fatalError("Could not find BANGUMI_APP_SECRET in Info.plist")
     }
+    guard let version = plist["CFBundleShortVersionString"] as? String else {
+      fatalError("Could not find CFBundleShortVersionString in Info.plist")
+    }
+    guard let build = plist["CFBundleVersion"] as? String else {
+      fatalError("Could not find CFBundleVersion in Info.plist")
+    }
+    self.version = "v\(version)(\(build))"
+    self.userAgent = "everpcpc/Chobits/\(self.version) (iOS)"
     self.appInfo = AppInfo(
       clientId: clientId,
       clientSecret: clientSecret,
       callbackURL: "bangumi://oauth/callback"
     )
-    self.mock = mock
-    if mock != nil {
-      isAuthenticated = true
-    }
-    self.db = BackgroundActor(modelContainer: modelContainer)
   }
 
-  func setAuthStatus(_ isAuthenticated: Bool) async {
+  func setUp(container: ModelContainer) {
+    self.db = BackgroundActor(modelContainer: container)
+  }
+
+  func setMock() {
+    self.mock = true
+  }
+
+  func commit() async throws {
+    guard let db = self.db else {
+      throw ChiiError.uninitialized
+    }
+    try await db.save()
+  }
+}
+
+extension Chii {
+  func setAuthStatus(_ authroized: Bool) async {
     @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
-    isAuthenticated = isAuthenticated
+    isAuthenticated = authroized
   }
 
   func isAuthenticated() -> Bool {
@@ -165,5 +187,4 @@ final class ChiiClient {
     sessionConfig.httpAdditionalHeaders = headers
     return URLSession(configuration: sessionConfig)
   }
-
 }

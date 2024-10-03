@@ -11,7 +11,6 @@ import SwiftUI
 
 struct CollectionsView: View {
   @Environment(Notifier.self) private var notifier
-  @Environment(ChiiClient.self) private var chii
   @Environment(\.modelContext) var modelContext
 
   @State private var refreshing: Bool = false
@@ -23,25 +22,28 @@ struct CollectionsView: View {
     var offset: Int = 0
     while true {
       do {
-        let resp = try await chii.getSubjectCollections(
+        guard let db = await Chii.shared.db else {
+          throw ChiiError.uninitialized
+        }
+        let resp = try await Chii.shared.getSubjectCollections(
           collectionType: .unknown, subjectType: .unknown, offset: offset)
         if resp.data.isEmpty {
           break
         }
         for item in resp.data {
           let collection = UserSubjectCollection(item)
-          await chii.db.insert(collection)
+          await db.insert(collection)
           if let slim = item.subject {
             let subject = Subject(slim)
             let subjectId = subject.subjectId
-            try await chii.db.insertIfNeeded(
+            try await db.insertIfNeeded(
               data: subject,
               predicate: #Predicate<Subject> {
                 $0.subjectId == subjectId
               })
           }
         }
-        try await chii.db.save()
+        try await db.save()
         Logger.collection.info(
           "loaded user collection: \(resp.data.count), offset: \(offset), total: \(resp.total)")
         offset += resp.data.count
@@ -107,7 +109,6 @@ struct CollectionsView: View {
     ScrollView {
       CollectionsView()
         .environment(Notifier())
-        .environment(ChiiClient(modelContainer: container, mock: .anime))
         .modelContainer(container)
     }
     .padding(.horizontal, 8)

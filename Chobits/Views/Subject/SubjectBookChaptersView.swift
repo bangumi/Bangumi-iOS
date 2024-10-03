@@ -13,7 +13,6 @@ struct SubjectBookChaptersView: View {
   let subjectId: UInt
 
   @Environment(Notifier.self) private var notifier
-  @Environment(ChiiClient.self) private var chii
 
   @State private var inputEps: String = ""
   @State private var eps: UInt? = nil
@@ -52,7 +51,7 @@ struct SubjectBookChaptersView: View {
     self.updating = true
     Task {
       do {
-        try await chii.updateBookCollection(sid: subjectId, eps: eps, vols: vols)
+        try await Chii.shared.updateBookCollection(sid: subjectId, eps: eps, vols: vols)
         UIImpactFeedbackGenerator(style: .light).impactOccurred()
       } catch {
         notifier.alert(error: error)
@@ -176,7 +175,6 @@ struct SubjectBookChaptersView: View {
     LazyVStack(alignment: .leading) {
       SubjectBookChaptersView(subjectId: subject.subjectId)
         .environment(Notifier())
-        .environment(ChiiClient(modelContainer: container, mock: .book))
         .modelContainer(container)
     }
   }

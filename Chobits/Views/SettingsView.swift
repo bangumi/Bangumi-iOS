@@ -17,7 +17,6 @@ struct SettingsView: View {
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
 
   @Environment(Notifier.self) private var notifier
-  @Environment(ChiiClient.self) private var chii
   @Environment(\.modelContext) var modelContext
 
   @State private var selectedShareDomain: ShareDomain = .chii
@@ -36,7 +35,7 @@ struct SettingsView: View {
 
   func logout() {
     Task {
-      await chii.logout()
+      await Chii.shared.logout()
       do {
         try modelContext.delete(model: UserSubjectCollection.self)
         try modelContext.delete(model: Episode.self)
@@ -129,7 +128,9 @@ struct SettingsView: View {
             }.foregroundStyle(.red)
           } else {
             Button {
-              SignInViewModel(notifier: notifier, chii: chii).signIn()
+              Task {
+                await SignInViewModel(notifier: notifier).signIn()
+              }
             } label: {
               Text("使用 Bangumi 登录")
             }
@@ -149,6 +150,5 @@ struct SettingsView: View {
 
   return SettingsView()
     .environment(Notifier())
-    .environment(ChiiClient(modelContainer: container, mock: .anime))
     .modelContainer(container)
 }

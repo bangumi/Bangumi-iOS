@@ -25,6 +25,9 @@ func mockContainer() -> ModelContainer {
     PersonRelatedSubject.self,
     PersonRelatedCharacter.self,
     configurations: config)
+  Task {
+    await Chii.shared.setUp(container: container)
+  }
   return container
 }
 

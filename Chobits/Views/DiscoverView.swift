@@ -11,7 +11,6 @@ import SwiftUI
 
 struct ChiiDiscoverView: View {
   @Environment(Notifier.self) private var notifier
-  @Environment(ChiiClient.self) private var chii
   @Environment(\.modelContext) var modelContext
 
   @State private var searching = false
@@ -77,7 +76,10 @@ struct ChiiDiscoverView: View {
 
   func remoteSearch(limit: Int = 50) async -> [EnumerateItem<Subject>] {
     do {
-      let resp = try await chii.search(
+      guard let db = await Chii.shared.db else {
+        throw ChiiError.uninitialized
+      }
+      let resp = try await Chii.shared.search(
         keyword: query, type: subjectType, limit: limit, offset: offset)
       if offset > resp.total {
         Logger.app.info("remote search exhausted at total count: \(resp.total)")
@@ -87,14 +89,14 @@ struct ChiiDiscoverView: View {
       for item in resp.data.enumerated() {
         let subject = Subject(item.element)
         let subjectId = item.element.id
-        try await chii.db.insertIfNeeded(
+        try await db.insertIfNeeded(
           data: subject,
           predicate: #Predicate<Subject> {
             $0.subjectId == subjectId
           })
         result.append(EnumerateItem(idx: item.offset + offset, inner: subject))
       }
-      try await chii.db.save()
+      try await db.save()
       if result.count < limit {
         exhausted = true
       }

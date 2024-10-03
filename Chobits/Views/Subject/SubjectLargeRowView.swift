@@ -12,7 +12,6 @@ struct SubjectLargeRowView: View {
   let subjectId: UInt
 
   @Environment(Notifier.self) private var notifier
-  @Environment(ChiiClient.self) private var chii
   @Environment(\.modelContext) var modelContext
 
   @Query
@@ -138,7 +137,6 @@ struct SubjectLargeRowView: View {
     LazyVStack(alignment: .leading) {
       SubjectLargeRowView(subjectId: subject.subjectId)
         .environment(Notifier())
-        .environment(ChiiClient(modelContainer: container, mock: .book))
     }
   }
   .padding()

@@ -16,7 +16,6 @@ struct SubjectView: View {
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
 
   @Environment(Notifier.self) private var notifier
-  @Environment(ChiiClient.self) private var chii
 
   @State private var refreshed: Bool = false
 
@@ -41,8 +40,8 @@ struct SubjectView: View {
     refreshed = true
 
     do {
-      try await chii.loadSubject(subjectId)
-      try await chii.db.save()
+      try await Chii.shared.loadSubject(subjectId)
+      try await Chii.shared.commit()
     } catch {
       notifier.alert(error: error)
       return
@@ -51,11 +50,11 @@ struct SubjectView: View {
 
   func refreshAll() async {
     do {
-      try await chii.loadSubject(subjectId)
-      try await chii.loadEpisodes(subjectId)
-      try await chii.loadSubjectCharacters(subjectId)
-      try await chii.loadSubjectRelations(subjectId)
-      try await chii.db.save()
+      try await Chii.shared.loadSubject(subjectId)
+      try await Chii.shared.loadEpisodes(subjectId)
+      try await Chii.shared.loadSubjectCharacters(subjectId)
+      try await Chii.shared.loadSubjectRelations(subjectId)
+      try await Chii.shared.commit()
     } catch {
       notifier.alert(error: error)
     }
@@ -131,7 +130,6 @@ struct SubjectView: View {
   return NavigationStack {
     SubjectView(subjectId: subject.subjectId)
       .environment(Notifier())
-      .environment(ChiiClient(modelContainer: container, mock: .anime))
       .modelContainer(container)
   }
 }

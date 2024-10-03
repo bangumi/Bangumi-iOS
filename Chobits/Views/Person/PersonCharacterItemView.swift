@@ -14,7 +14,6 @@ struct PersonCharacterItemView: View {
   var subjectId: UInt
 
   @Environment(Notifier.self) private var notifier
-  @Environment(ChiiClient.self) private var chii
   @Environment(\.modelContext) var modelContext
 
   @State private var character: PersonRelatedCharacter? = nil
@@ -126,7 +125,6 @@ struct PersonCharacterItemView: View {
         personId: person.personId, characterId: character.characterId, subjectId: subject.subjectId
       )
       .environment(Notifier())
-      .environment(ChiiClient(modelContainer: container, mock: .anime))
       .modelContainer(container)
     }.padding(.horizontal, 8)
   }

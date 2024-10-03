@@ -13,7 +13,6 @@ struct CharacterSubjectItemView: View {
   var subjectId: UInt
 
   @Environment(Notifier.self) private var notifier
-  @Environment(ChiiClient.self) private var chii
 
   @Query
   private var relations: [CharacterRelatedSubject]
@@ -132,7 +131,6 @@ struct CharacterSubjectItemView: View {
     LazyVStack(alignment: .leading) {
       CharacterSubjectItemView(characterId: character.characterId, subjectId: subject.subjectId)
         .environment(Notifier())
-        .environment(ChiiClient(modelContainer: container, mock: .anime))
         .modelContainer(container)
     }.padding(.horizontal, 8)
   }

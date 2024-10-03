@@ -11,7 +11,6 @@ import SwiftUI
 @main
 struct ChobitsApp: App {
   @State var sharedModelContainer: ModelContainer
-  @State var chii: ChiiClient
   @State var notifier = Notifier()
 
   @AppStorage("appearance") var appearance: String = "system"
@@ -36,7 +35,9 @@ struct ChobitsApp: App {
     do {
       let container = try ModelContainer(for: schema, configurations: [modelConfiguration])
       sharedModelContainer = container
-      chii = ChiiClient(modelContainer: container)
+      Task {
+        await Chii.shared.setUp(container: container)
+      }
     } catch {
       fatalError("Could not create ModelContainer: \(error)")
     }
@@ -46,7 +47,6 @@ struct ChobitsApp: App {
     WindowGroup {
       ContentView()
         .environment(notifier)
-        .environment(chii)
         .preferredColorScheme(AppearanceType(appearance).colorScheme)
         .alert("ERROR", isPresented: $notifier.showAlert) {
           Button("OK") {

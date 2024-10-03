@@ -16,7 +16,6 @@ struct CharacterView: View {
   @AppStorage("isolationMode") var isolationMode: Bool = false
 
   @Environment(Notifier.self) private var notifier
-  @Environment(ChiiClient.self) private var chii
 
   @State private var refreshed: Bool = false
   @State private var coverDetail = false
@@ -44,8 +43,8 @@ struct CharacterView: View {
     refreshed = true
 
     do {
-      try await chii.loadCharacter(characterId)
-      try await chii.db.save()
+      try await Chii.shared.loadCharacter(characterId)
+      try await Chii.shared.commit()
     } catch {
       notifier.alert(error: error)
       return
@@ -54,10 +53,10 @@ struct CharacterView: View {
 
   func refreshAll() async {
     do {
-      try await chii.loadCharacter(characterId)
-      try await chii.loadCharacterSubjects(characterId)
-      try await chii.loadCharacterPersons(characterId)
-      try await chii.db.save()
+      try await Chii.shared.loadCharacter(characterId)
+      try await Chii.shared.loadCharacterSubjects(characterId)
+      try await Chii.shared.loadCharacterPersons(characterId)
+      try await Chii.shared.commit()
     } catch {
       notifier.alert(error: error)
     }
@@ -260,7 +259,6 @@ struct CharacterView: View {
   return NavigationStack {
     CharacterView(characterId: character.characterId)
       .environment(Notifier())
-      .environment(ChiiClient(modelContainer: container, mock: .anime))
       .modelContainer(container)
   }
 }
