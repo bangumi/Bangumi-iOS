@@ -14,18 +14,14 @@ import SwiftData
 
 extension Chii {
   func loadCalendar() async throws {
-    guard let db = self.db else {
-      throw ChiiError.uninitialized
-    }
+    let db = try self.getDB()
     let response = try await self.getCalendar()
     try await db.saveCalendar(response)
     try await db.commit()
   }
 
   func loadSubject(_ sid: UInt) async throws {
-    guard let db = self.db else {
-      throw ChiiError.uninitialized
-    }
+    let db = try self.getDB()
     let item = try await self.getSubject(sid)
 
     // 对于合并的条目，可能搜索返回的 ID 跟 API 拿到的 ID 不同
@@ -44,18 +40,14 @@ extension Chii {
     if !self.isAuthenticated() {
       return
     }
-    guard let db = self.db else {
-      throw ChiiError.uninitialized
-    }
+    let db = try self.getDB()
     let item = try await self.getSubjectCollection(subjectId)
     try await db.saveUserCollection(item)
     try await db.commit()
   }
 
   func loadUserCollections(type: SubjectType?) async throws {
-    guard let db = self.db else {
-      throw ChiiError.uninitialized
-    }
+    let db = try self.getDB()
     var offset: Int = 0
     while true {
       let response = try await self.getSubjectCollections(
@@ -79,9 +71,7 @@ extension Chii {
   }
 
   func loadEpisodes(_ subjectId: UInt) async throws {
-    guard let db = self.db else {
-      throw ChiiError.uninitialized
-    }
+    let db = try self.getDB()
     let type = try await db.getSubjectType(subjectId)
     switch type {
     case .anime, .real:
@@ -142,9 +132,7 @@ extension Chii {
   }
 
   func loadSubjectCharacters(_ subjectId: UInt) async throws {
-    guard let db = self.db else {
-      throw ChiiError.uninitialized
-    }
+    let db = try self.getDB()
     let response = try await self.getSubjectCharacters(subjectId)
     for (idx, item) in response.enumerated() {
       try await db.saveSubjectCharacter(item, subjectId: subjectId, sort: Float(idx))
@@ -159,9 +147,7 @@ extension Chii {
   }
 
   func loadSubjectRelations(_ subjectId: UInt) async throws {
-    guard let db = self.db else {
-      throw ChiiError.uninitialized
-    }
+    let db = try self.getDB()
     let response = try await self.getSubjectRelations(subjectId)
     for (idx, item) in response.enumerated() {
       try await db.saveSubject(item)
@@ -171,9 +157,7 @@ extension Chii {
   }
 
   func loadSubjectPersons(_ subjectId: UInt) async throws {
-    guard let db = self.db else {
-      throw ChiiError.uninitialized
-    }
+    let db = try self.getDB()
     let response = try await self.getSubjectPersons(subjectId)
     for (idx, item) in response.enumerated() {
       try await db.saveSubjectPerson(item, subjectId: subjectId, sort: Float(idx))
@@ -183,9 +167,7 @@ extension Chii {
   }
 
   func loadCharacter(_ cid: UInt) async throws {
-    guard let db = self.db else {
-      throw ChiiError.uninitialized
-    }
+    let db = try self.getDB()
     let item = try await self.getCharacter(cid)
     if cid != item.id {
       Logger.subject.warning("character id mismatch: \(cid) != \(item.id)")
@@ -196,9 +178,7 @@ extension Chii {
   }
 
   func loadCharacterSubjects(_ cid: UInt) async throws {
-    guard let db = self.db else {
-      throw ChiiError.uninitialized
-    }
+    let db = try self.getDB()
     let response = try await self.getCharacterSubjects(cid)
     for item in response {
       try await db.saveCharacterSubject(item, characterId: cid)
@@ -208,9 +188,7 @@ extension Chii {
   }
 
   func loadCharacterPersons(_ cid: UInt) async throws {
-    guard let db = self.db else {
-      throw ChiiError.uninitialized
-    }
+    let db = try self.getDB()
     let response = try await self.getCharacterPersons(cid)
     for item in response {
       try await db.saveCharacterPerson(item, characterId: cid)
@@ -221,9 +199,7 @@ extension Chii {
   }
 
   func loadPerson(_ pid: UInt) async throws {
-    guard let db = self.db else {
-      throw ChiiError.uninitialized
-    }
+    let db = try self.getDB()
     let item = try await self.getPerson(pid)
     if pid != item.id {
       Logger.subject.warning("person id mismatch: \(pid) != \(item.id)")
@@ -234,9 +210,7 @@ extension Chii {
   }
 
   func loadPersonSubjects(_ pid: UInt) async throws {
-    guard let db = self.db else {
-      throw ChiiError.uninitialized
-    }
+    let db = try self.getDB()
     let response = try await self.getPersonSubjects(pid)
     for item in response {
       try await db.savePersonSubject(item, personId: pid)
@@ -246,9 +220,7 @@ extension Chii {
   }
 
   func loadPersonCharacters(_ pid: UInt) async throws {
-    guard let db = self.db else {
-      throw ChiiError.uninitialized
-    }
+    let db = try self.getDB()
     let response = try await self.getPersonCharacters(pid)
     for item in response {
       try await db.savePersonCharacter(item, personId: pid)

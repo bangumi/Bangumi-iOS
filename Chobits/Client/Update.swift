@@ -14,9 +14,7 @@ extension Chii {
     if self.mock {
       return
     }
-    guard let db = self.db else {
-      throw ChiiError.uninitialized
-    }
+    let db = try self.getDB()
     Logger.api.info(
       "start update subject collection: \(sid), eps: \(eps.debugDescription), vols: \(vols.debugDescription)"
     )
@@ -45,9 +43,7 @@ extension Chii {
     if self.mock {
       return
     }
-    guard let db = self.db else {
-      throw ChiiError.uninitialized
-    }
+    let db = try self.getDB()
     Logger.api.info("start update subject collection: \(sid)")
     let url = self.endpointPublic.appendingPathComponent("v0/users/-/collections/\(sid)")
     var body: [String: Any] = [:]
@@ -82,9 +78,7 @@ extension Chii {
     if self.mock {
       return
     }
-    guard let db = self.db else {
-      throw ChiiError.uninitialized
-    }
+    let db = try self.getDB()
     Logger.api.info(
       "start update subject episode collection: \(subjectId), -> \(updateTo) to \(type.description)"
     )
@@ -109,9 +103,7 @@ extension Chii {
     if self.mock {
       return
     }
-    guard let db = self.db else {
-      throw ChiiError.uninitialized
-    }
+    let db = try self.getDB()
     Logger.api.info("start update episode collection: \(episodeId)")
     let url = self.endpointPublic.appendingPathComponent(
       "v0/users/-/collections/-/episodes/\(episodeId)")

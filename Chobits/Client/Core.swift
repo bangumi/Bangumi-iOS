@@ -67,6 +67,13 @@ actor Chii {
     self.db = DatabaseOperator(modelContainer: container)
   }
 
+  func getDB() throws -> DatabaseOperator {
+    guard let db = self.db else {
+      throw ChiiError.uninitialized
+    }
+    return db
+  }
+
   func setMock() {
     self.mock = true
   }
