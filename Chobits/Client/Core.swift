@@ -28,7 +28,7 @@ actor Chii {
   var anonymousSession: URLSession?
   var authorizedSession: URLSession?
 
-  var db: BackgroundActor?
+  var db: DatabaseOperator?
   var mock: Bool = false
 
   init() {
@@ -61,18 +61,11 @@ actor Chii {
   }
 
   func setUp(container: ModelContainer) {
-    self.db = BackgroundActor(modelContainer: container)
+    self.db = DatabaseOperator(modelContainer: container)
   }
 
   func setMock() {
     self.mock = true
-  }
-
-  func commit() async throws {
-    guard let db = self.db else {
-      throw ChiiError.uninitialized
-    }
-    try await db.save()
   }
 }
 

@@ -41,7 +41,6 @@ struct SubjectView: View {
 
     do {
       try await Chii.shared.loadSubject(subjectId)
-      try await Chii.shared.commit()
     } catch {
       notifier.alert(error: error)
       return
@@ -54,7 +53,6 @@ struct SubjectView: View {
       try await Chii.shared.loadEpisodes(subjectId)
       try await Chii.shared.loadSubjectCharacters(subjectId)
       try await Chii.shared.loadSubjectRelations(subjectId)
-      try await Chii.shared.commit()
     } catch {
       notifier.alert(error: error)
     }

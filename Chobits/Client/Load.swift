@@ -18,20 +18,8 @@ extension Chii {
       throw ChiiError.uninitialized
     }
     let response = try await self.getCalendar()
-    for item in response {
-      Logger.api.info("processing calendar: \(item.weekday.en)")
-      let cal = BangumiCalendar(item)
-      await db.insert(cal)
-      for small in item.items {
-        let subject = Subject(small)
-        let sid = small.id
-        try await db.insertIfNeeded(
-          data: subject,
-          predicate: #Predicate<Subject> {
-            $0.subjectId == sid
-          })
-      }
-    }
+    try await db.saveCalendar(response)
+    try await db.commit()
   }
 
   func loadSubject(_ sid: UInt) async throws {
@@ -54,8 +42,8 @@ extension Chii {
       throw ChiiError(message: "这是一个被合并的条目")
     }
 
-    let subject = Subject(item)
-    await db.insert(subject)
+    try await db.saveSubject(item)
+    try await db.commit()
   }
 
   func loadUserCollection(_ subjectId: UInt) async throws {
@@ -66,8 +54,8 @@ extension Chii {
       throw ChiiError.uninitialized
     }
     let item = try await self.getSubjectCollection(subjectId)
-    let collection = UserSubjectCollection(item)
-    await db.insert(collection)
+    try await db.saveUserCollection(item)
+    try await db.commit()
   }
 
   func loadUserCollections(type: SubjectType?) async throws {
@@ -82,16 +70,9 @@ extension Chii {
         break
       }
       for item in response.data {
-        let collection = UserSubjectCollection(item)
-        await db.insert(collection)
+        try await db.saveUserCollection(item)
         if let slim = item.subject {
-          let subject = Subject(slim)
-          let subjectId = subject.subjectId
-          try await db.insertIfNeeded(
-            data: subject,
-            predicate: #Predicate<Subject> {
-              $0.subjectId == subjectId
-            })
+          try await db.saveSubject(slim)
         }
       }
       Logger.api.info("loaded user collection: \(response.data.count), total: \(response.total)")
@@ -100,6 +81,7 @@ extension Chii {
         break
       }
     }
+    try await db.commit()
   }
 
   func loadEpisodes(_ subjectId: UInt) async throws {
@@ -121,9 +103,11 @@ extension Chii {
     }
     var offset: Int = 0
     let limit: Int = 1000
-    while true {
-      var total: Int = 0
-      if self.isAuthenticated() {
+    var total: Int = 0
+
+    if self.isAuthenticated() {
+      var items: [EpisodeCollectionDTO] = []
+      while true {
         let response = try await self.getEpisodeCollections(
           subjectId: subjectId, type: nil, limit: limit, offset: offset)
         total = response.total
@@ -134,26 +118,38 @@ extension Chii {
           break
         }
         for item in data {
-          let episode = Episode(item, subjectId: subjectId)
-          await db.insert(episode)
+          items.append(item)
         }
-        total = response.total
-      } else {
+        offset += limit
+        if offset > total {
+          break
+        }
+      }
+      for item in items {
+        try await db.saveEpisode(item, subjectId: subjectId)
+      }
+      try await db.commit()
+    } else {
+      var items: [EpisodeDTO] = []
+      while true {
         let response = try await self.getSubjectEpisodes(
           subjectId: subjectId, type: nil, limit: limit, offset: offset)
+        total = response.total
         if response.data.isEmpty {
           break
         }
         for item in response.data {
-          let episode = Episode(item, subjectId: subjectId)
-          await db.insert(episode)
+          items.append(item)
         }
-        total = response.total
+        offset += limit
+        if offset > total {
+          break
+        }
       }
-      offset += limit
-      if offset > total {
-        break
+      for item in items {
+        try await db.saveEpisode(item, subjectId: subjectId)
       }
+      try await db.commit()
     }
   }
 
@@ -163,27 +159,15 @@ extension Chii {
     }
     let response = try await self.getSubjectCharacters(subjectId)
     for (idx, item) in response.enumerated() {
-      let related = SubjectRelatedCharacter(item, subjectId: subjectId, sort: Float(idx))
-      await db.insert(related)
-      let character = Character(item)
-      let characterId = character.characterId
-      try await db.insertIfNeeded(
-        data: character,
-        predicate: #Predicate<Character> {
-          $0.characterId == characterId
-        })
+      try await db.saveSubjectCharacter(item, subjectId: subjectId, sort: Float(idx))
+      try await db.saveCharacter(item)
       if let actors = item.actors {
         for actor in actors {
-          let actor = Person(actor)
-          let actorId = actor.personId
-          try await db.insertIfNeeded(
-            data: actor,
-            predicate: #Predicate<Person> {
-              $0.personId == actorId
-            })
+          try await db.savePerson(actor)
         }
       }
     }
+    try await db.commit()
   }
 
   func loadSubjectRelations(_ subjectId: UInt) async throws {
@@ -192,16 +176,10 @@ extension Chii {
     }
     let response = try await self.getSubjectRelations(subjectId)
     for (idx, item) in response.enumerated() {
-      let related = SubjectRelation(item, subjectId: subjectId, sort: Float(idx))
-      await db.insert(related)
-      let relation = Subject(item)
-      let relationId = relation.subjectId
-      try await db.insertIfNeeded(
-        data: relation,
-        predicate: #Predicate<Subject> {
-          $0.subjectId == relationId
-        })
+      try await db.saveSubject(item)
+      try await db.saveSubjectRelation(item, subjectId: subjectId, sort: Float(idx))
     }
+    try await db.commit()
   }
 
   func loadSubjectPersons(_ subjectId: UInt) async throws {
@@ -210,16 +188,10 @@ extension Chii {
     }
     let response = try await self.getSubjectPersons(subjectId)
     for (idx, item) in response.enumerated() {
-      let related = SubjectRelatedPerson(item, subjectId: subjectId, sort: Float(idx))
-      await db.insert(related)
-      let person = Person(item)
-      let personId = person.personId
-      try await db.insertIfNeeded(
-        data: person,
-        predicate: #Predicate<Person> {
-          $0.personId == personId
-        })
+      try await db.saveSubjectPerson(item, subjectId: subjectId, sort: Float(idx))
+      try await db.savePerson(item)
     }
+    try await db.commit()
   }
 
   func loadCharacter(_ cid: UInt) async throws {
@@ -231,8 +203,8 @@ extension Chii {
       Logger.subject.warning("character id mismatch: \(cid) != \(item.id)")
       throw ChiiError(message: "这是一个被合并的角色")
     }
-    let character = Character(item)
-    await db.insert(character)
+    try await db.saveCharacter(item)
+    try await db.commit()
   }
 
   func loadCharacterSubjects(_ cid: UInt) async throws {
@@ -241,16 +213,10 @@ extension Chii {
     }
     let response = try await self.getCharacterSubjects(cid)
     for item in response {
-      let related = CharacterRelatedSubject(item, characterId: cid)
-      await db.insert(related)
-      let subject = Subject(item)
-      let subjectId = subject.subjectId
-      try await db.insertIfNeeded(
-        data: subject,
-        predicate: #Predicate<Subject> {
-          $0.subjectId == subjectId
-        })
+      try await db.saveCharacterSubject(item, characterId: cid)
+      try await db.saveSubject(item)
     }
+    try await db.commit()
   }
 
   func loadCharacterPersons(_ cid: UInt) async throws {
@@ -259,26 +225,11 @@ extension Chii {
     }
     let response = try await self.getCharacterPersons(cid)
     for item in response {
-      let related = CharacterRelatedPerson(item, characterId: cid)
-      await db.insert(related)
-
-      let person = Person(item)
-      let personId = person.personId
-      try await db.insertIfNeeded(
-        data: person,
-        predicate: #Predicate<Person> {
-          $0.personId == personId
-        })
-
-      let subject = Subject(item)
-      let subjectId = subject.subjectId
-      try await db.insertIfNeeded(
-        data: subject,
-        predicate: #Predicate<Subject> {
-          $0.subjectId == subjectId
-        })
-
+      try await db.saveCharacterPerson(item, characterId: cid)
+      try await db.savePerson(item)
+      try await db.saveSubject(item)
     }
+    try await db.commit()
   }
 
   func loadPerson(_ pid: UInt) async throws {
@@ -290,8 +241,8 @@ extension Chii {
       Logger.subject.warning("person id mismatch: \(pid) != \(item.id)")
       throw ChiiError(message: "这是一个被合并的人物")
     }
-    let person = Person(item)
-    await db.insert(person)
+    try await db.savePerson(item)
+    try await db.commit()
   }
 
   func loadPersonSubjects(_ pid: UInt) async throws {
@@ -300,16 +251,10 @@ extension Chii {
     }
     let response = try await self.getPersonSubjects(pid)
     for item in response {
-      let related = PersonRelatedSubject(item, personId: pid)
-      await db.insert(related)
-      let subject = Subject(item)
-      let subjectId = subject.subjectId
-      try await db.insertIfNeeded(
-        data: subject,
-        predicate: #Predicate<Subject> {
-          $0.subjectId == subjectId
-        })
+      try await db.savePersonSubject(item, personId: pid)
+      try await db.saveSubject(item)
     }
+    try await db.commit()
   }
 
   func loadPersonCharacters(_ pid: UInt) async throws {
@@ -318,24 +263,10 @@ extension Chii {
     }
     let response = try await self.getPersonCharacters(pid)
     for item in response {
-      let related = PersonRelatedCharacter(item, personId: pid)
-      await db.insert(related)
-
-      let character = Character(item)
-      let characterId = character.characterId
-      try await db.insertIfNeeded(
-        data: character,
-        predicate: #Predicate<Character> {
-          $0.characterId == characterId
-        })
-
-      let subject = Subject(item)
-      let subjectId = subject.subjectId
-      try await db.insertIfNeeded(
-        data: subject,
-        predicate: #Predicate<Subject> {
-          $0.subjectId == subjectId
-        })
+      try await db.savePersonCharacter(item, personId: pid)
+      try await db.saveCharacter(item)
+      try await db.saveSubject(item)
     }
+    try await db.commit()
   }
 }

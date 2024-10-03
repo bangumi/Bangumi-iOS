@@ -105,7 +105,6 @@ struct ChiiProgressView: View {
   func updateCollections(type: SubjectType?) async {
     do {
       try await Chii.shared.loadUserCollections(type: type)
-      try await Chii.shared.commit()
     } catch {
       notifier.alert(error: error)
     }

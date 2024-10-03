@@ -34,10 +34,8 @@ extension Chii {
     Logger.api.info(
       "finish update subject collection: \(sid), eps: \(eps.debugDescription), vols: \(vols.debugDescription)"
     )
-    let item = try await getSubjectCollection(sid)
-    let collect = UserSubjectCollection(item)
-    await db.insert(collect)
-    try await db.save()
+    try await db.updateUserCollection(sid: sid, eps: eps, vols: vols)
+    try await db.commit()
   }
 
   func updateSubjectCollection(
@@ -72,10 +70,9 @@ extension Chii {
       _ = try await self.request(url: url, method: "POST", body: body, authorized: true)
     }
     Logger.api.info("finish update subject collection: \(sid)")
-    let item = try await getSubjectCollection(sid)
-    let collect = UserSubjectCollection(item)
-    await db.insert(collect)
-    try await db.save()
+
+    try await db.updateUserCollection(sid: sid, type: type, rate: rate, comment: comment, priv: priv, tags: tags)
+    try await db.commit()
   }
 
   func updateSubjectEpisodeCollection(
@@ -90,11 +87,8 @@ extension Chii {
     Logger.api.info(
       "start update subject episode collection: \(subjectId), -> \(updateTo) to \(type.description)"
     )
-    let predicate = #Predicate<Episode> {
-      $0.subjectId == subjectId && $0.sort <= updateTo
-    }
-    let episodes = try await db.fetchData(predicate: predicate)
-    let episodeIds = episodes.map { $0.episodeId }
+
+    let episodeIds = try await db.getEpisodeIDs(subjectId: subjectId, sort: updateTo)
     let url = self.endpointPublic
       .appendingPathComponent("v0/users/-/collections/\(subjectId)/episodes")
     let body: [String: Any] = [
@@ -103,23 +97,9 @@ extension Chii {
     ]
     _ = try await self.request(url: url, method: "PATCH", body: body, authorized: true)
     Logger.api.info("finish update subject episode collection: \(subjectId), \(episodeIds)")
-    try await db.update(
-      predicate: #Predicate<Episode> {
-        $0.subjectId == subjectId && $0.sort <= updateTo
-      },
-      update: {
-        Logger.episode.info("update episode collection: \($0.episodeId) -> \(type.description)")
-        $0.collection = type.rawValue
-      })
-    try await db.update(
-      predicate: #Predicate<UserSubjectCollection> {
-        $0.subjectId == subjectId
-      },
-      update: {
-        Logger.subject.info("update subject collection date: \($0.subjectId)")
-        $0.updatedAt = Date()
-      })
-    try await db.save()
+
+    try await db.updateEpisodeCollections(subjectId: subjectId, sort: updateTo, type: type)
+    try await db.commit()
   }
 
   func updateEpisodeCollection(subjectId: UInt, episodeId: UInt, type: EpisodeCollectionType)
@@ -139,22 +119,8 @@ extension Chii {
     ]
     _ = try await self.request(url: url, method: "PUT", body: body, authorized: true)
     Logger.api.info("finish update episode collection: \(episodeId)")
-    try await db.update(
-      predicate: #Predicate<Episode> {
-        $0.episodeId == episodeId
-      },
-      update: {
-        Logger.episode.info("update episode collection: \($0.episodeId) -> \(type.description)")
-        $0.collection = type.rawValue
-      })
-    try await db.update(
-      predicate: #Predicate<UserSubjectCollection> {
-        $0.subjectId == subjectId
-      },
-      update: {
-        Logger.subject.info("update subject collection date: \($0.subjectId)")
-        $0.updatedAt = Date()
-      })
-    try await db.save()
+
+    try await db.updateEpisodeCollection(subjectId: subjectId, episodeId: episodeId, type: type)
+    try await db.commit()
   }
 }

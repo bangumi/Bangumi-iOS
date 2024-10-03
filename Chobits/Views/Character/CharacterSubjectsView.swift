@@ -34,7 +34,6 @@ struct CharacterSubjectsView: View {
     do {
       try await Chii.shared.loadCharacterSubjects(characterId)
       try await Chii.shared.loadCharacterPersons(characterId)
-      try await Chii.shared.commit()
     } catch {
       notifier.alert(error: error)
     }

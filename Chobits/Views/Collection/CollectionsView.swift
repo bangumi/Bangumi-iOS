@@ -31,19 +31,12 @@ struct CollectionsView: View {
           break
         }
         for item in resp.data {
-          let collection = UserSubjectCollection(item)
-          await db.insert(collection)
+          try await db.saveUserCollection(item)
           if let slim = item.subject {
-            let subject = Subject(slim)
-            let subjectId = subject.subjectId
-            try await db.insertIfNeeded(
-              data: subject,
-              predicate: #Predicate<Subject> {
-                $0.subjectId == subjectId
-              })
+            try await db.saveSubject(slim)
           }
         }
-        try await db.save()
+        try await db.commit()
         Logger.collection.info(
           "loaded user collection: \(resp.data.count), offset: \(offset), total: \(resp.total)")
         offset += resp.data.count

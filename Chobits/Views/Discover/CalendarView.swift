@@ -41,7 +41,6 @@ struct CalendarView: View {
     refreshed = true
     do {
       try await Chii.shared.loadCalendar()
-      try await Chii.shared.commit()
     } catch {
       notifier.alert(error: error)
     }

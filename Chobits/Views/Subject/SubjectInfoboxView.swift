@@ -84,7 +84,6 @@ struct SubjectInfoboxView: View {
   func refresh() async {
     do {
       try await Chii.shared.loadSubjectPersons(subjectId)
-      try await Chii.shared.commit()
     } catch {
       notifier.alert(error: error)
     }

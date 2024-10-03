@@ -70,11 +70,10 @@ struct SubjectBrowsingView: View {
       }
       var result: [EnumerateItem<(UInt)>] = []
       for item in resp.data.enumerated() {
-        let subject = Subject(item.element)
-        await db.insert(subject)
+        try await db.saveSubject(item.element)
         result.append(EnumerateItem(idx: item.offset + offset, inner: (item.element.id)))
       }
-      try await db.save()
+      try await db.commit()
       if result.count < limit {
         exhausted = true
       }

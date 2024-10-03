@@ -87,16 +87,10 @@ struct ChiiDiscoverView: View {
       }
       var result: [EnumerateItem<Subject>] = []
       for item in resp.data.enumerated() {
-        let subject = Subject(item.element)
-        let subjectId = item.element.id
-        try await db.insertIfNeeded(
-          data: subject,
-          predicate: #Predicate<Subject> {
-            $0.subjectId == subjectId
-          })
-        result.append(EnumerateItem(idx: item.offset + offset, inner: subject))
+        try await db.saveSubject(item.element)
+        result.append(EnumerateItem(idx: item.offset + offset, inner: Subject(item.element)))
       }
-      try await db.save()
+      try await db.commit()
       if result.count < limit {
         exhausted = true
       }

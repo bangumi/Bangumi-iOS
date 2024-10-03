@@ -51,11 +51,6 @@ struct SubjectCollectionView: View {
       notifier.alert(error: error)
       return
     }
-    do {
-      try await Chii.shared.commit()
-    } catch {
-      notifier.alert(error: error)
-    }
   }
 
   var body: some View {
