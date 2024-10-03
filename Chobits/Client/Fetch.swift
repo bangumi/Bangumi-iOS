@@ -21,9 +21,7 @@ extension Chii {
     Logger.api.info("start get profile")
     let url = self.endpointPublic.appendingPathComponent("v0/me")
     let data = try await request(url: url, method: "GET")
-    let decoder = JSONDecoder()
-    decoder.keyDecodingStrategy = .convertFromSnakeCase
-    let profile = try decoder.decode(Profile.self, from: data)
+    let profile: Profile = try self.decodeResponse(data)
     self.profile = profile
     Logger.api.info("finish get profile")
     return profile
@@ -54,9 +52,7 @@ extension Chii {
     }
     let pageURL = url.appending(queryItems: queryItems)
     let data = try await request(url: pageURL, method: "GET")
-    let decoder = JSONDecoder()
-    decoder.keyDecodingStrategy = .convertFromSnakeCase
-    let response = try decoder.decode(SubjectCollectionResponse.self, from: data)
+    let response: SubjectCollectionResponse = try self.decodeResponse(data)
     Logger.api.info("finish get subject collections")
     return response
   }
@@ -65,9 +61,7 @@ extension Chii {
     Logger.api.info("start get calendar")
     let url = self.endpointPublic.appendingPathComponent("calendar")
     let data = try await request(url: url, method: "GET", authorized: false)
-    let decoder = JSONDecoder()
-    decoder.keyDecodingStrategy = .convertFromSnakeCase
-    let calendars = try decoder.decode([BangumiCalendarDTO].self, from: data)
+    let calendars: [BangumiCalendarDTO] = try self.decodeResponse(data)
     Logger.api.info("finish get calendar")
     return calendars
   }
@@ -101,9 +95,7 @@ extension Chii {
     let data = try await self.request(
       url: url, method: "POST", body: body, authorized: self.isAuthenticated()
     )
-    let decoder = JSONDecoder()
-    decoder.keyDecodingStrategy = .convertFromSnakeCase
-    let resp = try decoder.decode(SubjectSearchResponse.self, from: data)
+    let resp: SubjectSearchResponse = try self.decodeResponse(data)
     Logger.api.info("finish search: \(keyword), \(type.name), \(limit), \(offset)")
     return resp
   }
@@ -123,9 +115,7 @@ extension Chii {
           "v0/users/\(profile.username)/collections/\(sid)")
       }
     let data = try await request(url: url, method: "GET")
-    let decoder = JSONDecoder()
-    decoder.keyDecodingStrategy = .convertFromSnakeCase
-    let collection = try decoder.decode(UserSubjectCollectionDTO.self, from: data)
+    let collection: UserSubjectCollectionDTO = try self.decodeResponse(data)
     Logger.api.info("finish get subject collection: \(sid)")
     return collection
   }
@@ -137,9 +127,7 @@ extension Chii {
     Logger.api.info("start get subject: \(sid)")
     let url = self.endpointPublic.appendingPathComponent("v0/subjects/\(sid)")
     let data = try await request(url: url, method: "GET", authorized: self.isAuthenticated())
-    let decoder = JSONDecoder()
-    decoder.keyDecodingStrategy = .convertFromSnakeCase
-    let subject = try decoder.decode(SubjectDTO.self, from: data)
+    let subject: SubjectDTO = try self.decodeResponse(data)
     Logger.api.info("finish get subject: \(sid)")
     return subject
   }
@@ -178,9 +166,7 @@ extension Chii {
     let url = self.endpointPublic.appendingPathComponent("v0/subjects")
       .appending(queryItems: queries)
     let data = try await request(url: url, method: "GET", authorized: self.isAuthenticated())
-    let decoder = JSONDecoder()
-    decoder.keyDecodingStrategy = .convertFromSnakeCase
-    let response = try decoder.decode(SubjectsResponse.self, from: data)
+    let response: SubjectsResponse = try self.decodeResponse(data)
     Logger.api.info(
       "finish browsing subjects: \(type.description), \(limit), \(offset), \(filter.description)")
     return response
@@ -205,9 +191,7 @@ extension Chii {
     let url = self.endpointPublic.appendingPathComponent("v0/episodes")
       .appending(queryItems: queries)
     let data = try await request(url: url, method: "GET", authorized: self.isAuthenticated())
-    let decoder = JSONDecoder()
-    decoder.keyDecodingStrategy = .convertFromSnakeCase
-    let resp = try decoder.decode(EpisodeResponse.self, from: data)
+    let resp: EpisodeResponse = try self.decodeResponse(data)
     Logger.api.info(
       "finish get subject episodes: \(subjectId), \(type.debugDescription), \(limit), \(offset)")
     return resp
@@ -236,9 +220,7 @@ extension Chii {
     )
     .appending(queryItems: queries)
     let data = try await request(url: url, method: "GET", authorized: self.isAuthenticated())
-    let decoder = JSONDecoder()
-    decoder.keyDecodingStrategy = .convertFromSnakeCase
-    let resp = try decoder.decode(EpisodeCollectionResponse.self, from: data)
+    let resp: EpisodeCollectionResponse = try self.decodeResponse(data)
     Logger.api.info(
       "finish get episode collections: \(subjectId), \(type.debugDescription), \(limit), \(offset)")
     return resp
@@ -251,9 +233,7 @@ extension Chii {
     Logger.api.info("start get subject characters: \(sid)")
     let url = self.endpointPublic.appendingPathComponent("v0/subjects/\(sid)/characters")
     let data = try await request(url: url, method: "GET", authorized: self.isAuthenticated())
-    let decoder = JSONDecoder()
-    decoder.keyDecodingStrategy = .convertFromSnakeCase
-    let characters = try decoder.decode([SubjectCharacterDTO].self, from: data)
+    let characters: [SubjectCharacterDTO] = try self.decodeResponse(data)
     Logger.api.info("finish get subject characters: \(sid)")
     return characters
   }
@@ -265,9 +245,7 @@ extension Chii {
     Logger.api.info("start get subject persons: \(sid)")
     let url = self.endpointPublic.appendingPathComponent("v0/subjects/\(sid)/persons")
     let data = try await request(url: url, method: "GET", authorized: self.isAuthenticated())
-    let decoder = JSONDecoder()
-    decoder.keyDecodingStrategy = .convertFromSnakeCase
-    let persons = try decoder.decode([SubjectPersonDTO].self, from: data)
+    let persons: [SubjectPersonDTO] = try self.decodeResponse(data)
     Logger.api.info("finish get subject persons: \(sid)")
     return persons
   }
@@ -279,9 +257,7 @@ extension Chii {
     Logger.api.info("start get subject relations: \(sid)")
     let url = self.endpointPublic.appendingPathComponent("v0/subjects/\(sid)/subjects")
     let data = try await request(url: url, method: "GET", authorized: self.isAuthenticated())
-    let decoder = JSONDecoder()
-    decoder.keyDecodingStrategy = .convertFromSnakeCase
-    let relations = try decoder.decode([SubjectRelationDTO].self, from: data)
+    let relations: [SubjectRelationDTO] = try self.decodeResponse(data)
     Logger.api.info("finish get subject relations: \(sid)")
     return relations
   }
@@ -293,9 +269,7 @@ extension Chii {
     Logger.api.info("start get characters: \(cid)")
     let url = self.endpointPublic.appendingPathComponent("v0/characters/\(cid)")
     let data = try await request(url: url, method: "GET", authorized: self.isAuthenticated())
-    let decoder = JSONDecoder()
-    decoder.keyDecodingStrategy = .convertFromSnakeCase
-    let character = try decoder.decode(CharacterDTO.self, from: data)
+    let character: CharacterDTO = try self.decodeResponse(data)
     Logger.api.info("finish get characters: \(cid)")
     return character
   }
@@ -307,9 +281,7 @@ extension Chii {
     Logger.api.info("start get character subjects: \(cid)")
     let url = self.endpointPublic.appendingPathComponent("v0/characters/\(cid)/subjects")
     let data = try await request(url: url, method: "GET", authorized: self.isAuthenticated())
-    let decoder = JSONDecoder()
-    decoder.keyDecodingStrategy = .convertFromSnakeCase
-    let subjects = try decoder.decode([CharacterSubjectDTO].self, from: data)
+    let subjects: [CharacterSubjectDTO] = try self.decodeResponse(data)
     Logger.api.info("finish get character subjects: \(cid)")
     return subjects
   }
@@ -321,9 +293,7 @@ extension Chii {
     Logger.api.info("start get character persons: \(cid)")
     let url = self.endpointPublic.appendingPathComponent("v0/characters/\(cid)/persons")
     let data = try await request(url: url, method: "GET", authorized: self.isAuthenticated())
-    let decoder = JSONDecoder()
-    decoder.keyDecodingStrategy = .convertFromSnakeCase
-    let persons = try decoder.decode([CharacterPersonDTO].self, from: data)
+    let persons: [CharacterPersonDTO] = try self.decodeResponse(data)
     Logger.api.info("finish get character persons: \(cid)")
     return persons
   }
@@ -335,9 +305,7 @@ extension Chii {
     Logger.api.info("start get persons: \(pid)")
     let url = self.endpointPublic.appendingPathComponent("v0/persons/\(pid)")
     let data = try await request(url: url, method: "GET", authorized: self.isAuthenticated())
-    let decoder = JSONDecoder()
-    decoder.keyDecodingStrategy = .convertFromSnakeCase
-    let person = try decoder.decode(PersonDTO.self, from: data)
+    let person: PersonDTO = try self.decodeResponse(data)
     Logger.api.info("finish get persons: \(pid)")
     return person
   }
@@ -349,9 +317,7 @@ extension Chii {
     Logger.api.info("start get person subjects: \(pid)")
     let url = self.endpointPublic.appendingPathComponent("v0/persons/\(pid)/subjects")
     let data = try await request(url: url, method: "GET", authorized: self.isAuthenticated())
-    let decoder = JSONDecoder()
-    decoder.keyDecodingStrategy = .convertFromSnakeCase
-    let subjects = try decoder.decode([PersonSubjectDTO].self, from: data)
+    let subjects: [PersonSubjectDTO] = try self.decodeResponse(data)
     Logger.api.info("finish get person subjects: \(pid)")
     return subjects
   }
@@ -363,9 +329,7 @@ extension Chii {
     Logger.api.info("start get person characters: \(pid)")
     let url = self.endpointPublic.appendingPathComponent("v0/persons/\(pid)/characters")
     let data = try await request(url: url, method: "GET", authorized: self.isAuthenticated())
-    let decoder = JSONDecoder()
-    decoder.keyDecodingStrategy = .convertFromSnakeCase
-    let characters = try decoder.decode([PersonCharacterDTO].self, from: data)
+    let characters: [PersonCharacterDTO] = try self.decodeResponse(data)
     Logger.api.info("finish get person characters: \(pid)")
     return characters
   }

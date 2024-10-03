@@ -90,6 +90,12 @@ extension Chii {
     return isAuthenticated
   }
 
+  func decodeResponse<T: Codable>(_ data: Data) throws -> T {
+    let decoder = JSONDecoder()
+    decoder.keyDecodingStrategy = .convertFromSnakeCase
+    return try decoder.decode(T.self, from: data)
+  }
+
   func request(url: URL, method: String, body: Any? = nil, authorized: Bool = true) async throws
     -> Data
   {
@@ -127,9 +133,7 @@ extension Chii {
       return data
     } else if response.statusCode < 500 {
       Logger.api.warning("response \(response.statusCode): \(url.absoluteString)")
-      let decoder = JSONDecoder()
-      decoder.keyDecodingStrategy = .convertFromSnakeCase
-      let error = try decoder.decode(ResponseError.self, from: data)
+      let error: ResponseError = try self.decodeResponse(data)
       throw ChiiError(code: response.statusCode, response: error)
     } else {
       let error = String(data: data, encoding: .utf8) ?? ""

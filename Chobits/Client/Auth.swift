@@ -46,9 +46,7 @@ extension Chii {
   }
 
   func saveAuthResponse(data: Data) throws -> Auth {
-    let decoder = JSONDecoder()
-    decoder.keyDecodingStrategy = .convertFromSnakeCase
-    let resp = try decoder.decode(TokenResponse.self, from: data)
+    let resp: TokenResponse = try self.decodeResponse(data)
     let auth = Auth(response: resp)
     let encoder = JSONEncoder()
     let value = try encoder.encode(auth)
