@@ -92,16 +92,25 @@ struct SubjectCharactersView: View {
         ForEach(characters) { character in
           NavigationLink(value: NavDestination.character(characterId: character.characterId)) {
             VStack {
-              Text(character.relation)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .overlay {
-                  RoundedRectangle(cornerRadius: 5)
-                    .stroke(Color.secondary, lineWidth: 1)
-                    .padding(.horizontal, -4)
-                    .padding(.vertical, -2)
-                }.padding(.top, 4)
               ImageView(img: character.images.medium, width: 60, height: 80, alignment: .top)
+                .overlay {
+                  VStack {
+                    Spacer()
+                    ZStack {
+                      Rectangle()
+                        .background(.black)
+                        .mask(
+                          LinearGradient(
+                            gradient: Gradient(colors: [
+                              Color.black.opacity(0),
+                              Color.black.opacity(0.8)
+                            ]), startPoint: .top, endPoint: .bottom))
+                      Text(character.relation)
+                        .font(.caption)
+                        .foregroundStyle(.white)
+                    }.frame(height: 20)
+                  }
+                }
               Text(character.name).font(.caption)
               if let person = character.actors.first {
                 Text(person.name).foregroundStyle(.secondary).font(.caption2)
@@ -109,7 +118,7 @@ struct SubjectCharactersView: View {
               Spacer()
             }
             .lineLimit(1)
-            .frame(width: 60, height: 160)
+            .frame(width: 60, height: 120)
           }.buttonStyle(.plain)
         }
       }

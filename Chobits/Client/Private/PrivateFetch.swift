@@ -5,8 +5,8 @@
 //  Created by Chuan Chuan on 2024/10/4.
 //
 
-import OSLog
 import Foundation
+import OSLog
 
 extension Chii {
   func getNotify(limit: Int? = nil, unread: Bool? = nil) async throws -> NotifyResponse {
