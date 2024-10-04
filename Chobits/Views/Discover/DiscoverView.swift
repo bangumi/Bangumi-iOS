@@ -142,7 +142,7 @@ struct ChiiDiscoverView: View {
             if query.isEmpty {
               return
             }
-            Task(priority: .background) {
+            Task {
               if local {
                 await newLocalSearch()
               } else {

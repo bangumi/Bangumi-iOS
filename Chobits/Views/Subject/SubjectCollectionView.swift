@@ -118,7 +118,7 @@ struct SubjectCollectionView: View {
       }
     }
     .onAppear {
-      Task(priority: .background) {
+      Task {
         await refresh()
       }
     }

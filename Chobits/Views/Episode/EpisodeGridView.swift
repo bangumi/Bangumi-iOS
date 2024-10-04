@@ -73,7 +73,7 @@ struct EpisodeGridView: View {
         Text("全部章节 »").font(.caption).foregroundStyle(Color("LinkTextColor"))
       }.buttonStyle(.plain)
     }.onAppear {
-      Task(priority: .background) {
+      Task {
         await load()
         await refresh()
       }

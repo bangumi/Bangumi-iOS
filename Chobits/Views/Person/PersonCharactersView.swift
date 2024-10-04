@@ -53,7 +53,7 @@ struct PersonCharactersView: View {
       } else if !refreshed {
         ProgressView()
           .onAppear {
-            Task(priority: .background) {
+            Task {
               await refresh()
             }
           }

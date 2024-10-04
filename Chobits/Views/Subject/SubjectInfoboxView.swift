@@ -230,7 +230,7 @@ struct SubjectInfoboxView: View {
       }
     }
     .onAppear {
-      Task(priority: .background) {
+      Task {
         await load()
         await checkRefresh()
       }

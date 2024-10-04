@@ -105,7 +105,7 @@ struct SubjectView: View {
       }
     }
     .onAppear {
-      Task(priority: .background) {
+      Task {
         await refresh()
       }
     }

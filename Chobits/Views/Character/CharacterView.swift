@@ -239,7 +239,7 @@ struct CharacterView: View {
     .navigationTitle(character?.name ?? "角色")
     .navigationBarTitleDisplayMode(.inline)
     .onAppear {
-      Task(priority: .background) {
+      Task {
         await refresh()
       }
     }
