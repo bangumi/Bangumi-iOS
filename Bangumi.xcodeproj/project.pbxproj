@@ -186,6 +186,7 @@
 		1998DCDE2CAF398800115E1F /* Public */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Public; sourceTree = "<group>"; };
 		1998DCDF2CAF99FE00115E1F /* Private */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Private; sourceTree = "<group>"; };
 		1998DCF22CAFDA5400115E1F /* Timeline */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Timeline; sourceTree = "<group>"; };
+		1998DCF62CB023B000115E1F /* User */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = User; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -289,6 +290,7 @@
 		19671C4D2BDEB55D000B4D99 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				1998DCF62CB023B000115E1F /* User */,
 				1998DCF22CAFDA5400115E1F /* Timeline */,
 				19E0E5052BF34EE700066EB7 /* Collection */,
 				19B9003E2BEEE20500405F0F /* Discover */,
@@ -436,6 +438,7 @@
 				1998DCDE2CAF398800115E1F /* Public */,
 				1998DCDF2CAF99FE00115E1F /* Private */,
 				1998DCF22CAFDA5400115E1F /* Timeline */,
+				1998DCF62CB023B000115E1F /* User */,
 			);
 			name = Chobits;
 			packageProductDependencies = (

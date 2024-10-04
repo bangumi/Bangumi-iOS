@@ -47,7 +47,7 @@ struct PersonCharactersView: View {
           Text("最近演出角色").font(.title3)
           Spacer()
           NavigationLink(value: NavDestination.personCharacterList(personId: personId)) {
-            Text("更多角色 »").font(.caption).foregroundStyle(Color("LinkTextColor"))
+            Text("更多角色 »").font(.caption).foregroundStyle(.linkText)
           }.buttonStyle(.plain)
         }
       } else if !refreshed {

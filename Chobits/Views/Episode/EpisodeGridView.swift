@@ -70,7 +70,7 @@ struct EpisodeGridView: View {
       }
       Spacer()
       NavigationLink(value: NavDestination.episodeList(subjectId: subjectId)) {
-        Text("全部章节 »").font(.caption).foregroundStyle(Color("LinkTextColor"))
+        Text("全部章节 »").font(.caption).foregroundStyle(.linkText)
       }.buttonStyle(.plain)
     }.onAppear {
       Task {

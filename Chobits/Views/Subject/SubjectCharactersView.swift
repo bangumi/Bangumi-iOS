@@ -68,7 +68,7 @@ struct SubjectCharactersView: View {
         Text("角色介绍").font(.title3)
         Spacer()
         NavigationLink(value: NavDestination.subjectCharacterList(subjectId: subjectId)) {
-          Text("更多角色 »").font(.caption).foregroundStyle(Color("LinkTextColor"))
+          Text("更多角色 »").font(.caption).foregroundStyle(.linkText)
         }.buttonStyle(.plain)
       }
     } else if !loaded {

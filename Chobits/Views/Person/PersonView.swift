@@ -112,7 +112,7 @@ struct PersonView: View {
                   if !isolationMode {
                     Label("评论: \(person.stat.comments)", systemImage: "bubble")
                       .font(.footnote)
-                      .foregroundStyle(Color("LinkTextColor"))
+                      .foregroundStyle(.linkText)
                   }
                 }
                 .font(.footnote)
@@ -182,7 +182,7 @@ struct PersonView: View {
                 }) {
                   Text("more...")
                     .font(.caption)
-                    .foregroundStyle(Color("LinkTextColor"))
+                    .foregroundStyle(.linkText)
                 }
               }.padding(.leading, 2)
             }
@@ -232,7 +232,7 @@ struct PersonView: View {
                       }) {
                         Text("more...")
                           .font(.caption)
-                          .foregroundStyle(Color("LinkTextColor"))
+                          .foregroundStyle(.linkText)
                       }
                       .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
                     }

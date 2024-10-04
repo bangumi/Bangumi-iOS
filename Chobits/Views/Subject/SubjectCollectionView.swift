@@ -68,10 +68,10 @@ struct SubjectCollectionView: View {
               systemImage: "pencil.line"
             )
             .font(.callout)
-            .foregroundStyle(Color("LinkTextColor"))
+            .foregroundStyle(.linkText)
             .overlay {
               RoundedRectangle(cornerRadius: 5)
-                .stroke(Color("LinkTextColor"), lineWidth: 1)
+                .stroke(.linkText, lineWidth: 1)
                 .padding(.horizontal, -2)
                 .padding(.vertical, -1)
             }

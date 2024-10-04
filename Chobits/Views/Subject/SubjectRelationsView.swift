@@ -47,7 +47,7 @@ struct SubjectRelationsView: View {
         Text("关联条目").font(.title3)
         Spacer()
         NavigationLink(value: NavDestination.subjectRelationList(subjectId: subjectId)) {
-          Text("更多条目 »").font(.caption).foregroundStyle(Color("LinkTextColor"))
+          Text("更多条目 »").font(.caption).foregroundStyle(.linkText)
         }.buttonStyle(.plain)
       }
     } else if !refreshed {

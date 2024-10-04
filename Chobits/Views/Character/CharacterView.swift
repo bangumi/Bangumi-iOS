@@ -105,7 +105,7 @@ struct CharacterView: View {
                   if !isolationMode {
                     Label("评论: \(character.stat.comments)", systemImage: "bubble")
                       .font(.footnote)
-                      .foregroundStyle(Color("LinkTextColor"))
+                      .foregroundStyle(.linkText)
                   }
                 }
                 .font(.footnote)
@@ -175,7 +175,7 @@ struct CharacterView: View {
                 }) {
                   Text("more...")
                     .font(.caption)
-                    .foregroundStyle(Color("LinkTextColor"))
+                    .foregroundStyle(.linkText)
                 }
 
               }.padding(.leading, 2)
@@ -209,7 +209,7 @@ struct CharacterView: View {
                       }) {
                         Text("more...")
                           .font(.caption)
-                          .foregroundStyle(Color("LinkTextColor"))
+                          .foregroundStyle(.linkText)
                       }
                       .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
                     }

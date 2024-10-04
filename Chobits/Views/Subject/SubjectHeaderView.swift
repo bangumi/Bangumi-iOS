@@ -98,7 +98,7 @@ struct SubjectHeaderView: View {
             }
           }
           .buttonStyle(.plain)
-          .foregroundStyle(Color("LinkTextColor"))
+          .foregroundStyle(.linkText)
 
           Spacer()
           HStack {
@@ -109,7 +109,7 @@ struct SubjectHeaderView: View {
               if subject.rating.total > 0 {
                 Text("(\(subject.rating.total) 人评分)")
                   .font(.footnote)
-                  .foregroundStyle(Color("LinkTextColor"))
+                  .foregroundStyle(.linkText)
               }
               Spacer()
             }

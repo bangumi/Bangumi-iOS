@@ -9,6 +9,7 @@ import Foundation
 import SwiftUI
 
 enum NavDestination: Hashable, View {
+  case user(uid: String)
   case subject(subjectId: UInt)
   case subjectInfobox(subjectId: UInt)
   case subjectRelationList(subjectId: UInt)
@@ -29,6 +30,8 @@ enum NavDestination: Hashable, View {
       SettingsView()
     case .notice:
       NoticeView()
+    case .user(let uid):
+      UserView(uid: uid)
     case .subject(let subjectId):
       SubjectView(subjectId: subjectId)
     case .subjectInfobox(let subjectId):

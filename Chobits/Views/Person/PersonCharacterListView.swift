@@ -118,7 +118,7 @@ struct PersonCharacterListItemView: View {
           VStack(alignment: .leading) {
             HStack {
               Text(character.name)
-                .foregroundStyle(Color("LinkTextColor"))
+                .foregroundStyle(.linkText)
                 .lineLimit(1)
             }
           }
@@ -173,7 +173,7 @@ struct PersonCharacterListItemSubjectItemView: View {
       VStack(alignment: .trailing) {
         HStack(alignment: .bottom) {
           Text(subject?.name ?? "")
-            .foregroundStyle(Color("LinkTextColor"))
+            .foregroundStyle(.linkText)
             .truncationMode(.middle)
             .lineLimit(1)
           if let icon = subject?.typeEnum.icon {

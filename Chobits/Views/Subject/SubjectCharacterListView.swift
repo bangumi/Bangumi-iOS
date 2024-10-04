@@ -66,7 +66,7 @@ struct SubjectCharacterListView: View {
               VStack(alignment: .leading) {
                 HStack {
                   Text(character.name)
-                    .foregroundStyle(Color("LinkTextColor"))
+                    .foregroundStyle(.linkText)
                     .lineLimit(1)
                 }
                 HStack(alignment: .bottom) {
@@ -92,7 +92,7 @@ struct SubjectCharacterListView: View {
                       .foregroundStyle(.secondary)
                     Text(actor.name)
                       .font(.footnote)
-                      .foregroundStyle(Color("LinkTextColor"))
+                      .foregroundStyle(.linkText)
                   }
                   if let img = actor.images?.grid {
                     ImageView(img: img, width: 40, height: 40, alignment: .top)

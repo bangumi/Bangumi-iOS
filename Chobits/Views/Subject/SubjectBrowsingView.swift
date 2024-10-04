@@ -129,10 +129,10 @@ struct SubjectBrowsingView: View {
               if let cat = filter.cat {
                 Text(cat.name).foregroundStyle(.accent)
               } else {
-                Text("类型").foregroundStyle(Color("LinkTextColor"))
+                Text("类型").foregroundStyle(.linkText)
               }
               Image(systemName: filterExpand == "cat" ? "chevron.up" : "chevron.down")
-                .foregroundStyle(filter.cat == nil ? Color("LinkTextColor") : .accent).padding(
+                .foregroundStyle(filter.cat == nil ? .linkText : .accent).padding(
                   .horizontal, -5)
             }.padding(.horizontal, 5)
           }
@@ -149,10 +149,10 @@ struct SubjectBrowsingView: View {
               if let series = filter.series {
                 Text(series ? "系列" : "单行本").foregroundStyle(.accent)
               } else {
-                Text("系列").foregroundStyle(Color("LinkTextColor"))
+                Text("系列").foregroundStyle(.linkText)
               }
               Image(systemName: filterExpand == "series" ? "chevron.up" : "chevron.down")
-                .foregroundStyle(filter.series == nil ? Color("LinkTextColor") : .accent).padding(
+                .foregroundStyle(filter.series == nil ? .linkText : .accent).padding(
                   .horizontal, -5)
             }.padding(.horizontal, 5)
           }
@@ -167,12 +167,12 @@ struct SubjectBrowsingView: View {
               }
             } label: {
               if filter.platform.isEmpty {
-                Text("平台").foregroundStyle(Color("LinkTextColor"))
+                Text("平台").foregroundStyle(.linkText)
               } else {
                 Text(filter.platform).foregroundStyle(.accent)
               }
               Image(systemName: filterExpand == "platform" ? "chevron.up" : "chevron.down")
-                .foregroundStyle(filter.platform.isEmpty ? Color("LinkTextColor") : .accent)
+                .foregroundStyle(filter.platform.isEmpty ? .linkText : .accent)
                 .padding(.horizontal, -5)
             }.padding(.horizontal, 5)
           }
@@ -186,7 +186,7 @@ struct SubjectBrowsingView: View {
             }
           } label: {
             if filter.year == 0 {
-              Text("日期").foregroundStyle(Color("LinkTextColor"))
+              Text("日期").foregroundStyle(.linkText)
             } else {
               if filter.month == 0 {
                 Text("\(String(filter.year))年").foregroundStyle(.accent)
@@ -197,7 +197,7 @@ struct SubjectBrowsingView: View {
             Image(
               systemName: filterExpand == "year" || filterExpand == "month"
                 ? "chevron.up" : "chevron.down"
-            ).foregroundStyle(filter.year == 0 ? Color("LinkTextColor") : .accent).padding(
+            ).foregroundStyle(filter.year == 0 ? .linkText : .accent).padding(
               .horizontal, -5)
           }.padding(.horizontal, 5)
 
@@ -221,7 +221,7 @@ struct SubjectBrowsingView: View {
               if filter.cat == nil {
                 Text("不限").foregroundStyle(.accent)
               } else {
-                Text("不限").foregroundStyle(Color("LinkTextColor"))
+                Text("不限").foregroundStyle(.linkText)
               }
             }
             .buttonStyle(.plain)
@@ -239,7 +239,7 @@ struct SubjectBrowsingView: View {
                   if let cat = filter.cat, cat.id == category.id {
                     Text(category.name).foregroundStyle(.accent)
                   } else {
-                    Text(category.name).foregroundStyle(Color("LinkTextColor"))
+                    Text(category.name).foregroundStyle(.linkText)
                   }
                 }
                 .buttonStyle(.plain)
@@ -258,7 +258,7 @@ struct SubjectBrowsingView: View {
               if filter.series == nil {
                 Text("不限").foregroundStyle(.accent)
               } else {
-                Text("不限").foregroundStyle(Color("LinkTextColor"))
+                Text("不限").foregroundStyle(.linkText)
               }
             }
             .buttonStyle(.plain)
@@ -275,7 +275,7 @@ struct SubjectBrowsingView: View {
                 if let series = filter.series, series {
                   Text("系列").foregroundStyle(.accent)
                 } else {
-                  Text("系列").foregroundStyle(Color("LinkTextColor"))
+                  Text("系列").foregroundStyle(.linkText)
                 }
               }
               .buttonStyle(.plain)
@@ -291,7 +291,7 @@ struct SubjectBrowsingView: View {
                 if let series = filter.series, !series {
                   Text("单行本").foregroundStyle(.accent)
                 } else {
-                  Text("单行本").foregroundStyle(Color("LinkTextColor"))
+                  Text("单行本").foregroundStyle(.linkText)
                 }
               }
               .buttonStyle(.plain)
@@ -309,7 +309,7 @@ struct SubjectBrowsingView: View {
               if filter.platform.isEmpty {
                 Text("不限").foregroundStyle(.accent)
               } else {
-                Text("不限").foregroundStyle(Color("LinkTextColor"))
+                Text("不限").foregroundStyle(.linkText)
               }
             }
             .buttonStyle(.plain)
@@ -327,7 +327,7 @@ struct SubjectBrowsingView: View {
                   if filter.platform == platform {
                     Text(platform).foregroundStyle(.accent)
                   } else {
-                    Text(platform).foregroundStyle(Color("LinkTextColor"))
+                    Text(platform).foregroundStyle(.linkText)
                   }
                 }
                 .buttonStyle(.plain)
@@ -345,7 +345,7 @@ struct SubjectBrowsingView: View {
               if filter.year == 0 {
                 Text("不限").foregroundStyle(.accent)
               } else {
-                Text("不限").foregroundStyle(Color("LinkTextColor"))
+                Text("不限").foregroundStyle(.linkText)
               }
             }
             .buttonStyle(.plain)
@@ -359,7 +359,7 @@ struct SubjectBrowsingView: View {
               Button {
                 updateYears(modifier: 10)
               } label: {
-                Text("来年们").foregroundStyle(Color("LinkTextColor"))
+                Text("来年们").foregroundStyle(.linkText)
               }
               .buttonStyle(.plain)
               .padding(2)
@@ -371,7 +371,7 @@ struct SubjectBrowsingView: View {
                   if filter.year == year {
                     Text("\(String(year))年").foregroundStyle(.accent)
                   } else {
-                    Text("\(String(year))年").foregroundStyle(Color("LinkTextColor"))
+                    Text("\(String(year))年").foregroundStyle(.linkText)
                   }
                 }
                 .buttonStyle(.plain)
@@ -380,7 +380,7 @@ struct SubjectBrowsingView: View {
               Button {
                 updateYears(modifier: -10)
               } label: {
-                Text("往年们").foregroundStyle(Color("LinkTextColor"))
+                Text("往年们").foregroundStyle(.linkText)
               }
               .buttonStyle(.plain)
               .padding(2)
@@ -396,7 +396,7 @@ struct SubjectBrowsingView: View {
               if filter.month == 0 {
                 Text("不限").foregroundStyle(.accent)
               } else {
-                Text("不限").foregroundStyle(Color("LinkTextColor"))
+                Text("不限").foregroundStyle(.linkText)
               }
             }
             .buttonStyle(.plain)
@@ -420,7 +420,7 @@ struct SubjectBrowsingView: View {
                   if filter.month == month {
                     Text("\(month)月").foregroundStyle(.accent)
                   } else {
-                    Text("\(month)月").foregroundStyle(Color("LinkTextColor"))
+                    Text("\(month)月").foregroundStyle(.linkText)
                   }
                 }
                 .buttonStyle(.plain)
@@ -477,7 +477,7 @@ struct SubjectBrowsingView: View {
                 }
               } label: {
                 Label("排名", systemImage: "chart.bar.xaxis")
-                  .foregroundStyle(filter.sort == "rank" ? .accent : Color("LinkTextColor"))
+                  .foregroundStyle(filter.sort == "rank" ? .accent : .linkText)
               }.buttonStyle(.plain)
               Button {
                 if filter.sort != "date" {
@@ -489,7 +489,7 @@ struct SubjectBrowsingView: View {
                 }
               } label: {
                 Label("日期", systemImage: "calendar")
-                  .foregroundStyle(filter.sort == "date" ? .accent : Color("LinkTextColor"))
+                  .foregroundStyle(filter.sort == "date" ? .accent : .linkText)
               }.buttonStyle(.plain)
             }
           default:

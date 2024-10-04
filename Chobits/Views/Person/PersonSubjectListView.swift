@@ -61,7 +61,7 @@ struct PersonSubjectListView: View {
               ImageView(img: subject.image, width: 60, height: 60, type: .subject)
               VStack(alignment: .leading) {
                 Text(subject.name)
-                  .foregroundStyle(Color("LinkTextColor"))
+                  .foregroundStyle(.linkText)
                   .lineLimit(1)
                 Text(subject.nameCn)
                   .font(.footnote)

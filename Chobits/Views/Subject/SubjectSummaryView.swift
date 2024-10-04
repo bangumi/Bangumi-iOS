@@ -79,7 +79,7 @@ struct SubjectSummaryView: View {
       }) {
         Text("more...")
           .font(.caption)
-          .foregroundStyle(Color("LinkTextColor"))
+          .foregroundStyle(.linkText)
       }
     }
   }

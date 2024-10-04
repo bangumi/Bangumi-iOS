@@ -25,6 +25,18 @@ extension Chii {
     return profile
   }
 
+  func getUser(uid: String) async throws -> User {
+    if self.mock {
+      return loadFixture(fixture: "profile.json", target: User.self)
+    }
+    Logger.api.info("start get user \(uid)")
+    let url = BangumiAPI.pub.build("v0/users/\(uid)")
+    let data = try await request(url: url, method: "GET")
+    let user: User = try self.decodeResponse(data)
+    Logger.api.info("finish get user \(uid)")
+    return user
+  }
+
   func getSubjectCollections(collectionType: CollectionType, subjectType: SubjectType, offset: Int)
     async throws
     -> SubjectCollectionResponse

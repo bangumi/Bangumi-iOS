@@ -67,7 +67,7 @@ struct CharacterSubjectItemView: View {
                   .foregroundStyle(.secondary)
               }
               Text(subject.name)
-                .foregroundStyle(Color("LinkTextColor"))
+                .foregroundStyle(.linkText)
                 .lineLimit(1)
             }.padding(.bottom, 2)
             HStack(alignment: .bottom) {
@@ -99,7 +99,7 @@ struct CharacterSubjectItemView: View {
                   .foregroundStyle(.secondary)
                 Text(person.name)
                   .font(.footnote)
-                  .foregroundStyle(Color("LinkTextColor"))
+                  .foregroundStyle(.linkText)
               }
               ImageView(img: person.images.grid, width: 40, height: 40, alignment: .top)
             }

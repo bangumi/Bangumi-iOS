@@ -51,7 +51,7 @@ struct PersonCharacterItemView: View {
         ImageView(img: character?.images.medium, width: 60, height: 60, alignment: .top)
         VStack(alignment: .leading) {
           Text(character?.name ?? "")
-            .foregroundStyle(Color("LinkTextColor"))
+            .foregroundStyle(.linkText)
             .lineLimit(1)
             .padding(.bottom, 2)
           if let staff = character?.staff {
@@ -72,7 +72,7 @@ struct PersonCharacterItemView: View {
         HStack(alignment: .bottom) {
           VStack(alignment: .trailing) {
             Text(subject?.name ?? "")
-              .foregroundStyle(Color("LinkTextColor"))
+              .foregroundStyle(.linkText)
               .truncationMode(.middle)
               .lineLimit(1)
               .font(.footnote)

@@ -71,7 +71,7 @@ struct CollectionsView: View {
                 NavigationLink(value: NavDestination.collectionList(subjectType: stype)) {
                   Text("更多 »")
                     .font(.caption)
-                    .foregroundStyle(Color("LinkTextColor"))
+                    .foregroundStyle(.linkText)
                 }.buttonStyle(.plain)
               }.padding(.top, 8)
               CollectionSubjectTypeView(stype: stype)

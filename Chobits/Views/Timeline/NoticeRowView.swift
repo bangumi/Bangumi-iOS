@@ -11,13 +11,31 @@ import SwiftUI
 struct NoticeRowView: View {
   let notice: Notice
 
+  var senderUID: String {
+    if notice.sender.username == "" {
+      return String(notice.sender.id)
+    } else {
+      return notice.sender.username
+    }
+  }
+
   var body: some View {
     HStack {
-      ImageView(img: notice.sender.avatar.large, width: 40, height: 40, type: .avatar)
+      if notice.unread {
+        Circle()
+          .frame(width: 10, height: 10)
+          .foregroundStyle(.accent)
+      }
+      NavigationLink(value: NavDestination.user(uid: senderUID)) {
+        ImageView(img: notice.sender.avatar.large, width: 40, height: 40, type: .avatar)
+      }
       VStack(alignment: .leading) {
         HStack {
-          Text(notice.sender.nickname)
-            .lineLimit(1)
+          NavigationLink(value: NavDestination.user(uid: senderUID)) {
+            Text(notice.sender.nickname)
+              .lineLimit(1)
+              .foregroundStyle(.linkText)
+          }.buttonStyle(.plain)
           Spacer()
           Text(notice.createdAt.datetimeDisplay)
             .font(.footnote)
@@ -157,7 +175,9 @@ struct NoticeRowView: View {
           default:
             Text("未知通知类型")
           }
-        }.lineLimit(1)
+        }
+        .lineLimit(1)
+        .font(.callout)
       }
       Spacer()
     }

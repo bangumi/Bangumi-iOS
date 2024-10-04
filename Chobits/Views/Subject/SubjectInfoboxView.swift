@@ -189,7 +189,7 @@ struct SubjectInfoboxView: View {
                       case .person(let person):
                         NavigationLink(value: NavDestination.person(personId: person.personId)) {
                           Text(person.name).lineLimit(1)
-                        }.buttonStyle(.plain).foregroundStyle(Color("LinkTextColor"))
+                        }.buttonStyle(.plain).foregroundStyle(.linkText)
                       }
                     }
                   }
@@ -206,7 +206,7 @@ struct SubjectInfoboxView: View {
                     case .person(let person):
                       NavigationLink(value: NavDestination.person(personId: person.personId)) {
                         Text(person.name).lineLimit(1)
-                      }.buttonStyle(.plain).foregroundStyle(Color("LinkTextColor"))
+                      }.buttonStyle(.plain).foregroundStyle(.linkText)
                     }
                   }
                 }

@@ -47,7 +47,7 @@ struct PersonSubjectsView: View {
           Text("最近参与").font(.title3)
           Spacer()
           NavigationLink(value: NavDestination.personSubjectList(personId: personId)) {
-            Text("更多作品 »").font(.caption).foregroundStyle(Color("LinkTextColor"))
+            Text("更多作品 »").font(.caption).foregroundStyle(.linkText)
           }.buttonStyle(.plain)
         }
       } else if !refreshed {
@@ -69,7 +69,7 @@ struct PersonSubjectsView: View {
                   .foregroundStyle(.secondary)
               }
               Text(subject.name)
-                .foregroundStyle(Color("LinkTextColor"))
+                .foregroundStyle(.linkText)
                 .lineLimit(1)
             }.padding(.bottom, 2)
             HStack(alignment: .bottom) {

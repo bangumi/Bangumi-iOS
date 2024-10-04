@@ -50,14 +50,14 @@ struct SubjectLargeRowView: View {
               Text(subject?.name ?? "")
                 .font(.headline)
                 .lineLimit(1)
-                .foregroundStyle(Color("LinkTextColor"))
+                .foregroundStyle(.linkText)
             }
           }
           Spacer()
           if let rank = subject?.rating.rank, rank > 0 {
             Label(String(rank), systemImage: "chart.bar.xaxis")
               .font(.footnote)
-              .foregroundStyle(Color("LinkTextColor"))
+              .foregroundStyle(.linkText)
           }
         }
         HStack {
