@@ -98,12 +98,12 @@ struct SubjectCharactersView: View {
                     Spacer()
                     ZStack {
                       Rectangle()
-                        .background(.black)
-                        .mask(
+                        .fill(
                           LinearGradient(
                             gradient: Gradient(colors: [
                               Color.black.opacity(0),
-                              Color.black.opacity(0.8)
+                              Color.black.opacity(0.4),
+                              Color.black.opacity(0.6)
                             ]), startPoint: .top, endPoint: .bottom))
                       Text(character.relation)
                         .font(.caption)
@@ -132,11 +132,13 @@ struct SubjectCharactersView: View {
   let subject = Subject.previewAnime
   container.mainContext.insert(subject)
 
-  return ScrollView {
-    LazyVStack(alignment: .leading) {
-      SubjectCharactersView(subjectId: subject.subjectId)
-        .environment(Notifier())
-        .modelContainer(container)
-    }
-  }.padding()
+  return NavigationStack {
+    ScrollView {
+      LazyVStack(alignment: .leading) {
+        SubjectCharactersView(subjectId: subject.subjectId)
+          .environment(Notifier())
+          .modelContainer(container)
+      }
+    }.padding()
+  }
 }
