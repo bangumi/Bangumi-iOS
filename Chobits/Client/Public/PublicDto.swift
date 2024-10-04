@@ -1,5 +1,5 @@
 //
-//  Dto.swift
+//  PublicDto.swift
 //  Chobits
 //
 //  Created by Chuan Chuan on 2024/4/21.
@@ -29,13 +29,22 @@ struct Auth: Codable {
   }
 }
 
-struct Profile: Codable {
+struct User: Codable {
   var id: UInt
   var username: String
   var nickname: String
   var userGroup: UserGroup
   var avatar: Avatar
   var sign: String
+
+  init() {
+    self.id = 0
+    self.username = ""
+    self.nickname = "匿名"
+    self.userGroup = .unknown
+    self.avatar = Avatar()
+    self.sign = ""
+  }
 }
 
 struct BangumiCalendarDTO: Codable {

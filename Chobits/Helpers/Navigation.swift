@@ -21,14 +21,14 @@ enum NavDestination: Hashable, View {
   case collectionList(subjectType: SubjectType)
   case subjectBrowsing(subjectType: SubjectType)
   case setting
-  case notification
+  case notice
 
   var body: some View {
     switch self {
     case .setting:
       SettingsView()
-    case .notification:
-      NotificationView()
+    case .notice:
+      NoticeView()
     case .subject(let subjectId):
       SubjectView(subjectId: subjectId)
     case .subjectInfobox(let subjectId):

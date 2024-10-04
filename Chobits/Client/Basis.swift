@@ -49,6 +49,12 @@ struct Avatar: Codable {
   var large: String
   var medium: String
   var small: String
+
+  init() {
+    self.large = ""
+    self.medium = ""
+    self.small = ""
+  }
 }
 
 enum UserGroup: UInt8, Codable {

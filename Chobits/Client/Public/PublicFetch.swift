@@ -9,9 +9,9 @@ import Foundation
 import OSLog
 
 extension Chii {
-  func getProfile() async throws -> Profile {
+  func getProfile() async throws -> User {
     if self.mock {
-      return loadFixture(fixture: "profile.json", target: Profile.self)
+      return loadFixture(fixture: "profile.json", target: User.self)
     }
     if let profile = self.profile {
       return profile
@@ -19,7 +19,7 @@ extension Chii {
     Logger.api.info("start get profile")
     let url = BangumiAPI.pub.build("v0/me")
     let data = try await request(url: url, method: "GET")
-    let profile: Profile = try self.decodeResponse(data)
+    let profile: User = try self.decodeResponse(data)
     self.profile = profile
     Logger.api.info("finish get profile")
     return profile

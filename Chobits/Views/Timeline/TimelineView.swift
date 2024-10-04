@@ -14,12 +14,28 @@ struct ChiiTimelineView: View {
 
   @Environment(Notifier.self) private var notifier
 
-  @State private var profile: Profile?
+  @State private var profile: User?
+  @State private var unreadNotice: Bool = false
 
   func updateProfile() {
     Task {
       do {
         profile = try await Chii.shared.getProfile()
+      } catch {
+        notifier.alert(error: error)
+      }
+    }
+  }
+
+  func checkNotice() {
+    Task {
+      do {
+        let resp = try await Chii.shared.getNotify(limit: 1, unread: true)
+        if resp.total == 0 {
+          unreadNotice = false
+        } else {
+          unreadNotice = true
+        }
       } catch {
         notifier.alert(error: error)
       }
@@ -72,10 +88,10 @@ struct ChiiTimelineView: View {
         }
         ToolbarItem(placement: .topBarTrailing) {
           HStack {
-            if isAuthenticated {
-              NavigationLink(value: NavDestination.setting) {
-                Image(systemName: "bell")
-              }
+            if isAuthenticated, !isolationMode  {
+              NavigationLink(value: NavDestination.notice) {
+                Image(systemName: unreadNotice ? "bell.badge.fill" : "bell")
+              }.onAppear(perform: checkNotice)
             }
             NavigationLink(value: NavDestination.setting) {
               Image(systemName: "gearshape")

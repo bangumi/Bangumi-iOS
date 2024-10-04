@@ -39,7 +39,7 @@ actor Chii {
   let appInfo: AppInfo
 
   var auth: Auth?
-  var profile: Profile?
+  var profile: User?
   var anonymousSession: URLSession?
   var authorizedSession: URLSession?
 

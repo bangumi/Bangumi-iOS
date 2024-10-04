@@ -166,14 +166,12 @@ struct ChiiProgressView: View {
               }
               .animation(.easeInOut, value: subjectType)
               .refreshable {
-                Task(priority: .background) {
-                  if counts.isEmpty {
-                    // do not fresh when page loads
-                    return
-                  }
-                  await updateCollections(type: subjectType)
-                  await load()
+                if counts.isEmpty {
+                  // do not fresh when page loads
+                  return
                 }
+                await updateCollections(type: subjectType)
+                await load()
               }
             }
             .animation(.default, value: counts)
