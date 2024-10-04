@@ -14,7 +14,6 @@ struct UserView: View {
   @Environment(Notifier.self) private var notifier
 
   @State private var user: User?
-  @State private var showSign: Bool = false
 
   func load() async {
     do {
@@ -28,58 +27,39 @@ struct UserView: View {
     if let user = user {
       ScrollView {
         LazyVStack(alignment: .leading) {
-          Text(user.nickname).font(.title2.bold())
-          HStack {
-            Text(user.userGroup.description)
-              .font(.footnote)
-              .foregroundStyle(.secondary)
-              .overlay {
-                RoundedRectangle(cornerRadius: 4)
-                  .stroke(.secondary, lineWidth: 1)
-                  .padding(.horizontal, -2)
-                  .padding(.vertical, -1)
-              }
-            if user.username != "" {
-              Text("@\(user.username)")
-            } else {
-              Text("@\(user.id)")
-            }
-          }
-          .padding(.leading, 5)
-          .foregroundStyle(.secondary)
-          .font(.footnote)
           HStack {
             ImageView(img: user.avatar.large, width: 60, height: 60, type: .avatar)
             VStack(alignment: .leading) {
-              Text(user.sign)
-                .font(.footnote)
-                .lineLimit(3)
-                .sheet(isPresented: $showSign) {
-                  ScrollView {
-                    LazyVStack(alignment: .leading) {
-                      Text(user.sign)
-                        .textSelection(.enabled)
-                        .multilineTextAlignment(.leading)
-                        .presentationDragIndicator(.visible)
-                        .presentationDetents([.medium, .large])
-                      Spacer()
-                    }
-                  }.padding()
-                }
+              Spacer()
+              Text(user.nickname).font(.title2.bold())
+              Spacer()
               HStack {
-                Spacer()
-                Button(action: {
-                  showSign.toggle()
-                }) {
-                  Text("more...")
-                    .font(.caption)
-                    .foregroundStyle(.linkText)
+                Text(user.userGroup.description)
+                  .font(.footnote)
+                  .foregroundStyle(.secondary)
+                  .overlay {
+                    RoundedRectangle(cornerRadius: 4)
+                      .stroke(.secondary, lineWidth: 1)
+                      .padding(.horizontal, -2)
+                      .padding(.vertical, -1)
+                  }
+                if user.username != "" {
+                  Text("@\(user.username)")
+                } else {
+                  Text("@\(user.id)")
                 }
               }
+              .padding(.leading, 2)
+              .foregroundStyle(.secondary)
+              .font(.footnote)
+              Spacer()
             }
             .padding(.leading, 2)
           }
-          Divider().padding(.vertical, 2)
+          Text(user.sign)
+            .font(.footnote)
+            .padding(.vertical, 1)
+          Divider().padding(.vertical, 1)
           Text("时光机 🚧")
         }
       }
