@@ -103,7 +103,7 @@ struct SubjectCharactersView: View {
                             gradient: Gradient(colors: [
                               Color.black.opacity(0),
                               Color.black.opacity(0.4),
-                              Color.black.opacity(0.6)
+                              Color.black.opacity(0.6),
                             ]), startPoint: .top, endPoint: .bottom))
                       Text(character.relation)
                         .font(.caption)
