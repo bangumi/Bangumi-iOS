@@ -73,6 +73,13 @@ extension Date {
 }
 
 extension UInt {
+  var dateDisplay: String {
+    let formatter = DateFormatter()
+    formatter.dateStyle = .medium
+    formatter.timeStyle = .none
+    return formatter.string(from: Date(timeIntervalSince1970: TimeInterval(self)))
+  }
+
   var datetimeDisplay: String {
     let formatter = DateFormatter()
     formatter.dateStyle = .medium

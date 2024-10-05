@@ -13,7 +13,7 @@ struct SubjectRelationsView: View {
 
   @Environment(Notifier.self) private var notifier
 
-  @State private var refreshed: Bool = false
+  @State private var refreshing: Bool = false
   @State private var counts: Int = 0
 
   @Query
@@ -30,35 +30,37 @@ struct SubjectRelationsView: View {
   }
 
   func refresh() async {
-    if refreshed { return }
-    refreshed = true
-
+    if relations.count > 0 {
+      return
+    }
+    refreshing = true
     do {
       try await Chii.shared.loadSubjectRelations(subjectId)
     } catch {
       notifier.alert(error: error)
     }
+    refreshing = false
   }
 
   var body: some View {
-    if relations.count > 0 {
-      Divider()
-      HStack {
-        Text("关联条目").font(.title3)
-        Spacer()
+    Divider()
+    HStack {
+      Text("关联条目")
+        .foregroundStyle(relations.count > 0 ? .primary : .secondary)
+        .font(.title3)
+        .task {
+          await refresh()
+        }
+      if refreshing {
+        ProgressView()
+      }
+      Spacer()
+      if relations.count > 0 {
         NavigationLink(value: NavDestination.subjectRelationList(subjectId: subjectId)) {
           Text("更多条目 »").font(.caption).foregroundStyle(.linkText)
         }.buttonStyle(.plain)
       }
-    } else if !refreshed {
-      ProgressView()
-        .onAppear {
-          Task {
-            await refresh()
-          }
-        }
     }
-
     ScrollView(.horizontal, showsIndicators: false) {
       LazyHStack {
         ForEach(relations) { relation in
@@ -69,9 +71,9 @@ struct SubjectRelationsView: View {
               Text(relation.name)
                 .multilineTextAlignment(.leading)
                 .truncationMode(.middle)
-                .lineLimit(3)
+                .lineLimit(2)
               Spacer()
-            }.font(.caption2).frame(width: 60, height: 150)
+            }.font(.caption2).frame(width: 60, height: 120)
           }.buttonStyle(.plain)
         }
       }

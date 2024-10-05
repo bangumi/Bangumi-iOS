@@ -45,7 +45,7 @@ struct Images: Codable {
   }
 }
 
-struct Avatar: Codable {
+struct Avatar: Codable, Hashable {
   var large: String
   var medium: String
   var small: String

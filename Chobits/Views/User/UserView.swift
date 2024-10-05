@@ -55,9 +55,11 @@ struct UserView: View {
             }
             .padding(.leading, 2)
           }
-          Text(user.sign)
-            .font(.footnote)
-            .padding(.vertical, 1)
+          if user.sign != "" {
+            Text(user.sign)
+              .font(.footnote)
+              .padding(.vertical, 1)
+          }
           Divider().padding(.vertical, 1)
           Text("时光机 🚧")
         }

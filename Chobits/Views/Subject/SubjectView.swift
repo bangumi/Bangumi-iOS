@@ -13,6 +13,7 @@ struct SubjectView: View {
   var subjectId: UInt
 
   @AppStorage("shareDomain") var shareDomain: String = ShareDomain.chii.label
+  @AppStorage("isolationMode") var isolationMode: Bool = false
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
 
   @Environment(Notifier.self) private var notifier
@@ -81,6 +82,10 @@ struct SubjectView: View {
             SubjectCharactersView(subjectId: subjectId)
 
             SubjectRelationsView(subjectId: subjectId)
+
+            if !isolationMode {
+              SubjectTopicsView(subjectId: subjectId)
+            }
 
             Spacer()
           }

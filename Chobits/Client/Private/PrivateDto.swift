@@ -28,3 +28,13 @@ struct Notice: Codable, Identifiable, Equatable {
     self.createdAt = 0
   }
 }
+
+struct Topic: Codable, Identifiable, Equatable, Hashable {
+  var id: UInt
+  var parentID: UInt
+  var creator: User
+  var title: String
+  var repliesCount: UInt
+  var createdAt: UInt
+  var updatedAt: UInt
+}

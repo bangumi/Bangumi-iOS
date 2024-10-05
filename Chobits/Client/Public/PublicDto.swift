@@ -29,7 +29,7 @@ struct Auth: Codable {
   }
 }
 
-struct User: Codable, Equatable {
+struct User: Codable, Equatable, Hashable {
   var id: UInt
   var username: String
   var nickname: String
@@ -48,6 +48,14 @@ struct User: Codable, Equatable {
 
   static func == (lhs: User, rhs: User) -> Bool {
     return lhs.id == rhs.id && lhs.username == rhs.username && lhs.nickname == rhs.nickname && lhs.userGroup == rhs.userGroup
+  }
+
+  var uid: String {
+    if username == "" {
+      return String(id)
+    } else {
+      return username
+    }
   }
 }
 

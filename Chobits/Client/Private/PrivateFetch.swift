@@ -25,4 +25,21 @@ extension Chii {
     Logger.api.info("finish get notify")
     return resp
   }
+
+  func getSubjectTopics(subjectId: UInt, limit: Int = 10, offset: Int = 0) async throws -> SubjectTopicsResponse {
+    if self.mock {
+      return loadFixture(fixture: "subject_topics.json", target: SubjectTopicsResponse.self)
+    }
+    Logger.api.info("start get subject topics")
+    let url = BangumiAPI.priv.build("p1/subjects/\(subjectId)/topics")
+    let queryItems: [URLQueryItem] = [
+      URLQueryItem(name: "limit", value: String(limit)),
+      URLQueryItem(name: "offset", value: String(offset)),
+    ]
+    let pageURL = url.appending(queryItems: queryItems)
+    let data = try await request(url: pageURL, method: "GET")
+    let resp: SubjectTopicsResponse = try! self.decodeResponse(data)
+    Logger.api.info("finish get subject topics")
+    return resp
+  }
 }

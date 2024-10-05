@@ -9,3 +9,8 @@ struct NotifyResponse: Codable {
   var data: [Notice]
   var total: Int
 }
+
+struct SubjectTopicsResponse: Codable {
+  var total: Int
+  var data: [Topic]
+}

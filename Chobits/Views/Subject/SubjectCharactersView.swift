@@ -14,9 +14,7 @@ struct SubjectCharactersView: View {
   @Environment(Notifier.self) private var notifier
   @Environment(\.modelContext) var modelContext
 
-  @State private var refreshed: Bool = false
-  @State private var loaded: Bool = false
-
+  @State private var refreshing: Bool = false
   @State private var characters: [SubjectRelatedCharacter] = []
 
   func load() async {
@@ -46,47 +44,43 @@ struct SubjectCharactersView: View {
     } catch {
       notifier.alert(error: error)
     }
-    loaded = true
   }
 
   func refresh() async {
-    if refreshed { return }
-    refreshed = true
-
+    if characters.count > 0 {
+      return
+    }
+    refreshing = true
+    await load()
     do {
       try await Chii.shared.loadSubjectCharacters(subjectId)
     } catch {
       notifier.alert(error: error)
     }
     await load()
+    refreshing = false
   }
 
   var body: some View {
-    if characters.count > 0 {
-      Divider()
-      HStack {
-        Text("角色介绍").font(.title3)
-        Spacer()
+    Divider()
+    HStack {
+      Text("角色介绍")
+        .foregroundStyle(characters.count > 0 ? .primary : .secondary)
+        .font(.title3)
+        .task {
+          await refresh()
+        }
+
+      if refreshing {
+        ProgressView()
+      }
+      Spacer()
+      if characters.count > 0 {
         NavigationLink(value: NavDestination.subjectCharacterList(subjectId: subjectId)) {
           Text("更多角色 »").font(.caption).foregroundStyle(.linkText)
         }.buttonStyle(.plain)
       }
-    } else if !loaded {
-      ProgressView()
-        .onAppear {
-          Task {
-            await load()
-          }
-        }
-    } else if !refreshed {
-      ProgressView()
-        .onAppear {
-          Task {
-            await refresh()
-          }
-        }
     }
-
     ScrollView(.horizontal, showsIndicators: false) {
       LazyHStack(alignment: .top) {
         ForEach(characters) { character in

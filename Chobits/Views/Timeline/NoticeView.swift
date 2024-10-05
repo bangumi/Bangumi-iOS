@@ -20,8 +20,7 @@ struct NoticeView: View {
   func getNotice() async {
     do {
       let resp = try await Chii.shared.getNotify(limit: 20)
-      notices.removeAll()
-      notices.append(contentsOf: resp.data)
+      notices = resp.data
       unreadCount = notices.count(where: { $0.unread })
     } catch {
       notifier.alert(error: error)
@@ -72,7 +71,7 @@ struct NoticeView: View {
               }
             }
             LazyVStack(alignment: .leading, spacing: 10) {
-              ForEach($notices, id: \.id) { notice in
+              ForEach($notices) { notice in
                 NoticeRowView(notice: notice)
               }
             }

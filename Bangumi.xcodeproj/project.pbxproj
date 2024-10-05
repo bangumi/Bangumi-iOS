@@ -71,6 +71,9 @@
 		197A19E42BE699CF00804B13 /* EpisodeListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 197A19E32BE699CF00804B13 /* EpisodeListView.swift */; };
 		1980EE002BE418C800E013EA /* episodes.json in Resources */ = {isa = PBXBuildFile; fileRef = 1980EDFF2BE418C800E013EA /* episodes.json */; };
 		1980EE022BE419D500E013EA /* episode_collections.json in Resources */ = {isa = PBXBuildFile; fileRef = 1980EE012BE419D500E013EA /* episode_collections.json */; };
+		1998DCFB2CB1066F00115E1F /* SubjectTopicsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1998DCFA2CB1066700115E1F /* SubjectTopicsView.swift */; };
+		1998DCFD2CB10A5C00115E1F /* SubjectTopicListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1998DCFC2CB10A5700115E1F /* SubjectTopicListView.swift */; };
+		1998DCFF2CB10B7F00115E1F /* subject_topics.json in Resources */ = {isa = PBXBuildFile; fileRef = 1998DCFE2CB10B7900115E1F /* subject_topics.json */; };
 		19AA1FCB2C100A1200FA4E18 /* subjects.json in Resources */ = {isa = PBXBuildFile; fileRef = 19AA1FCA2C100A1200FA4E18 /* subjects.json */; };
 		19B9002E2BED15B600405F0F /* PersonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19B9002D2BED15B600405F0F /* PersonView.swift */; };
 		19B900302BED16FE00405F0F /* person.json in Resources */ = {isa = PBXBuildFile; fileRef = 19B9002F2BED16FE00405F0F /* person.json */; };
@@ -159,6 +162,9 @@
 		197A19E32BE699CF00804B13 /* EpisodeListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EpisodeListView.swift; sourceTree = "<group>"; };
 		1980EDFF2BE418C800E013EA /* episodes.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = episodes.json; sourceTree = "<group>"; };
 		1980EE012BE419D500E013EA /* episode_collections.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = episode_collections.json; sourceTree = "<group>"; };
+		1998DCFA2CB1066700115E1F /* SubjectTopicsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubjectTopicsView.swift; sourceTree = "<group>"; };
+		1998DCFC2CB10A5700115E1F /* SubjectTopicListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubjectTopicListView.swift; sourceTree = "<group>"; };
+		1998DCFE2CB10B7900115E1F /* subject_topics.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = subject_topics.json; sourceTree = "<group>"; };
 		19AA1FCA2C100A1200FA4E18 /* subjects.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = subjects.json; sourceTree = "<group>"; };
 		19B9002D2BED15B600405F0F /* PersonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonView.swift; sourceTree = "<group>"; };
 		19B9002F2BED16FE00405F0F /* person.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = person.json; sourceTree = "<group>"; };
@@ -187,6 +193,7 @@
 		1998DCDF2CAF99FE00115E1F /* Private */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Private; sourceTree = "<group>"; };
 		1998DCF22CAFDA5400115E1F /* Timeline */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Timeline; sourceTree = "<group>"; };
 		1998DCF62CB023B000115E1F /* User */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = User; sourceTree = "<group>"; };
+		1998DD002CB10E7E00115E1F /* Topic */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Topic; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -229,6 +236,8 @@
 				1915A89F2BF09F4D003DB76D /* SubjectCharacterListView.swift */,
 				1909F39B2BEB98F600E3B8F0 /* SubjectRelationsView.swift */,
 				1915A89D2BF09E6B003DB76D /* SubjectRelationListView.swift */,
+				1998DCFA2CB1066700115E1F /* SubjectTopicsView.swift */,
+				1998DCFC2CB10A5700115E1F /* SubjectTopicListView.swift */,
 			);
 			path = Subject;
 			sourceTree = "<group>";
@@ -270,6 +279,7 @@
 				1909F3B02BEC47B200E3B8F0 /* subject_persons.json */,
 				1909F3AC2BEC43D000E3B8F0 /* subject_characters.json */,
 				1909F3AE2BEC444500E3B8F0 /* subject_relations.json */,
+				1998DCFE2CB10B7900115E1F /* subject_topics.json */,
 				1909F3B52BECFAC400E3B8F0 /* character.json */,
 				1915A8952BEFB66D003DB76D /* character_subjects.json */,
 				1915A8972BEFB6CA003DB76D /* character_persons.json */,
@@ -290,6 +300,7 @@
 		19671C4D2BDEB55D000B4D99 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				1998DD002CB10E7E00115E1F /* Topic */,
 				1998DCF62CB023B000115E1F /* User */,
 				1998DCF22CAFDA5400115E1F /* Timeline */,
 				19E0E5052BF34EE700066EB7 /* Collection */,
@@ -439,6 +450,7 @@
 				1998DCDF2CAF99FE00115E1F /* Private */,
 				1998DCF22CAFDA5400115E1F /* Timeline */,
 				1998DCF62CB023B000115E1F /* User */,
+				1998DD002CB10E7E00115E1F /* Topic */,
 			);
 			name = Chobits;
 			packageProductDependencies = (
@@ -503,6 +515,7 @@
 				19C2CE612BE2538A0080A056 /* subject_book.json in Resources */,
 				19C2CE5F2BE2536D0080A056 /* user_collection_book.json in Resources */,
 				1909F3B62BECFAC400E3B8F0 /* character.json in Resources */,
+				1998DCFF2CB10B7F00115E1F /* subject_topics.json in Resources */,
 				19671C672BDEB55D000B4D99 /* subject_anime.json in Resources */,
 				19C2CE672BE3211B0080A056 /* search_subject_anime.json in Resources */,
 				1915A8A42BF0D863003DB76D /* person_characters.json in Resources */,
@@ -554,11 +567,13 @@
 				1930110E2C00F08A008DCEBF /* CollectionSubjectTypeView.swift in Sources */,
 				1909F3B42BECF9D100E3B8F0 /* CharacterView.swift in Sources */,
 				19671C5E2BDEB55D000B4D99 /* LoadingView.swift in Sources */,
+				1998DCFD2CB10A5C00115E1F /* SubjectTopicListView.swift in Sources */,
 				19E0E5042BF24E0F00066EB7 /* PersonSubjectListView.swift in Sources */,
 				1943C50A2C0DF4030067ACDB /* SubjectBrowsingView.swift in Sources */,
 				19C2CE692BE330F60080A056 /* SubjectCollectionBoxView.swift in Sources */,
 				19671C572BDEB55D000B4D99 /* SubjectRatingBoxView.swift in Sources */,
 				19C2CE5D2BE1E7B10080A056 /* NotFoundView.swift in Sources */,
+				1998DCFB2CB1066F00115E1F /* SubjectTopicsView.swift in Sources */,
 				19671C6B2BDEB55D000B4D99 /* DiscoverView.swift in Sources */,
 				1915A8AA2BF0E8C4003DB76D /* PersonCharacterItemView.swift in Sources */,
 				19671C5B2BDEB55D000B4D99 /* CalendarView.swift in Sources */,

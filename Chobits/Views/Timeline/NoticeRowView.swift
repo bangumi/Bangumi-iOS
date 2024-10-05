@@ -12,14 +12,6 @@ import SwiftUI
 struct NoticeRowView: View {
   @Binding var notice: Notice
 
-  var senderUID: String {
-    if notice.sender.username == "" {
-      return String(notice.sender.id)
-    } else {
-      return notice.sender.username
-    }
-  }
-
   var body: some View {
     HStack {
       if notice.unread {
@@ -27,12 +19,12 @@ struct NoticeRowView: View {
           .frame(width: 10, height: 10)
           .foregroundStyle(.accent)
       }
-      NavigationLink(value: NavDestination.user(uid: senderUID)) {
+      NavigationLink(value: NavDestination.user(uid: notice.sender.uid)) {
         ImageView(img: notice.sender.avatar.large, width: 40, height: 40, type: .avatar)
       }
       VStack(alignment: .leading) {
         HStack {
-          NavigationLink(value: NavDestination.user(uid: senderUID)) {
+          NavigationLink(value: NavDestination.user(uid: notice.sender.uid)) {
             Text(notice.sender.nickname)
               .lineLimit(1)
               .foregroundStyle(.linkText)
