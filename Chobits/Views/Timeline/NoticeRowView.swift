@@ -6,10 +6,11 @@
 //
 // ref: https://github.com/bangumi/server-private/blob/master/lib/notify.ts
 
+import Foundation
 import SwiftUI
 
 struct NoticeRowView: View {
-  let notice: Notice
+  @Binding var notice: Notice
 
   var senderUID: String {
     if notice.sender.username == "" {
@@ -187,11 +188,10 @@ struct NoticeRowView: View {
 
 #Preview {
   let container = mockContainer()
-  let notice = Notice()
 
   return ScrollView {
     LazyVStack(alignment: .leading) {
-      NoticeRowView(notice: notice)
+      NoticeRowView(notice: .constant(Notice()))
         .environment(Notifier())
         .modelContainer(container)
     }

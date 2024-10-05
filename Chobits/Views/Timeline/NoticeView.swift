@@ -39,7 +39,9 @@ struct NoticeView: View {
       } catch {
         notifier.alert(error: error)
       }
-      await getNotice()
+      for i in 0 ..< notices.count {
+        notices[i].unread = false
+      }
       updating = false
     }
   }
@@ -70,7 +72,7 @@ struct NoticeView: View {
               }
             }
             LazyVStack(alignment: .leading, spacing: 10) {
-              ForEach(notices, id: \.id) { notice in
+              ForEach($notices, id: \.id) { notice in
                 NoticeRowView(notice: notice)
               }
             }

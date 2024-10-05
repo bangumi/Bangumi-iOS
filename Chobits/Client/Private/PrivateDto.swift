@@ -5,6 +5,8 @@
 //  Created by Chuan Chuan on 2024/10/4.
 //
 
+import Foundation
+
 struct Notice: Codable, Identifiable, Equatable {
   var id: UInt
   var postID: UInt
@@ -24,9 +26,5 @@ struct Notice: Codable, Identifiable, Equatable {
     self.type = 0
     self.unread = false
     self.createdAt = 0
-  }
-
-  static func == (lhs: Notice, rhs: Notice) -> Bool {
-    return lhs.id == rhs.id
   }
 }

@@ -29,7 +29,7 @@ struct Auth: Codable {
   }
 }
 
-struct User: Codable {
+struct User: Codable, Equatable {
   var id: UInt
   var username: String
   var nickname: String
@@ -44,6 +44,10 @@ struct User: Codable {
     self.userGroup = .unknown
     self.avatar = Avatar()
     self.sign = ""
+  }
+
+  static func == (lhs: User, rhs: User) -> Bool {
+    return lhs.id == rhs.id && lhs.username == rhs.username && lhs.nickname == rhs.nickname && lhs.userGroup == rhs.userGroup
   }
 }
 
