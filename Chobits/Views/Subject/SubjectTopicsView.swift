@@ -13,11 +13,12 @@ struct SubjectTopicsView: View {
 
   @Environment(Notifier.self) private var notifier
 
+  @State private var loaded: Bool = false
   @State private var refreshing: Bool = false
   @State private var topics: [Topic] = []
 
   func refresh() {
-    if topics.count > 0 {
+    if loaded {
       return
     }
     refreshing = true
@@ -29,6 +30,7 @@ struct SubjectTopicsView: View {
         notifier.alert(error: error)
       }
       refreshing = false
+      loaded = true
     }
   }
 
@@ -48,6 +50,15 @@ struct SubjectTopicsView: View {
           Text("更多讨论 »").font(.caption).foregroundStyle(.linkText)
         }.buttonStyle(.plain)
       }
+    }
+    if topics.count == 0 {
+      HStack {
+        Spacer()
+        Text("暂无讨论")
+          .font(.caption)
+          .foregroundStyle(.secondary)
+        Spacer()
+      }.padding(.bottom, 5)
     }
     VStack {
       ForEach(topics) { topic in

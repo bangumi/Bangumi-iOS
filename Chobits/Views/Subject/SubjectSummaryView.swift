@@ -34,7 +34,7 @@ struct SubjectSummaryView: View {
   }
 
   var body: some View {
-    VStack {
+    VStack(alignment: .leading) {
       Text(subject?.summary ?? "")
         .font(.footnote)
         .multilineTextAlignment(.leading)

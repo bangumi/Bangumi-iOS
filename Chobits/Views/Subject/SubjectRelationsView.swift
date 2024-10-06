@@ -12,35 +12,40 @@ struct SubjectRelationsView: View {
   let subjectId: UInt
 
   @Environment(Notifier.self) private var notifier
+  @Environment(\.modelContext) var modelContext
 
+  @State private var loaded: Bool = false
   @State private var refreshing: Bool = false
-  @State private var counts: Int = 0
+  @State private var relations: [SubjectRelation] = []
 
-  @Query
-  private var relations: [SubjectRelation]
-
-  init(subjectId: UInt) {
-    self.subjectId = subjectId
-    var descriptor = FetchDescriptor<SubjectRelation>(
-      predicate: #Predicate<SubjectRelation> {
-        $0.subjectId == subjectId
-      }, sortBy: [SortDescriptor<SubjectRelation>(\.relationId)])
-    descriptor.fetchLimit = 10
-    _relations = Query(descriptor)
+  func load() async {
+    do {
+      var descriptor = FetchDescriptor<SubjectRelation>(
+        predicate: #Predicate<SubjectRelation> {
+          $0.subjectId == subjectId
+        }, sortBy: [SortDescriptor<SubjectRelation>(\.relationId)])
+      descriptor.fetchLimit = 10
+      relations = try modelContext.fetch(descriptor)
+    } catch {
+      notifier.alert(error: error)
+    }
   }
 
   func refresh() {
-    if relations.count > 0 {
+    if loaded {
       return
     }
     refreshing = true
     Task {
+      await load()
       do {
         try await Chii.shared.loadSubjectRelations(subjectId)
       } catch {
         notifier.alert(error: error)
       }
+      await load()
       refreshing = false
+      loaded = true
     }
   }
 

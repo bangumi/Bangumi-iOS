@@ -14,6 +14,7 @@ struct SubjectCharactersView: View {
   @Environment(Notifier.self) private var notifier
   @Environment(\.modelContext) var modelContext
 
+  @State private var loaded: Bool = false
   @State private var refreshing: Bool = false
   @State private var characters: [SubjectRelatedCharacter] = []
 
@@ -47,7 +48,7 @@ struct SubjectCharactersView: View {
   }
 
   func refresh() {
-    if characters.count > 0 {
+    if loaded {
       return
     }
     refreshing = true
@@ -60,6 +61,7 @@ struct SubjectCharactersView: View {
       }
       await load()
       refreshing = false
+      loaded = true
     }
   }
 
@@ -95,7 +97,6 @@ struct SubjectCharactersView: View {
                           LinearGradient(
                             gradient: Gradient(colors: [
                               Color.black.opacity(0),
-                              Color.black.opacity(0.05),
                               Color.black.opacity(0.1),
                               Color.black.opacity(0.3),
                               Color.black.opacity(0.5),

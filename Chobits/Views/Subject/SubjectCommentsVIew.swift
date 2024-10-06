@@ -13,11 +13,12 @@ struct SubjectCommentsView: View {
 
   @Environment(Notifier.self) private var notifier
 
+  @State private var loaded: Bool = false
   @State private var refreshing: Bool = false
   @State private var comments: [SubjectInterestComment] = []
 
   func refresh() {
-    if comments.count > 0 {
+    if loaded {
       return
     }
     refreshing = true
@@ -29,6 +30,7 @@ struct SubjectCommentsView: View {
         notifier.alert(error: error)
       }
       refreshing = false
+      loaded = true
     }
   }
 
@@ -48,6 +50,15 @@ struct SubjectCommentsView: View {
           Text("更多吐槽 »").font(.caption).foregroundStyle(.linkText)
         }.buttonStyle(.plain)
       }
+    }
+    if comments.count == 0 {
+      HStack {
+        Spacer()
+        Text("暂无吐槽")
+          .font(.caption)
+          .foregroundStyle(.secondary)
+        Spacer()
+      }.padding(.bottom, 5)
     }
     VStack {
       ForEach(comments) { comment in
