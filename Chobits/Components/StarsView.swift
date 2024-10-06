@@ -26,12 +26,12 @@ struct StarsView: View {
         .resizable()
         .foregroundStyle(.orange)
         .frame(width: size, height: size)
-        .padding(.horizontal, -2)
+        .padding(.horizontal, -3)
       }
     }
   }
 }
 
 #Preview {
-  StarsView(score: 7.8, size: 20)
+  StarsView(score: 7.8, size: 40)
 }

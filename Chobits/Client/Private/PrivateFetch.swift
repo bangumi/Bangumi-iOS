@@ -26,7 +26,7 @@ extension Chii {
     return resp
   }
 
-  func getSubjectTopics(subjectId: UInt, limit: Int = 10, offset: Int = 0) async throws -> SubjectTopicsResponse {
+  func getSubjectTopics(subjectId: UInt, limit: Int, offset: Int = 0) async throws -> SubjectTopicsResponse {
     if self.mock {
       return loadFixture(fixture: "subject_topics.json", target: SubjectTopicsResponse.self)
     }
@@ -38,8 +38,26 @@ extension Chii {
     ]
     let pageURL = url.appending(queryItems: queryItems)
     let data = try await request(url: pageURL, method: "GET")
-    let resp: SubjectTopicsResponse = try! self.decodeResponse(data)
+    let resp: SubjectTopicsResponse = try self.decodeResponse(data)
     Logger.api.info("finish get subject topics")
     return resp
   }
+
+  func getSubjectComments(subjectId: UInt, limit: Int, offset: Int = 0) async throws -> SubjectInterestCommentsResponse {
+    if self.mock {
+      return loadFixture(fixture: "subject_comments.json", target: SubjectInterestCommentsResponse.self)
+    }
+    Logger.api.info("start get subject comments")
+    let url = BangumiAPI.priv.build("p1/subjects/\(subjectId)/comments")
+    let queryItems: [URLQueryItem] = [
+      URLQueryItem(name: "limit", value: String(limit)),
+      URLQueryItem(name: "offset", value: String(offset)),
+    ]
+    let pageURL = url.appending(queryItems: queryItems)
+    let data = try await request(url: pageURL, method: "GET")
+    let resp: SubjectInterestCommentsResponse = try self.decodeResponse(data)
+    Logger.api.info("finish get subject comments")
+    return resp
+  }
+
 }

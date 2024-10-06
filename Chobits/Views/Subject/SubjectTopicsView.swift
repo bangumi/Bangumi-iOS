@@ -16,18 +16,20 @@ struct SubjectTopicsView: View {
   @State private var refreshing: Bool = false
   @State private var topics: [Topic] = []
 
-  func refresh() async {
+  func refresh() {
     if topics.count > 0 {
       return
     }
     refreshing = true
-    do {
-      let resp = try await Chii.shared.getSubjectTopics(subjectId: subjectId, limit: 5)
-      topics = resp.data
-    } catch {
-      notifier.alert(error: error)
+    Task {
+      do {
+        let resp = try await Chii.shared.getSubjectTopics(subjectId: subjectId, limit: 5)
+        topics = resp.data
+      } catch {
+        notifier.alert(error: error)
+      }
+      refreshing = false
     }
-    refreshing = false
   }
 
   var body: some View {
@@ -36,9 +38,7 @@ struct SubjectTopicsView: View {
       Text("讨论版")
         .foregroundStyle(topics.count > 0 ? .primary : .secondary)
         .font(.title3)
-        .task {
-          await refresh()
-        }
+        .onAppear(perform: refresh)
       if refreshing {
         ProgressView()
       }
@@ -55,6 +55,7 @@ struct SubjectTopicsView: View {
           HStack {
             NavigationLink(value: NavDestination.topic(topic: topic)) {
               Text("\(topic.title)")
+                .font(.callout)
                 .lineLimit(1)
                 .foregroundStyle(.linkText)
             }.buttonStyle(.plain)

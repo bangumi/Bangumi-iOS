@@ -38,3 +38,14 @@ struct Topic: Codable, Identifiable, Equatable, Hashable {
   var createdAt: UInt
   var updatedAt: UInt
 }
+
+struct SubjectInterestComment: Codable, Identifiable, Equatable, Hashable {
+  var comment: String
+  var rate: UInt8
+  var updatedAt: UInt
+  var user: User
+
+  var id: UInt {
+    user.id
+  }
+}

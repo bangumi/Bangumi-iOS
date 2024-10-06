@@ -29,17 +29,19 @@ struct SubjectRelationsView: View {
     _relations = Query(descriptor)
   }
 
-  func refresh() async {
+  func refresh() {
     if relations.count > 0 {
       return
     }
     refreshing = true
-    do {
-      try await Chii.shared.loadSubjectRelations(subjectId)
-    } catch {
-      notifier.alert(error: error)
+    Task {
+      do {
+        try await Chii.shared.loadSubjectRelations(subjectId)
+      } catch {
+        notifier.alert(error: error)
+      }
+      refreshing = false
     }
-    refreshing = false
   }
 
   var body: some View {
@@ -48,9 +50,7 @@ struct SubjectRelationsView: View {
       Text("关联条目")
         .foregroundStyle(relations.count > 0 ? .primary : .secondary)
         .font(.title3)
-        .task {
-          await refresh()
-        }
+        .onAppear(perform: refresh)
       if refreshing {
         ProgressView()
       }

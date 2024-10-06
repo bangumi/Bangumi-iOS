@@ -86,4 +86,20 @@ extension UInt {
     formatter.timeStyle = .medium
     return formatter.string(from: Date(timeIntervalSince1970: TimeInterval(self)))
   }
+
+  var durationDisplay: String {
+    let now = Date()
+    let t = Date(timeIntervalSince1970: TimeInterval(self))
+    let duration = now.timeIntervalSince(t)
+    if duration < 86400 {
+      let formatter = RelativeDateTimeFormatter()
+      formatter.unitsStyle = .full
+      return formatter.localizedString(for: t, relativeTo: now)
+    } else {
+      let formatter = DateFormatter()
+      formatter.dateStyle = .medium
+      formatter.timeStyle = .medium
+      return formatter.string(from: t)
+    }
+  }
 }

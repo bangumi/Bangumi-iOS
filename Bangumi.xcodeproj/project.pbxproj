@@ -74,6 +74,9 @@
 		1998DCFB2CB1066F00115E1F /* SubjectTopicsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1998DCFA2CB1066700115E1F /* SubjectTopicsView.swift */; };
 		1998DCFD2CB10A5C00115E1F /* SubjectTopicListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1998DCFC2CB10A5700115E1F /* SubjectTopicListView.swift */; };
 		1998DCFF2CB10B7F00115E1F /* subject_topics.json in Resources */ = {isa = PBXBuildFile; fileRef = 1998DCFE2CB10B7900115E1F /* subject_topics.json */; };
+		1998DD052CB11F9C00115E1F /* SubjectCommentsVIew.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1998DD042CB11F9700115E1F /* SubjectCommentsVIew.swift */; };
+		1998DD072CB1222400115E1F /* subject_comments.json in Resources */ = {isa = PBXBuildFile; fileRef = 1998DD062CB1221E00115E1F /* subject_comments.json */; };
+		1998DD092CB122BC00115E1F /* SubjectCommentListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1998DD082CB122B600115E1F /* SubjectCommentListView.swift */; };
 		19AA1FCB2C100A1200FA4E18 /* subjects.json in Resources */ = {isa = PBXBuildFile; fileRef = 19AA1FCA2C100A1200FA4E18 /* subjects.json */; };
 		19B9002E2BED15B600405F0F /* PersonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19B9002D2BED15B600405F0F /* PersonView.swift */; };
 		19B900302BED16FE00405F0F /* person.json in Resources */ = {isa = PBXBuildFile; fileRef = 19B9002F2BED16FE00405F0F /* person.json */; };
@@ -165,6 +168,9 @@
 		1998DCFA2CB1066700115E1F /* SubjectTopicsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubjectTopicsView.swift; sourceTree = "<group>"; };
 		1998DCFC2CB10A5700115E1F /* SubjectTopicListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubjectTopicListView.swift; sourceTree = "<group>"; };
 		1998DCFE2CB10B7900115E1F /* subject_topics.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = subject_topics.json; sourceTree = "<group>"; };
+		1998DD042CB11F9700115E1F /* SubjectCommentsVIew.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubjectCommentsVIew.swift; sourceTree = "<group>"; };
+		1998DD062CB1221E00115E1F /* subject_comments.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = subject_comments.json; sourceTree = "<group>"; };
+		1998DD082CB122B600115E1F /* SubjectCommentListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubjectCommentListView.swift; sourceTree = "<group>"; };
 		19AA1FCA2C100A1200FA4E18 /* subjects.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = subjects.json; sourceTree = "<group>"; };
 		19B9002D2BED15B600405F0F /* PersonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonView.swift; sourceTree = "<group>"; };
 		19B9002F2BED16FE00405F0F /* person.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = person.json; sourceTree = "<group>"; };
@@ -238,6 +244,8 @@
 				1915A89D2BF09E6B003DB76D /* SubjectRelationListView.swift */,
 				1998DCFA2CB1066700115E1F /* SubjectTopicsView.swift */,
 				1998DCFC2CB10A5700115E1F /* SubjectTopicListView.swift */,
+				1998DD042CB11F9700115E1F /* SubjectCommentsVIew.swift */,
+				1998DD082CB122B600115E1F /* SubjectCommentListView.swift */,
 			);
 			path = Subject;
 			sourceTree = "<group>";
@@ -280,6 +288,7 @@
 				1909F3AC2BEC43D000E3B8F0 /* subject_characters.json */,
 				1909F3AE2BEC444500E3B8F0 /* subject_relations.json */,
 				1998DCFE2CB10B7900115E1F /* subject_topics.json */,
+				1998DD062CB1221E00115E1F /* subject_comments.json */,
 				1909F3B52BECFAC400E3B8F0 /* character.json */,
 				1915A8952BEFB66D003DB76D /* character_subjects.json */,
 				1915A8972BEFB6CA003DB76D /* character_persons.json */,
@@ -511,6 +520,7 @@
 				19AA1FCB2C100A1200FA4E18 /* subjects.json in Resources */,
 				1915A8A22BF0D83F003DB76D /* person_subjects.json in Resources */,
 				1909F3AD2BEC43D000E3B8F0 /* subject_characters.json in Resources */,
+				1998DD072CB1222400115E1F /* subject_comments.json in Resources */,
 				19C2CE652BE2ACE60080A056 /* profile.json in Resources */,
 				19C2CE612BE2538A0080A056 /* subject_book.json in Resources */,
 				19C2CE5F2BE2536D0080A056 /* user_collection_book.json in Resources */,
@@ -588,12 +598,14 @@
 				197A19E02BE696E200804B13 /* EpisodeGridView.swift in Sources */,
 				1909F3A52BEBC30300E3B8F0 /* Episode.swift in Sources */,
 				1915A8A02BF09F4D003DB76D /* SubjectCharacterListView.swift in Sources */,
+				1998DD092CB122BC00115E1F /* SubjectCommentListView.swift in Sources */,
 				19671C602BDEB55D000B4D99 /* Basis.swift in Sources */,
 				194484232BF4C68B002EC925 /* CollectionListView.swift in Sources */,
 				19B900322BED1EF300405F0F /* SubjectInfoboxView.swift in Sources */,
 				197A19D12BE6304D00804B13 /* EpisodeCollectionBoxView.swift in Sources */,
 				1915A89C2BF04BD4003DB76D /* CharacterSubjectItemView.swift in Sources */,
 				19671C6C2BDEB55D000B4D99 /* ProgressView.swift in Sources */,
+				1998DD052CB11F9C00115E1F /* SubjectCommentsVIew.swift in Sources */,
 				19671C592BDEB55D000B4D99 /* SubjectSummaryView.swift in Sources */,
 				197A19D62BE6729A00804B13 /* Auth.swift in Sources */,
 				1943C5082C08CD2E0067ACDB /* StarsView.swift in Sources */,

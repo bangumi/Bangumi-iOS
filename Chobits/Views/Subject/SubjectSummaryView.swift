@@ -34,54 +34,56 @@ struct SubjectSummaryView: View {
   }
 
   var body: some View {
-    Text(subject?.summary ?? "")
-      .font(.footnote)
-      .multilineTextAlignment(.leading)
-      .lineLimit(5)
-      .sheet(isPresented: $showSummary) {
-        ScrollView {
-          LazyVStack(alignment: .leading) {
-            FlowStack {
-              ForEach(tags, id: \.name) { tag in
-                HStack {
-                  Text(tag.name)
-                    .font(.footnote)
-                    .lineLimit(1)
-                  Text("\(tag.count)")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+    VStack {
+      Text(subject?.summary ?? "")
+        .font(.footnote)
+        .multilineTextAlignment(.leading)
+        .lineLimit(5)
+        .sheet(isPresented: $showSummary) {
+          ScrollView {
+            LazyVStack(alignment: .leading) {
+              FlowStack {
+                ForEach(tags, id: \.name) { tag in
+                  HStack {
+                    Text(tag.name)
+                      .font(.footnote)
+                      .lineLimit(1)
+                    Text("\(tag.count)")
+                      .font(.caption)
+                      .foregroundStyle(.secondary)
+                  }
+                  .padding(.horizontal, 6)
+                  .padding(.vertical, 4)
+                  .overlay {
+                    RoundedRectangle(cornerRadius: 5)
+                      .stroke(Color.secondary, lineWidth: 1)
+                      .padding(.horizontal, 2)
+                      .padding(.vertical, 2)
+                  }
                 }
-                .padding(.horizontal, 6)
-                .padding(.vertical, 4)
-                .overlay {
-                  RoundedRectangle(cornerRadius: 5)
-                    .stroke(Color.secondary, lineWidth: 1)
-                    .padding(.horizontal, 2)
-                    .padding(.vertical, 2)
-                }
-              }
-            }.animation(.default, value: tags)
-            Divider()
-            Text("简介").font(.title3).padding(.vertical, 10)
-            Text(subject?.summary ?? "")
-              .textSelection(.enabled)
-              .multilineTextAlignment(.leading)
-              .presentationDragIndicator(.visible)
-              .presentationDetents([.medium, .large])
-            Spacer()
-          }
-        }.padding()
+              }.animation(.default, value: tags)
+              Divider()
+              Text("简介").font(.title3).padding(.vertical, 10)
+              Text(subject?.summary ?? "")
+                .textSelection(.enabled)
+                .multilineTextAlignment(.leading)
+                .presentationDragIndicator(.visible)
+                .presentationDetents([.medium, .large])
+              Spacer()
+            }
+          }.padding()
+        }
+      HStack {
+        Spacer()
+        Button(action: {
+          showSummary.toggle()
+        }) {
+          Text("more...")
+            .font(.caption)
+            .foregroundStyle(.linkText)
+        }
       }
-    HStack {
-      Spacer()
-      Button(action: {
-        showSummary.toggle()
-      }) {
-        Text("more...")
-          .font(.caption)
-          .foregroundStyle(.linkText)
-      }
-    }
+    }.padding(.vertical, 2)
   }
 }
 

@@ -46,19 +46,21 @@ struct SubjectCharactersView: View {
     }
   }
 
-  func refresh() async {
+  func refresh() {
     if characters.count > 0 {
       return
     }
     refreshing = true
-    await load()
-    do {
-      try await Chii.shared.loadSubjectCharacters(subjectId)
-    } catch {
-      notifier.alert(error: error)
+    Task {
+      await load()
+      do {
+        try await Chii.shared.loadSubjectCharacters(subjectId)
+      } catch {
+        notifier.alert(error: error)
+      }
+      await load()
+      refreshing = false
     }
-    await load()
-    refreshing = false
   }
 
   var body: some View {
@@ -67,10 +69,7 @@ struct SubjectCharactersView: View {
       Text("角色介绍")
         .foregroundStyle(characters.count > 0 ? .primary : .secondary)
         .font(.title3)
-        .task {
-          await refresh()
-        }
-
+        .onAppear(perform: refresh)
       if refreshing {
         ProgressView()
       }
@@ -96,13 +95,19 @@ struct SubjectCharactersView: View {
                           LinearGradient(
                             gradient: Gradient(colors: [
                               Color.black.opacity(0),
-                              Color.black.opacity(0.4),
-                              Color.black.opacity(0.6),
+                              Color.black.opacity(0.05),
+                              Color.black.opacity(0.1),
+                              Color.black.opacity(0.3),
+                              Color.black.opacity(0.5),
                             ]), startPoint: .top, endPoint: .bottom))
-                      Text(character.relation)
-                        .font(.caption)
-                        .foregroundStyle(.white)
-                    }.frame(height: 20)
+                      VStack {
+                        Spacer()
+                        Text(character.relation)
+                          .font(.caption)
+                          .foregroundStyle(.white)
+                          .padding(.vertical, 2)
+                      }
+                    }.frame(height: 40)
                   }
                 }
               Text(character.name).font(.caption)

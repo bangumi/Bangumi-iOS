@@ -6,11 +6,16 @@
 //
 
 struct NotifyResponse: Codable {
-  var data: [Notice]
   var total: Int
+  var data: [Notice]
 }
 
 struct SubjectTopicsResponse: Codable {
   var total: Int
   var data: [Topic]
+}
+
+struct SubjectInterestCommentsResponse: Codable {
+  var total: Int
+  var list: [SubjectInterestComment]
 }
