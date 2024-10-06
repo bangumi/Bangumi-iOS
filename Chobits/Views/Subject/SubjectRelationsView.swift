@@ -5,6 +5,8 @@
 //  Created by Chuan Chuan on 2024/5/8.
 //
 
+import OSLog
+import Foundation
 import SwiftData
 import SwiftUI
 
@@ -18,6 +20,7 @@ struct SubjectRelationsView: View {
   @State private var refreshing: Bool = false
   @State private var singles: [SubjectRelation] = []
   @State private var relations: [SubjectRelation] = []
+  @State private var collections: [UInt:CollectionType] = [:]
 
   @Query
   private var subjects: [Subject]
@@ -46,6 +49,19 @@ struct SubjectRelationsView: View {
           $0.subjectId == subjectId && $0.relation == singleRelation
         }, sortBy: [SortDescriptor<SubjectRelation>(\.relationId)])
       singles = try modelContext.fetch(singleDescriptor)
+
+      var relationIds: [UInt] = []
+      relationIds.append(contentsOf: relations.map { $0.relationId })
+      relationIds.append(contentsOf: singles.map { $0.relationId })
+      let collectionDescriptor = FetchDescriptor<UserSubjectCollection>(
+        predicate: #Predicate<UserSubjectCollection> {
+          relationIds.contains($0.subjectId)
+        })
+      let collects = try modelContext.fetch(collectionDescriptor)
+      for collection in collects {
+        Logger.collection.info("collection: \(collection.subjectId): \(collection.type)")
+        self.collections[collection.subjectId] = collection.typeEnum
+      }
     } catch {
       notifier.alert(error: error)
     }
@@ -84,6 +100,35 @@ struct SubjectRelationsView: View {
             NavigationLink(value: NavDestination.subject(subjectId: relation.relationId)) {
               VStack {
                 ImageView(img: relation.images.common, width: 60, height: 90, type: .subject)
+                  .overlay {
+                    if let ctype = collections[relation.relationId] {
+                      VStack {
+                        Spacer()
+                        ZStack {
+                          Rectangle()
+                            .fill(
+                              LinearGradient(
+                                gradient: Gradient(colors: [
+                                  Color.black.opacity(0),
+                                  Color.black.opacity(0.1),
+                                  Color.black.opacity(0.4),
+                                  Color.black.opacity(0.6),
+                                ]), startPoint: .top, endPoint: .bottom))
+                          VStack {
+                            Spacer()
+                            HStack {
+                              Image(systemName: ctype.icon)
+                              Spacer()
+                              Text(ctype.description(type: subject?.typeEnum))
+                            }
+                            .foregroundStyle(.white)
+                            .font(.caption)
+                            .padding(2)
+                          }
+                        }.frame(height: 40)
+                      }
+                    }
+                  }
                 Spacer()
               }.font(.caption2).frame(width: 60, height: 90)
             }.buttonStyle(.plain)
@@ -115,6 +160,35 @@ struct SubjectRelationsView: View {
             VStack {
               Text(relation.relation).foregroundStyle(.secondary)
               ImageView(img: relation.images.common, width: 90, height: 120, type: .subject)
+                .overlay {
+                  if let ctype = collections[relation.relationId] {
+                    VStack {
+                      Spacer()
+                      ZStack {
+                        Rectangle()
+                          .fill(
+                            LinearGradient(
+                              gradient: Gradient(colors: [
+                                Color.black.opacity(0),
+                                Color.black.opacity(0.1),
+                                Color.black.opacity(0.4),
+                                Color.black.opacity(0.6),
+                              ]), startPoint: .top, endPoint: .bottom))
+                        VStack {
+                          Spacer()
+                          HStack {
+                            Image(systemName: ctype.icon)
+                            Spacer()
+                            Text(ctype.description(type: subject?.typeEnum))
+                          }
+                          .foregroundStyle(.white)
+                          .font(.caption)
+                          .padding(2)
+                        }
+                      }.frame(height: 40)
+                    }
+                  }
+                }
               Text(relation.name)
                 .multilineTextAlignment(.leading)
                 .truncationMode(.middle)
