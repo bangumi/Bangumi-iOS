@@ -5,7 +5,6 @@
 //  Created by Chuan Chuan on 2024/5/8.
 //
 
-import OSLog
 import Foundation
 import SwiftData
 import SwiftUI
@@ -59,7 +58,6 @@ struct SubjectRelationsView: View {
         })
       let collects = try modelContext.fetch(collectionDescriptor)
       for collection in collects {
-        Logger.collection.info("collection: \(collection.subjectId): \(collection.type)")
         self.collections[collection.subjectId] = collection.typeEnum
       }
     } catch {
@@ -99,7 +97,7 @@ struct SubjectRelationsView: View {
           ForEach(singles) { relation in
             NavigationLink(value: NavDestination.subject(subjectId: relation.relationId)) {
               VStack {
-                ImageView(img: relation.images.common, width: 60, height: 90, type: .subject)
+                ImageView(img: relation.images.common, width: 60, height: 80, type: .subject)
                   .overlay {
                     if let ctype = collections[relation.relationId] {
                       VStack {
@@ -119,7 +117,7 @@ struct SubjectRelationsView: View {
                             HStack {
                               Image(systemName: ctype.icon)
                               Spacer()
-                              Text(ctype.description(type: subject?.typeEnum))
+                              Text(ctype.description(type: relation.typeEnum))
                             }
                             .foregroundStyle(.white)
                             .font(.caption)
@@ -179,11 +177,11 @@ struct SubjectRelationsView: View {
                           HStack {
                             Image(systemName: ctype.icon)
                             Spacer()
-                            Text(ctype.description(type: subject?.typeEnum))
+                            Text(ctype.description(type: relation.typeEnum))
                           }
                           .foregroundStyle(.white)
                           .font(.caption)
-                          .padding(2)
+                          .padding(4)
                         }
                       }.frame(height: 40)
                     }
