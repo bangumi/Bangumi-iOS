@@ -39,23 +39,11 @@ struct SubjectView: View {
   func refresh() async {
     if refreshed { return }
     refreshed = true
-
     do {
       try await Chii.shared.loadSubject(subjectId)
     } catch {
       notifier.alert(error: error)
       return
-    }
-  }
-
-  func refreshAll() async {
-    do {
-      try await Chii.shared.loadSubject(subjectId)
-      try await Chii.shared.loadEpisodes(subjectId)
-      try await Chii.shared.loadSubjectCharacters(subjectId)
-      try await Chii.shared.loadSubjectRelations(subjectId)
-    } catch {
-      notifier.alert(error: error)
     }
   }
 
@@ -90,9 +78,6 @@ struct SubjectView: View {
           }
         }
         .padding(.horizontal, 8)
-        .refreshable {
-          await refreshAll()
-        }
         .toolbar {
           ToolbarItem(placement: .topBarTrailing) {
             ShareLink(item: shareLink) {

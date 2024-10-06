@@ -41,20 +41,8 @@ struct PersonView: View {
   func refresh() async {
     if refreshed { return }
     refreshed = true
-
     do {
       try await Chii.shared.loadPerson(personId)
-    } catch {
-      notifier.alert(error: error)
-      return
-    }
-  }
-
-  func refreshAll() async {
-    do {
-      try await Chii.shared.loadPerson(personId)
-      try await Chii.shared.loadPersonSubjects(personId)
-      try await Chii.shared.loadPersonCharacters(personId)
     } catch {
       notifier.alert(error: error)
       return
@@ -248,9 +236,6 @@ struct PersonView: View {
           }
         }
         .padding(.horizontal, 8)
-        .refreshable {
-          await refreshAll()
-        }
       } else {
         NotFoundView()
       }

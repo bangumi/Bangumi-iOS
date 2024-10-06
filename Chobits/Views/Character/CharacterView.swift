@@ -50,16 +50,6 @@ struct CharacterView: View {
     }
   }
 
-  func refreshAll() async {
-    do {
-      try await Chii.shared.loadCharacter(characterId)
-      try await Chii.shared.loadCharacterSubjects(characterId)
-      try await Chii.shared.loadCharacterPersons(characterId)
-    } catch {
-      notifier.alert(error: error)
-    }
-  }
-
   func shouldShowToggle(geometry: GeometryProxy) -> Bool {
     let lines = Int(
       geometry.size.height / UIFont.preferredFont(forTextStyle: .body).lineHeight)
@@ -222,9 +212,6 @@ struct CharacterView: View {
           }
         }
         .padding(.horizontal, 8)
-        .refreshable {
-          await refreshAll()
-        }
       } else {
         NotFoundView()
       }
