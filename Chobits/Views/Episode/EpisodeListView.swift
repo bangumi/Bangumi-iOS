@@ -29,10 +29,6 @@ struct EpisodeListView: View {
   @State private var countMain: Int = 0
   @State private var countOther: Int = 0
 
-  init(subjectId: UInt) {
-    self.subjectId = subjectId
-  }
-
   func loadCounts() async {
     let mainType = EpisodeType.main.rawValue
     do {
@@ -78,12 +74,12 @@ struct EpisodeListView: View {
     descriptor.fetchLimit = limit
     descriptor.fetchOffset = offset
     do {
-      let episodes = try modelContext.fetch(descriptor)
-      if episodes.count < limit {
+      let resp = try modelContext.fetch(descriptor)
+      if resp.count < limit {
         exhausted = true
       }
-      let result = episodes.enumerated().map { (idx, episode) in
-        EnumerateItem(idx: idx + offset, inner: episode)
+      let result = resp.enumerated().map { (idx, item) in
+        EnumerateItem(idx: idx + offset, inner: item)
       }
       offset += limit
       return result
@@ -98,8 +94,8 @@ struct EpisodeListView: View {
     exhausted = false
     loadedIdx.removeAll()
     episodes.removeAll()
-    let episodes = await fetch()
-    self.episodes.append(contentsOf: episodes)
+    let items = await fetch()
+    self.episodes.append(contentsOf: items)
   }
 
   func loadNextPage(idx: Int) async {
@@ -113,8 +109,8 @@ struct EpisodeListView: View {
       return
     }
     loadedIdx[idx] = true
-    let episodes = await fetch()
-    self.episodes.append(contentsOf: episodes)
+    let items = await fetch()
+    self.episodes.append(contentsOf: items)
   }
 
   var body: some View {
