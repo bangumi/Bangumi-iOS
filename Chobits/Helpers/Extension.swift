@@ -91,9 +91,10 @@ extension UInt {
     let now = Date()
     let t = Date(timeIntervalSince1970: TimeInterval(self))
     let duration = now.timeIntervalSince(t)
-    if duration < 86400 {
+    /// 3 days
+    if duration < 259200 {
       let formatter = RelativeDateTimeFormatter()
-      formatter.unitsStyle = .full
+      formatter.unitsStyle = .abbreviated
       return formatter.localizedString(for: t, relativeTo: now)
     } else {
       let formatter = DateFormatter()
