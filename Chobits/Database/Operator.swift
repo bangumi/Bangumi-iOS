@@ -289,11 +289,27 @@ extension DatabaseOperator {
     sid: UInt, type: CollectionType?, rate: UInt8?, comment: String?,
     priv: Bool?, tags: [String]?
   ) throws {
-    let collection = try self.fetchOne(
+    var collection = try self.fetchOne(
       predicate: #Predicate<UserSubjectCollection> {
         $0.subjectId == sid
       }
     )
+    if collection == nil {
+      let item = UserSubjectCollection(
+        subjectId: sid,
+        subjectType: 0,
+        rate: 0,
+        type: 0,
+        comment: "",
+        tags: [],
+        epStatus: 0,
+        volStatus: 0,
+        updatedAt: Date(),
+        priv: false
+      )
+      modelContext.insert(item)
+      collection = item
+    }
     if let type = type {
       collection?.type = type.rawValue
     }
@@ -313,7 +329,7 @@ extension DatabaseOperator {
   }
 
   public func updateEpisodeCollections(subjectId: UInt, sort: Float, type: EpisodeCollectionType)
-    throws
+  throws
   {
     let descriptor = FetchDescriptor<Episode>(
       predicate: #Predicate<Episode> {
@@ -332,7 +348,7 @@ extension DatabaseOperator {
   }
 
   public func updateEpisodeCollection(subjectId: UInt, episodeId: UInt, type: EpisodeCollectionType)
-    throws
+  throws
   {
     let episode = try self.fetchOne(
       predicate: #Predicate<Episode> {
@@ -347,5 +363,4 @@ extension DatabaseOperator {
     )
     collection?.updatedAt = Date()
   }
-
 }

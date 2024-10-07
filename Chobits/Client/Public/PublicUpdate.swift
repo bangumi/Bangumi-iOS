@@ -43,7 +43,6 @@ extension Chii {
     if self.mock {
       return
     }
-    let db = try self.getDB()
     Logger.api.info("start update subject collection: \(sid)")
     let url = BangumiAPI.pub.build("v0/users/-/collections/\(sid)")
     var body: [String: Any] = [:]
@@ -67,8 +66,9 @@ extension Chii {
     }
     Logger.api.info("finish update subject collection: \(sid)")
 
+    let db = try self.getDB()
     try await db.updateUserCollection(
-      sid: sid, type: type, rate: rate, comment: comment, priv: priv, tags: tags)
+        sid: sid, type: type, rate: rate, comment: comment, priv: priv, tags: tags)
     try await db.commit()
   }
 
@@ -97,7 +97,7 @@ extension Chii {
   }
 
   func updateEpisodeCollection(subjectId: UInt, episodeId: UInt, type: EpisodeCollectionType)
-    async throws
+  async throws
   {
     if self.mock {
       return
