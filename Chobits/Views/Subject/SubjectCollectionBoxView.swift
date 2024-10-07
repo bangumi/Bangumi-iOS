@@ -40,6 +40,16 @@ struct SubjectCollectionBoxView: View {
     }
   }
 
+  var ratingComment: String {
+    if rate == 10 {
+      return "\(rate.ratingDescription) \(rate) (请谨慎评价)"
+    }
+    if rate > 0 {
+      return "\(rate.ratingDescription) \(rate)"
+    }
+    return ""
+  }
+
   func load() async {
     do {
       var sdesc = FetchDescriptor<Subject>(
@@ -70,7 +80,7 @@ struct SubjectCollectionBoxView: View {
       self.comment = collection.comment
       self.priv = collection.priv
       self.tags = collection.tags
-      self.tagsInput = collection.tags.joined(separator: ",")
+      self.tagsInput = collection.tags.joined(separator: " ")
     }
   }
 
@@ -130,12 +140,8 @@ struct SubjectCollectionBoxView: View {
         VStack(alignment: .leading) {
           HStack(alignment: .top) {
             Text("我的评价:")
-            if rate > 0 {
-              Text("\(rate.ratingDescription)\(rate)").foregroundStyle(.red)
-            }
-            if rate == 10 {
-              Text("(请谨慎评价)").foregroundStyle(.red)
-            }
+            Text(ratingComment)
+              .foregroundStyle(rate > 0 ? .red : .secondary)
           }
           .padding(.top, 10)
           HStack {
