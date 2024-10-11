@@ -61,20 +61,13 @@ struct CharacterSubjectItemView: View {
           ImageView(img: subject.images.common, width: 60, height: 60, type: .subject)
           VStack(alignment: .leading) {
             HStack {
-              if !subject.typeEnum.icon.isEmpty {
-                Image(systemName: subject.typeEnum.icon)
-                  .font(.footnote)
-                  .foregroundStyle(.secondary)
-              }
               Text(subject.name)
                 .foregroundStyle(.linkText)
                 .lineLimit(1)
-            }.padding(.bottom, 2)
+            }
             HStack(alignment: .bottom) {
               if let relation = relation {
                 Text(relation.staff)
-                  .font(.footnote)
-                  .foregroundStyle(.secondary)
                   .overlay {
                     RoundedRectangle(cornerRadius: 4)
                       .stroke(Color.secondary, lineWidth: 1)
@@ -82,11 +75,15 @@ struct CharacterSubjectItemView: View {
                       .padding(.vertical, -1)
                   }
               }
+              if !subject.typeEnum.icon.isEmpty {
+                Image(systemName: subject.typeEnum.icon)
+              }
               Text(subject.nameCn)
-                .font(.footnote)
                 .lineLimit(1)
-                .foregroundStyle(.secondary)
             }
+            .font(.footnote)
+            .foregroundStyle(.secondary)
+            Spacer()
           }
         }.buttonStyle(.plain)
         Spacer()

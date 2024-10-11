@@ -55,23 +55,29 @@ struct ImageView: View {
       }
     } else {
       if width > 0, height > 0 {
-        switch type {
-        case .subject:
-          Image("noIconSubject")
-            .resizable()
-            .scaledToFit()
+        if width == height {
+          switch type {
+          case .subject:
+            Image("noIconSubject")
+              .resizable()
+              .scaledToFit()
+              .frame(width: width, height: height)
+              .clipShape(RoundedRectangle(cornerRadius: 5))
+          case .avatar:
+            Image("noIconAvatar")
+              .resizable()
+              .scaledToFit()
+              .frame(width: width, height: height)
+              .clipShape(RoundedRectangle(cornerRadius: 5))
+          default:
+            Image(systemName: "photo")
+              .frame(width: width, height: height)
+              .clipShape(RoundedRectangle(cornerRadius: 5))
+          }
+        } else {
+          RoundedRectangle(cornerRadius: 5)
+            .foregroundStyle(.secondary.opacity(0.2))
             .frame(width: width, height: height)
-            .clipShape(RoundedRectangle(cornerRadius: 5))
-        case .avatar:
-          Image("noIconAvatar")
-            .resizable()
-            .scaledToFit()
-            .frame(width: width, height: height)
-            .clipShape(RoundedRectangle(cornerRadius: 5))
-        default:
-          Image(systemName: "photo")
-            .frame(width: width, height: height)
-            .clipShape(RoundedRectangle(cornerRadius: 5))
         }
       } else {
         Image(systemName: "photo")
@@ -82,6 +88,9 @@ struct ImageView: View {
 
 #Preview {
   ImageView(
-    img: "https://lain.bgm.tv/pic/crt/l/ce/65/32_crt_0g9f9.jpg", width: 240, height: 240,
+    img: "https://lain.bgm.tv/pic/crt/l/ce/65/32_crt_0g9f9.jpg", width: 120, height: 160,
+    alignment: .top)
+  ImageView(
+    img: "", width: 120, height: 160,
     alignment: .top)
 }

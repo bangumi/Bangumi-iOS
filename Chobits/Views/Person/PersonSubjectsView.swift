@@ -63,16 +63,10 @@ struct PersonSubjectsView: View {
         NavigationLink(value: NavDestination.subject(subjectId: subject.subjectId)) {
           ImageView(img: subject.image, width: 60, height: 60, type: .subject)
           VStack(alignment: .leading) {
+            Text(subject.name)
+              .foregroundStyle(.linkText)
+              .lineLimit(1)
             HStack {
-              if !subject.typeEnum.icon.isEmpty {
-                Image(systemName: subject.typeEnum.icon)
-                  .foregroundStyle(.secondary)
-              }
-              Text(subject.name)
-                .foregroundStyle(.linkText)
-                .lineLimit(1)
-            }.padding(.bottom, 2)
-            HStack(alignment: .bottom) {
               Text(subject.staff)
                 .overlay {
                   RoundedRectangle(cornerRadius: 4)
@@ -80,11 +74,15 @@ struct PersonSubjectsView: View {
                     .padding(.horizontal, -2)
                     .padding(.vertical, -1)
                 }
+              if !subject.typeEnum.icon.isEmpty {
+                Image(systemName: subject.typeEnum.icon)
+              }
               Text(subject.nameCn)
                 .lineLimit(1)
             }
             .font(.footnote)
             .foregroundStyle(.secondary)
+            Spacer()
           }
         }.buttonStyle(.plain)
       }

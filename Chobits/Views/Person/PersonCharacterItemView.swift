@@ -53,7 +53,6 @@ struct PersonCharacterItemView: View {
           Text(character?.name ?? "")
             .foregroundStyle(.linkText)
             .lineLimit(1)
-            .padding(.bottom, 2)
           if let staff = character?.staff {
             Text(staff)
               .font(.footnote)
@@ -65,6 +64,7 @@ struct PersonCharacterItemView: View {
                   .padding(.vertical, -1)
               }
           }
+          Spacer()
         }
       }.buttonStyle(.plain)
       Spacer()
@@ -76,7 +76,6 @@ struct PersonCharacterItemView: View {
               .truncationMode(.middle)
               .lineLimit(1)
               .font(.footnote)
-              .padding(.bottom, 2)
             HStack(alignment: .bottom) {
               Text(subject?.nameCn ?? "")
                 .truncationMode(.middle)
