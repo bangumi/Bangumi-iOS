@@ -87,30 +87,9 @@ struct SubjectCharactersView: View {
         ForEach(characters) { character in
           NavigationLink(value: NavDestination.character(characterId: character.characterId)) {
             VStack {
-              ImageView(img: character.images.medium, width: 60, height: 80, alignment: .top)
-                .overlay {
-                  VStack {
-                    Spacer()
-                    ZStack {
-                      Rectangle()
-                        .fill(
-                          LinearGradient(
-                            gradient: Gradient(colors: [
-                              Color.black.opacity(0),
-                              Color.black.opacity(0.1),
-                              Color.black.opacity(0.3),
-                              Color.black.opacity(0.5),
-                            ]), startPoint: .top, endPoint: .bottom))
-                      VStack {
-                        Spacer()
-                        Text(character.relation)
-                          .font(.caption)
-                          .foregroundStyle(.white)
-                          .padding(.vertical, 2)
-                      }
-                    }.frame(height: 40)
-                  }
-                }
+              ImageView(img: character.images.medium, width: 60, height: 80, alignment: .top, caption: {
+                Text(character.relation)
+              })
               Text(character.name).font(.caption)
               if let person = character.actors.first {
                 Text(person.name).foregroundStyle(.secondary).font(.caption2)

@@ -97,36 +97,17 @@ struct SubjectRelationsView: View {
           ForEach(singles) { relation in
             NavigationLink(value: NavDestination.subject(subjectId: relation.relationId)) {
               VStack {
-                ImageView(img: relation.images.common, width: 60, height: 80, type: .subject)
-                  .overlay {
-                    if let ctype = collections[relation.relationId] {
-                      VStack {
-                        Spacer()
-                        ZStack {
-                          Rectangle()
-                            .fill(
-                              LinearGradient(
-                                gradient: Gradient(colors: [
-                                  Color.black.opacity(0),
-                                  Color.black.opacity(0.1),
-                                  Color.black.opacity(0.4),
-                                  Color.black.opacity(0.6),
-                                ]), startPoint: .top, endPoint: .bottom))
-                          VStack {
-                            Spacer()
-                            HStack {
-                              Image(systemName: ctype.icon)
-                              Spacer()
-                              Text(ctype.description(type: relation.typeEnum))
-                            }
-                            .foregroundStyle(.white)
-                            .font(.caption)
-                            .padding(2)
-                          }
-                        }.frame(height: 40)
-                      }
-                    }
-                  }
+                if let ctype = collections[relation.relationId] {
+                  ImageView(img: relation.images.common, width: 60, height: 80, type: .subject, caption: {
+                    HStack {
+                      Image(systemName: ctype.icon)
+                      Spacer()
+                      Text(ctype.description(type: relation.typeEnum))
+                    }.padding(.horizontal, 4)
+                  })
+                } else {
+                  ImageView(img: relation.images.common, width: 60, height: 80, type: .subject)
+                }
                 Spacer()
               }.font(.caption2).frame(width: 60, height: 90)
             }.buttonStyle(.plain)
@@ -157,36 +138,17 @@ struct SubjectRelationsView: View {
           NavigationLink(value: NavDestination.subject(subjectId: relation.relationId)) {
             VStack {
               Text(relation.relation).foregroundStyle(.secondary)
-              ImageView(img: relation.images.common, width: 90, height: 120, type: .subject)
-                .overlay {
-                  if let ctype = collections[relation.relationId] {
-                    VStack {
-                      Spacer()
-                      ZStack {
-                        Rectangle()
-                          .fill(
-                            LinearGradient(
-                              gradient: Gradient(colors: [
-                                Color.black.opacity(0),
-                                Color.black.opacity(0.1),
-                                Color.black.opacity(0.4),
-                                Color.black.opacity(0.6),
-                              ]), startPoint: .top, endPoint: .bottom))
-                        VStack {
-                          Spacer()
-                          HStack {
-                            Image(systemName: ctype.icon)
-                            Spacer()
-                            Text(ctype.description(type: relation.typeEnum))
-                          }
-                          .foregroundStyle(.white)
-                          .font(.caption)
-                          .padding(4)
-                        }
-                      }.frame(height: 40)
-                    }
-                  }
-                }
+              if let ctype = collections[relation.relationId] {
+                ImageView(img: relation.images.common, width: 90, height: 120, type: .subject, caption: {
+                  HStack {
+                    Image(systemName: ctype.icon)
+                    Spacer()
+                    Text(ctype.description(type: relation.typeEnum))
+                  }.padding(.horizontal, 4)
+                })
+              } else {
+                ImageView(img: relation.images.common, width: 90, height: 120, type: .subject)
+              }
               Text(relation.name)
                 .multilineTextAlignment(.leading)
                 .truncationMode(.middle)

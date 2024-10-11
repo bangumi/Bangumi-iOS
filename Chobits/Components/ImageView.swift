@@ -14,22 +14,24 @@ enum ImageType: String {
   case avatar
 }
 
-struct ImageView: View {
+struct ImageView<Caption: View>: View {
   let img: String?
   let width: CGFloat
   let height: CGFloat
   let alignment: Alignment
   let type: ImageType
+  let caption: (() -> Caption)?
 
   init(
     img: String?, width: CGFloat, height: CGFloat, alignment: Alignment = .center,
-    type: ImageType = .common
+    type: ImageType = .common, caption: (() -> Caption)?
   ) {
     self.img = img
     self.width = width
     self.height = height
     self.alignment = alignment
     self.type = type
+    self.caption = caption
   }
 
   var imageURL: URL? {
@@ -39,58 +41,106 @@ struct ImageView: View {
   }
 
   var body: some View {
-    if let imageURL = imageURL {
-      if width > 0, height > 0 {
-        KFImage(imageURL)
-          .resizable()
-          .scaledToFill()
-          .alignmentGuide(.top, computeValue: { _ in 0 })
-          .frame(width: width, height: height, alignment: alignment)
-          .clipShape(RoundedRectangle(cornerRadius: 5))
-      } else {
-        KFImage(imageURL)
-          .resizable()
-          .scaledToFit()
-          .clipShape(RoundedRectangle(cornerRadius: 5))
-      }
-    } else {
-      if width > 0, height > 0 {
-        if width == height {
-          switch type {
-          case .subject:
-            Image("noIconSubject")
+    ZStack {
+      Section {
+        if let imageURL = imageURL {
+          if width > 0, height > 0 {
+            KFImage(imageURL)
+              .resizable()
+              .scaledToFill()
+              .alignmentGuide(.top, computeValue: { _ in 0 })
+          } else {
+            KFImage(imageURL)
               .resizable()
               .scaledToFit()
-              .frame(width: width, height: height)
-              .clipShape(RoundedRectangle(cornerRadius: 5))
-          case .avatar:
-            Image("noIconAvatar")
-              .resizable()
-              .scaledToFit()
-              .frame(width: width, height: height)
-              .clipShape(RoundedRectangle(cornerRadius: 5))
-          default:
-            Image(systemName: "photo")
-              .frame(width: width, height: height)
-              .clipShape(RoundedRectangle(cornerRadius: 5))
           }
         } else {
-          RoundedRectangle(cornerRadius: 5)
-            .foregroundStyle(.secondary.opacity(0.2))
-            .frame(width: width, height: height)
+          if width > 0, height > 0 {
+            if width == height {
+              switch type {
+              case .subject:
+                Image("noIconSubject")
+                  .resizable()
+                  .scaledToFit()
+              case .avatar:
+                Image("noIconAvatar")
+                  .resizable()
+                  .scaledToFit()
+              default:
+                Image(systemName: "photo")
+              }
+            } else {
+              Rectangle()
+                .foregroundStyle(.secondary.opacity(0.2))
+            }
+          } else {
+            Image(systemName: "photo")
+          }
         }
-      } else {
-        Image(systemName: "photo")
+      }
+      .frame(width: width, height: height, alignment: alignment)
+      if let caption = caption {
+        VStack {
+          Spacer()
+          ZStack {
+            Rectangle()
+              .fill(
+                LinearGradient(
+                  gradient: Gradient(colors: [
+                    Color.black.opacity(0),
+                    Color.black.opacity(0),
+                    Color.black.opacity(0),
+                    Color.black.opacity(0),
+                    Color.black.opacity(0.1),
+                    Color.black.opacity(0.2),
+                    Color.black.opacity(0.3),
+                    Color.black.opacity(0.6),
+                  ]), startPoint: .top, endPoint: .bottom))
+            VStack {
+              Spacer()
+              caption()
+            }
+            .font(.caption)
+            .foregroundStyle(.white)
+            .padding(.bottom, 2)
+          }
+        }
       }
     }
+    .frame(width: width, height: height, alignment: .bottom)
+    .clipShape(RoundedRectangle(cornerRadius: 5))
   }
 }
 
+extension ImageView where Caption == EmptyView {
+  init(img: String?, width: CGFloat, height: CGFloat, alignment: Alignment = .center,
+       type: ImageType = .common) {
+    self.init(
+      img: img, width: width, height: height, alignment: alignment,
+      type: type, caption: nil)
+  }
+}
+
+
 #Preview {
-  ImageView(
-    img: "https://lain.bgm.tv/pic/crt/l/ce/65/32_crt_0g9f9.jpg", width: 120, height: 160,
-    alignment: .top)
-  ImageView(
-    img: "", width: 120, height: 160,
-    alignment: .top)
+  ImageView(img: "https://lain.bgm.tv/pic/cover/l/5e/39/140534_cUj6H.jpg", width: 60, height: 80, caption: {
+    HStack {
+      Text("abc")
+      Spacer()
+      Text("bcd")
+    }.padding(.horizontal, 4)
+  })
+  ImageView(img: "", width: 60, height: 60, type: .avatar)
+  ImageView(img: "https://lain.bgm.tv/pic/cover/l/5e/39/140534_cUj6H.jpg", width: 60, height: 60, alignment: .top)
+  ImageView(img: "", width: 80, height: 80, type: .subject)
+  ImageView(img: "https://lain.bgm.tv/pic/cover/l/5e/39/140534_cUj6H.jpg", width: 120, height: 160, caption: {
+    HStack {
+      Text("abc")
+      Spacer()
+      Text("bcd")
+    }.padding(.horizontal, 4)
+  })
+  ImageView(img: "", width: 120, height: 160, caption: {
+    Text("abc")
+  })
 }
