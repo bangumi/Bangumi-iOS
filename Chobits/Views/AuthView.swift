@@ -16,18 +16,16 @@ struct AuthView: View {
   var slogan: String
 
   var body: some View {
-    Section {
-      VStack {
-        Text(slogan)
-        Button {
-          Task {
-            await signInView.signIn()
-          }
-        } label: {
-          Text("登录")
+    VStack {
+      Text(slogan)
+      Button {
+        Task {
+          await signInView.signIn()
         }
-        .buttonStyle(.borderedProminent)
+      } label: {
+        Text("登录")
       }
+      .buttonStyle(.borderedProminent)
     }
   }
 

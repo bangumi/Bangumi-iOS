@@ -56,7 +56,6 @@ struct ProgressRowView: View {
       desc.fetchLimit = 1
       let episodes = try modelContext.fetch(desc)
       if let episode = episodes.first {
-        Logger.episode.info("subject \(subjectId) next episode: \(episode.sort.episodeDisplay)")
         nextEpisode = episode
       } else {
         nextEpisode = nil

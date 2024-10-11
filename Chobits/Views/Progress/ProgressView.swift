@@ -105,71 +105,63 @@ struct ChiiProgressView: View {
     NavigationStack {
       VStack {
         if isAuthenticated {
-          if counts.isEmpty {
-            ProgressView().onAppear {
-              Task {
-                if loaded {
-                  return
-                }
-                loaded = true
-                Logger.collection.info("initial loading progress")
-                await load()
-              }
-            }
-          } else {
-            VStack {
+            ScrollView {
               Picker("Subject Type", selection: $subjectType) {
                 ForEach(SubjectType.progressTypes()) { type in
                   Text("\(type.description)(\(counts[type, default: 0]))").tag(type)
                 }
               }
+              .padding(.horizontal, 8)
               .pickerStyle(.segmented)
               .onChange(of: subjectType) {
                 Task {
                   await load()
                 }
               }
-              ScrollView {
-                LazyVStack(alignment: .leading, spacing: 10) {
-                  ForEach(collections, id: \.inner.self) { item in
-                    NavigationLink(value: NavDestination.subject(subjectId: item.inner.subjectId)) {
-                      ProgressRowView(subjectId: item.inner.subjectId)
-                    }
-                    .buttonStyle(.plain)
-                    .onAppear {
-                      Task {
-                        await loadNextPage(idx: item.idx)
-                      }
-                    }
-                    Divider()
+              LazyVStack(alignment: .leading, spacing: 10) {
+                ForEach(collections, id: \.inner.self) { item in
+                  NavigationLink(value: NavDestination.subject(subjectId: item.inner.subjectId)) {
+                    ProgressRowView(subjectId: item.inner.subjectId)
                   }
-                  if exhausted {
-                    HStack {
-                      Spacer()
-                      Text("没有更多了")
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
-                      Spacer()
+                  .buttonStyle(.plain)
+                  .onAppear {
+                    Task {
+                      await loadNextPage(idx: item.idx)
                     }
                   }
-                }.padding(.horizontal, 8)
-              }
-              .animation(.easeInOut, value: subjectType)
-              .refreshable {
-                if counts.isEmpty {
-                  // do not fresh when page loads
-                  return
+                  Divider()
                 }
-                UIImpactFeedbackGenerator(style: .soft).impactOccurred()
-                await updateCollections(type: subjectType)
-                await load()
-              }
+                if exhausted {
+                  HStack {
+                    Spacer()
+                    Text("没有更多了")
+                      .font(.footnote)
+                      .foregroundStyle(.secondary)
+                    Spacer()
+                  }
+                }
+              }.padding(.horizontal, 8)
             }
+            .animation(.default, value: subjectType)
             .animation(.default, value: counts)
             .animation(.default, value: collections)
-          }
+            .refreshable {
+              UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+              await updateCollections(type: subjectType)
+              await load()
+            }
+            .task {
+              await load()
+            }
         } else {
           AuthView(slogan: "使用 Bangumi 管理观看进度")
+            .toolbar {
+              ToolbarItem(placement: .topBarTrailing) {
+                NavigationLink(value: NavDestination.setting) {
+                  Image(systemName: "gearshape")
+                }
+              }
+            }
         }
       }
       .navigationDestination(for: NavDestination.self) { $0 }
