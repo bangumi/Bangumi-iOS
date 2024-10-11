@@ -77,7 +77,7 @@ struct PersonView: View {
 
             /// header
             HStack(alignment: .top) {
-              ImageView(img: person.images.medium, width: 100, height: 150, alignment: .top)
+              ImageView(img: person.images.medium, width: 120, height: 160, alignment: .top)
                 .onTapGesture {
                   coverDetail.toggle()
                 }
@@ -99,6 +99,7 @@ struct PersonView: View {
                   }
                   if !isolationMode {
                     Label("评论: \(person.stat.comments)", systemImage: "bubble")
+                      .lineLimit(1)
                       .font(.footnote)
                       .foregroundStyle(.linkText)
                   }
@@ -129,7 +130,7 @@ struct PersonView: View {
                   }
                 }
                 .font(.footnote)
-                .frame(maxHeight: 108, alignment: .top)
+                .frame(maxHeight: 110, alignment: .top)
                 .clipped()
                 .sheet(isPresented: $showInfobox) {
                   ScrollView {
