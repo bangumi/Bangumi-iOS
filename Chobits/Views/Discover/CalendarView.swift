@@ -61,6 +61,7 @@ struct CalendarView: View {
       }
       .refreshable {
         refreshed = false
+        UIImpactFeedbackGenerator(style: .soft).impactOccurred()
         await refreshCalendar()
       }
     }

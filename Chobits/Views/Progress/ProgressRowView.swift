@@ -78,7 +78,7 @@ struct ProgressRowView: View {
       do {
         try await Chii.shared.updateEpisodeCollection(
           subjectId: subjectId, episodeId: episodeId, type: .collect)
-        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        UIImpactFeedbackGenerator(style: .soft).impactOccurred()
         await loadNextEpisode()
       } catch {
         notifier.alert(error: error)

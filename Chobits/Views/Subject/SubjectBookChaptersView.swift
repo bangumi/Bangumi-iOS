@@ -52,7 +52,7 @@ struct SubjectBookChaptersView: View {
     Task {
       do {
         try await Chii.shared.updateBookCollection(sid: subjectId, eps: eps, vols: vols)
-        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        UIImpactFeedbackGenerator(style: .soft).impactOccurred()
       } catch {
         notifier.alert(error: error)
       }

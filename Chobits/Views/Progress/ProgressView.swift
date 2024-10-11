@@ -16,7 +16,7 @@ struct ChiiProgressView: View {
   @Environment(\.modelContext) var modelContext
 
   @State private var loaded: Bool = false
-  @State private var subjectType = SubjectType.unknown
+  @State private var subjectType = SubjectType.anime
   @State private var offset: Int = 0
   @State private var exhausted: Bool = false
   @State private var loadedIdx: [Int: Bool] = [:]
@@ -27,9 +27,6 @@ struct ChiiProgressView: View {
     let doingType = CollectionType.do.rawValue
     do {
       for type in SubjectType.progressTypes() {
-        if type == .unknown {
-          continue
-        }
         let tvalue = type.rawValue
         let desc = FetchDescriptor<UserSubjectCollection>(
           predicate: #Predicate<UserSubjectCollection> {
@@ -38,13 +35,6 @@ struct ChiiProgressView: View {
         let count = try modelContext.fetchCount(desc)
         counts[type] = count
       }
-      let desc = FetchDescriptor<UserSubjectCollection>(
-        predicate: #Predicate<UserSubjectCollection> {
-          $0.type == doingType
-        })
-      let totalCount = try modelContext.fetchCount(desc)
-      Logger.collection.info("load progress total count: \(totalCount)")
-      counts[.unknown] = totalCount
     } catch {
       notifier.alert(error: error)
     }
@@ -170,6 +160,7 @@ struct ChiiProgressView: View {
                   // do not fresh when page loads
                   return
                 }
+                UIImpactFeedbackGenerator(style: .soft).impactOccurred()
                 await updateCollections(type: subjectType)
                 await load()
               }

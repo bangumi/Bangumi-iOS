@@ -360,7 +360,7 @@ enum SubjectType: UInt8, Codable, Identifiable, CaseIterable {
   }
 
   static func progressTypes() -> [Self] {
-    return [.unknown, .book, .anime, .real]
+    return [.book, .anime, .real]
   }
 
   static func allTypes() -> [Self] {

@@ -224,6 +224,7 @@ struct SubjectInfoboxView: View {
       }
     }
     .refreshable {
+      UIImpactFeedbackGenerator(style: .soft).impactOccurred()
       await refresh()
     }
     .onAppear {

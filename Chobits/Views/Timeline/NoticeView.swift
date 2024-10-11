@@ -78,6 +78,7 @@ struct NoticeView: View {
           }
           .animation(.default, value: notices)
           .refreshable {
+            UIImpactFeedbackGenerator(style: .soft).impactOccurred()
             await getNotice()
           }
         }
