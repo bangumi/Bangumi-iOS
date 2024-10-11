@@ -37,7 +37,7 @@ struct SubjectLargeRowView: View {
 
   var body: some View {
     HStack {
-      ImageView(img: subject?.images.common, width: 72, height: 108, type: .subject)
+      ImageView(img: subject?.images.common, width: 90, height: 120, type: .subject)
       VStack(alignment: .leading) {
         HStack {
           VStack(alignment: .leading) {
@@ -118,7 +118,7 @@ struct SubjectLargeRowView: View {
         .font(.caption)
       }.padding(.leading, 2)
     }
-    .frame(height: 108)
+    .frame(height: 120)
     .padding(2)
     .clipShape(RoundedRectangle(cornerRadius: 10))
   }

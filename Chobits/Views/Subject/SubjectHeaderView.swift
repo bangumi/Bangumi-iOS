@@ -49,7 +49,7 @@ struct SubjectHeaderView: View {
         .multilineTextAlignment(.leading)
         .textSelection(.enabled)
       HStack {
-        ImageView(img: subject.images.common, width: 100, height: 150, type: .subject)
+        ImageView(img: subject.images.common, width: 120, height: 160, type: .subject)
           .onTapGesture {
             coverDetail.toggle()
           }

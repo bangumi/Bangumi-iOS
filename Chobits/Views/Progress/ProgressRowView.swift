@@ -118,8 +118,11 @@ struct ProgressRowView: View {
   var body: some View {
     VStack(alignment: .leading) {
       HStack {
-        ImageView(img: subject?.images.common, width: 60, height: 90, type: .subject)
+        ImageView(img: subject?.images.common, width: 90, height: 120, type: .subject)
         VStack(alignment: .leading) {
+          Text(subject?.name ?? "")
+            .font(.headline)
+            .lineLimit(1)
 
           HStack {
             if collection?.priv ?? false {
@@ -137,22 +140,18 @@ struct ProgressRowView: View {
                     .padding(.vertical, -1)
                 }
             }
-            Text(subject?.name ?? "")
-              .font(.headline)
+            Text(subject?.nameCn ?? "")
+              .foregroundStyle(.secondary)
+              .font(.subheadline)
               .lineLimit(1)
           }
-
-          Text(subject?.nameCn ?? "")
-            .foregroundStyle(.secondary)
-            .font(.subheadline)
-            .lineLimit(1)
 
           if let authority = subject?.authority {
             Spacer()
             Text(authority)
               .font(.caption)
               .foregroundStyle(.secondary)
-              .lineLimit(1)
+              .lineLimit(2)
           }
 
           Spacer()

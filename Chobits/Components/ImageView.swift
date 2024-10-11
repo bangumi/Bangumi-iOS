@@ -46,12 +46,12 @@ struct ImageView: View {
           .scaledToFill()
           .alignmentGuide(.top, computeValue: { _ in 0 })
           .frame(width: width, height: height, alignment: alignment)
-          .clipShape(RoundedRectangle(cornerRadius: 10))
+          .clipShape(RoundedRectangle(cornerRadius: 5))
       } else {
         KFImage(imageURL)
           .resizable()
           .scaledToFit()
-          .clipShape(RoundedRectangle(cornerRadius: 10))
+          .clipShape(RoundedRectangle(cornerRadius: 5))
       }
     } else {
       if width > 0, height > 0 {
@@ -61,17 +61,17 @@ struct ImageView: View {
             .resizable()
             .scaledToFit()
             .frame(width: width, height: height)
-            .clipShape(RoundedRectangle(cornerRadius: 10))
+            .clipShape(RoundedRectangle(cornerRadius: 5))
         case .avatar:
           Image("noIconAvatar")
             .resizable()
             .scaledToFit()
             .frame(width: width, height: height)
-            .clipShape(RoundedRectangle(cornerRadius: 10))
+            .clipShape(RoundedRectangle(cornerRadius: 5))
         default:
           Image(systemName: "photo")
             .frame(width: width, height: height)
-            .clipShape(RoundedRectangle(cornerRadius: 10))
+            .clipShape(RoundedRectangle(cornerRadius: 5))
         }
       } else {
         Image(systemName: "photo")
