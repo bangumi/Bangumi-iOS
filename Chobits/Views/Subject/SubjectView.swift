@@ -75,9 +75,8 @@ struct SubjectView: View {
             }
 
             Spacer()
-          }
+          }.padding(.horizontal, 8)
         }
-        .padding(.horizontal, 8)
         .toolbar {
           ToolbarItem(placement: .topBarTrailing) {
             ShareLink(item: shareLink) {

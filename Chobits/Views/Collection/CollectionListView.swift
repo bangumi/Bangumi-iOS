@@ -143,11 +143,11 @@ struct CollectionListView: View {
               }
             }
           }
+          .padding(.horizontal, 8)
           .animation(.easeInOut, value: collectionType)
         }
         .animation(.default, value: counts)
         .animation(.default, value: collections)
-        .padding(.horizontal, 8)
       }
     }
     .navigationTitle("我的\(subjectType.description)")

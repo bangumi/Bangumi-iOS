@@ -74,9 +74,8 @@ struct SubjectRelationListView: View {
             }
           }.buttonStyle(.plain)
         }
-      }
+      }.padding(.horizontal, 8)
     }
-    .padding(.horizontal, 8)
     .buttonStyle(.plain)
     .animation(.default, value: relations)
     .navigationTitle("关联条目")

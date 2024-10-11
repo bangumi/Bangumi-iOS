@@ -162,7 +162,7 @@ struct ChiiProgressView: View {
                       Spacer()
                     }
                   }
-                }
+                }.padding(.horizontal, 8)
               }
               .animation(.easeInOut, value: subjectType)
               .refreshable {
@@ -176,7 +176,6 @@ struct ChiiProgressView: View {
             }
             .animation(.default, value: counts)
             .animation(.default, value: collections)
-            .padding(.horizontal, 8)
           }
         } else {
           AuthView(slogan: "使用 Bangumi 管理观看进度")

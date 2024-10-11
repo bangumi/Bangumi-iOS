@@ -157,8 +157,8 @@ struct CharacterView: View {
                       .presentationDragIndicator(.visible)
                       .presentationDetents([.medium, .large])
                       Spacer()
-                    }
-                  }.padding()
+                    }.padding()
+                  }
                 }
                 Spacer()
                 Button(action: {
@@ -189,8 +189,8 @@ struct CharacterView: View {
                         .presentationDragIndicator(.visible)
                         .presentationDetents([.medium, .large])
                       Spacer()
-                    }
-                  }.padding()
+                    }.padding()
+                  }
                 }
                 .overlay(
                   GeometryReader { geometry in
@@ -210,9 +210,8 @@ struct CharacterView: View {
 
             /// related subjects
             CharacterSubjectsView(characterId: characterId)
-          }
+          }.padding(.horizontal, 8)
         }
-        .padding(.horizontal, 8)
       } else {
         NotFoundView()
       }

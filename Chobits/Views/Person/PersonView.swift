@@ -162,8 +162,8 @@ struct PersonView: View {
                       .presentationDragIndicator(.visible)
                       .presentationDetents([.medium, .large])
                       Spacer()
-                    }
-                  }.padding()
+                    }.padding()
+                  }
                 }
                 Spacer()
                 Button(action: {
@@ -210,8 +210,8 @@ struct PersonView: View {
                         .presentationDragIndicator(.visible)
                         .presentationDetents([.medium, .large])
                       Spacer()
-                    }
-                  }.padding()
+                    }.padding()
+                  }
                 }
                 .overlay(
                   GeometryReader { geometry in
@@ -234,9 +234,8 @@ struct PersonView: View {
 
             /// subjects
             PersonSubjectsView(personId: personId)
-          }
+          }.padding(.horizontal, 8)
         }
-        .padding(.horizontal, 8)
       } else {
         NotFoundView()
       }

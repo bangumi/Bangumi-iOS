@@ -118,9 +118,8 @@ struct SubjectCommentListView: View {
             Spacer()
           }
         }
-      }
+      }.padding(.horizontal, 8)
     }
-    .padding(.horizontal, 8)
     .buttonStyle(.plain)
     .animation(.default, value: comments)
     .navigationTitle("吐槽")

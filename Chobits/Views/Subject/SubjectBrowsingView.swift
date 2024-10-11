@@ -527,9 +527,8 @@ struct SubjectBrowsingView: View {
             Spacer()
           }
         }
-      }
+      }.padding(.horizontal, 8)
     }
-    .padding(.horizontal, 8)
     .navigationTitle("全部\(subjectType.description)")
     .navigationBarTitleDisplayMode(.inline)
   }

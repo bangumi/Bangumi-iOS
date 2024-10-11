@@ -153,50 +153,32 @@ struct SubjectInfoboxView: View {
   }
 
   var body: some View {
-    Section {
-      ScrollView {
-        LazyVStack(alignment: .leading) {
-          ForEach(infoList) { info in
-            HStack(alignment: .top) {
-              Text("\(info.relation):").bold()
-              if info.long {
-                let plains = info.staffs.filter {
-                  if case .plain = $0 {
-                    return true
-                  } else {
-                    return false
-                  }
+    ScrollView {
+      LazyVStack(alignment: .leading) {
+        ForEach(infoList) { info in
+          HStack(alignment: .top) {
+            Text("\(info.relation):").bold()
+            if info.long {
+              let plains = info.staffs.filter {
+                if case .plain = $0 {
+                  return true
+                } else {
+                  return false
                 }
-                let links = info.staffs.filter {
-                  if case .person = $0 {
-                    return true
-                  } else {
-                    return false
-                  }
+              }
+              let links = info.staffs.filter {
+                if case .person = $0 {
+                  return true
+                } else {
+                  return false
                 }
-                VStack(alignment: .leading) {
-                  ForEach(plains) { staff in
-                    Text(staff.id).textSelection(.enabled)
-                  }
-                  FlowStack {
-                    ForEach(Array(links.enumerated()), id: \.offset) { idx, staff in
-                      if idx > 0 {
-                        Text("、")
-                      }
-                      switch staff {
-                      case .plain(let name):
-                        Text(name).lineLimit(1).textSelection(.enabled)
-                      case .person(let person):
-                        NavigationLink(value: NavDestination.person(personId: person.personId)) {
-                          Text(person.name).lineLimit(1)
-                        }.buttonStyle(.plain).foregroundStyle(.linkText)
-                      }
-                    }
-                  }
+              }
+              VStack(alignment: .leading) {
+                ForEach(plains) { staff in
+                  Text(staff.id).textSelection(.enabled)
                 }
-              } else {
                 FlowStack {
-                  ForEach(Array(info.staffs.enumerated()), id: \.offset) { idx, staff in
+                  ForEach(Array(links.enumerated()), id: \.offset) { idx, staff in
                     if idx > 0 {
                       Text("、")
                     }
@@ -211,15 +193,27 @@ struct SubjectInfoboxView: View {
                   }
                 }
               }
+            } else {
+              FlowStack {
+                ForEach(Array(info.staffs.enumerated()), id: \.offset) { idx, staff in
+                  if idx > 0 {
+                    Text("、")
+                  }
+                  switch staff {
+                  case .plain(let name):
+                    Text(name).lineLimit(1).textSelection(.enabled)
+                  case .person(let person):
+                    NavigationLink(value: NavDestination.person(personId: person.personId)) {
+                      Text(person.name).lineLimit(1)
+                    }.buttonStyle(.plain).foregroundStyle(.linkText)
+                  }
+                }
+              }
             }
-            Divider()
           }
+          Divider()
         }
-      }
-      .refreshable {
-        await refresh()
-      }
-      .padding(.horizontal, 8)
+      }.padding(.horizontal, 8)
     }
     .animation(.default, value: persons)
     .navigationTitle("条目信息")
@@ -228,6 +222,9 @@ struct SubjectInfoboxView: View {
       ToolbarItem(placement: .automatic) {
         Image(systemName: "info.circle").foregroundStyle(.secondary)
       }
+    }
+    .refreshable {
+      await refresh()
     }
     .onAppear {
       Task {

@@ -62,11 +62,10 @@ struct UserView: View {
           }
           Divider().padding(.vertical, 1)
           Text("时光机 🚧")
-        }
+        }.padding(.horizontal, 8)
       }
       .navigationTitle("\(user.nickname)")
       .navigationBarTitleDisplayMode(.inline)
-      .padding(.horizontal, 8)
     } else {
       ProgressView()
         .task {

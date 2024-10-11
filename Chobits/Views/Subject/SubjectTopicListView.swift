@@ -120,9 +120,8 @@ struct SubjectTopicListView: View {
             Spacer()
           }
         }
-      }
+      }.padding(.horizontal, 8)
     }
-    .padding(.horizontal, 8)
     .buttonStyle(.plain)
     .animation(.default, value: topics)
     .navigationTitle("讨论版")

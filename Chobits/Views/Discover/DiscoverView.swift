@@ -186,10 +186,8 @@ struct ChiiDiscoverView: View {
                       Spacer()
                     }
                   }
-                }
-              }
-              .animation(.easeInOut, value: subjectType)
-              .padding(.horizontal, 8)
+                }.padding(.horizontal, 8)
+              }.animation(.easeInOut, value: subjectType)
             }
           }
           Spacer()

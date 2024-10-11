@@ -65,9 +65,8 @@ struct PersonCharacterListView: View {
           PersonCharacterListItemView(characterId: cid)
           Divider()
         }
-      }
+      }.padding(.horizontal, 8)
     }
-    .padding(.horizontal, 8)
     .buttonStyle(.plain)
     .animation(.default, value: characterIds)
     .navigationTitle("出演角色")

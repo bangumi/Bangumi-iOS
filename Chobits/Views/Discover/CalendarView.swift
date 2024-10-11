@@ -57,9 +57,8 @@ struct CalendarView: View {
           ForEach(sortedCalendars) { calendar in
             CalendarWeekdayView(calendar: calendar).padding(.vertical, 10)
           }
-        }
+        }.padding(.horizontal, 8)
       }
-      .padding(.horizontal, 8)
       .refreshable {
         refreshed = false
         await refreshCalendar()

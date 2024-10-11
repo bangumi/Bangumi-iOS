@@ -102,9 +102,8 @@ struct SubjectCharacterListView: View {
             }
           }
         }
-      }
+      }.padding(.horizontal, 8)
     }
-    .padding(.horizontal, 8)
     .buttonStyle(.plain)
     .animation(.default, value: characters)
     .navigationTitle("角色列表")

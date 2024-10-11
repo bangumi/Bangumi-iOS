@@ -137,8 +137,8 @@ struct EpisodeCollectionBoxView: View {
           }
           Spacer()
         }
-      }
-    }.padding()
+      }.padding()
+    }
   }
 }
 

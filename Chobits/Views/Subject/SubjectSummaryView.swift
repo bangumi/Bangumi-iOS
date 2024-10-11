@@ -70,8 +70,8 @@ struct SubjectSummaryView: View {
                 .presentationDragIndicator(.visible)
                 .presentationDetents([.medium, .large])
               Spacer()
-            }
-          }.padding()
+            }.padding()
+          }
         }
       HStack {
         Spacer()

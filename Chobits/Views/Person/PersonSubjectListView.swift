@@ -74,9 +74,8 @@ struct PersonSubjectListView: View {
             }
           }.buttonStyle(.plain)
         }
-      }
+      }.padding(.horizontal, 8)
     }
-    .padding(.horizontal, 8)
     .buttonStyle(.plain)
     .animation(.default, value: subjects)
     .navigationTitle("参与作品")
