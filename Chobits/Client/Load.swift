@@ -43,7 +43,7 @@ extension Chii {
     try await db.commit()
   }
 
-  func loadUserCollections(type: SubjectType?) async throws {
+  func loadUserCollections(type: SubjectType?, once: Bool = false) async throws {
     let db = try self.getDB()
     var offset: Int = 0
     while true {
@@ -60,7 +60,7 @@ extension Chii {
       }
       Logger.api.info("loaded user collection: \(response.data.count), total: \(response.total)")
       offset += response.data.count
-      if offset >= response.total {
+      if offset >= response.total || once {
         break
       }
     }

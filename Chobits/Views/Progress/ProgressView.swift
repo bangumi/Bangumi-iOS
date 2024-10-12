@@ -15,6 +15,7 @@ struct ChiiProgressView: View {
   @Environment(Notifier.self) private var notifier
   @Environment(\.modelContext) var modelContext
 
+  @State private var refreshing: Bool = false
   @State private var loaded: Bool = false
   @State private var subjectType = SubjectType.anime
   @State private var offset: Int = 0
@@ -95,10 +96,25 @@ struct ChiiProgressView: View {
 
   func updateCollections(type: SubjectType?) async {
     do {
-      try await Chii.shared.loadUserCollections(type: type)
+      try await Chii.shared.loadUserCollections(type: type, once: true)
     } catch {
       notifier.alert(error: error)
     }
+    await load()
+  }
+
+  func refreshAllCollections() async {
+    if refreshing {
+      return
+    }
+    refreshing = true
+    do {
+      try await Chii.shared.loadUserCollections(type: .unknown)
+    } catch {
+      notifier.alert(error: error)
+    }
+    await load()
+    refreshing = false
   }
 
   var body: some View {
@@ -146,12 +162,30 @@ struct ChiiProgressView: View {
             .animation(.default, value: counts)
             .animation(.default, value: collections)
             .refreshable {
+              if refreshing {
+                return
+              }
               UIImpactFeedbackGenerator(style: .soft).impactOccurred()
               await updateCollections(type: subjectType)
-              await load()
             }
             .task {
               await load()
+            }
+            .toolbar {
+              ToolbarItem(placement: .topBarTrailing) {
+                if refreshing {
+                  ProgressView()
+                } else {
+                  Button {
+                    Task {
+                      UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+                      await refreshAllCollections()
+                    }
+                  } label: {
+                    Image(systemName: "arrow.clockwise.circle")
+                  }
+                }
+              }
             }
         } else {
           AuthView(slogan: "使用 Bangumi 管理观看进度")
