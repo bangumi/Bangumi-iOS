@@ -196,6 +196,8 @@ struct ChiiDiscoverView: View {
         }
       }
       .navigationDestination(for: NavDestination.self) { $0 }
+      .navigationTitle("发现")
+      .toolbarTitleDisplayMode(.inlineLarge)
     }
     .searchable(
       text: $query, isPresented: $searching, placement: .navigationBarDrawer(displayMode: .always)

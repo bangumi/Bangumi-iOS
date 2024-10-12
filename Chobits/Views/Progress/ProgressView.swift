@@ -171,6 +171,8 @@ struct ChiiProgressView: View {
             .task {
               await load()
             }
+            .navigationTitle("进度管理")
+            .toolbarTitleDisplayMode(.inlineLarge)
             .toolbar {
               ToolbarItem(placement: .topBarTrailing) {
                 if refreshing {
