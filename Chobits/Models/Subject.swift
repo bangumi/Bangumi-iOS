@@ -46,6 +46,14 @@ final class Subject {
     }
   }
 
+  var epsDesc: String {
+    return self.eps > 0 ? "/\(self.eps)话" : "/?话"
+  }
+
+  var volumesDesc: String {
+    return self.volumes > 0 ? "/\(self.volumes)卷" : "/?卷"
+  }
+
   var authority: String {
     var items: [String] = []
     switch typeEnum {

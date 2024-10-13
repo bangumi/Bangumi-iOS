@@ -64,16 +64,6 @@ struct SubjectBookChaptersView: View {
     }
   }
 
-  var epsDesc: String {
-    guard let subject = self.subject else { return "/?话" }
-    return subject.eps > 0 ? "/\(subject.eps)话" : "/?话"
-  }
-
-  var volumesDesc: String {
-    guard let subject = self.subject else { return "/?卷" }
-    return subject.volumes > 0 ? "/\(subject.volumes)卷" : "/?卷"
-  }
-
   var collectionEps: UInt {
     guard let collection = self.collection else { return 0 }
     return collection.epStatus
@@ -112,7 +102,7 @@ struct SubjectBookChaptersView: View {
               self.eps = nil
             }
           }
-        Text(epsDesc).foregroundStyle(.secondary)
+        Text(subject?.epsDesc ?? "").foregroundStyle(.secondary)
       }.monospaced()
       HStack(alignment: .firstTextBaseline, spacing: 0) {
         Button {
@@ -140,7 +130,7 @@ struct SubjectBookChaptersView: View {
               self.vols = nil
             }
           }
-        Text(volumesDesc).foregroundStyle(.secondary)
+        Text(subject?.volumesDesc ?? "").foregroundStyle(.secondary)
       }.monospaced()
       Spacer()
       VStack {
