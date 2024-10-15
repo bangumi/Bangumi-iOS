@@ -101,7 +101,6 @@ extension UInt {
   }
 
   var durationDisplay: String {
-    let now = Date()
     let t = Date(timeIntervalSince1970: TimeInterval(self))
     return t.formatRelative
   }
