@@ -105,7 +105,7 @@ extension DatabaseOperator {
 
   public func saveSubject(_ item: CharacterPersonDTO) throws {
     let subject = Subject(item)
-    let subjectID = item.id
+    let subjectID = item.subjectId
     try self.insertIfNeeded(
       data: subject,
       predicate: #Predicate<Subject> {
@@ -125,7 +125,7 @@ extension DatabaseOperator {
 
   public func saveSubject(_ item: PersonCharacterDTO) throws {
     let subject = Subject(item)
-    let subjectID = item.id
+    let subjectID = item.subjectId
     try self.insertIfNeeded(
       data: subject,
       predicate: #Predicate<Subject> {
