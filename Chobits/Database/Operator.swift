@@ -262,7 +262,7 @@ extension DatabaseOperator {
   public func getEpisodeIDs(subjectId: UInt, sort: Float) throws -> [UInt] {
     let descriptor = FetchDescriptor<Episode>(
       predicate: #Predicate<Episode> {
-        $0.subjectId == subjectId && $0.sort < sort
+        $0.subjectId == subjectId && $0.sort <= sort
       })
     let episodes = try modelContext.fetch(descriptor)
     return episodes.map { $0.episodeId }
@@ -333,7 +333,7 @@ extension DatabaseOperator {
   {
     let descriptor = FetchDescriptor<Episode>(
       predicate: #Predicate<Episode> {
-        $0.subjectId == subjectId && $0.sort < sort
+        $0.subjectId == subjectId && $0.sort <= sort
       })
     let episodes = try modelContext.fetch(descriptor)
     for episode in episodes {
