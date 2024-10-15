@@ -156,7 +156,7 @@ struct ProgressRowView: View {
           Spacer()
           if let collection = collection {
             HStack(alignment: .bottom) {
-              Text(collection.updatedAt.formatCollectionDate)
+              Text(collection.updatedAt.formatRelative)
                 .foregroundStyle(.secondary)
                 .lineLimit(1)
               Spacer()

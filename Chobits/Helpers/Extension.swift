@@ -70,6 +70,19 @@ extension Date {
     formatter.timeStyle = .short
     return formatter.string(from: self)
   }
+
+  var formatRelative: String {
+    if self.timeIntervalSinceNow > -604800 {
+      let formatter = RelativeDateTimeFormatter()
+      formatter.unitsStyle = .abbreviated
+      return formatter.localizedString(for: self, relativeTo: Date())
+    } else {
+      let formatter = DateFormatter()
+      formatter.dateStyle = .medium
+      formatter.timeStyle = .medium
+      return formatter.string(from: self)
+    }
+  }
 }
 
 extension UInt {
@@ -90,17 +103,6 @@ extension UInt {
   var durationDisplay: String {
     let now = Date()
     let t = Date(timeIntervalSince1970: TimeInterval(self))
-    let duration = now.timeIntervalSince(t)
-    /// 3 days
-    if duration < 259200 {
-      let formatter = RelativeDateTimeFormatter()
-      formatter.unitsStyle = .abbreviated
-      return formatter.localizedString(for: t, relativeTo: now)
-    } else {
-      let formatter = DateFormatter()
-      formatter.dateStyle = .medium
-      formatter.timeStyle = .medium
-      return formatter.string(from: t)
-    }
+    return t.formatRelative
   }
 }
