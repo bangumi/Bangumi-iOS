@@ -94,13 +94,12 @@ struct ChiiProgressView: View {
     self.collections.append(contentsOf: collections)
   }
 
-  func updateCollections(type: SubjectType?) async {
+  func refreshCollections(type: SubjectType?) async {
     do {
       try await Chii.shared.loadUserCollections(type: type, once: true)
     } catch {
       notifier.alert(error: error)
     }
-    await load()
   }
 
   func refreshAllCollections() async {
@@ -113,7 +112,6 @@ struct ChiiProgressView: View {
     } catch {
       notifier.alert(error: error)
     }
-    await load()
     refreshing = false
   }
 
@@ -161,14 +159,15 @@ struct ChiiProgressView: View {
             .animation(.default, value: subjectType)
             .animation(.default, value: counts)
             .animation(.default, value: collections)
+            .task {
+              await load()
+            }
             .refreshable {
               if refreshing {
                 return
               }
               UIImpactFeedbackGenerator(style: .soft).impactOccurred()
-              await updateCollections(type: subjectType)
-            }
-            .task {
+              await refreshCollections(type: subjectType)
               await load()
             }
             .navigationTitle("进度管理")
@@ -182,6 +181,7 @@ struct ChiiProgressView: View {
                     Task {
                       UIImpactFeedbackGenerator(style: .soft).impactOccurred()
                       await refreshAllCollections()
+                      await load()
                     }
                   } label: {
                     Image(systemName: "arrow.clockwise.circle")

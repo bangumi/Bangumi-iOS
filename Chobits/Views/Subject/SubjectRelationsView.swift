@@ -98,13 +98,13 @@ struct SubjectRelationsView: View {
             NavigationLink(value: NavDestination.subject(subjectId: relation.relationId)) {
               VStack {
                 if let ctype = collections[relation.relationId] {
-                  ImageView(img: relation.images.common, width: 60, height: 80, type: .subject, caption: {
+                  ImageView(img: relation.images.common, width: 60, height: 80, type: .subject) {
                     HStack {
                       Image(systemName: ctype.icon)
                       Spacer()
                       Text(ctype.description(type: relation.typeEnum))
                     }.padding(.horizontal, 4)
-                  })
+                  }
                 } else {
                   ImageView(img: relation.images.common, width: 60, height: 80, type: .subject)
                 }
@@ -139,13 +139,13 @@ struct SubjectRelationsView: View {
             VStack {
               Text(relation.relation).foregroundStyle(.secondary)
               if let ctype = collections[relation.relationId] {
-                ImageView(img: relation.images.common, width: 90, height: 120, type: .subject, caption: {
+                ImageView(img: relation.images.common, width: 90, height: 120, type: .subject) {
                   HStack {
                     Image(systemName: ctype.icon)
                     Spacer()
                     Text(ctype.description(type: relation.typeEnum))
                   }.padding(.horizontal, 4)
-                })
+                }
               } else {
                 ImageView(img: relation.images.common, width: 90, height: 120, type: .subject)
               }

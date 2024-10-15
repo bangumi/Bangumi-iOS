@@ -24,7 +24,7 @@ struct ImageView<Caption: View>: View {
 
   init(
     img: String?, width: CGFloat, height: CGFloat, alignment: Alignment = .center,
-    type: ImageType = .common, caption: (() -> Caption)?
+    type: ImageType = .common, @ViewBuilder caption: @escaping () -> Caption
   ) {
     self.img = img
     self.width = width
@@ -117,30 +117,30 @@ extension ImageView where Caption == EmptyView {
        type: ImageType = .common) {
     self.init(
       img: img, width: width, height: height, alignment: alignment,
-      type: type, caption: nil)
+      type: type) {}
   }
 }
 
 
 #Preview {
-  ImageView(img: "https://lain.bgm.tv/pic/cover/l/5e/39/140534_cUj6H.jpg", width: 60, height: 80, caption: {
+  ImageView(img: "https://lain.bgm.tv/pic/cover/l/5e/39/140534_cUj6H.jpg", width: 60, height: 80) {
     HStack {
       Text("abc")
       Spacer()
       Text("bcd")
     }.padding(.horizontal, 4)
-  })
+  }
   ImageView(img: "", width: 60, height: 60, type: .avatar)
   ImageView(img: "https://lain.bgm.tv/pic/cover/l/5e/39/140534_cUj6H.jpg", width: 60, height: 60, alignment: .top)
   ImageView(img: "", width: 80, height: 80, type: .subject)
-  ImageView(img: "https://lain.bgm.tv/pic/cover/l/5e/39/140534_cUj6H.jpg", width: 120, height: 160, caption: {
+  ImageView(img: "https://lain.bgm.tv/pic/cover/l/5e/39/140534_cUj6H.jpg", width: 120, height: 160) {
     HStack {
       Text("abc")
       Spacer()
       Text("bcd")
     }.padding(.horizontal, 4)
-  })
-  ImageView(img: "", width: 120, height: 160, caption: {
+  }
+  ImageView(img: "", width: 120, height: 160) {
     Text("abc")
-  })
+  }
 }
