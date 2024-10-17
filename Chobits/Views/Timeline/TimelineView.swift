@@ -64,15 +64,11 @@ struct ChiiTimelineView: View {
                   Text("\(me.nickname)")
                     .font(.footnote)
                     .lineLimit(1)
-                  Text(me.userGroup.description)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .overlay {
-                      RoundedRectangle(cornerRadius: 4)
-                        .stroke(.secondary, lineWidth: 1)
-                        .padding(.horizontal, -2)
-                        .padding(.vertical, -1)
-                    }
+                  BorderView(.secondary, padding: 2) {
+                    Text(me.userGroup.description)
+                      .font(.caption)
+                      .foregroundStyle(.secondary)
+                  }
                 }
               }
             }

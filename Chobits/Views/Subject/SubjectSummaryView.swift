@@ -44,22 +44,16 @@ struct SubjectSummaryView: View {
             LazyVStack(alignment: .leading) {
               FlowStack {
                 ForEach(tags, id: \.name) { tag in
-                  HStack {
-                    Text(tag.name)
-                      .font(.footnote)
-                      .lineLimit(1)
-                    Text("\(tag.count)")
-                      .font(.caption)
-                      .foregroundStyle(.secondary)
-                  }
-                  .padding(.horizontal, 6)
-                  .padding(.vertical, 4)
-                  .overlay {
-                    RoundedRectangle(cornerRadius: 5)
-                      .stroke(Color.secondary, lineWidth: 1)
-                      .padding(.horizontal, 2)
-                      .padding(.vertical, 2)
-                  }
+                  BorderView(.secondary, padding: 2) {
+                    HStack {
+                      Text(tag.name)
+                        .font(.footnote)
+                        .lineLimit(1)
+                      Text("\(tag.count)")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    }
+                  }.padding(1)
                 }
               }.animation(.default, value: tags)
               Divider()

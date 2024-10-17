@@ -54,15 +54,11 @@ struct PersonCharacterItemView: View {
             .foregroundStyle(.linkText)
             .lineLimit(1)
           if let staff = character?.staff {
-            Text(staff)
-              .font(.footnote)
-              .foregroundStyle(.secondary)
-              .overlay {
-                RoundedRectangle(cornerRadius: 4)
-                  .stroke(Color.secondary, lineWidth: 1)
-                  .padding(.horizontal, -2)
-                  .padding(.vertical, -1)
-              }
+            BorderView(.secondary, padding: 2) {
+              Text(staff)
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+            }
           }
           Spacer()
         }

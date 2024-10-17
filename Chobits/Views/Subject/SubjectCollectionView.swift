@@ -63,19 +63,14 @@ struct SubjectCollectionView: View {
             if collection.priv {
               Image(systemName: "lock.fill").foregroundStyle(.accent)
             }
-            Label(
-              collection.typeEnum.message(type: collection.subjectTypeEnum),
-              systemImage: "pencil.line"
-            )
-            .font(.callout)
-            .foregroundStyle(.linkText)
-            .overlay {
-              RoundedRectangle(cornerRadius: 5)
-                .stroke(.linkText, lineWidth: 1)
-                .padding(.horizontal, -2)
-                .padding(.vertical, -1)
+            BorderView(.linkText, padding: 2) {
+              Label(
+                collection.typeEnum.message(type: collection.subjectTypeEnum),
+                systemImage: "pencil.line"
+              )
+              .font(.callout)
+              .foregroundStyle(.linkText)
             }
-            .padding(2)
             .onTapGesture {
               edit.toggle()
             }
@@ -88,26 +83,21 @@ struct SubjectCollectionView: View {
               })
           } else if refreshed {
             Spacer()
-            Label("未收藏", systemImage: "plus")
-              .foregroundStyle(.secondary)
-              .font(.callout)
-              .overlay {
-                RoundedRectangle(cornerRadius: 5)
-                  .stroke(.secondary, lineWidth: 1)
-                  .padding(.horizontal, -2)
-                  .padding(.vertical, -1)
-              }
-              .padding(2)
-              .onTapGesture {
-                edit.toggle()
-              }
-              .sheet(
-                isPresented: $edit,
-                content: {
-                  SubjectCollectionBoxView(subjectId: subjectId)
-                    .presentationDragIndicator(.visible)
-                    .presentationDetents(.init([.medium, .large]))
-                })
+            BorderView(.secondary, padding: 2) {
+              Label("未收藏", systemImage: "plus")
+                .foregroundStyle(.secondary)
+                .font(.callout)
+            }
+            .onTapGesture {
+              edit.toggle()
+            }
+            .sheet(
+              isPresented: $edit,
+              content: {
+                SubjectCollectionBoxView(subjectId: subjectId)
+                  .presentationDragIndicator(.visible)
+                  .presentationDetents(.init([.medium, .large]))
+              })
           } else {
             ProgressView()
           }

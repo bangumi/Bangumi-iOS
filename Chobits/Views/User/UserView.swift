@@ -33,15 +33,11 @@ struct UserView: View {
               Text(user.nickname).font(.title2.bold())
               Spacer()
               HStack {
-                Text(user.userGroup.description)
-                  .font(.footnote)
-                  .foregroundStyle(.secondary)
-                  .overlay {
-                    RoundedRectangle(cornerRadius: 4)
-                      .stroke(.secondary, lineWidth: 1)
-                      .padding(.horizontal, -2)
-                      .padding(.vertical, -1)
-                  }
+                BorderView(.secondary, padding: 2) {
+                  Text(user.userGroup.description)
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                }
                 if user.username != "" {
                   Text("@\(user.username)")
                 } else {

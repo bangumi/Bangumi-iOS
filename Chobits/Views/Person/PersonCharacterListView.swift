@@ -186,14 +186,10 @@ struct PersonCharacterListItemSubjectItemView: View {
             .truncationMode(.middle)
             .foregroundStyle(.secondary)
             .lineLimit(1)
-          Text(staff)
-            .foregroundStyle(.secondary)
-            .overlay {
-              RoundedRectangle(cornerRadius: 4)
-                .stroke(Color.secondary, lineWidth: 1)
-                .padding(.horizontal, -2)
-                .padding(.vertical, -1)
-            }
+          BorderView(.secondary, padding: 2) {
+            Text(staff)
+              .foregroundStyle(.secondary)
+          }
         }.font(.caption)
           .padding(.trailing, 2)
       }

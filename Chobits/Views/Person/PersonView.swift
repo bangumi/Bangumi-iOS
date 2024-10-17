@@ -179,15 +179,10 @@ struct PersonView: View {
             /// career
             HStack {
               ForEach(careers, id: \.self) { career in
-                Text(career)
-                  .padding(.horizontal, 2)
-                  .font(.subheadline)
-                  .overlay {
-                    RoundedRectangle(cornerRadius: 4)
-                      .stroke(.gray, lineWidth: 1)
-                      .padding(.horizontal, -2)
-                      .padding(.vertical, -1)
-                  }
+                BorderView(.secondary, padding: 2) {
+                  Text(career)
+                    .font(.subheadline)
+                }
               }
             }
             .padding(.horizontal, 4)

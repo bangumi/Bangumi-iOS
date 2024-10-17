@@ -31,6 +31,7 @@
 		1915A8A62BF0DFB8003DB76D /* PersonSubjectsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1915A8A52BF0DFB8003DB76D /* PersonSubjectsView.swift */; };
 		1915A8A82BF0E668003DB76D /* PersonCharactersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1915A8A72BF0E668003DB76D /* PersonCharactersView.swift */; };
 		1915A8AA2BF0E8C4003DB76D /* PersonCharacterItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1915A8A92BF0E8C4003DB76D /* PersonCharacterItemView.swift */; };
+		191CF1A62CC09F25000EF819 /* BorderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 191CF1A52CC09F1E000EF819 /* BorderView.swift */; };
 		1930110E2C00F08A008DCEBF /* CollectionSubjectTypeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1930110D2C00F08A008DCEBF /* CollectionSubjectTypeView.swift */; };
 		1943C5082C08CD2E0067ACDB /* StarsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1943C5072C08CD2E0067ACDB /* StarsView.swift */; };
 		1943C50A2C0DF4030067ACDB /* SubjectBrowsingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1943C5092C0DF4030067ACDB /* SubjectBrowsingView.swift */; };
@@ -124,6 +125,7 @@
 		1915A8A52BF0DFB8003DB76D /* PersonSubjectsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonSubjectsView.swift; sourceTree = "<group>"; };
 		1915A8A72BF0E668003DB76D /* PersonCharactersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonCharactersView.swift; sourceTree = "<group>"; };
 		1915A8A92BF0E8C4003DB76D /* PersonCharacterItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonCharacterItemView.swift; sourceTree = "<group>"; };
+		191CF1A52CC09F1E000EF819 /* BorderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BorderView.swift; sourceTree = "<group>"; };
 		1930110D2C00F08A008DCEBF /* CollectionSubjectTypeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionSubjectTypeView.swift; sourceTree = "<group>"; };
 		1943C5072C08CD2E0067ACDB /* StarsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StarsView.swift; sourceTree = "<group>"; };
 		1943C5092C0DF4030067ACDB /* SubjectBrowsingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubjectBrowsingView.swift; sourceTree = "<group>"; };
@@ -253,6 +255,7 @@
 		19671C3C2BDEB55D000B4D99 /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				191CF1A52CC09F1E000EF819 /* BorderView.swift */,
 				19671C382BDEB55D000B4D99 /* FlowStack.swift */,
 				19671C392BDEB55D000B4D99 /* ImageView.swift */,
 				1943C5072C08CD2E0067ACDB /* StarsView.swift */,
@@ -561,6 +564,7 @@
 				19E0E5072BF34F0E00066EB7 /* CollectionsView.swift in Sources */,
 				1909F3A12BEBC2B600E3B8F0 /* Calendar.swift in Sources */,
 				19671C692BDEB55D000B4D99 /* AuthView.swift in Sources */,
+				191CF1A62CC09F25000EF819 /* BorderView.swift in Sources */,
 				19B900402BEEE23600405F0F /* ChartView.swift in Sources */,
 				19671C642BDEB55D000B4D99 /* Mock.swift in Sources */,
 				1909F3A32BEBC2E600E3B8F0 /* Subject.swift in Sources */,

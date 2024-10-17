@@ -70,15 +70,11 @@ struct SubjectCharacterListView: View {
                     .lineLimit(1)
                 }
                 HStack(alignment: .bottom) {
-                  Text(character.relation)
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-                    .overlay {
-                      RoundedRectangle(cornerRadius: 4)
-                        .stroke(Color.secondary, lineWidth: 1)
-                        .padding(.horizontal, -2)
-                        .padding(.vertical, -1)
-                    }
+                  BorderView(.secondary, padding: 2) {
+                    Text(character.relation)
+                      .font(.footnote)
+                      .foregroundStyle(.secondary)
+                  }
                 }
               }
             }.buttonStyle(.plain)

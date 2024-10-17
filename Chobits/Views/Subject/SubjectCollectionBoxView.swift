@@ -165,63 +165,46 @@ struct SubjectCollectionBoxView: View {
 
           Text("标签 (使用半角空格或逗号隔开，至多10个)")
             .padding(.top, 10)
-          TextField("标签", text: $tagsInput)
-            .onChange(of: tagsInput) { _, new in
-              var tagSet: Set<String> = Set()
-              for tag in new.components(separatedBy: " ") {
-                if !tag.isEmpty {
-                  tagSet.insert(tag.trimmingCharacters(in: .whitespacesAndNewlines))
+          BorderView(.secondary.opacity(0.2), padding: 5) {
+            TextField("标签", text: $tagsInput)
+              .onChange(of: tagsInput) { _, new in
+                var tagSet: Set<String> = Set()
+                for tag in new.components(separatedBy: " ") {
+                  if !tag.isEmpty {
+                    tagSet.insert(tag.trimmingCharacters(in: .whitespacesAndNewlines))
+                  }
+                }
+                tags = Array(tagSet.sorted())
+                if tags.count > 10 {
+                  tags = Array(tags[0..<10])
                 }
               }
-              tags = Array(tagSet.sorted())
-              if tags.count > 10 {
-                tags = Array(tags[0..<10])
-              }
-            }
-            .padding(.horizontal, 5)
-            .padding(.vertical, 5)
-            .overlay {
-              RoundedRectangle(cornerRadius: 5)
-                .stroke(.secondary.opacity(0.2), lineWidth: 1)
-                .padding(.horizontal, -2)
-                .padding(.vertical, -2)
-            }
+          }
           HStack(alignment: .top) {
             Text("常用标签").font(.footnote).foregroundStyle(.secondary)
             FlowStack {
               ForEach(recommendedTags, id: \.self) { tag in
-                Button {
-                  self.tagsInput += " " + tag
-                } label: {
-                  Text(tag)
+                BorderView(.secondary, padding: 2) {
+                  Button {
+                    self.tagsInput += " " + tag
+                  } label: {
+                    Text(tag)
+                  }
+                  .font(.caption)
+                  .foregroundStyle(.secondary)
+                  .lineLimit(1)
                 }
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .lineLimit(1)
-                .padding(.horizontal, 6)
-                .padding(.vertical, 4)
-                .overlay {
-                  RoundedRectangle(cornerRadius: 5)
-                    .stroke(Color.secondary, lineWidth: 1)
-                    .padding(.horizontal, 2)
-                    .padding(.vertical, 2)
-                }
+                .padding(2)
               }
             }
           }
 
           Text("吐槽")
-          TextField("吐槽", text: $comment, axis: .vertical)
-            .multilineTextAlignment(.leading)
-            .lineLimit(5, reservesSpace: true)
-            .padding(.horizontal, 5)
-            .padding(.vertical, 5)
-            .overlay {
-              RoundedRectangle(cornerRadius: 5)
-                .stroke(.secondary.opacity(0.2), lineWidth: 1)
-                .padding(.horizontal, -2)
-                .padding(.vertical, -2)
-            }
+          BorderView(.secondary.opacity(0.2), padding: 5) {
+            TextField("吐槽", text: $comment, axis: .vertical)
+              .multilineTextAlignment(.leading)
+              .lineLimit(5, reservesSpace: true)
+          }
         }
         Spacer()
       }

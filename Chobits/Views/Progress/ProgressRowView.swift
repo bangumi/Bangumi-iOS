@@ -128,16 +128,11 @@ struct ProgressRowView: View {
               Image(systemName: "lock.fill").foregroundStyle(.accent)
             }
             if let platform = subject?.platform, !platform.isEmpty {
-              Text(platform)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .padding(.horizontal, 1)
-                .overlay {
-                  RoundedRectangle(cornerRadius: 5)
-                    .stroke(.secondary, lineWidth: 1)
-                    .padding(.horizontal, -1)
-                    .padding(.vertical, -1)
-                }
+              BorderView(.secondary, padding: 2) {
+                Text(platform)
+                  .font(.caption)
+                  .foregroundStyle(.secondary)
+              }
             }
             Text(subject?.nameCn ?? "")
               .foregroundStyle(.secondary)

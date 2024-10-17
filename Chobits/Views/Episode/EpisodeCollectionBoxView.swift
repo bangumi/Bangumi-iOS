@@ -73,15 +73,11 @@ struct EpisodeCollectionBoxView: View {
         if let episode = episode {
           HStack {
             Text(episode.title).font(.title3).lineLimit(1)
-            Text(episode.typeEnum.description)
-              .font(.footnote)
-              .foregroundStyle(.secondary)
-              .overlay {
-                RoundedRectangle(cornerRadius: 5)
-                  .stroke(.secondary, lineWidth: 1)
-                  .padding(.horizontal, -4)
-                  .padding(.vertical, -2)
-              }
+            BorderView(.secondary, padding: 2) {
+              Text(episode.typeEnum.description)
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+            }
             Spacer()
             if episode.comment > 0 && !isolationMode {
               Label("讨论", systemImage: "bubble.fill").font(.caption).foregroundStyle(.secondary)

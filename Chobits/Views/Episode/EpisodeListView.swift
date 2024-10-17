@@ -165,50 +165,37 @@ struct EpisodeListView: View {
                 .lineLimit(1)
               HStack {
                 if isAuthenticated && episode.collectionTypeEnum != .none {
-                  RoundedRectangle(cornerRadius: 5)
-                    .fill(Color(hex: episode.backgroundColor))
-                    .stroke(Color(hex: episode.borderColor), lineWidth: 1)
-                    .frame(width: 40, height: 24)
-                    .overlay {
-                      Text("\(episode.collectionTypeEnum.description)")
-                        .foregroundStyle(Color(hex: episode.textColor))
-                        .font(.footnote)
-                    }
-                    .padding(.horizontal, 2)
-                    .strikethrough(episode.collection == EpisodeCollectionType.dropped.rawValue)
+                  BorderView(Color(hex: episode.borderColor), padding: 4) {
+                    Text("\(episode.collectionTypeEnum.description)")
+                      .foregroundStyle(Color(hex: episode.textColor))
+                      .font(.footnote)
+                  }
+                  .strikethrough(episode.collection == EpisodeCollectionType.dropped.rawValue)
+                  .background {
+                    RoundedRectangle(cornerRadius: 5)
+                      .fill(Color(hex: episode.backgroundColor))
+                  }
                 } else {
                   if main {
                     if episode.airdate > now {
-                      RoundedRectangle(cornerRadius: 5)
-                        .stroke(.secondary, lineWidth: 1)
-                        .frame(width: 40, height: 24)
-                        .overlay {
-                          Text("未播")
-                            .foregroundStyle(.secondary)
-                            .font(.footnote)
-                        }
-                        .padding(.horizontal, 2)
+                      BorderView(.secondary, padding: 4) {
+                        Text("未播")
+                          .foregroundStyle(.secondary)
+                          .font(.footnote)
+                      }
                     } else {
-                      RoundedRectangle(cornerRadius: 5)
-                        .stroke(.primary, lineWidth: 1)
-                        .frame(width: 40, height: 24)
-                        .overlay {
-                          Text("已播")
-                            .foregroundStyle(.primary)
-                            .font(.footnote)
-                        }
-                        .padding(.horizontal, 2)
-                    }
-                  } else {
-                    RoundedRectangle(cornerRadius: 5)
-                      .stroke(.primary, lineWidth: 1)
-                      .frame(width: 40, height: 24)
-                      .overlay {
-                        Text(episode.typeEnum.description)
+                      BorderView(.primary, padding: 4) {
+                        Text("已播")
                           .foregroundStyle(.primary)
                           .font(.footnote)
                       }
-                      .padding(.horizontal, 2)
+                    }
+                  } else {
+                    BorderView(.primary, padding: 4) {
+                      Text(episode.typeEnum.description)
+                        .foregroundStyle(.primary)
+                        .font(.footnote)
+                    }
                   }
                 }
 

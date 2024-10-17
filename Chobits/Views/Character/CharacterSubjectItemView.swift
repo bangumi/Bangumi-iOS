@@ -67,13 +67,9 @@ struct CharacterSubjectItemView: View {
             }
             HStack(alignment: .bottom) {
               if let relation = relation {
-                Text(relation.staff)
-                  .overlay {
-                    RoundedRectangle(cornerRadius: 4)
-                      .stroke(Color.secondary, lineWidth: 1)
-                      .padding(.horizontal, -2)
-                      .padding(.vertical, -1)
-                  }
+                BorderView(.secondary, padding: 2) {
+                  Text(relation.staff)
+                }
               }
               if !subject.typeEnum.icon.isEmpty {
                 Image(systemName: subject.typeEnum.icon)

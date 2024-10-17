@@ -37,14 +37,10 @@ struct SubjectRatingBoxView: View {
                 Text(scoreInfo.desc)
               }
               Spacer()
-              Text("\(subject.rating.total) 人评分")
-                .font(.footnote)
-                .overlay {
-                  RoundedRectangle(cornerRadius: 5)
-                    .stroke(Color.secondary, lineWidth: 1)
-                    .padding(.horizontal, -4)
-                    .padding(.vertical, -2)
-                }
+              BorderView(.secondary, padding: 2) {
+                Text("\(subject.rating.total) 人评分")
+                  .font(.footnote)
+              }
             }
             if subject.rating.rank > 0 {
               HStack {
