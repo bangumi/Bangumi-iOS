@@ -76,62 +76,66 @@ struct SubjectBookChaptersView: View {
 
   var body: some View {
     HStack {
-      HStack(alignment: .firstTextBaseline, spacing: 0) {
-        Button {
-          if let value = eps {
-            self.inputEps = "\(value+1)"
-          } else {
-            self.inputEps = "\(collectionEps+1)"
-          }
-        } label: {
-          Image(systemName: "plus.circle")
-            .foregroundStyle(.secondary)
-            .padding(.trailing, 5)
-        }.buttonStyle(.plain)
-        TextField("\(collectionEps)", text: $inputEps)
-          .keyboardType(.numberPad)
-          .frame(minWidth: 48, maxWidth: 60)
-          .multilineTextAlignment(.trailing)
-          .fixedSize(horizontal: true, vertical: false)
-          .padding(.trailing, 2)
-          .textFieldStyle(.roundedBorder)
-          .onChange(of: inputEps) {
-            if let newEps = UInt(inputEps) {
-              self.eps = newEps
+      VStack {
+        HStack(alignment: .firstTextBaseline, spacing: 0) {
+          Button {
+            if let value = eps {
+              self.inputEps = "\(value+1)"
             } else {
-              self.eps = nil
+              self.inputEps = "\(collectionEps+1)"
             }
-          }
-        Text(subject?.epsDesc ?? "").foregroundStyle(.secondary)
-      }.monospaced()
-      HStack(alignment: .firstTextBaseline, spacing: 0) {
-        Button {
-          if let value = vols {
-            self.inputVols = "\(value+1)"
-          } else {
-            self.inputVols = "\(collectionVols+1)"
-          }
-        } label: {
-          Image(systemName: "plus.circle")
-            .foregroundStyle(.secondary)
-            .padding(.trailing, 5)
-        }.buttonStyle(.plain)
-        TextField("\(collectionVols)", text: $inputVols)
-          .keyboardType(.numberPad)
-          .frame(minWidth: 36, maxWidth: 48)
-          .multilineTextAlignment(.trailing)
-          .fixedSize(horizontal: true, vertical: false)
-          .padding(.trailing, 2)
-          .textFieldStyle(.roundedBorder)
-          .onChange(of: inputVols) {
-            if let newVols = UInt(inputVols) {
-              self.vols = newVols
+          } label: {
+            Image(systemName: "plus.circle")
+              .foregroundStyle(.secondary)
+              .padding(.trailing, 5)
+          }.buttonStyle(.plain)
+          TextField("\(collectionEps)", text: $inputEps)
+            .keyboardType(.numberPad)
+            .frame(minWidth: 50, maxWidth: 100)
+            .multilineTextAlignment(.trailing)
+            .fixedSize(horizontal: true, vertical: false)
+            .padding(.trailing, 2)
+            .textFieldStyle(.roundedBorder)
+            .onChange(of: inputEps) {
+              if let newEps = UInt(inputEps) {
+                self.eps = newEps
+              } else {
+                self.eps = nil
+              }
+            }
+          Text(subject?.epsDesc ?? "").foregroundStyle(.secondary)
+          Spacer()
+        }.monospaced()
+        HStack(alignment: .firstTextBaseline, spacing: 0) {
+          Button {
+            if let value = vols {
+              self.inputVols = "\(value+1)"
             } else {
-              self.vols = nil
+              self.inputVols = "\(collectionVols+1)"
             }
-          }
-        Text(subject?.volumesDesc ?? "").foregroundStyle(.secondary)
-      }.monospaced()
+          } label: {
+            Image(systemName: "plus.circle")
+              .foregroundStyle(.secondary)
+              .padding(.trailing, 5)
+          }.buttonStyle(.plain)
+          TextField("\(collectionVols)", text: $inputVols)
+            .keyboardType(.numberPad)
+            .frame(minWidth: 50, maxWidth: 100)
+            .multilineTextAlignment(.trailing)
+            .fixedSize(horizontal: true, vertical: false)
+            .padding(.trailing, 2)
+            .textFieldStyle(.roundedBorder)
+            .onChange(of: inputVols) {
+              if let newVols = UInt(inputVols) {
+                self.vols = newVols
+              } else {
+                self.vols = nil
+              }
+            }
+          Text(subject?.volumesDesc ?? "").foregroundStyle(.secondary)
+          Spacer()
+        }.monospaced()
+      }
       Spacer()
       VStack {
         if updating {
