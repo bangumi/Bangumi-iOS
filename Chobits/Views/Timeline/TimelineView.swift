@@ -62,13 +62,11 @@ struct ChiiTimelineView: View {
                 ImageView(img: me.avatar.medium, width: 32, height: 32)
                 VStack(alignment: .leading) {
                   Text("\(me.nickname)")
-                    .font(.footnote)
+                    .font(.callout)
                     .lineLimit(1)
-                  BorderView(.secondary, padding: 2) {
-                    Text(me.userGroup.description)
-                      .font(.caption)
-                      .foregroundStyle(.secondary)
-                  }
+                  Text(me.userGroup.description)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
                 }
               }
             }
