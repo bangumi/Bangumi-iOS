@@ -29,9 +29,7 @@ struct UserView: View {
           HStack {
             ImageView(img: user.avatar.large, width: 60, height: 60, type: .avatar)
             VStack(alignment: .leading) {
-              Spacer()
               Text(user.nickname).font(.title2.bold())
-              Spacer()
               HStack {
                 BorderView(.secondary, padding: 2) {
                   Text(user.userGroup.description)
@@ -44,10 +42,8 @@ struct UserView: View {
                   Text("@\(user.id)")
                 }
               }
-              .padding(.leading, 2)
               .foregroundStyle(.secondary)
               .font(.footnote)
-              Spacer()
             }
             .padding(.leading, 2)
           }
