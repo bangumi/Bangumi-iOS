@@ -152,7 +152,9 @@ struct SubjectBookChaptersView: View {
             .buttonStyle(.borderedProminent)
         }
       }
-    }.disabled(updating)
+    }
+    .disabled(updating)
+    .padding(5)
   }
 }
 
