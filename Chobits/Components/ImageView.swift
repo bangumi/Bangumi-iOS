@@ -34,6 +34,18 @@ struct ImageView<Caption: View>: View {
     self.caption = caption
   }
 
+  init(
+    img: String?, width: CGFloat, height: CGFloat, alignment: Alignment = .center,
+    type: ImageType = .common, caption: (() -> Caption)?
+  ) {
+    self.img = img
+    self.width = width
+    self.height = height
+    self.alignment = alignment
+    self.type = type
+    self.caption = caption
+  }
+
   var imageURL: URL? {
     guard let img = img else { return nil }
     let icon = img.replacing("http://", with: "https://")
@@ -117,7 +129,7 @@ extension ImageView where Caption == EmptyView {
        type: ImageType = .common) {
     self.init(
       img: img, width: width, height: height, alignment: alignment,
-      type: type) {}
+      type: type, caption: nil)
   }
 }
 
@@ -130,6 +142,7 @@ extension ImageView where Caption == EmptyView {
       Text("bcd")
     }.padding(.horizontal, 4)
   }
+  ImageView(img: "", width: 40, height: 60)
   ImageView(img: "", width: 60, height: 60, type: .avatar)
   ImageView(img: "https://lain.bgm.tv/pic/cover/l/5e/39/140534_cUj6H.jpg", width: 60, height: 60, alignment: .top)
   ImageView(img: "", width: 80, height: 80, type: .subject)
