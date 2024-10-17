@@ -78,7 +78,7 @@ struct EpisodeCollectionBoxView: View {
               .foregroundStyle(.secondary)
               .overlay {
                 RoundedRectangle(cornerRadius: 5)
-                  .stroke(Color.secondary, lineWidth: 1)
+                  .stroke(.secondary, lineWidth: 1)
                   .padding(.horizontal, -4)
                   .padding(.vertical, -2)
               }

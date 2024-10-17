@@ -134,7 +134,7 @@ struct ProgressRowView: View {
                 .padding(.horizontal, 1)
                 .overlay {
                   RoundedRectangle(cornerRadius: 5)
-                    .stroke(Color.secondary, lineWidth: 1)
+                    .stroke(.secondary, lineWidth: 1)
                     .padding(.horizontal, -1)
                     .padding(.vertical, -1)
                 }

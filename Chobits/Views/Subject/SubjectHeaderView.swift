@@ -44,6 +44,30 @@ struct SubjectHeaderView: View {
 
   var body: some View {
     if let subject = subject {
+      if subject.locked {
+        ZStack {
+          HStack {
+            Image("Musume")
+              .scaleEffect(x: 0.5, y: 0.5, anchor: .bottomLeading)
+              .offset(x: -40, y: 20)
+              .frame(width: 36, height: 60, alignment: .bottomLeading)
+              .clipped()
+              .padding(.horizontal, 5)
+            VStack(alignment: .leading) {
+              Text("条目已锁定")
+                .font(.callout.bold())
+                .foregroundStyle(.accent)
+              Text("同人誌，条目及相关收藏、讨论、关联等内容将会随时被移除。")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+            }
+            Spacer()
+          }
+          RoundedRectangle(cornerRadius: 5)
+            .stroke(.accent, lineWidth: 1)
+            .padding(.horizontal, 1)
+        }
+      }
       Text(subject.name)
         .font(.title2.bold())
         .multilineTextAlignment(.leading)
@@ -72,9 +96,6 @@ struct SubjectHeaderView: View {
             Spacer()
             if subject.nsfw {
               Label("", systemImage: "18.circle").foregroundStyle(.red)
-            }
-            if subject.locked {
-              Label("", systemImage: "lock").foregroundStyle(.red)
             }
           }
           .font(.caption)
@@ -129,25 +150,23 @@ struct SubjectHeaderView: View {
       }
       if subject.rating.rank > 0 {
         NavigationLink(value: NavDestination.subjectBrowsing(subjectType: subject.typeEnum)) {
-          HStack {
-            Spacer()
-            Label(
-              "Bangumi \(subject.typeEnum.name.capitalized) Ranked:", systemImage: "chart.bar.xaxis"
-            )
-            Text("#\(subject.rating.rank)")
-            Image(systemName: "chevron.right")
-            Spacer()
-          }
-          .padding(2)
-          .overlay {
+          ZStack {
+            HStack {
+              Spacer()
+              Label(
+                "Bangumi \(subject.typeEnum.name.capitalized) Ranked:", systemImage: "chart.bar.xaxis"
+              )
+              Text("#\(subject.rating.rank)")
+              Image(systemName: "chevron.right")
+              Spacer()
+            }
+            .font(.callout)
+            .foregroundStyle(.accent)
+            .padding(4)
             RoundedRectangle(cornerRadius: 5)
-              .stroke(.secondary, lineWidth: 1)
-              .padding(.horizontal, -2)
-              .padding(.vertical, -1)
+              .stroke(.accent, lineWidth: 1)
+              .padding(.horizontal, 1)
           }
-          .font(.callout)
-          .foregroundStyle(.accent)
-          .padding(4)
         }
       }
     }
