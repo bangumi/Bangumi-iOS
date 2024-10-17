@@ -27,7 +27,7 @@ struct UserView: View {
       ScrollView {
         LazyVStack(alignment: .leading) {
           HStack {
-            ImageView(img: user.avatar.large, width: 60, height: 60, type: .avatar)
+            ImageView(img: user.avatar.large, width: 100, height: 100, type: .avatar)
             VStack(alignment: .leading) {
               Text(user.nickname).font(.title2.bold())
               HStack {
@@ -44,15 +44,14 @@ struct UserView: View {
               }
               .foregroundStyle(.secondary)
               .font(.footnote)
+              if user.sign != "" {
+                  Text(user.sign)
+                    .font(.footnote)
+                }
             }
             .padding(.leading, 2)
           }
-          if user.sign != "" {
-            Text(user.sign)
-              .font(.footnote)
-              .padding(.vertical, 1)
-          }
-          Divider().padding(.vertical, 1)
+          Divider()
           Text("时光机 🚧")
         }.padding(.horizontal, 8)
       }
