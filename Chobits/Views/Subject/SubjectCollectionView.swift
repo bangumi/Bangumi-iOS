@@ -102,7 +102,7 @@ struct SubjectCollectionView: View {
             ProgressView()
           }
         }.padding(.horizontal, 4)
-        if let collection = collection, collection.subjectTypeEnum == .book {
+        if collection?.subjectTypeEnum == .book {
           SubjectBookChaptersView(subjectId: subjectId)
         }
       }

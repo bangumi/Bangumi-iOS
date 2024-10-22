@@ -282,7 +282,7 @@ extension DatabaseOperator {
     if let vols = vols {
       collection?.volStatus = vols
     }
-    collection?.updatedAt = Date()
+    collection?.updatedAt = Date() - 1
   }
 
   public func updateUserCollection(
@@ -325,7 +325,7 @@ extension DatabaseOperator {
     if let tags = tags {
       collection?.tags = tags
     }
-    collection?.updatedAt = Date()
+    collection?.updatedAt = Date() - 1
   }
 
   public func updateEpisodeCollections(subjectId: UInt, sort: Float, type: EpisodeCollectionType)
@@ -344,7 +344,7 @@ extension DatabaseOperator {
         $0.subjectId == subjectId
       }
     )
-    collection?.updatedAt = Date()
+    collection?.updatedAt = Date() - 1
   }
 
   public func updateEpisodeCollection(subjectId: UInt, episodeId: UInt, type: EpisodeCollectionType)
@@ -361,6 +361,6 @@ extension DatabaseOperator {
         $0.subjectId == subjectId
       }
     )
-    collection?.updatedAt = Date()
+    collection?.updatedAt = Date() - 1
   }
 }
