@@ -9,14 +9,14 @@ import OSLog
 import SwiftData
 import SwiftUI
 
-struct ChiiDiscoverView: View {
+struct SearchView: View {
+  @Binding var query: String
+  @Binding var remote: Bool
+
   @Environment(Notifier.self) private var notifier
   @Environment(\.modelContext) var modelContext
 
-  @State private var searching = false
-  @State private var query = ""
   @State private var subjectType: SubjectType = .unknown
-  @State private var local = true
   @State private var offset = 0
   @State private var exhausted = false
 
@@ -27,7 +27,7 @@ struct ChiiDiscoverView: View {
     var desc = FetchDescriptor<Subject>(
       predicate: #Predicate<Subject> {
         return (subjectType.rawValue == 0 || subjectType.rawValue == $0.type)
-          && ($0.name.localizedStandardContains(query)
+        && ($0.name.localizedStandardContains(query)
             || $0.nameCn.localizedStandardContains(query))
       })
     desc.fetchLimit = limit
@@ -49,12 +49,14 @@ struct ChiiDiscoverView: View {
   }
 
   func newLocalSearch() async {
-    Logger.app.info("new local search")
-    local = true
     offset = 0
     exhausted = false
     loadedIdx.removeAll()
     subjects.removeAll()
+    if query.isEmpty {
+      return
+    }
+    Logger.app.info("new local search")
     let subjects = await localSearch()
     self.subjects.append(contentsOf: subjects)
   }
@@ -103,12 +105,14 @@ struct ChiiDiscoverView: View {
   }
 
   func newRemoteSearch() async {
-    Logger.app.info("new remote search")
-    local = false
     offset = 0
     exhausted = false
     loadedIdx.removeAll()
     subjects.removeAll()
+    if query.isEmpty {
+      return
+    }
+    Logger.app.info("new remote search")
     let subjects = await remoteSearch()
     self.subjects.append(contentsOf: subjects)
   }
@@ -129,92 +133,73 @@ struct ChiiDiscoverView: View {
   }
 
   var body: some View {
-    NavigationStack {
-      VStack {
-        if searching {
-          Picker("Subject Type", selection: $subjectType) {
-            Text("全部").tag(SubjectType.unknown)
-            ForEach(SubjectType.allTypes()) { type in
-              Text(type.description).tag(type)
-            }
-          }
-          .onChange(of: subjectType) { _, _ in
-            if query.isEmpty {
-              return
-            }
-            Task {
-              if local {
-                await newLocalSearch()
-              } else {
-                await newRemoteSearch()
-              }
-            }
-          }
-          .pickerStyle(.segmented)
-          .padding(.horizontal, 8)
-          if !query.isEmpty {
-            if subjects.isEmpty && !local && !exhausted {
-              VStack {
-                Spacer()
-                ProgressView()
-                Spacer()
-              }
-            } else {
-              ScrollView {
-                LazyVStack(alignment: .leading, spacing: 10) {
-                  ForEach(subjects, id: \.inner.self) { item in
-                    NavigationLink(value: NavDestination.subject(subjectId: item.inner.subjectId)) {
-                      SubjectLargeRowView(subjectId: item.inner.subjectId)
-                        .onAppear {
-                          Task {
-                            if local {
-                              await localSearchNextPage(idx: item.idx)
-                            } else {
-                              await remoteSearchNextPage(idx: item.idx)
-                            }
-                          }
-                        }
-                    }.buttonStyle(.plain)
-                    Divider()
-                  }
-                  if exhausted {
-                    HStack {
-                      Spacer()
-                      Text("没有更多了")
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
-                      Spacer()
-                    }
-                  }
-                }.padding(.horizontal, 8)
-              }.animation(.easeInOut, value: subjectType)
-            }
-          }
-          Spacer()
+    Picker("Subject Type", selection: $subjectType) {
+      Text("全部").tag(SubjectType.unknown)
+      ForEach(SubjectType.allTypes()) { type in
+        Text(type.description).tag(type)
+      }
+    }
+    .pickerStyle(.segmented)
+    .padding(.horizontal, 8)
+    .onChange(of: subjectType) { _, _ in
+      Task {
+        if remote {
+          await newRemoteSearch()
         } else {
-          CalendarView()
+          await newLocalSearch()
         }
       }
-      .navigationDestination(for: NavDestination.self) { $0 }
-      .navigationTitle("发现")
-      .toolbarTitleDisplayMode(.inlineLarge)
     }
-    .searchable(
-      text: $query, isPresented: $searching, placement: .navigationBarDrawer(displayMode: .always)
-    )
     .onChange(of: query) { _, _ in
       Task {
-        await newLocalSearch()
+          await newLocalSearch()
       }
     }
-    .onSubmit(of: .search) {
-      Task {
-        await newRemoteSearch()
+    .onChange(of: remote) { _, _ in
+      if remote {
+        Task {
+          await newRemoteSearch()
+        }
       }
     }
-    .onOpenURL(perform: { url in
-      // TODO: handle urls
-      print(url)
-    })
+    if !query.isEmpty {
+      if subjects.isEmpty && remote && !exhausted {
+        VStack {
+          Spacer()
+          ProgressView()
+          Spacer()
+        }
+      } else {
+        ScrollView {
+          LazyVStack(alignment: .leading, spacing: 10) {
+            ForEach(subjects, id: \.inner.self) { item in
+              NavigationLink(value: NavDestination.subject(subjectId: item.inner.subjectId)) {
+                SubjectLargeRowView(subjectId: item.inner.subjectId)
+                  .onAppear {
+                    Task {
+                      if remote {
+                        await remoteSearchNextPage(idx: item.idx)
+                      } else {
+                        await localSearchNextPage(idx: item.idx)
+                      }
+                    }
+                  }
+              }.buttonStyle(.plain)
+              Divider()
+            }
+            if exhausted {
+              HStack {
+                Spacer()
+                Text("没有更多了")
+                  .font(.footnote)
+                  .foregroundStyle(.secondary)
+                Spacer()
+              }
+            }
+          }.padding(.horizontal, 8)
+        }.animation(.easeInOut, value: subjectType)
+      }
+    }
+    Spacer()
   }
 }

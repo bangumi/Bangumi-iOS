@@ -126,91 +126,88 @@ struct ChiiProgressView: View {
   }
 
   var body: some View {
-    NavigationStack {
-      VStack {
-        if isAuthenticated {
-            ScrollView {
-              Picker("Subject Type", selection: $subjectType) {
-                ForEach(SubjectType.progressTypes()) { type in
-                  Text("\(type.description)(\(counts[type, default: 0]))").tag(type)
+    VStack {
+      if isAuthenticated {
+        ScrollView {
+          Picker("Subject Type", selection: $subjectType) {
+            ForEach(SubjectType.progressTypes()) { type in
+              Text("\(type.description)(\(counts[type, default: 0]))").tag(type)
+            }
+          }
+          .padding(.horizontal, 8)
+          .pickerStyle(.segmented)
+          .onChange(of: subjectType) {
+            Task {
+              await load()
+            }
+          }
+          LazyVStack(alignment: .leading, spacing: 10) {
+            ForEach(collections, id: \.inner.self) { item in
+              NavigationLink(value: NavDestination.subject(subjectId: item.inner.subjectId)) {
+                ProgressRowView(subjectId: item.inner.subjectId)
+              }
+              .buttonStyle(.plain)
+              .onAppear {
+                Task {
+                  await loadNextPage(idx: item.idx)
                 }
               }
-              .padding(.horizontal, 8)
-              .pickerStyle(.segmented)
-              .onChange(of: subjectType) {
+              Divider()
+            }
+            if exhausted {
+              HStack {
+                Spacer()
+                Text("没有更多了")
+                  .font(.footnote)
+                  .foregroundStyle(.secondary)
+                Spacer()
+              }
+            }
+          }.padding(.horizontal, 8)
+        }
+        .animation(.default, value: subjectType)
+        .animation(.default, value: counts)
+        .animation(.default, value: collections)
+        .task {
+          await load()
+        }
+        .refreshable {
+          if refreshing {
+            return
+          }
+          UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+          await refreshCollections(type: subjectType)
+          await load()
+        }
+        .navigationTitle("进度管理")
+        .toolbarTitleDisplayMode(.inlineLarge)
+        .toolbar {
+          ToolbarItem(placement: .topBarTrailing) {
+            if refreshing {
+              ProgressView()
+            } else {
+              Button {
                 Task {
+                  UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+                  await refreshAllCollections()
                   await load()
                 }
-              }
-              LazyVStack(alignment: .leading, spacing: 10) {
-                ForEach(collections, id: \.inner.self) { item in
-                  NavigationLink(value: NavDestination.subject(subjectId: item.inner.subjectId)) {
-                    ProgressRowView(subjectId: item.inner.subjectId)
-                  }
-                  .buttonStyle(.plain)
-                  .onAppear {
-                    Task {
-                      await loadNextPage(idx: item.idx)
-                    }
-                  }
-                  Divider()
-                }
-                if exhausted {
-                  HStack {
-                    Spacer()
-                    Text("没有更多了")
-                      .font(.footnote)
-                      .foregroundStyle(.secondary)
-                    Spacer()
-                  }
-                }
-              }.padding(.horizontal, 8)
-            }
-            .animation(.default, value: subjectType)
-            .animation(.default, value: counts)
-            .animation(.default, value: collections)
-            .task {
-              await load()
-            }
-            .refreshable {
-              if refreshing {
-                return
-              }
-              UIImpactFeedbackGenerator(style: .soft).impactOccurred()
-              await refreshCollections(type: subjectType)
-              await load()
-            }
-            .navigationTitle("进度管理")
-            .toolbarTitleDisplayMode(.inlineLarge)
-            .toolbar {
-              ToolbarItem(placement: .topBarTrailing) {
-                if refreshing {
-                  ProgressView()
-                } else {
-                  Button {
-                    Task {
-                      UIImpactFeedbackGenerator(style: .soft).impactOccurred()
-                      await refreshAllCollections()
-                      await load()
-                    }
-                  } label: {
-                    Image(systemName: "arrow.clockwise.circle")
-                  }
-                }
+              } label: {
+                Image(systemName: "arrow.clockwise.circle")
               }
             }
-        } else {
-          AuthView(slogan: "使用 Bangumi 管理观看进度")
-            .toolbar {
-              ToolbarItem(placement: .topBarTrailing) {
-                NavigationLink(value: NavDestination.setting) {
-                  Image(systemName: "gearshape")
-                }
-              }
-            }
+          }
         }
+      } else {
+        AuthView(slogan: "使用 Bangumi 管理观看进度")
+          .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+              NavigationLink(value: NavDestination.setting) {
+                Image(systemName: "gearshape")
+              }
+            }
+          }
       }
-      .navigationDestination(for: NavDestination.self) { $0 }
     }
   }
 }

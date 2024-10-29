@@ -43,53 +43,49 @@ struct ChiiTimelineView: View {
   }
 
   var body: some View {
-    NavigationStack {
-      VStack {
-        if isAuthenticated {
-          CollectionsView()
-            .padding(.horizontal, 8)
-        } else {
-          AuthView(slogan: "Bangumi 让你的 ACG 生活更美好")
-        }
+    VStack {
+      if isAuthenticated {
+        CollectionsView()
+          .padding(.horizontal, 8)
+      } else {
+        AuthView(slogan: "Bangumi 让你的 ACG 生活更美好")
       }
-      .navigationDestination(for: NavDestination.self) { $0 }
-      .navigationBarTitleDisplayMode(.inline)
-      .toolbar {
-        if isAuthenticated {
-          if let me = profile {
-            ToolbarItem(placement: .topBarLeading) {
-              HStack {
-                ImageView(img: me.avatar.medium, width: 32, height: 32)
-                VStack(alignment: .leading) {
-                  Text("\(me.nickname)")
-                    .font(.callout)
-                    .lineLimit(1)
-                  Text(me.userGroup.description)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                }
+    }
+    .toolbar {
+      if isAuthenticated {
+        if let me = profile {
+          ToolbarItem(placement: .topBarLeading) {
+            HStack {
+              ImageView(img: me.avatar.medium, width: 32, height: 32)
+              VStack(alignment: .leading) {
+                Text("\(me.nickname)")
+                  .font(.callout)
+                  .lineLimit(1)
+                Text(me.userGroup.description)
+                  .font(.caption)
+                  .foregroundStyle(.secondary)
               }
-            }
-          } else {
-            ToolbarItem(placement: .topBarLeading) {
-              ProgressView().onAppear(perform: updateProfile)
             }
           }
         } else {
           ToolbarItem(placement: .topBarLeading) {
-            ImageView(img: nil, width: 32, height: 32, type: .avatar)
+            ProgressView().onAppear(perform: updateProfile)
           }
         }
-        ToolbarItem(placement: .topBarTrailing) {
-          HStack {
-            if isAuthenticated, !isolationMode {
-              NavigationLink(value: NavDestination.notice) {
-                Image(systemName: unreadNotice ? "bell.badge.fill" : "bell")
-              }.onAppear(perform: checkNotice)
-            }
-            NavigationLink(value: NavDestination.setting) {
-              Image(systemName: "gearshape")
-            }
+      } else {
+        ToolbarItem(placement: .topBarLeading) {
+          ImageView(img: nil, width: 32, height: 32, type: .avatar)
+        }
+      }
+      ToolbarItem(placement: .topBarTrailing) {
+        HStack {
+          if isAuthenticated, !isolationMode {
+            NavigationLink(value: NavDestination.notice) {
+              Image(systemName: unreadNotice ? "bell.badge.fill" : "bell")
+            }.onAppear(perform: checkNotice)
+          }
+          NavigationLink(value: NavDestination.setting) {
+            Image(systemName: "gearshape")
           }
         }
       }

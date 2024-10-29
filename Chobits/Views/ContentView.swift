@@ -13,12 +13,6 @@ struct ContentView: View {
   @Environment(Notifier.self) private var notifier
 
   @State private var initialized = false
-  @State private var selectedTab: ContentViewTab
-
-  init() {
-    let defaultTab = UserDefaults.standard.string(forKey: "defaultTab") ?? "discover"
-    self.selectedTab = ContentViewTab(defaultTab)
-  }
 
   func refreshProfile() async {
     var tries = 0
@@ -54,22 +48,10 @@ struct ContentView: View {
         }
       }
     } else {
-      TabView(selection: $selectedTab) {
-        ChiiTimelineView()
-          .tag(ContentViewTab.timeline)
-          .tabItem {
-            Image(systemName: "person")
-          }
-        ChiiProgressView()
-          .tag(ContentViewTab.progress)
-          .tabItem {
-            Image(systemName: "square.grid.3x2.fill")
-          }
-        ChiiDiscoverView()
-          .tag(ContentViewTab.discover)
-          .tabItem {
-            Image(systemName: "magnifyingglass")
-          }
+      if UIDevice.current.userInterfaceIdiom == .phone {
+        PhoneView()
+      } else {
+        PadView()
       }
     }
   }

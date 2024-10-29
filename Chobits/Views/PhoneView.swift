@@ -1,0 +1,70 @@
+//
+//  PhoneView.swift
+//  Chobits
+//
+//  Created by Chuan Chuan on 2024/10/29.
+//
+
+import SwiftUI
+
+struct PhoneView: View {
+  @State private var selectedTab: ContentViewTab
+  @State private var searching = false
+  @State private var searchQuery = ""
+  @State private var searchRemote = false
+
+  init() {
+    let defaultTab = UserDefaults.standard.string(forKey: "defaultTab") ?? "discover"
+    self.selectedTab = ContentViewTab(defaultTab)
+  }
+
+  var body: some View {
+    TabView(selection: $selectedTab) {
+      NavigationStack {
+        ChiiTimelineView()
+          .navigationBarTitleDisplayMode(.inline)
+          .navigationDestination(for: NavDestination.self) { $0 }
+      }
+      .tag(ContentViewTab.timeline)
+      .tabItem {
+        Image(systemName: "person")
+      }
+      NavigationStack {
+        ChiiProgressView()
+          .navigationBarTitleDisplayMode(.inline)
+          .navigationDestination(for: NavDestination.self) { $0 }
+      }
+      .tag(ContentViewTab.progress)
+      .tabItem {
+        Image(systemName: "square.grid.3x2.fill")
+      }
+      NavigationStack {
+        VStack {
+          if searching {
+            SearchView(query: $searchQuery, remote: $searchRemote)
+          } else {
+            CalendarView()
+          }
+        }
+        .navigationTitle("发现")
+        .toolbarTitleDisplayMode(.inlineLarge)
+        .navigationBarTitleDisplayMode(.inline)
+        .navigationDestination(for: NavDestination.self) { $0 }
+      }
+      .searchable(
+        text: $searchQuery, isPresented: $searching, placement: .navigationBarDrawer(displayMode: .always)
+      )
+      .onChange(of: searchQuery) { _, _ in
+        searchRemote = false
+      }
+      .onSubmit(of: .search) {
+        searchRemote = true
+      }
+      .tag(ContentViewTab.discover)
+      .tabItem {
+        Image(systemName: "magnifyingglass")
+      }
+    }
+    .navigationBarTitleDisplayMode(.inline)
+  }
+}
