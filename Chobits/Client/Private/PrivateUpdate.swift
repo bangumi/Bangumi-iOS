@@ -14,7 +14,7 @@ extension Chii {
     let url = BangumiAPI.priv.build("p1/clear-notify")
     var body: [String: Any] = [:]
     body["id"] = ids
-    _ = try await request(url: url, method: "POST", body: body)
+    _ = try await request(url: url, method: "POST", body: body, authorized: true)
     Logger.api.info("finish clear notify")
   }
 }

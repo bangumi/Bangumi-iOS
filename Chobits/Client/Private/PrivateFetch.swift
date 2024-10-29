@@ -20,7 +20,7 @@ extension Chii {
       queryItems.append(URLQueryItem(name: "unread", value: String(unread)))
     }
     let pageURL = url.appending(queryItems: queryItems)
-    let data = try await request(url: pageURL, method: "GET")
+    let data = try await request(url: pageURL, method: "GET", authorized: true)
     let resp: NotifyResponse = try self.decodeResponse(data)
     Logger.api.info("finish get notify")
     return resp
@@ -59,5 +59,4 @@ extension Chii {
     Logger.api.info("finish get subject comments")
     return resp
   }
-
 }

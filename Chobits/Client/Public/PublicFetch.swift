@@ -18,7 +18,7 @@ extension Chii {
     }
     Logger.api.info("start get profile")
     let url = BangumiAPI.pub.build("v0/me")
-    let data = try await request(url: url, method: "GET")
+    let data = try await request(url: url, method: "GET", authorized: true)
     let profile: User = try self.decodeResponse(data)
     self.profile = profile
     Logger.api.info("finish get profile")
@@ -43,12 +43,7 @@ extension Chii {
   {
     Logger.api.info("start get subject collections")
     let profile = try await self.getProfile()
-    let url =
-      if profile.username.isEmpty {
-        BangumiAPI.pub.build("v0/users/\(profile.id)/collections")
-      } else {
-        BangumiAPI.pub.build("v0/users/\(profile.username)/collections")
-      }
+    let url = BangumiAPI.pub.build("v0/users/\(profile.username)/collections")
     var queryItems = [
       // limit should less equal than 100
       URLQueryItem(name: "limit", value: "100"),
@@ -70,7 +65,7 @@ extension Chii {
   func getCalendar() async throws -> [BangumiCalendarDTO] {
     Logger.api.info("start get calendar")
     let url = BangumiAPI.pub.build("calendar")
-    let data = try await request(url: url, method: "GET", authorized: false)
+    let data = try await request(url: url, method: "GET")
     let calendars: [BangumiCalendarDTO] = try self.decodeResponse(data)
     Logger.api.info("finish get calendar")
     return calendars
@@ -103,7 +98,7 @@ extension Chii {
       ]
     }
     let data = try await self.request(
-      url: url, method: "POST", body: body, authorized: self.isAuthenticated()
+      url: url, method: "POST", body: body
     )
     let resp: SubjectSearchResponse = try self.decodeResponse(data)
     Logger.api.info("finish search: \(keyword), \(type.name), \(limit), \(offset)")
@@ -117,13 +112,7 @@ extension Chii {
     }
     Logger.api.info("start get subject collection: \(sid)")
     let profile = try await self.getProfile()
-    let url =
-      if profile.username.isEmpty {
-        BangumiAPI.pub.build("v0/users/\(profile.id)/collections/\(sid)")
-      } else {
-        BangumiAPI.pub.build(
-          "v0/users/\(profile.username)/collections/\(sid)")
-      }
+    let url = BangumiAPI.pub.build("v0/users/\(profile.username)/collections/\(sid)")
     let data = try await request(url: url, method: "GET")
     let collection: UserSubjectCollectionDTO = try self.decodeResponse(data)
     Logger.api.info("finish get subject collection: \(sid)")
@@ -136,7 +125,7 @@ extension Chii {
     }
     Logger.api.info("start get subject: \(sid)")
     let url = BangumiAPI.pub.build("v0/subjects/\(sid)")
-    let data = try await request(url: url, method: "GET", authorized: self.isAuthenticated())
+    let data = try await request(url: url, method: "GET")
     let subject: SubjectDTO = try self.decodeResponse(data)
     Logger.api.info("finish get subject: \(sid)")
     return subject
@@ -175,7 +164,7 @@ extension Chii {
     }
     let url = BangumiAPI.pub.build("v0/subjects")
       .appending(queryItems: queries)
-    let data = try await request(url: url, method: "GET", authorized: self.isAuthenticated())
+    let data = try await request(url: url, method: "GET")
     let response: SubjectsResponse = try self.decodeResponse(data)
     Logger.api.info(
       "finish browsing subjects: \(type.description), \(limit), \(offset), \(filter.description)")
@@ -200,7 +189,7 @@ extension Chii {
     }
     let url = BangumiAPI.pub.build("v0/episodes")
       .appending(queryItems: queries)
-    let data = try await request(url: url, method: "GET", authorized: self.isAuthenticated())
+    let data = try await request(url: url, method: "GET")
     let resp: EpisodeResponse = try self.decodeResponse(data)
     Logger.api.info(
       "finish get subject episodes: \(subjectId), \(type.debugDescription), \(limit), \(offset)")
@@ -229,7 +218,7 @@ extension Chii {
       "v0/users/-/collections/\(subjectId)/episodes"
     )
     .appending(queryItems: queries)
-    let data = try await request(url: url, method: "GET", authorized: self.isAuthenticated())
+    let data = try await request(url: url, method: "GET", authorized: true)
     let resp: EpisodeCollectionResponse = try self.decodeResponse(data)
     Logger.api.info(
       "finish get episode collections: \(subjectId), \(type.debugDescription), \(limit), \(offset)")
@@ -242,7 +231,7 @@ extension Chii {
     }
     Logger.api.info("start get subject characters: \(sid)")
     let url = BangumiAPI.pub.build("v0/subjects/\(sid)/characters")
-    let data = try await request(url: url, method: "GET", authorized: self.isAuthenticated())
+    let data = try await request(url: url, method: "GET")
     let characters: [SubjectCharacterDTO] = try self.decodeResponse(data)
     Logger.api.info("finish get subject characters: \(sid)")
     return characters
@@ -254,7 +243,7 @@ extension Chii {
     }
     Logger.api.info("start get subject persons: \(sid)")
     let url = BangumiAPI.pub.build("v0/subjects/\(sid)/persons")
-    let data = try await request(url: url, method: "GET", authorized: self.isAuthenticated())
+    let data = try await request(url: url, method: "GET")
     let persons: [SubjectPersonDTO] = try self.decodeResponse(data)
     Logger.api.info("finish get subject persons: \(sid)")
     return persons
@@ -266,7 +255,7 @@ extension Chii {
     }
     Logger.api.info("start get subject relations: \(sid)")
     let url = BangumiAPI.pub.build("v0/subjects/\(sid)/subjects")
-    let data = try await request(url: url, method: "GET", authorized: self.isAuthenticated())
+    let data = try await request(url: url, method: "GET")
     let relations: [SubjectRelationDTO] = try self.decodeResponse(data)
     Logger.api.info("finish get subject relations: \(sid)")
     return relations
@@ -278,7 +267,7 @@ extension Chii {
     }
     Logger.api.info("start get characters: \(cid)")
     let url = BangumiAPI.pub.build("v0/characters/\(cid)")
-    let data = try await request(url: url, method: "GET", authorized: self.isAuthenticated())
+    let data = try await request(url: url, method: "GET")
     let character: CharacterDTO = try self.decodeResponse(data)
     Logger.api.info("finish get characters: \(cid)")
     return character
@@ -290,7 +279,7 @@ extension Chii {
     }
     Logger.api.info("start get character subjects: \(cid)")
     let url = BangumiAPI.pub.build("v0/characters/\(cid)/subjects")
-    let data = try await request(url: url, method: "GET", authorized: self.isAuthenticated())
+    let data = try await request(url: url, method: "GET")
     let subjects: [CharacterSubjectDTO] = try self.decodeResponse(data)
     Logger.api.info("finish get character subjects: \(cid)")
     return subjects
@@ -302,7 +291,7 @@ extension Chii {
     }
     Logger.api.info("start get character persons: \(cid)")
     let url = BangumiAPI.pub.build("v0/characters/\(cid)/persons")
-    let data = try await request(url: url, method: "GET", authorized: self.isAuthenticated())
+    let data = try await request(url: url, method: "GET")
     let persons: [CharacterPersonDTO] = try self.decodeResponse(data)
     Logger.api.info("finish get character persons: \(cid)")
     return persons
@@ -314,7 +303,7 @@ extension Chii {
     }
     Logger.api.info("start get persons: \(pid)")
     let url = BangumiAPI.pub.build("v0/persons/\(pid)")
-    let data = try await request(url: url, method: "GET", authorized: self.isAuthenticated())
+    let data = try await request(url: url, method: "GET")
     let person: PersonDTO = try self.decodeResponse(data)
     Logger.api.info("finish get persons: \(pid)")
     return person
@@ -326,7 +315,7 @@ extension Chii {
     }
     Logger.api.info("start get person subjects: \(pid)")
     let url = BangumiAPI.pub.build("v0/persons/\(pid)/subjects")
-    let data = try await request(url: url, method: "GET", authorized: self.isAuthenticated())
+    let data = try await request(url: url, method: "GET")
     let subjects: [PersonSubjectDTO] = try self.decodeResponse(data)
     Logger.api.info("finish get person subjects: \(pid)")
     return subjects
@@ -338,7 +327,7 @@ extension Chii {
     }
     Logger.api.info("start get person characters: \(pid)")
     let url = BangumiAPI.pub.build("v0/persons/\(pid)/characters")
-    let data = try await request(url: url, method: "GET", authorized: self.isAuthenticated())
+    let data = try await request(url: url, method: "GET")
     let characters: [PersonCharacterDTO] = try self.decodeResponse(data)
     Logger.api.info("finish get person characters: \(pid)")
     return characters

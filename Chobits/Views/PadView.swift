@@ -8,24 +8,32 @@
 import SwiftUI
 
 struct PadView: View {
-  @State private var selectedTab: ContentViewTab
-  
+  @State private var content: ContentViewTab
+  @State private var detail: NavDestination?
+
   init() {
     let defaultTab = UserDefaults.standard.string(forKey: "defaultTab") ?? "discover"
-    self.selectedTab = ContentViewTab(defaultTab)
+    self.content = ContentViewTab(defaultTab)
   }
-  
+
   var body: some View {
     NavigationSplitView {
       List {
-        NavigationLink(ContentViewTab.timeline.title, destination: ChiiTimelineView())
-        NavigationLink(ContentViewTab.progress.title, destination: ChiiProgressView())
-        NavigationLink(ContentViewTab.discover.title, destination: CalendarView())
+        Button(ContentViewTab.timeline.title) {
+          content = .timeline
+        }
+        Button(ContentViewTab.progress.title) {
+          content = .progress
+        }
+        Button(ContentViewTab.discover.title) {
+          content = .discover
+        }
       }
+      .navigationSplitViewColumnWidth(min: 80, ideal: 160, max: 240)
     } detail: {
       NavigationStack {
         VStack {
-          switch selectedTab {
+          switch content {
           case .timeline:
             ChiiTimelineView()
           case .progress:
@@ -42,5 +50,6 @@ struct PadView: View {
         })
       }
     }
+    .navigationSplitViewStyle(.balanced)
   }
 }

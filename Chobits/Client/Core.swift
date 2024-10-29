@@ -108,11 +108,17 @@ extension Chii {
     return try decoder.decode(T.self, from: data)
   }
 
-  func request(url: URL, method: String, body: Any? = nil, authorized: Bool = true) async throws
+  func request(url: URL, method: String, body: Any? = nil, authorized: Bool = false) async throws
     -> Data
   {
+    var authed: Bool
+    if authorized {
+      authed = true
+    } else {
+      authed = self.isAuthenticated()
+    }
     Logger.api.info("\(method): \(url.absoluteString)")
-    let session = try await self.getSession(authroized: authorized)
+    let session = try await self.getSession(authroized: authed)
     var request = URLRequest(url: url)
     request.addValue("application/json", forHTTPHeaderField: "Content-Type")
     request.httpMethod = method
