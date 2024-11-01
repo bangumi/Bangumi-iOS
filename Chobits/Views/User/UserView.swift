@@ -31,11 +31,11 @@ struct UserView: View {
             VStack(alignment: .leading) {
               Text(user.nickname).font(.title2.bold())
               HStack {
-                BorderView(.secondary, padding: 2) {
-                  Text(user.userGroup.description)
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-                }
+//                BorderView(.secondary, padding: 2) {
+//                  Text(user.userGroup.description)
+//                    .font(.footnote)
+//                    .foregroundStyle(.secondary)
+//                }
                 if user.username != "" {
                   Text("@\(user.username)")
                 } else {

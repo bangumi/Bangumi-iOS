@@ -33,7 +33,6 @@ struct User: Codable, Equatable, Hashable {
   var id: UInt
   var username: String
   var nickname: String
-  var userGroup: UserGroup
   var avatar: Avatar
   var sign: String
 
@@ -41,13 +40,12 @@ struct User: Codable, Equatable, Hashable {
     self.id = 0
     self.username = ""
     self.nickname = "匿名"
-    self.userGroup = .unknown
     self.avatar = Avatar()
     self.sign = ""
   }
 
   static func == (lhs: User, rhs: User) -> Bool {
-    return lhs.id == rhs.id && lhs.username == rhs.username && lhs.nickname == rhs.nickname && lhs.userGroup == rhs.userGroup
+    return lhs.id == rhs.id && lhs.username == rhs.username && lhs.nickname == rhs.nickname
   }
 
   var uid: String {
