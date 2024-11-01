@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Flow
 
 struct ScoreInfo {
   var desc: String
@@ -58,7 +59,7 @@ struct SubjectRatingBoxView: View {
         .frame(width: geometry.size.width, height: 240)
         .background(Color.secondary.opacity(0.02))
         .clipShape(RoundedRectangle(cornerRadius: 10))
-        FlowStack {
+        HFlow(alignment: .center, spacing: 2) {
           Section {
             Text("\(subject.collection.wish)人")
             Text(CollectionType.wish.description(type: subject.typeEnum))

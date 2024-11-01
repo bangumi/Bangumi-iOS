@@ -7,6 +7,7 @@
 
 import SwiftData
 import SwiftUI
+import Flow
 
 struct SubjectCollectionBoxView: View {
   let subjectId: UInt
@@ -182,7 +183,7 @@ struct SubjectCollectionBoxView: View {
           }
           HStack(alignment: .top) {
             Text("常用标签").font(.footnote).foregroundStyle(.secondary)
-            FlowStack {
+            HFlow(alignment: .center, spacing: 2) {
               ForEach(recommendedTags, id: \.self) { tag in
                 BorderView(.secondary, padding: 2) {
                   Button {

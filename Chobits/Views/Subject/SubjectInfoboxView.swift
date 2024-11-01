@@ -8,6 +8,7 @@
 import OSLog
 import SwiftData
 import SwiftUI
+import Flow
 
 enum SubjectStaffItem: Identifiable {
   case plain(String)
@@ -177,7 +178,7 @@ struct SubjectInfoboxView: View {
                 ForEach(plains) { staff in
                   Text(staff.id).textSelection(.enabled)
                 }
-                FlowStack {
+                HFlow(alignment: .center, spacing: 2) {
                   ForEach(Array(links.enumerated()), id: \.offset) { idx, staff in
                     if idx > 0 {
                       Text("、")
@@ -194,7 +195,7 @@ struct SubjectInfoboxView: View {
                 }
               }
             } else {
-              FlowStack {
+              HFlow(alignment: .center, spacing: 2) {
                 ForEach(Array(info.staffs.enumerated()), id: \.offset) { idx, staff in
                   if idx > 0 {
                     Text("、")

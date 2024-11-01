@@ -8,6 +8,7 @@
 import OSLog
 import SwiftData
 import SwiftUI
+import Flow
 
 struct SubjectSummaryView: View {
   let subjectId: UInt
@@ -42,7 +43,7 @@ struct SubjectSummaryView: View {
         .sheet(isPresented: $showSummary) {
           ScrollView {
             LazyVStack(alignment: .leading) {
-              FlowStack {
+              HFlow(alignment: .center, spacing: 2) {
                 ForEach(tags, id: \.name) { tag in
                   BorderView(.secondary, padding: 2) {
                     HStack {

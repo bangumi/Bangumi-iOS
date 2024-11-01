@@ -7,6 +7,7 @@
 
 import SwiftData
 import SwiftUI
+import Flow
 
 struct SubjectBrowsingView: View {
   let subjectType: SubjectType
@@ -225,7 +226,7 @@ struct SubjectBrowsingView: View {
               }
             }
             .buttonStyle(.plain)
-            FlowStack(spacing: CGSize(width: 15, height: 10)) {
+            HFlow(alignment: .center, spacing: 2, justification: .stretchSpaces) {
               ForEach(categories, id: \.id) { category in
                 Button {
                   if filter.cat?.id != category.id {
@@ -262,7 +263,7 @@ struct SubjectBrowsingView: View {
               }
             }
             .buttonStyle(.plain)
-            FlowStack(spacing: CGSize(width: 15, height: 10)) {
+            HFlow(alignment: .center, spacing: 2, justification: .stretchSpaces) {
               Button {
                 if filter.series != true {
                   filter.series = true
@@ -313,7 +314,7 @@ struct SubjectBrowsingView: View {
               }
             }
             .buttonStyle(.plain)
-            FlowStack(spacing: CGSize(width: 15, height: 10)) {
+            HFlow(alignment: .center, spacing: 2, justification: .stretchSpaces) {
               ForEach(GAME_PLATFORMS, id: \.self) { platform in
                 Button {
                   if filter.platform != platform {
@@ -466,7 +467,7 @@ struct SubjectBrowsingView: View {
         Section {
           switch filterExpand {
           case "sort":
-            FlowStack(spacing: CGSize(width: 15, height: 10)) {
+            HFlow(alignment: .center, spacing: 2, justification: .stretchSpaces) {
               Button {
                 if filter.sort != "rank" {
                   filter.sort = "rank"

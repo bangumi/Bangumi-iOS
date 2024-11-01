@@ -8,6 +8,7 @@
 import OSLog
 import SwiftData
 import SwiftUI
+import Flow
 
 struct EpisodeGridView: View {
   let subjectId: UInt
@@ -78,7 +79,7 @@ struct EpisodeGridView: View {
         await refresh()
       }
     }
-    FlowStack {
+    HFlow(alignment: .center, spacing: 2) {
       ForEach(episodeMains) { episode in
         Button {
           selected = episode

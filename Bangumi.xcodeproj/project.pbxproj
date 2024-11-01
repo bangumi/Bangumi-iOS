@@ -46,7 +46,6 @@
 		19671C582BDEB55D000B4D99 /* SubjectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19671C332BDEB55D000B4D99 /* SubjectView.swift */; };
 		19671C592BDEB55D000B4D99 /* SubjectSummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19671C342BDEB55D000B4D99 /* SubjectSummaryView.swift */; };
 		19671C5B2BDEB55D000B4D99 /* CalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19671C372BDEB55D000B4D99 /* CalendarView.swift */; };
-		19671C5C2BDEB55D000B4D99 /* FlowStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19671C382BDEB55D000B4D99 /* FlowStack.swift */; };
 		19671C5D2BDEB55D000B4D99 /* ImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19671C392BDEB55D000B4D99 /* ImageView.swift */; };
 		19671C5E2BDEB55D000B4D99 /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19671C3A2BDEB55D000B4D99 /* LoadingView.swift */; };
 		19671C5F2BDEB55D000B4D99 /* ProgressRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19671C3B2BDEB55D000B4D99 /* ProgressRowView.swift */; };
@@ -64,6 +63,7 @@
 		19671C6F2BDEB55D000B4D99 /* ChobitsApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19671C4F2BDEB55D000B4D99 /* ChobitsApp.swift */; };
 		19671C732BDEB8B1000B4D99 /* KeychainSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 19671C722BDEB8B1000B4D99 /* KeychainSwift */; };
 		19671C782BE1BB72000B4D99 /* search_subject_book.json in Resources */ = {isa = PBXBuildFile; fileRef = 19671C772BE1BB72000B4D99 /* search_subject_book.json */; };
+		1968C5DD2CD5010C00242103 /* Flow in Frameworks */ = {isa = PBXBuildFile; productRef = 1968C5DC2CD5010C00242103 /* Flow */; };
 		197A19CB2BE5E59900804B13 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 197A19CA2BE5E59900804B13 /* Logger.swift */; };
 		197A19CF2BE5E5E700804B13 /* Notifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 197A19CE2BE5E5E700804B13 /* Notifier.swift */; };
 		197A19D12BE6304D00804B13 /* EpisodeCollectionBoxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 197A19D02BE6304D00804B13 /* EpisodeCollectionBoxView.swift */; };
@@ -142,7 +142,6 @@
 		19671C332BDEB55D000B4D99 /* SubjectView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubjectView.swift; sourceTree = "<group>"; };
 		19671C342BDEB55D000B4D99 /* SubjectSummaryView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubjectSummaryView.swift; sourceTree = "<group>"; };
 		19671C372BDEB55D000B4D99 /* CalendarView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CalendarView.swift; sourceTree = "<group>"; };
-		19671C382BDEB55D000B4D99 /* FlowStack.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlowStack.swift; sourceTree = "<group>"; };
 		19671C392BDEB55D000B4D99 /* ImageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageView.swift; sourceTree = "<group>"; };
 		19671C3A2BDEB55D000B4D99 /* LoadingView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
 		19671C3B2BDEB55D000B4D99 /* ProgressRowView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProgressRowView.swift; sourceTree = "<group>"; };
@@ -215,6 +214,7 @@
 			files = (
 				19BD24262BE9C53800595973 /* Kingfisher in Frameworks */,
 				19671C732BDEB8B1000B4D99 /* KeychainSwift in Frameworks */,
+				1968C5DD2CD5010C00242103 /* Flow in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -260,7 +260,6 @@
 			isa = PBXGroup;
 			children = (
 				191CF1A52CC09F1E000EF819 /* BorderView.swift */,
-				19671C382BDEB55D000B4D99 /* FlowStack.swift */,
 				19671C392BDEB55D000B4D99 /* ImageView.swift */,
 				1943C5072C08CD2E0067ACDB /* StarsView.swift */,
 				19B9003F2BEEE23600405F0F /* ChartView.swift */,
@@ -474,6 +473,7 @@
 			packageProductDependencies = (
 				19671C722BDEB8B1000B4D99 /* KeychainSwift */,
 				19BD24252BE9C53800595973 /* Kingfisher */,
+				1968C5DC2CD5010C00242103 /* Flow */,
 			);
 			productName = Chobits;
 			productReference = 19BB342B2BD239AB00E5C295 /* Chobits.app */;
@@ -506,6 +506,7 @@
 			packageReferences = (
 				191FEF252BDCF59B0047162A /* XCRemoteSwiftPackageReference "keychain-swift" */,
 				19BD24242BE9C53800595973 /* XCRemoteSwiftPackageReference "Kingfisher" */,
+				1968C5DB2CD5010C00242103 /* XCRemoteSwiftPackageReference "SwiftUI-Flow" */,
 			);
 			productRefGroup = 19BB342C2BD239AB00E5C295 /* Products */;
 			projectDirPath = "";
@@ -602,7 +603,6 @@
 				19E0E5022BF24D6300066EB7 /* PersonCharacterListView.swift in Sources */,
 				1915A89E2BF09E6B003DB76D /* SubjectRelationListView.swift in Sources */,
 				1915A8A82BF0E668003DB76D /* PersonCharactersView.swift in Sources */,
-				19671C5C2BDEB55D000B4D99 /* FlowStack.swift in Sources */,
 				19671C542BDEB55D000B4D99 /* SubjectLargeRowView.swift in Sources */,
 				197A19E42BE699CF00804B13 /* EpisodeListView.swift in Sources */,
 				1915A89A2BEFB942003DB76D /* CharacterSubjectsView.swift in Sources */,
@@ -849,6 +849,14 @@
 				minimumVersion = 24.0.0;
 			};
 		};
+		1968C5DB2CD5010C00242103 /* XCRemoteSwiftPackageReference "SwiftUI-Flow" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/tevelee/SwiftUI-Flow";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.5.0;
+			};
+		};
 		19BD24242BE9C53800595973 /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/onevcat/Kingfisher.git";
@@ -864,6 +872,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 191FEF252BDCF59B0047162A /* XCRemoteSwiftPackageReference "keychain-swift" */;
 			productName = KeychainSwift;
+		};
+		1968C5DC2CD5010C00242103 /* Flow */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1968C5DB2CD5010C00242103 /* XCRemoteSwiftPackageReference "SwiftUI-Flow" */;
+			productName = Flow;
 		};
 		19BD24252BE9C53800595973 /* Kingfisher */ = {
 			isa = XCSwiftPackageProductDependency;
