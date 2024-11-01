@@ -117,7 +117,7 @@ extension Chii {
     } else {
       authed = self.isAuthenticated()
     }
-    Logger.api.info("\(method): \(url.absoluteString)")
+    Logger.api.info("\(method)(\(authed)): \(url.absoluteString)")
     let session = try await self.getSession(authroized: authed)
     var request = URLRequest(url: url)
     request.addValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -150,13 +150,13 @@ extension Chii {
     if response.statusCode < 400 {
       return data
     } else if response.statusCode < 500 {
-      Logger.api.warning("response \(response.statusCode): \(url.absoluteString)")
-      let error: ResponseError = try self.decodeResponse(data)
+      let error = String(data: data, encoding: .utf8) ?? ""
+      Logger.api.warning("response \(response.statusCode): \(url.absoluteString): \(error)")
       throw ChiiError(code: response.statusCode, response: error)
     } else {
       let error = String(data: data, encoding: .utf8) ?? ""
-      Logger.api.error("response: \(response.statusCode): \(error)")
-      throw ChiiError(message: "api error \(response.statusCode): \(error)")
+      Logger.api.error("response: \(response.statusCode): \(url.absoluteString): \(error)")
+      throw ChiiError(code: response.statusCode, response: error)
     }
   }
 
