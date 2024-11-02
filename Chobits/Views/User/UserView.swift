@@ -10,9 +10,15 @@ import SwiftUI
 struct UserView: View {
   let uid: String
 
+  @AppStorage("shareDomain") var shareDomain: String = ShareDomain.chii.label
+
   @Environment(Notifier.self) private var notifier
 
   @State private var user: User?
+
+  var shareLink: URL {
+    URL(string: "https://\(shareDomain)/user/\(uid)")!
+  }
 
   func load() async {
     do {
@@ -57,6 +63,13 @@ struct UserView: View {
       }
       .navigationTitle("\(user.nickname)")
       .navigationBarTitleDisplayMode(.inline)
+      .toolbar {
+        ToolbarItem(placement: .topBarTrailing) {
+          ShareLink(item: shareLink) {
+            Label("Share", systemImage: "square.and.arrow.up")
+          }
+        }
+      }
     } else {
       ProgressView()
         .task {

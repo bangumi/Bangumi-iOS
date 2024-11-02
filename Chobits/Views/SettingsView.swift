@@ -121,23 +121,15 @@ struct SettingsView: View {
         }
       }
 
-      Section {
-        HStack {
-          Spacer()
-          if isAuthenticated {
+      if isAuthenticated {
+        Section {
+          HStack {
+            Spacer()
             Button(action: logout) {
               Text("退出登录")
             }.foregroundStyle(.red)
-          } else {
-            Button {
-              Task {
-                await SignInViewModel(notifier: notifier).signIn()
-              }
-            } label: {
-              Text("使用 Bangumi 登录")
-            }
+            Spacer()
           }
-          Spacer()
         }
       }
     }
