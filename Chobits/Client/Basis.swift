@@ -359,11 +359,11 @@ enum SubjectType: UInt8, Codable, Identifiable, CaseIterable {
     self = Self.unknown
   }
 
-  static func progressTypes() -> [Self] {
+  static var progressTypes: [Self] {
     return [.book, .anime, .real]
   }
 
-  static func allTypes() -> [Self] {
+  static var allTypes: [Self] {
     return [.book, .anime, .music, .game, .real]
   }
 
@@ -464,7 +464,7 @@ enum SubjectCategoryAnime: UInt16, Identifiable, CaseIterable {
     }
   }
 
-  static func categories() -> [SubjectCategory] {
+  static var categories: [SubjectCategory] {
     return [
       SubjectCategory(1, "TV"),
       SubjectCategory(2, "OVA"),
@@ -507,7 +507,7 @@ enum SubjectCategoryBook: UInt16, Identifiable, CaseIterable {
     }
   }
 
-  static func categories() -> [SubjectCategory] {
+  static var categories: [SubjectCategory] {
     return [
       SubjectCategory(1001, "漫画"),
       SubjectCategory(1002, "小说"),
@@ -552,7 +552,7 @@ enum SubjectCategoryGame: UInt16, Identifiable, CaseIterable {
     }
   }
 
-  static func categories() -> [SubjectCategory] {
+  static var categories: [SubjectCategory] {
     return [
       SubjectCategory(4001, "游戏"),
       SubjectCategory(4002, "软件"),
@@ -607,7 +607,7 @@ enum SubjectCategoryReal: UInt16, Identifiable, CaseIterable {
     }
   }
 
-  static func categories() -> [SubjectCategory] {
+  static var categories: [SubjectCategory] {
     return [
       SubjectCategory(1, "日剧"),
       SubjectCategory(2, "欧美剧"),
@@ -958,14 +958,6 @@ enum EpisodeType: UInt8, Codable, Identifiable, CaseIterable {
     case .other:
       return "其他"
     }
-  }
-
-  static func gridTypes() -> [Self] {
-    return [.main, .sp, .op, .ed]
-  }
-
-  static func gridOtherTypes() -> [Self] {
-    return [.sp, .op, .ed]
   }
 }
 

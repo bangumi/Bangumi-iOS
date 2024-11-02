@@ -61,9 +61,9 @@ struct ChiiTimelineView: View {
                 Text("\(me.nickname)")
                   .font(.callout)
                   .lineLimit(1)
-//                Text(me.userGroup.description)
-//                  .font(.caption)
-//                  .foregroundStyle(.secondary)
+                //                Text(me.userGroup.description)
+                //                  .font(.caption)
+                //                  .foregroundStyle(.secondary)
               }
             }
           }

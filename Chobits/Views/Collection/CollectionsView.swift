@@ -63,7 +63,7 @@ struct CollectionsView: View {
     } else {
       ScrollView(showsIndicators: false) {
         LazyVStack(alignment: .leading) {
-          ForEach(SubjectType.allTypes()) { stype in
+          ForEach(SubjectType.allTypes) { stype in
             VStack {
               HStack {
                 Text("我的\(stype.description)").font(.title3)

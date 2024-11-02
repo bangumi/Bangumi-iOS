@@ -27,7 +27,7 @@ struct ChiiProgressView: View {
   init() {
     let defaultProgressType = UserDefaults.standard.integer(forKey: "defaultProgressType")
     let stype = SubjectType(UInt8(defaultProgressType))
-    if SubjectType.progressTypes().contains(stype) {
+    if SubjectType.progressTypes.contains(stype) {
       subjectType = stype
     } else {
       subjectType = .anime
@@ -37,7 +37,7 @@ struct ChiiProgressView: View {
   func loadCounts() async {
     let doingType = CollectionType.do.rawValue
     do {
-      for type in SubjectType.progressTypes() {
+      for type in SubjectType.progressTypes {
         let tvalue = type.rawValue
         let desc = FetchDescriptor<UserSubjectCollection>(
           predicate: #Predicate<UserSubjectCollection> {
@@ -130,7 +130,7 @@ struct ChiiProgressView: View {
       if isAuthenticated {
         ScrollView {
           Picker("Subject Type", selection: $subjectType) {
-            ForEach(SubjectType.progressTypes()) { type in
+            ForEach(SubjectType.progressTypes) { type in
               Text("\(type.description)(\(counts[type, default: 0]))").tag(type)
             }
           }

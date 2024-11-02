@@ -135,7 +135,7 @@ struct SearchView: View {
   var body: some View {
     Picker("Subject Type", selection: $subjectType) {
       Text("全部").tag(SubjectType.unknown)
-      ForEach(SubjectType.allTypes()) { type in
+      ForEach(SubjectType.allTypes) { type in
         Text(type.description).tag(type)
       }
     }

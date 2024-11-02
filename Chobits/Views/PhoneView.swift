@@ -8,14 +8,14 @@
 import SwiftUI
 
 struct PhoneView: View {
-  @State private var selectedTab: ContentViewTab
+  @State private var selectedTab: PhoneViewTab
   @State private var searching = false
   @State private var searchQuery = ""
   @State private var searchRemote = false
 
   init() {
     let defaultTab = UserDefaults.standard.string(forKey: "defaultTab") ?? "discover"
-    self.selectedTab = ContentViewTab(defaultTab)
+    self.selectedTab = PhoneViewTab(defaultTab)
   }
 
   var body: some View {
@@ -25,7 +25,7 @@ struct PhoneView: View {
           .navigationBarTitleDisplayMode(.inline)
           .navigationDestination(for: NavDestination.self) { $0 }
       }
-      .tag(ContentViewTab.timeline)
+      .tag(PhoneViewTab.timeline)
       .tabItem {
         Image(systemName: "person")
       }
@@ -34,7 +34,7 @@ struct PhoneView: View {
           .navigationBarTitleDisplayMode(.inline)
           .navigationDestination(for: NavDestination.self) { $0 }
       }
-      .tag(ContentViewTab.progress)
+      .tag(PhoneViewTab.progress)
       .tabItem {
         Image(systemName: "square.grid.3x2.fill")
       }
@@ -60,7 +60,7 @@ struct PhoneView: View {
       .onSubmit(of: .search) {
         searchRemote = true
       }
-      .tag(ContentViewTab.discover)
+      .tag(PhoneViewTab.discover)
       .tabItem {
         Image(systemName: "magnifyingglass")
       }

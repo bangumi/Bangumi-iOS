@@ -30,13 +30,13 @@ struct SubjectBrowsingView: View {
     self.subjectType = subjectType
     switch subjectType {
     case .anime:
-      self.categories = SubjectCategoryAnime.categories()
+      self.categories = SubjectCategoryAnime.categories
     case .book:
-      self.categories = SubjectCategoryBook.categories()
+      self.categories = SubjectCategoryBook.categories
     case .game:
-      self.categories = SubjectCategoryGame.categories()
+      self.categories = SubjectCategoryGame.categories
     case .real:
-      self.categories = SubjectCategoryReal.categories()
+      self.categories = SubjectCategoryReal.categories
     default:
       self.categories = []
     }

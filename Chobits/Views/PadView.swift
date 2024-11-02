@@ -8,38 +8,40 @@
 import SwiftUI
 
 struct PadView: View {
-  @State private var content: ContentViewTab
-  @State private var detail: NavDestination?
+  @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
+  @AppStorage("defaultTab") var defaultTab: String = "discover"
 
-  init() {
-    let defaultTab = UserDefaults.standard.string(forKey: "defaultTab") ?? "discover"
-    self.content = ContentViewTab(defaultTab)
-  }
+  @State private var content: PadViewTab?
+  @State private var columns: NavigationSplitViewVisibility = .all
 
   var body: some View {
-    NavigationSplitView {
-      List {
-        Button(ContentViewTab.timeline.title) {
-          content = .timeline
+    NavigationSplitView(columnVisibility: $columns) {
+      List(selection: $content) {
+        Section {
+          ForEach(PadViewTab.mainTabs, id: \.self) { tab in
+            Text(tab.title)
+          }
         }
-        Button(ContentViewTab.progress.title) {
-          content = .progress
+        if isAuthenticated {
+          Section {
+            ForEach(PadViewTab.userTabs, id: \.self) { tab in
+              Text(tab.title)
+            }
+          }
         }
-        Button(ContentViewTab.discover.title) {
-          content = .discover
+        Section {
+          ForEach(PadViewTab.otherTabs, id: \.self) { tab in
+            Text(tab.title)
+          }
         }
-      }
-      .navigationSplitViewColumnWidth(min: 80, ideal: 160, max: 240)
+      }.navigationSplitViewColumnWidth(min: 80, ideal: 160, max: 240)
     } detail: {
       NavigationStack {
         VStack {
-          switch content {
-          case .timeline:
-            ChiiTimelineView()
-          case .progress:
-            ChiiProgressView()
-          case .discover:
-            CalendarView()
+          if let content = content {
+            content
+          } else {
+            PadViewTab(defaultTab)
           }
         }
         .navigationBarTitleDisplayMode(.inline)

@@ -127,7 +127,7 @@ enum AuthDomain: Codable, CaseIterable, Identifiable {
   }
 }
 
-enum ContentViewTab: Codable, CaseIterable, Identifiable {
+enum PhoneViewTab: Codable, CaseIterable, Identifiable {
   case timeline
   case progress
   case discover
@@ -167,5 +167,98 @@ enum ContentViewTab: Codable, CaseIterable, Identifiable {
     case .discover:
       "discover"
     }
+  }
+}
+
+enum PadViewTab: Codable, CaseIterable, View {
+  case timeline
+  case progress
+  case discover
+
+  case collection
+  case notice
+
+  case settings
+
+  init(_ label: String) {
+    switch label {
+    case "timeline":
+      self = .timeline
+    case "progress":
+      self = .progress
+    case "discover":
+      self = .discover
+    case "collection":
+      self = .collection
+    case "notice":
+      self = .notice
+    case "settings":
+      self = .settings
+    default:
+      self = .timeline
+    }
+  }
+
+  var title: String {
+    switch self {
+    case .timeline:
+      "动态"
+    case .progress:
+      "进度管理"
+    case .discover:
+      "发现"
+    case .collection:
+      "时光机"
+    case .notice:
+      "电波提醒"
+    case .settings:
+      "设置"
+    }
+  }
+
+  var label: String {
+    switch self {
+    case .timeline:
+      "timeline"
+    case .progress:
+      "progress"
+    case .discover:
+      "discover"
+    case .collection:
+      "collection"
+    case .notice:
+      "notice"
+    case .settings:
+      "settings"
+    }
+  }
+
+  var body: some View {
+    switch self {
+    case .timeline:
+      ChiiTimelineView()
+    case .progress:
+      ChiiProgressView()
+    case .discover:
+      CalendarView()
+    case .collection:
+      ChiiTimelineView()
+    case .notice:
+      NoticeView()
+    case .settings:
+      SettingsView()
+    }
+  }
+
+  static var mainTabs: [Self] {
+    return [.timeline, .progress, .discover]
+  }
+
+  static var userTabs: [Self] {
+    return [.collection, .notice]
+  }
+
+  static var otherTabs: [Self] {
+    return [.settings]
   }
 }
