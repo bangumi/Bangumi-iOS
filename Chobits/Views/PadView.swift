@@ -14,34 +14,42 @@ struct PadView: View {
   @State private var content: PadViewTab?
   @State private var columns: NavigationSplitViewVisibility = .all
 
+  @State private var searching = false
+  @State private var searchQuery = ""
+  @State private var searchRemote = false
+
   var body: some View {
     NavigationSplitView(columnVisibility: $columns) {
       List(selection: $content) {
         Section {
           ForEach(PadViewTab.mainTabs, id: \.self) { tab in
-            Text(tab.title)
+            Label(tab.title, systemImage: tab.icon)
           }
         }
         if isAuthenticated {
           Section {
             ForEach(PadViewTab.userTabs, id: \.self) { tab in
-              Text(tab.title)
+              Label(tab.title, systemImage: tab.icon)
             }
           }
         }
         Section {
           ForEach(PadViewTab.otherTabs, id: \.self) { tab in
-            Text(tab.title)
+            Label(tab.title, systemImage: tab.icon)
           }
         }
-      }.navigationSplitViewColumnWidth(min: 80, ideal: 160, max: 240)
+      }.navigationSplitViewColumnWidth(min: 160, ideal: 200, max: 240)
     } detail: {
       NavigationStack {
         VStack {
-          if let content = content {
-            content
-          } else {
-            PadViewTab(defaultTab)
+          if searching {
+            SearchView(query: $searchQuery, remote: $searchRemote)
+          }else {
+            if let content = content {
+              content
+            } else {
+              PadViewTab(defaultTab)
+            }
           }
         }
         .navigationBarTitleDisplayMode(.inline)
@@ -51,6 +59,15 @@ struct PadView: View {
           print(url)
         })
       }
+    }
+    .searchable(
+      text: $searchQuery, isPresented: $searching, placement: .navigationBarDrawer(displayMode: .always)
+    )
+    .onChange(of: searchQuery) { _, _ in
+      searchRemote = false
+    }
+    .onSubmit(of: .search) {
+      searchRemote = true
     }
     .navigationSplitViewStyle(.balanced)
   }

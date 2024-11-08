@@ -233,6 +233,23 @@ enum PadViewTab: Codable, CaseIterable, View {
     }
   }
 
+  var icon: String {
+    switch self {
+    case .timeline:
+      "person"
+    case .progress:
+      "square.grid.2x2.fill"
+    case .discover:
+      "magnifyingglass"
+    case .collection:
+      "square.grid.2x2.fill"
+    case .notice:
+      "bell"
+    case .settings:
+      "gear"
+    }
+  }
+
   var body: some View {
     switch self {
     case .timeline:
@@ -251,11 +268,11 @@ enum PadViewTab: Codable, CaseIterable, View {
   }
 
   static var mainTabs: [Self] {
-    return [.timeline, .progress, .discover]
+    return [.timeline, .discover]
   }
 
   static var userTabs: [Self] {
-    return [.collection, .notice]
+    return [.progress, .collection, .notice]
   }
 
   static var otherTabs: [Self] {

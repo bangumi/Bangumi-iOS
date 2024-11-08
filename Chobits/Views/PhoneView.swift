@@ -8,7 +8,10 @@
 import SwiftUI
 
 struct PhoneView: View {
+  @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
+
   @State private var selectedTab: PhoneViewTab
+
   @State private var searching = false
   @State private var searchQuery = ""
   @State private var searchRemote = false
@@ -36,7 +39,7 @@ struct PhoneView: View {
       }
       .tag(PhoneViewTab.progress)
       .tabItem {
-        Image(systemName: "square.grid.3x2.fill")
+        Image(systemName: "square.grid.2x2.fill")
       }
       NavigationStack {
         VStack {
