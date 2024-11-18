@@ -20,7 +20,7 @@ extension Chii {
       queryItems.append(URLQueryItem(name: "unread", value: String(unread)))
     }
     let pageURL = url.appending(queryItems: queryItems)
-    let data = try await request(url: pageURL, method: "GET", authorized: true)
+    let data = try await self.request(url: pageURL, method: "GET", auth: .required)
     let resp: NotifyResponse = try self.decodeResponse(data)
     Logger.api.info("finish get notify")
     return resp
@@ -37,7 +37,7 @@ extension Chii {
       URLQueryItem(name: "offset", value: String(offset)),
     ]
     let pageURL = url.appending(queryItems: queryItems)
-    let data = try await request(url: pageURL, method: "GET")
+    let data = try await self.request(url: pageURL, method: "GET")
     let resp: SubjectTopicsResponse = try self.decodeResponse(data)
     Logger.api.info("finish get subject topics")
     return resp
@@ -54,7 +54,7 @@ extension Chii {
       URLQueryItem(name: "offset", value: String(offset)),
     ]
     let pageURL = url.appending(queryItems: queryItems)
-    let data = try await request(url: pageURL, method: "GET")
+    let data = try await self.request(url: pageURL, method: "GET")
     let resp: SubjectInterestCommentsResponse = try self.decodeResponse(data)
     Logger.api.info("finish get subject comments")
     return resp

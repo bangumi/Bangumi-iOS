@@ -65,7 +65,7 @@ extension Chii {
       "code": code,
       "redirect_uri": self.appInfo.callbackURL,
     ]
-    let data = try await self.request(url: url, method: "POST", body: body)
+    let data = try await self.request(url: url, method: "POST", body: body, auth: .disabled)
     _ = try self.saveAuthResponse(data: data)
     self.setAuthStatus(true)
   }
@@ -80,7 +80,7 @@ extension Chii {
       "refresh_token": auth.refreshToken,
       "redirect_uri": self.appInfo.callbackURL,
     ]
-    let data = try await self.request(url: url, method: "POST", body: body)
+    let data = try await self.request(url: url, method: "POST", body: body, auth: .disabled)
     let auth = try self.saveAuthResponse(data: data)
     return auth
   }

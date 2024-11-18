@@ -29,6 +29,12 @@ enum BangumiAPI {
   }
 }
 
+enum AuthMode {
+  case auto
+  case disabled
+  case required
+}
+
 @globalActor
 actor Chii {
   static let shared = Chii()
@@ -108,14 +114,17 @@ extension Chii {
     return try decoder.decode(T.self, from: data)
   }
 
-  func request(url: URL, method: String, body: Any? = nil, authorized: Bool = false) async throws
+  func request(url: URL, method: String, body: Any? = nil, auth: AuthMode = .auto) async throws
     -> Data
   {
     var authed: Bool
-    if authorized {
-      authed = true
-    } else {
+    switch authorized {
+    case .auto:
       authed = self.isAuthenticated()
+    case .required:
+      authed = true
+    case .disabled:
+      authed = false
     }
     Logger.api.info("\(method)(\(authed)): \(url.absoluteString)")
     let session = try await self.getSession(authroized: authed)

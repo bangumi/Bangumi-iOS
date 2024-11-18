@@ -27,7 +27,7 @@ extension Chii {
       body["vol_status"] = volStatus
     }
     if body.count > 0 {
-      _ = try await self.request(url: url, method: "POST", body: body, authorized: true)
+      _ = try await self.request(url: url, method: "POST", body: body, auth: .required)
     }
     Logger.api.info(
       "finish update subject collection: \(sid), eps: \(eps.debugDescription), vols: \(vols.debugDescription)"
@@ -62,7 +62,7 @@ extension Chii {
       body["tags"] = tags
     }
     if body.count > 0 {
-      _ = try await self.request(url: url, method: "POST", body: body, authorized: true)
+      _ = try await self.request(url: url, method: "POST", body: body, auth: .required)
     }
     Logger.api.info("finish update subject collection: \(sid)")
 
@@ -89,7 +89,7 @@ extension Chii {
       "episode_id": episodeIds,
       "type": type.rawValue,
     ]
-    _ = try await self.request(url: url, method: "PATCH", body: body, authorized: true)
+    _ = try await self.request(url: url, method: "PATCH", body: body, auth: .required)
     Logger.api.info("finish update subject episode collection: \(subjectId), \(episodeIds)")
 
     try await db.updateEpisodeCollections(subjectId: subjectId, sort: updateTo, type: type)
@@ -109,7 +109,7 @@ extension Chii {
     let body: [String: Any] = [
       "type": type.rawValue
     ]
-    _ = try await self.request(url: url, method: "PUT", body: body, authorized: true)
+    _ = try await self.request(url: url, method: "PUT", body: body, auth: .required)
     Logger.api.info("finish update episode collection: \(episodeId)")
 
     try await db.updateEpisodeCollection(subjectId: subjectId, episodeId: episodeId, type: type)
