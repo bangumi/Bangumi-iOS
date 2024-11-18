@@ -11,8 +11,6 @@ import SwiftUI
 struct SubjectCommentsView: View {
   let subjectId: UInt
 
-  @Environment(Notifier.self) private var notifier
-
   @State private var loaded: Bool = false
   @State private var refreshing: Bool = false
   @State private var comments: [SubjectInterestComment] = []
@@ -27,7 +25,7 @@ struct SubjectCommentsView: View {
         let resp = try await Chii.shared.getSubjectComments(subjectId: subjectId, limit: 10)
         comments = resp.list
       } catch {
-        notifier.alert(error: error)
+        Notifier.shared.alert(error: error)
       }
       refreshing = false
       loaded = true
@@ -102,7 +100,6 @@ struct SubjectCommentsView: View {
   return ScrollView {
     LazyVStack(alignment: .leading) {
       SubjectCommentsView(subjectId: subject.subjectId)
-        .environment(Notifier())
         .modelContainer(container)
     }
   }.padding()

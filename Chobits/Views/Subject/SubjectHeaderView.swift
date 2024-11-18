@@ -11,8 +11,6 @@ import SwiftUI
 struct SubjectHeaderView: View {
   let subjectId: UInt
 
-  @Environment(Notifier.self) private var notifier
-
   @State private var coverDetail = false
   @State private var collectionDetail = false
 
@@ -182,7 +180,6 @@ struct SubjectHeaderView: View {
   return ScrollView {
     LazyVStack(alignment: .leading) {
       SubjectHeaderView(subjectId: subject.subjectId)
-        .environment(Notifier())
         .modelContainer(container)
     }
   }.padding()

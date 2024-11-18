@@ -13,7 +13,6 @@ struct SearchView: View {
   @Binding var query: String
   @Binding var remote: Bool
 
-  @Environment(Notifier.self) private var notifier
   @Environment(\.modelContext) var modelContext
 
   @State private var subjectType: SubjectType = .unknown
@@ -43,7 +42,7 @@ struct SearchView: View {
       offset += limit
       return result
     } catch {
-      notifier.alert(error: error)
+      Notifier.shared.alert(error: error)
     }
     return []
   }
@@ -99,7 +98,7 @@ struct SearchView: View {
       offset += limit
       return result
     } catch {
-      notifier.alert(error: error)
+      Notifier.shared.alert(error: error)
     }
     return []
   }

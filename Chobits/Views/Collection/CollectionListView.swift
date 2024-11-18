@@ -11,7 +11,6 @@ import SwiftUI
 struct CollectionListView: View {
   let subjectType: SubjectType
 
-  @Environment(Notifier.self) private var notifier
   @Environment(\.modelContext) var modelContext
 
   @State private var loaded: Bool = false
@@ -35,7 +34,7 @@ struct CollectionListView: View {
         counts[type] = count
       }
     } catch {
-      notifier.alert(error: error)
+      Notifier.shared.alert(error: error)
     }
   }
 
@@ -62,7 +61,7 @@ struct CollectionListView: View {
       offset += limit
       return result
     } catch {
-      notifier.alert(error: error)
+      Notifier.shared.alert(error: error)
     }
     return []
   }
@@ -164,6 +163,5 @@ struct CollectionListView: View {
   container.mainContext.insert(collection)
 
   return CollectionListView(subjectType: SubjectType.anime)
-    .environment(Notifier())
     .modelContainer(container)
 }

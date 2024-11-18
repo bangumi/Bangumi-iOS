@@ -12,7 +12,6 @@ import SwiftUI
 struct SubjectRelationsView: View {
   let subjectId: UInt
 
-  @Environment(Notifier.self) private var notifier
   @Environment(\.modelContext) var modelContext
 
   @State private var loaded: Bool = false
@@ -61,7 +60,7 @@ struct SubjectRelationsView: View {
         self.collections[collection.subjectId] = collection.typeEnum
       }
     } catch {
-      notifier.alert(error: error)
+      Notifier.shared.alert(error: error)
     }
   }
 
@@ -75,7 +74,7 @@ struct SubjectRelationsView: View {
       do {
         try await Chii.shared.loadSubjectRelations(subjectId)
       } catch {
-        notifier.alert(error: error)
+        Notifier.shared.alert(error: error)
       }
       await load()
       refreshing = false
@@ -171,7 +170,6 @@ struct SubjectRelationsView: View {
   return ScrollView {
     LazyVStack(alignment: .leading) {
       SubjectRelationsView(subjectId: subject.subjectId)
-        .environment(Notifier())
         .modelContainer(container)
     }
   }.padding()

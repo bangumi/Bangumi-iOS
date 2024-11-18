@@ -11,8 +11,6 @@ import SwiftUI
 import UIKit
 
 struct AuthView: View {
-  @Environment(Notifier.self) private var notifier
-
   var slogan: String
 
   var body: some View {
@@ -30,17 +28,11 @@ struct AuthView: View {
   }
 
   private var signInView: SignInViewModel {
-    return SignInViewModel(notifier: notifier)
+    return SignInViewModel()
   }
 }
 
 class SignInViewModel: NSObject, ASWebAuthenticationPresentationContextProviding {
-  let notifier: Notifier
-
-  init(notifier: Notifier) {
-    self.notifier = notifier
-  }
-
   func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
     return ASPresentationAnchor()
   }
@@ -52,14 +44,14 @@ class SignInViewModel: NSObject, ASWebAuthenticationPresentationContextProviding
     let query = URLComponents(string: successURL.absoluteString)?
       .queryItems?.filter { $0.name == "code" }.first
     let authorizationCode = query?.value ?? ""
-    if authorizationCode.isEmpty {
-      notifier.alert(message: "failed to get oauth token")
-    }
     Task {
+      if authorizationCode.isEmpty {
+        Notifier.shared.alert(message: "failed to get oauth token")
+      }
       do {
         try await Chii.shared.exchangeForAccessToken(code: authorizationCode)
       } catch {
-        notifier.alert(message: "failed to exchange for access token")
+        Notifier.shared.alert(message: "failed to exchange for access token")
       }
     }
   }

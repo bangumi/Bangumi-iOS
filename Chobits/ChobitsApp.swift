@@ -11,7 +11,6 @@ import SwiftUI
 @main
 struct ChobitsApp: App {
   @State var sharedModelContainer: ModelContainer
-  @State var notifier = Notifier()
 
   @AppStorage("appearance") var appearance: String = "system"
 
@@ -45,22 +44,7 @@ struct ChobitsApp: App {
 
   var body: some Scene {
     WindowGroup {
-      ContentView()
-        .environment(notifier)
-        .preferredColorScheme(AppearanceType(appearance).colorScheme)
-        .alert("ERROR", isPresented: $notifier.showAlert) {
-          Button("OK") {
-            notifier.currentError = nil
-            notifier.showAlert = false
-          }
-        } message: {
-          if let error = notifier.currentError {
-            Text("\(error)")
-          } else {
-            Text("Unknown Error")
-          }
-        }
-    }
-    .modelContainer(sharedModelContainer)
+      ContentView().preferredColorScheme(AppearanceType(appearance).colorScheme)
+    }.modelContainer(sharedModelContainer)
   }
 }

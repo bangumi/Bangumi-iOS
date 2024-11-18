@@ -7,14 +7,16 @@
 
 import Foundation
 import OSLog
+import SwiftUI
 
+@MainActor
 @Observable
 class Notifier {
-  var currentError: ChiiError?
-  var showAlert: Bool = false
+  static let shared = Notifier()
 
-  var notification: String?
-  var showNotification: Bool = false
+  var hasAlert: Bool = false
+  var currentError: ChiiError? = nil
+  var notifications: [String] = []
 
   func alert(error: ChiiError) {
     switch error {
@@ -23,14 +25,14 @@ class Notifier {
     default:
       Logger.app.error("error: \(error)")
       self.currentError = error
-      self.showAlert = true
+      self.hasAlert = true
     }
   }
 
   func alert(message: String) {
     Logger.app.error("error: \(message)")
     self.currentError = ChiiError(message: message)
-    self.showAlert = true
+    self.hasAlert = true
   }
 
   func alert(error: any Error) {
@@ -41,9 +43,20 @@ class Notifier {
     }
   }
 
-  func notify(message: String) {
+  func vanishError() {
+    self.currentError = nil
+    self.hasAlert = false
+  }
+
+  func vanishMessage() {
+    self.notifications.removeFirst()
+  }
+
+  func notify(message: String, duration: TimeInterval = 2) {
     Logger.app.info("notification: \(message)")
-    self.notification = message
-    self.showNotification = true
+    self.notifications.append(message)
+    DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
+      self.vanishMessage()
+    }
   }
 }

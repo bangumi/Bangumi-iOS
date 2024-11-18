@@ -11,7 +11,6 @@ import SwiftUI
 struct CollectionSubjectTypeView: View {
   let stype: SubjectType
 
-  @Environment(Notifier.self) private var notifier
   @Environment(\.modelContext) var modelContext
 
   @State private var collectionType: CollectionType = .collect
@@ -44,7 +43,7 @@ struct CollectionSubjectTypeView: View {
         subjects[sid] = subject
       }
     } catch {
-      notifier.alert(error: error)
+      Notifier.shared.alert(error: error)
     }
   }
 
@@ -61,7 +60,7 @@ struct CollectionSubjectTypeView: View {
         counts[type] = count
       }
     } catch {
-      notifier.alert(error: error)
+      Notifier.shared.alert(error: error)
     }
   }
 
@@ -113,7 +112,6 @@ struct CollectionSubjectTypeView: View {
   return NavigationStack {
     ScrollView {
       CollectionSubjectTypeView(stype: .anime)
-        .environment(Notifier())
         .modelContainer(container)
     }
     .padding(.horizontal, 8)

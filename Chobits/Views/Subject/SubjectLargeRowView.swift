@@ -11,7 +11,6 @@ import SwiftUI
 struct SubjectLargeRowView: View {
   let subjectId: UInt
 
-  @Environment(Notifier.self) private var notifier
   @Environment(\.modelContext) var modelContext
 
   @Query
@@ -134,7 +133,6 @@ struct SubjectLargeRowView: View {
   return ScrollView {
     LazyVStack(alignment: .leading) {
       SubjectLargeRowView(subjectId: subject.subjectId)
-        .environment(Notifier())
     }
   }
   .padding()

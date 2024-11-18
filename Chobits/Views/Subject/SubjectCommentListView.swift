@@ -12,8 +12,6 @@ import SwiftUI
 struct SubjectCommentListView: View {
   let subjectId: UInt
 
-  @Environment(Notifier.self) private var notifier
-
   @State private var fetching: Bool = false
   @State private var offset: Int = 0
   @State private var exhausted: Bool = false
@@ -34,7 +32,7 @@ struct SubjectCommentListView: View {
       fetching = false
       return result
     } catch {
-      notifier.alert(error: error)
+      Notifier.shared.alert(error: error)
     }
     fetching = false
     return []
@@ -149,7 +147,6 @@ struct SubjectCommentListView: View {
   return ScrollView {
     LazyVStack(alignment: .leading) {
       SubjectCommentListView(subjectId: subject.subjectId)
-        .environment(Notifier())
         .modelContainer(container)
     }
   }.padding()

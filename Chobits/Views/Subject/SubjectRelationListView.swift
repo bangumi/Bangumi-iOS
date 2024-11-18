@@ -11,7 +11,6 @@ import SwiftUI
 struct SubjectRelationListView: View {
   let subjectId: UInt
 
-  @Environment(Notifier.self) private var notifier
   @Environment(\.modelContext) var modelContext
 
   @State private var subjectType: SubjectType = .unknown
@@ -31,7 +30,7 @@ struct SubjectRelationListView: View {
     do {
       relations = try modelContext.fetch(descriptor)
     } catch {
-      notifier.alert(error: error)
+      Notifier.shared.alert(error: error)
     }
   }
 
@@ -99,6 +98,5 @@ struct SubjectRelationListView: View {
   }
 
   return SubjectRelationListView(subjectId: subject.subjectId)
-    .environment(Notifier())
     .modelContainer(container)
 }

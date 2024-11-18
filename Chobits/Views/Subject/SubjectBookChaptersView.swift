@@ -12,8 +12,6 @@ import SwiftUI
 struct SubjectBookChaptersView: View {
   let subjectId: UInt
 
-  @Environment(Notifier.self) private var notifier
-
   @State private var inputEps: String = ""
   @State private var eps: UInt? = nil
   @State private var inputVols: String = ""
@@ -52,9 +50,9 @@ struct SubjectBookChaptersView: View {
     Task {
       do {
         try await Chii.shared.updateBookCollection(sid: subjectId, eps: eps, vols: vols)
-        UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
       } catch {
-        notifier.alert(error: error)
+        Notifier.shared.alert(error: error)
       }
       self.eps = nil
       self.vols = nil
@@ -170,7 +168,6 @@ struct SubjectBookChaptersView: View {
   return ScrollView {
     LazyVStack(alignment: .leading) {
       SubjectBookChaptersView(subjectId: subject.subjectId)
-        .environment(Notifier())
         .modelContainer(container)
     }
   }

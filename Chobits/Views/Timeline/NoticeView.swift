@@ -10,8 +10,6 @@ import SwiftUI
 struct NoticeView: View {
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
 
-  @Environment(Notifier.self) private var notifier
-
   @State private var fetched: Bool = false
   @State private var updating: Bool = false
   @State private var notices: [Notice] = []
@@ -23,7 +21,7 @@ struct NoticeView: View {
       notices = resp.data
       unreadCount = notices.count(where: { $0.unread })
     } catch {
-      notifier.alert(error: error)
+      Notifier.shared.alert(error: error)
     }
     fetched = true
   }
@@ -36,7 +34,7 @@ struct NoticeView: View {
       do {
         try await Chii.shared.clearNotify(ids: ids)
       } catch {
-        notifier.alert(error: error)
+        Notifier.shared.alert(error: error)
       }
       for i in 0 ..< notices.count {
         notices[i].unread = false
@@ -78,7 +76,7 @@ struct NoticeView: View {
           }
           .animation(.default, value: notices)
           .refreshable {
-            UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
             await getNotice()
           }
         }
@@ -98,6 +96,5 @@ struct NoticeView: View {
   let container = mockContainer()
 
   return NoticeView()
-    .environment(Notifier())
     .modelContainer(container)
 }

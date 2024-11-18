@@ -17,7 +17,6 @@ struct SettingsView: View {
   @AppStorage("isolationMode") var isolationMode: Bool = false
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
 
-  @Environment(Notifier.self) private var notifier
   @Environment(\.modelContext) var modelContext
 
   @State private var selectedShareDomain: ShareDomain = .chii
@@ -43,7 +42,7 @@ struct SettingsView: View {
         try modelContext.delete(model: UserSubjectCollection.self)
         try modelContext.delete(model: Episode.self)
       } catch {
-        notifier.alert(error: error)
+        Notifier.shared.alert(error: error)
       }
     }
   }
@@ -143,6 +142,5 @@ struct SettingsView: View {
   let container = mockContainer()
 
   return SettingsView()
-    .environment(Notifier())
     .modelContainer(container)
 }

@@ -15,7 +15,6 @@ struct EpisodeGridView: View {
 
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
 
-  @Environment(Notifier.self) private var notifier
   @Environment(\.modelContext) var modelContext
 
   @State private var selected: Episode? = nil
@@ -46,7 +45,7 @@ struct EpisodeGridView: View {
       self.episodeMains = try modelContext.fetch(mainDescriptor)
       self.episodeSps = try modelContext.fetch(spDescriptor)
     } catch {
-      notifier.alert(error: error)
+      Notifier.shared.alert(error: error)
     }
   }
 
@@ -57,7 +56,7 @@ struct EpisodeGridView: View {
     do {
       try await Chii.shared.loadEpisodes(subjectId)
     } catch {
-      notifier.alert(error: error)
+      Notifier.shared.alert(error: error)
     }
     await load()
   }
@@ -152,7 +151,6 @@ struct EpisodeGridView: View {
   return ScrollView {
     LazyVStack(alignment: .leading) {
       EpisodeGridView(subjectId: subject.subjectId)
-        .environment(Notifier())
         .modelContainer(container)
     }
   }.padding()

@@ -11,8 +11,6 @@ import SwiftUI
 struct PersonSubjectsView: View {
   var personId: UInt
 
-  @Environment(Notifier.self) private var notifier
-
   @Query
   private var subjects: [PersonRelatedSubject]
 
@@ -35,7 +33,7 @@ struct PersonSubjectsView: View {
     do {
       try await Chii.shared.loadPersonSubjects(personId)
     } catch {
-      notifier.alert(error: error)
+      Notifier.shared.alert(error: error)
     }
   }
 
@@ -95,7 +93,6 @@ struct PersonSubjectsView: View {
   return ScrollView(showsIndicators: false) {
     LazyVStack(alignment: .leading) {
       PersonSubjectsView(personId: person.personId)
-        .environment(Notifier())
         .modelContainer(container)
     }.padding(.horizontal, 8)
   }

@@ -15,8 +15,6 @@ struct PersonView: View {
   @AppStorage("shareDomain") var shareDomain: String = ShareDomain.chii.label
   @AppStorage("isolationMode") var isolationMode: Bool = false
 
-  @Environment(Notifier.self) private var notifier
-
   @State private var refreshed: Bool = false
   @State private var coverDetail = false
   @State private var showSummary: Bool = false
@@ -44,7 +42,7 @@ struct PersonView: View {
     do {
       try await Chii.shared.loadPerson(personId)
     } catch {
-      notifier.alert(error: error)
+      Notifier.shared.alert(error: error)
       return
     }
   }
@@ -260,7 +258,6 @@ struct PersonView: View {
 
   return NavigationStack {
     PersonView(personId: person.personId)
-      .environment(Notifier())
       .modelContainer(container)
   }
 }

@@ -16,8 +16,6 @@ struct SubjectView: View {
   @AppStorage("isolationMode") var isolationMode: Bool = false
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
 
-  @Environment(Notifier.self) private var notifier
-
   @State private var refreshed: Bool = false
 
   @Query
@@ -42,7 +40,7 @@ struct SubjectView: View {
     do {
       try await Chii.shared.loadSubject(subjectId)
     } catch {
-      notifier.alert(error: error)
+      Notifier.shared.alert(error: error)
       return
     }
   }
@@ -111,7 +109,6 @@ struct SubjectView: View {
 
   return NavigationStack {
     SubjectView(subjectId: subject.subjectId)
-      .environment(Notifier())
       .modelContainer(container)
   }
 }

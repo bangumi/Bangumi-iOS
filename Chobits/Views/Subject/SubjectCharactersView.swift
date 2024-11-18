@@ -11,7 +11,6 @@ import SwiftUI
 struct SubjectCharactersView: View {
   let subjectId: UInt
 
-  @Environment(Notifier.self) private var notifier
   @Environment(\.modelContext) var modelContext
 
   @State private var loaded: Bool = false
@@ -43,7 +42,7 @@ struct SubjectCharactersView: View {
         characters.append(contentsOf: sides)
       }
     } catch {
-      notifier.alert(error: error)
+      Notifier.shared.alert(error: error)
     }
   }
 
@@ -57,7 +56,7 @@ struct SubjectCharactersView: View {
       do {
         try await Chii.shared.loadSubjectCharacters(subjectId)
       } catch {
-        notifier.alert(error: error)
+        Notifier.shared.alert(error: error)
       }
       await load()
       refreshing = false
@@ -115,7 +114,6 @@ struct SubjectCharactersView: View {
     ScrollView {
       LazyVStack(alignment: .leading) {
         SubjectCharactersView(subjectId: subject.subjectId)
-          .environment(Notifier())
           .modelContainer(container)
       }
     }.padding()

@@ -10,7 +10,6 @@ import SwiftData
 import SwiftUI
 
 struct CollectionsView: View {
-  @Environment(Notifier.self) private var notifier
   @Environment(\.modelContext) var modelContext
 
   @State private var refreshing: Bool = false
@@ -45,7 +44,7 @@ struct CollectionsView: View {
         }
         refreshProgress = CGFloat(offset) / CGFloat(resp.total)
       } catch {
-        notifier.alert(error: error)
+        Notifier.shared.alert(error: error)
         break
       }
     }
@@ -101,7 +100,6 @@ struct CollectionsView: View {
   return NavigationStack {
     ScrollView {
       CollectionsView()
-        .environment(Notifier())
         .modelContainer(container)
     }
     .padding(.horizontal, 8)

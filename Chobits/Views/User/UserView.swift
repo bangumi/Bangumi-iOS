@@ -12,8 +12,6 @@ struct UserView: View {
 
   @AppStorage("shareDomain") var shareDomain: String = ShareDomain.chii.label
 
-  @Environment(Notifier.self) private var notifier
-
   @State private var user: User?
 
   var shareLink: URL {
@@ -24,7 +22,7 @@ struct UserView: View {
     do {
       user = try await Chii.shared.getUser(uid: uid)
     } catch {
-      notifier.alert(error: error)
+      Notifier.shared.alert(error: error)
     }
   }
 
@@ -83,6 +81,5 @@ struct UserView: View {
   let container = mockContainer()
 
   return UserView(uid: "873244")
-    .environment(Notifier())
     .modelContainer(container)
 }

@@ -12,7 +12,6 @@ import SwiftUI
 struct SubjectCollectionView: View {
   let subjectId: UInt
 
-  @Environment(Notifier.self) private var notifier
   @Environment(\.modelContext) var modelContext
 
   @State private var refreshed: Bool = false
@@ -48,7 +47,7 @@ struct SubjectCollectionView: View {
       //        Logger.collection.error("clear collection error: \(error)")
       //      }
     } catch {
-      notifier.alert(error: error)
+      Notifier.shared.alert(error: error)
       return
     }
   }
@@ -124,7 +123,6 @@ struct SubjectCollectionView: View {
   return ScrollView {
     LazyVStack(alignment: .leading) {
       SubjectCollectionView(subjectId: collection.subjectId)
-        .environment(Notifier())
         .modelContainer(container)
     }
   }

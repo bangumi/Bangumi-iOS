@@ -184,7 +184,6 @@ struct NoticeRowView: View {
   return ScrollView {
     LazyVStack(alignment: .leading) {
       NoticeRowView(notice: .constant(Notice()))
-        .environment(Notifier())
         .modelContainer(container)
     }
   }.padding()

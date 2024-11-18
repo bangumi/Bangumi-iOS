@@ -12,7 +12,6 @@ import Flow
 struct SubjectCollectionBoxView: View {
   let subjectId: UInt
 
-  @Environment(Notifier.self) private var notifier
   @Environment(\.modelContext) var modelContext
   @Environment(\.dismiss) private var dismiss
 
@@ -73,7 +72,7 @@ struct SubjectCollectionBoxView: View {
         collection = c
       }
     } catch {
-      notifier.alert(error: error)
+      Notifier.shared.alert(error: error)
     }
     if let collection = collection {
       self.collectionType = collection.typeEnum
@@ -97,10 +96,10 @@ struct SubjectCollectionBoxView: View {
           priv: priv,
           tags: tags
         )
-        UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
         dismiss()
       } catch {
-        notifier.alert(error: error)
+        Notifier.shared.alert(error: error)
       }
       self.updating = false
     }
@@ -231,6 +230,5 @@ struct SubjectCollectionBoxView: View {
   return SubjectCollectionBoxView(
     subjectId: subject.subjectId
   )
-  .environment(Notifier())
   .modelContainer(container)
 }

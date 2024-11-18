@@ -12,8 +12,6 @@ struct CharacterSubjectItemView: View {
   var characterId: UInt
   var subjectId: UInt
 
-  @Environment(Notifier.self) private var notifier
-
   @Query
   private var relations: [CharacterRelatedSubject]
   private var relation: CharacterRelatedSubject? { relations.first }
@@ -123,7 +121,6 @@ struct CharacterSubjectItemView: View {
   return ScrollView(showsIndicators: false) {
     LazyVStack(alignment: .leading) {
       CharacterSubjectItemView(characterId: character.characterId, subjectId: subject.subjectId)
-        .environment(Notifier())
         .modelContainer(container)
     }.padding(.horizontal, 8)
   }

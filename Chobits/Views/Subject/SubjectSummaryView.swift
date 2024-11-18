@@ -13,8 +13,6 @@ import Flow
 struct SubjectSummaryView: View {
   let subjectId: UInt
 
-  @Environment(Notifier.self) private var notifier
-
   @State private var showSummary = false
 
   @Query
@@ -91,7 +89,6 @@ struct SubjectSummaryView: View {
   return ScrollView {
     LazyVStack(alignment: .leading) {
       SubjectSummaryView(subjectId: subject.subjectId)
-        .environment(Notifier())
         .modelContainer(container)
     }
   }.padding()

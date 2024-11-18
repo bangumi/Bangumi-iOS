@@ -12,7 +12,6 @@ import SwiftUI
 struct ProgressRowView: View {
   let subjectId: UInt
 
-  @Environment(Notifier.self) private var notifier
   @Environment(\.modelContext) var modelContext
 
   @State private var updating: Bool = false
@@ -77,10 +76,10 @@ struct ProgressRowView: View {
       do {
         try await Chii.shared.updateEpisodeCollection(
           subjectId: subjectId, episodeId: episodeId, type: .collect)
-        UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
         await loadNextEpisode()
       } catch {
-        notifier.alert(error: error)
+        Notifier.shared.alert(error: error)
       }
       updating = false
     }
@@ -217,7 +216,6 @@ struct ProgressRowView: View {
   return ScrollView {
     LazyVStack(alignment: .leading) {
       ProgressRowView(subjectId: subject.subjectId)
-        .environment(Notifier())
     }
   }
   .padding()

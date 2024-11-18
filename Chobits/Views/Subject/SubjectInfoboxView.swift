@@ -43,7 +43,6 @@ struct SubjectInfoboxItem: Identifiable {
 struct SubjectInfoboxView: View {
   let subjectId: UInt
 
-  @Environment(Notifier.self) private var notifier
   @Environment(\.modelContext) var modelContext
 
   @State private var refreshed: Bool = false
@@ -69,7 +68,7 @@ struct SubjectInfoboxView: View {
     do {
       self.persons = try modelContext.fetch(descriptor)
     } catch {
-      notifier.alert(error: error)
+      Notifier.shared.alert(error: error)
     }
   }
 
@@ -86,7 +85,7 @@ struct SubjectInfoboxView: View {
     do {
       try await Chii.shared.loadSubjectPersons(subjectId)
     } catch {
-      notifier.alert(error: error)
+      Notifier.shared.alert(error: error)
     }
     await load()
   }
@@ -225,7 +224,7 @@ struct SubjectInfoboxView: View {
       }
     }
     .refreshable {
-      UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+      UIImpactFeedbackGenerator(style: .medium).impactOccurred()
       await refresh()
     }
     .onAppear {
@@ -246,7 +245,6 @@ struct SubjectInfoboxView: View {
   return ScrollView {
     LazyVStack(alignment: .leading) {
       SubjectInfoboxView(subjectId: subject.subjectId)
-        .environment(Notifier())
         .modelContainer(container)
     }
   }.padding()

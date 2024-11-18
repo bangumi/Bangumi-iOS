@@ -12,8 +12,6 @@ struct ChiiTimelineView: View {
   @AppStorage("isolationMode") var isolationMode: Bool = false
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
 
-  @Environment(Notifier.self) private var notifier
-
   @State private var profile: User?
   @State private var unreadNotice: Bool = false
 
@@ -22,7 +20,7 @@ struct ChiiTimelineView: View {
       do {
         profile = try await Chii.shared.getProfile()
       } catch {
-        notifier.alert(error: error)
+        Notifier.shared.alert(error: error)
       }
     }
   }
@@ -37,7 +35,7 @@ struct ChiiTimelineView: View {
           unreadNotice = true
         }
       } catch {
-        notifier.alert(error: error)
+        Notifier.shared.alert(error: error)
       }
     }
   }
@@ -97,6 +95,5 @@ struct ChiiTimelineView: View {
   let container = mockContainer()
 
   return ChiiTimelineView()
-    .environment(Notifier())
     .modelContainer(container)
 }

@@ -13,7 +13,6 @@ struct PersonCharacterItemView: View {
   var characterId: UInt
   var subjectId: UInt
 
-  @Environment(Notifier.self) private var notifier
   @Environment(\.modelContext) var modelContext
 
   @State private var character: PersonRelatedCharacter? = nil
@@ -41,7 +40,7 @@ struct PersonCharacterItemView: View {
         subject = s
       }
     } catch {
-      notifier.alert(error: error)
+      Notifier.shared.alert(error: error)
     }
   }
 
@@ -119,7 +118,6 @@ struct PersonCharacterItemView: View {
       PersonCharacterItemView(
         personId: person.personId, characterId: character.characterId, subjectId: subject.subjectId
       )
-      .environment(Notifier())
       .modelContainer(container)
     }.padding(.horizontal, 8)
   }

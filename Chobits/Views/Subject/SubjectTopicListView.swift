@@ -12,8 +12,6 @@ import SwiftUI
 struct SubjectTopicListView: View {
   let subjectId: UInt
 
-  @Environment(Notifier.self) private var notifier
-
   @State private var fetching: Bool = false
   @State private var offset: Int = 0
   @State private var exhausted: Bool = false
@@ -34,7 +32,7 @@ struct SubjectTopicListView: View {
       fetching = false
       return result
     } catch {
-      notifier.alert(error: error)
+      Notifier.shared.alert(error: error)
     }
     fetching = false
     return []
@@ -151,7 +149,6 @@ struct SubjectTopicListView: View {
   return ScrollView {
     LazyVStack(alignment: .leading) {
       SubjectTopicListView(subjectId: subject.subjectId)
-        .environment(Notifier())
         .modelContainer(container)
     }
   }.padding()

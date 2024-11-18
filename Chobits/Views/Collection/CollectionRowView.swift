@@ -11,7 +11,6 @@ import SwiftUI
 struct CollectionRowView: View {
   let subjectId: UInt
 
-  @Environment(Notifier.self) private var notifier
   @Environment(\.modelContext) var modelContext
 
   @Query
@@ -74,7 +73,6 @@ struct CollectionRowView: View {
   return ScrollView {
     LazyVStack(alignment: .leading) {
       CollectionRowView(subjectId: subject.subjectId)
-        .environment(Notifier())
     }
   }
   .padding()

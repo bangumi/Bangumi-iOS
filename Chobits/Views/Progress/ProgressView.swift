@@ -12,7 +12,6 @@ import SwiftUI
 struct ChiiProgressView: View {
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
 
-  @Environment(Notifier.self) private var notifier
   @Environment(\.modelContext) var modelContext
 
   @State private var subjectType: SubjectType
@@ -47,7 +46,7 @@ struct ChiiProgressView: View {
         counts[type] = count
       }
     } catch {
-      notifier.alert(error: error)
+      Notifier.shared.alert(error: error)
     }
   }
 
@@ -74,7 +73,7 @@ struct ChiiProgressView: View {
       offset += limit
       return result
     } catch {
-      notifier.alert(error: error)
+      Notifier.shared.alert(error: error)
     }
     return []
   }
@@ -108,7 +107,7 @@ struct ChiiProgressView: View {
     do {
       try await Chii.shared.loadUserCollections(type: type, once: true)
     } catch {
-      notifier.alert(error: error)
+      Notifier.shared.alert(error: error)
     }
   }
 
@@ -120,7 +119,7 @@ struct ChiiProgressView: View {
     do {
       try await Chii.shared.loadUserCollections(type: .unknown)
     } catch {
-      notifier.alert(error: error)
+      Notifier.shared.alert(error: error)
     }
     refreshing = false
   }
@@ -175,7 +174,7 @@ struct ChiiProgressView: View {
           if refreshing {
             return
           }
-          UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+          UIImpactFeedbackGenerator(style: .medium).impactOccurred()
           await refreshCollections(type: subjectType)
           await load()
         }
@@ -188,7 +187,8 @@ struct ChiiProgressView: View {
             } else {
               Button {
                 Task {
-                  UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+                  UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                  Notifier.shared.notify(message: "正在刷新全部进度")
                   await refreshAllCollections()
                   await load()
                 }

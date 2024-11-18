@@ -15,7 +15,6 @@ struct EpisodeCollectionBoxView: View {
   @AppStorage("isolationMode") var isolationMode: Bool = false
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
 
-  @Environment(Notifier.self) private var notifier
   @Environment(\.dismiss) private var dismiss
 
   @State private var updating: Bool = false
@@ -37,19 +36,19 @@ struct EpisodeCollectionBoxView: View {
     do {
       try await Chii.shared.updateEpisodeCollection(
         subjectId: subjectId, episodeId: episodeId, type: type)
-      UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+      UIImpactFeedbackGenerator(style: .medium).impactOccurred()
       updating = false
       dismiss()
     } catch {
       updating = false
-      notifier.alert(error: error)
+      Notifier.shared.alert(error: error)
     }
   }
 
   func updateBatch() async {
     if updating { return }
     guard let episode = episode else {
-      notifier.alert(message: "Episode not found")
+      Notifier.shared.alert(message: "Episode not found")
       return
     }
     updating = true
@@ -57,12 +56,12 @@ struct EpisodeCollectionBoxView: View {
       do {
         try await Chii.shared.updateSubjectEpisodeCollection(
           subjectId: subjectId, updateTo: episode.sort, type: .collect)
-        UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
         updating = false
         dismiss()
       } catch {
         updating = false
-        notifier.alert(error: error)
+        Notifier.shared.alert(error: error)
       }
     }
   }
@@ -153,6 +152,5 @@ struct EpisodeCollectionBoxView: View {
   return EpisodeCollectionBoxView(
     subjectId: subject.subjectId, episodeId: episodes.first!.episodeId
   )
-  .environment(Notifier())
   .modelContainer(container)
 }

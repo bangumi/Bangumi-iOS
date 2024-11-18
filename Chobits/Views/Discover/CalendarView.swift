@@ -10,7 +10,6 @@ import SwiftData
 import SwiftUI
 
 struct CalendarView: View {
-  @Environment(Notifier.self) private var notifier
 
   @State private var refreshed: Bool = false
 
@@ -21,7 +20,7 @@ struct CalendarView: View {
     let calendar = Calendar.current
     // FIXME: something wrong with weekday for today
     guard let yesterday = calendar.date(byAdding: .day, value: -1, to: Date()) else {
-      notifier.alert(message: "Could not get yesterday")
+      Logger.app.error("Could not get yesterday")
       return calendars
     }
     let weekday = calendar.component(.weekday, from: yesterday)
@@ -42,7 +41,7 @@ struct CalendarView: View {
     do {
       try await Chii.shared.loadCalendar()
     } catch {
-      notifier.alert(error: error)
+      Notifier.shared.alert(error: error)
     }
   }
 
@@ -61,7 +60,7 @@ struct CalendarView: View {
       }
       .refreshable {
         refreshed = false
-        UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
         await refreshCalendar()
       }
     }

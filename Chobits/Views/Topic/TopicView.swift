@@ -11,8 +11,6 @@ import SwiftUI
 struct TopicView: View {
   let topic: Topic
 
-  @Environment(Notifier.self) private var notifier
-
   var body: some View {
     Text("🚧")
   }

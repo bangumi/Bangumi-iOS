@@ -14,7 +14,6 @@ struct EpisodeListView: View {
 
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
 
-  @Environment(Notifier.self) private var notifier
   @Environment(\.modelContext) var modelContext
 
   @State private var now: Date = Date()
@@ -46,7 +45,7 @@ struct EpisodeListView: View {
       let countOther = try modelContext.fetchCount(otherDesc)
       self.countOther = countOther
     } catch {
-      notifier.alert(error: error)
+      Notifier.shared.alert(error: error)
     }
   }
 
@@ -84,7 +83,7 @@ struct EpisodeListView: View {
       offset += limit
       return result
     } catch {
-      notifier.alert(error: error)
+      Notifier.shared.alert(error: error)
     }
     return []
   }
@@ -275,6 +274,5 @@ struct EpisodeListView: View {
   }
 
   return EpisodeListView(subjectId: subject.subjectId)
-    .environment(Notifier())
     .modelContainer(container)
 }

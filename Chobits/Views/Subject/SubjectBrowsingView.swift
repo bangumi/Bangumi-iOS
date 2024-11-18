@@ -13,7 +13,6 @@ struct SubjectBrowsingView: View {
   let subjectType: SubjectType
   let categories: [SubjectCategory]
 
-  @Environment(Notifier.self) private var notifier
   @Environment(\.modelContext) var modelContext
 
   @State private var filterExpand: String = ""
@@ -82,7 +81,7 @@ struct SubjectBrowsingView: View {
       fetching = false
       return result
     } catch {
-      notifier.alert(error: error)
+      Notifier.shared.alert(error: error)
     }
     fetching = false
     return []
@@ -540,7 +539,6 @@ struct SubjectBrowsingView: View {
 
   return NavigationStack {
     SubjectBrowsingView(subjectType: .anime)
-      .environment(Notifier())
       .modelContainer(container)
   }
 }

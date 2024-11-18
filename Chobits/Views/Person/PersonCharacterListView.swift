@@ -11,7 +11,6 @@ import SwiftUI
 struct PersonCharacterListView: View {
   let personId: UInt
 
-  @Environment(Notifier.self) private var notifier
   @Environment(\.modelContext) var modelContext
 
   @State private var relationType: SubjectCharacterRelationType = .unknown
@@ -37,7 +36,7 @@ struct PersonCharacterListView: View {
       let chars = Dictionary(grouping: characters, by: { $0.characterId })
       characterIds = chars.keys.sorted()
     } catch {
-      notifier.alert(error: error)
+      Notifier.shared.alert(error: error)
     }
   }
 
@@ -82,7 +81,6 @@ struct PersonCharacterListView: View {
 struct PersonCharacterListItemView: View {
   let characterId: UInt
 
-  @Environment(Notifier.self) private var notifier
   @Environment(\.modelContext) var modelContext
 
   @State private var character: Character? = nil
@@ -106,7 +104,7 @@ struct PersonCharacterListItemView: View {
         }, sortBy: [SortDescriptor<PersonRelatedCharacter>(\.subjectId, order: .reverse)])
       relations = try modelContext.fetch(rdesc)
     } catch {
-      notifier.alert(error: error)
+      Notifier.shared.alert(error: error)
     }
   }
   var body: some View {
@@ -147,7 +145,6 @@ struct PersonCharacterListItemSubjectItemView: View {
   let subjectId: UInt
   let staff: String
 
-  @Environment(Notifier.self) private var notifier
   @Environment(\.modelContext) var modelContext
 
   @State private var subject: Subject? = nil
@@ -164,7 +161,7 @@ struct PersonCharacterListItemSubjectItemView: View {
         subject = s
       }
     } catch {
-      notifier.alert(error: error)
+      Notifier.shared.alert(error: error)
     }
   }
   var body: some View {
@@ -222,6 +219,5 @@ struct PersonCharacterListItemSubjectItemView: View {
   }
 
   return PersonCharacterListView(personId: person.personId)
-    .environment(Notifier())
     .modelContainer(container)
 }
