@@ -118,7 +118,7 @@ extension Chii {
     -> Data
   {
     var authed: Bool
-    switch authorized {
+    switch auth {
     case .auto:
       authed = self.isAuthenticated()
     case .required:
