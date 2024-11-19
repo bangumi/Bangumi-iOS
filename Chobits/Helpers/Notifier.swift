@@ -23,14 +23,14 @@ class Notifier {
     case .ignore:
       Logger.app.warning("ignore error: \(error)")
     default:
-      Logger.app.error("error: \(error)")
+      Logger.app.error("alert: \(error)")
       self.currentError = error
       self.hasAlert = true
     }
   }
 
   func alert(message: String) {
-    Logger.app.error("error: \(message)")
+    Logger.app.error("alert: \(message)")
     self.currentError = ChiiError(message: message)
     self.hasAlert = true
   }
@@ -48,15 +48,11 @@ class Notifier {
     self.hasAlert = false
   }
 
-  func vanishMessage() {
-    self.notifications.removeFirst()
-  }
-
   func notify(message: String, duration: TimeInterval = 2) {
-    Logger.app.info("notification: \(message)")
+    Logger.app.info("notify: \(message)")
     self.notifications.append(message)
-    DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
-      self.vanishMessage()
+    DispatchQueue.main.asyncAfter(deadline: .now() + duration) { [weak self] in
+      self?.notifications.removeFirst()
     }
   }
 }

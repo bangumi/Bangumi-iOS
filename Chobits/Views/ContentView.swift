@@ -52,7 +52,7 @@ struct ContentView: View {
             .padding(.horizontal, 16)
             .padding(.vertical, 8)
             .foregroundStyle(.white)
-            .background(.accent.opacity(0.8))
+            .background(.accent.opacity(0.9))
             .clipShape(RoundedRectangle(cornerRadius: 16))
         }
       }

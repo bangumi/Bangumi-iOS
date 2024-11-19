@@ -216,8 +216,12 @@ struct CharacterView: View {
     }
     .toolbar {
       ToolbarItem(placement: .topBarTrailing) {
-        ShareLink(item: shareLink) {
-          Label("Share", systemImage: "square.and.arrow.up")
+        Menu {
+          ShareLink(item: shareLink) {
+            Label("分享", systemImage: "square.and.arrow.up")
+          }
+        } label: {
+          Image(systemName: "ellipsis.circle")
         }
       }
     }
