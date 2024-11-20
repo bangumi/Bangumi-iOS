@@ -13,7 +13,6 @@ struct SettingsView: View {
   @AppStorage("shareDomain") var shareDomain: String = ShareDomain.chii.label
   @AppStorage("authDomain") var authDomain: String = AuthDomain.origin.label
   @AppStorage("defaultTab") var defaultTab: String = PhoneViewTab.discover.label
-  @AppStorage("defaultProgressType") var defaultProgressType: Int = Int(SubjectType.anime.rawValue)
   @AppStorage("isolationMode") var isolationMode: Bool = false
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
 
@@ -31,7 +30,6 @@ struct SettingsView: View {
     selectedAuthDomain = AuthDomain(authDomain)
     selectedAppearance = AppearanceType(appearance)
     selectedDefaultTab = PhoneViewTab(defaultTab)
-    selectedDefaultProgressType = SubjectType(UInt8(defaultProgressType))
     isolationModeEnabled = isolationMode
   }
 
@@ -86,15 +84,6 @@ struct SettingsView: View {
           }
           .onChange(of: selectedDefaultTab) { _, _ in
             defaultTab = selectedDefaultTab.label
-          }
-
-          Picker(selection: $selectedDefaultProgressType, label: Text("默认进度管理")) {
-            ForEach(SubjectType.progressTypes) { type in
-              Text(type.description).tag(type)
-            }
-          }
-          .onChange(of: selectedDefaultProgressType) { _, _ in
-            defaultProgressType = Int(selectedDefaultProgressType.rawValue)
           }
         }
       }

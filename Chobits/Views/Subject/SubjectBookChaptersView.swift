@@ -11,6 +11,7 @@ import SwiftUI
 
 struct SubjectBookChaptersView: View {
   let subjectId: UInt
+  let compact: Bool
 
   @State private var inputEps: String = ""
   @State private var eps: UInt? = nil
@@ -26,7 +27,7 @@ struct SubjectBookChaptersView: View {
   private var collections: [UserSubjectCollection]
   private var collection: UserSubjectCollection? { collections.first }
 
-  init(subjectId: UInt) {
+  init(subjectId: UInt, compact: Bool = false) {
     self.subjectId = subjectId
     _subjects = Query(
       filter: #Predicate<Subject> {
@@ -36,6 +37,7 @@ struct SubjectBookChaptersView: View {
       filter: #Predicate<UserSubjectCollection> {
         $0.subjectId == subjectId
       })
+    self.compact = compact
   }
 
   var updateButtonDisable: Bool {
@@ -43,6 +45,45 @@ struct SubjectBookChaptersView: View {
       return true
     }
     return eps == nil && vols == nil
+  }
+
+  func parseInputEps() {
+    if let newEps = UInt(inputEps) {
+      self.eps = newEps
+    } else {
+      self.eps = nil
+    }
+  }
+
+  func parseInputVols() {
+    if let newVols = UInt(inputVols) {
+      self.vols = newVols
+    } else {
+      self.vols = nil
+    }
+  }
+
+  func incrEps() {
+    if let value = eps {
+      self.inputEps = "\(value+1)"
+    } else {
+      self.inputEps = "\(collectionEps+1)"
+    }
+  }
+
+  func incrVols() {
+    if let value = vols {
+      self.inputVols = "\(value+1)"
+    } else {
+      self.inputVols = "\(collectionVols+1)"
+    }
+  }
+
+  func reset() {
+    self.eps = nil
+    self.vols = nil
+    self.inputEps = ""
+    self.inputVols = ""
   }
 
   func update() {
@@ -54,10 +95,7 @@ struct SubjectBookChaptersView: View {
       } catch {
         Notifier.shared.alert(error: error)
       }
-      self.eps = nil
-      self.vols = nil
-      self.inputEps = ""
-      self.inputVols = ""
+      self.reset()
       self.updating = false
     }
   }
@@ -76,83 +114,151 @@ struct SubjectBookChaptersView: View {
     HStack {
       VStack {
         HStack(alignment: .firstTextBaseline, spacing: 0) {
-          Button {
-            if let value = eps {
-              self.inputEps = "\(value+1)"
-            } else {
-              self.inputEps = "\(collectionEps+1)"
-            }
-          } label: {
-            Image(systemName: "plus.circle")
-              .foregroundStyle(.secondary)
-              .padding(.trailing, 5)
-          }.buttonStyle(.plain)
-          TextField("\(collectionEps)", text: $inputEps)
-            .keyboardType(.numberPad)
-            .frame(minWidth: 50, maxWidth: 100)
-            .multilineTextAlignment(.trailing)
-            .fixedSize(horizontal: true, vertical: false)
-            .padding(.trailing, 2)
-            .textFieldStyle(.roundedBorder)
-            .onChange(of: inputEps) {
-              if let newEps = UInt(inputEps) {
-                self.eps = newEps
-              } else {
-                self.eps = nil
+          if compact {
+            Button {
+              incrEps()
+            } label: {
+              Image(systemName: "plus.circle")
+                .foregroundStyle(.secondary)
+            }.buttonStyle(.plain)
+            TextField("\(collectionEps)", text: $inputEps)
+              .keyboardType(.numberPad)
+              .frame(minWidth: 40, maxWidth: 80)
+              .multilineTextAlignment(.trailing)
+              .fixedSize(horizontal: true, vertical: false)
+              .padding(.trailing, 2)
+              .textFieldStyle(.plain)
+              .onChange(of: inputEps){
+                parseInputEps()
               }
-            }
+          } else {
+            Button {
+              incrEps()
+            } label: {
+              Image(systemName: "plus.circle")
+                .foregroundStyle(.secondary)
+                .padding(.trailing, 5)
+            }.buttonStyle(.plain)
+            TextField("\(collectionEps)", text: $inputEps)
+              .keyboardType(.numberPad)
+              .frame(minWidth: 50, maxWidth: 100)
+              .multilineTextAlignment(.trailing)
+              .fixedSize(horizontal: true, vertical: false)
+              .padding(.trailing, 2)
+              .textFieldStyle(.roundedBorder)
+              .onChange(of: inputEps){
+                parseInputEps()
+              }
+          }
           Text(subject?.epsDesc ?? "").foregroundStyle(.secondary)
           Spacer()
         }.monospaced()
         HStack(alignment: .firstTextBaseline, spacing: 0) {
-          Button {
-            if let value = vols {
-              self.inputVols = "\(value+1)"
-            } else {
-              self.inputVols = "\(collectionVols+1)"
-            }
-          } label: {
-            Image(systemName: "plus.circle")
-              .foregroundStyle(.secondary)
-              .padding(.trailing, 5)
-          }.buttonStyle(.plain)
-          TextField("\(collectionVols)", text: $inputVols)
-            .keyboardType(.numberPad)
-            .frame(minWidth: 50, maxWidth: 100)
-            .multilineTextAlignment(.trailing)
-            .fixedSize(horizontal: true, vertical: false)
-            .padding(.trailing, 2)
-            .textFieldStyle(.roundedBorder)
-            .onChange(of: inputVols) {
-              if let newVols = UInt(inputVols) {
-                self.vols = newVols
-              } else {
-                self.vols = nil
+          if compact {
+            Button {
+              incrVols()
+            } label: {
+              Image(systemName: "plus.circle")
+                .foregroundStyle(.secondary)
+            }.buttonStyle(.plain)
+            TextField("\(collectionVols)", text: $inputVols)
+              .keyboardType(.numberPad)
+              .frame(minWidth: 40, maxWidth: 80)
+              .multilineTextAlignment(.trailing)
+              .fixedSize(horizontal: true, vertical: false)
+              .padding(.trailing, 2)
+              .textFieldStyle(.plain)
+              .onChange(of: inputVols) {
+                parseInputVols()
               }
-            }
+          } else {
+            Button {
+              incrVols()
+            } label: {
+              Image(systemName: "plus.circle")
+                .foregroundStyle(.secondary)
+                .padding(.trailing, 5)
+            }.buttonStyle(.plain)
+            TextField("\(collectionVols)", text: $inputVols)
+              .keyboardType(.numberPad)
+              .frame(minWidth: 50, maxWidth: 100)
+              .multilineTextAlignment(.trailing)
+              .fixedSize(horizontal: true, vertical: false)
+              .padding(.trailing, 2)
+              .textFieldStyle(.roundedBorder)
+              .onChange(of: inputVols) {
+                parseInputVols()
+              }
+          }
           Text(subject?.volumesDesc ?? "").foregroundStyle(.secondary)
           Spacer()
         }.monospaced()
       }
       Spacer()
-      VStack {
+
+      if compact {
         if updating {
           ZStack {
-            Button("更新", action: {})
-              .disabled(true)
-              .hidden()
-              .buttonStyle(.borderedProminent)
+            Button{
+            } label: {
+              Image(systemName: "checkmark.circle")
+            }
+            .disabled(true)
+            .hidden()
+            .buttonStyle(.plain)
             ProgressView()
           }
         } else {
-          Button("更新", action: update)
+          Button {
+            update()
+          } label: {
+            Image(systemName: "checkmark.circle")
+          }
+          .disabled(updateButtonDisable)
+          .buttonStyle(.plain)
+          .foregroundStyle(.accent)
+        }
+        Button {
+          reset()
+        } label: {
+          Image(systemName: "arrow.counterclockwise.circle")
+        }
+        .disabled(updateButtonDisable)
+        .buttonStyle(.plain)
+        .foregroundStyle(.accent)
+      } else {
+        VStack {
+          if updating {
+            ZStack {
+              Button{
+              } label: {
+                Label("更新", systemImage: "checkmark")
+              }
+              .disabled(true)
+              .hidden()
+              .buttonStyle(.borderedProminent)
+              ProgressView()
+            }
+          } else {
+            Button {
+              update()
+            } label: {
+              Label("更新", systemImage: "checkmark")
+            }
             .disabled(updateButtonDisable)
             .buttonStyle(.borderedProminent)
+          }
+          Button {
+            reset()
+          } label: {
+            Label("重置", systemImage: "arrow.counterclockwise")
+          }
+          .disabled(updateButtonDisable)
+          .buttonStyle(.borderedProminent)
         }
       }
     }
     .disabled(updating)
-    .padding(5)
   }
 }
 

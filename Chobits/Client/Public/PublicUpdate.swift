@@ -114,5 +114,6 @@ extension Chii {
 
     try await db.updateEpisodeCollection(subjectId: subjectId, episodeId: episodeId, type: type)
     try await db.commit()
+    try await self.loadUserCollection(subjectId)
   }
 }

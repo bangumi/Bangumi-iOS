@@ -85,34 +85,6 @@ struct ProgressRowView: View {
     }
   }
 
-  var epsColor: Color {
-    guard let collection = collection else { return .secondary }
-    return collection.epStatus == 0 ? .secondary : .accent
-  }
-
-  var volsColor: Color {
-    guard let collection = collection else { return .secondary }
-    return collection.volStatus == 0 ? .secondary : .accent
-  }
-
-  var chapters: String {
-    guard let subject = subject else { return "" }
-    if subject.eps > 0 {
-      return "/ \(subject.eps) 话"
-    } else {
-      return "/ ? 话"
-    }
-  }
-
-  var volumes: String {
-    guard let subject = subject else { return "" }
-    if subject.volumes > 0 {
-      return "/ \(subject.volumes) 卷"
-    } else {
-      return "/ ? 卷"
-    }
-  }
-
   var body: some View {
     VStack(alignment: .leading) {
       HStack {
@@ -139,61 +111,76 @@ struct ProgressRowView: View {
               .lineLimit(1)
           }
 
-          if let authority = subject?.authority {
-            Spacer()
-            Text(authority)
-              .font(.caption)
-              .foregroundStyle(.secondary)
-              .lineLimit(2)
+          Spacer()
+
+          switch collection?.subjectTypeEnum {
+          case .anime, .real:
+            HStack {
+              Text("\(collection?.epStatus ?? 0) / \(subject?.eps ?? 0)")
+                .foregroundStyle(.secondary)
+              Spacer()
+              if let episode = nextEpisode {
+                if episode.airdate > Date() {
+                  Text("EP.\(episode.sort.episodeDisplay) ~ \(episode.waitDesc)")
+                    .foregroundStyle(.secondary)
+                } else {
+                  if updating {
+                    ZStack {
+                      Button("EP... 看过", action: {})
+                        .disabled(true)
+                        .hidden()
+                      ProgressView()
+                    }
+                  } else {
+                    Button("EP.\(episode.sort.episodeDisplay) 看过", action: markNextWatched)
+                  }
+                }
+              } else {
+                Image(systemName: "square.grid.2x2.fill")
+                  .foregroundStyle(.secondary)
+              }
+            }
+          case .book:
+            SubjectBookChaptersView(subjectId: subjectId, compact: true)
+
+          default:
+            Label(
+              collection?.subjectTypeEnum.description ?? "",
+              systemImage: collection?.subjectTypeEnum.icon ?? "questionmark"
+            )
+            .foregroundStyle(.accent)
           }
 
           Spacer()
-          if let collection = collection {
-            HStack(alignment: .bottom) {
-              Text(collection.updatedAt.formatRelative)
-                .foregroundStyle(.secondary)
-                .lineLimit(1)
-              Spacer()
-              switch collection.subjectTypeEnum {
-              case .anime, .real:
-                if let episode = nextEpisode {
-                  if episode.airdate > Date() {
-                    Text("EP.\(episode.sort.episodeDisplay) ~ \(episode.waitDesc)")
-                      .foregroundStyle(.secondary)
-                  } else {
-                    if updating {
-                      ZStack {
-                        Button("EP...", action: {})
-                          .font(.callout)
-                          .disabled(true)
-                          .hidden()
-                        ProgressView()
-                      }
-                    } else {
-                      Button("EP.\(episode.sort.episodeDisplay)", action: markNextWatched)
-                        .font(.callout)
-                    }
-                  }
-                } else {
-                  Text("\(collection.epStatus)").foregroundStyle(epsColor).font(.callout)
-                  Text(chapters).foregroundStyle(epsColor)
-                }
-              case .book:
-                Text("\(collection.epStatus)").foregroundStyle(epsColor).font(.callout)
-                Text("\(chapters)").foregroundStyle(epsColor)
-                Text("\(collection.volStatus)").foregroundStyle(volsColor).font(.callout)
-                Text("\(volumes)").foregroundStyle(volsColor)
-              default:
-                Label(
-                  collection.subjectTypeEnum.description,
-                  systemImage: collection.subjectTypeEnum.icon
-                )
-                .foregroundStyle(.accent)
-              }
-            }.font(.footnote)
-          }
+          Text(collection?.updatedAt.formatRelative ?? "")
+            .font(.footnote)
+            .foregroundStyle(.secondary)
+            .lineLimit(1)
+
         }
+        .padding(.horizontal, 2)
       }
+
+      switch collection?.subjectTypeEnum {
+      case .book:
+        ProgressView(value: Float(min(subject?.eps ?? 0, collection?.epStatus ?? 0)), total: Float(subject?.eps ?? 0))
+          .progressViewStyle(.linear)
+          .frame(height: 1)
+        ProgressView(value: Float(min(subject?.volumes ?? 0, collection?.volStatus ?? 0)), total: Float(subject?.volumes ?? 0))
+          .progressViewStyle(.linear)
+          .frame(height: 1)
+
+      case .anime, .real:
+        ProgressView(value: Float(min(subject?.eps ?? 0, collection?.epStatus ?? 0)), total: Float(subject?.eps ?? 0))
+          .progressViewStyle(.linear)
+          .frame(height: 1)
+
+      default:
+        ProgressView(value: 0, total: 0)
+          .progressViewStyle(.linear)
+          .frame(height: 1)
+      }
+
     }
     .task {
       await loadNextEpisode()

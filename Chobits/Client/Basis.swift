@@ -274,7 +274,7 @@ enum CollectionType: UInt8, Codable, Identifiable, CaseIterable {
     case .do:
       return "eye"
     case .onHold:
-      return "clock"
+      return "hourglass"
     case .dropped:
       return "trash"
     }
@@ -360,7 +360,7 @@ enum SubjectType: UInt8, Codable, Identifiable, CaseIterable {
   }
 
   static var progressTypes: [Self] {
-    return [.book, .anime, .real]
+    return [.unknown, .book, .anime, .real]
   }
 
   static var allTypes: [Self] {
@@ -406,11 +406,11 @@ enum SubjectType: UInt8, Codable, Identifiable, CaseIterable {
     case .unknown:
       return "questionmark"
     case .book:
-      return "book"
+      return "book.closed"
     case .anime:
-      return "photo.stack"
+      return "film"
     case .music:
-      return "music.note.list"
+      return "music.note"
     case .game:
       return "gamecontroller"
     case .real:

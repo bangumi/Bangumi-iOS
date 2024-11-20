@@ -43,12 +43,12 @@ extension Chii {
     try await db.commit()
   }
 
-  func loadUserCollections(type: SubjectType?, once: Bool = false) async throws {
+  func loadUserCollections(once: Bool = false) async throws {
     let db = try self.getDB()
     var offset: Int = 0
     while true {
       let response = try await self.getSubjectCollections(
-        collectionType: .do, subjectType: type ?? .unknown, offset: offset)
+        collectionType: .do, subjectType: .unknown, offset: offset)
       if response.data.isEmpty {
         break
       }

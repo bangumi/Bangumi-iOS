@@ -14,7 +14,7 @@ struct ChiiProgressView: View {
 
   @Environment(\.modelContext) var modelContext
 
-  @State private var subjectType: SubjectType
+  @State private var subjectType: SubjectType = .unknown
   @State private var refreshing: Bool = false
   @State private var loaded: Bool = false
   @State private var offset: Int = 0
@@ -23,16 +23,6 @@ struct ChiiProgressView: View {
   @State private var counts: [SubjectType: Int] = [:]
   @State private var collections: [EnumerateItem<(UserSubjectCollection)>] = []
 
-  init() {
-    let defaultProgressType = UserDefaults.standard.integer(forKey: "defaultProgressType")
-    let stype = SubjectType(UInt8(defaultProgressType))
-    if SubjectType.progressTypes.contains(stype) {
-      subjectType = stype
-    } else {
-      subjectType = .anime
-    }
-  }
-
   func loadCounts() async {
     let doingType = CollectionType.do.rawValue
     do {
@@ -40,7 +30,7 @@ struct ChiiProgressView: View {
         let tvalue = type.rawValue
         let desc = FetchDescriptor<UserSubjectCollection>(
           predicate: #Predicate<UserSubjectCollection> {
-            $0.type == doingType && $0.subjectType == tvalue
+            (tvalue == 0 || $0.subjectType == tvalue) && $0.type == doingType
           })
         let count = try modelContext.fetchCount(desc)
         counts[type] = count
@@ -103,9 +93,9 @@ struct ChiiProgressView: View {
     self.collections.append(contentsOf: collections)
   }
 
-  func refreshCollections(type: SubjectType?) async {
+  func refreshCollections() async {
     do {
-      try await Chii.shared.loadUserCollections(type: type, once: true)
+      try await Chii.shared.loadUserCollections(once: true)
     } catch {
       Notifier.shared.alert(error: error)
     }
@@ -117,7 +107,7 @@ struct ChiiProgressView: View {
     }
     refreshing = true
     do {
-      try await Chii.shared.loadUserCollections(type: .unknown)
+      try await Chii.shared.loadUserCollections()
     } catch {
       Notifier.shared.alert(error: error)
     }
@@ -151,7 +141,6 @@ struct ChiiProgressView: View {
                   await loadNextPage(idx: item.idx)
                 }
               }
-              Divider()
             }
             if exhausted {
               HStack {
@@ -175,7 +164,7 @@ struct ChiiProgressView: View {
             return
           }
           UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-          await refreshCollections(type: subjectType)
+          await refreshCollections()
           await load()
         }
         .navigationTitle("进度管理")
