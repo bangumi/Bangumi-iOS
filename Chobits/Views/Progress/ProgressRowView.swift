@@ -88,7 +88,7 @@ struct ProgressRowView: View {
   var body: some View {
     VStack(alignment: .leading) {
       HStack {
-        ImageView(img: subject?.images.common, width: 90, height: 120, type: .subject)
+        ImageView(img: subject?.images.common, width: 72, height: 96, type: .subject)
         VStack(alignment: .leading) {
           Text(subject?.name ?? "")
             .font(.headline)
@@ -163,22 +163,18 @@ struct ProgressRowView: View {
 
       switch collection?.subjectTypeEnum {
       case .book:
-        ProgressView(value: Float(min(subject?.eps ?? 0, collection?.epStatus ?? 0)), total: Float(subject?.eps ?? 0))
-          .progressViewStyle(.linear)
-          .frame(height: 1)
-        ProgressView(value: Float(min(subject?.volumes ?? 0, collection?.volStatus ?? 0)), total: Float(subject?.volumes ?? 0))
-          .progressViewStyle(.linear)
-          .frame(height: 1)
+        VStack(spacing: 1) {
+          ProgressView(value: Float(min(subject?.eps ?? 0, collection?.epStatus ?? 0)), total: Float(subject?.eps ?? 0))
+          ProgressView(value: Float(min(subject?.volumes ?? 0, collection?.volStatus ?? 0)), total: Float(subject?.volumes ?? 0))
+        }.progressViewStyle(.linear)
 
       case .anime, .real:
         ProgressView(value: Float(min(subject?.eps ?? 0, collection?.epStatus ?? 0)), total: Float(subject?.eps ?? 0))
           .progressViewStyle(.linear)
-          .frame(height: 1)
 
       default:
         ProgressView(value: 0, total: 0)
           .progressViewStyle(.linear)
-          .frame(height: 1)
       }
 
     }

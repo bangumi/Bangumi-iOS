@@ -242,7 +242,7 @@ enum PadViewTab: Codable, CaseIterable, View {
     case .discover:
       "magnifyingglass"
     case .collection:
-      "clock"
+      "person.badge.clock"
     case .notice:
       "bell"
     case .settings:

@@ -112,91 +112,50 @@ struct SubjectBookChaptersView: View {
 
   var body: some View {
     HStack {
-      VStack {
-        HStack(alignment: .firstTextBaseline, spacing: 0) {
-          if compact {
-            Button {
-              incrEps()
-            } label: {
-              Image(systemName: "plus.circle")
-                .foregroundStyle(.secondary)
-            }.buttonStyle(.plain)
-            TextField("\(collectionEps)", text: $inputEps)
-              .keyboardType(.numberPad)
-              .frame(minWidth: 40, maxWidth: 80)
-              .multilineTextAlignment(.trailing)
-              .fixedSize(horizontal: true, vertical: false)
-              .padding(.trailing, 2)
-              .textFieldStyle(.plain)
-              .onChange(of: inputEps){
-                parseInputEps()
-              }
-          } else {
-            Button {
-              incrEps()
-            } label: {
-              Image(systemName: "plus.circle")
-                .foregroundStyle(.secondary)
-                .padding(.trailing, 5)
-            }.buttonStyle(.plain)
-            TextField("\(collectionEps)", text: $inputEps)
-              .keyboardType(.numberPad)
-              .frame(minWidth: 50, maxWidth: 100)
-              .multilineTextAlignment(.trailing)
-              .fixedSize(horizontal: true, vertical: false)
-              .padding(.trailing, 2)
-              .textFieldStyle(.roundedBorder)
-              .onChange(of: inputEps){
-                parseInputEps()
-              }
-          }
-          Text(subject?.epsDesc ?? "").foregroundStyle(.secondary)
-          Spacer()
-        }.monospaced()
-        HStack(alignment: .firstTextBaseline, spacing: 0) {
-          if compact {
-            Button {
-              incrVols()
-            } label: {
-              Image(systemName: "plus.circle")
-                .foregroundStyle(.secondary)
-            }.buttonStyle(.plain)
-            TextField("\(collectionVols)", text: $inputVols)
-              .keyboardType(.numberPad)
-              .frame(minWidth: 40, maxWidth: 80)
-              .multilineTextAlignment(.trailing)
-              .fixedSize(horizontal: true, vertical: false)
-              .padding(.trailing, 2)
-              .textFieldStyle(.plain)
-              .onChange(of: inputVols) {
-                parseInputVols()
-              }
-          } else {
-            Button {
-              incrVols()
-            } label: {
-              Image(systemName: "plus.circle")
-                .foregroundStyle(.secondary)
-                .padding(.trailing, 5)
-            }.buttonStyle(.plain)
-            TextField("\(collectionVols)", text: $inputVols)
-              .keyboardType(.numberPad)
-              .frame(minWidth: 50, maxWidth: 100)
-              .multilineTextAlignment(.trailing)
-              .fixedSize(horizontal: true, vertical: false)
-              .padding(.trailing, 2)
-              .textFieldStyle(.roundedBorder)
-              .onChange(of: inputVols) {
-                parseInputVols()
-              }
-          }
-          Text(subject?.volumesDesc ?? "").foregroundStyle(.secondary)
-          Spacer()
-        }.monospaced()
-      }
-      Spacer()
-
       if compact {
+        HStack {
+          HStack(alignment: .firstTextBaseline, spacing: 0) {
+            Button {
+              incrEps()
+            } label: {
+              Image(systemName: "plus.circle")
+                .foregroundStyle(.secondary)
+            }.buttonStyle(.plain)
+            TextField("\(collectionEps)", text: $inputEps)
+              .keyboardType(.numberPad)
+              .frame(minWidth: 32, maxWidth: 64)
+              .multilineTextAlignment(.trailing)
+              .fixedSize(horizontal: true, vertical: false)
+              .padding(.trailing, 2)
+              .textFieldStyle(.plain)
+              .onChange(of: inputEps){
+                parseInputEps()
+              }
+            Text(subject?.epsDesc ?? "").foregroundStyle(.secondary)
+            Spacer()
+          }.monospaced()
+          HStack(alignment: .firstTextBaseline, spacing: 0) {
+            Button {
+              incrVols()
+            } label: {
+              Image(systemName: "plus.circle")
+                .foregroundStyle(.secondary)
+            }.buttonStyle(.plain)
+            TextField("\(collectionVols)", text: $inputVols)
+              .keyboardType(.numberPad)
+              .frame(minWidth: 32, maxWidth: 64)
+              .multilineTextAlignment(.trailing)
+              .fixedSize(horizontal: true, vertical: false)
+              .padding(.trailing, 2)
+              .textFieldStyle(.plain)
+              .onChange(of: inputVols) {
+                parseInputVols()
+              }
+            Text(subject?.epsDesc ?? "").foregroundStyle(.secondary)
+            Spacer()
+          }
+        }.font(.footnote)
+        Spacer()
         if updating {
           ZStack {
             Button{
@@ -215,18 +174,54 @@ struct SubjectBookChaptersView: View {
             Image(systemName: "checkmark.circle")
           }
           .disabled(updateButtonDisable)
-          .buttonStyle(.plain)
-          .foregroundStyle(.accent)
+          .buttonStyle(.borderless)
         }
-        Button {
-          reset()
-        } label: {
-          Image(systemName: "arrow.counterclockwise.circle")
-        }
-        .disabled(updateButtonDisable)
-        .buttonStyle(.plain)
-        .foregroundStyle(.accent)
       } else {
+        VStack {
+          HStack(alignment: .firstTextBaseline, spacing: 0) {
+            Button {
+              incrEps()
+            } label: {
+              Image(systemName: "plus.circle")
+                .foregroundStyle(.secondary)
+                .padding(.trailing, 5)
+            }.buttonStyle(.plain)
+            TextField("\(collectionEps)", text: $inputEps)
+              .keyboardType(.numberPad)
+              .frame(minWidth: 50, maxWidth: 100)
+              .multilineTextAlignment(.trailing)
+              .fixedSize(horizontal: true, vertical: false)
+              .padding(.trailing, 2)
+              .textFieldStyle(.roundedBorder)
+              .onChange(of: inputEps){
+                parseInputEps()
+              }
+            Text(subject?.epsDesc ?? "").foregroundStyle(.secondary)
+            Spacer()
+          }.monospaced()
+          HStack(alignment: .firstTextBaseline, spacing: 0) {
+            Button {
+              incrVols()
+            } label: {
+              Image(systemName: "plus.circle")
+                .foregroundStyle(.secondary)
+                .padding(.trailing, 5)
+            }.buttonStyle(.plain)
+            TextField("\(collectionVols)", text: $inputVols)
+              .keyboardType(.numberPad)
+              .frame(minWidth: 50, maxWidth: 100)
+              .multilineTextAlignment(.trailing)
+              .fixedSize(horizontal: true, vertical: false)
+              .padding(.trailing, 2)
+              .textFieldStyle(.roundedBorder)
+              .onChange(of: inputVols) {
+                parseInputVols()
+              }
+            Text(subject?.volumesDesc ?? "").foregroundStyle(.secondary)
+            Spacer()
+          }.monospaced()
+        }
+        Spacer()
         VStack {
           if updating {
             ZStack {
