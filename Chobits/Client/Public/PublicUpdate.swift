@@ -10,15 +10,14 @@ import OSLog
 import SwiftData
 
 extension Chii {
-  func updateBookCollection(sid: UInt, eps: UInt?, vols: UInt?) async throws {
+  func updateBookCollection(subjectId: UInt, eps: UInt?, vols: UInt?) async throws {
     if self.mock {
       return
     }
-    let db = try self.getDB()
     Logger.api.info(
-      "start update subject collection: \(sid), eps: \(eps.debugDescription), vols: \(vols.debugDescription)"
+      "start update subject collection: \(subjectId), eps: \(eps.debugDescription), vols: \(vols.debugDescription)"
     )
-    let url = BangumiAPI.pub.build("v0/users/-/collections/\(sid)")
+    let url = BangumiAPI.pub.build("v0/users/-/collections/\(subjectId)")
     var body: [String: Any] = [:]
     if let epStatus = eps {
       body["ep_status"] = epStatus
@@ -30,21 +29,20 @@ extension Chii {
       _ = try await self.request(url: url, method: "POST", body: body, auth: .required)
     }
     Logger.api.info(
-      "finish update subject collection: \(sid), eps: \(eps.debugDescription), vols: \(vols.debugDescription)"
+      "finish update subject collection: \(subjectId), eps: \(eps.debugDescription), vols: \(vols.debugDescription)"
     )
-    try await db.updateUserCollection(sid: sid, eps: eps, vols: vols)
-    try await db.commit()
+    try await self.loadUserCollection(subjectId)
   }
 
   func updateSubjectCollection(
-    sid: UInt, type: CollectionType?, rate: UInt8?, comment: String?,
+    subjectId: UInt, type: CollectionType?, rate: UInt8?, comment: String?,
     priv: Bool?, tags: [String]?
   ) async throws {
     if self.mock {
       return
     }
-    Logger.api.info("start update subject collection: \(sid)")
-    let url = BangumiAPI.pub.build("v0/users/-/collections/\(sid)")
+    Logger.api.info("start update subject collection: \(subjectId)")
+    let url = BangumiAPI.pub.build("v0/users/-/collections/\(subjectId)")
     var body: [String: Any] = [:]
     if let type = type {
       body["type"] = type.rawValue
@@ -64,12 +62,8 @@ extension Chii {
     if body.count > 0 {
       _ = try await self.request(url: url, method: "POST", body: body, auth: .required)
     }
-    Logger.api.info("finish update subject collection: \(sid)")
-
-    let db = try self.getDB()
-    try await db.updateUserCollection(
-        sid: sid, type: type, rate: rate, comment: comment, priv: priv, tags: tags)
-    try await db.commit()
+    Logger.api.info("finish update subject collection: \(subjectId)")
+    try await self.loadUserCollection(subjectId)
   }
 
   func updateSubjectEpisodeCollection(
@@ -94,6 +88,7 @@ extension Chii {
 
     try await db.updateEpisodeCollections(subjectId: subjectId, sort: updateTo, type: type)
     try await db.commit()
+    try await self.loadUserCollection(subjectId)
   }
 
   func updateEpisodeCollection(subjectId: UInt, episodeId: UInt, type: EpisodeCollectionType)

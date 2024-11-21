@@ -89,7 +89,7 @@ struct SubjectCollectionBoxView: View {
     Task {
       do {
         try await Chii.shared.updateSubjectCollection(
-          sid: subjectId,
+          subjectId: subjectId,
           type: collectionType,
           rate: rate,
           comment: comment,

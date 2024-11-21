@@ -62,15 +62,15 @@ struct SubjectCollectionView: View {
           BorderView(.linkText, padding: 5) {
             HStack {
               Spacer()
-              if let collection = collection {
-                if collection.priv {
-                  Image(systemName: "lock.fill").foregroundStyle(.secondary)
-                }
-                Text(collection.typeEnum.message(type: collection.subjectTypeEnum))
-                StarsView(score: Float(collection.rate), size: 16)
-              } else {
+              if collection == nil {
                 Label("未收藏", systemImage: "plus")
                   .foregroundStyle(.secondary)
+              } else {
+                if collection?.priv ?? false {
+                  Image(systemName: "lock.fill").foregroundStyle(.secondary)
+                }
+                Text(collection?.typeEnum.message(type: collection?.subjectTypeEnum ?? .unknown) ?? "")
+                StarsView(score: Float(collection?.rate ?? 0), size: 16)
               }
               Spacer()
             }

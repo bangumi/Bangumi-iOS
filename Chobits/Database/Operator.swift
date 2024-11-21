@@ -270,63 +270,63 @@ extension DatabaseOperator {
 }
 
 extension DatabaseOperator {
-  public func updateUserCollection(sid: UInt, eps: UInt?, vols: UInt?) throws {
-    let collection = try self.fetchOne(
-      predicate: #Predicate<UserSubjectCollection> {
-        $0.subjectId == sid
-      }
-    )
-    if let eps = eps {
-      collection?.epStatus = eps
-    }
-    if let vols = vols {
-      collection?.volStatus = vols
-    }
-    collection?.updatedAt = Date() - 1
-  }
+//  public func updateUserCollection(subjectId: UInt, eps: UInt?, vols: UInt?) throws {
+//    let collection = try self.fetchOne(
+//      predicate: #Predicate<UserSubjectCollection> {
+//        $0.subjectId == subjectId
+//      }
+//    )
+//    if let eps = eps {
+//      collection?.epStatus = eps
+//    }
+//    if let vols = vols {
+//      collection?.volStatus = vols
+//    }
+//    collection?.updatedAt = Date() - 1
+//  }
 
-  public func updateUserCollection(
-    sid: UInt, type: CollectionType?, rate: UInt8?, comment: String?,
-    priv: Bool?, tags: [String]?
-  ) throws {
-    var collection = try self.fetchOne(
-      predicate: #Predicate<UserSubjectCollection> {
-        $0.subjectId == sid
-      }
-    )
-    if collection == nil {
-      let item = UserSubjectCollection(
-        subjectId: sid,
-        subjectType: 0,
-        rate: 0,
-        type: 0,
-        comment: "",
-        tags: [],
-        epStatus: 0,
-        volStatus: 0,
-        updatedAt: Date(),
-        priv: false
-      )
-      modelContext.insert(item)
-      collection = item
-    }
-    if let type = type {
-      collection?.type = type.rawValue
-    }
-    if let rate = rate {
-      collection?.rate = rate
-    }
-    if let comment = comment {
-      collection?.comment = comment
-    }
-    if let priv = priv {
-      collection?.priv = priv
-    }
-    if let tags = tags {
-      collection?.tags = tags
-    }
-    collection?.updatedAt = Date() - 1
-  }
+//  public func updateUserCollection(
+//    subjectId: UInt, type: CollectionType?, rate: UInt8?, comment: String?,
+//    priv: Bool?, tags: [String]?
+//  ) throws {
+//    var collection = try self.fetchOne(
+//      predicate: #Predicate<UserSubjectCollection> {
+//        $0.subjectId == subjectId
+//      }
+//    )
+//    if collection == nil {
+//      let item = UserSubjectCollection(
+//        subjectId: subjectId,
+//        subjectType: 0,
+//        rate: 0,
+//        type: 0,
+//        comment: "",
+//        tags: [],
+//        epStatus: 0,
+//        volStatus: 0,
+//        updatedAt: Date(),
+//        priv: false
+//      )
+//      modelContext.insert(item)
+//      collection = item
+//    }
+//    if let type = type {
+//      collection?.type = type.rawValue
+//    }
+//    if let rate = rate {
+//      collection?.rate = rate
+//    }
+//    if let comment = comment {
+//      collection?.comment = comment
+//    }
+//    if let priv = priv {
+//      collection?.priv = priv
+//    }
+//    if let tags = tags {
+//      collection?.tags = tags
+//    }
+//    collection?.updatedAt = Date() - 1
+//  }
 
   public func updateEpisodeCollections(subjectId: UInt, sort: Float, type: EpisodeCollectionType)
   throws
