@@ -47,11 +47,11 @@ final class Subject {
   }
 
   var epsDesc: String {
-    return self.eps > 0 ? "/\(self.eps)话" : "/?话"
+    return self.eps > 0 ? "\(self.eps)" : "??"
   }
 
   var volumesDesc: String {
-    return self.volumes > 0 ? "/\(self.volumes)卷" : "/?卷"
+    return self.volumes > 0 ? "\(self.volumes)" : "??"
   }
 
   var authority: String {

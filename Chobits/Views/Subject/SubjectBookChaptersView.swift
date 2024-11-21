@@ -113,48 +113,54 @@ struct SubjectBookChaptersView: View {
   var body: some View {
     HStack {
       if compact {
-        HStack {
-          HStack(alignment: .firstTextBaseline, spacing: 0) {
-            Button {
-              incrEps()
-            } label: {
-              Image(systemName: "plus.circle")
-                .foregroundStyle(.secondary)
-            }.buttonStyle(.plain)
-            TextField("\(collectionEps)", text: $inputEps)
-              .keyboardType(.numberPad)
-              .frame(minWidth: 32, maxWidth: 64)
-              .multilineTextAlignment(.trailing)
-              .fixedSize(horizontal: true, vertical: false)
-              .padding(.trailing, 2)
-              .textFieldStyle(.plain)
-              .onChange(of: inputEps){
-                parseInputEps()
-              }
-            Text(subject?.epsDesc ?? "").foregroundStyle(.secondary)
-            Spacer()
-          }.monospaced()
-          HStack(alignment: .firstTextBaseline, spacing: 0) {
-            Button {
-              incrVols()
-            } label: {
-              Image(systemName: "plus.circle")
-                .foregroundStyle(.secondary)
-            }.buttonStyle(.plain)
-            TextField("\(collectionVols)", text: $inputVols)
-              .keyboardType(.numberPad)
-              .frame(minWidth: 32, maxWidth: 64)
-              .multilineTextAlignment(.trailing)
-              .fixedSize(horizontal: true, vertical: false)
-              .padding(.trailing, 2)
-              .textFieldStyle(.plain)
-              .onChange(of: inputVols) {
-                parseInputVols()
-              }
-            Text(subject?.epsDesc ?? "").foregroundStyle(.secondary)
-            Spacer()
-          }
-        }.font(.footnote)
+        HStack(alignment: .firstTextBaseline, spacing: 0) {
+          TextField("\(collectionEps)", text: $inputEps)
+            .keyboardType(.numberPad)
+            .frame(minWidth: 15, maxWidth: 30)
+            .multilineTextAlignment(.trailing)
+            .fixedSize(horizontal: true, vertical: false)
+            .padding(.trailing, 2)
+            .textFieldStyle(.plain)
+            .onChange(of: inputEps){
+              parseInputEps()
+            }
+          Text("/").foregroundStyle(.secondary)
+          Text(subject?.epsDesc ?? "").foregroundStyle(.secondary)
+          Text("话").foregroundStyle(.secondary)
+            .padding(.trailing, 2)
+          Button {
+            incrEps()
+          } label: {
+            Image(systemName: "plus.circle")
+              .foregroundStyle(.secondary)
+          }.buttonStyle(.plain)
+        }
+        .monospaced()
+        .font(.callout)
+        HStack(alignment: .firstTextBaseline, spacing: 0) {
+          TextField("\(collectionVols)", text: $inputVols)
+            .keyboardType(.numberPad)
+            .frame(minWidth: 15, maxWidth: 30)
+            .multilineTextAlignment(.trailing)
+            .fixedSize(horizontal: true, vertical: false)
+            .padding(.trailing, 2)
+            .textFieldStyle(.plain)
+            .onChange(of: inputVols) {
+              parseInputVols()
+            }
+          Text("/").foregroundStyle(.secondary)
+          Text(subject?.volumesDesc ?? "").foregroundStyle(.secondary)
+          Text("卷").foregroundStyle(.secondary)
+            .padding(.trailing, 2)
+          Button {
+            incrVols()
+          } label: {
+            Image(systemName: "plus.circle")
+              .foregroundStyle(.secondary)
+          }.buttonStyle(.plain)
+        }
+        .monospaced()
+        .font(.callout)
         Spacer()
         if updating {
           ZStack {
@@ -179,13 +185,7 @@ struct SubjectBookChaptersView: View {
       } else {
         VStack {
           HStack(alignment: .firstTextBaseline, spacing: 0) {
-            Button {
-              incrEps()
-            } label: {
-              Image(systemName: "plus.circle")
-                .foregroundStyle(.secondary)
-                .padding(.trailing, 5)
-            }.buttonStyle(.plain)
+            Text("Chap.").foregroundStyle(.secondary)
             TextField("\(collectionEps)", text: $inputEps)
               .keyboardType(.numberPad)
               .frame(minWidth: 50, maxWidth: 100)
@@ -196,17 +196,19 @@ struct SubjectBookChaptersView: View {
               .onChange(of: inputEps){
                 parseInputEps()
               }
+            Text("/").foregroundStyle(.secondary)
             Text(subject?.epsDesc ?? "").foregroundStyle(.secondary)
-            Spacer()
-          }.monospaced()
-          HStack(alignment: .firstTextBaseline, spacing: 0) {
+              .padding(.trailing, 5)
             Button {
-              incrVols()
+              incrEps()
             } label: {
               Image(systemName: "plus.circle")
                 .foregroundStyle(.secondary)
-                .padding(.trailing, 5)
             }.buttonStyle(.plain)
+            Spacer()
+          }.monospaced()
+          HStack(alignment: .firstTextBaseline, spacing: 0) {
+            Text("Vol. ").foregroundStyle(.secondary)
             TextField("\(collectionVols)", text: $inputVols)
               .keyboardType(.numberPad)
               .frame(minWidth: 50, maxWidth: 100)
@@ -217,7 +219,15 @@ struct SubjectBookChaptersView: View {
               .onChange(of: inputVols) {
                 parseInputVols()
               }
+            Text("/").foregroundStyle(.secondary)
             Text(subject?.volumesDesc ?? "").foregroundStyle(.secondary)
+              .padding(.trailing, 5)
+            Button {
+              incrVols()
+            } label: {
+              Image(systemName: "plus.circle")
+                .foregroundStyle(.secondary)
+            }.buttonStyle(.plain)
             Spacer()
           }.monospaced()
         }
