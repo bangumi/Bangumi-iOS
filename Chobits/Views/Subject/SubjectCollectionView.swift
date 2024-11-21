@@ -55,54 +55,39 @@ struct SubjectCollectionView: View {
   var body: some View {
     Section {
       VStack(alignment: .leading) {
-        HStack {
-          if let collection = collection {
-            StarsView(score: Float(collection.rate), size: 20)
-            Spacer()
-            if collection.priv {
-              Image(systemName: "lock.fill").foregroundStyle(.accent)
-            }
-            BorderView(.linkText, padding: 2) {
-              Label(
-                collection.typeEnum.message(type: collection.subjectTypeEnum),
-                systemImage: "pencil.line"
-              )
-              .font(.callout)
-              .foregroundStyle(.linkText)
-            }
-            .onTapGesture {
-              edit.toggle()
-            }
-            .sheet(
-              isPresented: $edit,
-              content: {
-                SubjectCollectionBoxView(subjectId: subjectId)
-                  .presentationDragIndicator(.visible)
-                  .presentationDetents(.init([.medium, .large]))
-              })
-          } else if refreshed {
-            Spacer()
-            BorderView(.secondary, padding: 2) {
-              Label("未收藏", systemImage: "plus")
-                .foregroundStyle(.secondary)
-                .font(.callout)
-            }
-            .onTapGesture {
-              edit.toggle()
-            }
-            .sheet(
-              isPresented: $edit,
-              content: {
-                SubjectCollectionBoxView(subjectId: subjectId)
-                  .presentationDragIndicator(.visible)
-                  .presentationDetents(.init([.medium, .large]))
-              })
-          } else {
-            ProgressView()
-          }
-        }.padding(.horizontal, 4)
         if collection?.subjectTypeEnum == .book {
           SubjectBookChaptersView(subjectId: subjectId)
+        }
+        if refreshed {
+          BorderView(.linkText, padding: 4) {
+            HStack {
+              Spacer()
+              if let collection = collection {
+                if collection.priv {
+                  Image(systemName: "lock.fill").foregroundStyle(.secondary)
+                }
+                Text(collection.typeEnum.message(type: collection.subjectTypeEnum))
+                StarsView(score: Float(collection.rate), size: 16)
+              } else {
+                Label("未收藏", systemImage: "plus")
+                  .foregroundStyle(.secondary)
+              }
+              Spacer()
+            }
+          }
+          .foregroundStyle(.linkText)
+          .onTapGesture {
+            edit.toggle()
+          }
+          .sheet(
+            isPresented: $edit,
+            content: {
+              SubjectCollectionBoxView(subjectId: subjectId)
+                .presentationDragIndicator(.visible)
+                .presentationDetents(.init([.medium, .large]))
+            })
+        } else {
+          ProgressView()
         }
       }
     }

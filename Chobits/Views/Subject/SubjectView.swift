@@ -52,15 +52,14 @@ struct SubjectView: View {
           LazyVStack(alignment: .leading) {
             SubjectHeaderView(subjectId: subjectId)
 
-            if isAuthenticated {
-              SubjectCollectionView(subjectId: subjectId)
-            }
-
             switch subject.typeEnum {
             case .anime, .real:
               EpisodeGridView(subjectId: subjectId)
             default:
               EmptyView()
+            }
+            if isAuthenticated {
+              SubjectCollectionView(subjectId: subjectId)
             }
 
             SubjectSummaryView(subjectId: subjectId)
