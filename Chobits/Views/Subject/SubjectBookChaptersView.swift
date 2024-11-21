@@ -136,7 +136,6 @@ struct SubjectBookChaptersView: View {
           }.buttonStyle(.plain)
         }
         .monospaced()
-        .font(.callout)
         HStack(alignment: .firstTextBaseline, spacing: 0) {
           TextField("\(collectionVols)", text: $inputVols)
             .keyboardType(.numberPad)
@@ -160,7 +159,6 @@ struct SubjectBookChaptersView: View {
           }.buttonStyle(.plain)
         }
         .monospaced()
-        .font(.callout)
         Spacer()
         if updating {
           ZStack {

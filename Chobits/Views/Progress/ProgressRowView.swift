@@ -86,30 +86,17 @@ struct ProgressRowView: View {
   }
 
   var body: some View {
-    VStack(alignment: .leading) {
+    VStack(alignment: .leading, spacing: 2) {
       HStack {
         ImageView(img: subject?.images.common, width: 72, height: 96, type: .subject)
         VStack(alignment: .leading) {
           Text(subject?.name ?? "")
             .font(.headline)
             .lineLimit(1)
-
-          HStack {
-            if collection?.priv ?? false {
-              Image(systemName: "lock.fill").foregroundStyle(.accent)
-            }
-            if let platform = subject?.platform, !platform.isEmpty {
-              BorderView(.secondary, padding: 2) {
-                Text(platform)
-                  .font(.caption)
-                  .foregroundStyle(.secondary)
-              }
-            }
-            Text(subject?.nameCn ?? "")
-              .foregroundStyle(.secondary)
-              .font(.subheadline)
-              .lineLimit(1)
-          }
+          Text(subject?.nameCn ?? "")
+            .foregroundStyle(.secondary)
+            .font(.subheadline)
+            .lineLimit(1)
 
           Spacer()
 
@@ -139,9 +126,10 @@ struct ProgressRowView: View {
                 Image(systemName: "square.grid.2x2.fill")
                   .foregroundStyle(.secondary)
               }
-            }
+            }.font(.callout)
           case .book:
             SubjectBookChaptersView(subjectId: subjectId, compact: true)
+              .font(.callout)
 
           default:
             Label(
@@ -149,34 +137,40 @@ struct ProgressRowView: View {
               systemImage: collection?.subjectTypeEnum.icon ?? "questionmark"
             )
             .foregroundStyle(.accent)
+            .font(.callout)
           }
 
           Spacer()
-          Text(collection?.updatedAt.formatRelative ?? "")
-            .font(.footnote)
-            .foregroundStyle(.secondary)
-            .lineLimit(1)
-
+          HStack {
+            Text(collection?.updatedAt.formatRelative ?? "")
+              .lineLimit(1)
+            Spacer()
+            if collection?.priv ?? false {
+              Image(systemName: "lock.fill")
+            }
+          }
+          .font(.footnote)
+          .foregroundStyle(.secondary)
         }
-        .padding(.horizontal, 2)
       }
 
-      switch collection?.subjectTypeEnum {
-      case .book:
-        VStack(spacing: 1) {
+      Section {
+        switch collection?.subjectTypeEnum {
+        case .book:
+          VStack(spacing: 1) {
+            ProgressView(value: Float(min(subject?.eps ?? 0, collection?.epStatus ?? 0)), total: Float(subject?.eps ?? 0))
+            ProgressView(value: Float(min(subject?.volumes ?? 0, collection?.volStatus ?? 0)), total: Float(subject?.volumes ?? 0))
+          }.progressViewStyle(.linear)
+
+        case .anime, .real:
           ProgressView(value: Float(min(subject?.eps ?? 0, collection?.epStatus ?? 0)), total: Float(subject?.eps ?? 0))
-          ProgressView(value: Float(min(subject?.volumes ?? 0, collection?.volStatus ?? 0)), total: Float(subject?.volumes ?? 0))
-        }.progressViewStyle(.linear)
+            .progressViewStyle(.linear)
 
-      case .anime, .real:
-        ProgressView(value: Float(min(subject?.eps ?? 0, collection?.epStatus ?? 0)), total: Float(subject?.eps ?? 0))
-          .progressViewStyle(.linear)
-
-      default:
-        ProgressView(value: 0, total: 0)
-          .progressViewStyle(.linear)
+        default:
+          ProgressView(value: 0, total: 0)
+            .progressViewStyle(.linear)
+        }
       }
-
     }
     .task {
       await loadNextEpisode()
