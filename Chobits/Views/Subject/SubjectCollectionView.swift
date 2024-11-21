@@ -59,7 +59,7 @@ struct SubjectCollectionView: View {
           SubjectBookChaptersView(subjectId: subjectId)
         }
         if refreshed {
-          BorderView(.linkText, padding: 4) {
+          BorderView(.linkText, padding: 5) {
             HStack {
               Spacer()
               if let collection = collection {
@@ -74,8 +74,8 @@ struct SubjectCollectionView: View {
               }
               Spacer()
             }
+            .foregroundStyle(.linkText)
           }
-          .foregroundStyle(.linkText)
           .onTapGesture {
             edit.toggle()
           }

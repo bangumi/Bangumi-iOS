@@ -152,11 +152,11 @@ struct SubjectHeaderView: View {
                 .presentationDragIndicator(.visible)
                 .presentationDetents(.init([.medium]))
             })
-        }.padding(.leading, 5)
+        }
       }
       if subject.rating.rank > 0 {
         NavigationLink(value: NavDestination.subjectBrowsing(subjectType: subject.typeEnum)) {
-          ZStack {
+          BorderView(.accent, padding: 5) {
             HStack {
               Spacer()
               Label(
@@ -168,10 +168,6 @@ struct SubjectHeaderView: View {
             }
             .font(.callout)
             .foregroundStyle(.accent)
-            .padding(4)
-            RoundedRectangle(cornerRadius: 5)
-              .stroke(.accent, lineWidth: 1)
-              .padding(.horizontal, 1)
           }
         }
       }
