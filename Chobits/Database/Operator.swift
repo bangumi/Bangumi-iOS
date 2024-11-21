@@ -270,6 +270,14 @@ extension DatabaseOperator {
 }
 
 extension DatabaseOperator {
+  public func deleteUserCollection(subjectId: UInt) throws {
+    try modelContext.delete(
+      model: UserSubjectCollection.self,
+      where: #Predicate<UserSubjectCollection> {
+        $0.subjectId == subjectId
+      })
+  }
+
 //  public func updateUserCollection(subjectId: UInt, eps: UInt?, vols: UInt?) throws {
 //    let collection = try self.fetchOne(
 //      predicate: #Predicate<UserSubjectCollection> {

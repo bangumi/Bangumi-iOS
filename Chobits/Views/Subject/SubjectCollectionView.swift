@@ -35,17 +35,6 @@ struct SubjectCollectionView: View {
 
     do {
       try await Chii.shared.loadUserCollection(subjectId)
-    } catch ChiiError.notFound(_) {
-      Logger.collection.warning("collection not found for subject: \(subjectId)")
-      //      do {
-      //        try modelContext.delete(
-      //          model: UserSubjectCollection.self,
-      //          where: #Predicate<UserSubjectCollection> {
-      //            $0.subjectId == subjectId
-      //          })
-      //      } catch {
-      //        Logger.collection.error("clear collection error: \(error)")
-      //      }
     } catch {
       Notifier.shared.alert(error: error)
       return

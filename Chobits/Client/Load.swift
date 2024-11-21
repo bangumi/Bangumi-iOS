@@ -38,8 +38,13 @@ extension Chii {
       return
     }
     let db = try self.getDB()
-    let item = try await self.getSubjectCollection(subjectId)
-    try await db.saveUserCollection(item)
+    do {
+      let item = try await self.getSubjectCollection(subjectId)
+      try await db.saveUserCollection(item)
+    } catch ChiiError.notFound(_) {
+      Logger.collection.warning("collection not found for subject: \(subjectId)")
+      try await db.deleteUserCollection(subjectId: subjectId)
+    }
     try await db.commit()
   }
 
