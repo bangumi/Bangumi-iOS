@@ -16,7 +16,6 @@ struct ChiiProgressView: View {
 
   @State private var subjectType: SubjectType = .unknown
   @State private var refreshing: Bool = false
-  @State private var loaded: Bool = false
   @State private var offset: Int = 0
   @State private var exhausted: Bool = false
   @State private var loadedIdx: [Int: Bool] = [:]
@@ -125,6 +124,11 @@ struct ChiiProgressView: View {
           }
           .padding(.horizontal, 8)
           .pickerStyle(.segmented)
+          .task {
+            if counts.isEmpty {
+              await load()
+            }
+          }
           .onChange(of: subjectType) {
             Task {
               await load()
@@ -156,9 +160,6 @@ struct ChiiProgressView: View {
         .animation(.default, value: subjectType)
         .animation(.default, value: counts)
         .animation(.default, value: collections)
-        .task {
-          await load()
-        }
         .refreshable {
           if refreshing {
             return
