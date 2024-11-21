@@ -121,6 +121,14 @@ struct SubjectHeaderView: View {
 
           Spacer()
           HStack {
+            Text("\(subject.collection.doing) 人\(CollectionType.do.description(type: subject.typeEnum))")
+            Text("/")
+            Text("\(subject.collection.collect) 人\(CollectionType.collect.description(type: subject.typeEnum))")
+            Spacer()
+          }
+          .font(.footnote)
+          .foregroundStyle(.secondary)
+          HStack {
             if subject.rating.score > 0 {
               StarsView(score: Float(subject.rating.score), size: 12)
               Text("\(subject.rating.score.rateDisplay)")
