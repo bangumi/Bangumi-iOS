@@ -132,12 +132,11 @@ struct ProgressRowView: View {
               .font(.callout)
 
           default:
-            Label(
-              collection?.subjectTypeEnum.description ?? "",
-              systemImage: collection?.subjectTypeEnum.icon ?? "questionmark"
-            )
-            .foregroundStyle(.accent)
-            .font(.callout)
+            if let stype = collection?.subjectTypeEnum {
+              Label(stype.description, systemImage: stype.icon)
+              .foregroundStyle(.accent)
+              .font(.callout)
+            }
           }
 
           Spacer()
