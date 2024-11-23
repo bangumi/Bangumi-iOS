@@ -127,6 +127,8 @@ struct ChiiProgressView: View {
           .task {
             if counts.isEmpty {
               await load()
+              await refreshCollections()
+              await load()
             }
           }
           .onChange(of: subjectType) {
