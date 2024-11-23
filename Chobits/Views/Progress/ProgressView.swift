@@ -93,11 +93,16 @@ struct ChiiProgressView: View {
   }
 
   func refreshCollections() async {
+    if refreshing {
+      return
+    }
+    refreshing = true
     do {
       try await Chii.shared.loadUserCollections(once: true)
     } catch {
       Notifier.shared.alert(error: error)
     }
+    refreshing = false
   }
 
   func refreshAllCollections() async {
