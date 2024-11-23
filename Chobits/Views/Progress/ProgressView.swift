@@ -134,11 +134,14 @@ struct ChiiProgressView: View {
               await load()
             }
           }
-          LazyVStack(alignment: .leading, spacing: 10) {
+          LazyVStack(alignment: .leading, spacing: 8) {
             ForEach(collections, id: \.inner.self) { item in
               NavigationLink(value: NavDestination.subject(subjectId: item.inner.subjectId)) {
-                ProgressRowView(subjectId: item.inner.subjectId)
+                ProgressRowView(subjectId: item.inner.subjectId).padding(8)
               }
+              .background(Color("CardBackgroundColor"))
+              .cornerRadius(8)
+              .shadow(color: Color.black.opacity(0.2), radius: 4)
               .buttonStyle(.plain)
               .onAppear {
                 Task {

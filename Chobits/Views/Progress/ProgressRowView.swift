@@ -86,7 +86,7 @@ struct ProgressRowView: View {
   }
 
   var body: some View {
-    VStack(alignment: .leading, spacing: 2) {
+    VStack(alignment: .leading) {
       HStack {
         ImageView(img: subject?.images.common, width: 72, height: 96, type: .subject)
         VStack(alignment: .leading) {
