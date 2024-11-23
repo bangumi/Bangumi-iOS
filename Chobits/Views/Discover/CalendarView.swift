@@ -8,6 +8,7 @@
 import OSLog
 import SwiftData
 import SwiftUI
+import Flow
 
 struct CalendarView: View {
 
@@ -73,17 +74,16 @@ struct CalendarWeekdayView: View {
   var body: some View {
     VStack {
       Text(calendar.weekday.cn).font(.title3)
-      LazyVGrid(columns: [
-        GridItem(.flexible()),
-        GridItem(.flexible()),
-        GridItem(.flexible()),
-        GridItem(.flexible()),
-      ]) {
+      HFlow {
         ForEach(calendar.items, id: \.id) { subject in
           NavigationLink(value: NavDestination.subject(subjectId: subject.id)) {
             VStack {
               ImageView(img: subject.images?.common, width: 80, height: 80, type: .subject)
-              Text(subject.name).font(.caption).multilineTextAlignment(.leading).lineLimit(1)
+              Text(subject.name)
+                .font(.caption)
+                .multilineTextAlignment(.leading)
+                .lineLimit(1)
+                .frame(width: 80)
             }
           }.buttonStyle(.plain)
         }
