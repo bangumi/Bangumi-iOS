@@ -93,29 +93,11 @@ struct ChiiProgressView: View {
   }
 
   func refreshCollections() async {
-    if refreshing {
-      return
-    }
-    refreshing = true
     do {
       try await Chii.shared.loadUserCollections(once: true)
     } catch {
       Notifier.shared.alert(error: error)
     }
-    refreshing = false
-  }
-
-  func refreshAllCollections() async {
-    if refreshing {
-      return
-    }
-    refreshing = true
-    do {
-      try await Chii.shared.loadUserCollections()
-    } catch {
-      Notifier.shared.alert(error: error)
-    }
-    refreshing = false
   }
 
   var body: some View {
@@ -132,7 +114,9 @@ struct ChiiProgressView: View {
           .task {
             if counts.isEmpty {
               await load()
+              refreshing = true
               await refreshCollections()
+              refreshing = false
               await load()
             }
           }
