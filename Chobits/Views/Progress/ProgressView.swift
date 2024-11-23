@@ -174,20 +174,9 @@ struct ChiiProgressView: View {
         .navigationTitle("进度管理")
         .toolbarTitleDisplayMode(.inlineLarge)
         .toolbar {
-          ToolbarItem(placement: .topBarTrailing) {
-            if refreshing {
+          if refreshing {
+            ToolbarItem(placement: .topBarTrailing) {
               ProgressView()
-            } else {
-              Button {
-                Task {
-                  UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                  Notifier.shared.notify(message: "正在刷新全部进度")
-                  await refreshAllCollections()
-                  await load()
-                }
-              } label: {
-                Image(systemName: "arrow.clockwise.circle")
-              }
             }
           }
         }

@@ -60,9 +60,7 @@ struct PadView: View {
         })
       }
     }
-    .searchable(
-      text: $searchQuery, isPresented: $searching, placement: .navigationBarDrawer(displayMode: .always)
-    )
+    .searchable(text: $searchQuery, isPresented: $searching)
     .onChange(of: searchQuery) { _, _ in
       searchRemote = false
     }
