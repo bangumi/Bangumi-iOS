@@ -125,7 +125,7 @@ struct ChiiProgressView: View {
               await load()
             }
           }
-          LazyVStack(alignment: .leading, spacing: 8) {
+          LazyVStack(alignment: .leading) {
             ForEach(collections, id: \.inner.self) { item in
               NavigationLink(value: NavDestination.subject(subjectId: item.inner.subjectId)) {
                 ProgressRowView(subjectId: item.inner.subjectId).padding(8)

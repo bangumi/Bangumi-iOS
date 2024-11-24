@@ -9,18 +9,18 @@ import SwiftUI
 
 struct PadView: View {
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
-  @AppStorage("defaultTab") var defaultTab: String = "discover"
 
-  @State private var content: PadViewTab?
+  @State private var selectedTab: PadViewTab?
   @State private var columns: NavigationSplitViewVisibility = .all
 
-  @State private var searching = false
-  @State private var searchQuery = ""
-  @State private var searchRemote = false
+  init() {
+    let defaultTab = UserDefaults.standard.string(forKey: "defaultTab") ?? "discover"
+    self.selectedTab = PadViewTab(defaultTab)
+  }
 
   var body: some View {
     NavigationSplitView(columnVisibility: $columns) {
-      List(selection: $content) {
+      List(selection: $selectedTab) {
         Section {
           ForEach(PadViewTab.mainTabs, id: \.self) { tab in
             Label(tab.title, systemImage: tab.icon)
@@ -41,31 +41,34 @@ struct PadView: View {
       }.navigationSplitViewColumnWidth(min: 160, ideal: 200, max: 240)
     } detail: {
       NavigationStack {
-        VStack {
-          if searching {
-            SearchView(query: $searchQuery, remote: $searchRemote)
-          }else {
-            if let content = content {
-              content
-            } else {
-              PadViewTab(defaultTab)
+        TabView(selection: $selectedTab) {
+          ForEach(PadViewTab.mainTabs, id: \.self) { tab in
+            tab
+              .tag(tab)
+              .tabItem {
+                Label(tab.title, systemImage: tab.icon).labelStyle(.iconOnly)
+              }
+          }
+          if isAuthenticated {
+            ForEach(PadViewTab.userTabs, id: \.self) { tab in
+              tab
+                .tag(tab)
+                .tabItem {
+                  Label(tab.title, systemImage: tab.icon).labelStyle(.iconOnly)
+                }
             }
+          }
+          ForEach(PadViewTab.otherTabs, id: \.self) { tab in
+            tab
+              .tag(tab)
+              .tabItem {
+                Label(tab.title, systemImage: tab.icon).labelStyle(.iconOnly)
+              }
           }
         }
         .navigationBarTitleDisplayMode(.inline)
         .navigationDestination(for: NavDestination.self) { $0 }
-        .onOpenURL(perform: { url in
-          // TODO: handle urls
-          print(url)
-        })
       }
-    }
-    .searchable(text: $searchQuery, isPresented: $searching)
-    .onChange(of: searchQuery) { _, _ in
-      searchRemote = false
-    }
-    .onSubmit(of: .search) {
-      searchRemote = true
     }
     .navigationSplitViewStyle(.balanced)
   }

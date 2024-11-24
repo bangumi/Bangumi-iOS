@@ -127,10 +127,11 @@ enum AuthDomain: Codable, CaseIterable, Identifiable {
   }
 }
 
-enum PhoneViewTab: Codable, CaseIterable, Identifiable {
+enum PhoneViewTab: Codable, CaseIterable, View {
   case timeline
   case progress
   case discover
+  case search
 
   init(_ label: String) {
     switch label {
@@ -140,12 +141,12 @@ enum PhoneViewTab: Codable, CaseIterable, Identifiable {
       self = .progress
     case "discover":
       self = .discover
+    case "search":
+      self = .search
     default:
       self = .timeline
     }
   }
-
-  var id: Self { self }
 
   var title: String {
     switch self {
@@ -155,6 +156,8 @@ enum PhoneViewTab: Codable, CaseIterable, Identifiable {
       "进度管理"
     case .discover:
       "发现"
+    case .search:
+      "搜索"
     }
   }
 
@@ -166,14 +169,44 @@ enum PhoneViewTab: Codable, CaseIterable, Identifiable {
       "progress"
     case .discover:
       "discover"
+    case .search:
+      "search"
     }
   }
+
+  var icon: String {
+    switch self {
+    case .timeline:
+      "person"
+    case .progress:
+      "square.grid.2x2.fill"
+    case .discover:
+      "waveform"
+    case .search:
+      "magnifyingglass"
+    }
+  }
+
+  var body: some View {
+    switch self {
+    case .timeline:
+      ChiiTimelineView()
+    case .progress:
+      ChiiProgressView()
+    case .discover:
+      CalendarView()
+    case .search:
+      SearchView()
+    }
+  }
+
 }
 
 enum PadViewTab: Codable, CaseIterable, View {
   case timeline
   case progress
   case discover
+  case search
 
   case collection
   case notice
@@ -188,6 +221,8 @@ enum PadViewTab: Codable, CaseIterable, View {
       self = .progress
     case "discover":
       self = .discover
+    case "search":
+      self = .search
     case "collection":
       self = .collection
     case "notice":
@@ -207,6 +242,8 @@ enum PadViewTab: Codable, CaseIterable, View {
       "进度管理"
     case .discover:
       "发现"
+    case .search:
+      "搜索"
     case .collection:
       "时光机"
     case .notice:
@@ -224,6 +261,8 @@ enum PadViewTab: Codable, CaseIterable, View {
       "progress"
     case .discover:
       "discover"
+    case .search:
+      "search"
     case .collection:
       "collection"
     case .notice:
@@ -240,6 +279,8 @@ enum PadViewTab: Codable, CaseIterable, View {
     case .progress:
       "square.grid.2x2.fill"
     case .discover:
+      "waveform"
+    case .search:
       "magnifyingglass"
     case .collection:
       "person.badge.clock"
@@ -258,6 +299,8 @@ enum PadViewTab: Codable, CaseIterable, View {
       ChiiProgressView()
     case .discover:
       CalendarView()
+    case .search:
+      SearchView()
     case .collection:
       ChiiTimelineView()
     case .notice:
@@ -268,7 +311,7 @@ enum PadViewTab: Codable, CaseIterable, View {
   }
 
   static var mainTabs: [Self] {
-    return [.timeline, .discover]
+    return [.timeline, .discover, .search]
   }
 
   static var userTabs: [Self] {

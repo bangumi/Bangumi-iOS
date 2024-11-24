@@ -10,10 +10,11 @@ import SwiftData
 import SwiftUI
 
 struct SearchView: View {
-  @Binding var query: String
-  @Binding var remote: Bool
-
   @Environment(\.modelContext) var modelContext
+
+  @FocusState private var searching: Bool
+  @State private var text: String = ""
+  @State private var remote: Bool = false
 
   @State private var subjectType: SubjectType = .unknown
   @State private var offset = 0
@@ -26,8 +27,8 @@ struct SearchView: View {
     var desc = FetchDescriptor<Subject>(
       predicate: #Predicate<Subject> {
         return (subjectType.rawValue == 0 || subjectType.rawValue == $0.type)
-        && ($0.name.localizedStandardContains(query)
-            || $0.nameCn.localizedStandardContains(query))
+        && ($0.name.localizedStandardContains(text)
+            || $0.nameCn.localizedStandardContains(text))
       })
     desc.fetchLimit = limit
     desc.fetchOffset = offset
@@ -47,41 +48,13 @@ struct SearchView: View {
     return []
   }
 
-  func newLocalSearch() async {
-    offset = 0
-    exhausted = false
-    loadedIdx.removeAll()
-    subjects.removeAll()
-    if query.isEmpty {
-      return
-    }
-    Logger.app.info("new local search")
-    let subjects = await localSearch()
-    self.subjects.append(contentsOf: subjects)
-  }
-
-  func localSearchNextPage(idx: Int) async {
-    if exhausted {
-      return
-    }
-    if idx != offset - 10 {
-      return
-    }
-    if loadedIdx[idx, default: false] {
-      return
-    }
-    loadedIdx[idx] = true
-    let subjects = await localSearch()
-    self.subjects.append(contentsOf: subjects)
-  }
-
   func remoteSearch(limit: Int = 50) async -> [EnumerateItem<Subject>] {
     do {
       guard let db = await Chii.shared.db else {
         throw ChiiError.uninitialized
       }
       let resp = try await Chii.shared.search(
-        keyword: query, type: subjectType, limit: limit, offset: offset)
+        keyword: text, type: subjectType, limit: limit, offset: offset)
       if offset > resp.total {
         Logger.app.info("remote search exhausted at total count: \(resp.total)")
         exhausted = true
@@ -103,20 +76,26 @@ struct SearchView: View {
     return []
   }
 
-  func newRemoteSearch() async {
+  func newSearch() async {
     offset = 0
     exhausted = false
     loadedIdx.removeAll()
     subjects.removeAll()
-    if query.isEmpty {
+    if text.isEmpty {
       return
     }
-    Logger.app.info("new remote search")
-    let subjects = await remoteSearch()
-    self.subjects.append(contentsOf: subjects)
+    if remote {
+      Logger.app.info("new remote search")
+      let subjects = await remoteSearch()
+      self.subjects.append(contentsOf: subjects)
+    } else {
+      Logger.app.info("new local search")
+      let subjects = await localSearch()
+      self.subjects.append(contentsOf: subjects)
+    }
   }
 
-  func remoteSearchNextPage(idx: Int) async {
+  func searchNextPage(idx: Int) async {
     if exhausted {
       return
     }
@@ -127,78 +106,97 @@ struct SearchView: View {
       return
     }
     loadedIdx[idx] = true
-    let subjects = await remoteSearch()
-    self.subjects.append(contentsOf: subjects)
+    if remote {
+      let subjects = await remoteSearch()
+      self.subjects.append(contentsOf: subjects)
+    } else {
+      let subjects = await localSearch()
+      self.subjects.append(contentsOf: subjects)
+    }
   }
 
   var body: some View {
-    Picker("Subject Type", selection: $subjectType) {
-      Text("全部").tag(SubjectType.unknown)
-      ForEach(SubjectType.allTypes) { type in
-        Text(type.description).tag(type)
-      }
-    }
-    .pickerStyle(.segmented)
-    .padding(.horizontal, 8)
-    .onChange(of: subjectType) { _, _ in
-      Task {
-        if remote {
-          await newRemoteSearch()
-        } else {
-          await newLocalSearch()
-        }
-      }
-    }
-    .onChange(of: query) { _, _ in
-      Task {
-          await newLocalSearch()
-      }
-    }
-    .onChange(of: remote) { _, _ in
-      if remote {
-        Task {
-          await newRemoteSearch()
-        }
-      }
-    }
-    if !query.isEmpty {
-      if subjects.isEmpty && remote && !exhausted {
-        VStack {
-          Spacer()
-          ProgressView()
-          Spacer()
-        }
-      } else {
-        ScrollView {
-          LazyVStack(alignment: .leading, spacing: 10) {
-            ForEach(subjects, id: \.inner.self) { item in
-              NavigationLink(value: NavDestination.subject(subjectId: item.inner.subjectId)) {
-                SubjectLargeRowView(subjectId: item.inner.subjectId)
-                  .onAppear {
-                    Task {
-                      if remote {
-                        await remoteSearchNextPage(idx: item.idx)
-                      } else {
-                        await localSearchNextPage(idx: item.idx)
-                      }
-                    }
-                  }
-              }.buttonStyle(.plain)
-              Divider()
+    VStack {
+      VStack {
+        HStack {
+          Picker("Subject Type", selection: $subjectType) {
+            Text("全部").tag(SubjectType.unknown)
+            ForEach(SubjectType.allTypes) { type in
+              Text(type.description).tag(type)
             }
-            if exhausted {
-              HStack {
-                Spacer()
-                Text("没有更多了")
-                  .font(.footnote)
-                  .foregroundStyle(.secondary)
-                Spacer()
+          }
+          .pickerStyle(.menu)
+          .onChange(of: subjectType) { _, _ in
+            Task {
+              await newSearch()
+            }
+          }
+          TextField("搜索", text: $text)
+            .focused($searching)
+            .textFieldStyle(.roundedBorder)
+            .onChange(of: text) { _, _ in
+              remote = false
+              Task {
+                await newSearch()
               }
             }
-          }.padding(.horizontal, 8)
-        }.animation(.easeInOut, value: subjectType)
+            .onSubmit {
+              remote = true
+              Task {
+                await newSearch()
+              }
+            }
+          Button {
+            searching = false
+            remote = false
+            text = ""
+          } label: {
+            Image(systemName: "xmark.circle")
+          }
+          .disabled(!searching && text.isEmpty)
+        }
+      }.padding(.horizontal, 8)
+      if text.isEmpty {
+        Text("输入关键字搜索").foregroundStyle(.secondary)
+      } else {
+        if subjects.isEmpty && remote && !exhausted {
+          VStack {
+            Spacer()
+            ProgressView()
+            Spacer()
+          }
+        } else {
+          ScrollView {
+            LazyVStack(alignment: .leading) {
+              ForEach(subjects, id: \.inner.self) { item in
+                NavigationLink(value: NavDestination.subject(subjectId: item.inner.subjectId)) {
+                  SubjectLargeRowView(subjectId: item.inner.subjectId).padding(8)
+                }
+                .background(Color("CardBackgroundColor"))
+                .cornerRadius(8)
+                .shadow(color: Color.black.opacity(0.2), radius: 4)
+                .buttonStyle(.plain)
+                .onAppear {
+                  Task {
+                    await searchNextPage(idx: item.idx)
+                  }
+                }
+              }
+              if exhausted {
+                HStack {
+                  Spacer()
+                  Text("没有更多了")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                  Spacer()
+                }
+              }
+            }.padding(8)
+          }
+          .animation(.default, value: subjects)
+        }
       }
+      Spacer()
     }
-    Spacer()
   }
 }
