@@ -134,6 +134,11 @@ struct SearchView: View {
           TextField("搜索", text: $text)
             .focused($searching)
             .textFieldStyle(.roundedBorder)
+            .onAppear {
+              if text.isEmpty {
+                searching = true
+              }
+            }
             .onChange(of: text) { _, _ in
               remote = false
               Task {
