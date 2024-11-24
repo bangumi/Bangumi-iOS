@@ -11,7 +11,6 @@ import SwiftUI
 struct SubjectHeaderView: View {
   let subjectId: UInt
 
-  @State private var coverDetail = false
   @State private var collectionDetail = false
 
   @Query
@@ -71,15 +70,19 @@ struct SubjectHeaderView: View {
         .multilineTextAlignment(.leading)
         .textSelection(.enabled)
       HStack {
-        ImageView(img: subject.images.common, width: 120, height: 160, type: .subject)
-          .onTapGesture {
-            coverDetail.toggle()
+        if subject.nsfw {
+          ImageView(img: subject.images.common, width: 120, height: 160, type: .subject, overlay: .badge) {
+            Text("18+")
+              .padding(2)
+              .background(.red.opacity(0.8))
+              .padding(2)
+              .foregroundStyle(.white)
+              .font(.caption)
+              .clipShape(Capsule())
           }
-          .sheet(isPresented: $coverDetail) {
-            ImageView(img: subject.images.large, width: 0, height: 0)
-              .presentationDragIndicator(.visible)
-              .presentationDetents([.fraction(0.8)])
-          }
+        } else {
+          ImageView(img: subject.images.common, width: 120, height: 160, type: .subject)
+        }
         VStack(alignment: .leading) {
           HStack {
             if subject.typeEnum != .unknown {
@@ -92,9 +95,6 @@ struct SubjectHeaderView: View {
                 .lineLimit(1)
             }
             Spacer()
-            if subject.nsfw {
-              Label("", systemImage: "18.circle").foregroundStyle(.red)
-            }
           }
           .font(.caption)
           .foregroundStyle(.secondary)

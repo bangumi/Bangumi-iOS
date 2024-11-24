@@ -97,7 +97,7 @@ struct SubjectRelationsView: View {
             NavigationLink(value: NavDestination.subject(subjectId: relation.relationId)) {
               VStack {
                 if let ctype = collections[relation.relationId] {
-                  ImageView(img: relation.images.common, width: 60, height: 80, type: .subject) {
+                  ImageView(img: relation.images.common, width: 60, height: 80, type: .subject, overlay: .caption) {
                     HStack {
                       Image(systemName: ctype.icon)
                       Spacer()
@@ -138,7 +138,7 @@ struct SubjectRelationsView: View {
             VStack {
               Text(relation.relation).foregroundStyle(.secondary)
               if let ctype = collections[relation.relationId] {
-                ImageView(img: relation.images.common, width: 90, height: 120, type: .subject) {
+                ImageView(img: relation.images.common, width: 90, height: 120, type: .subject, overlay: .caption) {
                   HStack {
                     Image(systemName: ctype.icon)
                     Spacer()

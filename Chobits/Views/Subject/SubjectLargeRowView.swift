@@ -36,7 +36,20 @@ struct SubjectLargeRowView: View {
 
   var body: some View {
     HStack {
-      ImageView(img: subject?.images.common, width: 90, height: 120, type: .subject)
+      if subject?.nsfw ?? false {
+        ImageView(img: subject?.images.common, width: 90, height: 120, type: .subject, overlay: .badge) {
+          Text("18+")
+            .padding(2)
+            .background(.red.opacity(0.8))
+            .padding(2)
+            .foregroundStyle(.white)
+            .font(.caption)
+            .clipShape(Capsule())
+        }
+      } else {
+        ImageView(img: subject?.images.common, width: 90, height: 120, type: .subject)
+      }
+
       VStack(alignment: .leading) {
         HStack {
           VStack(alignment: .leading) {
@@ -95,12 +108,6 @@ struct SubjectLargeRowView: View {
             }
           }
           Spacer()
-          if subject?.nsfw ?? false {
-            Label("", systemImage: "18.circle").foregroundStyle(.red)
-          }
-          if subject?.locked ?? false {
-            Label("", systemImage: "lock.fill").foregroundStyle(.red)
-          }
           if let collection = collection, collection.typeEnum != .unknown {
             Label(
               collection.typeEnum.description(type: collection.subjectTypeEnum),

@@ -86,7 +86,7 @@ struct SubjectCharactersView: View {
         ForEach(characters) { character in
           NavigationLink(value: NavDestination.character(characterId: character.characterId)) {
             VStack {
-              ImageView(img: character.images.medium, width: 60, height: 80, alignment: .top) {
+              ImageView(img: character.images.medium, width: 60, height: 80, alignment: .top, overlay: .caption) {
                 Text(character.relation)
               }
               Text(character.name).font(.caption)
