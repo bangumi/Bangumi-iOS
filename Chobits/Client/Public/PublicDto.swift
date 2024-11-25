@@ -86,7 +86,7 @@ struct SubjectDTO: Codable {
   var nsfw: Bool
   var locked: Bool
   var date: String?
-  var platform: String
+  var platform: String?
   var images: SubjectImages
   var infobox: [InfoboxItem]?
   var volumes: UInt

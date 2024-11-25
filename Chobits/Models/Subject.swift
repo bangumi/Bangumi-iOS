@@ -174,7 +174,7 @@ final class Subject {
     self.nsfw = item.nsfw
     self.locked = item.locked
     self.date = safeParseDate(str: item.date)
-    self.platform = item.platform
+    self.platform = item.platform ?? ""
     self.images = item.images
     self.infobox = item.infobox ?? []
     self.volumes = item.volumes
