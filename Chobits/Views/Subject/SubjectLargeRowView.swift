@@ -95,6 +95,18 @@ struct SubjectLargeRowView: View {
             .foregroundStyle(.secondary)
             .lineLimit(2)
         }
+        if subject?.metaTags.count ?? 0 > 0 {
+          HStack(spacing: 5) {
+            ForEach(subject?.metaTags ?? [], id: \.self) { tag in
+              Text(tag)
+                .padding(2)
+                .foregroundStyle(.secondary)
+                .font(.caption)
+                .background(.secondary.opacity(0.1))
+                .clipShape(RoundedRectangle(cornerRadius: 5))
+            }
+          }
+        }
 
         Spacer()
         HStack {
@@ -128,8 +140,8 @@ struct SubjectLargeRowView: View {
 #Preview {
   let container = mockContainer()
 
-  let collection = UserSubjectCollection.previewBook
-  let subject = Subject.previewBook
+  let collection = UserSubjectCollection.previewAnime
+  let subject = Subject.previewAnime
   let episodes = Episode.previewList
   container.mainContext.insert(subject)
   container.mainContext.insert(collection)

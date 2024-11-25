@@ -14,123 +14,153 @@
   "tags": [
     {
       "name": "CLAMP",
-      "count": 174
+      "count": 180,
+      "total_cont": 0
     },
     {
       "name": "chobits",
-      "count": 95
+      "count": 100,
+      "total_cont": 0
     },
     {
       "name": "漫画",
-      "count": 89
+      "count": 94,
+      "total_cont": 0
     },
     {
       "name": "治愈系",
-      "count": 65
+      "count": 69,
+      "total_cont": 0
     },
     {
       "name": "科幻",
-      "count": 34
+      "count": 39,
+      "total_cont": 0
     },
     {
       "name": "叽",
-      "count": 28
-    },
-    {
-      "name": "恋爱",
-      "count": 24
-    },
-    {
-      "name": "爱情",
-      "count": 24
+      "count": 31,
+      "total_cont": 0
     },
     {
       "name": "萌的机械耳",
-      "count": 24
+      "count": 26,
+      "total_cont": 0
+    },
+    {
+      "name": "爱情",
+      "count": 26,
+      "total_cont": 0
     },
     {
       "name": "最初的感动",
-      "count": 23
+      "count": 26,
+      "total_cont": 0
     },
     {
-      "name": "无数次的重启",
-      "count": 12
-    },
-    {
-      "name": "日本",
-      "count": 12
-    },
-    {
-      "name": "ちょびっツ",
-      "count": 11
+      "name": "恋爱",
+      "count": 26,
+      "total_cont": 0
     },
     {
       "name": "治愈",
-      "count": 10
+      "count": 13,
+      "total_cont": 0
+    },
+    {
+      "name": "日本",
+      "count": 13,
+      "total_cont": 0
+    },
+    {
+      "name": "无数次的重启",
+      "count": 13,
+      "total_cont": 0
+    },
+    {
+      "name": "ちょびっツ",
+      "count": 11,
+      "total_cont": 0
     },
     {
       "name": "少女漫画",
-      "count": 8
+      "count": 10,
+      "total_cont": 0
     },
     {
       "name": "生活",
-      "count": 7
+      "count": 7,
+      "total_cont": 0
     },
     {
       "name": "浪漫",
-      "count": 6
-    },
-    {
-      "name": "講談社",
-      "count": 5
+      "count": 6,
+      "total_cont": 0
     },
     {
       "name": "2000",
-      "count": 5
+      "count": 6,
+      "total_cont": 0
+    },
+    {
+      "name": "講談社",
+      "count": 5,
+      "total_cont": 0
     },
     {
       "name": "漫画系列",
-      "count": 4
+      "count": 4,
+      "total_cont": 0
     },
     {
       "name": "讲谈社",
-      "count": 4
+      "count": 4,
+      "total_cont": 0
     },
     {
       "name": "已完结",
-      "count": 3
-    },
-    {
-      "name": "幻想",
-      "count": 3
-    },
-    {
-      "name": "人生",
-      "count": 3
+      "count": 3,
+      "total_cont": 0
     },
     {
       "name": "MANKO！",
-      "count": 3
+      "count": 3,
+      "total_cont": 0
     },
     {
-      "name": "男性向",
-      "count": 2
+      "name": "幻想",
+      "count": 3,
+      "total_cont": 0
     },
     {
-      "name": "初次的感动~chobits~",
-      "count": 2
-    },
-    {
-      "name": "重启",
-      "count": 2
-    },
-    {
-      "name": "系列",
-      "count": 2
+      "name": "人生",
+      "count": 3,
+      "total_cont": 0
     },
     {
       "name": "日漫",
-      "count": 2
+      "count": 2,
+      "total_cont": 0
+    },
+    {
+      "name": "系列",
+      "count": 2,
+      "total_cont": 0
+    },
+    {
+      "name": "完结",
+      "count": 2,
+      "total_cont": 0
+    },
+    {
+      "name": "愛情",
+      "count": 2,
+      "total_cont": 0
+    },
+    {
+      "name": "重启",
+      "count": 2,
+      "total_cont": 0
     }
   ],
   "infobox": [
@@ -182,31 +212,32 @@
   ],
   "rating": {
     "rank": 1586,
-    "total": 451,
+    "total": 475,
     "count": {
       "1": 2,
       "2": 0,
       "3": 0,
       "4": 1,
       "5": 8,
-      "6": 50,
-      "7": 128,
-      "8": 179,
-      "9": 55,
-      "10": 28
+      "6": 55,
+      "7": 133,
+      "8": 187,
+      "9": 57,
+      "10": 32
     },
-    "score": 7.6
+    "score": 7.7
   },
   "total_episodes": 0,
   "collection": {
     "on_hold": 30,
     "dropped": 9,
-    "wish": 202,
-    "collect": 605,
-    "doing": 34
+    "wish": 224,
+    "collect": 638,
+    "doing": 43
   },
   "id": 497,
   "eps": 88,
+  "meta_tags": [],
   "volumes": 8,
   "series": true,
   "locked": false,

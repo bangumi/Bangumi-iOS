@@ -91,10 +91,11 @@ struct SubjectDTO: Codable {
   var infobox: [InfoboxItem]?
   var volumes: UInt
   var eps: UInt
-  var totalEpisodes: UInt
+  var totalEpisodes: UInt?
   var rating: Rating
   var collection: SubjectCollection
   var tags: [Tag]
+  var metaTags: [String]
 }
 
 struct SlimSubject: Codable, Identifiable {
@@ -110,19 +111,6 @@ struct SlimSubject: Codable, Identifiable {
   var collectionTotal: UInt
   var score: Float
   var tags: [Tag]
-}
-
-struct SearchSubject: Codable, Identifiable {
-  var id: UInt
-  var type: SubjectType?
-  var date: String
-  var image: String
-  var summary: String
-  var name: String
-  var nameCn: String
-  var tags: [Tag]
-  var score: Float
-  var rank: UInt
 }
 
 struct SmallSubject: Codable {

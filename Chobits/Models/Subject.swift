@@ -29,6 +29,7 @@ final class Subject {
   var rating: Rating
   var collection: SubjectCollection
   var tags: [Tag]
+  var metaTags: [String] = []
 
   var typeEnum: SubjectType {
     return SubjectType(type)
@@ -140,7 +141,7 @@ final class Subject {
     subjectId: UInt, type: UInt8, name: String, nameCn: String, summary: String,
     series: Bool, nsfw: Bool, locked: Bool,
     date: Date, platform: String, images: SubjectImages, infobox: [InfoboxItem], volumes: UInt,
-    eps: UInt, totalEpisodes: UInt, rating: Rating, collection: SubjectCollection, tags: [Tag]
+    eps: UInt, totalEpisodes: UInt, rating: Rating, collection: SubjectCollection, tags: [Tag], metaTags: [String]
   ) {
     self.subjectId = subjectId
     self.type = type
@@ -160,6 +161,7 @@ final class Subject {
     self.rating = rating
     self.collection = collection
     self.tags = tags
+    self.metaTags = metaTags
   }
 
   init(_ item: SubjectDTO) {
@@ -177,10 +179,11 @@ final class Subject {
     self.infobox = item.infobox ?? []
     self.volumes = item.volumes
     self.eps = item.eps
-    self.totalEpisodes = item.totalEpisodes
+    self.totalEpisodes = item.totalEpisodes ?? 0
     self.rating = item.rating
     self.collection = item.collection
     self.tags = item.tags
+    self.metaTags = item.metaTags
   }
 
   init(_ slim: SlimSubject) {
@@ -199,24 +202,6 @@ final class Subject {
     self.rating = Rating(rank: 0, total: 0, count: [:], score: slim.score)
     self.collection = SubjectCollection()
     self.tags = slim.tags
-  }
-
-  init(_ search: SearchSubject) {
-    self.subjectId = search.id
-    self.type = search.type?.rawValue ?? 0
-    self.name = search.name
-    self.nameCn = search.nameCn
-    self.summary = search.summary
-    self.date = safeParseDate(str: search.date)
-    self.platform = ""
-    self.images = SubjectImages(subjectId: search.id)
-    self.infobox = []
-    self.volumes = 0
-    self.eps = 0
-    self.totalEpisodes = 0
-    self.rating = Rating(rank: search.rank, total: 0, count: [:], score: search.score)
-    self.collection = SubjectCollection()
-    self.tags = search.tags
   }
 
   init(_ small: SmallSubject) {

@@ -34,6 +34,17 @@ struct SubjectSummaryView: View {
 
   var body: some View {
     VStack(alignment: .leading) {
+      if subject?.metaTags.count ?? 0 > 0 {
+        HFlow(alignment: .center, spacing: 4) {
+          ForEach(subject?.metaTags ?? [], id: \.self) { tag in
+            BorderView(.secondary, padding: 2) {
+              Text(tag)
+                .font(.footnote)
+                .lineLimit(1)
+            }
+          }
+        }
+      }
       Text(subject?.summary ?? "")
         .font(.footnote)
         .multilineTextAlignment(.leading)

@@ -59,15 +59,6 @@ extension Subject {
   }
 }
 
-extension SearchSubject {
-  static var previewAnime: SearchSubject {
-    return loadFixture(fixture: "search_subject_anime.json", target: SearchSubject.self)
-  }
-  static var previewBook: SearchSubject {
-    return loadFixture(fixture: "search_subject_book.json", target: SearchSubject.self)
-  }
-}
-
 extension UserSubjectCollection {
   static var previewAnime: UserSubjectCollection {
     let item = loadFixture(

@@ -73,16 +73,6 @@ extension DatabaseOperator {
       })
   }
 
-  public func saveSubject(_ item: SearchSubject) throws {
-    let subject = Subject(item)
-    let subjectID = item.id
-    try self.insertIfNeeded(
-      data: subject,
-      predicate: #Predicate<Subject> {
-        $0.subjectId == subjectID
-      })
-  }
-
   public func saveSubject(_ item: SubjectRelationDTO) throws {
     let subject = Subject(item)
     let subjectID = item.id

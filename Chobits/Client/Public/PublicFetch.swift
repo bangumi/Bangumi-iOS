@@ -72,7 +72,7 @@ extension Chii {
   }
 
   func search(keyword: String, type: SubjectType = .unknown, limit: Int = 10, offset: Int = 0)
-    async throws -> SubjectSearchResponse
+    async throws -> SubjectsResponse
   {
     Logger.api.info("start search: \(keyword), \(type.name), \(limit), \(offset)")
     let queries: [URLQueryItem] = [
@@ -100,7 +100,7 @@ extension Chii {
     let data = try await self.request(
       url: url, method: "POST", body: body
     )
-    let resp: SubjectSearchResponse = try self.decodeResponse(data)
+    let resp: SubjectsResponse = try self.decodeResponse(data)
     Logger.api.info("finish search: \(keyword), \(type.name), \(limit), \(offset)")
     return resp
   }

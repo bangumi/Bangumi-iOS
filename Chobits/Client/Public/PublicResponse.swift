@@ -26,13 +26,6 @@ struct SubjectCollectionResponse: Codable {
   var data: [UserSubjectCollectionDTO]
 }
 
-struct SubjectSearchResponse: Codable {
-  var total: Int
-  var limit: Int
-  var offset: Int
-  var data: [SearchSubject]
-}
-
 struct EpisodeResponse: Codable {
   var total: Int
   var limit: Int
