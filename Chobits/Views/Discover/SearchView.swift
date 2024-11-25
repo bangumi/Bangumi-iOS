@@ -23,7 +23,7 @@ struct SearchView: View {
   @State private var loadedIdx: [Int: Bool] = [:]
   @State private var subjects: [EnumerateItem<Subject>] = []
 
-  func localSearch(limit: Int = 50) async -> [EnumerateItem<Subject>] {
+  func localSearch(limit: Int = 20) async -> [EnumerateItem<Subject>] {
     var desc = FetchDescriptor<Subject>(
       predicate: #Predicate<Subject> {
         return (subjectType.rawValue == 0 || subjectType.rawValue == $0.type)
@@ -48,7 +48,7 @@ struct SearchView: View {
     return []
   }
 
-  func remoteSearch(limit: Int = 50) async -> [EnumerateItem<Subject>] {
+  func remoteSearch(limit: Int = 20) async -> [EnumerateItem<Subject>] {
     do {
       guard let db = await Chii.shared.db else {
         throw ChiiError.uninitialized
@@ -99,7 +99,7 @@ struct SearchView: View {
     if exhausted {
       return
     }
-    if idx != offset - 10 {
+    if idx != offset - 5 {
       return
     }
     if loadedIdx[idx, default: false] {
