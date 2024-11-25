@@ -25,7 +25,6 @@ final class Subject {
   var infobox: [InfoboxItem]
   var volumes: UInt
   var eps: UInt
-  var totalEpisodes: UInt
   var rating: Rating
   var collection: SubjectCollection
   var tags: [Tag]
@@ -141,7 +140,7 @@ final class Subject {
     subjectId: UInt, type: UInt8, name: String, nameCn: String, summary: String,
     series: Bool, nsfw: Bool, locked: Bool,
     date: Date, platform: String, images: SubjectImages, infobox: [InfoboxItem], volumes: UInt,
-    eps: UInt, totalEpisodes: UInt, rating: Rating, collection: SubjectCollection, tags: [Tag], metaTags: [String]
+    eps: UInt, rating: Rating, collection: SubjectCollection, tags: [Tag], metaTags: [String]
   ) {
     self.subjectId = subjectId
     self.type = type
@@ -157,7 +156,6 @@ final class Subject {
     self.infobox = infobox
     self.volumes = volumes
     self.eps = eps
-    self.totalEpisodes = totalEpisodes
     self.rating = rating
     self.collection = collection
     self.tags = tags
@@ -179,7 +177,6 @@ final class Subject {
     self.infobox = item.infobox ?? []
     self.volumes = item.volumes
     self.eps = item.eps
-    self.totalEpisodes = item.totalEpisodes ?? 0
     self.rating = item.rating
     self.collection = item.collection
     self.tags = item.tags
@@ -198,7 +195,6 @@ final class Subject {
     self.infobox = []
     self.volumes = slim.volumes
     self.eps = slim.eps
-    self.totalEpisodes = 0
     self.rating = Rating(rank: 0, total: 0, count: [:], score: slim.score)
     self.collection = SubjectCollection()
     self.tags = slim.tags
@@ -216,7 +212,6 @@ final class Subject {
     self.infobox = []
     self.volumes = 0
     self.eps = 0
-    self.totalEpisodes = 0
     var rating = Rating(rank: small.rank ?? 0, total: 0, count: [:], score: 0)
     if let smallRating = small.rating {
       rating.score = smallRating.score
@@ -240,7 +235,6 @@ final class Subject {
     self.infobox = []
     self.volumes = 0
     self.eps = 0
-    self.totalEpisodes = 0
     self.rating = Rating(rank: 0, total: 0, count: [:], score: 0)
     self.collection = SubjectCollection()
     self.tags = []
@@ -258,7 +252,6 @@ final class Subject {
     self.infobox = []
     self.volumes = 0
     self.eps = 0
-    self.totalEpisodes = 0
     self.rating = Rating(rank: 0, total: 0, count: [:], score: 0)
     self.collection = SubjectCollection()
     self.tags = []
@@ -276,7 +269,6 @@ final class Subject {
     self.infobox = []
     self.volumes = 0
     self.eps = 0
-    self.totalEpisodes = 0
     self.rating = Rating(rank: 0, total: 0, count: [:], score: 0)
     self.collection = SubjectCollection()
     self.tags = []
@@ -294,7 +286,6 @@ final class Subject {
     self.infobox = []
     self.volumes = 0
     self.eps = 0
-    self.totalEpisodes = 0
     self.rating = Rating(rank: 0, total: 0, count: [:], score: 0)
     self.collection = SubjectCollection()
     self.tags = []
@@ -312,7 +303,6 @@ final class Subject {
     self.infobox = []
     self.volumes = 0
     self.eps = 0
-    self.totalEpisodes = 0
     self.rating = Rating(rank: 0, total: 0, count: [:], score: 0)
     self.collection = SubjectCollection()
     self.tags = []

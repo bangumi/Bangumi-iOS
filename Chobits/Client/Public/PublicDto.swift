@@ -91,7 +91,6 @@ struct SubjectDTO: Codable {
   var infobox: [InfoboxItem]?
   var volumes: UInt
   var eps: UInt
-  var totalEpisodes: UInt?
   var rating: Rating
   var collection: SubjectCollection
   var tags: [Tag]
