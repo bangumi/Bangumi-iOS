@@ -6,3 +6,4 @@ xcshareddata/
 .vscode/
 
 /apollo-ios-cli
+/buildServer.json
