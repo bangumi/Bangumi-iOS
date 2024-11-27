@@ -78,13 +78,6 @@ struct SubjectLargeRowView: View {
 
         // subtitle
         HStack {
-          if let category = subject?.category, !category.isEmpty {
-            BorderView(.secondary, padding: 2) {
-              Text(category)
-                .foregroundStyle(.secondary)
-                .font(.caption)
-            }
-          }
           if let nameCN = subject?.nameCn, !nameCN.isEmpty {
             Text(nameCN)
               .font(.subheadline)
@@ -103,18 +96,23 @@ struct SubjectLargeRowView: View {
         }
 
         // tags
-        if subject?.metaTags.count ?? 0 > 0 {
-          HStack(spacing: 5) {
+        HStack(spacing: 4) {
+          if let category = subject?.category, !category.isEmpty {
+            BorderView(.secondary, padding: 2) {
+              Text(category)
+            }
+          }
+          if subject?.metaTags.count ?? 0 > 0 {
             ForEach(subject?.metaTags ?? [], id: \.self) { tag in
               Text(tag)
                 .padding(2)
-                .foregroundStyle(.secondary)
-                .font(.caption)
                 .background(.secondary.opacity(0.1))
                 .clipShape(RoundedRectangle(cornerRadius: 5))
             }
           }
         }
+        .foregroundStyle(.secondary)
+        .font(.caption)
 
         // rating
         HStack {
