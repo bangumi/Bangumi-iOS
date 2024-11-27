@@ -230,34 +230,18 @@ struct SubjectBookChaptersView: View {
           }.monospaced()
         }
         Spacer()
-        VStack {
-          if updating {
-            ZStack {
-              Button{
-              } label: {
-                Label("更新", systemImage: "checkmark")
-              }
+        if updating {
+          ZStack {
+            Button("更新", action: {})
               .disabled(true)
               .hidden()
               .buttonStyle(.borderedProminent)
-              ProgressView()
-            }
-          } else {
-            Button {
-              update()
-            } label: {
-              Label("更新", systemImage: "checkmark")
-            }
+            ProgressView()
+          }
+        } else {
+          Button("更新", action: update)
             .disabled(updateButtonDisable)
             .buttonStyle(.borderedProminent)
-          }
-          Button {
-            reset()
-          } label: {
-            Label("重置", systemImage: "arrow.counterclockwise")
-          }
-          .disabled(updateButtonDisable)
-          .buttonStyle(.borderedProminent)
         }
       }
     }
