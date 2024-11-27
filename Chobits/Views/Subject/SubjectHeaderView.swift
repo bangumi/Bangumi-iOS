@@ -71,7 +71,9 @@ struct SubjectHeaderView: View {
         .textSelection(.enabled)
       HStack {
         if subject.nsfw {
-          ImageView(img: subject.images.common, width: 120, height: 160, type: .subject, overlay: .badge) {
+          ImageView(
+            img: subject.images.common, width: 120, height: 160, type: .subject, overlay: .badge
+          ) {
             Text("18+")
               .padding(2)
               .background(.red.opacity(0.8))
@@ -121,46 +123,60 @@ struct SubjectHeaderView: View {
 
           Spacer()
           HStack {
-            Text("\(subject.collection.doing) 人\(CollectionType.do.description(type: subject.typeEnum))")
+            Text(
+              "\(subject.collection.doing) 人\(CollectionType.do.description(type: subject.typeEnum))"
+            )
             Text("/")
-            Text("\(subject.collection.collect) 人\(CollectionType.collect.description(type: subject.typeEnum))")
+            Text(
+              "\(subject.collection.collect) 人\(CollectionType.collect.description(type: subject.typeEnum))"
+            )
             Spacer()
           }
           .font(.footnote)
           .foregroundStyle(.secondary)
-          HStack {
-            if subject.rating.score > 0 {
-              StarsView(score: Float(subject.rating.score), size: 12)
-              Text("\(subject.rating.score.rateDisplay)")
-                .foregroundStyle(.orange)
-              if subject.rating.total > 0 {
+
+          if subject.rating.total > 10 {
+            HStack {
+              if subject.rating.score > 0 {
+                StarsView(score: Float(subject.rating.score), size: 12)
+                Text("\(subject.rating.score.rateDisplay)")
+                  .foregroundStyle(.orange)
+                  .font(.callout)
                 Text("(\(subject.rating.total) 人评分)")
-                  .font(.footnote)
                   .foregroundStyle(.linkText)
+                Spacer()
               }
-              Spacer()
             }
+            .font(.footnote)
+            .onTapGesture {
+              collectionDetail.toggle()
+            }
+            .sheet(
+              isPresented: $collectionDetail,
+              content: {
+                SubjectRatingBoxView(subject: subject)
+                  .presentationDragIndicator(.visible)
+                  .presentationDetents(.init([.medium]))
+              })
+          } else {
+            HStack {
+              StarsView(score: 0, size: 12)
+              Text("(少于 10 人评分)")
+                .foregroundStyle(.secondary)
+            }
+            .font(.footnote)
           }
-          .font(.callout)
-          .onTapGesture {
-            collectionDetail.toggle()
-          }
-          .sheet(
-            isPresented: $collectionDetail,
-            content: {
-              SubjectRatingBoxView(subject: subject)
-                .presentationDragIndicator(.visible)
-                .presentationDetents(.init([.medium]))
-            })
         }
       }
+
       if subject.rating.rank > 0 {
         NavigationLink(value: NavDestination.subjectBrowsing(subjectType: subject.typeEnum)) {
           BorderView(.accent, padding: 5) {
             HStack {
               Spacer()
               Label(
-                "Bangumi \(subject.typeEnum.name.capitalized) Ranked:", systemImage: "chart.bar.xaxis"
+                "Bangumi \(subject.typeEnum.name.capitalized) Ranked:",
+                systemImage: "chart.bar.xaxis"
               )
               Text("#\(subject.rating.rank)")
               Image(systemName: "chevron.right")

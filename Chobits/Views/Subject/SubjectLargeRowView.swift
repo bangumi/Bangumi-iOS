@@ -37,7 +37,9 @@ struct SubjectLargeRowView: View {
   var body: some View {
     HStack {
       if subject?.nsfw ?? false {
-        ImageView(img: subject?.images.common, width: 90, height: 120, type: .subject, overlay: .badge) {
+        ImageView(
+          img: subject?.images.common, width: 90, height: 120, type: .subject, overlay: .badge
+        ) {
           Text("18+")
             .padding(2)
             .background(.red.opacity(0.8))
@@ -51,6 +53,7 @@ struct SubjectLargeRowView: View {
       }
 
       VStack(alignment: .leading) {
+        // title
         HStack {
           VStack(alignment: .leading) {
             HStack {
@@ -72,12 +75,14 @@ struct SubjectLargeRowView: View {
               .foregroundStyle(.linkText)
           }
         }
+
+        // subtitle
         HStack {
-          if let platform = subject?.platform, !platform.isEmpty {
+          if let category = subject?.category, !category.isEmpty {
             BorderView(.secondary, padding: 2) {
-              Text(platform)
-                .font(.caption)
+              Text(category)
                 .foregroundStyle(.secondary)
+                .font(.caption)
             }
           }
           if let nameCN = subject?.nameCn, !nameCN.isEmpty {
@@ -88,13 +93,16 @@ struct SubjectLargeRowView: View {
           }
         }
 
+        // meta
         if let authority = subject?.authority {
           Spacer()
           Text(authority)
-            .font(.caption)
+            .font(.footnote)
             .foregroundStyle(.secondary)
             .lineLimit(2)
         }
+
+        // tags
         if subject?.metaTags.count ?? 0 > 0 {
           HStack(spacing: 5) {
             ForEach(subject?.metaTags ?? [], id: \.self) { tag in
@@ -108,16 +116,23 @@ struct SubjectLargeRowView: View {
           }
         }
 
-        Spacer()
+        // rating
         HStack {
-          if let score = subject?.rating.score, score > 0 {
-            StarsView(score: score, size: 12)
-            Text("\(score.rateDisplay)")
-              .foregroundStyle(.orange)
-            if let total = subject?.rating.total, total > 0 {
-              Text("(\(total)人评分)")
-                .foregroundStyle(.secondary)
+          if subject?.rating.total ?? 0 > 10 {
+            if let score = subject?.rating.score, score > 0 {
+              StarsView(score: score, size: 12)
+              Text("\(score.rateDisplay)")
+                .font(.callout)
+                .foregroundStyle(.orange)
+              if let total = subject?.rating.total, total > 0 {
+                Text("(\(total)人评分)")
+                  .foregroundStyle(.secondary)
+              }
             }
+          } else {
+            StarsView(score: 0, size: 12)
+            Text("(少于10人评分)")
+              .foregroundStyle(.secondary)
           }
           Spacer()
           if let collection = collection, collection.typeEnum != .unknown {
@@ -128,7 +143,7 @@ struct SubjectLargeRowView: View {
             .foregroundStyle(.accent)
           }
         }
-        .font(.caption)
+        .font(.footnote)
       }.padding(.leading, 2)
     }
     .frame(height: 120)
