@@ -85,11 +85,9 @@ struct SearchView: View {
       return
     }
     if remote {
-      Logger.app.info("new remote search")
       let subjects = await remoteSearch()
       self.subjects.append(contentsOf: subjects)
     } else {
-      Logger.app.info("new local search")
       let subjects = await localSearch()
       self.subjects.append(contentsOf: subjects)
     }
