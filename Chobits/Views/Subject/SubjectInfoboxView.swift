@@ -157,7 +157,7 @@ struct SubjectInfoboxView: View {
       LazyVStack(alignment: .leading) {
         ForEach(infoList) { info in
           HStack(alignment: .top) {
-            Text("\(info.relation):").bold()
+            Text("\(info.relation): ").bold()
             if info.long {
               let plains = info.staffs.filter {
                 if case .plain = $0 {
