@@ -5,18 +5,18 @@
 //  Created by Chuan Chuan on 2024/5/2.
 //
 
+import Flow
 import SwiftData
 import SwiftUI
-import Flow
 
 struct SubjectCollectionBoxView: View {
-  let subjectId: UInt
+  let subjectId: Int
 
   @Environment(\.modelContext) var modelContext
   @Environment(\.dismiss) private var dismiss
 
   @State private var collectionType: CollectionType = .do
-  @State private var rate: UInt8 = 0
+  @State private var rate: Int = 0
   @State private var comment: String = ""
   @State private var priv: Bool = false
   @State private var tags: [String] = []
@@ -158,7 +158,7 @@ struct SubjectCollectionBoxView: View {
                 .foregroundStyle(.orange)
                 .frame(width: 20, height: 20)
                 .onTapGesture {
-                  rate = UInt8(idx)
+                  rate = Int(idx)
                 }
             }
           }

@@ -10,31 +10,23 @@ import SwiftData
 import SwiftUI
 
 struct SubjectBookChaptersView: View {
-  let subjectId: UInt
+  let subjectId: Int
   let compact: Bool
 
   @State private var inputEps: String = ""
-  @State private var eps: UInt? = nil
+  @State private var eps: Int? = nil
   @State private var inputVols: String = ""
-  @State private var vols: UInt? = nil
+  @State private var vols: Int? = nil
   @State private var updating: Bool = false
 
   @Query
   private var subjects: [Subject]
   private var subject: Subject? { subjects.first }
 
-  @Query
-  private var collections: [UserSubjectCollection]
-  private var collection: UserSubjectCollection? { collections.first }
-
-  init(subjectId: UInt, compact: Bool = false) {
+  init(subjectId: Int, compact: Bool = false) {
     self.subjectId = subjectId
     _subjects = Query(
       filter: #Predicate<Subject> {
-        $0.subjectId == subjectId
-      })
-    _collections = Query(
-      filter: #Predicate<UserSubjectCollection> {
         $0.subjectId == subjectId
       })
     self.compact = compact
@@ -48,7 +40,7 @@ struct SubjectBookChaptersView: View {
   }
 
   func parseInputEps() {
-    if let newEps = UInt(inputEps) {
+    if let newEps = Int(inputEps) {
       self.eps = newEps
     } else {
       self.eps = nil
@@ -56,7 +48,7 @@ struct SubjectBookChaptersView: View {
   }
 
   func parseInputVols() {
-    if let newVols = UInt(inputVols) {
+    if let newVols = Int(inputVols) {
       self.vols = newVols
     } else {
       self.vols = nil
@@ -100,13 +92,13 @@ struct SubjectBookChaptersView: View {
     }
   }
 
-  var collectionEps: UInt {
-    guard let collection = self.collection else { return 0 }
+  var collectionEps: Int {
+    guard let collection = self.subject?.userCollection else { return 0 }
     return collection.epStatus
   }
 
-  var collectionVols: UInt {
-    guard let collection = self.collection else { return 0 }
+  var collectionVols: Int {
+    guard let collection = self.subject?.userCollection else { return 0 }
     return collection.volStatus
   }
 
@@ -257,6 +249,7 @@ struct SubjectBookChaptersView: View {
 
   container.mainContext.insert(collection)
   container.mainContext.insert(subject)
+  collection.subject = subject
 
   return ScrollView {
     LazyVStack(alignment: .leading) {

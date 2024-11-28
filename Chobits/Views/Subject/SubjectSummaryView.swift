@@ -11,7 +11,7 @@ import SwiftUI
 import Flow
 
 struct SubjectSummaryView: View {
-  let subjectId: UInt
+  let subjectId: Int
 
   @State private var showSummary = false
 
@@ -19,7 +19,7 @@ struct SubjectSummaryView: View {
   private var subjects: [Subject]
   var subject: Subject? { subjects.first }
 
-  init(subjectId: UInt) {
+  init(subjectId: Int) {
     self.subjectId = subjectId
     let predicate = #Predicate<Subject> {
       $0.subjectId == subjectId
@@ -32,11 +32,15 @@ struct SubjectSummaryView: View {
     return Array(subject.tags.sorted { $0.count > $1.count }.prefix(20))
   }
 
+  var metaTags: [String] {
+    subject?.metaTags ?? []
+  }
+
   var body: some View {
     VStack(alignment: .leading) {
       if subject?.metaTags.count ?? 0 > 0 {
         HFlow(alignment: .center, spacing: 4) {
-          ForEach(subject?.metaTags ?? [], id: \.self) { tag in
+          ForEach(metaTags, id: \.self) { tag in
             BorderView(.secondary, padding: 2) {
               Text(tag)
                 .font(.footnote)

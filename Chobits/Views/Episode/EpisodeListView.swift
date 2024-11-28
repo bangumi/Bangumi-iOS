@@ -10,7 +10,7 @@ import SwiftData
 import SwiftUI
 
 struct EpisodeListView: View {
-  let subjectId: UInt
+  let subjectId: Int
 
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
 
@@ -52,19 +52,18 @@ struct EpisodeListView: View {
   func fetch(limit: Int = 100) async -> [EnumerateItem<Episode>] {
     let sortBy =
       sortDesc ? SortDescriptor<Episode>(\.sort, order: .reverse) : SortDescriptor<Episode>(\.sort)
-    let zero: UInt8 = 0
     let mainType = EpisodeType.main.rawValue
     var descriptor = FetchDescriptor<Episode>(
       predicate: #Predicate<Episode> {
         if main {
           if filterCollection {
-            $0.subjectId == subjectId && $0.type == mainType && $0.collection == zero
+            $0.subjectId == subjectId && $0.type == mainType && $0.collection == 0
           } else {
             $0.subjectId == subjectId && $0.type == mainType
           }
         } else {
           if filterCollection {
-            $0.subjectId == subjectId && $0.type != mainType && $0.collection == zero
+            $0.subjectId == subjectId && $0.type != mainType && $0.collection == 0
           } else {
             $0.subjectId == subjectId && $0.type != mainType
           }
@@ -176,7 +175,7 @@ struct EpisodeListView: View {
                   }
                 } else {
                   if main {
-                    if episode.airdate > now {
+                    if episode.air > now {
                       BorderView(.secondary, padding: 4) {
                         Text("未播")
                           .foregroundStyle(.secondary)
@@ -199,14 +198,14 @@ struct EpisodeListView: View {
                 }
 
                 VStack(alignment: .leading) {
-                  if !episode.nameCn.isEmpty {
-                    Text(episode.nameCn)
+                  if !episode.nameCN.isEmpty {
+                    Text(episode.nameCN)
                       .lineLimit(1)
                       .font(.subheadline)
                   }
                   HStack {
                     Label("\(episode.duration)", systemImage: "clock")
-                    Label("\(episode.airdateStr)", systemImage: "calendar")
+                    Label("\(episode.airdate)", systemImage: "calendar")
                     Spacer()
                     Label("+\(episode.comment)", systemImage: "bubble")
                   }

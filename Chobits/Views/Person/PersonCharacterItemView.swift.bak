@@ -9,9 +9,9 @@ import SwiftData
 import SwiftUI
 
 struct PersonCharacterItemView: View {
-  var personId: UInt
-  var characterId: UInt
-  var subjectId: UInt
+  var personId: Int
+  var characterId: Int
+  var subjectId: Int
 
   @Environment(\.modelContext) var modelContext
 
@@ -72,7 +72,7 @@ struct PersonCharacterItemView: View {
               .lineLimit(1)
               .font(.footnote)
             HStack(alignment: .bottom) {
-              Text(subject?.nameCn ?? "")
+              Text(subject?.nameCN ?? "")
                 .truncationMode(.middle)
                 .foregroundStyle(.secondary)
                 .lineLimit(1)
@@ -101,17 +101,9 @@ struct PersonCharacterItemView: View {
   let person = Person.preview
   let character = Character.preview
   let subject = Subject.previewAnime
-  let personCharacters = PersonRelatedCharacter.preview
-  let personSubjects = PersonRelatedSubject.preview
   container.mainContext.insert(person)
   container.mainContext.insert(character)
   container.mainContext.insert(subject)
-  for item in personCharacters {
-    container.mainContext.insert(item)
-  }
-  for item in personSubjects {
-    container.mainContext.insert(item)
-  }
 
   return ScrollView(showsIndicators: false) {
     LazyVStack(alignment: .leading) {

@@ -9,14 +9,14 @@ import SwiftData
 import SwiftUI
 
 struct PersonSubjectsView: View {
-  var personId: UInt
+  var personId: Int
 
   @Query
   private var subjects: [PersonRelatedSubject]
 
   @State private var refreshed: Bool = false
 
-  init(personId: UInt) {
+  init(personId: Int) {
     self.personId = personId
     var descriptor = FetchDescriptor<PersonRelatedSubject>(
       predicate: #Predicate<PersonRelatedSubject> {
@@ -71,7 +71,7 @@ struct PersonSubjectsView: View {
               if !subject.typeEnum.icon.isEmpty {
                 Image(systemName: subject.typeEnum.icon)
               }
-              Text(subject.nameCn)
+              Text(subject.nameCN)
                 .lineLimit(1)
             }
             .font(.footnote)

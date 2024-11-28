@@ -13,12 +13,13 @@ import SwiftData
 actor DatabaseOperator {
 }
 
+// MARK: - basic
 extension DatabaseOperator {
   public func commit() throws {
     try modelContext.save()
   }
 
-  private func fetchOne<T: PersistentModel>(
+  public func fetchOne<T: PersistentModel>(
     predicate: Predicate<T>? = nil,
     sortBy: [SortDescriptor<T>] = []
   ) throws -> T? {
@@ -28,7 +29,7 @@ extension DatabaseOperator {
     return list.first
   }
 
-  private func insertIfNeeded<T: PersistentModel>(
+  public func insertIfNeeded<T: PersistentModel>(
     data: T,
     predicate: Predicate<T>
   ) throws {
@@ -40,204 +41,9 @@ extension DatabaseOperator {
   }
 }
 
+// MARK: - fetch
 extension DatabaseOperator {
-  public func saveCalendar(_ items: [BangumiCalendarDTO]) throws {
-    for item in items {
-      Logger.db.info("processing calendar: \(item.weekday.en)")
-      let cal = BangumiCalendar(item)
-      modelContext.insert(cal)
-      for small in item.items {
-        let subject = Subject(small)
-        let sid = small.id
-        try self.insertIfNeeded(
-          data: subject,
-          predicate: #Predicate<Subject> {
-            $0.subjectId == sid
-          })
-      }
-    }
-  }
-
-  public func saveSubject(_ item: SubjectDTO) throws {
-    let subject = Subject(item)
-    modelContext.insert(subject)
-  }
-
-  public func saveSubject(_ item: SlimSubject) throws {
-    let subject = Subject(item)
-    let subjectID = item.id
-    try self.insertIfNeeded(
-      data: subject,
-      predicate: #Predicate<Subject> {
-        $0.subjectId == subjectID
-      })
-  }
-
-  public func saveSubject(_ item: SubjectRelationDTO) throws {
-    let subject = Subject(item)
-    let subjectID = item.id
-    try self.insertIfNeeded(
-      data: subject,
-      predicate: #Predicate<Subject> {
-        $0.subjectId == subjectID
-      })
-  }
-
-  public func saveSubject(_ item: CharacterSubjectDTO) throws {
-    let subject = Subject(item)
-    let subjectID = item.id
-    try self.insertIfNeeded(
-      data: subject,
-      predicate: #Predicate<Subject> {
-        $0.subjectId == subjectID
-      })
-  }
-
-  public func saveSubject(_ item: CharacterPersonDTO) throws {
-    let subject = Subject(item)
-    let subjectID = item.subjectId
-    try self.insertIfNeeded(
-      data: subject,
-      predicate: #Predicate<Subject> {
-        $0.subjectId == subjectID
-      })
-  }
-
-  public func saveSubject(_ item: PersonSubjectDTO) throws {
-    let subject = Subject(item)
-    let subjectID = item.id
-    try self.insertIfNeeded(
-      data: subject,
-      predicate: #Predicate<Subject> {
-        $0.subjectId == subjectID
-      })
-  }
-
-  public func saveSubject(_ item: PersonCharacterDTO) throws {
-    let subject = Subject(item)
-    let subjectID = item.subjectId
-    try self.insertIfNeeded(
-      data: subject,
-      predicate: #Predicate<Subject> {
-        $0.subjectId == subjectID
-      })
-  }
-
-  public func saveSubjectRelation(_ item: SubjectRelationDTO, subjectId: UInt, sort: Float) throws {
-    let relation = SubjectRelation(item, subjectId: subjectId, sort: sort)
-    modelContext.insert(relation)
-  }
-
-  public func saveUserCollection(_ item: UserSubjectCollectionDTO) throws {
-    let collection = UserSubjectCollection(item)
-    modelContext.insert(collection)
-  }
-
-  public func saveEpisode(_ item: EpisodeDTO, subjectId: UInt) throws {
-    let episode = Episode(item, subjectId: subjectId)
-    modelContext.insert(episode)
-  }
-
-  public func saveEpisode(_ item: EpisodeCollectionDTO, subjectId: UInt) throws {
-    let episode = Episode(item, subjectId: subjectId)
-    modelContext.insert(episode)
-  }
-
-  public func saveSubjectCharacter(_ item: SubjectCharacterDTO, subjectId: UInt, sort: Float) throws
-  {
-    let character = SubjectRelatedCharacter(item, subjectId: subjectId, sort: sort)
-    modelContext.insert(character)
-  }
-
-  public func saveSubjectPerson(_ item: SubjectPersonDTO, subjectId: UInt, sort: Float) throws {
-    let person = SubjectRelatedPerson(item, subjectId: subjectId, sort: sort)
-    modelContext.insert(person)
-  }
-
-  public func saveCharacter(_ item: CharacterDTO) throws {
-    let character = Character(item)
-    modelContext.insert(character)
-  }
-
-  public func saveCharacter(_ item: SubjectCharacterDTO) throws {
-    let character = Character(item)
-    let characterId = character.characterId
-    try self.insertIfNeeded(
-      data: character,
-      predicate: #Predicate<Character> {
-        $0.characterId == characterId
-      })
-  }
-
-  public func saveCharacter(_ item: PersonCharacterDTO) throws {
-    let character = Character(item)
-    let characterId = character.characterId
-    try self.insertIfNeeded(
-      data: character,
-      predicate: #Predicate<Character> {
-        $0.characterId == characterId
-      })
-  }
-
-  public func saveCharacterSubject(_ item: CharacterSubjectDTO, characterId: UInt) throws {
-    let character = CharacterRelatedSubject(item, characterId: characterId)
-    modelContext.insert(character)
-  }
-
-  public func saveCharacterPerson(_ item: CharacterPersonDTO, characterId: UInt) throws {
-    let person = CharacterRelatedPerson(item, characterId: characterId)
-    modelContext.insert(person)
-  }
-
-  public func savePerson(_ item: SubjectCharacterActorItem) throws {
-    let person = Person(item)
-    let personId = person.personId
-    try self.insertIfNeeded(
-      data: person,
-      predicate: #Predicate<Person> {
-        $0.personId == personId
-      })
-  }
-
-  public func savePerson(_ item: PersonDTO) throws {
-    let person = Person(item)
-    modelContext.insert(person)
-  }
-
-  public func savePerson(_ itme: SubjectPersonDTO) throws {
-    let person = Person(itme)
-    let personId = person.personId
-    try self.insertIfNeeded(
-      data: person,
-      predicate: #Predicate<Person> {
-        $0.personId == personId
-      })
-  }
-
-  public func savePerson(_ item: CharacterPersonDTO) throws {
-    let person = Person(item)
-    let personId = person.personId
-    try self.insertIfNeeded(
-      data: person,
-      predicate: #Predicate<Person> {
-        $0.personId == personId
-      })
-  }
-
-  public func savePersonSubject(_ item: PersonSubjectDTO, personId: UInt) throws {
-    let person = PersonRelatedSubject(item, personId: personId)
-    modelContext.insert(person)
-  }
-
-  public func savePersonCharacter(_ item: PersonCharacterDTO, personId: UInt) throws {
-    let person = PersonRelatedCharacter(item, personId: personId)
-    modelContext.insert(person)
-  }
-
-}
-
-extension DatabaseOperator {
-  public func getSubjectType(_ id: UInt) throws -> SubjectType {
+  public func getSubjectType(_ id: Int) throws -> SubjectType {
     let subject = try self.fetchOne(
       predicate: #Predicate<Subject> {
         $0.subjectId == id
@@ -249,7 +55,7 @@ extension DatabaseOperator {
     return subject.typeEnum
   }
 
-  public func getEpisodeIDs(subjectId: UInt, sort: Float) throws -> [UInt] {
+  public func getEpisodeIDs(subjectId: Int, sort: Float) throws -> [Int] {
     let descriptor = FetchDescriptor<Episode>(
       predicate: #Predicate<Episode> {
         $0.subjectId == subjectId && $0.sort <= sort
@@ -259,8 +65,9 @@ extension DatabaseOperator {
   }
 }
 
+// MARK: - delete,update user collection
 extension DatabaseOperator {
-  public func deleteUserCollection(subjectId: UInt) throws {
+  public func deleteUserCollection(subjectId: Int) throws {
     try modelContext.delete(
       model: UserSubjectCollection.self,
       where: #Predicate<UserSubjectCollection> {
@@ -268,66 +75,8 @@ extension DatabaseOperator {
       })
   }
 
-//  public func updateUserCollection(subjectId: UInt, eps: UInt?, vols: UInt?) throws {
-//    let collection = try self.fetchOne(
-//      predicate: #Predicate<UserSubjectCollection> {
-//        $0.subjectId == subjectId
-//      }
-//    )
-//    if let eps = eps {
-//      collection?.epStatus = eps
-//    }
-//    if let vols = vols {
-//      collection?.volStatus = vols
-//    }
-//    collection?.updatedAt = Date() - 1
-//  }
-
-//  public func updateUserCollection(
-//    subjectId: UInt, type: CollectionType?, rate: UInt8?, comment: String?,
-//    priv: Bool?, tags: [String]?
-//  ) throws {
-//    var collection = try self.fetchOne(
-//      predicate: #Predicate<UserSubjectCollection> {
-//        $0.subjectId == subjectId
-//      }
-//    )
-//    if collection == nil {
-//      let item = UserSubjectCollection(
-//        subjectId: subjectId,
-//        subjectType: 0,
-//        rate: 0,
-//        type: 0,
-//        comment: "",
-//        tags: [],
-//        epStatus: 0,
-//        volStatus: 0,
-//        updatedAt: Date(),
-//        priv: false
-//      )
-//      modelContext.insert(item)
-//      collection = item
-//    }
-//    if let type = type {
-//      collection?.type = type.rawValue
-//    }
-//    if let rate = rate {
-//      collection?.rate = rate
-//    }
-//    if let comment = comment {
-//      collection?.comment = comment
-//    }
-//    if let priv = priv {
-//      collection?.priv = priv
-//    }
-//    if let tags = tags {
-//      collection?.tags = tags
-//    }
-//    collection?.updatedAt = Date() - 1
-//  }
-
-  public func updateEpisodeCollections(subjectId: UInt, sort: Float, type: EpisodeCollectionType)
-  throws
+  public func updateEpisodeCollections(subjectId: Int, sort: Float, type: EpisodeCollectionType)
+    throws
   {
     let descriptor = FetchDescriptor<Episode>(
       predicate: #Predicate<Episode> {
@@ -345,8 +94,8 @@ extension DatabaseOperator {
     collection?.updatedAt = Date() - 1
   }
 
-  public func updateEpisodeCollection(subjectId: UInt, episodeId: UInt, type: EpisodeCollectionType)
-  throws
+  public func updateEpisodeCollection(subjectId: Int, episodeId: Int, type: EpisodeCollectionType)
+    throws
   {
     let episode = try self.fetchOne(
       predicate: #Predicate<Episode> {
@@ -360,5 +109,152 @@ extension DatabaseOperator {
       }
     )
     collection?.updatedAt = Date() - 1
+  }
+}
+
+// MARK: - ensure
+extension DatabaseOperator {
+  public func ensureSubject(_ item: SubjectDTO) throws -> Subject {
+    let sid = item.id
+    let fetched = try self.fetchOne(
+      predicate: #Predicate<Subject> {
+        $0.subjectId == sid
+      })
+    if let subject = fetched {
+      subject.update(item)
+      return subject
+    }
+    let subject = Subject(item)
+    modelContext.insert(subject)
+    return subject
+  }
+
+  public func ensureCharacter(_ item: CharacterDTO) throws -> Character {
+    let cid = item.id
+    let fetched = try self.fetchOne(
+      predicate: #Predicate<Character> {
+        $0.characterId == cid
+      })
+    if let character = fetched {
+      character.update(item)
+      return character
+    }
+    let character = Character(item)
+    modelContext.insert(character)
+    return character
+  }
+
+  public func ensurePerson(_ item: PersonDTO) throws -> Person {
+    let pid = item.id
+    let fetched = try self.fetchOne(
+      predicate: #Predicate<Person> {
+        $0.personId == pid
+      })
+    if let person = fetched {
+      person.update(item)
+      return person
+    }
+    let person = Person(item)
+    modelContext.insert(person)
+    return person
+  }
+
+  public func ensureUserSubjectCollection(_ item: UserSubjectCollectionDTO) throws
+    -> UserSubjectCollection
+  {
+    let sid = item.subject.id
+    let fetched = try self.fetchOne(
+      predicate: #Predicate<UserSubjectCollection> {
+        $0.subjectId == sid
+      })
+    if let collection = fetched {
+      collection.update(item)
+      return collection
+    }
+    let collection = UserSubjectCollection(item)
+    modelContext.insert(collection)
+    return collection
+  }
+
+  public func ensureUserCharacterCollection(_ item: UserCharacterCollectionDTO) throws
+    -> UserCharacterCollection
+  {
+    let cid = item.character.id
+    let fetched = try self.fetchOne(
+      predicate: #Predicate<UserCharacterCollection> {
+        $0.characterId == cid
+      })
+    if let collection = fetched {
+      collection.update(item)
+      return collection
+    }
+    let collection = UserCharacterCollection(item)
+    modelContext.insert(collection)
+    return collection
+  }
+
+  public func ensureUserPersonCollection(_ item: UserPersonCollectionDTO) throws
+    -> UserPersonCollection
+  {
+    let pid = item.person.id
+    let fetched = try self.fetchOne(
+      predicate: #Predicate<UserPersonCollection> {
+        $0.personId == pid
+      })
+    if let collection = fetched {
+      collection.update(item)
+      return collection
+    }
+    let collection = UserPersonCollection(item)
+    modelContext.insert(collection)
+    return collection
+  }
+}
+
+// MARK: - save
+extension DatabaseOperator {
+  public func saveCalendarItem(_ item: BangumiCalendarDTO) throws {
+    let cal = BangumiCalendar(item)
+    modelContext.insert(cal)
+  }
+
+  public func saveSubject(_ item: SubjectDTO) throws {
+    let _ = try self.ensureSubject(item)
+  }
+
+  public func saveUserSubjectCollection(_ item: UserSubjectCollectionDTO) throws {
+    let subject = try self.ensureSubject(item.subject)
+    let collection = try self.ensureUserSubjectCollection(item)
+    collection.subject = subject
+  }
+
+  public func saveEpisode(_ item: EpisodeDTO) throws {
+    let episode = Episode(item)
+    modelContext.insert(episode)
+  }
+
+  public func saveEpisode(_ item: EpisodeCollectionDTO) throws {
+    let episode = Episode(item)
+    modelContext.insert(episode)
+  }
+
+  public func saveCharacter(_ item: CharacterDTO) throws {
+    let _ = try self.ensureCharacter(item)
+  }
+
+  public func savePerson(_ item: PersonDTO) throws {
+    let _ = try self.ensurePerson(item)
+  }
+
+  public func saveUserCharacterCollection(_ item: UserCharacterCollectionDTO) throws {
+    let character = try self.ensureCharacter(item.character)
+    let collection = try self.ensureUserCharacterCollection(item)
+    collection.character = character
+  }
+
+  public func saveUserPersonCollection(_ item: UserPersonCollectionDTO) throws {
+    let person = try self.ensurePerson(item.person)
+    let collection = try self.ensureUserPersonCollection(item)
+    collection.person = person
   }
 }

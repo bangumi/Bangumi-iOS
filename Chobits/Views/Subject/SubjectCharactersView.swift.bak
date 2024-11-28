@@ -9,7 +9,7 @@ import SwiftData
 import SwiftUI
 
 struct SubjectCharactersView: View {
-  let subjectId: UInt
+  let subjectId: Int
 
   @Environment(\.modelContext) var modelContext
 

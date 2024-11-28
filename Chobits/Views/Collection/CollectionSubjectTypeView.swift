@@ -16,7 +16,7 @@ struct CollectionSubjectTypeView: View {
   @State private var collectionType: CollectionType = .collect
   @State private var counts: [CollectionType: Int] = [:]
   @State private var collections: [UserSubjectCollection] = []
-  @State private var subjects: [UInt: Subject] = [:]
+  @State private var subjects: [Int: Subject] = [:]
 
   func load() async {
     let stypeVal = stype.rawValue
@@ -95,7 +95,7 @@ struct CollectionSubjectTypeView: View {
           ForEach(collections) { collection in
             NavigationLink(value: NavDestination.subject(subjectId: collection.subjectId)) {
               ImageView(
-                img: subjects[collection.subjectId]?.images.common, width: 60, height: 60,
+                img: subjects[collection.subjectId]?.images?.common, width: 60, height: 60,
                 type: .subject)
             }.buttonStyle(.plain)
           }

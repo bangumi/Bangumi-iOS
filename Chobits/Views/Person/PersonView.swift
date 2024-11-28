@@ -10,13 +10,12 @@ import SwiftData
 import SwiftUI
 
 struct PersonView: View {
-  var personId: UInt
+  var personId: Int
 
   @AppStorage("shareDomain") var shareDomain: String = ShareDomain.chii.label
   @AppStorage("isolationMode") var isolationMode: Bool = false
 
   @State private var refreshed: Bool = false
-  @State private var coverDetail = false
   @State private var showSummary: Bool = false
   @State private var showInfobox: Bool = false
 
@@ -24,7 +23,7 @@ struct PersonView: View {
   private var persons: [Person]
   var person: Person? { persons.first }
 
-  init(personId: UInt) {
+  init(personId: Int) {
     self.personId = personId
     let predicate = #Predicate<Person> {
       $0.personId == personId
@@ -75,20 +74,12 @@ struct PersonView: View {
 
             /// header
             HStack(alignment: .top) {
-              ImageView(img: person.images.medium, width: 120, height: 160, alignment: .top)
-                .onTapGesture {
-                  coverDetail.toggle()
-                }
-                .sheet(isPresented: $coverDetail) {
-                  ImageView(img: person.images.large, width: 0, height: 0)
-                    .presentationDragIndicator(.visible)
-                    .presentationDetents([.fraction(0.8)])
-                }
+              ImageView(img: person.images?.medium, width: 120, height: 160, alignment: .top)
               VStack(alignment: .leading) {
                 HStack {
                   Label(person.typeEnum.description, systemImage: person.typeEnum.icon)
-                  if person.stat.collects > 0 {
-                    Text("(\(person.stat.collects)人收藏)")
+                  if person.collects > 0 {
+                    Text("(\(person.collects)人收藏)")
                   }
                   Spacer()
                   if person.locked {
@@ -96,7 +87,7 @@ struct PersonView: View {
                       .foregroundStyle(.red)
                   }
                   if !isolationMode {
-                    Label("评论: \(person.stat.comments)", systemImage: "bubble")
+                    Label("评论: \(person.comment)", systemImage: "bubble")
                       .lineLimit(1)
                       .font(.footnote)
                       .foregroundStyle(.linkText)
@@ -105,27 +96,19 @@ struct PersonView: View {
                 .font(.footnote)
                 .foregroundStyle(.secondary)
                 VStack(alignment: .leading) {
-                  ForEach(person.infobox, id: \.key) { item in
-                    HStack(alignment: .top) {
-                      Text("\(item.key):").fixedSize(horizontal: false, vertical: true)
-                      switch item.value {
-                      case .string(let val):
-                        Text(val)
-                          .foregroundStyle(.secondary)
-                          .textSelection(.enabled)
-                          .lineLimit(1)
-                      case .list(let vals):
-                        VStack(alignment: .leading) {
-                          ForEach(vals, id: \.desc) { val in
-                            Text(val.desc)
-                              .foregroundStyle(.secondary)
-                              .textSelection(.enabled)
-                              .lineLimit(1)
-                          }
-                        }
-                      }
-                    }
-                  }
+//                  ForEach(person.infobox.keys(), id: \.self) { key in
+//                    HStack(alignment: .top) {
+//                      Text("\(key):").fixedSize(horizontal: false, vertical: true)
+//                      VStack(alignment: .leading) {
+//                        ForEach(person.infobox[key], id: \.self) { item in
+//                          Text(.desc)
+//                            .foregroundStyle(.secondary)
+//                            .textSelection(.enabled)
+//                            .lineLimit(1)
+//                        }
+//                      }
+//                    }
+//                  }
                 }
                 .font(.footnote)
                 .frame(maxHeight: 110, alignment: .top)
@@ -135,27 +118,19 @@ struct PersonView: View {
                     LazyVStack(alignment: .leading) {
                       Text("资料").font(.title3).padding(.vertical, 10)
                       VStack(alignment: .leading) {
-                        ForEach(person.infobox, id: \.key) { item in
-                          HStack(alignment: .top) {
-                            Text("\(item.key):")
-                            switch item.value {
-                            case .string(let val):
-                              Text(val)
-                                .foregroundStyle(.secondary)
-                                .textSelection(.enabled)
-                                .lineLimit(1)
-                            case .list(let vals):
-                              VStack(alignment: .leading) {
-                                ForEach(vals, id: \.desc) { val in
-                                  Text(val.desc)
-                                    .foregroundStyle(.secondary)
-                                    .textSelection(.enabled)
-                                    .lineLimit(1)
-                                }
-                              }
-                            }
-                          }
-                        }
+//                        ForEach(person.infobox.keys(), id: \.self) { key in
+//                          HStack(alignment: .top) {
+//                            Text("\(key):").fixedSize(horizontal: false, vertical: true)
+//                            VStack(alignment: .leading) {
+//                              ForEach(person.infobox[key], id: \.self) { item in
+//                                Text(.desc)
+//                                  .foregroundStyle(.secondary)
+//                                  .textSelection(.enabled)
+//                                  .lineLimit(1)
+//                              }
+//                            }
+//                          }
+//                        }
                       }
                       .presentationDragIndicator(.visible)
                       .presentationDetents([.medium, .large])
@@ -223,10 +198,10 @@ struct PersonView: View {
             }
 
             /// characters
-            PersonCharactersView(personId: personId)
+            // PersonCharactersView(personId: personId)
 
             /// subjects
-            PersonSubjectsView(personId: personId)
+            // PersonSubjectsView(personId: personId)
           }.padding(.horizontal, 8)
         }
       } else {

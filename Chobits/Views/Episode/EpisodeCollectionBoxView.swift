@@ -9,8 +9,8 @@ import SwiftData
 import SwiftUI
 
 struct EpisodeCollectionBoxView: View {
-  let subjectId: UInt
-  let episodeId: UInt
+  let subjectId: Int
+  let episodeId: Int
 
   @AppStorage("isolationMode") var isolationMode: Bool = false
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
@@ -23,7 +23,7 @@ struct EpisodeCollectionBoxView: View {
   private var episodes: [Episode]
   private var episode: Episode? { episodes.first }
 
-  init(subjectId: UInt, episodeId: UInt) {
+  init(subjectId: Int, episodeId: Int) {
     self.subjectId = subjectId
     self.episodeId = episodeId
 
@@ -114,11 +114,11 @@ struct EpisodeCollectionBoxView: View {
           if !episode.name.isEmpty {
             Text("标题: \(episode.name)")
           }
-          if !episode.nameCn.isEmpty {
-            Text("中文标题: \(episode.nameCn)")
+          if !episode.nameCN.isEmpty {
+            Text("中文标题: \(episode.nameCN)")
           }
-          if !episode.airdateStr.isEmpty {
-            Text("首播时间: \(episode.airdateStr)")
+          if !episode.airdate.isEmpty {
+            Text("首播时间: \(episode.airdate)")
           }
           if !episode.duration.isEmpty {
             Text("时长: \(episode.duration)")

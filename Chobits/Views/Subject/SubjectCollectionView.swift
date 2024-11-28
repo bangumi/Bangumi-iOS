@@ -10,7 +10,7 @@ import SwiftData
 import SwiftUI
 
 struct SubjectCollectionView: View {
-  let subjectId: UInt
+  let subjectId: Int
 
   @Environment(\.modelContext) var modelContext
 
@@ -21,7 +21,7 @@ struct SubjectCollectionView: View {
   private var collections: [UserSubjectCollection]
   var collection: UserSubjectCollection? { collections.first }
 
-  init(subjectId: UInt) {
+  init(subjectId: Int) {
     self.subjectId = subjectId
     _collections = Query(
       filter: #Predicate<UserSubjectCollection> {
@@ -34,7 +34,7 @@ struct SubjectCollectionView: View {
     refreshed = true
 
     do {
-      try await Chii.shared.loadUserCollection(subjectId)
+      try await Chii.shared.loadUserSubjectCollection(subjectId)
     } catch {
       Notifier.shared.alert(error: error)
       return
@@ -44,7 +44,7 @@ struct SubjectCollectionView: View {
   var body: some View {
     Section {
       VStack(alignment: .leading) {
-        if collection?.subjectTypeEnum == .book {
+        if collection?.subject?.typeEnum == .book {
           SubjectBookChaptersView(subjectId: subjectId)
         }
         if refreshed {
@@ -58,7 +58,7 @@ struct SubjectCollectionView: View {
                 if collection?.priv ?? false {
                   Image(systemName: "lock.fill").foregroundStyle(.secondary)
                 }
-                Text(collection?.typeEnum.message(type: collection?.subjectTypeEnum ?? .unknown) ?? "")
+                Text(collection?.typeEnum.message(type: collection?.subject?.typeEnum ?? .unknown) ?? "")
                 StarsView(score: Float(collection?.rate ?? 0), size: 16)
               }
               Spacer()

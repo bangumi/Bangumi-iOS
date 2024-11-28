@@ -28,7 +28,7 @@ struct ChiiTimelineView: View {
   func checkNotice() {
     Task {
       do {
-        let resp = try await Chii.shared.getNotify(limit: 1, unread: true)
+        let resp = try await Chii.shared.listNotice(limit: 1, unread: true)
         if resp.total == 0 {
           unreadNotice = false
         } else {
@@ -54,12 +54,12 @@ struct ChiiTimelineView: View {
         if let me = profile {
           ToolbarItem(placement: .topBarLeading) {
             HStack {
-              ImageView(img: me.avatar.medium, width: 32, height: 32)
+              ImageView(img: me.avatar?.medium, width: 32, height: 32)
               VStack(alignment: .leading) {
                 Text("\(me.nickname)")
                   .font(.callout)
                   .lineLimit(1)
-                //                Text(me.userGroup.description)
+                //                Text(me.group.description)
                 //                  .font(.caption)
                 //                  .foregroundStyle(.secondary)
               }

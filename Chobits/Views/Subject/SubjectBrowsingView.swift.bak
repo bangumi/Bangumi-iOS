@@ -5,9 +5,9 @@
 //  Created by Chuan Chuan on 2024/6/3.
 //
 
+import Flow
 import SwiftData
 import SwiftUI
-import Flow
 
 struct SubjectBrowsingView: View {
   let subjectType: SubjectType

@@ -10,23 +10,23 @@ import SwiftData
 import SwiftUI
 
 struct SubjectTopicListView: View {
-  let subjectId: UInt
+  let subjectId: Int
 
   @State private var fetching: Bool = false
   @State private var offset: Int = 0
   @State private var exhausted: Bool = false
   @State private var loadedIdx: [Int: Bool] = [:]
-  @State private var topics: [EnumerateItem<Topic>] = []
+  @State private var topics: [EnumerateItem<TopicDTO>] = []
 
-  func fetch(limit: Int=20) async -> [EnumerateItem<Topic>] {
+  func fetch(limit: Int = 20) async -> [EnumerateItem<TopicDTO>] {
     fetching = true
     do {
-      let resp = try await Chii.shared.getSubjectTopics(subjectId: subjectId, limit: limit, offset: offset)
+      let resp = try await Chii.shared.getSubjectTopics(subjectId, limit: limit, offset: offset)
       if resp.total < offset + limit {
         exhausted = true
       }
       let result = resp.data.enumerated().map { (idx, item) in
-        EnumerateItem(idx: idx+offset, inner: item)
+        EnumerateItem(idx: idx + offset, inner: item)
       }
       offset += limit
       fetching = false

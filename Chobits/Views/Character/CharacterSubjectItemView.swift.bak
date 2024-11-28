@@ -9,8 +9,8 @@ import SwiftData
 import SwiftUI
 
 struct CharacterSubjectItemView: View {
-  var characterId: UInt
-  var subjectId: UInt
+  var characterId: Int
+  var subjectId: Int
 
   @Query
   private var relations: [CharacterRelatedSubject]
@@ -24,7 +24,7 @@ struct CharacterSubjectItemView: View {
   private var persons: [CharacterRelatedPerson]
   private var person: CharacterRelatedPerson? { persons.first }
 
-  init(characterId: UInt, subjectId: UInt) {
+  init(characterId: Int, subjectId: Int) {
     self.characterId = characterId
     self.subjectId = subjectId
 
@@ -72,7 +72,7 @@ struct CharacterSubjectItemView: View {
               if !subject.typeEnum.icon.isEmpty {
                 Image(systemName: subject.typeEnum.icon)
               }
-              Text(subject.nameCn)
+              Text(subject.nameCN)
                 .lineLimit(1)
             }
             .font(.footnote)

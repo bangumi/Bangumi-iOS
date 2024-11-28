@@ -9,14 +9,14 @@ import SwiftData
 import SwiftUI
 
 struct PersonCharactersView: View {
-  var personId: UInt
+  var personId: Int
 
   @Query
   private var characters: [PersonRelatedCharacter]
 
   @State private var refreshed: Bool = false
 
-  init(personId: UInt) {
+  init(personId: Int) {
     self.personId = personId
     var descriptor = FetchDescriptor<PersonRelatedCharacter>(
       predicate: #Predicate<PersonRelatedCharacter> {

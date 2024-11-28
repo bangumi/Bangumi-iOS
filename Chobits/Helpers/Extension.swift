@@ -5,10 +5,11 @@
 //  Created by Chuan Chuan on 2024/5/4.
 //
 
+import OSLog
 import Foundation
 import SwiftUI
 
-extension UInt8 {
+extension Int {
   var ratingDescription: String {
     let desc: [String: String] = [
       "10": "超神作",
@@ -85,7 +86,7 @@ extension Date {
   }
 }
 
-extension UInt {
+extension Int {
   var dateDisplay: String {
     let formatter = DateFormatter()
     formatter.dateStyle = .medium
@@ -103,5 +104,50 @@ extension UInt {
   var durationDisplay: String {
     let t = Date(timeIntervalSince1970: TimeInterval(self))
     return t.formatRelative
+  }
+}
+
+func safeParseDate(str: String?) -> Date {
+  guard let str = str else {
+    return Date(timeIntervalSince1970: 0)
+  }
+  if str.isEmpty {
+    return Date(timeIntervalSince1970: 0)
+  }
+  if str == "2099" {
+    return Date(timeIntervalSince1970: 0)
+  }
+
+  let dateFormatter = DateFormatter()
+  dateFormatter.locale = Locale(identifier: "en_US_POSIX")
+  dateFormatter.dateFormat = "yyyy-MM-dd"
+  dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
+
+  if let date = dateFormatter.date(from: str) {
+    return date
+  } else {
+    Logger.app.warning("failed to parse date: \(str)")
+    return Date(timeIntervalSince1970: 0)
+  }
+}
+
+func safeParseRFC3339Date(str: String?) -> Date {
+  guard let str = str else {
+    return Date(timeIntervalSince1970: 0)
+  }
+  if str.isEmpty {
+    return Date(timeIntervalSince1970: 0)
+  }
+
+  let RFC3339DateFormatter = DateFormatter()
+  RFC3339DateFormatter.locale = Locale(identifier: "en_US_POSIX")
+  RFC3339DateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZZZZZ"
+  RFC3339DateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
+
+  if let date = RFC3339DateFormatter.date(from: str) {
+    return date
+  } else {
+    Logger.app.warning("failed to parse RFC3339 date: \(str)")
+    return Date(timeIntervalSince1970: 0)
   }
 }

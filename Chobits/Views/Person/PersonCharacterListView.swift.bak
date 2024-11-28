@@ -9,7 +9,7 @@ import SwiftData
 import SwiftUI
 
 struct PersonCharacterListView: View {
-  let personId: UInt
+  let personId: Int
 
   @Environment(\.modelContext) var modelContext
 
@@ -79,7 +79,7 @@ struct PersonCharacterListView: View {
 }
 
 struct PersonCharacterListItemView: View {
-  let characterId: UInt
+  let characterId: Int
 
   @Environment(\.modelContext) var modelContext
 
@@ -142,7 +142,7 @@ struct PersonCharacterListItemView: View {
 }
 
 struct PersonCharacterListItemSubjectItemView: View {
-  let subjectId: UInt
+  let subjectId: Int
   let staff: String
 
   @Environment(\.modelContext) var modelContext
@@ -179,7 +179,7 @@ struct PersonCharacterListItemSubjectItemView: View {
         .font(.footnote)
         .padding(.bottom, 2)
         HStack(alignment: .bottom) {
-          Text(subject?.nameCn ?? "")
+          Text(subject?.nameCN ?? "")
             .truncationMode(.middle)
             .foregroundStyle(.secondary)
             .lineLimit(1)

@@ -9,7 +9,7 @@ import SwiftData
 import SwiftUI
 
 struct SubjectHeaderView: View {
-  let subjectId: UInt
+  let subjectId: Int
 
   @State private var collectionDetail = false
 
@@ -17,7 +17,7 @@ struct SubjectHeaderView: View {
   private var subjects: [Subject]
   var subject: Subject? { subjects.first }
 
-  init(subjectId: UInt) {
+  init(subjectId: Int) {
     self.subjectId = subjectId
     let predicate = #Predicate<Subject> {
       $0.subjectId == subjectId
@@ -27,16 +27,16 @@ struct SubjectHeaderView: View {
 
   var scoreDescription: String {
     guard let subject = subject else { return "" }
-    let score = UInt8(subject.rating.score.rounded())
+    let score = Int(subject.rating.score.rounded())
     return score.ratingDescription
   }
 
   var nameCN: String {
     guard let subject = subject else { return "" }
-    if subject.nameCn.isEmpty {
+    if subject.nameCN.isEmpty {
       return subject.name
     }
-    return subject.nameCn
+    return subject.nameCN
   }
 
   var body: some View {
@@ -72,7 +72,7 @@ struct SubjectHeaderView: View {
       HStack {
         if subject.nsfw {
           ImageView(
-            img: subject.images.common, width: 120, height: 160, type: .subject, overlay: .badge
+            img: subject.images?.common, width: 120, height: 160, type: .subject, overlay: .badge
           ) {
             Text("18+")
               .padding(2)
@@ -83,15 +83,15 @@ struct SubjectHeaderView: View {
               .clipShape(Capsule())
           }
         } else {
-          ImageView(img: subject.images.common, width: 120, height: 160, type: .subject)
+          ImageView(img: subject.images?.common, width: 120, height: 160, type: .subject)
         }
         VStack(alignment: .leading) {
           HStack {
             if subject.typeEnum != .unknown {
               Label(subject.category, systemImage: subject.typeEnum.icon)
             }
-            if subject.date.timeIntervalSince1970 > 0 {
-              Label(subject.date.formatAirdate, systemImage: "calendar")
+            if subject.airtime.date != "" {
+              Label(subject.airtime.date, systemImage: "calendar")
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .lineLimit(1)
@@ -170,21 +170,18 @@ struct SubjectHeaderView: View {
       }
 
       if subject.rating.rank > 0 {
-        NavigationLink(value: NavDestination.subjectBrowsing(subjectType: subject.typeEnum)) {
-          BorderView(.accent, padding: 5) {
-            HStack {
-              Spacer()
-              Label(
-                "Bangumi \(subject.typeEnum.name.capitalized) Ranked:",
-                systemImage: "chart.bar.xaxis"
-              )
-              Text("#\(subject.rating.rank)")
-              Image(systemName: "chevron.right")
-              Spacer()
-            }
-            .font(.callout)
-            .foregroundStyle(.accent)
+        BorderView(.accent, padding: 5) {
+          HStack {
+            Spacer()
+            Label(
+              "Bangumi \(subject.typeEnum.name.capitalized) Ranked:",
+              systemImage: "chart.bar.xaxis"
+            )
+            Text("#\(subject.rating.rank)")
+            Spacer()
           }
+          .font(.callout)
+          .foregroundStyle(.accent)
         }
       }
     }

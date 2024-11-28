@@ -141,9 +141,14 @@ struct ChartView: View {
 
 #Preview {
   let subject = Subject.previewAnime
+  var data: [String: UInt] = [:]
+  for (idx, val) in subject.rating.count.enumerated() {
+    data["\(idx+1)"] = UInt(val)
+  }
+
   return VStack {
     ChartView(
-      title: "数据统计", data: subject.rating.count,
+      title: "数据统计", data: data,
       width: 360, height: 240
     )
     .frame(width: 360, height: 240)

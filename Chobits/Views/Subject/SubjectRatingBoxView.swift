@@ -17,9 +17,17 @@ struct SubjectRatingBoxView: View {
   let subject: Subject
 
   var scoreInfo: ScoreInfo {
-    let score = UInt8(subject.rating.score.rounded())
+    let score = Int(subject.rating.score.rounded())
     let offset = score >= 4 ? Int(score - 4) : 0
     return ScoreInfo(desc: score.ratingDescription, offset: offset)
+  }
+
+  var chartData: [String: UInt] {
+    var data: [String: UInt] = [:]
+    for (idx, val) in subject.rating.count.enumerated() {
+      data["\(idx+1)"] = UInt(val)
+    }
+    return data
   }
 
   var body: some View {
@@ -53,7 +61,7 @@ struct SubjectRatingBoxView: View {
           }
         }.padding(.top, 10)
         ChartView(
-          title: "评分分布", data: subject.rating.count,
+          title: "评分分布", data: chartData,
           width: geometry.size.width, height: 240
         )
         .frame(width: geometry.size.width, height: 240)

@@ -10,23 +10,23 @@ import SwiftData
 import SwiftUI
 
 struct SubjectCommentListView: View {
-  let subjectId: UInt
+  let subjectId: Int
 
   @State private var fetching: Bool = false
   @State private var offset: Int = 0
   @State private var exhausted: Bool = false
   @State private var loadedIdx: [Int: Bool] = [:]
-  @State private var comments: [EnumerateItem<SubjectInterestComment>] = []
+  @State private var comments: [EnumerateItem<SubjectCommentDTO>] = []
 
-  func fetch(limit: Int=20) async -> [EnumerateItem<SubjectInterestComment>] {
+  func fetch(limit: Int = 20) async -> [EnumerateItem<SubjectCommentDTO>] {
     fetching = true
     do {
-      let resp = try await Chii.shared.getSubjectComments(subjectId: subjectId, limit: limit, offset: offset)
+      let resp = try await Chii.shared.getSubjectComments(subjectId, limit: limit, offset: offset)
       if resp.total < offset + limit {
         exhausted = true
       }
-      let result = resp.list.enumerated().map { (idx, item) in
-        EnumerateItem(idx: idx+offset, inner: item)
+      let result = resp.data.enumerated().map { (idx, item) in
+        EnumerateItem(idx: idx + offset, inner: item)
       }
       offset += limit
       fetching = false
@@ -69,7 +69,7 @@ struct SubjectCommentListView: View {
           let comment = item.inner
           HStack(alignment: .top) {
             NavigationLink(value: NavDestination.user(uid: comment.user.uid)) {
-              ImageView(img: comment.user.avatar.large, width: 32, height: 32, type: .avatar)
+              ImageView(img: comment.user.avatar?.large, width: 32, height: 32, type: .avatar)
             }
             VStack(alignment: .leading) {
               HStack {

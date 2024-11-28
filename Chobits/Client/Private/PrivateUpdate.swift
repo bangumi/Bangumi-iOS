@@ -9,7 +9,7 @@ import Foundation
 import OSLog
 
 extension Chii {
-  func clearNotify(ids: [UInt]) async throws {
+  func clearNotice(ids: [Int]) async throws {
     Logger.api.info("start clear notify")
     let url = BangumiAPI.priv.build("p1/clear-notify")
     var body: [String: Any] = [:]

@@ -1,70 +1,83 @@
 {
-  "birth_mon": 4,
-  "gender": "female",
-  "birth_day": 13,
-  "birth_year": null,
-  "blood_type": null,
-  "images": {
-    "small": "https://lain.bgm.tv/r/100/pic/crt/l/ce/65/32_crt_0g9f9.jpg?r=1606033650",
-    "grid": "https://lain.bgm.tv/r/200/pic/crt/l/ce/65/32_crt_0g9f9.jpg?r=1606033650",
-    "large": "https://lain.bgm.tv/pic/crt/l/ce/65/32_crt_0g9f9.jpg?r=1606033650",
-    "medium": "https://lain.bgm.tv/r/400/pic/crt/l/ce/65/32_crt_0g9f9.jpg?r=1606033650"
+  "id": 32,
+  "name": "ちぃ",
+  "role": 1,
+  "infobox": {
+    "生日": [
+      {
+        "v": "4月13日"
+      }
+    ],
+    "身高": [
+      {
+        "v": "152cm"
+      }
+    ],
+    "性别": [
+      {
+        "v": "女"
+      }
+    ],
+    "别名": [
+      {
+        "v": "ちぃ",
+        "k": "日文名"
+      },
+      {
+        "v": "chii",
+        "k": "罗马字"
+      },
+      {
+        "v": "小唧",
+        "k": "第二中文名"
+      }
+    ],
+    "引用来源": [
+      {
+        "v": "anidb.net"
+      }
+    ],
+    "简体中文名": [
+      {
+        "v": "小叽"
+      }
+    ],
+    "忌日": [
+      {
+        "v": ""
+      }
+    ],
+    "血型": [
+      {
+        "v": ""
+      }
+    ],
+    "体重": [
+      {
+        "v": ""
+      }
+    ],
+    "BWH": [
+      {
+        "v": ""
+      }
+    ],
+    "声优": [
+      {
+        "v": "田中理惠"
+      }
+    ]
   },
   "summary": "传说中性能超强的人型电脑，故事第一话时被人弃置在垃圾场，后被我们的本须和秀树发现，并抱回家。由于开始时唧只会'唧，唧'的这样叫，所以秀树为其取名 '唧'TV版第二话「ちぃでかける」时发现小唧本身并没有安OS，不过因为拥有“学习程式”，所以可以通过对话和教导让她‘成长’起来。",
-  "name": "ちぃ",
-  "infobox": [
-    {
-      "key": "生日",
-      "value": "4月13日"
-    },
-    {
-      "key": "身高",
-      "value": "152cm"
-    },
-    {
-      "key": "性别",
-      "value": "女"
-    },
-    {
-      "key": "别名",
-      "value": [
-        {
-          "k": "日文名",
-          "v": "ちぃ"
-        },
-        {
-          "k": "罗马字",
-          "v": "chii"
-        },
-        {
-          "k": "第二中文名",
-          "v": "小唧"
-        }
-      ]
-    },
-    {
-      "key": "引用来源",
-      "value": [
-        {
-          "v": "anidb.net"
-        }
-      ]
-    },
-    {
-      "key": "简体中文名",
-      "value": "小叽"
-    },
-    {
-      "key": "声优",
-      "value": "田中理惠"
-    }
-  ],
-  "stat": {
-    "comments": 55,
-    "collects": 313
-  },
-  "id": 32,
-  "locked": false,
-  "type": 1,
-  "nsfw": false
+  "comment": 56,
+  "collects": 333,
+  "lock": false,
+  "redirect": 0,
+  "nsfw": false,
+  "images": {
+    "large": "https://lain.bgm.tv/pic/crt/l/ce/65/32_crt_0g9f9.jpg?r=1606033650",
+    "medium": "https://lain.bgm.tv/pic/crt/m/ce/65/32_crt_0g9f9.jpg?r=1606033650",
+    "small": "https://lain.bgm.tv/pic/crt/s/ce/65/32_crt_0g9f9.jpg?r=1606033650",
+    "grid": "https://lain.bgm.tv/pic/crt/g/ce/65/32_crt_0g9f9.jpg?r=1606033650"
+  }
 }

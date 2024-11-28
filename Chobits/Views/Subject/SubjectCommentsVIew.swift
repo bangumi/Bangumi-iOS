@@ -9,11 +9,11 @@ import SwiftData
 import SwiftUI
 
 struct SubjectCommentsView: View {
-  let subjectId: UInt
+  let subjectId: Int
 
   @State private var loaded: Bool = false
   @State private var refreshing: Bool = false
-  @State private var comments: [SubjectInterestComment] = []
+  @State private var comments: [SubjectCommentDTO] = []
 
   func refresh() {
     if loaded {
@@ -22,8 +22,8 @@ struct SubjectCommentsView: View {
     refreshing = true
     Task {
       do {
-        let resp = try await Chii.shared.getSubjectComments(subjectId: subjectId, limit: 10)
-        comments = resp.list
+        let resp = try await Chii.shared.getSubjectComments(subjectId, limit: 10)
+        comments = resp.data
       } catch {
         Notifier.shared.alert(error: error)
       }
@@ -62,7 +62,7 @@ struct SubjectCommentsView: View {
       ForEach(comments) { comment in
         HStack(alignment: .top) {
           NavigationLink(value: NavDestination.user(uid: comment.user.uid)) {
-            ImageView(img: comment.user.avatar.large, width: 32, height: 32, type: .avatar)
+            ImageView(img: comment.user.avatar?.large, width: 32, height: 32, type: .avatar)
           }
           VStack(alignment: .leading) {
             HStack {

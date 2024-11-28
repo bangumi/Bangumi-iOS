@@ -11,8 +11,8 @@ struct StarsView: View {
   let score: Float
   let size: CGFloat
 
-  var rate: UInt8 {
-    UInt8(score.rounded())
+  var rate: Int {
+    Int(score.rounded())
   }
 
   var body: some View {

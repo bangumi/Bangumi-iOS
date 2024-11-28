@@ -28,7 +28,7 @@ struct SearchView: View {
       predicate: #Predicate<Subject> {
         return (subjectType.rawValue == 0 || subjectType.rawValue == $0.type)
           && ($0.name.localizedStandardContains(text)
-            || $0.nameCn.localizedStandardContains(text))
+            || $0.nameCN.localizedStandardContains(text))
       })
     desc.fetchLimit = limit
     desc.fetchOffset = offset

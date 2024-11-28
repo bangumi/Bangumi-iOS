@@ -10,20 +10,20 @@ import SwiftUI
 
 enum NavDestination: Hashable, View {
   case user(uid: String)
-  case subject(subjectId: UInt)
-  case subjectInfobox(subjectId: UInt)
-  case subjectRelationList(subjectId: UInt)
-  case subjectCharacterList(subjectId: UInt)
-  case subjectTopicList(subjectId: UInt)
-  case subjectCommentList(subjectId: UInt)
-  case episodeList(subjectId: UInt)
-  case character(characterId: UInt)
-  case person(personId: UInt)
-  case personCharacterList(personId: UInt)
-  case personSubjectList(personId: UInt)
+  case subject(subjectId: Int)
+  case subjectInfobox(subjectId: Int)
+//  case subjectRelationList(subjectId: Int)
+//  case subjectCharacterList(subjectId: Int)
+  case subjectTopicList(subjectId: Int)
+  case subjectCommentList(subjectId: Int)
+  case episodeList(subjectId: Int)
+  case character(characterId: Int)
+  case person(personId: Int)
+//  case personCharacterList(personId: Int)
+//  case personSubjectList(personId: Int)
   case collectionList(subjectType: SubjectType)
-  case subjectBrowsing(subjectType: SubjectType)
-  case topic(topic: Topic)
+//  case subjectBrowsing(subjectType: SubjectType)
+  case topic(topic: TopicDTO)
   case setting
   case notice
 
@@ -39,10 +39,10 @@ enum NavDestination: Hashable, View {
       SubjectView(subjectId: subjectId)
     case .subjectInfobox(let subjectId):
       SubjectInfoboxView(subjectId: subjectId)
-    case .subjectRelationList(let subjectId):
-      SubjectRelationListView(subjectId: subjectId)
-    case .subjectCharacterList(let subjectId):
-      SubjectCharacterListView(subjectId: subjectId)
+//    case .subjectRelationList(let subjectId):
+//      SubjectRelationListView(subjectId: subjectId)
+//    case .subjectCharacterList(let subjectId):
+//      SubjectCharacterListView(subjectId: subjectId)
     case .subjectTopicList(let subjectId):
       SubjectTopicListView(subjectId: subjectId)
     case .subjectCommentList(let subjectId):
@@ -53,14 +53,14 @@ enum NavDestination: Hashable, View {
       CharacterView(characterId: characterId)
     case .person(let personId):
       PersonView(personId: personId)
-    case .personCharacterList(let personId):
-      PersonCharacterListView(personId: personId)
-    case .personSubjectList(let personId):
-      PersonSubjectListView(personId: personId)
+//    case .personCharacterList(let personId):
+//      PersonCharacterListView(personId: personId)
+//    case .personSubjectList(let personId):
+//      PersonSubjectListView(personId: personId)
     case .collectionList(let subjectType):
       CollectionListView(subjectType: subjectType)
-    case .subjectBrowsing(let subjectType):
-      SubjectBrowsingView(subjectType: subjectType)
+//    case .subjectBrowsing(let subjectType):
+//      SubjectBrowsingView(subjectType: subjectType)
     case .topic(let topic):
       TopicView(topic: topic)
     }

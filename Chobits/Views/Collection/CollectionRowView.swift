@@ -9,7 +9,7 @@ import SwiftData
 import SwiftUI
 
 struct CollectionRowView: View {
-  let subjectId: UInt
+  let subjectId: Int
 
   @Environment(\.modelContext) var modelContext
 
@@ -21,7 +21,7 @@ struct CollectionRowView: View {
   private var collections: [UserSubjectCollection]
   private var collection: UserSubjectCollection? { collections.first }
 
-  init(subjectId: UInt) {
+  init(subjectId: Int) {
     self.subjectId = subjectId
 
     _subjects = Query(
@@ -36,10 +36,10 @@ struct CollectionRowView: View {
 
   var body: some View {
     HStack {
-      ImageView(img: subject?.images.common, width: 60, height: 60, type: .subject)
+      ImageView(img: subject?.images?.common, width: 60, height: 60, type: .subject)
       VStack(alignment: .leading) {
         Text(subject?.name ?? "").font(.headline)
-        Text(subject?.nameCn ?? "").font(.footnote).foregroundStyle(.secondary)
+        Text(subject?.nameCN ?? "").font(.footnote).foregroundStyle(.secondary)
         if let collection = collection {
           HStack {
             if collection.priv {

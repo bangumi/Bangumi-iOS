@@ -10,7 +10,7 @@ import SwiftData
 import SwiftUI
 
 struct SubjectView: View {
-  var subjectId: UInt
+  var subjectId: Int
 
   @AppStorage("shareDomain") var shareDomain: String = ShareDomain.chii.label
   @AppStorage("isolationMode") var isolationMode: Bool = false
@@ -22,7 +22,7 @@ struct SubjectView: View {
   private var subjects: [Subject]
   var subject: Subject? { subjects.first }
 
-  init(subjectId: UInt) {
+  init(subjectId: Int) {
     self.subjectId = subjectId
     let predicate = #Predicate<Subject> {
       $0.subjectId == subjectId
@@ -36,23 +36,23 @@ struct SubjectView: View {
 
   func refresh() async {
     if refreshed { return }
-    refreshed = true
     do {
       try await Chii.shared.loadSubject(subjectId)
     } catch {
       Notifier.shared.alert(error: error)
       return
     }
+    refreshed = true
   }
 
   var body: some View {
     Section {
-      if let subject = subject {
+      if subject != nil {
         ScrollView(showsIndicators: false) {
           LazyVStack(alignment: .leading) {
             SubjectHeaderView(subjectId: subjectId)
 
-            switch subject.typeEnum {
+            switch subject?.typeEnum {
             case .anime, .real:
               EpisodeGridView(subjectId: subjectId)
             default:
@@ -64,11 +64,12 @@ struct SubjectView: View {
 
             SubjectSummaryView(subjectId: subjectId)
 
-            SubjectCharactersView(subjectId: subjectId)
-            SubjectRelationsView(subjectId: subjectId)
+            // SubjectCharactersView(subjectId: subjectId)
+            // SubjectRelationsView(subjectId: subjectId)
+
             if !isolationMode {
               SubjectTopicsView(subjectId: subjectId)
-              SubjectCommentsView(subjectId: subjectId)
+              // SubjectCommentsView(subjectId: subjectId)
             }
 
             Spacer()
@@ -85,7 +86,7 @@ struct SubjectView: View {
             }
           }
         }
-        .navigationTitle(subject.name)
+        .navigationTitle(subject?.name ?? "")
         .navigationBarTitleDisplayMode(.inline)
       } else if refreshed {
         NotFoundView()

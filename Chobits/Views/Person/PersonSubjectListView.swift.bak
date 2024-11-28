@@ -9,7 +9,7 @@ import SwiftData
 import SwiftUI
 
 struct PersonSubjectListView: View {
-  let personId: UInt
+  let personId: Int
 
   @Environment(\.modelContext) var modelContext
 
@@ -18,10 +18,9 @@ struct PersonSubjectListView: View {
 
   func load() async {
     let stype = subjectType.rawValue
-    let zero: UInt8 = 0
     let descriptor = FetchDescriptor<PersonRelatedSubject>(
       predicate: #Predicate<PersonRelatedSubject> {
-        if stype == zero {
+        if stype == 0 {
           return $0.personId == personId
         } else {
           return $0.personId == personId && $0.type == stype
@@ -62,7 +61,7 @@ struct PersonSubjectListView: View {
                 Text(subject.name)
                   .foregroundStyle(.linkText)
                   .lineLimit(1)
-                Text(subject.nameCn)
+                Text(subject.nameCN)
                   .font(.footnote)
                   .foregroundStyle(.secondary)
                   .lineLimit(1)

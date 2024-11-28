@@ -10,7 +10,7 @@ import OSLog
 import SwiftData
 
 extension Chii {
-  func updateBookCollection(subjectId: UInt, eps: UInt?, vols: UInt?) async throws {
+  func updateBookCollection(subjectId: Int, eps: Int?, vols: Int?) async throws {
     if self.mock {
       return
     }
@@ -31,11 +31,11 @@ extension Chii {
     Logger.api.info(
       "finish update subject collection: \(subjectId), eps: \(eps.debugDescription), vols: \(vols.debugDescription)"
     )
-    try await self.loadUserCollection(subjectId)
+    try await self.loadUserSubjectCollection(subjectId)
   }
 
   func updateSubjectCollection(
-    subjectId: UInt, type: CollectionType?, rate: UInt8?, comment: String?,
+    subjectId: Int, type: CollectionType?, rate: Int?, comment: String?,
     priv: Bool?, tags: [String]?
   ) async throws {
     if self.mock {
@@ -63,11 +63,11 @@ extension Chii {
       _ = try await self.request(url: url, method: "POST", body: body, auth: .required)
     }
     Logger.api.info("finish update subject collection: \(subjectId)")
-    try await self.loadUserCollection(subjectId)
+    try await self.loadUserSubjectCollection(subjectId)
   }
 
   func updateSubjectEpisodeCollection(
-    subjectId: UInt, updateTo: Float, type: EpisodeCollectionType
+    subjectId: Int, updateTo: Float, type: EpisodeCollectionType
   ) async throws {
     if self.mock {
       return
@@ -88,11 +88,11 @@ extension Chii {
 
     try await db.updateEpisodeCollections(subjectId: subjectId, sort: updateTo, type: type)
     try await db.commit()
-    try await self.loadUserCollection(subjectId)
+    try await self.loadUserSubjectCollection(subjectId)
   }
 
-  func updateEpisodeCollection(subjectId: UInt, episodeId: UInt, type: EpisodeCollectionType)
-  async throws
+  func updateEpisodeCollection(subjectId: Int, episodeId: Int, type: EpisodeCollectionType)
+    async throws
   {
     if self.mock {
       return
@@ -109,6 +109,6 @@ extension Chii {
 
     try await db.updateEpisodeCollection(subjectId: subjectId, episodeId: episodeId, type: type)
     try await db.commit()
-    try await self.loadUserCollection(subjectId)
+    try await self.loadUserSubjectCollection(subjectId)
   }
 }

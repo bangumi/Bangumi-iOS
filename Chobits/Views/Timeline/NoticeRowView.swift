@@ -10,7 +10,7 @@ import Foundation
 import SwiftUI
 
 struct NoticeRowView: View {
-  @Binding var notice: Notice
+  @Binding var notice: NoticeDTO
 
   var body: some View {
     HStack {
@@ -20,7 +20,7 @@ struct NoticeRowView: View {
           .foregroundStyle(.accent)
       }
       NavigationLink(value: NavDestination.user(uid: notice.sender.uid)) {
-        ImageView(img: notice.sender.avatar.large, width: 40, height: 40, type: .avatar)
+        ImageView(img: notice.sender.avatar?.large, width: 40, height: 40, type: .avatar)
       }
       VStack(alignment: .leading) {
         HStack {
@@ -183,7 +183,7 @@ struct NoticeRowView: View {
 
   return ScrollView {
     LazyVStack(alignment: .leading) {
-      NoticeRowView(notice: .constant(Notice()))
+      NoticeRowView(notice: .constant(NoticeDTO()))
         .modelContainer(container)
     }
   }.padding()

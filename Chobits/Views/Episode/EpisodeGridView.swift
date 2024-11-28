@@ -11,7 +11,7 @@ import SwiftUI
 import Flow
 
 struct EpisodeGridView: View {
-  let subjectId: UInt
+  let subjectId: Int
 
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
 
@@ -23,7 +23,7 @@ struct EpisodeGridView: View {
   @State private var episodeMains: [Episode] = []
   @State private var episodeSps: [Episode] = []
 
-  init(subjectId: UInt) {
+  init(subjectId: Int) {
     self.subjectId = subjectId
   }
 

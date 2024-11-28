@@ -18,24 +18,3 @@ struct SubjectsResponse: Codable {
   var offset: Int
   var data: [SubjectDTO]
 }
-
-struct SubjectCollectionResponse: Codable {
-  var total: Int
-  var limit: Int
-  var offset: Int
-  var data: [UserSubjectCollectionDTO]
-}
-
-struct EpisodeResponse: Codable {
-  var total: Int
-  var limit: Int
-  var offset: Int
-  var data: [EpisodeDTO]
-}
-
-struct EpisodeCollectionResponse: Codable {
-  var total: Int
-  var limit: Int
-  var offset: Int
-  var data: [EpisodeCollectionDTO]?
-}

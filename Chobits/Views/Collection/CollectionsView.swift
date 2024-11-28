@@ -18,22 +18,19 @@ struct CollectionsView: View {
   func refreshCollections() async {
     refreshing = true
     refreshProgress = 0
+    let limit: Int = 100
     var offset: Int = 0
     while true {
       do {
         guard let db = await Chii.shared.db else {
           throw ChiiError.uninitialized
         }
-        let resp = try await Chii.shared.getSubjectCollections(
-          collectionType: .unknown, subjectType: .unknown, offset: offset)
+        let resp = try await Chii.shared.getUserSubjectCollections(limit: limit, offset: offset)
         if resp.data.isEmpty {
           break
         }
         for item in resp.data {
-          try await db.saveUserCollection(item)
-          if let slim = item.subject {
-            try await db.saveSubject(slim)
-          }
+          try await db.saveUserSubjectCollection(item)
         }
         try await db.commit()
         Logger.collection.info(

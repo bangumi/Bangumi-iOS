@@ -17,18 +17,11 @@ struct ChobitsApp: App {
   init() {
     let schema = Schema([
       BangumiCalendar.self,
-      UserSubjectCollection.self,
       Episode.self,
       Subject.self,
-      SubjectRelation.self,
-      SubjectRelatedCharacter.self,
-      SubjectRelatedPerson.self,
+      UserSubjectCollection.self,
       Character.self,
-      CharacterRelatedSubject.self,
-      CharacterRelatedPerson.self,
       Person.self,
-      PersonRelatedSubject.self,
-      PersonRelatedCharacter.self,
     ])
     let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
     do {

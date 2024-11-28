@@ -11,6 +11,7 @@ import SwiftUI
 
 struct ChiiProgressView: View {
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
+  @AppStorage("lastLoadUserSubjectCollections") var lastLoadUserSubjectCollections: Int = 0
 
   @Environment(\.modelContext) var modelContext
 
@@ -93,11 +94,16 @@ struct ChiiProgressView: View {
   }
 
   func refreshCollections() async {
+    let now = Date()
     do {
-      try await Chii.shared.loadUserCollections(once: true)
+      let count = try await Chii.shared.loadUserSubjectCollections(since: lastLoadUserSubjectCollections)
+      if count > 0 {
+        Notifier.shared.notify(message: "更新了 \(count) 条收藏")
+      }
     } catch {
       Notifier.shared.alert(error: error)
     }
+    lastLoadUserSubjectCollections = Int(now.timeIntervalSince1970)
   }
 
   var body: some View {
@@ -126,7 +132,7 @@ struct ChiiProgressView: View {
             }
           }
           LazyVStack(alignment: .leading) {
-            ForEach(collections, id: \.inner.self) { item in
+            ForEach(collections, id: \.idx) { item in
               NavigationLink(value: NavDestination.subject(subjectId: item.inner.subjectId)) {
                 ProgressRowView(subjectId: item.inner.subjectId).padding(8)
               }

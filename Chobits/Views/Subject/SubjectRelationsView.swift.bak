@@ -10,7 +10,7 @@ import SwiftData
 import SwiftUI
 
 struct SubjectRelationsView: View {
-  let subjectId: UInt
+  let subjectId: Int
 
   @Environment(\.modelContext) var modelContext
 
@@ -24,7 +24,7 @@ struct SubjectRelationsView: View {
   private var subjects: [Subject]
   private var subject: Subject? { subjects.first }
 
-  init(subjectId: UInt) {
+  init(subjectId: Int) {
     self.subjectId = subjectId
     _subjects = Query(
       filter: #Predicate<Subject> {

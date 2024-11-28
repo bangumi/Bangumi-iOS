@@ -10,13 +10,12 @@ import SwiftData
 import SwiftUI
 
 struct CharacterView: View {
-  var characterId: UInt
+  var characterId: Int
 
   @AppStorage("shareDomain") var shareDomain: String = ShareDomain.chii.label
   @AppStorage("isolationMode") var isolationMode: Bool = false
 
   @State private var refreshed: Bool = false
-  @State private var coverDetail = false
   @State private var showSummary: Bool = false
   @State private var showInfobox: Bool = false
 
@@ -24,7 +23,7 @@ struct CharacterView: View {
   private var characters: [Character]
   private var character: Character? { characters.first }
 
-  init(characterId: UInt) {
+  init(characterId: Int) {
     self.characterId = characterId
     let predicate = #Predicate<Character> {
       $0.characterId == characterId
@@ -70,28 +69,16 @@ struct CharacterView: View {
 
             /// header
             HStack(alignment: .top) {
-              ImageView(img: character.images.medium, width: 120, height: 160, alignment: .top)
-                .onTapGesture {
-                  coverDetail.toggle()
-                }
-                .sheet(isPresented: $coverDetail) {
-                  ImageView(img: character.images.large, width: 0, height: 0)
-                    .presentationDragIndicator(.visible)
-                    .presentationDetents([.fraction(0.8)])
-                }
+              ImageView(img: character.images?.medium, width: 120, height: 160, alignment: .top)
               VStack(alignment: .leading) {
                 HStack {
-                  Label(character.typeEnum.description, systemImage: character.typeEnum.icon)
-                  if character.stat.collects > 0 {
-                    Text("(\(character.stat.collects)人收藏)")
+                  Label(character.roleEnum.description, systemImage: character.roleEnum.icon)
+                  if character.collects > 0 {
+                    Text("(\(character.collects)人收藏)")
                   }
                   Spacer()
-                  if character.locked {
-                    Label("", systemImage: "lock")
-                      .foregroundStyle(.red)
-                  }
                   if !isolationMode {
-                    Label("评论: \(character.stat.comments)", systemImage: "bubble")
+                    Label("评论: \(character.comment)", systemImage: "bubble")
                       .lineLimit(1)
                       .font(.footnote)
                       .foregroundStyle(.linkText)
@@ -100,27 +87,19 @@ struct CharacterView: View {
                 .font(.footnote)
                 .foregroundStyle(.secondary)
                 VStack(alignment: .leading) {
-                  ForEach(character.infobox, id: \.key) { item in
-                    HStack(alignment: .top) {
-                      Text("\(item.key):").fixedSize(horizontal: false, vertical: true)
-                      switch item.value {
-                      case .string(let val):
-                        Text(val)
-                          .foregroundStyle(.secondary)
-                          .textSelection(.enabled)
-                          .lineLimit(1)
-                      case .list(let vals):
-                        VStack(alignment: .leading) {
-                          ForEach(vals, id: \.desc) { val in
-                            Text(val.desc)
-                              .foregroundStyle(.secondary)
-                              .textSelection(.enabled)
-                              .lineLimit(1)
-                          }
-                        }
-                      }
-                    }
-                  }
+//                  ForEach(character.infobox.keys(), id: \.self) { key in
+//                    HStack(alignment: .top) {
+//                      Text("\(key):").fixedSize(horizontal: false, vertical: true)
+//                      VStack(alignment: .leading) {
+//                        ForEach(character.infobox[key], id: \.self) { item in
+//                          Text(.desc)
+//                            .foregroundStyle(.secondary)
+//                            .textSelection(.enabled)
+//                            .lineLimit(1)
+//                        }
+//                      }
+//                    }
+//                  }
                 }
                 .font(.footnote)
                 .frame(maxHeight: 110, alignment: .top)
@@ -130,27 +109,19 @@ struct CharacterView: View {
                     LazyVStack(alignment: .leading) {
                       Text("资料").font(.title3).padding(.vertical, 10)
                       VStack(alignment: .leading) {
-                        ForEach(character.infobox, id: \.key) { item in
-                          HStack(alignment: .top) {
-                            Text("\(item.key):")
-                            switch item.value {
-                            case .string(let val):
-                              Text(val)
-                                .foregroundStyle(.secondary)
-                                .textSelection(.enabled)
-                                .lineLimit(1)
-                            case .list(let vals):
-                              VStack(alignment: .leading) {
-                                ForEach(vals, id: \.desc) { val in
-                                  Text(val.desc)
-                                    .foregroundStyle(.secondary)
-                                    .textSelection(.enabled)
-                                    .lineLimit(1)
-                                }
-                              }
-                            }
-                          }
-                        }
+//                        ForEach(character.infobox.keys(), id: \.self) { key in
+//                          HStack(alignment: .top) {
+//                            Text("\(key):").fixedSize(horizontal: false, vertical: true)
+//                            VStack(alignment: .leading) {
+//                              ForEach(character.infobox[key], id: \.self) { item in
+//                                Text(.desc)
+//                                  .foregroundStyle(.secondary)
+//                                  .textSelection(.enabled)
+//                                  .lineLimit(1)
+//                              }
+//                            }
+//                          }
+//                        }
                       }
                       .presentationDragIndicator(.visible)
                       .presentationDetents([.medium, .large])
@@ -166,7 +137,6 @@ struct CharacterView: View {
                     .font(.caption)
                     .foregroundStyle(.linkText)
                 }
-
               }.padding(.leading, 2)
             }
 
@@ -207,11 +177,15 @@ struct CharacterView: View {
             }
 
             /// related subjects
-            CharacterSubjectsView(characterId: characterId)
+            // CharacterSubjectsView(characterId: characterId)
           }.padding(.horizontal, 8)
         }
       } else {
-        NotFoundView()
+        if refreshed {
+          NotFoundView()
+        } else {
+          ProgressView()
+        }
       }
     }
     .toolbar {
@@ -240,8 +214,6 @@ struct CharacterView: View {
 
   let character = Character.preview
   container.mainContext.insert(character)
-  container.mainContext.insert(Subject.previewAnime)
-  container.mainContext.insert(Subject.previewBook)
 
   return NavigationStack {
     CharacterView(characterId: character.characterId)

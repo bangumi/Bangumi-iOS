@@ -12,12 +12,12 @@ struct NoticeView: View {
 
   @State private var fetched: Bool = false
   @State private var updating: Bool = false
-  @State private var notices: [Notice] = []
+  @State private var notices: [NoticeDTO] = []
   @State private var unreadCount: Int = 0
 
   func getNotice() async {
     do {
-      let resp = try await Chii.shared.getNotify(limit: 20)
+      let resp = try await Chii.shared.listNotice(limit: 20)
       notices = resp.data
       unreadCount = notices.count(where: { $0.unread })
     } catch {
@@ -32,7 +32,7 @@ struct NoticeView: View {
     let ids = notices.map { $0.id }
     Task {
       do {
-        try await Chii.shared.clearNotify(ids: ids)
+        try await Chii.shared.clearNotice(ids: ids)
       } catch {
         Notifier.shared.alert(error: error)
       }

@@ -5,10 +5,10 @@
 //  Created by Chuan Chuan on 2024/4/26.
 //
 
+import Flow
 import OSLog
 import SwiftData
 import SwiftUI
-import Flow
 
 struct CalendarView: View {
 
@@ -75,7 +75,7 @@ struct CalendarWeekdayView: View {
     VStack {
       Text(calendar.weekday.cn).font(.title3)
       HFlow {
-        ForEach(calendar.items, id: \.id) { subject in
+        ForEach(calendar.subjects, id: \.id) { subject in
           NavigationLink(value: NavDestination.subject(subjectId: subject.id)) {
             VStack {
               ImageView(img: subject.images?.common, width: 80, height: 80, type: .subject)

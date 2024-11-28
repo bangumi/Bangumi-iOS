@@ -31,7 +31,7 @@ struct UserView: View {
       ScrollView {
         LazyVStack(alignment: .leading) {
           HStack {
-            ImageView(img: user.avatar.large, width: 100, height: 100, type: .avatar)
+            ImageView(img: user.avatar?.large, width: 100, height: 100, type: .avatar)
             VStack(alignment: .leading) {
               Text(user.nickname).font(.title2.bold())
               HStack {

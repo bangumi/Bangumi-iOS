@@ -7,9 +7,10 @@
 
 import SwiftData
 import SwiftUI
+import Flow
 
 struct SubjectLargeRowView: View {
-  let subjectId: UInt
+  let subjectId: Int
 
   @Environment(\.modelContext) var modelContext
 
@@ -17,28 +18,23 @@ struct SubjectLargeRowView: View {
   private var subjects: [Subject]
   private var subject: Subject? { subjects.first }
 
-  @Query
-  private var collections: [UserSubjectCollection]
-  private var collection: UserSubjectCollection? { collections.first }
-
-  init(subjectId: UInt) {
+  init(subjectId: Int) {
     self.subjectId = subjectId
-
     _subjects = Query(
       filter: #Predicate<Subject> {
         $0.subjectId == subjectId
       })
-    _collections = Query(
-      filter: #Predicate<UserSubjectCollection> {
-        $0.subjectId == subjectId
-      })
+  }
+
+  var metaTags: [String] {
+    subject?.metaTags ?? []
   }
 
   var body: some View {
     HStack {
       if subject?.nsfw ?? false {
         ImageView(
-          img: subject?.images.common, width: 90, height: 120, type: .subject, overlay: .badge
+          img: subject?.images?.common, width: 90, height: 120, type: .subject, overlay: .badge
         ) {
           Text("18+")
             .padding(2)
@@ -49,7 +45,7 @@ struct SubjectLargeRowView: View {
             .clipShape(Capsule())
         }
       } else {
-        ImageView(img: subject?.images.common, width: 90, height: 120, type: .subject)
+        ImageView(img: subject?.images?.common, width: 90, height: 120, type: .subject)
       }
 
       VStack(alignment: .leading) {
@@ -78,7 +74,7 @@ struct SubjectLargeRowView: View {
 
         // subtitle
         HStack {
-          if let nameCN = subject?.nameCn, !nameCN.isEmpty {
+          if let nameCN = subject?.nameCN, !nameCN.isEmpty {
             Text(nameCN)
               .font(.subheadline)
               .foregroundStyle(.secondary)
@@ -99,12 +95,13 @@ struct SubjectLargeRowView: View {
         HStack(spacing: 4) {
           if let category = subject?.category, !category.isEmpty {
             BorderView(.secondary, padding: 2) {
-              Text(category)
+              Text(category).fixedSize()
             }
           }
-          if subject?.metaTags.count ?? 0 > 0 {
-            ForEach(subject?.metaTags ?? [], id: \.self) { tag in
+          if metaTags.count > 0 {
+            ForEach(metaTags, id: \.self) { tag in
               Text(tag)
+                .fixedSize()
                 .padding(2)
                 .background(.secondary.opacity(0.1))
                 .clipShape(RoundedRectangle(cornerRadius: 5))
@@ -133,12 +130,9 @@ struct SubjectLargeRowView: View {
               .foregroundStyle(.secondary)
           }
           Spacer()
-          if let collection = collection, collection.typeEnum != .unknown {
-            Label(
-              collection.typeEnum.description(type: collection.subjectTypeEnum),
-              systemImage: collection.typeEnum.icon
-            )
-            .foregroundStyle(.accent)
+          if let collection = subject?.userCollection, collection.typeEnum != .unknown {
+            Label(collection.typeDesc, systemImage: collection.typeEnum.icon)
+              .foregroundStyle(.accent)
           }
         }
         .font(.footnote)
@@ -161,6 +155,7 @@ struct SubjectLargeRowView: View {
   for episode in episodes {
     container.mainContext.insert(episode)
   }
+  collection.subject = subject
 
   return ScrollView {
     LazyVStack(alignment: .leading) {

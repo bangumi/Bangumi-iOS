@@ -14,14 +14,6 @@ struct SubjectImages: Codable {
   var medium: String
   var small: String
   var grid: String
-
-  init(subjectId: UInt) {
-    self.large = "https://api.bgm.tv/v0/subjects/\(subjectId)/image?type=large"
-    self.common = "https://api.bgm.tv/v0/subjects/\(subjectId)/image?type=common"
-    self.medium = "https://api.bgm.tv/v0/subjects/\(subjectId)/image?type=medium"
-    self.small = "https://api.bgm.tv/v0/subjects/\(subjectId)/image?type=small"
-    self.grid = "https://api.bgm.tv/v0/subjects/\(subjectId)/image?type=grid"
-  }
 }
 
 struct Images: Codable {
@@ -29,35 +21,15 @@ struct Images: Codable {
   var medium: String
   var small: String
   var grid: String
-
-  init(characterId: UInt) {
-    self.large = "https://api.bgm.tv/v0/characters/\(characterId)/image?type=large"
-    self.medium = "https://api.bgm.tv/v0/characters/\(characterId)/image?type=medium"
-    self.small = "https://api.bgm.tv/v0/characters/\(characterId)/image?type=small"
-    self.grid = "https://api.bgm.tv/v0/characters/\(characterId)/image?type=grid"
-  }
-
-  init(personId: UInt) {
-    self.large = "https://api.bgm.tv/v0/people/\(personId)/image?type=large"
-    self.medium = "https://api.bgm.tv/v0/people/\(personId)/image?type=medium"
-    self.small = "https://api.bgm.tv/v0/people/\(personId)/image?type=small"
-    self.grid = "https://api.bgm.tv/v0/people/\(personId)/image?type=grid"
-  }
 }
 
 struct Avatar: Codable, Hashable {
   var large: String
   var medium: String
   var small: String
-
-  init() {
-    self.large = ""
-    self.medium = ""
-    self.small = ""
-  }
 }
 
-enum UserGroup: UInt8, Codable {
+enum UserGroup: Int, Codable {
   case unknown = 0
   case admin = 1
   case bangumiManager = 2
@@ -69,7 +41,7 @@ enum UserGroup: UInt8, Codable {
   case user = 10
   case wikipedians = 11
 
-  init(_ value: UInt8 = 0) {
+  init(_ value: Int = 0) {
     let tmp = Self(rawValue: value)
     if let out = tmp {
       self = out
@@ -106,7 +78,7 @@ enum UserGroup: UInt8, Codable {
 
 struct Tag: Codable, Equatable {
   var name: String
-  var count: UInt
+  var count: Int
 
   static func == (lhs: Tag, rhs: Tag) -> Bool {
     return lhs.name == rhs.name && lhs.count == rhs.count
@@ -117,114 +89,86 @@ struct Weekday: Codable {
   var en: String
   var cn: String
   var ja: String
-  var id: UInt
+  var id: Int
 }
 
-struct SmallRating: Codable {
-  var total: UInt
-  var count: [String: UInt]
+struct SubjectAirtime: Codable {
+  var date: String
+  var month: Int
+  var weekday: Int
+  var year: Int
+
+  init() {
+    self.date = ""
+    self.month = 0
+    self.weekday = 0
+    self.year = 0
+  }
+}
+
+typealias SubjectCollection = [String: Int]
+
+extension SubjectCollection {
+  var wish: Int {
+    self[String(CollectionType.wish.rawValue)] ?? 0
+  }
+  var collect: Int {
+    self[String(CollectionType.collect.rawValue)] ?? 0
+  }
+  var doing: Int {
+    self[String(CollectionType.do.rawValue)] ?? 0
+  }
+  var onHold: Int {
+    self[String(CollectionType.onHold.rawValue)] ?? 0
+  }
+  var dropped: Int {
+    self[String(CollectionType.dropped.rawValue)] ?? 0
+  }
+}
+
+struct SubjectPlatform: Codable {
+  var alias: String
+  var enableHeader: Bool?
+  var id: Int
+  var order: Int?
+  var searchString: String?
+  var sortKeys: [String]?
+  var type: String
+  var typeCN: String
+  var wikiTpl: String?
+
+  init() {
+    self.alias = ""
+    self.enableHeader = false
+    self.id = 0
+    self.order = 0
+    self.searchString = ""
+    self.sortKeys = []
+    self.type = ""
+    self.typeCN = ""
+    self.wikiTpl = ""
+  }
+}
+
+struct SubjectRating: Codable {
+  var count: [Int]
+  var total: Int
   var score: Float
+  var rank: Int
+
+  init() {
+    self.count = []
+    self.total = 0
+    self.score = 0
+    self.rank = 0
+  }
 }
 
-struct Rating: Codable {
-  var rank: UInt
-  var total: UInt
-  var count: [String: UInt]
-  var score: Float
-}
+typealias Infobox = [String: [InfoboxValue]]
 
-struct InfoboxValueListValue: Codable, Identifiable {
+struct InfoboxValue: Codable {
   var k: String?
   var v: String
-
-  var desc: String {
-    if let k = self.k {
-      return "\(k): \(self.v)"
-    }
-    return self.v
-  }
-
-  var id: String {
-    self.desc
-  }
-}
-
-enum InfoboxValue: Codable {
-  case string(String)
-  case list([InfoboxValueListValue])
-
-  var desc: String {
-    switch self {
-    case .string(let s):
-      return s
-    case .list(let l):
-      let vals = l.map({ $0.desc })
-      return vals.joined(separator: "、")
-    }
-  }
-
-  init(from decoder: Decoder) throws {
-    let container = try decoder.singleValueContainer()
-    if let string = try? container.decode(String.self) {
-      self = .string(string)
-      return
-    }
-    if let list = try? container.decode([InfoboxValueListValue].self) {
-      self = .list(list)
-      return
-    }
-    throw DecodingError.typeMismatch(
-      InfoboxValue.self,
-      DecodingError.Context(
-        codingPath: decoder.codingPath, debugDescription: "Wrong type for InfoboxValue"))
-  }
-
-  func encode(to encoder: Encoder) throws {
-    var container = encoder.singleValueContainer()
-    switch self {
-    case .string(let string):
-      try container.encode(string)
-    case .list(let list):
-      try container.encode(list)
-    }
-  }
-}
-
-struct InfoboxItem: Codable, Identifiable {
-  var key: String
-  var value: InfoboxValue
-
-  var id: String {
-    self.key
-  }
-}
-
-let INFOBOX_NAME_CN_KEYS: [String] = ["简体中文名", "中文名"]
-
-struct Stat: Codable {
-  var comments: UInt
-  var collects: UInt
-
-  init() {
-    self.comments = 0
-    self.collects = 0
-  }
-}
-
-struct SubjectCollection: Codable {
-  var wish: UInt
-  var collect: UInt
-  var doing: UInt
-  var onHold: UInt
-  var dropped: UInt
-
-  init() {
-    self.wish = 0
-    self.collect = 0
-    self.doing = 0
-    self.onHold = 0
-    self.dropped = 0
-  }
 }
 
 /// 收藏类型
@@ -234,7 +178,7 @@ struct SubjectCollection: Codable {
 /// 3: 在看
 /// 4: 搁置
 /// 5: 抛弃
-enum CollectionType: UInt8, Codable, Identifiable, CaseIterable {
+enum CollectionType: Int, Codable, Identifiable, CaseIterable {
   case unknown = 0
   case wish = 1
   case collect = 2
@@ -246,7 +190,7 @@ enum CollectionType: UInt8, Codable, Identifiable, CaseIterable {
     self
   }
 
-  init(_ value: UInt8 = 0) {
+  init(_ value: Int = 0) {
     let tmp = Self(rawValue: value)
     if let out = tmp {
       self = out
@@ -328,6 +272,7 @@ enum CollectionType: UInt8, Codable, Identifiable, CaseIterable {
     }
     return text
   }
+
 }
 
 /// 条目类型
@@ -338,7 +283,7 @@ enum CollectionType: UInt8, Codable, Identifiable, CaseIterable {
 /// 6 为 三次元
 ///
 /// 没有 5
-enum SubjectType: UInt8, Codable, Identifiable, CaseIterable {
+enum SubjectType: Int, Codable, Identifiable, CaseIterable {
   case unknown = 0
   case book = 1
   case anime = 2
@@ -350,7 +295,7 @@ enum SubjectType: UInt8, Codable, Identifiable, CaseIterable {
     self
   }
 
-  init(_ value: UInt8 = 0) {
+  init(_ value: Int = 0) {
     let tmp = Self(rawValue: value)
     if let out = tmp {
       self = out
@@ -417,7 +362,399 @@ enum SubjectType: UInt8, Codable, Identifiable, CaseIterable {
       return "play.tv"
     }
   }
+
+  var authorityFields: [[String]] {
+    switch self {
+    case .unknown:
+      return []
+    case .book:
+      return [
+        ["发售日", "开始"],
+        ["作者", "作画"],
+        ["原作"],
+        ["出版社"],
+      ]
+    case .anime:
+      return [
+        ["放送开始", "上映年度"],
+        ["导演"],
+        ["原作"],
+        ["制作", "製作"],
+      ]
+    case .music:
+      return [
+        ["发售日期"],
+        ["艺术家"],
+      ]
+    case .game:
+      return [
+        ["发行日期"],
+        ["平台"],
+        ["游戏类型"],
+        ["游戏开发商", "开发商", "开发"],
+      ]
+    case .real:
+      return [
+        ["开始"],
+        ["导演"],
+        ["编剧"],
+        ["主演"],
+      ]
+    }
+  }
 }
+
+enum PersonCareer: String, Codable, CaseIterable {
+  case unknown
+  case producer
+  case mangaka
+  case artist
+  case seiyu
+  case writer
+  case illustrator
+  case actor
+
+  init(_ value: String) {
+    let tmp = Self(rawValue: value)
+    if let out = tmp {
+      self = out
+      return
+    }
+    self = Self.unknown
+  }
+
+  var description: String {
+    switch self {
+    case .unknown:
+      return "未知"
+    case .producer:
+      return "制作人员"
+    case .mangaka:
+      return "漫画家"
+    case .artist:
+      return "音乐人"
+    case .seiyu:
+      return "声优"
+    case .writer:
+      return "作家"
+    case .illustrator:
+      return "绘师"
+    case .actor:
+      return "演员"
+    }
+  }
+
+  var label: String {
+    switch self {
+    case .unknown:
+      return "unknown"
+    case .producer:
+      return "producer"
+    case .mangaka:
+      return "mangaka"
+    case .artist:
+      return "artist"
+    case .seiyu:
+      return "seiyu"
+    case .writer:
+      return "writer"
+    case .illustrator:
+      return "illustrator"
+    case .actor:
+      return "actor"
+    }
+  }
+}
+
+/// 人物类型
+/// 1 为 个人
+/// 2 为 公司
+/// 3 为 组合
+enum PersonType: Int, Codable, Identifiable, CaseIterable {
+  case unknown = 0
+  case individual = 1
+  case company = 2
+  case group = 3
+
+  var id: Self {
+    self
+  }
+
+  init(_ value: Int = 0) {
+    let tmp = Self(rawValue: value)
+    if let out = tmp {
+      self = out
+      return
+    }
+    self = Self.unknown
+  }
+
+  var description: String {
+    switch self {
+    case .unknown:
+      return "未知"
+    case .individual:
+      return "个人"
+    case .company:
+      return "公司"
+    case .group:
+      return "组合"
+    }
+  }
+
+  var icon: String {
+    switch self {
+    case .unknown:
+      return "questionmark"
+    case .individual:
+      return "person"
+    case .company:
+      return "building.2"
+    case .group:
+      return "person.3"
+    }
+  }
+}
+
+/// 角色类型
+/// 1 为 角色
+/// 2 为 机体
+/// 3 为 舰船
+/// 4 为 组织
+enum CharacterType: Int, Codable, Identifiable, CaseIterable {
+  case unknown = 0
+  case character = 1
+  case vehicle = 2
+  case ship = 3
+  case organization = 4
+
+  var id: Self {
+    self
+  }
+
+  init(_ value: Int = 0) {
+    let tmp = Self(rawValue: value)
+    if let out = tmp {
+      self = out
+      return
+    }
+    self = Self.unknown
+  }
+
+  var description: String {
+    switch self {
+    case .unknown:
+      return "未知"
+    case .character:
+      return "角色"
+    case .vehicle:
+      return "机体"
+    case .ship:
+      return "舰船"
+    case .organization:
+      return "组织"
+    }
+  }
+
+  var icon: String {
+    switch self {
+    case .unknown:
+      return "questionmark"
+    case .character:
+      return "person"
+    case .vehicle:
+      return "car"
+    case .ship:
+      return "ferry"
+    case .organization:
+      return "building.2"
+    }
+  }
+}
+
+/// 出演类型
+/// 1 为 主角
+/// 2 为 配角
+/// 3 为 客串
+enum CastType: Int, Codable, Identifiable, CaseIterable {
+  case unknown = 0
+  case main = 1
+  case secondary = 2
+  case cameo = 3
+
+  var id: Self {
+    self
+  }
+
+  init(_ value: Int = 0) {
+    let tmp = Self(rawValue: value)
+    if let out = tmp {
+      self = out
+      return
+    }
+    self = Self.unknown
+  }
+
+  var description: String {
+    switch self {
+    case .unknown:
+      return "未知"
+    case .main:
+      return "主角"
+    case .secondary:
+      return "配角"
+    case .cameo:
+      return "客串"
+    }
+  }
+
+  var icon: String {
+    switch self {
+    case .unknown:
+      return "questionmark"
+    case .main:
+      return "star"
+    case .secondary:
+      return "person.2"
+    case .cameo:
+      return "person.3"
+    }
+  }
+}
+
+/// 章节类型
+/// 0 = 本篇
+/// 1 = 特别篇
+/// 2 = OP
+/// 3 = ED
+/// 4 = 预告/宣传/广告
+/// 5 = MAD
+/// 6 = 其他
+enum EpisodeType: Int, Codable, Identifiable, CaseIterable {
+  case main = 0
+  case sp = 1
+  case op = 2
+  case ed = 3
+  case trailer = 4
+  case mad = 5
+  case other = 6
+
+  var id: Self {
+    self
+  }
+
+  init(_ value: Int = 0) {
+    let tmp = Self(rawValue: value)
+    if let out = tmp {
+      self = out
+      return
+    }
+    self = Self.main
+  }
+
+  var name: String {
+    switch self {
+    case .main:
+      return "ep"
+    case .sp:
+      return "sp"
+    case .op:
+      return "op"
+    case .ed:
+      return "ed"
+    case .trailer:
+      return "trailer"
+    case .mad:
+      return "mad"
+    case .other:
+      return "other"
+    }
+  }
+
+  var description: String {
+    switch self {
+    case .main:
+      return "本篇"
+    case .sp:
+      return "SP"
+    case .op:
+      return "OP"
+    case .ed:
+      return "ED"
+    case .trailer:
+      return "预告"
+    case .mad:
+      return "MAD"
+    case .other:
+      return "其他"
+    }
+  }
+}
+
+/// 0: 未收藏
+/// 1: 想看
+/// 2: 看过
+/// 3: 抛弃
+enum EpisodeCollectionType: Int, Codable, Identifiable, CaseIterable {
+  case none = 0
+  case wish = 1
+  case collect = 2
+  case dropped = 3
+
+  var id: Self {
+    self
+  }
+
+  init(_ value: Int = 0) {
+    let tmp = Self(rawValue: value)
+    if let out = tmp {
+      self = out
+      return
+    }
+    self = Self.none
+  }
+
+  var description: String {
+    switch self {
+    case .none:
+      return "未收藏"
+    case .wish:
+      return "想看"
+    case .collect:
+      return "看过"
+    case .dropped:
+      return "抛弃"
+    }
+  }
+
+  var action: String {
+    switch self {
+    case .none:
+      return "撤销"
+    case .wish:
+      return "想看"
+    case .collect:
+      return "看过"
+    case .dropped:
+      return "抛弃"
+    }
+  }
+
+  func otherTypes() -> [Self] {
+    switch self {
+    case .none:
+      return [.collect, .wish, .dropped]
+    case .wish:
+      return [.none, .collect, .dropped]
+    case .collect:
+      return [.none, .wish, .dropped]
+    case .dropped:
+      return [.none, .collect, .wish]
+    }
+  }
+}
+
+/// TODO: use bangumi/common
 
 struct SubjectCategory: Identifiable {
   let id: UInt16
@@ -690,381 +1027,5 @@ enum SubjectCharacterRelationType: String, Identifiable, CaseIterable {
     case .cameo:
       return "客串"
     }
-  }
-}
-
-enum PersonCareer: String, Codable, CaseIterable {
-  case producer
-  case mangaka
-  case artist
-  case seiyu
-  case writer
-  case illustrator
-  case actor
-
-  init(_ value: String) {
-    let tmp = Self(rawValue: value)
-    if let out = tmp {
-      self = out
-      return
-    }
-    self = Self.actor
-  }
-
-  var description: String {
-    switch self {
-    case .producer:
-      return "制作人员"
-    case .mangaka:
-      return "漫画家"
-    case .artist:
-      return "音乐人"
-    case .seiyu:
-      return "声优"
-    case .writer:
-      return "作家"
-    case .illustrator:
-      return "绘师"
-    case .actor:
-      return "演员"
-    }
-  }
-
-  var label: String {
-    switch self {
-    case .producer:
-      return "producer"
-    case .mangaka:
-      return "mangaka"
-    case .artist:
-      return "artist"
-    case .seiyu:
-      return "seiyu"
-    case .writer:
-      return "writer"
-    case .illustrator:
-      return "illustrator"
-    case .actor:
-      return "actor"
-    }
-  }
-}
-
-/// 人物类型
-/// 1 为 个人
-/// 2 为 公司
-/// 3 为 组合
-enum PersonType: UInt8, Codable, Identifiable, CaseIterable {
-  case unknown = 0
-  case individual = 1
-  case company = 2
-  case group = 3
-
-  var id: Self {
-    self
-  }
-
-  init(_ value: UInt8 = 0) {
-    let tmp = Self(rawValue: value)
-    if let out = tmp {
-      self = out
-      return
-    }
-    self = Self.unknown
-  }
-
-  var description: String {
-    switch self {
-    case .unknown:
-      return "未知"
-    case .individual:
-      return "个人"
-    case .company:
-      return "公司"
-    case .group:
-      return "组合"
-    }
-  }
-
-  var icon: String {
-    switch self {
-    case .unknown:
-      return "questionmark"
-    case .individual:
-      return "person"
-    case .company:
-      return "building.2"
-    case .group:
-      return "person.3"
-    }
-  }
-}
-
-/// 角色类型
-/// 1 为 角色
-/// 2 为 机体
-/// 3 为 舰船
-/// 4 为 组织
-enum CharacterType: UInt8, Codable, Identifiable, CaseIterable {
-  case unknown = 0
-  case character = 1
-  case vehicle = 2
-  case ship = 3
-  case organization = 4
-
-  var id: Self {
-    self
-  }
-
-  init(_ value: UInt8 = 0) {
-    let tmp = Self(rawValue: value)
-    if let out = tmp {
-      self = out
-      return
-    }
-    self = Self.unknown
-  }
-
-  var description: String {
-    switch self {
-    case .unknown:
-      return "未知"
-    case .character:
-      return "角色"
-    case .vehicle:
-      return "机体"
-    case .ship:
-      return "舰船"
-    case .organization:
-      return "组织"
-    }
-  }
-
-  var icon: String {
-    switch self {
-    case .unknown:
-      return "questionmark"
-    case .character:
-      return "person"
-    case .vehicle:
-      return "car"
-    case .ship:
-      return "ferry"
-    case .organization:
-      return "building.2"
-    }
-  }
-}
-
-enum BloodType: UInt8, Codable, Identifiable {
-  case unknown = 0
-  case a = 1
-  case b = 2
-  case ab = 3
-  case o = 4
-
-  var id: Self {
-    self
-  }
-
-  init(_ value: UInt8 = 0) {
-    let tmp = Self(rawValue: value)
-    if let out = tmp {
-      self = out
-      return
-    }
-    self = Self.unknown
-  }
-
-  var name: String {
-    switch self {
-    case .unknown:
-      return "unknown"
-    case .a:
-      return "A"
-    case .b:
-      return "B"
-    case .ab:
-      return "AB"
-    case .o:
-      return "O"
-    }
-  }
-}
-
-/// 章节类型
-/// 0 = 本篇
-/// 1 = 特别篇
-/// 2 = OP
-/// 3 = ED
-/// 4 = 预告/宣传/广告
-/// 5 = MAD
-/// 6 = 其他
-enum EpisodeType: UInt8, Codable, Identifiable, CaseIterable {
-  case main = 0
-  case sp = 1
-  case op = 2
-  case ed = 3
-  case trailer = 4
-  case mad = 5
-  case other = 6
-
-  var id: Self {
-    self
-  }
-
-  init(_ value: UInt8 = 0) {
-    let tmp = Self(rawValue: value)
-    if let out = tmp {
-      self = out
-      return
-    }
-    self = Self.main
-  }
-
-  var name: String {
-    switch self {
-    case .main:
-      return "ep"
-    case .sp:
-      return "sp"
-    case .op:
-      return "op"
-    case .ed:
-      return "ed"
-    case .trailer:
-      return "trailer"
-    case .mad:
-      return "mad"
-    case .other:
-      return "other"
-    }
-  }
-
-  var description: String {
-    switch self {
-    case .main:
-      return "本篇"
-    case .sp:
-      return "SP"
-    case .op:
-      return "OP"
-    case .ed:
-      return "ED"
-    case .trailer:
-      return "预告"
-    case .mad:
-      return "MAD"
-    case .other:
-      return "其他"
-    }
-  }
-}
-
-/// 0: 未收藏
-/// 1: 想看
-/// 2: 看过
-/// 3: 抛弃
-enum EpisodeCollectionType: UInt8, Codable, Identifiable, CaseIterable {
-  case none = 0
-  case wish = 1
-  case collect = 2
-  case dropped = 3
-
-  var id: Self {
-    self
-  }
-
-  init(_ value: UInt8 = 0) {
-    let tmp = Self(rawValue: value)
-    if let out = tmp {
-      self = out
-      return
-    }
-    self = Self.none
-  }
-
-  var description: String {
-    switch self {
-    case .none:
-      return "未收藏"
-    case .wish:
-      return "想看"
-    case .collect:
-      return "看过"
-    case .dropped:
-      return "抛弃"
-    }
-  }
-
-  var action: String {
-    switch self {
-    case .none:
-      return "撤销"
-    case .wish:
-      return "想看"
-    case .collect:
-      return "看过"
-    case .dropped:
-      return "抛弃"
-    }
-  }
-
-  func otherTypes() -> [Self] {
-    switch self {
-    case .none:
-      return [.collect, .wish, .dropped]
-    case .wish:
-      return [.none, .collect, .dropped]
-    case .collect:
-      return [.none, .wish, .dropped]
-    case .dropped:
-      return [.none, .collect, .wish]
-    }
-  }
-}
-
-func safeParseDate(str: String?) -> Date {
-  guard let str = str else {
-    return Date(timeIntervalSince1970: 0)
-  }
-  if str.isEmpty {
-    return Date(timeIntervalSince1970: 0)
-  }
-  if str == "2099" {
-    return Date(timeIntervalSince1970: 0)
-  }
-
-  let dateFormatter = DateFormatter()
-  dateFormatter.locale = Locale(identifier: "en_US_POSIX")
-  dateFormatter.dateFormat = "yyyy-MM-dd"
-  dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
-
-  if let date = dateFormatter.date(from: str) {
-    return date
-  } else {
-    Logger.app.warning("failed to parse date: \(str)")
-    return Date(timeIntervalSince1970: 0)
-  }
-}
-
-func safeParseRFC3339Date(str: String?) -> Date {
-  guard let str = str else {
-    return Date(timeIntervalSince1970: 0)
-  }
-  if str.isEmpty {
-    return Date(timeIntervalSince1970: 0)
-  }
-
-  let RFC3339DateFormatter = DateFormatter()
-  RFC3339DateFormatter.locale = Locale(identifier: "en_US_POSIX")
-  RFC3339DateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZZZZZ"
-  RFC3339DateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
-
-  if let date = RFC3339DateFormatter.date(from: str) {
-    return date
-  } else {
-    Logger.app.warning("failed to parse RFC3339 date: \(str)")
-    return Date(timeIntervalSince1970: 0)
   }
 }

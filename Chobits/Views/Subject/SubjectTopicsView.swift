@@ -9,11 +9,11 @@ import SwiftData
 import SwiftUI
 
 struct SubjectTopicsView: View {
-  let subjectId: UInt
+  let subjectId: Int
 
   @State private var loaded: Bool = false
   @State private var refreshing: Bool = false
-  @State private var topics: [Topic] = []
+  @State private var topics: [TopicDTO] = []
 
   func refresh() {
     if loaded {
@@ -22,7 +22,7 @@ struct SubjectTopicsView: View {
     refreshing = true
     Task {
       do {
-        let resp = try await Chii.shared.getSubjectTopics(subjectId: subjectId, limit: 5)
+        let resp = try await Chii.shared.getSubjectTopics(subjectId, limit: 5)
         topics = resp.data
       } catch {
         Notifier.shared.alert(error: error)
