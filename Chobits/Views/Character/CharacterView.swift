@@ -37,14 +37,13 @@ struct CharacterView: View {
 
   func refresh() async {
     if refreshed { return }
-    refreshed = true
-
     do {
       try await Chii.shared.loadCharacter(characterId)
     } catch {
       Notifier.shared.alert(error: error)
       return
     }
+    refreshed = true
   }
 
   func shouldShowToggle(geometry: GeometryProxy) -> Bool {

@@ -37,13 +37,13 @@ struct PersonView: View {
 
   func refresh() async {
     if refreshed { return }
-    refreshed = true
     do {
       try await Chii.shared.loadPerson(personId)
     } catch {
       Notifier.shared.alert(error: error)
       return
     }
+    refreshed = true
   }
 
   func shouldShowToggle(geometry: GeometryProxy, limits: Int) -> Bool {
@@ -204,8 +204,10 @@ struct PersonView: View {
             // PersonSubjectsView(personId: personId)
           }.padding(.horizontal, 8)
         }
-      } else {
+      } else if refreshed {
         NotFoundView()
+      } else {
+        ProgressView()
       }
     }
     .navigationTitle(person?.name ?? "人物")
