@@ -266,7 +266,10 @@ extension Chii {
     return resp
   }
 
-  func getSubjectCharacters(_ subjectId: Int, type: Int? = nil, limit: Int = 20, offset: Int = 0)
+  func getSubjectCharacters(
+    _ subjectId: Int, type: CastType = .unknown,
+    limit: Int = 20, offset: Int = 0
+  )
     async throws -> PagedData<SubjectCharacterDTO>
   {
     Logger.api.info("start get subject characters")
@@ -275,8 +278,8 @@ extension Chii {
       URLQueryItem(name: "limit", value: String(limit)),
       URLQueryItem(name: "offset", value: String(offset)),
     ]
-    if let type = type {
-      queryItems.append(URLQueryItem(name: "type", value: String(type)))
+    if type != .unknown {
+      queryItems.append(URLQueryItem(name: "type", value: String(type.rawValue)))
     }
     let pageURL = url.appending(queryItems: queryItems)
     let data = try await self.request(url: pageURL, method: "GET")

@@ -121,6 +121,27 @@ final class SubjectV1 {
     self.volumes = item.volumes
   }
 
+  init(_ item: SubjectDTOV0) {
+    self.subjectId = item.id
+    self.airtime = SubjectAirtime(date: item.date)
+    self.collection = item.collection
+    self.eps = item.eps
+    self.images = item.images
+    self.infobox = [:]
+    self.locked = item.locked
+    self.metaTags = item.metaTags
+    self.tags = item.tags
+    self.name = item.name
+    self.nameCN = item.nameCn
+    self.nsfw = item.nsfw
+    self.platform = SubjectPlatform(name: item.platform)
+    self.rating = SubjectRating(item.rating)
+    self.series = item.series
+    self.summary = item.summary
+    self.type = item.type.rawValue
+    self.volumes = item.volumes
+  }
+
   func update(_ item: SubjectDTO) {
     self.airtime = item.airtime
     self.collection = item.collection
@@ -135,6 +156,23 @@ final class SubjectV1 {
     self.nsfw = item.nsfw
     self.platform = item.platform
     self.rating = item.rating
+    self.series = item.series
+    self.summary = item.summary
+    self.type = item.type.rawValue
+    self.volumes = item.volumes
+  }
+
+  func update(_ item: SubjectDTOV0) {
+    self.collection = item.collection
+    self.eps = item.eps
+    self.images = item.images
+    self.locked = item.locked
+    self.metaTags = item.metaTags
+    self.tags = item.tags
+    self.name = item.name
+    self.nameCN = item.nameCn
+    self.nsfw = item.nsfw
+    self.rating = SubjectRating(item.rating)
     self.series = item.series
     self.summary = item.summary
     self.type = item.type.rawValue
@@ -207,7 +245,7 @@ final class CharacterV1 {
   var comment: Int
   var images: Images?
   var infobox: Infobox
-  var locked: Bool
+  var lock: Bool
   var name: String
   var nsfw: Bool
   var role: Int
@@ -226,7 +264,7 @@ final class CharacterV1 {
     self.comment = item.comment
     self.images = item.images
     self.infobox = item.infobox
-    self.locked = item.locked
+    self.lock = item.lock
     self.name = item.name
     self.nsfw = item.nsfw
     self.role = item.role.rawValue
@@ -238,7 +276,7 @@ final class CharacterV1 {
     self.comment = item.comment
     self.images = item.images
     self.infobox = item.infobox
-    self.locked = item.locked
+    self.lock = item.lock
     self.name = item.name
     self.nsfw = item.nsfw
     self.role = item.role.rawValue
@@ -277,7 +315,7 @@ final class PersonV1 {
   var comment: Int
   var images: Images?
   var infobox: Infobox
-  var locked: Bool
+  var lock: Bool
   var name: String
   var nsfw: Bool
   var summary: String
@@ -297,7 +335,7 @@ final class PersonV1 {
     self.comment = item.comment
     self.images = item.images
     self.infobox = item.infobox
-    self.locked = item.locked
+    self.lock = item.lock
     self.name = item.name
     self.nsfw = item.nsfw
     self.summary = item.summary
@@ -310,7 +348,7 @@ final class PersonV1 {
     self.comment = item.comment
     self.images = item.images
     self.infobox = item.infobox
-    self.locked = item.locked
+    self.lock = item.lock
     self.name = item.name
     self.nsfw = item.nsfw
     self.summary = item.summary

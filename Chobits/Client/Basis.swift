@@ -98,8 +98,8 @@ struct SubjectAirtime: Codable {
   var weekday: Int
   var year: Int
 
-  init() {
-    self.date = ""
+  init(date: String?) {
+    self.date = date ?? ""
     self.month = 0
     self.weekday = 0
     self.year = 0
@@ -137,7 +137,7 @@ struct SubjectPlatform: Codable {
   var typeCN: String
   var wikiTpl: String?
 
-  init() {
+  init(name: String) {
     self.alias = ""
     self.enableHeader = false
     self.id = 0
@@ -145,7 +145,7 @@ struct SubjectPlatform: Codable {
     self.searchString = ""
     self.sortKeys = []
     self.type = ""
-    self.typeCN = ""
+    self.typeCN = name
     self.wikiTpl = ""
   }
 }
@@ -160,6 +160,13 @@ struct SubjectRating: Codable {
     self.count = []
     self.total = 0
     self.score = 0
+    self.rank = 0
+  }
+
+  init(_ v0: SubjectRatingV0) {
+    self.count = v0.count.map { $0.value }
+    self.total = v0.total
+    self.score = v0.score
     self.rank = 0
   }
 }
@@ -598,7 +605,7 @@ enum CastType: Int, Codable, Identifiable, CaseIterable {
   var description: String {
     switch self {
     case .unknown:
-      return "未知"
+      return "全部"
     case .main:
       return "主角"
     case .secondary:
@@ -992,40 +999,3 @@ let GAME_PLATFORMS: [String] = [
   "GB",
   "Virtual Boy",
 ]
-
-enum SubjectCharacterRelationType: String, Identifiable, CaseIterable {
-  case unknown
-  case main
-  case secondary
-  case cameo
-
-  var id: Self {
-    self
-  }
-
-  init(_ value: String) {
-    switch value {
-    case "主角":
-      self = .main
-    case "配角":
-      self = .secondary
-    case "客串":
-      self = .cameo
-    default:
-      self = .unknown
-    }
-  }
-
-  var description: String {
-    switch self {
-    case .unknown:
-      return "全部"
-    case .main:
-      return "主角"
-    case .secondary:
-      return "配角"
-    case .cameo:
-      return "客串"
-    }
-  }
-}

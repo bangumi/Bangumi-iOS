@@ -16,5 +16,5 @@ struct SubjectsResponse: Codable {
   var total: Int
   var limit: Int
   var offset: Int
-  var data: [SubjectDTO]
+  var data: [SubjectDTOV0]
 }

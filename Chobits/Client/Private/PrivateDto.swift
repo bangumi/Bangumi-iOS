@@ -106,7 +106,7 @@ struct CharacterDTO: Codable, Identifiable {
   var id: Int
   var images: Images?
   var infobox: Infobox
-  var locked: Bool
+  var lock: Bool
   var name: String
   var nsfw: Bool
   var redirect: Int
@@ -117,7 +117,7 @@ struct CharacterDTO: Codable, Identifiable {
 struct SlimCharacterDTO: Codable, Identifiable {
   var id: Int
   var images: Images?
-  var locked: Bool
+  var lock: Bool
   var name: String
   var nsfw: Bool
   var role: CharacterType
@@ -130,7 +130,7 @@ struct PersonDTO: Codable, Identifiable {
   var id: Int
   var images: Images?
   var infobox: Infobox
-  var locked: Bool
+  var lock: Bool
   var name: String
   var nsfw: Bool
   var redirect: Int
@@ -138,15 +138,23 @@ struct PersonDTO: Codable, Identifiable {
   var type: PersonType
 }
 
-struct CharacterCastDTO: Codable {
+struct CharacterCastDTO: Codable, Identifiable {
   var actors: [SlimPersonDTO]
   var subject: SlimSubjectDTO
   var type: CastType
+
+  var id: Int {
+    subject.id
+  }
 }
 
-struct PersonWorkDTO: Codable {
+struct PersonWorkDTO: Codable, Identifiable {
   var subject: SlimSubjectDTO
   var position: SubjectStaffPosition
+
+  var id: Int {
+    subject.id
+  }
 }
 
 struct SubjectStaffPosition: Codable {
@@ -164,7 +172,7 @@ struct SubjectRelationType: Codable {
   var desc: String
 }
 
-struct EpisodeDTO: Codable, Identifiable {
+struct EpisodeDTO: Codable, Identifiable, Equatable {
   var id: Int
   var subjectID: Int
   var type: EpisodeType
@@ -188,22 +196,38 @@ struct EpisodeCollectionDTO: Codable {
   var type: EpisodeCollectionType
 }
 
-struct SubjectRelationDTO: Codable {
+struct SubjectRelationDTO: Codable, Identifiable {
   var order: Int
   var subject: SlimSubjectDTO
   var relation: SubjectRelationType
+
+  var id: Int {
+    subject.id
+  }
 }
 
-struct SubjectCharacterDTO: Codable {
+struct SubjectCharacterDTO: Codable, Identifiable, Equatable {
   var character: SlimCharacterDTO
   var actors: [SlimPersonDTO]
   var type: CastType
   var order: Int
+
+  var id: Int {
+    character.id
+  }
+
+  static func == (lhs: SubjectCharacterDTO, rhs: SubjectCharacterDTO) -> Bool {
+    lhs.character.id == rhs.character.id
+  }
 }
 
-struct SubjectStaffDTO: Codable {
+struct SubjectStaffDTO: Codable, Identifiable {
   var person: SlimPersonDTO
   var position: SubjectStaffPosition
+
+  var id: Int {
+    person.id
+  }
 }
 
 struct SlimPersonDTO: Codable, Identifiable {
@@ -211,28 +235,44 @@ struct SlimPersonDTO: Codable, Identifiable {
   var name: String
   var type: PersonType
   var images: Images?
-  var locked: Bool
+  var lock: Bool
   var nsfw: Bool
 }
 
-struct PersonCollectDTO: Codable {
+struct PersonCollectDTO: Codable, Identifiable {
   var user: User
   var createdAt: Int
+
+  var id: Int {
+    user.id
+  }
 }
 
-struct PersonCharacterDTO: Codable {
+struct PersonCharacterDTO: Codable, Identifiable {
   var character: SlimCharacterDTO
   var relations: [CharacterSubjectRelationDTO]
+
+  var id: Int {
+    character.id
+  }
 }
 
-struct CharacterSubjectRelationDTO: Codable {
+struct CharacterSubjectRelationDTO: Codable, Identifiable {
   var subject: SlimSubjectDTO
   var type: CastType
+
+  var id: Int {
+    subject.id
+  }
 }
 
-struct UserCharacterCollectionDTO: Codable {
+struct UserCharacterCollectionDTO: Codable, Identifiable {
   var character: CharacterDTO
   var createdAt: Int
+
+  var id: Int {
+    character.id
+  }
 }
 
 struct UserPersonCollectionDTO: Codable {

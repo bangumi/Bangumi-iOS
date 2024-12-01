@@ -64,7 +64,7 @@ struct SubjectView: View {
 
             SubjectSummaryView(subjectId: subjectId)
 
-            // SubjectCharactersView(subjectId: subjectId)
+            SubjectCharactersView(subjectId: subjectId)
             // SubjectRelationsView(subjectId: subjectId)
 
             if !isolationMode {

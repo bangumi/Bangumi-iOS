@@ -82,10 +82,10 @@ struct PersonView: View {
                     Text("(\(person.collects)人收藏)")
                   }
                   Spacer()
-                  if person.locked {
-                    Label("", systemImage: "lock")
-                      .foregroundStyle(.red)
-                  }
+//                  if person.lock {
+//                    Label("", systemImage: "lock")
+//                      .foregroundStyle(.red)
+//                  }
                   if !isolationMode {
                     Label("评论: \(person.comment)", systemImage: "bubble")
                       .lineLimit(1)

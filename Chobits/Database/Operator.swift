@@ -129,6 +129,21 @@ extension DatabaseOperator {
     return subject
   }
 
+  public func ensureSubject(_ item: SubjectDTOV0) throws -> Subject {
+    let sid = item.id
+    let fetched = try self.fetchOne(
+      predicate: #Predicate<Subject> {
+        $0.subjectId == sid
+      })
+    if let subject = fetched {
+      subject.update(item)
+      return subject
+    }
+    let subject = Subject(item)
+    modelContext.insert(subject)
+    return subject
+  }
+
   public func ensureCharacter(_ item: CharacterDTO) throws -> Character {
     let cid = item.id
     let fetched = try self.fetchOne(
@@ -219,6 +234,10 @@ extension DatabaseOperator {
   }
 
   public func saveSubject(_ item: SubjectDTO) throws {
+    let _ = try self.ensureSubject(item)
+  }
+
+  public func saveSubject(_ item: SubjectDTOV0) throws {
     let _ = try self.ensureSubject(item)
   }
 
