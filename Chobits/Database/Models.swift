@@ -208,6 +208,10 @@ final class UserSubjectCollectionV1 {
     return typeEnum.description(type: SubjectType(subjectType))
   }
 
+  var message: String {
+    typeEnum.message(type: SubjectType(subjectType))
+  }
+
   init(_ item: UserSubjectCollectionDTO) {
     self.subjectId = item.subject.id
     self.rate = item.rate

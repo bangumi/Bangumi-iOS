@@ -58,7 +58,7 @@ struct SubjectCollectionView: View {
                 if collection?.priv ?? false {
                   Image(systemName: "lock.fill").foregroundStyle(.secondary)
                 }
-                Text(collection?.typeEnum.message(type: collection?.subject?.typeEnum ?? .none) ?? "")
+                Label(collection?.message ?? "", systemImage: collection?.typeEnum.icon ?? "star")
                 StarsView(score: Float(collection?.rate ?? 0), size: 16)
               }
               Spacer()
