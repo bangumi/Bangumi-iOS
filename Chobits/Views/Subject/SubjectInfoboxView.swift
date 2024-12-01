@@ -5,15 +5,12 @@
 //  Created by Chuan Chuan on 2024/5/9.
 //
 
-import OSLog
+import Flow
 import SwiftData
 import SwiftUI
-import Flow
 
 struct SubjectInfoboxView: View {
   let subjectId: Int
-
-  @Environment(\.modelContext) var modelContext
 
   @Query
   private var subjects: [Subject]
@@ -21,36 +18,41 @@ struct SubjectInfoboxView: View {
 
   init(subjectId: Int) {
     self.subjectId = subjectId
-    _subjects = Query(
-      filter: #Predicate<Subject> {
-        $0.subjectId == subjectId
-      }, sort: \Subject.subjectId)
+    let predicate = #Predicate<Subject> {
+      $0.subjectId == subjectId
+    }
+    _subjects = Query(filter: predicate, sort: \Subject.subjectId)
   }
 
   var body: some View {
     ScrollView {
       LazyVStack(alignment: .leading) {
-        ForEach(subject?.infobox.keys.sorted() ?? [], id: \.self) { key in
+        ForEach(Array(subject?.infobox ?? [:]), id: \.key) { key, values in
           HStack(alignment: .top) {
             Text("\(key): ").bold()
-            VStack {
-//              for (key, value) in info {
-//                HStack {
-//                  Text(key).font(.footnote).foregroundStyle(.secondary)
-//                  Text(value).font(.footnote).foregroundStyle(.primary)
-//                }
-//              }
+            VStack(alignment: .leading) {
+              ForEach(values, id: \.v) { value in
+                if let k = value.k {
+                  HStack {
+                    Text("\(k): ").foregroundStyle(.secondary)
+                    Text(value.v)
+                  }
+                } else {
+                  Text(value.v)
+                }
+              }
             }
           }
           Divider()
         }
-      }.padding(.horizontal, 8)
-    }
-    .navigationTitle("条目信息")
-    .navigationBarTitleDisplayMode(.inline)
-    .toolbar {
-      ToolbarItem(placement: .automatic) {
-        Image(systemName: "info.circle").foregroundStyle(.secondary)
+      }
+      .padding()
+      .navigationTitle("条目信息")
+      .navigationBarTitleDisplayMode(.inline)
+      .toolbar {
+        ToolbarItem(placement: .automatic) {
+          Image(systemName: "info.circle").foregroundStyle(.secondary)
+        }
       }
     }
   }
@@ -62,10 +64,6 @@ struct SubjectInfoboxView: View {
   let subject = Subject.previewAnime
   container.mainContext.insert(subject)
 
-  return ScrollView {
-    LazyVStack(alignment: .leading) {
-      SubjectInfoboxView(subjectId: subject.subjectId)
+  return SubjectInfoboxView(subjectId: subject.subjectId)
         .modelContainer(container)
-    }
-  }.padding()
 }

@@ -351,7 +351,7 @@ extension Chii {
   func getUserSubjectCollection(_ subjectId: Int) async throws -> UserSubjectCollectionDTO {
     if self.mock {
       return loadFixture(
-        fixture: "user_collection_anime.json", target: UserSubjectCollectionDTO.self)
+        fixture: "user_subject_collection_anime.json", target: UserSubjectCollectionDTO.self)
     }
     Logger.api.info("start get subject collection: \(subjectId)")
     let profile = try await self.getProfile()
@@ -373,7 +373,7 @@ extension Chii {
   {
     if self.mock {
       return loadFixture(
-        fixture: "user_collections.json", target: PagedData<UserSubjectCollectionDTO>.self)
+        fixture: "user_subject_collections.json", target: PagedData<UserSubjectCollectionDTO>.self)
     }
     Logger.api.info("start get subject collections")
     let profile = try await self.getProfile()

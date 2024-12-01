@@ -2047,7 +2047,7 @@ info:
     关于订阅通知的 socket.io 相关的文档在
     <https://github.com/bangumi/GraphQL/blob/master/docs/socket.io.md>
   title: bangumi private api
-  version: 2024-11-30-2bc3647
+  version: 2024-12-01-d329eac
 openapi: 3.0.3
 paths:
   /p1/blocklist:
@@ -4355,7 +4355,7 @@ paths:
         - description: 是否单行本
           in: query
           name: offprint
-          required: true
+          required: false
           schema:
             default: false
             type: boolean
