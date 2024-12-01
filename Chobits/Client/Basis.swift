@@ -30,7 +30,7 @@ struct Avatar: Codable, Hashable {
 }
 
 enum UserGroup: Int, Codable {
-  case unknown = 0
+  case none = 0
   case admin = 1
   case bangumiManager = 2
   case doujinManager = 3
@@ -47,12 +47,12 @@ enum UserGroup: Int, Codable {
       self = out
       return
     }
-    self = Self.unknown
+    self = Self.none
   }
 
   var description: String {
     switch self {
-    case .unknown:
+    case .none:
       return "未知"
     case .admin:
       return "管理员"
@@ -186,7 +186,7 @@ struct InfoboxValue: Codable {
 /// 4: 搁置
 /// 5: 抛弃
 enum CollectionType: Int, Codable, Identifiable, CaseIterable {
-  case unknown = 0
+  case none = 0
   case wish = 1
   case collect = 2
   case `do` = 3
@@ -203,7 +203,7 @@ enum CollectionType: Int, Codable, Identifiable, CaseIterable {
       self = out
       return
     }
-    self = Self.unknown
+    self = Self.none
   }
 
   static func allTypes() -> [Self] {
@@ -216,7 +216,7 @@ enum CollectionType: Int, Codable, Identifiable, CaseIterable {
 
   var icon: String {
     switch self {
-    case .unknown:
+    case .none:
       return "questionmark"
     case .wish:
       return "heart"
@@ -233,7 +233,7 @@ enum CollectionType: Int, Codable, Identifiable, CaseIterable {
 
   func description(type: SubjectType?) -> String {
     var action: String
-    let type = type ?? .unknown
+    let type = type ?? .none
     switch type {
     case .book:
       action = "读"
@@ -245,7 +245,7 @@ enum CollectionType: Int, Codable, Identifiable, CaseIterable {
       action = "看"
     }
     switch self {
-    case .unknown:
+    case .none:
       return "未知"
     case .wish:
       return "想" + action
@@ -291,7 +291,7 @@ enum CollectionType: Int, Codable, Identifiable, CaseIterable {
 ///
 /// 没有 5
 enum SubjectType: Int, Codable, Identifiable, CaseIterable {
-  case unknown = 0
+  case none = 0
   case book = 1
   case anime = 2
   case music = 3
@@ -308,11 +308,11 @@ enum SubjectType: Int, Codable, Identifiable, CaseIterable {
       self = out
       return
     }
-    self = Self.unknown
+    self = Self.none
   }
 
   static var progressTypes: [Self] {
-    return [.unknown, .book, .anime, .real]
+    return [.none, .book, .anime, .real]
   }
 
   static var allTypes: [Self] {
@@ -321,7 +321,7 @@ enum SubjectType: Int, Codable, Identifiable, CaseIterable {
 
   var description: String {
     switch self {
-    case .unknown:
+    case .none:
       return "全部"
     case .book:
       return "书籍"
@@ -338,8 +338,8 @@ enum SubjectType: Int, Codable, Identifiable, CaseIterable {
 
   var name: String {
     switch self {
-    case .unknown:
-      return "unknown"
+    case .none:
+      return "none"
     case .book:
       return "book"
     case .anime:
@@ -355,7 +355,7 @@ enum SubjectType: Int, Codable, Identifiable, CaseIterable {
 
   var icon: String {
     switch self {
-    case .unknown:
+    case .none:
       return "questionmark"
     case .book:
       return "book.closed"
@@ -372,7 +372,7 @@ enum SubjectType: Int, Codable, Identifiable, CaseIterable {
 
   var authorityFields: [[String]] {
     switch self {
-    case .unknown:
+    case .none:
       return []
     case .book:
       return [
@@ -412,7 +412,7 @@ enum SubjectType: Int, Codable, Identifiable, CaseIterable {
 }
 
 enum PersonCareer: String, Codable, CaseIterable {
-  case unknown
+  case none
   case producer
   case mangaka
   case artist
@@ -427,12 +427,12 @@ enum PersonCareer: String, Codable, CaseIterable {
       self = out
       return
     }
-    self = Self.unknown
+    self = Self.none
   }
 
   var description: String {
     switch self {
-    case .unknown:
+    case .none:
       return "未知"
     case .producer:
       return "制作人员"
@@ -453,8 +453,8 @@ enum PersonCareer: String, Codable, CaseIterable {
 
   var label: String {
     switch self {
-    case .unknown:
-      return "unknown"
+    case .none:
+      return "none"
     case .producer:
       return "producer"
     case .mangaka:
@@ -478,7 +478,7 @@ enum PersonCareer: String, Codable, CaseIterable {
 /// 2 为 公司
 /// 3 为 组合
 enum PersonType: Int, Codable, Identifiable, CaseIterable {
-  case unknown = 0
+  case none = 0
   case individual = 1
   case company = 2
   case group = 3
@@ -493,12 +493,12 @@ enum PersonType: Int, Codable, Identifiable, CaseIterable {
       self = out
       return
     }
-    self = Self.unknown
+    self = Self.none
   }
 
   var description: String {
     switch self {
-    case .unknown:
+    case .none:
       return "未知"
     case .individual:
       return "个人"
@@ -511,7 +511,7 @@ enum PersonType: Int, Codable, Identifiable, CaseIterable {
 
   var icon: String {
     switch self {
-    case .unknown:
+    case .none:
       return "questionmark"
     case .individual:
       return "person"
@@ -529,7 +529,7 @@ enum PersonType: Int, Codable, Identifiable, CaseIterable {
 /// 3 为 舰船
 /// 4 为 组织
 enum CharacterType: Int, Codable, Identifiable, CaseIterable {
-  case unknown = 0
+  case none = 0
   case character = 1
   case vehicle = 2
   case ship = 3
@@ -545,12 +545,12 @@ enum CharacterType: Int, Codable, Identifiable, CaseIterable {
       self = out
       return
     }
-    self = Self.unknown
+    self = Self.none
   }
 
   var description: String {
     switch self {
-    case .unknown:
+    case .none:
       return "未知"
     case .character:
       return "角色"
@@ -565,7 +565,7 @@ enum CharacterType: Int, Codable, Identifiable, CaseIterable {
 
   var icon: String {
     switch self {
-    case .unknown:
+    case .none:
       return "questionmark"
     case .character:
       return "person"
@@ -584,7 +584,7 @@ enum CharacterType: Int, Codable, Identifiable, CaseIterable {
 /// 2 为 配角
 /// 3 为 客串
 enum CastType: Int, Codable, Identifiable, CaseIterable {
-  case unknown = 0
+  case none = 0
   case main = 1
   case secondary = 2
   case cameo = 3
@@ -599,12 +599,12 @@ enum CastType: Int, Codable, Identifiable, CaseIterable {
       self = out
       return
     }
-    self = Self.unknown
+    self = Self.none
   }
 
   var description: String {
     switch self {
-    case .unknown:
+    case .none:
       return "全部"
     case .main:
       return "主角"
@@ -617,7 +617,7 @@ enum CastType: Int, Codable, Identifiable, CaseIterable {
 
   var icon: String {
     switch self {
-    case .unknown:
+    case .none:
       return "questionmark"
     case .main:
       return "star"

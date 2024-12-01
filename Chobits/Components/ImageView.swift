@@ -53,11 +53,13 @@ struct ImageView<Overlay: View>: View {
         if let imageURL = imageURL {
           if width > 0, height > 0 {
             KFImage(imageURL)
+              .fade(duration: 0.25)
               .resizable()
               .scaledToFill()
               .alignmentGuide(.top, computeValue: { _ in 0 })
           } else {
             KFImage(imageURL)
+              .fade(duration: 0.25)
               .resizable()
               .scaledToFit()
           }

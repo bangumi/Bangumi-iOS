@@ -196,13 +196,17 @@ struct EpisodeCollectionDTO: Codable {
   var type: EpisodeCollectionType
 }
 
-struct SubjectRelationDTO: Codable, Identifiable {
+struct SubjectRelationDTO: Codable, Identifiable, Equatable {
   var order: Int
   var subject: SlimSubjectDTO
   var relation: SubjectRelationType
 
   var id: Int {
     subject.id
+  }
+
+  static func == (lhs: SubjectRelationDTO, rhs: SubjectRelationDTO) -> Bool {
+    lhs.subject.id == rhs.subject.id
   }
 }
 

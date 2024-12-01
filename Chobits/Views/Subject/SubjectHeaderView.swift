@@ -87,7 +87,7 @@ struct SubjectHeaderView: View {
         }
         VStack(alignment: .leading) {
           HStack {
-            if subject.typeEnum != .unknown {
+            if subject.typeEnum != .none {
               Label(subject.category, systemImage: subject.typeEnum.icon)
             }
             if subject.airtime.date != "" {

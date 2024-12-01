@@ -12,7 +12,7 @@ enum NavDestination: Hashable, View {
   case user(uid: String)
   case subject(subjectId: Int)
   case subjectInfobox(subjectId: Int)
-  //  case subjectRelationList(subjectId: Int)
+  case subjectRelationList(subjectId: Int)
   case subjectCharacterList(subjectId: Int)
   case subjectTopicList(subjectId: Int)
   case subjectCommentList(subjectId: Int)
@@ -39,8 +39,8 @@ enum NavDestination: Hashable, View {
       SubjectView(subjectId: subjectId)
     case .subjectInfobox(let subjectId):
       SubjectInfoboxView(subjectId: subjectId)
-    //    case .subjectRelationList(let subjectId):
-    //      SubjectRelationListView(subjectId: subjectId)
+    case .subjectRelationList(let subjectId):
+      SubjectRelationListView(subjectId: subjectId)
     case .subjectCharacterList(let subjectId):
       SubjectCharacterListView(subjectId: subjectId)
     case .subjectTopicList(let subjectId):

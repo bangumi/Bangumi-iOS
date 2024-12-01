@@ -17,19 +17,21 @@ struct SubjectCharactersView: View {
   @State private var loading: Bool = false
   @State private var relations: [SubjectCharacterDTO] = []
 
-  func load() async {
+  func load() {
     if loading || loaded {
       return
     }
     loading = true
-    do {
-      let resp = try await Chii.shared.getSubjectCharacters(subjectId, limit: 10)
-      relations.append(contentsOf: resp.data)
-    } catch {
-      Notifier.shared.alert(error: error)
+    Task {
+      do {
+        let resp = try await Chii.shared.getSubjectCharacters(subjectId, limit: 10)
+        relations.append(contentsOf: resp.data)
+      } catch {
+        Notifier.shared.alert(error: error)
+      }
+      loading = false
+      loaded = true
     }
-    loading = false
-    loaded = true
   }
 
   var body: some View {
@@ -38,7 +40,7 @@ struct SubjectCharactersView: View {
       Text("角色介绍")
         .foregroundStyle(relations.count > 0 ? .primary : .secondary)
         .font(.title3)
-        .task(load)
+        .onAppear(perform: load)
       if loading {
         ProgressView()
       }

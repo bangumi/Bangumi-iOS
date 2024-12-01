@@ -13,7 +13,7 @@ struct PersonSubjectListView: View {
 
   @Environment(\.modelContext) var modelContext
 
-  @State private var subjectType: SubjectType = .unknown
+  @State private var subjectType: SubjectType = .none
   @State private var subjects: [PersonRelatedSubject] = []
 
   func load() async {

@@ -15,7 +15,7 @@ struct ChiiProgressView: View {
 
   @Environment(\.modelContext) var modelContext
 
-  @State private var subjectType: SubjectType = .unknown
+  @State private var subjectType: SubjectType = .none
   @State private var refreshing: Bool = false
   @State private var offset: Int = 0
   @State private var exhausted: Bool = false
@@ -117,8 +117,11 @@ struct ChiiProgressView: View {
           }
           .padding(.horizontal, 8)
           .pickerStyle(.segmented)
-          .task {
-            if counts.isEmpty {
+          .onAppear {
+            if !counts.isEmpty {
+              return
+            }
+            Task {
               await load()
               refreshing = true
               await refreshCollections()

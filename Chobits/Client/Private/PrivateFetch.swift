@@ -245,7 +245,7 @@ extension Chii {
   }
 
   func getSubjectRelations(
-    _ subjectId: Int, type: Int? = nil, offprint: Bool = false, limit: Int = 20, offset: Int = 0
+    _ subjectId: Int, type: SubjectType = .none, offprint: Bool? = nil, limit: Int = 20, offset: Int = 0
   )
     async throws -> PagedData<SubjectRelationDTO>
   {
@@ -255,9 +255,11 @@ extension Chii {
       URLQueryItem(name: "limit", value: String(limit)),
       URLQueryItem(name: "offset", value: String(offset)),
     ]
-    if let type = type {
-      queryItems.append(URLQueryItem(name: "type", value: String(type)))
+    if let offprint = offprint {
       queryItems.append(URLQueryItem(name: "offprint", value: String(offprint)))
+    }
+    if type != .none {
+      queryItems.append(URLQueryItem(name: "type", value: String(type.rawValue)))
     }
     let pageURL = url.appending(queryItems: queryItems)
     let data = try await self.request(url: pageURL, method: "GET")
@@ -267,7 +269,7 @@ extension Chii {
   }
 
   func getSubjectCharacters(
-    _ subjectId: Int, type: CastType = .unknown,
+    _ subjectId: Int, type: CastType = .none,
     limit: Int = 20, offset: Int = 0
   )
     async throws -> PagedData<SubjectCharacterDTO>
@@ -278,7 +280,7 @@ extension Chii {
       URLQueryItem(name: "limit", value: String(limit)),
       URLQueryItem(name: "offset", value: String(offset)),
     ]
-    if type != .unknown {
+    if type != .none {
       queryItems.append(URLQueryItem(name: "type", value: String(type.rawValue)))
     }
     let pageURL = url.appending(queryItems: queryItems)
@@ -362,8 +364,8 @@ extension Chii {
   }
 
   func getUserSubjectCollections(
-    type: CollectionType = .unknown,
-    subjectType: SubjectType = .unknown,
+    type: CollectionType = .none,
+    subjectType: SubjectType = .none,
     since: Int = 0, limit: Int = 100, offset: Int = 0
   )
     async throws
@@ -381,10 +383,10 @@ extension Chii {
       URLQueryItem(name: "limit", value: String(limit)),
       URLQueryItem(name: "offset", value: String(offset)),
     ]
-    if type != .unknown {
+    if type != .none {
       queryItems.append(URLQueryItem(name: "type", value: String(type.rawValue)))
     }
-    if subjectType != .unknown {
+    if subjectType != .none {
       queryItems.append(URLQueryItem(name: "subjectType", value: String(subjectType.rawValue)))
     }
     let pageURL = url.appending(queryItems: queryItems)

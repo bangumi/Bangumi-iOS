@@ -75,7 +75,7 @@ final class SubjectV1 {
   var authority: String {
     var items: [String] = []
     switch typeEnum {
-    case .unknown:
+    case .none:
       return ""
     case .book, .anime, .real:
       if eps > 0 {

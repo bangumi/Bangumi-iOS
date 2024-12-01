@@ -46,7 +46,7 @@ extension Chii {
     return calendars
   }
 
-  func search(keyword: String, type: SubjectType = .unknown, limit: Int = 10, offset: Int = 0)
+  func search(keyword: String, type: SubjectType = .none, limit: Int = 10, offset: Int = 0)
     async throws -> SubjectsResponse
   {
     Logger.api.info("start search: \(keyword), \(type.name), \(limit), \(offset)")
@@ -67,7 +67,7 @@ extension Chii {
     //    rank 排名由高到低
     //    score 评分
 
-    if type != .unknown {
+    if type != .none {
       body["filter"] = [
         "type": [type.rawValue]
       ]

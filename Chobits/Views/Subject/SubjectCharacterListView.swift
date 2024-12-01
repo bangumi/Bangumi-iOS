@@ -12,7 +12,7 @@ import SwiftUI
 struct SubjectCharacterListView: View {
   let subjectId: Int
 
-  @State private var castType: CastType = .unknown
+  @State private var castType: CastType = .none
   @State private var reloader = false
 
   func load(limit: Int, offset: Int) async -> PagedData<SubjectCharacterDTO>? {

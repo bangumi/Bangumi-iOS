@@ -16,7 +16,7 @@ struct SearchView: View {
   @State private var text: String = ""
   @State private var remote: Bool = false
 
-  @State private var subjectType: SubjectType = .unknown
+  @State private var subjectType: SubjectType = .none
   @State private var offset = 0
   @State private var exhausted = false
 
@@ -118,7 +118,7 @@ struct SearchView: View {
       VStack {
         HStack {
           Picker("Subject Type", selection: $subjectType) {
-            Text("全部").tag(SubjectType.unknown)
+            Text("全部").tag(SubjectType.none)
             ForEach(SubjectType.allTypes) { type in
               Text(type.description).tag(type)
             }

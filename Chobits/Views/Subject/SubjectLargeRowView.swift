@@ -53,7 +53,7 @@ struct SubjectLargeRowView: View {
         HStack {
           VStack(alignment: .leading) {
             HStack {
-              if let stype = subject?.typeEnum, stype != .unknown {
+              if let stype = subject?.typeEnum, stype != .none {
                 Image(systemName: stype.icon)
                   .foregroundStyle(.secondary)
                   .font(.footnote)
@@ -130,7 +130,7 @@ struct SubjectLargeRowView: View {
               .foregroundStyle(.secondary)
           }
           Spacer()
-          if let collection = subject?.userCollection, collection.typeEnum != .unknown {
+          if let collection = subject?.userCollection, collection.typeEnum != .none {
             Label(collection.typeDesc, systemImage: collection.typeEnum.icon)
               .foregroundStyle(.accent)
           }
