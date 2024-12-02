@@ -38,7 +38,7 @@ struct SubjectRelationListView: View {
     }
     ScrollView {
       PageView<SubjectRelationDTO, _>(reloader: reloader, nextPageFunc: load) { item in
-        Section {
+        CardView {
           HStack {
             NavigationLink(value: NavDestination.subject(subjectId: item.subject.id)) {
               ImageView(
@@ -66,11 +66,8 @@ struct SubjectRelationListView: View {
                 }
               }.buttonStyle(.plain)
             }.padding(.leading, 4)
-          }.padding(4)
+          }
         }
-        .background(Color("CardBackgroundColor"))
-        .cornerRadius(8)
-        .shadow(color: Color.black.opacity(0.2), radius: 4)
       }
       .padding(8)
     }

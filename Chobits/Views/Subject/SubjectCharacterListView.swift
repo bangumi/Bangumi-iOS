@@ -39,7 +39,7 @@ struct SubjectCharacterListView: View {
     }
     ScrollView {
       PageView<SubjectCharacterDTO, _>(reloader: reloader, nextPageFunc: load) { item in
-        Section {
+        CardView {
           HStack {
             NavigationLink(value: NavDestination.character(characterId: item.character.id)) {
               ImageView(
@@ -80,11 +80,8 @@ struct SubjectCharacterListView: View {
                 }
               }
             }.padding(.leading, 4)
-          }.padding(4)
+          }
         }
-        .background(Color("CardBackgroundColor"))
-        .cornerRadius(8)
-        .shadow(color: Color.black.opacity(0.2), radius: 4)
       }
       .padding(8)
     }

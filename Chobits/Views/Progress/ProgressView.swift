@@ -137,13 +137,11 @@ struct ChiiProgressView: View {
           }
           LazyVStack(alignment: .leading) {
             ForEach(collections, id: \.idx) { item in
-              NavigationLink(value: NavDestination.subject(subjectId: item.inner.subjectId)) {
-                ProgressRowView(collection: item.inner).padding(8)
+              CardView {
+                NavigationLink(value: NavDestination.subject(subjectId: item.inner.subjectId)) {
+                  ProgressRowView(collection: item.inner)
+                }.buttonStyle(.plain)
               }
-              .background(Color("CardBackgroundColor"))
-              .cornerRadius(8)
-              .shadow(color: Color.black.opacity(0.2), radius: 4)
-              .buttonStyle(.plain)
               .onAppear {
                 Task {
                   await loadNextPage(idx: item.idx)

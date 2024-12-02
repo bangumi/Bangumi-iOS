@@ -86,6 +86,7 @@
 		19ECCDA32CFC74C50092F715 /* user_subject_collections.json in Resources */ = {isa = PBXBuildFile; fileRef = 19ECCDA22CFC74C50092F715 /* user_subject_collections.json */; };
 		19ECCDC82CFC986E0092F715 /* Html.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19ECCDC72CFC986B0092F715 /* Html.swift */; };
 		19ECCDEF2CFD43CD0092F715 /* Wrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19ECCDEE2CFD43CA0092F715 /* Wrapper.swift */; };
+		19ECCE132CFD5B6B0092F715 /* CardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19ECCE122CFD5B6B0092F715 /* CardView.swift */; };
 		19F8C3D82BE73B830037D723 /* Navigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19F8C3D72BE73B820037D723 /* Navigation.swift */; };
 /* End PBXBuildFile section */
 
@@ -169,6 +170,7 @@
 		19ECCDA22CFC74C50092F715 /* user_subject_collections.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = user_subject_collections.json; sourceTree = "<group>"; };
 		19ECCDC72CFC986B0092F715 /* Html.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Html.swift; sourceTree = "<group>"; };
 		19ECCDEE2CFD43CA0092F715 /* Wrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Wrapper.swift; sourceTree = "<group>"; };
+		19ECCE122CFD5B6B0092F715 /* CardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardView.swift; sourceTree = "<group>"; };
 		19F8C3D72BE73B820037D723 /* Navigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Navigation.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -234,6 +236,7 @@
 			isa = PBXGroup;
 			children = (
 				191CF1A52CC09F1E000EF819 /* BorderView.swift */,
+				19ECCE122CFD5B6B0092F715 /* CardView.swift */,
 				19ECCDA02CFC21160092F715 /* PageView.swift */,
 				19671C392BDEB55D000B4D99 /* ImageView.swift */,
 				1943C5072C08CD2E0067ACDB /* StarsView.swift */,
@@ -516,6 +519,7 @@
 				19671C692BDEB55D000B4D99 /* AuthView.swift in Sources */,
 				191CF1A62CC09F25000EF819 /* BorderView.swift in Sources */,
 				19B900402BEEE23600405F0F /* ChartView.swift in Sources */,
+				19ECCE132CFD5B6B0092F715 /* CardView.swift in Sources */,
 				19671C5D2BDEB55D000B4D99 /* ImageView.swift in Sources */,
 				19671C622BDEB55D000B4D99 /* Core.swift in Sources */,
 				194484252BF4DD5E002EC925 /* CollectionRowView.swift in Sources */,

@@ -172,13 +172,11 @@ struct SearchView: View {
           ScrollView {
             LazyVStack(alignment: .leading) {
               ForEach(subjects, id: \.inner.self) { item in
-                NavigationLink(value: NavDestination.subject(subjectId: item.inner.subjectId)) {
-                  SubjectLargeRowView(subjectId: item.inner.subjectId).padding(8)
+                CardView {
+                  NavigationLink(value: NavDestination.subject(subjectId: item.inner.subjectId)) {
+                    SubjectLargeRowView(subjectId: item.inner.subjectId)
+                  }.buttonStyle(.plain)
                 }
-                .background(Color("CardBackgroundColor"))
-                .cornerRadius(8)
-                .shadow(color: Color.black.opacity(0.2), radius: 4)
-                .buttonStyle(.plain)
                 .onAppear {
                   Task {
                     await searchNextPage(idx: item.idx)
