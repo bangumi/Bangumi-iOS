@@ -47,25 +47,25 @@ struct SubjectView: View {
 
   var body: some View {
     Section {
-      if subject != nil {
+      if let subject = subject {
         ScrollView(showsIndicators: false) {
           LazyVStack(alignment: .leading) {
-            SubjectHeaderView(subjectId: subjectId)
+            SubjectHeaderView(subject: subject)
 
-            switch subject?.typeEnum {
+            switch subject.typeEnum {
             case .anime, .real:
               EpisodeGridView(subjectId: subjectId)
             default:
               EmptyView()
             }
             if isAuthenticated {
-              SubjectCollectionView(subjectId: subjectId)
+              SubjectCollectionView(subject: subject)
             }
 
-            SubjectSummaryView(subjectId: subjectId)
+            SubjectSummaryView(subject: subject)
 
             SubjectCharactersView(subjectId: subjectId)
-            SubjectRelationsView(subjectId: subjectId)
+            SubjectRelationsView(subjectId: subjectId, series: subject.series)
 
             if !isolationMode {
               SubjectTopicsView(subjectId: subjectId)
@@ -86,7 +86,7 @@ struct SubjectView: View {
             }
           }
         }
-        .navigationTitle(subject?.name ?? "")
+        .navigationTitle(subject.name)
         .navigationBarTitleDisplayMode(.inline)
       } else if refreshed {
         NotFoundView()

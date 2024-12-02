@@ -10,7 +10,7 @@ import SwiftData
 import SwiftUI
 
 struct SubjectCollectionBoxView: View {
-  let subjectId: Int
+  @ObservableModel var subject: Subject
 
   @Environment(\.modelContext) var modelContext
   @Environment(\.dismiss) private var dismiss
@@ -24,16 +24,12 @@ struct SubjectCollectionBoxView: View {
 
   @State private var updating: Bool = false
 
-  @State private var subject: Subject? = nil
-  @State private var collection: UserSubjectCollection? = nil
-
   var recommendedTags: [String] {
-    guard let subject = subject else { return [] }
     return subject.tags.sorted(by: { $0.count > $1.count }).prefix(15).map { $0.name }
   }
 
   var buttonText: String {
-    if collection == nil {
+    if subject.userCollection == nil {
       return priv ? "悄悄地添加" : "添加"
     } else {
       return priv ? "悄悄地更新" : "更新"
@@ -50,31 +46,8 @@ struct SubjectCollectionBoxView: View {
     return ""
   }
 
-  func load() async {
-    do {
-      var sdesc = FetchDescriptor<Subject>(
-        predicate: #Predicate<Subject> {
-          $0.subjectId == subjectId
-        })
-      sdesc.fetchLimit = 1
-      let subjects = try modelContext.fetch(sdesc)
-      if let s = subjects.first {
-        subject = s
-      }
-
-      var cdesc = FetchDescriptor<UserSubjectCollection>(
-        predicate: #Predicate<UserSubjectCollection> {
-          $0.subjectId == subjectId
-        })
-      cdesc.fetchLimit = 1
-      let collections = try modelContext.fetch(cdesc)
-      if let c = collections.first {
-        collection = c
-      }
-    } catch {
-      Notifier.shared.alert(error: error)
-    }
-    if let collection = collection {
+  func load() {
+    if let collection = subject.userCollection {
       self.collectionType = collection.typeEnum
       self.rate = collection.rate
       self.comment = collection.comment
@@ -89,7 +62,7 @@ struct SubjectCollectionBoxView: View {
     Task {
       do {
         try await Chii.shared.updateSubjectCollection(
-          subjectId: subjectId,
+          subjectId: subject.subjectId,
           type: collectionType,
           rate: rate,
           comment: comment,
@@ -123,19 +96,16 @@ struct SubjectCollectionBoxView: View {
           .frame(width: 40)
           .sensoryFeedback(.selection, trigger: priv)
         }.padding(.vertical, 5)
-        if let collection = collection {
+        if let collection = subject.userCollection {
           Text("上次更新：\(collection.updatedAt)").font(.caption).foregroundStyle(.secondary)
         }
 
         Picker("Collection Type", selection: $collectionType) {
           ForEach(CollectionType.allTypes()) { ct in
-            Text("\(ct.description(type: subject?.typeEnum))").tag(ct)
+            Text("\(ct.description(type: subject.typeEnum))").tag(ct)
           }
         }
         .pickerStyle(.segmented)
-        .task {
-          await load()
-        }
 
         VStack(alignment: .leading) {
           HStack(alignment: .top) {
@@ -212,6 +182,7 @@ struct SubjectCollectionBoxView: View {
       .animation(.default, value: priv)
       .animation(.default, value: rate)
       .padding()
+      .task(load)
     }
   }
 }
@@ -219,16 +190,14 @@ struct SubjectCollectionBoxView: View {
 #Preview {
   let container = mockContainer()
 
-  container.mainContext.insert(UserSubjectCollection.previewBook)
-
-  let collection = UserSubjectCollection.previewAnime
-  let subject = Subject.previewAnime
+  let collection = UserSubjectCollection.previewBook
+  let subject = Subject.previewBook
 
   container.mainContext.insert(collection)
   container.mainContext.insert(subject)
 
-  return SubjectCollectionBoxView(
-    subjectId: subject.subjectId
-  )
-  .modelContainer(container)
+  collection.subject = subject
+
+  return SubjectCollectionBoxView(subject: subject)
+    .modelContainer(container)
 }

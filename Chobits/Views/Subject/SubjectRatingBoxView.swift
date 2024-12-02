@@ -5,8 +5,8 @@
 //  Created by Chuan Chuan on 2024/4/28.
 //
 
-import SwiftUI
 import Flow
+import SwiftUI
 
 struct ScoreInfo {
   var desc: String
@@ -14,7 +14,7 @@ struct ScoreInfo {
 }
 
 struct SubjectRatingBoxView: View {
-  let subject: Subject
+  @ObservableModel var subject: Subject
 
   var scoreInfo: ScoreInfo {
     let score = Int(subject.rating.score.rounded())

@@ -10,7 +10,7 @@ import SwiftData
 import SwiftUI
 
 struct SubjectBookChaptersView: View {
-  let subjectId: Int
+  @ObservableModel var subject: Subject
   let compact: Bool
 
   @State private var inputEps: String = ""
@@ -18,19 +18,6 @@ struct SubjectBookChaptersView: View {
   @State private var inputVols: String = ""
   @State private var vols: Int? = nil
   @State private var updating: Bool = false
-
-  @Query
-  private var subjects: [Subject]
-  private var subject: Subject? { subjects.first }
-
-  init(subjectId: Int, compact: Bool = false) {
-    self.subjectId = subjectId
-    _subjects = Query(
-      filter: #Predicate<Subject> {
-        $0.subjectId == subjectId
-      })
-    self.compact = compact
-  }
 
   var updateButtonDisable: Bool {
     if updating {
@@ -82,7 +69,8 @@ struct SubjectBookChaptersView: View {
     self.updating = true
     Task {
       do {
-        try await Chii.shared.updateBookCollection(subjectId: subjectId, eps: eps, vols: vols)
+        try await Chii.shared.updateBookCollection(
+          subjectId: subject.subjectId, eps: eps, vols: vols)
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
       } catch {
         Notifier.shared.alert(error: error)
@@ -93,12 +81,12 @@ struct SubjectBookChaptersView: View {
   }
 
   var collectionEps: Int {
-    guard let collection = self.subject?.userCollection else { return 0 }
+    guard let collection = self.subject.userCollection else { return 0 }
     return collection.epStatus
   }
 
   var collectionVols: Int {
-    guard let collection = self.subject?.userCollection else { return 0 }
+    guard let collection = self.subject.userCollection else { return 0 }
     return collection.volStatus
   }
 
@@ -113,11 +101,11 @@ struct SubjectBookChaptersView: View {
             .fixedSize(horizontal: true, vertical: false)
             .padding(.trailing, 2)
             .textFieldStyle(.plain)
-            .onChange(of: inputEps){
+            .onChange(of: inputEps) {
               parseInputEps()
             }
           Text("/").foregroundStyle(.secondary)
-          Text(subject?.epsDesc ?? "").foregroundStyle(.secondary)
+          Text(subject.epsDesc).foregroundStyle(.secondary)
           Text("话").foregroundStyle(.secondary)
             .padding(.trailing, 2)
           Button {
@@ -140,7 +128,7 @@ struct SubjectBookChaptersView: View {
               parseInputVols()
             }
           Text("/").foregroundStyle(.secondary)
-          Text(subject?.volumesDesc ?? "").foregroundStyle(.secondary)
+          Text(subject.volumesDesc).foregroundStyle(.secondary)
           Text("卷").foregroundStyle(.secondary)
             .padding(.trailing, 2)
           Button {
@@ -154,7 +142,7 @@ struct SubjectBookChaptersView: View {
         Spacer()
         if updating {
           ZStack {
-            Button{
+            Button {
             } label: {
               Image(systemName: "checkmark.circle")
             }
@@ -183,11 +171,11 @@ struct SubjectBookChaptersView: View {
               .fixedSize(horizontal: true, vertical: false)
               .padding(.trailing, 2)
               .textFieldStyle(.roundedBorder)
-              .onChange(of: inputEps){
+              .onChange(of: inputEps) {
                 parseInputEps()
               }
             Text("/").foregroundStyle(.secondary)
-            Text(subject?.epsDesc ?? "").foregroundStyle(.secondary)
+            Text(subject.epsDesc).foregroundStyle(.secondary)
               .padding(.trailing, 5)
             Button {
               incrEps()
@@ -210,7 +198,7 @@ struct SubjectBookChaptersView: View {
                 parseInputVols()
               }
             Text("/").foregroundStyle(.secondary)
-            Text(subject?.volumesDesc ?? "").foregroundStyle(.secondary)
+            Text(subject.volumesDesc).foregroundStyle(.secondary)
               .padding(.trailing, 5)
             Button {
               incrVols()
@@ -253,7 +241,7 @@ struct SubjectBookChaptersView: View {
 
   return ScrollView {
     LazyVStack(alignment: .leading) {
-      SubjectBookChaptersView(subjectId: subject.subjectId)
+      SubjectBookChaptersView(subject: subject, compact: false)
         .modelContainer(container)
     }
   }

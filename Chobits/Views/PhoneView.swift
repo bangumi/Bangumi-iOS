@@ -29,7 +29,7 @@ struct PhoneView: View {
         }
         .tag(tab)
         .tabItem {
-          Label(tab.title, systemImage: tab.icon).labelStyle(.iconOnly)
+          Label(tab.title, systemImage: tab.icon)
         }
       }
     }

@@ -10,31 +10,19 @@ import SwiftData
 import SwiftUI
 
 struct SubjectCollectionView: View {
-  let subjectId: Int
+  @ObservableModel var subject: Subject
 
   @Environment(\.modelContext) var modelContext
 
   @State private var refreshed: Bool = false
   @State private var edit: Bool = false
 
-  @Query
-  private var collections: [UserSubjectCollection]
-  var collection: UserSubjectCollection? { collections.first }
-
-  init(subjectId: Int) {
-    self.subjectId = subjectId
-    _collections = Query(
-      filter: #Predicate<UserSubjectCollection> {
-        $0.subjectId == subjectId
-      })
-  }
-
   func refresh() async {
     if refreshed { return }
     refreshed = true
 
     do {
-      try await Chii.shared.loadUserSubjectCollection(subjectId)
+      try await Chii.shared.loadUserSubjectCollection(subject.subjectId)
     } catch {
       Notifier.shared.alert(error: error)
       return
@@ -44,22 +32,22 @@ struct SubjectCollectionView: View {
   var body: some View {
     Section {
       VStack(alignment: .leading) {
-        if collection?.subject?.typeEnum == .book {
-          SubjectBookChaptersView(subjectId: subjectId)
+        if subject.typeEnum == .book {
+          SubjectBookChaptersView(subject: subject, compact: false)
         }
         if refreshed {
           BorderView(.linkText, padding: 5) {
             HStack {
               Spacer()
-              if collection == nil {
-                Label("未收藏", systemImage: "plus")
-                  .foregroundStyle(.secondary)
-              } else {
-                if collection?.priv ?? false {
+              if let collection = subject.userCollection {
+                if collection.priv {
                   Image(systemName: "lock.fill").foregroundStyle(.secondary)
                 }
-                Label(collection?.message ?? "", systemImage: collection?.typeEnum.icon ?? "star")
-                StarsView(score: Float(collection?.rate ?? 0), size: 16)
+                Label(collection.message, systemImage: collection.typeEnum.icon)
+                StarsView(score: Float(collection.rate), size: 16)
+              } else {
+                Label("未收藏", systemImage: "plus")
+                  .foregroundStyle(.secondary)
               }
               Spacer()
             }
@@ -71,7 +59,7 @@ struct SubjectCollectionView: View {
           .sheet(
             isPresented: $edit,
             content: {
-              SubjectCollectionBoxView(subjectId: subjectId)
+              SubjectCollectionBoxView(subject: subject)
                 .presentationDragIndicator(.visible)
                 .presentationDetents(.init([.medium, .large]))
             })
@@ -91,12 +79,15 @@ struct SubjectCollectionView: View {
 #Preview {
   let container = mockContainer()
 
+  let subject = Subject.previewBook
   let collection = UserSubjectCollection.previewBook
+  container.mainContext.insert(subject)
   container.mainContext.insert(collection)
+  collection.subject = subject
 
   return ScrollView {
     LazyVStack(alignment: .leading) {
-      SubjectCollectionView(subjectId: collection.subjectId)
+      SubjectCollectionView(subject: subject)
         .modelContainer(container)
     }
   }

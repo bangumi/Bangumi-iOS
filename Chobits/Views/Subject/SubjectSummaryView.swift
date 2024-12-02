@@ -5,42 +5,25 @@
 //  Created by Chuan Chuan on 2024/4/28.
 //
 
+import Flow
 import OSLog
 import SwiftData
 import SwiftUI
-import Flow
 
 struct SubjectSummaryView: View {
-  let subjectId: Int
+  @ObservableModel var subject: Subject
 
   @State private var showSummary = false
 
-  @Query
-  private var subjects: [Subject]
-  var subject: Subject? { subjects.first }
-
-  init(subjectId: Int) {
-    self.subjectId = subjectId
-    let predicate = #Predicate<Subject> {
-      $0.subjectId == subjectId
-    }
-    _subjects = Query(filter: predicate, sort: \Subject.subjectId)
-  }
-
   var tags: [Tag] {
-    guard let subject = self.subject else { return [] }
     return Array(subject.tags.sorted { $0.count > $1.count }.prefix(20))
-  }
-
-  var metaTags: [String] {
-    subject?.metaTags ?? []
   }
 
   var body: some View {
     VStack(alignment: .leading) {
-      if subject?.metaTags.count ?? 0 > 0 {
+      if subject.metaTags.count > 0 {
         HFlow(alignment: .center, spacing: 4) {
-          ForEach(metaTags, id: \.self) { tag in
+          ForEach(subject.metaTags, id: \.self) { tag in
             BorderView(.secondary, padding: 2) {
               Text(tag)
                 .font(.footnote)
@@ -49,7 +32,7 @@ struct SubjectSummaryView: View {
           }
         }
       }
-      Text(subject?.summary ?? "")
+      Text(subject.summary)
         .font(.footnote)
         .multilineTextAlignment(.leading)
         .lineLimit(5)
@@ -72,7 +55,7 @@ struct SubjectSummaryView: View {
               }.animation(.default, value: tags)
               Divider()
               Text("简介").font(.title3).padding(.vertical, 10)
-              Text(subject?.summary ?? "")
+              Text(subject.summary)
                 .textSelection(.enabled)
                 .multilineTextAlignment(.leading)
                 .presentationDragIndicator(.visible)
@@ -103,7 +86,7 @@ struct SubjectSummaryView: View {
 
   return ScrollView {
     LazyVStack(alignment: .leading) {
-      SubjectSummaryView(subjectId: subject.subjectId)
+      SubjectSummaryView(subject: subject)
         .modelContainer(container)
     }
   }.padding()

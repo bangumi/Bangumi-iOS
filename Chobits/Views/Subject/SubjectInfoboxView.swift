@@ -10,24 +10,12 @@ import SwiftData
 import SwiftUI
 
 struct SubjectInfoboxView: View {
-  let subjectId: Int
-
-  @Query
-  private var subjects: [Subject]
-  var subject: Subject? { subjects.first }
-
-  init(subjectId: Int) {
-    self.subjectId = subjectId
-    let predicate = #Predicate<Subject> {
-      $0.subjectId == subjectId
-    }
-    _subjects = Query(filter: predicate, sort: \Subject.subjectId)
-  }
+  @ObservableModel var subject: Subject
 
   var body: some View {
     ScrollView {
       LazyVStack(alignment: .leading) {
-        ForEach(Array(subject?.infobox ?? [:]), id: \.key) { key, values in
+        ForEach(Array(subject.infobox), id: \.key) { key, values in
           HStack(alignment: .top) {
             Text("\(key): ").bold()
             VStack(alignment: .leading) {
@@ -64,6 +52,6 @@ struct SubjectInfoboxView: View {
   let subject = Subject.previewAnime
   container.mainContext.insert(subject)
 
-  return SubjectInfoboxView(subjectId: subject.subjectId)
-        .modelContainer(container)
+  return SubjectInfoboxView(subject: subject)
+    .modelContainer(container)
 }

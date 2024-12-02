@@ -10,37 +10,24 @@ import SwiftData
 import SwiftUI
 
 struct ProgressRowView: View {
-  let subjectId: Int
+  @ObservableModel var collection: UserSubjectCollection
 
   @Environment(\.modelContext) var modelContext
 
   @State private var updating: Bool = false
   @State private var nextEpisode: Episode?
 
-  @Query
-  private var subjects: [Subject]
-  private var subject: Subject? { subjects.first }
+  var totalEps: Int {
+    collection.subject?.eps ?? 0
+  }
 
-  @Query
-  private var collections: [UserSubjectCollection]
-  private var collection: UserSubjectCollection? { collections.first }
-
-  init(subjectId: Int) {
-    self.subjectId = subjectId
-
-    _subjects = Query(
-      filter: #Predicate<Subject> {
-        $0.subjectId == subjectId
-      })
-    _collections = Query(
-      filter: #Predicate<UserSubjectCollection> {
-        $0.subjectId == subjectId
-      })
+  var totalVols: Int {
+    collection.subject?.volumes ?? 0
   }
 
   func loadNextEpisode() async {
-    guard let subject = subject else { return }
-    switch subject.typeEnum {
+    let subjectId = collection.subjectId
+    switch collection.subject?.typeEnum {
     case .anime, .real:
       break
     default:
@@ -74,7 +61,7 @@ struct ProgressRowView: View {
     Task {
       do {
         try await Chii.shared.updateEpisodeCollection(
-          subjectId: subjectId, episodeId: episodeId, type: .collect)
+          subjectId: collection.subjectId, episodeId: episodeId, type: .collect)
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
         await loadNextEpisode()
       } catch {
@@ -87,22 +74,22 @@ struct ProgressRowView: View {
   var body: some View {
     VStack(alignment: .leading) {
       HStack {
-        ImageView(img: subject?.images?.common, width: 72, height: 96, type: .subject)
+        ImageView(img: collection.subject?.images?.common, width: 72, height: 96, type: .subject)
         VStack(alignment: .leading) {
-          Text(subject?.name ?? "")
+          Text(collection.subject?.name ?? "")
             .font(.headline)
             .lineLimit(1)
-          Text(subject?.nameCN ?? "")
+          Text(collection.subject?.nameCN ?? "")
             .foregroundStyle(.secondary)
             .font(.subheadline)
             .lineLimit(1)
 
           Spacer()
 
-          switch collection?.subject?.typeEnum {
+          switch collection.subject?.typeEnum {
           case .anime, .real:
             HStack {
-              Text("\(collection?.epStatus ?? 0) / \(subject?.eps ?? 0)")
+              Text("\(collection.epStatus) / \(totalEps)")
                 .foregroundStyle(.secondary)
               Spacer()
               if let episode = nextEpisode {
@@ -127,23 +114,25 @@ struct ProgressRowView: View {
               }
             }.font(.callout)
           case .book:
-            SubjectBookChaptersView(subjectId: subjectId, compact: true)
-              .font(.callout)
+            if let subject = collection.subject {
+              SubjectBookChaptersView(subject: subject, compact: true)
+                .font(.callout)
+            }
 
           default:
-            if let stype = collection?.subject?.typeEnum {
+            if let stype = collection.subject?.typeEnum {
               Label(stype.description, systemImage: stype.icon)
-              .foregroundStyle(.accent)
-              .font(.callout)
+                .foregroundStyle(.accent)
+                .font(.callout)
             }
           }
 
           Spacer()
           HStack {
-            Text(collection?.updatedAt.formatRelative ?? "")
+            Text(collection.updatedAt.formatRelative)
               .lineLimit(1)
             Spacer()
-            if collection?.priv ?? false {
+            if collection.priv {
               Image(systemName: "lock.fill")
             }
           }
@@ -153,15 +142,16 @@ struct ProgressRowView: View {
       }
 
       Section {
-        switch collection?.subject?.typeEnum {
+        switch collection.subject?.typeEnum {
         case .book:
           VStack(spacing: 1) {
-            ProgressView(value: Float(min(subject?.eps ?? 0, collection?.epStatus ?? 0)), total: Float(subject?.eps ?? 0))
-            ProgressView(value: Float(min(subject?.volumes ?? 0, collection?.volStatus ?? 0)), total: Float(subject?.volumes ?? 0))
+            ProgressView(value: Float(min(totalEps, collection.epStatus)), total: Float(totalEps))
+            ProgressView(
+              value: Float(min(totalVols, collection.volStatus)), total: Float(totalVols))
           }.progressViewStyle(.linear)
 
         case .anime, .real:
-          ProgressView(value: Float(min(subject?.eps ?? 0, collection?.epStatus ?? 0)), total: Float(subject?.eps ?? 0))
+          ProgressView(value: Float(min(totalEps, collection.epStatus)), total: Float(totalEps))
             .progressViewStyle(.linear)
 
         default:
@@ -184,13 +174,14 @@ struct ProgressRowView: View {
   let episodes = Episode.previewList
   container.mainContext.insert(subject)
   container.mainContext.insert(collection)
+  collection.subject = subject
   for episode in episodes {
     container.mainContext.insert(episode)
   }
 
   return ScrollView {
     LazyVStack(alignment: .leading) {
-      ProgressRowView(subjectId: subject.subjectId)
+      ProgressRowView(collection: collection)
     }
   }
   .padding()

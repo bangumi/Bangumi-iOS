@@ -96,7 +96,8 @@ struct ChiiProgressView: View {
   func refreshCollections() async {
     let now = Date()
     do {
-      let count = try await Chii.shared.loadUserSubjectCollections(since: lastLoadUserSubjectCollections)
+      let count = try await Chii.shared.loadUserSubjectCollections(
+        since: lastLoadUserSubjectCollections)
       if count > 0 {
         Notifier.shared.notify(message: "更新了 \(count) 条收藏")
       }
@@ -137,7 +138,7 @@ struct ChiiProgressView: View {
           LazyVStack(alignment: .leading) {
             ForEach(collections, id: \.idx) { item in
               NavigationLink(value: NavDestination.subject(subjectId: item.inner.subjectId)) {
-                ProgressRowView(subjectId: item.inner.subjectId).padding(8)
+                ProgressRowView(collection: item.inner).padding(8)
               }
               .background(Color("CardBackgroundColor"))
               .cornerRadius(8)

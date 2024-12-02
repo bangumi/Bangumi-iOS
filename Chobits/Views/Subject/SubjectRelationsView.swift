@@ -11,6 +11,7 @@ import SwiftUI
 
 struct SubjectRelationsView: View {
   let subjectId: Int
+  let series: Bool
 
   @Environment(\.modelContext) var modelContext
 
@@ -22,14 +23,6 @@ struct SubjectRelationsView: View {
   @Query
   private var subjects: [Subject]
   var subject: Subject? { subjects.first }
-
-  init(subjectId: Int) {
-    self.subjectId = subjectId
-    let predicate = #Predicate<Subject> {
-      $0.subjectId == subjectId
-    }
-    _subjects = Query(filter: predicate, sort: \Subject.subjectId)
-  }
 
   func load() {
     if loading || loaded {
@@ -52,7 +45,7 @@ struct SubjectRelationsView: View {
   }
 
   var body: some View {
-    if subject?.series ?? false {
+    if series {
       Divider()
       HStack {
         Text("单行本")
@@ -120,7 +113,7 @@ struct SubjectRelationsView: View {
 
   return ScrollView {
     LazyVStack(alignment: .leading) {
-      SubjectRelationsView(subjectId: subject.subjectId)
+      SubjectRelationsView(subjectId: subject.subjectId, series: subject.series)
         .modelContainer(container)
     }
   }.padding()

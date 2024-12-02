@@ -84,6 +84,8 @@
 		19E0E5072BF34F0E00066EB7 /* CollectionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19E0E5062BF34F0E00066EB7 /* CollectionsView.swift */; };
 		19ECCDA12CFC21160092F715 /* PageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19ECCDA02CFC21160092F715 /* PageView.swift */; };
 		19ECCDA32CFC74C50092F715 /* user_subject_collections.json in Resources */ = {isa = PBXBuildFile; fileRef = 19ECCDA22CFC74C50092F715 /* user_subject_collections.json */; };
+		19ECCDC82CFC986E0092F715 /* Html.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19ECCDC72CFC986B0092F715 /* Html.swift */; };
+		19ECCDEF2CFD43CD0092F715 /* Wrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19ECCDEE2CFD43CA0092F715 /* Wrapper.swift */; };
 		19F8C3D82BE73B830037D723 /* Navigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19F8C3D72BE73B820037D723 /* Navigation.swift */; };
 /* End PBXBuildFile section */
 
@@ -165,6 +167,8 @@
 		19E0E5062BF34F0E00066EB7 /* CollectionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionsView.swift; sourceTree = "<group>"; };
 		19ECCDA02CFC21160092F715 /* PageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageView.swift; sourceTree = "<group>"; };
 		19ECCDA22CFC74C50092F715 /* user_subject_collections.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = user_subject_collections.json; sourceTree = "<group>"; };
+		19ECCDC72CFC986B0092F715 /* Html.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Html.swift; sourceTree = "<group>"; };
+		19ECCDEE2CFD43CA0092F715 /* Wrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Wrapper.swift; sourceTree = "<group>"; };
 		19F8C3D72BE73B820037D723 /* Navigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Navigation.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -358,6 +362,8 @@
 			children = (
 				197A19D92BE6733A00804B13 /* Error.swift */,
 				19F8C3D72BE73B820037D723 /* Navigation.swift */,
+				19ECCDC72CFC986B0092F715 /* Html.swift */,
+				19ECCDEE2CFD43CA0092F715 /* Wrapper.swift */,
 				197A19CA2BE5E59900804B13 /* Logger.swift */,
 				197A19CE2BE5E5E700804B13 /* Notifier.swift */,
 				19BD242D2BEB2F3400595973 /* Setting.swift */,
@@ -520,6 +526,7 @@
 				19B9002E2BED15B600405F0F /* PersonView.swift in Sources */,
 				1930110E2C00F08A008DCEBF /* CollectionSubjectTypeView.swift in Sources */,
 				1909F3B42BECF9D100E3B8F0 /* CharacterView.swift in Sources */,
+				19ECCDC82CFC986E0092F715 /* Html.swift in Sources */,
 				19671C5E2BDEB55D000B4D99 /* LoadingView.swift in Sources */,
 				1998DCFD2CB10A5C00115E1F /* SubjectTopicListView.swift in Sources */,
 				19E0E5042BF24E0F00066EB7 /* PersonSubjectListView.swift.bak in Sources */,
@@ -528,6 +535,7 @@
 				191881412CD0804800B4DAD7 /* PadView.swift in Sources */,
 				19671C572BDEB55D000B4D99 /* SubjectRatingBoxView.swift in Sources */,
 				19C2CE5D2BE1E7B10080A056 /* NotFoundView.swift in Sources */,
+				19ECCDEF2CFD43CD0092F715 /* Wrapper.swift in Sources */,
 				19ECCDA12CFC21160092F715 /* PageView.swift in Sources */,
 				1998DCFB2CB1066F00115E1F /* SubjectTopicsView.swift in Sources */,
 				19671C6B2BDEB55D000B4D99 /* SearchView.swift in Sources */,
