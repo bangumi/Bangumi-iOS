@@ -72,7 +72,7 @@ struct SubjectDTO: Codable, Identifiable {
   var airtime: SubjectAirtime
   var collection: SubjectCollection
   var eps: Int
-  var images: SubjectImages
+  var images: SubjectImages?
   var infobox: Infobox
   var locked: Bool
   var metaTags: [String]

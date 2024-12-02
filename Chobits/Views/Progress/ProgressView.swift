@@ -11,7 +11,7 @@ import SwiftUI
 
 struct ChiiProgressView: View {
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
-  @AppStorage("lastLoadUserSubjectCollections") var lastLoadUserSubjectCollections: Int = 0
+  @AppStorage("collectionsUpdatedAt") var collectionsUpdatedAt: Int = 0
 
   @Environment(\.modelContext) var modelContext
 
@@ -93,24 +93,31 @@ struct ChiiProgressView: View {
     self.collections.append(contentsOf: collections)
   }
 
-  func refreshCollections() async {
+  func refresh() async {
     let now = Date()
     do {
       let count = try await Chii.shared.loadUserSubjectCollections(
-        since: lastLoadUserSubjectCollections)
+        since: collectionsUpdatedAt)
       if count > 0 {
         Notifier.shared.notify(message: "更新了 \(count) 条收藏")
       }
     } catch {
       Notifier.shared.alert(error: error)
     }
-    lastLoadUserSubjectCollections = Int(now.timeIntervalSince1970)
+    collectionsUpdatedAt = Int(now.timeIntervalSince1970)
   }
 
   var body: some View {
     VStack {
       if isAuthenticated {
         ScrollView {
+          if refreshing {
+            HStack {
+              Spacer()
+              ProgressView()
+              Spacer()
+            }.frame(height: 40)
+          }
           Picker("Subject Type", selection: $subjectType) {
             ForEach(SubjectType.progressTypes) { type in
               Text("\(type.description)(\(counts[type, default: 0]))").tag(type)
@@ -125,7 +132,7 @@ struct ChiiProgressView: View {
             Task {
               await load()
               refreshing = true
-              await refreshCollections()
+              await refresh()
               refreshing = false
               await load()
             }
@@ -167,18 +174,11 @@ struct ChiiProgressView: View {
             return
           }
           UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-          await refreshCollections()
+          await refresh()
           await load()
         }
         .navigationTitle("进度管理")
         .toolbarTitleDisplayMode(.inlineLarge)
-        .toolbar {
-          if refreshing {
-            ToolbarItem(placement: .topBarTrailing) {
-              ProgressView()
-            }
-          }
-        }
       } else {
         AuthView(slogan: "使用 Bangumi 管理观看进度")
           .toolbar {
