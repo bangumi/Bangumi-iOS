@@ -15,14 +15,14 @@ struct SubjectInfoboxView: View {
   var body: some View {
     ScrollView {
       LazyVStack(alignment: .leading) {
-        ForEach(Array(subject.infobox), id: \.key) { key, values in
+        ForEach(subject.infobox, id: \.key) { item in
           HStack(alignment: .top) {
-            Text("\(key): ").bold()
+            Text("\(item.key): ").bold()
             VStack(alignment: .leading) {
-              ForEach(values, id: \.v) { value in
+              ForEach(item.values, id: \.v) { value in
                 if let k = value.k {
                   HStack {
-                    Text("\(k): ").foregroundStyle(.secondary)
+                    Text("\(k) ").foregroundStyle(.secondary)
                     Text(value.v)
                   }
                 } else {

@@ -171,7 +171,21 @@ struct SubjectRating: Codable {
   }
 }
 
-typealias Infobox = [String: [InfoboxValue]]
+typealias Infobox = [InfoboxItem]
+
+struct InfoboxItem: Codable {
+  var key: String
+  var values: [InfoboxValue]
+
+  var isEmpty: Bool {
+    for value in values {
+      if !value.v.isEmpty {
+        return false
+      }
+    }
+    return true
+  }
+}
 
 struct InfoboxValue: Codable {
   var k: String?

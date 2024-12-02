@@ -69,7 +69,7 @@ struct SubjectView: View {
 
             if !isolationMode {
               SubjectTopicsView(subjectId: subjectId)
-              // SubjectCommentsView(subjectId: subjectId)
+              SubjectCommentsView(subjectId: subjectId)
             }
 
             Spacer()

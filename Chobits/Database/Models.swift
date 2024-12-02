@@ -86,10 +86,10 @@ final class SubjectV1 {
     }
     for fields in typeEnum.authorityFields {
       for field in fields {
-        if let item = infobox[field] {
-          if let value = item.first {
-            items.append(value.v)
-          }
+        if let item = infobox.filter({ item in
+          item.key == field
+        }).first {
+          items.append(item.values.map(\.v).joined(separator: ","))
         }
       }
     }
@@ -106,7 +106,9 @@ final class SubjectV1 {
     self.collection = item.collection
     self.eps = item.eps
     self.images = item.images
-    self.infobox = item.infobox
+    self.infobox = item.infobox.filter { item in
+      !item.isEmpty
+    }
     self.locked = item.locked
     self.metaTags = item.metaTags
     self.tags = item.tags
@@ -127,7 +129,7 @@ final class SubjectV1 {
     self.collection = item.collection
     self.eps = item.eps
     self.images = item.images
-    self.infobox = [:]
+    self.infobox = []
     self.locked = item.locked
     self.metaTags = item.metaTags
     self.tags = item.tags
@@ -147,7 +149,9 @@ final class SubjectV1 {
     self.collection = item.collection
     self.eps = item.eps
     self.images = item.images
-    self.infobox = item.infobox
+    self.infobox = item.infobox.filter { item in
+      !item.isEmpty
+    }
     self.locked = item.locked
     self.metaTags = item.metaTags
     self.tags = item.tags
@@ -267,7 +271,9 @@ final class CharacterV1 {
     self.collects = item.collects
     self.comment = item.comment
     self.images = item.images
-    self.infobox = item.infobox
+    self.infobox = item.infobox.filter { item in
+      !item.isEmpty
+    }
     self.lock = item.lock
     self.name = item.name
     self.nsfw = item.nsfw
@@ -279,7 +285,9 @@ final class CharacterV1 {
     self.collects = item.collects
     self.comment = item.comment
     self.images = item.images
-    self.infobox = item.infobox
+    self.infobox = item.infobox.filter { item in
+      !item.isEmpty
+    }
     self.lock = item.lock
     self.name = item.name
     self.nsfw = item.nsfw
@@ -338,7 +346,9 @@ final class PersonV1 {
     self.collects = item.collects
     self.comment = item.comment
     self.images = item.images
-    self.infobox = item.infobox
+    self.infobox = item.infobox.filter { item in
+      !item.isEmpty
+    }
     self.lock = item.lock
     self.name = item.name
     self.nsfw = item.nsfw
@@ -351,7 +361,9 @@ final class PersonV1 {
     self.collects = item.collects
     self.comment = item.comment
     self.images = item.images
-    self.infobox = item.infobox
+    self.infobox = item.infobox.filter { item in
+      !item.isEmpty
+    }
     self.lock = item.lock
     self.name = item.name
     self.nsfw = item.nsfw

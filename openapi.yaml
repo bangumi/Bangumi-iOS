@@ -78,6 +78,8 @@ components:
           type: boolean
         name:
           type: string
+        nameCN:
+          type: string
         nsfw:
           type: boolean
         redirect:
@@ -89,6 +91,7 @@ components:
       required:
         - id
         - name
+        - nameCN
         - role
         - infobox
         - summary
@@ -135,25 +138,38 @@ components:
         - subject
         - type
       type: object
+    CreateTopic:
+      example:
+        cf-turnstile-response: 10000000-aaaa-bbbb-cccc-000000000001
+        content: topic content
+        title: topic title
+      properties:
+        cf-turnstile-response:
+          description: >-
+            需要
+            [turnstile](https://developers.cloudflare.com/turnstile/get-started/client-side-rendering/)
+
+            next.bgm.tv 域名对应的 site-key 为 `0x4AAAAAAABkMYinukE8nzYS`
+
+            dev.bgm38.com 域名使用测试用的 site-key `1x00000000000000000000AA`
+          type: string
+        text:
+          description: bbcode
+          minLength: 1
+          type: string
+        title:
+          minLength: 1
+          type: string
+      required:
+        - title
+        - text
+        - cf-turnstile-response
+      type: object
     CurrentUser:
       allOf:
         - properties:
             avatar:
-              properties:
-                large:
-                  type: string
-                medium:
-                  examples:
-                    - sai
-                  type: string
-                small:
-                  type: string
-              required:
-                - small
-                - medium
-                - large
-              title: Avatar
-              type: object
+              $ref: '#/components/schemas/Avatar'
             id:
               examples:
                 - 1
@@ -407,24 +423,12 @@ components:
         - description
         - totalMembers
         - createdAt
+      title: Group
       type: object
     GroupMember:
       properties:
         avatar:
-          properties:
-            large:
-              type: string
-            medium:
-              example: sai
-              type: string
-            small:
-              type: string
-          required:
-            - small
-            - medium
-            - large
-          title: Avatar
-          type: object
+          $ref: '#/components/schemas/Avatar'
         id:
           type: integer
         joinedAt:
@@ -434,11 +438,12 @@ components:
         username:
           type: string
       required:
-        - avatar
         - id
         - nickname
         - username
+        - avatar
         - joinedAt
+      title: GroupMember
       type: object
     GroupProfile:
       properties:
@@ -548,19 +553,49 @@ components:
       title: Index
       type: object
     Infobox:
-      additionalProperties:
-        items:
-          properties:
-            k:
-              type: string
-            v:
-              type: string
-          required:
-            - v
-          title: InfoboxValue
-          type: object
-        type: array
+      items:
+        properties:
+          key:
+            type: string
+          values:
+            items:
+              properties:
+                k:
+                  type: string
+                v:
+                  type: string
+              required:
+                - v
+              title: InfoboxValue
+              type: object
+            type: array
+        required:
+          - key
+          - values
+        title: InfoboxItem
+        type: object
       title: Infobox
+      type: array
+    InfoboxItem:
+      properties:
+        key:
+          type: string
+        values:
+          items:
+            properties:
+              k:
+                type: string
+              v:
+                type: string
+            required:
+              - v
+            title: InfoboxValue
+            type: object
+          type: array
+      required:
+        - key
+        - values
+      title: InfoboxItem
       type: object
     InfoboxValue:
       properties:
@@ -604,20 +639,7 @@ components:
         sender:
           properties:
             avatar:
-              properties:
-                large:
-                  type: string
-                medium:
-                  example: sai
-                  type: string
-                small:
-                  type: string
-              required:
-                - small
-                - medium
-                - large
-              title: Avatar
-              type: object
+              $ref: '#/components/schemas/Avatar'
             id:
               example: 1
               type: integer
@@ -688,6 +710,8 @@ components:
           type: boolean
         name:
           type: string
+        nameCN:
+          type: string
         nsfw:
           type: boolean
         redirect:
@@ -699,6 +723,7 @@ components:
       required:
         - id
         - name
+        - nameCN
         - type
         - infobox
         - career
@@ -816,6 +841,7 @@ components:
         - selected
         - total
         - value
+      title: Reaction
       type: object
     RecentWikiChange:
       properties:
@@ -878,6 +904,7 @@ components:
         - text
         - state
         - reactions
+      title: Reply
       type: object
     SlimCharacter:
       properties:
@@ -889,6 +916,8 @@ components:
           type: boolean
         name:
           type: string
+        nameCN:
+          type: string
         nsfw:
           type: boolean
         role:
@@ -896,6 +925,7 @@ components:
       required:
         - id
         - name
+        - nameCN
         - role
         - lock
         - nsfw
@@ -931,6 +961,8 @@ components:
           type: boolean
         name:
           type: string
+        nameCN:
+          type: string
         nsfw:
           type: boolean
         type:
@@ -938,6 +970,7 @@ components:
       required:
         - id
         - name
+        - nameCN
         - type
         - lock
         - nsfw
@@ -999,20 +1032,7 @@ components:
     SlimUser:
       properties:
         avatar:
-          properties:
-            large:
-              type: string
-            medium:
-              example: sai
-              type: string
-            small:
-              type: string
-          required:
-            - small
-            - medium
-            - large
-          title: Avatar
-          type: object
+          $ref: '#/components/schemas/Avatar'
         id:
           example: 1
           type: integer
@@ -1061,6 +1081,7 @@ components:
         - text
         - state
         - reactions
+      title: SubReply
       type: object
     Subject:
       example:
@@ -1290,6 +1311,23 @@ components:
         type: integer
       title: SubjectCollection
       type: object
+    SubjectComment:
+      properties:
+        comment:
+          type: string
+        rate:
+          type: integer
+        updatedAt:
+          type: integer
+        user:
+          $ref: '#/components/schemas/SlimUser'
+      required:
+        - user
+        - rate
+        - comment
+        - updatedAt
+      title: SubjectComment
+      type: object
     SubjectEdit:
       example:
         infobox: |-
@@ -1372,32 +1410,6 @@ components:
         - small
         - grid
       title: SubjectImages
-      type: object
-    SubjectInterestComment:
-      properties:
-        list:
-          items:
-            properties:
-              comment:
-                type: string
-              rate:
-                type: integer
-              updatedAt:
-                type: integer
-              user:
-                $ref: '#/components/schemas/SlimUser'
-            required:
-              - user
-              - rate
-              - comment
-              - updatedAt
-            type: object
-          type: array
-        total:
-          type: integer
-      required:
-        - total
-        - list
       type: object
     SubjectNew:
       properties:
@@ -1616,51 +1628,17 @@ components:
           description: 发帖时间，unix time stamp in seconds
           type: integer
         creator:
-          properties:
-            avatar:
-              properties:
-                large:
-                  type: string
-                medium:
-                  example: sai
-                  type: string
-                small:
-                  type: string
-              required:
-                - small
-                - medium
-                - large
-              title: Avatar
-              type: object
-            id:
-              example: 1
-              type: integer
-            joinedAt:
-              type: integer
-            nickname:
-              example: Sai🖖
-              type: string
-            sign:
-              type: string
-            username:
-              example: sai
-              type: string
-          required:
-            - id
-            - username
-            - nickname
-            - avatar
-            - sign
-            - joinedAt
-          title: SlimUser
-          type: object
+          $ref: '#/components/schemas/SlimUser'
+        display:
+          type: integer
         id:
-          description: topic id
           type: integer
         parentID:
           description: 小组/条目ID
           type: integer
         repliesCount:
+          type: integer
+        state:
           type: integer
         title:
           type: string
@@ -1675,28 +1653,9 @@ components:
         - createdAt
         - updatedAt
         - repliesCount
+        - state
+        - display
       title: Topic
-      type: object
-    TopicCreation:
-      example:
-        cf-turnstile-response: 10000000-aaaa-bbbb-cccc-000000000001
-        content: topic content
-        title: topic title
-      properties:
-        cf-turnstile-response:
-          minLength: 1
-          type: string
-        text:
-          description: bbcode
-          minLength: 1
-          type: string
-        title:
-          minLength: 1
-          type: string
-      required:
-        - title
-        - text
-        - cf-turnstile-response
       type: object
     TopicDetail:
       properties:
@@ -1709,7 +1668,7 @@ components:
         parent:
           anyOf:
             - $ref: '#/components/schemas/Group'
-            - $ref: '#/components/schemas/Subject'
+            - $ref: '#/components/schemas/SlimSubject'
         reactions:
           items:
             $ref: '#/components/schemas/Reaction'
@@ -1734,6 +1693,7 @@ components:
         - createdAt
         - replies
         - reactions
+      title: TopicDetail
       type: object
     TrendingSubject:
       properties:
@@ -1745,23 +1705,23 @@ components:
         - subject
         - count
       type: object
+    UpdateTopic:
+      properties:
+        text:
+          description: bbcode
+          minLength: 1
+          type: string
+        title:
+          minLength: 1
+          type: string
+      required:
+        - title
+        - text
+      type: object
     User:
       properties:
         avatar:
-          properties:
-            large:
-              type: string
-            medium:
-              example: sai
-              type: string
-            small:
-              type: string
-          required:
-            - small
-            - medium
-            - large
-          title: Avatar
-          type: object
+          $ref: '#/components/schemas/Avatar'
         bio:
           type: string
         group:
@@ -2047,7 +2007,7 @@ info:
     关于订阅通知的 socket.io 相关的文档在
     <https://github.com/bangumi/GraphQL/blob/master/docs/socket.io.md>
   title: bangumi private api
-  version: 2024-12-01-d329eac
+  version: 2024-12-01-409ab9a
 openapi: 3.0.3
 paths:
   /p1/blocklist:
@@ -2586,20 +2546,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/TopicDetail'
           description: Default Response
-        '404':
-          content:
-            application/json:
-              examples:
-                NotFoundError:
-                  value:
-                    code: NOT_FOUND
-                    error: Not Found
-                    message: topic not found
-                    statusCode: 404
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-                description: 小组不存在
-          description: 小组不存在
         '500':
           content:
             application/json:
@@ -2623,7 +2569,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/TopicCreation'
+              $ref: '#/components/schemas/CreateTopic'
       responses:
         '200':
           content:
@@ -2792,20 +2738,6 @@ paths:
                   - total
                 type: object
           description: Default Response
-        '404':
-          content:
-            application/json:
-              examples:
-                NotFoundError:
-                  value:
-                    code: NOT_FOUND
-                    error: Not Found
-                    message: topic not found
-                    statusCode: 404
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-                description: 小组不存在
-          description: 小组不存在
         '500':
           content:
             application/json:
@@ -2847,20 +2779,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/GroupProfile'
           description: Default Response
-        '404':
-          content:
-            application/json:
-              examples:
-                NotFoundError:
-                  value:
-                    code: NOT_FOUND
-                    error: Not Found
-                    message: topic not found
-                    statusCode: 404
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-                description: 小组不存在
-          description: 小组不存在
         '500':
           content:
             application/json:
@@ -2948,7 +2866,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/TopicCreation'
+              $ref: '#/components/schemas/CreateTopic'
       responses:
         '200':
           content:
@@ -3905,9 +3823,9 @@ paths:
         - subject
   /p1/subjects/-/topics/{topicID}:
     get:
-      operationId: getSubjectTopicDetail
+      operationId: getSubjectTopic
       parameters:
-        - example: 1
+        - example: 371602
           in: path
           name: topicID
           required: true
@@ -3931,50 +3849,37 @@ paths:
       security:
         - CookiesSession: []
           HTTPBearer: []
-      summary: 获取帖子列表
+      summary: 获取条目讨论
       tags:
         - subject
     put:
-      operationId: editSubjectTopic
+      operationId: updateSubjectTopic
       parameters:
         - example: 371602
           in: path
           name: topicID
           required: true
           schema:
+            minimum: 0
             type: integer
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/TopicCreation'
+              properties:
+                text:
+                  description: bbcode
+                  minLength: 1
+                  type: string
+                title:
+                  minLength: 1
+                  type: string
+              required:
+                - title
+                - text
+              type: object
+        required: true
       responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                properties: {}
-                type: object
-          description: Default Response
-        '400':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          description: default error response type
-        '401':
-          content:
-            application/json:
-              examples:
-                NOT_ALLOWED:
-                  value:
-                    code: NOT_ALLOWED
-                    error: Unauthorized
-                    message: you don't have permission to edit a topic
-                    statusCode: 401
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          description: default error response type
         '500':
           content:
             application/json:
@@ -3985,7 +3890,7 @@ paths:
       security:
         - CookiesSession: []
           HTTPBearer: []
-      summary: 编辑自己创建的条目讨论版
+      summary: 编辑自己创建的条目讨论
       tags:
         - subject
   /p1/subjects/-/topics/{topicID}/replies:
@@ -4089,19 +3994,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/Subject'
           description: Default Response
-        '404':
-          content:
-            application/json:
-              examples:
-                NOT_FOUND:
-                  value:
-                    code: NOT_FOUND
-                    error: Not Found
-                    message: subject not found
-                    statusCode: 404
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          description: default error response type
         '500':
           content:
             application/json:
@@ -4164,19 +4056,6 @@ paths:
                   - total
                 type: object
           description: Default Response
-        '404':
-          content:
-            application/json:
-              examples:
-                NOT_FOUND:
-                  value:
-                    code: NOT_FOUND
-                    error: Not Found
-                    message: subject not found
-                    statusCode: 404
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          description: default error response type
         '500':
           content:
             application/json:
@@ -4192,34 +4071,67 @@ paths:
         - subject
   /p1/subjects/{subjectID}/comments:
     get:
-      operationId: subjectComments
+      operationId: getSubjectComments
       parameters:
-        - in: query
+        - description: 收藏类型
+          in: query
+          name: type
+          required: false
+          schema:
+            anyOf:
+              - enum:
+                  - 1
+                type: number
+              - enum:
+                  - 2
+                type: number
+              - enum:
+                  - 3
+                type: number
+              - enum:
+                  - 4
+                type: number
+              - enum:
+                  - 5
+                type: number
+        - description: max 100
+          in: query
           name: limit
           required: false
           schema:
             default: 20
+            maximum: 100
+            minimum: 1
             type: integer
-        - in: query
+        - description: min 0
+          in: query
           name: offset
           required: false
           schema:
             default: 0
             minimum: 0
             type: integer
-        - example: 8
-          in: path
+        - in: path
           name: subjectID
           required: true
           schema:
-            minimum: 0
             type: integer
       responses:
         '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SubjectInterestComment'
+                properties:
+                  data:
+                    items:
+                      $ref: '#/components/schemas/SubjectComment'
+                    type: array
+                  total:
+                    type: integer
+                required:
+                  - data
+                  - total
+                type: object
           description: Default Response
         '500':
           content:
@@ -4228,6 +4140,9 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
                 description: 意料之外的服务器错误
           description: 意料之外的服务器错误
+      security:
+        - CookiesSession: []
+          HTTPBearer: []
       summary: 获取条目的吐槽箱
       tags:
         - subject
@@ -4301,19 +4216,6 @@ paths:
                   - total
                 type: object
           description: Default Response
-        '404':
-          content:
-            application/json:
-              examples:
-                NOT_FOUND:
-                  value:
-                    code: NOT_FOUND
-                    error: Not Found
-                    message: subject not found
-                    statusCode: 404
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          description: default error response type
         '500':
           content:
             application/json:
@@ -4398,19 +4300,6 @@ paths:
                   - total
                 type: object
           description: Default Response
-        '404':
-          content:
-            application/json:
-              examples:
-                NOT_FOUND:
-                  value:
-                    code: NOT_FOUND
-                    error: Not Found
-                    message: subject not found
-                    statusCode: 404
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          description: default error response type
         '500':
           content:
             application/json:
@@ -4473,19 +4362,6 @@ paths:
                   - total
                 type: object
           description: Default Response
-        '404':
-          content:
-            application/json:
-              examples:
-                NOT_FOUND:
-                  value:
-                    code: NOT_FOUND
-                    error: Not Found
-                    message: subject not found
-                    statusCode: 404
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          description: default error response type
         '500':
           content:
             application/json:
@@ -4501,26 +4377,29 @@ paths:
         - subject
   /p1/subjects/{subjectID}/topics:
     get:
-      operationId: getSubjectTopicsBySubjectId
+      operationId: getSubjectTopics
       parameters:
-        - in: query
+        - description: max 100
+          in: query
           name: limit
           required: false
           schema:
-            default: 30
-            maximum: 40
+            default: 20
+            maximum: 100
+            minimum: 1
             type: integer
-        - in: query
+        - description: min 0
+          in: query
           name: offset
           required: false
           schema:
             default: 0
+            minimum: 0
             type: integer
         - in: path
           name: subjectID
           required: true
           schema:
-            exclusiveMinimum: 0
             type: integer
       responses:
         '200':
@@ -4539,20 +4418,6 @@ paths:
                   - total
                 type: object
           description: Default Response
-        '404':
-          content:
-            application/json:
-              examples:
-                NotFoundError:
-                  value:
-                    code: NOT_FOUND
-                    error: Not Found
-                    message: topic not found
-                    statusCode: 404
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-                description: 条目不存在
-          description: 条目不存在
         '500':
           content:
             application/json:
@@ -4563,20 +4428,11 @@ paths:
       security:
         - CookiesSession: []
           HTTPBearer: []
-      summary: 获取条目讨论版列表
+      summary: 获取条目讨论版
       tags:
         - subject
     post:
-      description: >-
-        需要
-        [turnstile](https://developers.cloudflare.com/turnstile/get-started/client-side-rendering/)
-
-
-        next.bgm.tv 域名对应的 site-key 为 `0x4AAAAAAABkMYinukE8nzYS`
-
-
-        dev.bgm38.com 域名使用测试用的 site-key `1x00000000000000000000AA`
-      operationId: createNewSubjectTopic
+      operationId: createSubjectTopic
       parameters:
         - example: 114514
           in: path
@@ -4588,8 +4444,34 @@ paths:
       requestBody:
         content:
           application/json:
+            example:
+              cf-turnstile-response: 10000000-aaaa-bbbb-cccc-000000000001
+              content: topic content
+              title: topic title
             schema:
-              $ref: '#/components/schemas/TopicCreation'
+              properties:
+                cf-turnstile-response:
+                  description: >-
+                    需要
+                    [turnstile](https://developers.cloudflare.com/turnstile/get-started/client-side-rendering/)
+
+                    next.bgm.tv 域名对应的 site-key 为 `0x4AAAAAAABkMYinukE8nzYS`
+
+                    dev.bgm38.com 域名使用测试用的 site-key `1x00000000000000000000AA`
+                  type: string
+                text:
+                  description: bbcode
+                  minLength: 1
+                  type: string
+                title:
+                  minLength: 1
+                  type: string
+              required:
+                - title
+                - text
+                - cf-turnstile-response
+              type: object
+        required: true
       responses:
         '200':
           content:
@@ -4613,7 +4495,7 @@ paths:
       security:
         - CookiesSession: []
           HTTPBearer: []
-      summary: 创建条目讨论版
+      summary: 创建条目讨论
       tags:
         - subject
   /p1/trending/subjects:
@@ -6174,20 +6056,7 @@ paths:
                         creator:
                           properties:
                             avatar:
-                              properties:
-                                large:
-                                  type: string
-                                medium:
-                                  example: sai
-                                  type: string
-                                small:
-                                  type: string
-                              required:
-                                - small
-                                - medium
-                                - large
-                              title: Avatar
-                              type: object
+                              $ref: '#/components/schemas/Avatar'
                             id:
                               example: 1
                               type: integer
