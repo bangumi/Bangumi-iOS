@@ -86,19 +86,26 @@ struct CharacterView: View {
                 .font(.footnote)
                 .foregroundStyle(.secondary)
                 VStack(alignment: .leading) {
-//                  ForEach(character.infobox.keys(), id: \.self) { key in
-//                    HStack(alignment: .top) {
-//                      Text("\(key):").fixedSize(horizontal: false, vertical: true)
-//                      VStack(alignment: .leading) {
-//                        ForEach(character.infobox[key], id: \.self) { item in
-//                          Text(.desc)
-//                            .foregroundStyle(.secondary)
-//                            .textSelection(.enabled)
-//                            .lineLimit(1)
-//                        }
-//                      }
-//                    }
-//                  }
+                  ForEach(character.infobox, id: \.key) { item in
+                    HStack(alignment: .top) {
+                      Text("\(item.key):").fixedSize(horizontal: false, vertical: true)
+                      VStack(alignment: .leading) {
+                        ForEach(item.values, id: \.v) { value in
+                          HStack {
+                            if let k = value.k {
+                              Text("\(k):")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                                .lineLimit(1)
+                            }
+                            Text(value.v)
+                              .textSelection(.enabled)
+                              .lineLimit(1)
+                          }
+                        }
+                      }
+                    }
+                  }
                 }
                 .font(.footnote)
                 .frame(maxHeight: 110, alignment: .top)
@@ -108,22 +115,29 @@ struct CharacterView: View {
                     LazyVStack(alignment: .leading) {
                       Text("资料").font(.title3).padding(.vertical, 10)
                       VStack(alignment: .leading) {
-//                        ForEach(character.infobox.keys(), id: \.self) { key in
-//                          HStack(alignment: .top) {
-//                            Text("\(key):").fixedSize(horizontal: false, vertical: true)
-//                            VStack(alignment: .leading) {
-//                              ForEach(character.infobox[key], id: \.self) { item in
-//                                Text(.desc)
-//                                  .foregroundStyle(.secondary)
-//                                  .textSelection(.enabled)
-//                                  .lineLimit(1)
-//                              }
-//                            }
-//                          }
-//                        }
+                        ForEach(character.infobox, id: \.key) { item in
+                          HStack(alignment: .top) {
+                            Text("\(item.key):").fixedSize(horizontal: false, vertical: true)
+                            VStack(alignment: .leading) {
+                              ForEach(item.values, id: \.v) { value in
+                                HStack {
+                                  if let k = value.k {
+                                    Text("\(k):")
+                                      .font(.footnote)
+                                      .foregroundStyle(.secondary)
+                                      .lineLimit(1)
+                                  }
+                                  Text(value.v)
+                                    .textSelection(.enabled)
+                                    .lineLimit(1)
+                                }
+                              }
+                            }
+                          }
+                          Divider()
+                        }
                       }
                       .presentationDragIndicator(.visible)
-                      .presentationDetents([.medium, .large])
                       Spacer()
                     }.padding()
                   }
