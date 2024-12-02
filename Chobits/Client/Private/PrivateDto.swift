@@ -108,6 +108,7 @@ struct CharacterDTO: Codable, Identifiable {
   var infobox: Infobox
   var lock: Bool
   var name: String
+  var nameCN: String
   var nsfw: Bool
   var redirect: Int
   var role: CharacterType
@@ -119,6 +120,7 @@ struct SlimCharacterDTO: Codable, Identifiable {
   var images: Images?
   var lock: Bool
   var name: String
+  var nameCN: String
   var nsfw: Bool
   var role: CharacterType
 }
@@ -132,6 +134,7 @@ struct PersonDTO: Codable, Identifiable {
   var infobox: Infobox
   var lock: Bool
   var name: String
+  var nameCN: String
   var nsfw: Bool
   var redirect: Int
   var summary: String
@@ -237,6 +240,7 @@ struct SubjectStaffDTO: Codable, Identifiable {
 struct SlimPersonDTO: Codable, Identifiable {
   var id: Int
   var name: String
+  var nameCN: String
   var type: PersonType
   var images: Images?
   var lock: Bool

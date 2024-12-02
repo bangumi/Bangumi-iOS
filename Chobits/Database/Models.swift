@@ -255,6 +255,7 @@ final class CharacterV1 {
   var infobox: Infobox
   var lock: Bool
   var name: String
+  var nameCN: String
   var nsfw: Bool
   var role: Int
   var summary: String
@@ -276,6 +277,7 @@ final class CharacterV1 {
     }
     self.lock = item.lock
     self.name = item.name
+    self.nameCN = item.nameCN
     self.nsfw = item.nsfw
     self.role = item.role.rawValue
     self.summary = item.summary
@@ -290,6 +292,7 @@ final class CharacterV1 {
     }
     self.lock = item.lock
     self.name = item.name
+    self.nameCN = item.nameCN
     self.nsfw = item.nsfw
     self.role = item.role.rawValue
     self.summary = item.summary
@@ -329,6 +332,7 @@ final class PersonV1 {
   var infobox: Infobox
   var lock: Bool
   var name: String
+  var nameCN: String
   var nsfw: Bool
   var summary: String
   var type: Int
@@ -351,6 +355,7 @@ final class PersonV1 {
     }
     self.lock = item.lock
     self.name = item.name
+    self.nameCN = item.nameCN
     self.nsfw = item.nsfw
     self.summary = item.summary
     self.type = item.type.rawValue
@@ -366,6 +371,7 @@ final class PersonV1 {
     }
     self.lock = item.lock
     self.name = item.name
+    self.nameCN = item.nameCN
     self.nsfw = item.nsfw
     self.summary = item.summary
     self.type = item.type.rawValue
