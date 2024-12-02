@@ -53,16 +53,20 @@ struct SubjectCharacterListView: View {
             }
             .buttonStyle(.plain)
             VStack(alignment: .leading) {
-              Spacer()
               NavigationLink(value: NavDestination.character(characterId: item.character.id)) {
                 HStack {
-                  Text(item.character.name)
-                    .foregroundStyle(.linkText)
-                    .lineLimit(1)
+                  VStack(alignment: .leading) {
+                    Text(item.character.name)
+                      .foregroundStyle(.linkText)
+                      .lineLimit(1)
+                    Text(item.character.nameCN)
+                      .font(.footnote)
+                      .foregroundStyle(.secondary)
+                      .lineLimit(1)
+                  }
                   Spacer()
                 }
               }.buttonStyle(.plain)
-              Spacer()
               HFlow {
                 ForEach(item.actors) { person in
                   NavigationLink(value: NavDestination.person(personId: person.id)) {
@@ -71,10 +75,16 @@ struct SubjectCharacterListView: View {
                         img: person.images?.grid,
                         width: 40, height: 40, alignment: .top, type: .subject
                       )
-                      Text(person.name)
-                        .font(.footnote)
-                        .foregroundStyle(.linkText)
-                        .lineLimit(1)
+                      VStack(alignment: .leading) {
+                        Text(person.name)
+                          .font(.footnote)
+                          .foregroundStyle(.linkText)
+                          .lineLimit(1)
+                        Text(person.nameCN)
+                          .font(.footnote)
+                          .foregroundStyle(.secondary)
+                          .lineLimit(1)
+                      }
                     }
                   }.buttonStyle(.plain)
                 }
