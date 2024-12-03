@@ -42,7 +42,7 @@ struct PersonWorkListView: View {
         CardView {
           NavigationLink(value: NavDestination.subject(subjectId: item.subject.id)) {
             HStack {
-              ImageView(img: item.subject.images?.medium,width: 64, height: 64, type: .subject)
+              ImageView(img: item.subject.images?.medium, width: 64, height: 64, type: .subject)
               VStack(alignment: .leading) {
                 Text(item.subject.name)
                   .font(.callout)
@@ -56,7 +56,7 @@ struct PersonWorkListView: View {
                   Image(systemName: item.subject.type.icon)
                     .font(.footnote)
                     .foregroundStyle(.secondary)
-                  BorderView(.secondary, padding: 2) {
+                  BorderView {
                     Text(item.position.cn)
                       .font(.caption)
                       .foregroundStyle(.secondary)

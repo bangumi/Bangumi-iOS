@@ -135,7 +135,7 @@ struct SubjectCollectionBoxView: View {
 
           Text("标签 (使用半角空格或逗号隔开，至多10个)")
             .padding(.top, 10)
-          BorderView(.secondary.opacity(0.2), padding: 5) {
+          BorderView(color: .secondary.opacity(0.2), padding: 4) {
             TextField("标签", text: $tagsInput)
               .onChange(of: tagsInput) { _, new in
                 var tagSet: Set<String> = Set()
@@ -154,7 +154,7 @@ struct SubjectCollectionBoxView: View {
             Text("常用标签").font(.footnote).foregroundStyle(.secondary)
             HFlow(alignment: .center, spacing: 2) {
               ForEach(recommendedTags, id: \.self) { tag in
-                BorderView(.secondary, padding: 2) {
+                BorderView {
                   Button {
                     self.tagsInput += " " + tag
                   } label: {
@@ -170,7 +170,7 @@ struct SubjectCollectionBoxView: View {
           }
 
           Text("吐槽")
-          BorderView(.secondary.opacity(0.2), padding: 5) {
+          BorderView(color: .secondary.opacity(0.2), padding: 4) {
             TextField("吐槽", text: $comment, axis: .vertical)
               .multilineTextAlignment(.leading)
               .lineLimit(5, reservesSpace: true)

@@ -166,7 +166,7 @@ struct PersonView: View {
             /// career
             HStack {
               ForEach(careers, id: \.self) { career in
-                BorderView(.secondary, padding: 2) {
+                BorderView {
                   Text(career)
                     .font(.subheadline)
                 }
@@ -212,7 +212,7 @@ struct PersonView: View {
             }
 
             /// casts
-            // PersonCastsView(personId: personId)
+            PersonCastsView(personId: personId)
 
             /// works
             PersonWorksView(personId: personId)

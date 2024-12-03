@@ -155,7 +155,7 @@ struct SubjectHeaderView: View {
     }
 
     if subject.rating.rank > 0 && subject.rating.rank < 1000 {
-      BorderView(.accent, padding: 5) {
+      BorderView(color: .accent, padding: 5) {
         HStack {
           Spacer()
           Label(

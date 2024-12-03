@@ -163,7 +163,7 @@ struct EpisodeListView: View {
                 .lineLimit(1)
               HStack {
                 if isAuthenticated && episode.collectionTypeEnum != .none {
-                  BorderView(Color(hex: episode.borderColor), padding: 4) {
+                  BorderView(color: Color(hex: episode.borderColor), padding: 4) {
                     Text("\(episode.collectionTypeEnum.description)")
                       .foregroundStyle(Color(hex: episode.textColor))
                       .font(.footnote)
@@ -176,20 +176,20 @@ struct EpisodeListView: View {
                 } else {
                   if main {
                     if episode.air > now {
-                      BorderView(.secondary, padding: 4) {
+                      BorderView(padding: 4) {
                         Text("未播")
                           .foregroundStyle(.secondary)
                           .font(.footnote)
                       }
                     } else {
-                      BorderView(.primary, padding: 4) {
+                      BorderView(color: .primary, padding: 4) {
                         Text("已播")
                           .foregroundStyle(.primary)
                           .font(.footnote)
                       }
                     }
                   } else {
-                    BorderView(.primary, padding: 4) {
+                    BorderView(color: .primary, padding: 4) {
                       Text(episode.typeEnum.description)
                         .foregroundStyle(.primary)
                         .font(.footnote)

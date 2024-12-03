@@ -72,7 +72,7 @@ struct EpisodeCollectionBoxView: View {
         if let episode = episode {
           HStack {
             Text(episode.title).font(.title3).lineLimit(1)
-            BorderView(.secondary, padding: 2) {
+            BorderView {
               Text(episode.typeEnum.description)
                 .font(.footnote)
                 .foregroundStyle(.secondary)

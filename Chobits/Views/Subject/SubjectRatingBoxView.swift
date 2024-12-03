@@ -46,7 +46,7 @@ struct SubjectRatingBoxView: View {
                 Text(scoreInfo.desc)
               }
               Spacer()
-              BorderView(.secondary, padding: 2) {
+              BorderView {
                 Text("\(subject.rating.total) 人评分")
                   .font(.footnote)
               }

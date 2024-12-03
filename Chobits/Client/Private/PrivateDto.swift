@@ -264,12 +264,16 @@ struct PersonCollectDTO: Codable, Identifiable {
   }
 }
 
-struct PersonCharacterDTO: Codable, Identifiable {
+struct PersonCastDTO: Codable, Identifiable, Equatable {
   var character: SlimCharacterDTO
   var relations: [CharacterSubjectRelationDTO]
 
   var id: Int {
     character.id
+  }
+
+  static func == (lhs: PersonCastDTO, rhs: PersonCastDTO) -> Bool {
+    lhs.character.id == rhs.character.id
   }
 }
 

@@ -22,7 +22,7 @@ struct SubjectCollectionView: View {
         if subject.typeEnum == .book {
           SubjectBookChaptersView(subject: subject, compact: false)
         }
-        BorderView(.linkText, padding: 5) {
+        BorderView(color: .linkText, padding: 5) {
           HStack {
             Spacer()
             if let collection = subject.userCollection {

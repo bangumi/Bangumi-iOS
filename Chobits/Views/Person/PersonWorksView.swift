@@ -61,7 +61,8 @@ struct PersonWorksView: View {
               Text(item.subject.name)
                 .lineLimit(2)
               Spacer()
-            }.font(.caption)
+            }
+            .font(.caption)
             .frame(width: 60, height: 145)
           }.buttonStyle(.plain)
         }

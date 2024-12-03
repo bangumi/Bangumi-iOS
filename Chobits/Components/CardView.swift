@@ -1,5 +1,5 @@
 //
-//  BorderView.swift
+//  CardView.swift
 //  Chobits
 //
 //  Created by Chuan Chuan on 2024/10/17.

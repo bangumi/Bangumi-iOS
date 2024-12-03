@@ -5,9 +5,9 @@
 //  Created by Chuan Chuan on 2024/4/26.
 //
 
+import Flow
 import SwiftData
 import SwiftUI
-import Flow
 
 struct SubjectLargeRowView: View {
   let subjectId: Int
@@ -94,7 +94,7 @@ struct SubjectLargeRowView: View {
         // tags
         HStack(spacing: 4) {
           if let category = subject?.category, !category.isEmpty {
-            BorderView(.secondary, padding: 2) {
+            BorderView {
               Text(category).fixedSize()
             }
           }

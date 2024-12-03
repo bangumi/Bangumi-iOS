@@ -143,7 +143,7 @@ extension Chii {
   func getPersonCasts(
     _ personID: Int, type: Int? = nil, subjectType: SubjectType? = nil, limit: Int = 20,
     offset: Int = 0
-  ) async throws -> PagedDTO<PersonCharacterDTO> {
+  ) async throws -> PagedDTO<PersonCastDTO> {
     Logger.api.info("start get person casts")
     let url = BangumiAPI.priv.build("p1/persons/\(personID)/casts")
     var queryItems: [URLQueryItem] = [
@@ -158,7 +158,7 @@ extension Chii {
     }
     let pageURL = url.appending(queryItems: queryItems)
     let data = try await self.request(url: pageURL, method: "GET")
-    let resp: PagedDTO<PersonCharacterDTO> = try self.decodeResponse(data)
+    let resp: PagedDTO<PersonCastDTO> = try self.decodeResponse(data)
     Logger.api.info("finish get person casts")
     return resp
   }

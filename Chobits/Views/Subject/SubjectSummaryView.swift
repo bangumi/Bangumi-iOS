@@ -24,7 +24,7 @@ struct SubjectSummaryView: View {
       if subject.metaTags.count > 0 {
         HFlow(alignment: .center, spacing: 4) {
           ForEach(subject.metaTags, id: \.self) { tag in
-            BorderView(.secondary, padding: 2) {
+            BorderView {
               Text(tag)
                 .font(.footnote)
                 .lineLimit(1)
@@ -41,7 +41,7 @@ struct SubjectSummaryView: View {
             LazyVStack(alignment: .leading) {
               HFlow(alignment: .center, spacing: 2) {
                 ForEach(tags, id: \.name) { tag in
-                  BorderView(.secondary, padding: 2) {
+                  BorderView {
                     HStack {
                       Text(tag.name)
                         .font(.footnote)
