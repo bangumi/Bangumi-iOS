@@ -40,7 +40,7 @@ extension Chii {
   }
 
   func getCharacterCasts(
-    _ characterID: Int, type: Int? = nil, subjectType: SubjectType? = nil, limit: Int = 20,
+    _ characterID: Int, type: CastType = .none, subjectType: SubjectType = .none, limit: Int = 20,
     offset: Int = 0
   ) async throws -> PagedDTO<CharacterCastDTO> {
     Logger.api.info("start get character casts")
@@ -49,10 +49,10 @@ extension Chii {
       URLQueryItem(name: "limit", value: String(limit)),
       URLQueryItem(name: "offset", value: String(offset)),
     ]
-    if let type = type {
-      queryItems.append(URLQueryItem(name: "type", value: String(type)))
+    if type != .none {
+      queryItems.append(URLQueryItem(name: "type", value: String(type.rawValue)))
     }
-    if let subjectType = subjectType {
+    if subjectType != .none {
       queryItems.append(URLQueryItem(name: "subjectType", value: String(subjectType.rawValue)))
     }
     let pageURL = url.appending(queryItems: queryItems)

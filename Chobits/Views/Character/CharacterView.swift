@@ -189,8 +189,8 @@ struct CharacterView: View {
                 )
             }
 
-            /// related subjects
-            // CharacterSubjectsView(characterId: characterId)
+            /// casts
+            CharacterCastsView(characterId: characterId)
           }.padding(.horizontal, 8)
         }
       } else {

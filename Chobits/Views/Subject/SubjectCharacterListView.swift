@@ -38,7 +38,7 @@ struct SubjectCharacterListView: View {
       reloader.toggle()
     }
     ScrollView {
-      PageView<SubjectCharacterDTO, _>(reloader: reloader, nextPageFunc: load) { item in
+      PageView<SubjectCharacterDTO, _>(limit: 10, reloader: reloader, nextPageFunc: load) { item in
         CardView {
           HStack {
             NavigationLink(value: NavDestination.character(characterId: item.character.id)) {
