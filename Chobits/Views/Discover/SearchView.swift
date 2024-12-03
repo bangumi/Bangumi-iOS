@@ -114,7 +114,7 @@ struct SearchView: View {
   }
 
   var body: some View {
-    VStack {
+    ScrollView {
       VStack {
         HStack {
           Picker("Subject Type", selection: $subjectType) {
@@ -158,46 +158,47 @@ struct SearchView: View {
           }
           .disabled(!searching && text.isEmpty)
         }
-      }.padding(.horizontal, 8)
+      }.padding(8)
       if text.isEmpty {
-        Text("输入关键字搜索").foregroundStyle(.secondary)
+        Text("输入关键字搜索")
+          .foregroundStyle(.secondary)
+          .padding(8)
       } else {
         if subjects.isEmpty && remote && !exhausted {
           VStack {
             Spacer()
             ProgressView()
             Spacer()
-          }
+          }.padding(8)
         } else {
-          ScrollView {
-            LazyVStack(alignment: .leading) {
-              ForEach(subjects, id: \.inner.self) { item in
-                CardView {
-                  NavigationLink(value: NavDestination.subject(subjectId: item.inner.subjectId)) {
-                    SubjectLargeRowView(subjectId: item.inner.subjectId)
-                  }.buttonStyle(.plain)
-                }
-                .onAppear {
-                  Task {
-                    await searchNextPage(idx: item.idx)
-                  }
+          LazyVStack(alignment: .leading) {
+            ForEach(subjects, id: \.inner.self) { item in
+              CardView {
+                NavigationLink(value: NavDestination.subject(subjectId: item.inner.subjectId)) {
+                  SubjectLargeRowView(subjectId: item.inner.subjectId)
+                }.buttonStyle(.plain)
+              }
+              .onAppear {
+                Task {
+                  await searchNextPage(idx: item.idx)
                 }
               }
-              if exhausted {
-                HStack {
-                  Spacer()
-                  Text("没有更多了")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-                  Spacer()
-                }
+            }
+            if exhausted {
+              HStack {
+                Spacer()
+                Text("没有更多了")
+                  .font(.footnote)
+                  .foregroundStyle(.secondary)
+                Spacer()
               }
-            }.padding(8)
+            }
           }
+          .padding(.horizontal, 8)
           .animation(.default, value: subjects)
         }
       }
-      Spacer()
     }
+    Spacer()
   }
 }
