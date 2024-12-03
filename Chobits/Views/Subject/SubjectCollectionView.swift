@@ -14,20 +14,7 @@ struct SubjectCollectionView: View {
 
   @Environment(\.modelContext) var modelContext
 
-  @State private var refreshed: Bool = false
   @State private var edit: Bool = false
-
-  func refresh() async {
-    if refreshed { return }
-    refreshed = true
-
-    do {
-      try await Chii.shared.loadUserSubjectCollection(subject.subjectId)
-    } catch {
-      Notifier.shared.alert(error: error)
-      return
-    }
-  }
 
   var body: some View {
     Section {
@@ -35,42 +22,33 @@ struct SubjectCollectionView: View {
         if subject.typeEnum == .book {
           SubjectBookChaptersView(subject: subject, compact: false)
         }
-        if refreshed {
-          BorderView(.linkText, padding: 5) {
-            HStack {
-              Spacer()
-              if let collection = subject.userCollection {
-                if collection.priv {
-                  Image(systemName: "lock.fill").foregroundStyle(.secondary)
-                }
-                Label(collection.message, systemImage: collection.typeEnum.icon)
-                StarsView(score: Float(collection.rate), size: 16)
-              } else {
-                Label("未收藏", systemImage: "plus")
-                  .foregroundStyle(.secondary)
+        BorderView(.linkText, padding: 5) {
+          HStack {
+            Spacer()
+            if let collection = subject.userCollection {
+              if collection.priv {
+                Image(systemName: "lock.fill").foregroundStyle(.secondary)
               }
-              Spacer()
+              Label(collection.message, systemImage: collection.typeEnum.icon)
+              StarsView(score: Float(collection.rate), size: 16)
+            } else {
+              Label("未收藏", systemImage: "plus")
+                .foregroundStyle(.secondary)
             }
-            .foregroundStyle(.linkText)
+            Spacer()
           }
-          .onTapGesture {
-            edit.toggle()
-          }
-          .sheet(
-            isPresented: $edit,
-            content: {
-              SubjectCollectionBoxView(subject: subject)
-                .presentationDragIndicator(.visible)
-                .presentationDetents(.init([.medium, .large]))
-            })
-        } else {
-          ProgressView()
+          .foregroundStyle(.linkText)
         }
-      }
-    }
-    .onAppear {
-      Task {
-        await refresh()
+        .onTapGesture {
+          edit.toggle()
+        }
+        .sheet(
+          isPresented: $edit,
+          content: {
+            SubjectCollectionBoxView(subject: subject)
+              .presentationDragIndicator(.visible)
+              .presentationDetents(.init([.medium, .large]))
+          })
       }
     }
   }
