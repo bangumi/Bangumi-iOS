@@ -5,15 +5,16 @@
 //  Created by Chuan Chuan on 2024/4/19.
 //
 
+import OSLog
 import SwiftData
 import SwiftUI
 
 struct ChiiTimelineView: View {
   @AppStorage("isolationMode") var isolationMode: Bool = false
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
+  @AppStorage("hasUnreadNotice") var hasUnreadNotice: Bool = false
 
   @State private var profile: User?
-  @State private var unreadNotice: Bool = false
 
   func updateProfile() {
     Task {
@@ -30,12 +31,12 @@ struct ChiiTimelineView: View {
       do {
         let resp = try await Chii.shared.listNotice(limit: 1, unread: true)
         if resp.total == 0 {
-          unreadNotice = false
+          hasUnreadNotice = false
         } else {
-          unreadNotice = true
+          hasUnreadNotice = true
         }
       } catch {
-        Notifier.shared.alert(error: error)
+        Logger.user.error("check notice failed: \(error)")
       }
     }
   }
@@ -45,6 +46,8 @@ struct ChiiTimelineView: View {
       if isAuthenticated {
         CollectionsView()
           .padding(.horizontal, 8)
+          // FIXME: - Move to a better place
+          .onAppear(perform: checkNotice)
       } else {
         AuthView(slogan: "Bangumi 让你的 ACG 生活更美好")
       }
@@ -79,8 +82,8 @@ struct ChiiTimelineView: View {
         HStack {
           if isAuthenticated, !isolationMode {
             NavigationLink(value: NavDestination.notice) {
-              Image(systemName: unreadNotice ? "bell.badge.fill" : "bell")
-            }.onAppear(perform: checkNotice)
+              Image(systemName: hasUnreadNotice ? "bell.badge.fill" : "bell")
+            }
           }
           NavigationLink(value: NavDestination.setting) {
             Image(systemName: "gearshape")

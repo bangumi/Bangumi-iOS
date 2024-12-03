@@ -273,21 +273,27 @@ enum PadViewTab: Codable, CaseIterable, View {
   }
 
   var icon: String {
+    @AppStorage("hasUnreadNotice") var hasUnreadNotice: Bool = false
+
     switch self {
     case .timeline:
-      "person"
+      return "person"
     case .progress:
-      "square.grid.2x2.fill"
+      return "square.grid.2x2.fill"
     case .discover:
-      "waveform"
+      return "waveform"
     case .search:
-      "magnifyingglass"
+      return "magnifyingglass"
     case .collection:
-      "person.badge.clock"
+      return "person.badge.clock"
     case .notice:
-      "bell"
+      if hasUnreadNotice {
+        return "bell.badge.fill"
+      } else {
+        return "bell"
+      }
     case .settings:
-      "gear"
+      return "gear"
     }
   }
 
