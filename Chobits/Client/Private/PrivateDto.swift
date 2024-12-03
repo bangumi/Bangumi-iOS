@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct PagedData<T: Sendable & Codable>: Codable, Sendable {
+struct PagedDTO<T: Sendable & Codable>: Codable, Sendable {
   var data: [T]
   var total: Int
 }

@@ -15,7 +15,7 @@ struct SubjectCharacterListView: View {
   @State private var castType: CastType = .none
   @State private var reloader = false
 
-  func load(limit: Int, offset: Int) async -> PagedData<SubjectCharacterDTO>? {
+  func load(limit: Int, offset: Int) async -> PagedDTO<SubjectCharacterDTO>? {
     do {
       let resp = try await Chii.shared.getSubjectCharacters(
         subjectId, type: castType, limit: limit, offset: offset)

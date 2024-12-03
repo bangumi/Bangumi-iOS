@@ -235,8 +235,8 @@
 		19671C3C2BDEB55D000B4D99 /* Components */ = {
 			isa = PBXGroup;
 			children = (
-				191CF1A52CC09F1E000EF819 /* BorderView.swift */,
 				19ECCE122CFD5B6B0092F715 /* CardView.swift */,
+				191CF1A52CC09F1E000EF819 /* BorderView.swift */,
 				19ECCDA02CFC21160092F715 /* PageView.swift */,
 				19671C392BDEB55D000B4D99 /* ImageView.swift */,
 				1943C5072C08CD2E0067ACDB /* StarsView.swift */,

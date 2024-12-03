@@ -14,7 +14,7 @@ struct SubjectRelationListView: View {
   @State private var subjectType: SubjectType = .none
   @State private var reloader = false
 
-  func load(limit: Int, offset: Int) async -> PagedData<SubjectRelationDTO>? {
+  func load(limit: Int, offset: Int) async -> PagedDTO<SubjectRelationDTO>? {
     do {
       let resp = try await Chii.shared.getSubjectRelations(
         subjectId, type: subjectType, limit: limit, offset: offset)

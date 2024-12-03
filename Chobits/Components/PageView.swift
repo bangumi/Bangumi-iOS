@@ -16,7 +16,7 @@ where C: View, T: Identifiable & Equatable & Codable & Sendable {
 
   let limit: Int
   let reloader: Bool
-  let nextPageFunc: (Int, Int) async -> PagedData<Item>?
+  let nextPageFunc: (Int, Int) async -> PagedDTO<Item>?
   let content: (Item) -> Content
 
   @State private var loading: Bool = false
@@ -59,6 +59,9 @@ where C: View, T: Identifiable & Equatable & Codable & Sendable {
       EnumerateItem(idx: idx + offset, inner: item)
     }
     offset += limit
+    if offset >= resp.total {
+      exhausted = true
+    }
     items.append(contentsOf: data)
     loading = false
   }
@@ -66,7 +69,7 @@ where C: View, T: Identifiable & Equatable & Codable & Sendable {
   public init(
     limit: Int = 20,
     reloader: Bool = false,
-    nextPageFunc: @escaping (Int, Int) async -> PagedData<Item>?,
+    nextPageFunc: @escaping (Int, Int) async -> PagedDTO<Item>?,
     @ViewBuilder content: @escaping (Item) -> Content
   ) {
     self.limit = limit
@@ -115,10 +118,10 @@ where C: View, T: Identifiable & Equatable & Codable & Sendable {
 }
 
 #Preview {
-  func nextPage(page: Int, size: Int) async -> PagedData<EpisodeDTO>? {
+  func nextPage(page: Int, size: Int) async -> PagedDTO<EpisodeDTO>? {
     let episodes = loadFixture(
       fixture: "subject_episodes.json",
-      target: PagedData<EpisodeDTO>.self
+      target: PagedDTO<EpisodeDTO>.self
     )
     return episodes
   }
@@ -126,7 +129,7 @@ where C: View, T: Identifiable & Equatable & Codable & Sendable {
   return ScrollView {
     PageView<EpisodeDTO, _>(nextPageFunc: nextPage) { item in
       VStack {
-        Text(item.name)
+        Text("\(item.id): \(item.name)")
         Divider()
       }
     }

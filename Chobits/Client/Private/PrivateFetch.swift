@@ -10,7 +10,7 @@ import OSLog
 
 // MARK: - User
 extension Chii {
-  func listNotice(limit: Int? = nil, unread: Bool? = nil) async throws -> PagedData<NoticeDTO> {
+  func listNotice(limit: Int? = nil, unread: Bool? = nil) async throws -> PagedDTO<NoticeDTO> {
     Logger.api.info("start get notify")
     let url = BangumiAPI.priv.build("p1/notify")
     var queryItems: [URLQueryItem] = []
@@ -22,7 +22,7 @@ extension Chii {
     }
     let pageURL = url.appending(queryItems: queryItems)
     let data = try await self.request(url: pageURL, method: "GET", auth: .required)
-    let resp: PagedData<NoticeDTO> = try self.decodeResponse(data)
+    let resp: PagedDTO<NoticeDTO> = try self.decodeResponse(data)
     Logger.api.info("finish get notify")
     return resp
   }
@@ -42,7 +42,7 @@ extension Chii {
   func getCharacterCasts(
     _ characterID: Int, type: Int? = nil, subjectType: SubjectType? = nil, limit: Int = 20,
     offset: Int = 0
-  ) async throws -> PagedData<CharacterCastDTO> {
+  ) async throws -> PagedDTO<CharacterCastDTO> {
     Logger.api.info("start get character casts")
     let url = BangumiAPI.priv.build("p1/characters/\(characterID)/casts")
     var queryItems: [URLQueryItem] = [
@@ -57,13 +57,13 @@ extension Chii {
     }
     let pageURL = url.appending(queryItems: queryItems)
     let data = try await self.request(url: pageURL, method: "GET")
-    let resp: PagedData<CharacterCastDTO> = try self.decodeResponse(data)
+    let resp: PagedDTO<CharacterCastDTO> = try self.decodeResponse(data)
     Logger.api.info("finish get character casts")
     return resp
   }
 
   func getCharacterCollects(_ characterID: Int, limit: Int = 20, offset: Int = 0) async throws
-    -> PagedData<PersonCollectDTO>
+    -> PagedDTO<PersonCollectDTO>
   {
     Logger.api.info("start get character collects")
     let url = BangumiAPI.priv.build("p1/characters/\(characterID)/collects")
@@ -73,13 +73,13 @@ extension Chii {
     ]
     let pageURL = url.appending(queryItems: queryItems)
     let data = try await self.request(url: pageURL, method: "GET")
-    let resp: PagedData<PersonCollectDTO> = try self.decodeResponse(data)
+    let resp: PagedDTO<PersonCollectDTO> = try self.decodeResponse(data)
     Logger.api.info("finish get character collects")
     return resp
   }
 
   func getUserCharacterCollections(username: String, limit: Int = 20, offset: Int = 0) async throws
-    -> PagedData<UserCharacterCollectionDTO>
+    -> PagedDTO<UserCharacterCollectionDTO>
   {
     Logger.api.info("start get user character collections")
     let url = BangumiAPI.priv.build("p1/users/\(username)/collections/characters")
@@ -89,7 +89,7 @@ extension Chii {
     ]
     let pageURL = url.appending(queryItems: queryItems)
     let data = try await self.request(url: pageURL, method: "GET")
-    let resp: PagedData<UserCharacterCollectionDTO> = try self.decodeResponse(data)
+    let resp: PagedDTO<UserCharacterCollectionDTO> = try self.decodeResponse(data)
     Logger.api.info("finish get user character collections")
     return resp
   }
@@ -120,7 +120,7 @@ extension Chii {
   func getPersonWorks(
     _ personID: Int, position: Int? = nil, subjectType: SubjectType? = nil, limit: Int = 20,
     offset: Int = 0
-  ) async throws -> PagedData<PersonWorkDTO> {
+  ) async throws -> PagedDTO<PersonWorkDTO> {
     Logger.api.info("start get person works")
     let url = BangumiAPI.priv.build("p1/persons/\(personID)/works")
     var queryItems: [URLQueryItem] = [
@@ -135,7 +135,7 @@ extension Chii {
     }
     let pageURL = url.appending(queryItems: queryItems)
     let data = try await self.request(url: pageURL, method: "GET")
-    let resp: PagedData<PersonWorkDTO> = try self.decodeResponse(data)
+    let resp: PagedDTO<PersonWorkDTO> = try self.decodeResponse(data)
     Logger.api.info("finish get person works")
     return resp
   }
@@ -143,7 +143,7 @@ extension Chii {
   func getPersonCasts(
     _ personID: Int, type: Int? = nil, subjectType: SubjectType? = nil, limit: Int = 20,
     offset: Int = 0
-  ) async throws -> PagedData<PersonCharacterDTO> {
+  ) async throws -> PagedDTO<PersonCharacterDTO> {
     Logger.api.info("start get person casts")
     let url = BangumiAPI.priv.build("p1/persons/\(personID)/casts")
     var queryItems: [URLQueryItem] = [
@@ -158,13 +158,13 @@ extension Chii {
     }
     let pageURL = url.appending(queryItems: queryItems)
     let data = try await self.request(url: pageURL, method: "GET")
-    let resp: PagedData<PersonCharacterDTO> = try self.decodeResponse(data)
+    let resp: PagedDTO<PersonCharacterDTO> = try self.decodeResponse(data)
     Logger.api.info("finish get person casts")
     return resp
   }
 
   func getPersonCollects(_ personID: Int, limit: Int = 20, offset: Int = 0) async throws
-    -> PagedData<PersonCollectDTO>
+    -> PagedDTO<PersonCollectDTO>
   {
     Logger.api.info("start get person collects")
     let url = BangumiAPI.priv.build("p1/persons/\(personID)/collects")
@@ -174,13 +174,13 @@ extension Chii {
     ]
     let pageURL = url.appending(queryItems: queryItems)
     let data = try await self.request(url: pageURL, method: "GET")
-    let resp: PagedData<PersonCollectDTO> = try self.decodeResponse(data)
+    let resp: PagedDTO<PersonCollectDTO> = try self.decodeResponse(data)
     Logger.api.info("finish get person collects")
     return resp
   }
 
   func getUserPersonCollections(username: String, limit: Int = 20, offset: Int = 0) async throws
-    -> PagedData<UserPersonCollectionDTO>
+    -> PagedDTO<UserPersonCollectionDTO>
   {
     Logger.api.info("start get user person collections")
     let url = BangumiAPI.priv.build("p1/users/\(username)/collections/persons")
@@ -190,7 +190,7 @@ extension Chii {
     ]
     let pageURL = url.appending(queryItems: queryItems)
     let data = try await self.request(url: pageURL, method: "GET")
-    let resp: PagedData<UserPersonCollectionDTO> = try self.decodeResponse(data)
+    let resp: PagedDTO<UserPersonCollectionDTO> = try self.decodeResponse(data)
     Logger.api.info("finish get user person collections")
     return resp
   }
@@ -223,10 +223,10 @@ extension Chii {
 
   func getSubjectEpisodes(
     _ subjectId: Int, type: EpisodeType? = nil, limit: Int = 100, offset: Int = 0
-  ) async throws -> PagedData<EpisodeDTO> {
+  ) async throws -> PagedDTO<EpisodeDTO> {
     if self.mock {
       return loadFixture(
-        fixture: "subject_episodes.json", target: PagedData<EpisodeDTO>.self)
+        fixture: "subject_episodes.json", target: PagedDTO<EpisodeDTO>.self)
     }
     Logger.api.info("start get subject episodes")
     let url = BangumiAPI.priv.build("p1/subjects/\(subjectId)/episodes")
@@ -239,15 +239,16 @@ extension Chii {
     }
     let pageURL = url.appending(queryItems: queryItems)
     let data = try await self.request(url: pageURL, method: "GET")
-    let resp: PagedData<EpisodeDTO> = try self.decodeResponse(data)
+    let resp: PagedDTO<EpisodeDTO> = try self.decodeResponse(data)
     Logger.api.info("finish get subject episodes")
     return resp
   }
 
   func getSubjectRelations(
-    _ subjectId: Int, type: SubjectType = .none, offprint: Bool? = nil, limit: Int = 20, offset: Int = 0
+    _ subjectId: Int, type: SubjectType = .none, offprint: Bool? = nil, limit: Int = 20,
+    offset: Int = 0
   )
-    async throws -> PagedData<SubjectRelationDTO>
+    async throws -> PagedDTO<SubjectRelationDTO>
   {
     Logger.api.info("start get subject relations")
     let url = BangumiAPI.priv.build("p1/subjects/\(subjectId)/relations")
@@ -263,7 +264,7 @@ extension Chii {
     }
     let pageURL = url.appending(queryItems: queryItems)
     let data = try await self.request(url: pageURL, method: "GET")
-    let resp: PagedData<SubjectRelationDTO> = try self.decodeResponse(data)
+    let resp: PagedDTO<SubjectRelationDTO> = try self.decodeResponse(data)
     Logger.api.info("finish get subject relations")
     return resp
   }
@@ -272,7 +273,7 @@ extension Chii {
     _ subjectId: Int, type: CastType = .none,
     limit: Int = 20, offset: Int = 0
   )
-    async throws -> PagedData<SubjectCharacterDTO>
+    async throws -> PagedDTO<SubjectCharacterDTO>
   {
     Logger.api.info("start get subject characters")
     let url = BangumiAPI.priv.build("p1/subjects/\(subjectId)/characters")
@@ -285,13 +286,13 @@ extension Chii {
     }
     let pageURL = url.appending(queryItems: queryItems)
     let data = try await self.request(url: pageURL, method: "GET")
-    let resp: PagedData<SubjectCharacterDTO> = try self.decodeResponse(data)
+    let resp: PagedDTO<SubjectCharacterDTO> = try self.decodeResponse(data)
     Logger.api.info("finish get subject characters")
     return resp
   }
 
   func getSubjectStaffs(_ subjectId: Int, position: Int? = nil, limit: Int = 20, offset: Int = 0)
-    async throws -> PagedData<SubjectStaffDTO>
+    async throws -> PagedDTO<SubjectStaffDTO>
   {
     Logger.api.info("start get subject staffs")
     let url = BangumiAPI.priv.build("p1/subjects/\(subjectId)/staffs")
@@ -304,16 +305,16 @@ extension Chii {
     }
     let pageURL = url.appending(queryItems: queryItems)
     let data = try await self.request(url: pageURL, method: "GET")
-    let resp: PagedData<SubjectStaffDTO> = try self.decodeResponse(data)
+    let resp: PagedDTO<SubjectStaffDTO> = try self.decodeResponse(data)
     Logger.api.info("finish get subject staffs")
     return resp
   }
 
-  func getSubjectTopics(_ subjectId: Int, limit: Int, offset: Int = 0) async throws -> PagedData<
+  func getSubjectTopics(_ subjectId: Int, limit: Int, offset: Int = 0) async throws -> PagedDTO<
     TopicDTO
   > {
     if self.mock {
-      return loadFixture(fixture: "subject_topics.json", target: PagedData<TopicDTO>.self)
+      return loadFixture(fixture: "subject_topics.json", target: PagedDTO<TopicDTO>.self)
     }
     Logger.api.info("start get subject topics")
     let url = BangumiAPI.priv.build("p1/subjects/\(subjectId)/topics")
@@ -323,17 +324,17 @@ extension Chii {
     ]
     let pageURL = url.appending(queryItems: queryItems)
     let data = try await self.request(url: pageURL, method: "GET")
-    let resp: PagedData<TopicDTO> = try self.decodeResponse(data)
+    let resp: PagedDTO<TopicDTO> = try self.decodeResponse(data)
     Logger.api.info("finish get subject topics")
     return resp
   }
 
-  func getSubjectComments(_ subjectId: Int, limit: Int, offset: Int = 0) async throws -> PagedData<
+  func getSubjectComments(_ subjectId: Int, limit: Int, offset: Int = 0) async throws -> PagedDTO<
     SubjectCommentDTO
   > {
     if self.mock {
       return loadFixture(
-        fixture: "subject_comments.json", target: PagedData<SubjectCommentDTO>.self)
+        fixture: "subject_comments.json", target: PagedDTO<SubjectCommentDTO>.self)
     }
     Logger.api.info("start get subject comments")
     let url = BangumiAPI.priv.build("p1/subjects/\(subjectId)/comments")
@@ -343,7 +344,7 @@ extension Chii {
     ]
     let pageURL = url.appending(queryItems: queryItems)
     let data = try await self.request(url: pageURL, method: "GET")
-    let resp: PagedData<SubjectCommentDTO> = try self.decodeResponse(data)
+    let resp: PagedDTO<SubjectCommentDTO> = try self.decodeResponse(data)
     Logger.api.info("finish get subject comments")
     return resp
   }
@@ -369,11 +370,11 @@ extension Chii {
     since: Int = 0, limit: Int = 100, offset: Int = 0
   )
     async throws
-    -> PagedData<UserSubjectCollectionDTO>
+    -> PagedDTO<UserSubjectCollectionDTO>
   {
     if self.mock {
       return loadFixture(
-        fixture: "user_subject_collections.json", target: PagedData<UserSubjectCollectionDTO>.self)
+        fixture: "user_subject_collections.json", target: PagedDTO<UserSubjectCollectionDTO>.self)
     }
     Logger.api.info("start get subject collections")
     let profile = try await self.getProfile()
@@ -391,7 +392,7 @@ extension Chii {
     }
     let pageURL = url.appending(queryItems: queryItems)
     let data = try await self.request(url: pageURL, method: "GET")
-    let response: PagedData<UserSubjectCollectionDTO> = try self.decodeResponse(data)
+    let response: PagedDTO<UserSubjectCollectionDTO> = try self.decodeResponse(data)
     Logger.api.info("finish get subject collections")
     return response
   }
@@ -399,11 +400,11 @@ extension Chii {
   func getEpisodeCollections(
     _ subjectId: Int, type: EpisodeType? = nil, limit: Int = 100, offset: Int = 0
   )
-    async throws -> PagedData<EpisodeCollectionDTO>
+    async throws -> PagedDTO<EpisodeCollectionDTO>
   {
     if self.mock {
       return loadFixture(
-        fixture: "episode_collections.json", target: PagedData<EpisodeCollectionDTO>.self)
+        fixture: "episode_collections.json", target: PagedDTO<EpisodeCollectionDTO>.self)
     }
     Logger.api.info(
       "start get episode collections: \(subjectId), \(type.debugDescription), \(limit), \(offset)")
@@ -419,7 +420,7 @@ extension Chii {
     )
     .appending(queryItems: queries)
     let data = try await self.request(url: url, method: "GET", auth: .required)
-    let resp: PagedData<EpisodeCollectionDTO> = try self.decodeResponse(data)
+    let resp: PagedDTO<EpisodeCollectionDTO> = try self.decodeResponse(data)
     Logger.api.info(
       "finish get episode collections: \(subjectId), \(type.debugDescription), \(limit), \(offset)")
     return resp
