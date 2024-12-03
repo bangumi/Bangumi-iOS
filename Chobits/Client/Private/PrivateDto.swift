@@ -287,3 +287,17 @@ struct UserPersonCollectionDTO: Codable {
   var person: PersonDTO
   var createdAt: Int
 }
+
+struct SubjectRecDTO: Codable, Identifiable, Equatable {
+  var subject: SlimSubjectDTO
+  var sim: Float
+  var count: Int
+
+  var id: Int {
+    subject.id
+  }
+
+  static func == (lhs: SubjectRecDTO, rhs: SubjectRecDTO) -> Bool {
+    lhs.subject.id == rhs.subject.id
+  }
+}

@@ -531,6 +531,8 @@ components:
           type: integer
         replies:
           type: integer
+        stats:
+          $ref: '#/components/schemas/IndexStats'
         title:
           type: string
         total:
@@ -547,10 +549,16 @@ components:
         - replies
         - total
         - collects
+        - stats
         - createdAt
         - updatedAt
         - creator
       title: Index
+      type: object
+    IndexStats:
+      additionalProperties:
+        type: integer
+      title: IndexStats
       type: object
     Infobox:
       items:
@@ -908,6 +916,8 @@ components:
       type: object
     SlimCharacter:
       properties:
+        comment:
+          type: integer
         id:
           type: integer
         images:
@@ -927,6 +937,7 @@ components:
         - name
         - nameCN
         - role
+        - comment
         - lock
         - nsfw
       title: SlimCharacter
@@ -953,6 +964,8 @@ components:
       type: object
     SlimPerson:
       properties:
+        comment:
+          type: integer
         id:
           type: integer
         images:
@@ -972,6 +985,7 @@ components:
         - name
         - nameCN
         - type
+        - comment
         - lock
         - nsfw
       title: SlimPerson
@@ -1503,6 +1517,20 @@ components:
         - total
       title: SubjectRating
       type: object
+    SubjectRec:
+      properties:
+        count:
+          type: integer
+        sim:
+          type: number
+        subject:
+          $ref: '#/components/schemas/SlimSubject'
+      required:
+        - subject
+        - sim
+        - count
+      title: SubjectRec
+      type: object
     SubjectRelation:
       properties:
         order:
@@ -1878,6 +1906,21 @@ components:
         - person
         - index
       type: object
+    UserHomepage:
+      properties:
+        left:
+          items:
+            type: string
+          type: array
+        right:
+          items:
+            type: string
+          type: array
+      required:
+        - left
+        - right
+      title: UserHomepage
+      type: object
     UserIndexCollection:
       properties:
         createdAt:
@@ -2007,7 +2050,7 @@ info:
     关于订阅通知的 socket.io 相关的文档在
     <https://github.com/bangumi/GraphQL/blob/master/docs/socket.io.md>
   title: bangumi private api
-  version: 2024-12-01-409ab9a
+  version: 2024-12-03-12cb3c7
 openapi: 3.0.3
 paths:
   /p1/blocklist:
@@ -4227,6 +4270,62 @@ paths:
         - CookiesSession: []
           HTTPBearer: []
       summary: 获取条目的剧集
+      tags:
+        - subject
+  /p1/subjects/{subjectID}/recs:
+    get:
+      operationId: getSubjectRecs
+      parameters:
+        - description: max 10
+          in: query
+          name: limit
+          required: false
+          schema:
+            default: 10
+            maximum: 10
+            minimum: 1
+            type: integer
+        - description: min 0
+          in: query
+          name: offset
+          required: false
+          schema:
+            default: 0
+            minimum: 0
+            type: integer
+        - in: path
+          name: subjectID
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  data:
+                    items:
+                      $ref: '#/components/schemas/SubjectRec'
+                    type: array
+                  total:
+                    type: integer
+                required:
+                  - data
+                  - total
+                type: object
+          description: Default Response
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                description: 意料之外的服务器错误
+          description: 意料之外的服务器错误
+      security:
+        - CookiesSession: []
+          HTTPBearer: []
+      summary: 获取条目的推荐
       tags:
         - subject
   /p1/subjects/{subjectID}/relations:

@@ -27,6 +27,7 @@ extension Chii {
   }
 
   func logout() {
+    @AppStorage("collectionsUpdatedAt") var collectionsUpdatedAt: Int = 0
     Logger.app.info("start logout")
     self.setAuthStatus(false)
     Logger.app.info("clear keychain")
@@ -35,6 +36,7 @@ extension Chii {
     self.auth = nil
     self.profile = nil
     self.authorizedSession = nil
+    collectionsUpdatedAt = 0
   }
 
   func getAuthFromKeychain() throws -> Auth? {

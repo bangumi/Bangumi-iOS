@@ -87,6 +87,7 @@
 		19ECCDC82CFC986E0092F715 /* Html.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19ECCDC72CFC986B0092F715 /* Html.swift */; };
 		19ECCDEF2CFD43CD0092F715 /* Wrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19ECCDEE2CFD43CA0092F715 /* Wrapper.swift */; };
 		19ECCE132CFD5B6B0092F715 /* CardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19ECCE122CFD5B6B0092F715 /* CardView.swift */; };
+		19ECCEC12CFF16860092F715 /* SubjectRecsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19ECCEC02CFF167F0092F715 /* SubjectRecsView.swift */; };
 		19F8C3D82BE73B830037D723 /* Navigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19F8C3D72BE73B820037D723 /* Navigation.swift */; };
 /* End PBXBuildFile section */
 
@@ -171,6 +172,7 @@
 		19ECCDC72CFC986B0092F715 /* Html.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Html.swift; sourceTree = "<group>"; };
 		19ECCDEE2CFD43CA0092F715 /* Wrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Wrapper.swift; sourceTree = "<group>"; };
 		19ECCE122CFD5B6B0092F715 /* CardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardView.swift; sourceTree = "<group>"; };
+		19ECCEC02CFF167F0092F715 /* SubjectRecsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubjectRecsView.swift; sourceTree = "<group>"; };
 		19F8C3D72BE73B820037D723 /* Navigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Navigation.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -221,6 +223,7 @@
 				19671C2E2BDEB55D000B4D99 /* SubjectLargeRowView.swift */,
 				19671C322BDEB55D000B4D99 /* SubjectRatingBoxView.swift */,
 				1909F3AA2BEC406500E3B8F0 /* SubjectCharactersView.swift */,
+				19ECCEC02CFF167F0092F715 /* SubjectRecsView.swift */,
 				1915A89F2BF09F4D003DB76D /* SubjectCharacterListView.swift */,
 				1909F39B2BEB98F600E3B8F0 /* SubjectRelationsView.swift */,
 				1915A89D2BF09E6B003DB76D /* SubjectRelationListView.swift */,
@@ -553,6 +556,7 @@
 				1915A89A2BEFB942003DB76D /* CharacterSubjectsView.swift.bak in Sources */,
 				19BD242E2BEB2F3400595973 /* Setting.swift in Sources */,
 				197A19E02BE696E200804B13 /* EpisodeGridView.swift in Sources */,
+				19ECCEC12CFF16860092F715 /* SubjectRecsView.swift in Sources */,
 				1915A8A02BF09F4D003DB76D /* SubjectCharacterListView.swift in Sources */,
 				1998DD092CB122BC00115E1F /* SubjectCommentListView.swift in Sources */,
 				19671C602BDEB55D000B4D99 /* Basis.swift in Sources */,

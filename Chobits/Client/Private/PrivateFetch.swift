@@ -426,4 +426,19 @@ extension Chii {
     return resp
   }
 
+  func getSubjectRecs(_ subjectId: Int, limit: Int = 10, offset: Int = 0) async throws -> PagedDTO<
+    SubjectRecDTO
+  > {
+    Logger.api.info("start get subject recs")
+    let url = BangumiAPI.priv.build("p1/subjects/\(subjectId)/recs")
+    let queryItems: [URLQueryItem] = [
+      URLQueryItem(name: "limit", value: String(limit)),
+      URLQueryItem(name: "offset", value: String(offset)),
+    ]
+    let pageURL = url.appending(queryItems: queryItems)
+    let data = try await self.request(url: pageURL, method: "GET")
+    let resp: PagedDTO<SubjectRecDTO> = try self.decodeResponse(data)
+    Logger.api.info("finish get subject recs")
+    return resp
+  }
 }

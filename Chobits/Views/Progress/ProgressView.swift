@@ -143,7 +143,7 @@ struct ChiiProgressView: View {
             }
           }
           LazyVStack(alignment: .leading) {
-            ForEach(collections, id: \.idx) { item in
+            ForEach(collections, id: \.inner) { item in
               CardView {
                 NavigationLink(value: NavDestination.subject(subjectId: item.inner.subjectId)) {
                   ProgressRowView(collection: item.inner)

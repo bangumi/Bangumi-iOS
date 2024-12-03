@@ -74,6 +74,8 @@ struct SubjectView: View {
             SubjectCharactersView(subjectId: subjectId)
             SubjectRelationsView(subjectId: subjectId, series: subject.series)
 
+            SubjectRecsView(subjectId: subjectId)
+
             if !isolationMode {
               SubjectTopicsView(subjectId: subjectId)
               SubjectCommentsView(subjectId: subjectId)
