@@ -82,10 +82,10 @@ struct PersonView: View {
                     Text("(\(person.collects)人收藏)")
                   }
                   Spacer()
-//                  if person.lock {
-//                    Label("", systemImage: "lock")
-//                      .foregroundStyle(.red)
-//                  }
+                  // if person.lock {
+                  //   Label("", systemImage: "lock")
+                  //     .foregroundStyle(.red)
+                  // }
                   if !isolationMode {
                     Label("评论: \(person.comment)", systemImage: "bubble")
                       .lineLimit(1)
@@ -211,11 +211,12 @@ struct PersonView: View {
                 )
             }
 
-            /// characters
-            // PersonCharactersView(personId: personId)
+            /// casts
+            // PersonCastsView(personId: personId)
 
-            /// subjects
-            // PersonSubjectsView(personId: personId)
+            /// works
+            PersonWorksView(personId: personId)
+
           }.padding(.horizontal, 8)
         }
       } else if refreshed {

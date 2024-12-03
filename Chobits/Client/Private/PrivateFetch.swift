@@ -118,7 +118,7 @@ extension Chii {
   }
 
   func getPersonWorks(
-    _ personID: Int, position: Int? = nil, subjectType: SubjectType? = nil, limit: Int = 20,
+    _ personID: Int, position: Int? = nil, subjectType: SubjectType = .none, limit: Int = 20,
     offset: Int = 0
   ) async throws -> PagedDTO<PersonWorkDTO> {
     Logger.api.info("start get person works")
@@ -130,7 +130,7 @@ extension Chii {
     if let position = position {
       queryItems.append(URLQueryItem(name: "position", value: String(position)))
     }
-    if let subjectType = subjectType {
+    if subjectType != .none {
       queryItems.append(URLQueryItem(name: "subjectType", value: String(subjectType.rawValue)))
     }
     let pageURL = url.appending(queryItems: queryItems)
