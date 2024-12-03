@@ -106,9 +106,7 @@ final class SubjectV1 {
     self.collection = item.collection
     self.eps = item.eps
     self.images = item.images
-    self.infobox = item.infobox.filter { item in
-      !item.isEmpty
-    }
+    self.infobox = item.infobox.clean()
     self.locked = item.locked
     self.metaTags = item.metaTags
     self.tags = item.tags
@@ -136,7 +134,7 @@ final class SubjectV1 {
     self.name = item.name
     self.nameCN = item.nameCn
     self.nsfw = item.nsfw
-    self.platform = SubjectPlatform(name: item.platform)
+    self.platform = SubjectPlatform(name: item.platform ?? "")
     self.rating = SubjectRating(item.rating)
     self.series = item.series
     self.summary = item.summary
@@ -149,9 +147,7 @@ final class SubjectV1 {
     self.collection = item.collection
     self.eps = item.eps
     self.images = item.images
-    self.infobox = item.infobox.filter { item in
-      !item.isEmpty
-    }
+    self.infobox = item.infobox.clean()
     self.locked = item.locked
     self.metaTags = item.metaTags
     self.tags = item.tags
@@ -272,9 +268,7 @@ final class CharacterV1 {
     self.collects = item.collects
     self.comment = item.comment
     self.images = item.images
-    self.infobox = item.infobox.filter { item in
-      !item.isEmpty
-    }
+    self.infobox = item.infobox.clean()
     self.lock = item.lock
     self.name = item.name
     self.nameCN = item.nameCN
@@ -287,9 +281,7 @@ final class CharacterV1 {
     self.collects = item.collects
     self.comment = item.comment
     self.images = item.images
-    self.infobox = item.infobox.filter { item in
-      !item.isEmpty
-    }
+    self.infobox = item.infobox.clean()
     self.lock = item.lock
     self.name = item.name
     self.nameCN = item.nameCN
@@ -350,9 +342,7 @@ final class PersonV1 {
     self.collects = item.collects
     self.comment = item.comment
     self.images = item.images
-    self.infobox = item.infobox.filter { item in
-      !item.isEmpty
-    }
+    self.infobox = item.infobox.clean()
     self.lock = item.lock
     self.name = item.name
     self.nameCN = item.nameCN
@@ -366,9 +356,7 @@ final class PersonV1 {
     self.collects = item.collects
     self.comment = item.comment
     self.images = item.images
-    self.infobox = item.infobox.filter { item in
-      !item.isEmpty
-    }
+    self.infobox = item.infobox.clean()
     self.lock = item.lock
     self.name = item.name
     self.nameCN = item.nameCN

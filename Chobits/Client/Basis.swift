@@ -173,18 +173,27 @@ struct SubjectRating: Codable {
 
 typealias Infobox = [InfoboxItem]
 
+extension Infobox {
+  func clean() -> Infobox {
+    var result: Infobox = []
+    for item in self {
+      var values: [InfoboxValue] = []
+      for value in item.values {
+        if !value.v.isEmpty {
+          values.append(value)
+        }
+      }
+      if values.count > 0 {
+        result.append(InfoboxItem(key: item.key, values: values))
+      }
+    }
+    return result
+  }
+}
+
 struct InfoboxItem: Codable {
   var key: String
   var values: [InfoboxValue]
-
-  var isEmpty: Bool {
-    for value in values {
-      if !value.v.isEmpty {
-        return false
-      }
-    }
-    return true
-  }
 }
 
 struct InfoboxValue: Codable {
