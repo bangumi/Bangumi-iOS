@@ -59,9 +59,12 @@ struct SubjectRelationsView: View {
             NavigationLink(value: NavDestination.subject(subjectId: offprint.subject.id)) {
               VStack {
                 ImageView(
-                  img: offprint.subject.images?.common, width: 60, height: 80, type: .subject)
+                  img: offprint.subject.images?.common,
+                  width: 60, height: 80, type: .subject)
                 Spacer()
-              }.font(.caption2).frame(width: 60, height: 90)
+              }
+              .font(.caption)
+              .frame(width: 60, height: 90)
             }.buttonStyle(.plain)
           }
         }
@@ -89,15 +92,29 @@ struct SubjectRelationsView: View {
         ForEach(relations) { relation in
           NavigationLink(value: NavDestination.subject(subjectId: relation.subject.id)) {
             VStack {
-              Text(relation.relation.cn).foregroundStyle(.secondary)
               ImageView(
-                img: relation.subject.images?.common, width: 90, height: 120, type: .subject)
+                img: relation.subject.images?.common,
+                width: 90, height: 120,
+                type: .subject, overlay: .caption
+              ) {
+                VStack {
+                  if relation.relation.cn.isEmpty {
+                    Text(relation.subject.type.description)
+                  } else {
+                    Text(relation.relation.cn)
+                  }
+                }
+                .lineLimit(1)
+                .font(.caption)
+                .foregroundStyle(.white)
+              }
               Text(relation.subject.name)
+                .font(.caption)
                 .multilineTextAlignment(.leading)
                 .truncationMode(.middle)
                 .lineLimit(2)
               Spacer()
-            }.font(.caption2).frame(width: 90, height: 180)
+            }.frame(width: 90, height: 165)
           }.buttonStyle(.plain)
         }
       }

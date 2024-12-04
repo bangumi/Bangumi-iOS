@@ -54,11 +54,13 @@ struct PersonWorksView: View {
         ForEach(relations) { item in
           NavigationLink(value: NavDestination.subject(subjectId: item.subject.id)) {
             VStack {
-              Text(item.position.cn)
-                .foregroundStyle(.secondary)
-                .lineLimit(1)
-              ImageView(img: item.subject.images?.medium, width: 60, height: 80)
+              ImageView(img: item.subject.images?.medium, width: 60, height: 80, overlay: .caption) {
+                Text(item.position.cn)
+                  .foregroundStyle(.white)
+                  .lineLimit(1)
+              }
               Text(item.subject.name)
+                .multilineTextAlignment(.leading)
                 .lineLimit(2)
               Spacer()
             }

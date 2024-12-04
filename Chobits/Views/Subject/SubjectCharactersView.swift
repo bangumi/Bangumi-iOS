@@ -61,10 +61,12 @@ struct SubjectCharactersView: View {
                 overlay: .caption
               ) {
                 Text(item.type.description)
+                  .foregroundStyle(.white)
+                  .lineLimit(1)
               }
               Text(item.character.name).font(.caption)
               if let person = item.actors.first {
-                Text(person.name).foregroundStyle(.secondary).font(.caption2)
+                Text(person.name).foregroundStyle(.secondary).font(.caption)
               }
               Spacer()
             }

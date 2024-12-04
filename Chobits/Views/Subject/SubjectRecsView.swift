@@ -57,7 +57,9 @@ struct SubjectRecsView: View {
                 .truncationMode(.middle)
                 .lineLimit(2)
               Spacer()
-            }.font(.caption2).frame(width: 72, height: 140)
+            }
+            .font(.caption)
+            .frame(width: 72, height: 140)
           }.buttonStyle(.plain)
         }
       }

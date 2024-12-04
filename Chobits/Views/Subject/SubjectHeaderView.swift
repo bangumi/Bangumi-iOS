@@ -167,7 +167,7 @@ struct SubjectHeaderView: View {
         }
         .font(.callout)
         .foregroundStyle(.accent)
-      }
+      }.padding(5)
     }
   }
 }

@@ -39,6 +39,7 @@ struct SubjectCollectionView: View {
           }
           .foregroundStyle(.linkText)
         }
+        .padding(5)
         .onTapGesture {
           edit.toggle()
         }
