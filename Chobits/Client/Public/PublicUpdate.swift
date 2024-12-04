@@ -31,7 +31,7 @@ extension Chii {
     Logger.api.info(
       "finish update subject collection: \(subjectId), eps: \(eps.debugDescription), vols: \(vols.debugDescription)"
     )
-    _ = try await self.loadUserSubjectCollection(subjectId)
+    try await self.loadUserSubjectCollection(subjectId)
   }
 
   func updateSubjectCollection(
@@ -63,7 +63,7 @@ extension Chii {
       _ = try await self.request(url: url, method: "POST", body: body, auth: .required)
     }
     Logger.api.info("finish update subject collection: \(subjectId)")
-    _ = try await self.loadUserSubjectCollection(subjectId)
+    try await self.loadUserSubjectCollection(subjectId)
   }
 
   func updateSubjectEpisodeCollection(
@@ -88,7 +88,7 @@ extension Chii {
 
     try await db.updateEpisodeCollections(subjectId: subjectId, sort: updateTo, type: type)
     try await db.commit()
-    _ = try await self.loadUserSubjectCollection(subjectId)
+    try await self.loadUserSubjectCollection(subjectId)
   }
 
   func updateEpisodeCollection(subjectId: Int, episodeId: Int, type: EpisodeCollectionType)
@@ -109,6 +109,6 @@ extension Chii {
 
     try await db.updateEpisodeCollection(subjectId: subjectId, episodeId: episodeId, type: type)
     try await db.commit()
-    _ = try await self.loadUserSubjectCollection(subjectId)
+    try await self.loadUserSubjectCollection(subjectId)
   }
 }

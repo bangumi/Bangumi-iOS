@@ -36,21 +36,19 @@ extension Chii {
     try await db.commit()
   }
 
-  func loadUserSubjectCollection(_ subjectId: Int) async throws -> Bool {
+  func loadUserSubjectCollection(_ subjectId: Int) async throws {
     if !self.isAuthenticated() {
-      return false
+      return
     }
     let db = try self.getDB()
     do {
       let item = try await self.getUserSubjectCollection(subjectId)
       try await db.saveUserSubjectCollection(item)
       try await db.commit()
-      return true
     } catch ChiiError.notFound(_) {
       Logger.collection.warning("collection not found for subject: \(subjectId)")
       try await db.deleteUserCollection(subjectId: subjectId)
       try await db.commit()
-      return false
     }
   }
 

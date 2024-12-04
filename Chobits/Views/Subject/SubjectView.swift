@@ -37,14 +37,7 @@ struct SubjectView: View {
   func refresh() async {
     if refreshed { return }
     do {
-      if isAuthenticated {
-        let updated = try await Chii.shared.loadUserSubjectCollection(subjectId)
-        if !updated {
-          try await Chii.shared.loadSubject(subjectId)
-        }
-      } else {
-        try await Chii.shared.loadSubject(subjectId)
-      }
+      try await Chii.shared.loadSubject(subjectId)
     } catch {
       Notifier.shared.alert(error: error)
       return

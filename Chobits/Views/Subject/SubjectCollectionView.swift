@@ -14,7 +14,19 @@ struct SubjectCollectionView: View {
 
   @Environment(\.modelContext) var modelContext
 
+  @State private var refreshed: Bool = false
   @State private var edit: Bool = false
+
+  func refresh() async {
+    if refreshed { return }
+    do {
+      try await Chii.shared.loadUserSubjectCollection(subject.subjectId)
+    } catch {
+      Notifier.shared.alert(error: error)
+      return
+    }
+    refreshed = true
+  }
 
   var body: some View {
     Section {
