@@ -10,8 +10,14 @@ import SwiftData
 import SwiftUI
 
 struct SubjectBookChaptersView: View {
-  @ObservableModel var subject: Subject
+  let subjectId: Int
   let compact: Bool
+
+  @Environment(\.modelContext) var modelContext
+
+  @Query
+  private var collections: [UserSubjectCollection]
+  private var collection: UserSubjectCollection? { collections.first }
 
   @State private var inputEps: String = ""
   @State private var eps: Int? = nil
@@ -19,11 +25,37 @@ struct SubjectBookChaptersView: View {
   @State private var vols: Int? = nil
   @State private var updating: Bool = false
 
+  init(subjectId: Int, compact: Bool = false) {
+    self.subjectId = subjectId
+    self.compact = compact
+
+    let predicate = #Predicate<UserSubjectCollection> {
+      $0.subjectId == subjectId
+    }
+    self._collections = Query(filter: predicate, sort: \UserSubjectCollection.subjectId)
+  }
+
   var updateButtonDisable: Bool {
     if updating {
       return true
     }
     return eps == nil && vols == nil
+  }
+
+  var epsDesc: String {
+    collection?.subject?.epsDesc ?? ""
+  }
+
+  var epStatus: Int {
+    collection?.epStatus ?? 0
+  }
+
+  var volsDesc: String {
+    collection?.subject?.volumesDesc ?? ""
+  }
+
+  var volStatus: Int {
+    collection?.volStatus ?? 0
   }
 
   func parseInputEps() {
@@ -43,18 +75,24 @@ struct SubjectBookChaptersView: View {
   }
 
   func incrEps() {
+    guard let collection = collection else {
+      return
+    }
     if let value = eps {
       self.inputEps = "\(value+1)"
     } else {
-      self.inputEps = "\(collectionEps+1)"
+      self.inputEps = "\(collection.epStatus+1)"
     }
   }
 
   func incrVols() {
+    guard let collection = collection else {
+      return
+    }
     if let value = vols {
       self.inputVols = "\(value+1)"
     } else {
-      self.inputVols = "\(collectionVols+1)"
+      self.inputVols = "\(collection.volStatus+1)"
     }
   }
 
@@ -70,7 +108,7 @@ struct SubjectBookChaptersView: View {
     Task {
       do {
         try await Chii.shared.updateBookCollection(
-          subjectId: subject.subjectId, eps: eps, vols: vols)
+          subjectId: subjectId, eps: eps, vols: vols)
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
       } catch {
         Notifier.shared.alert(error: error)
@@ -80,21 +118,11 @@ struct SubjectBookChaptersView: View {
     }
   }
 
-  var collectionEps: Int {
-    guard let collection = self.subject.userCollection else { return 0 }
-    return collection.epStatus
-  }
-
-  var collectionVols: Int {
-    guard let collection = self.subject.userCollection else { return 0 }
-    return collection.volStatus
-  }
-
   var body: some View {
     HStack {
       if compact {
         HStack(alignment: .firstTextBaseline, spacing: 0) {
-          TextField("\(collectionEps)", text: $inputEps)
+          TextField("\(epStatus)", text: $inputEps)
             .keyboardType(.numberPad)
             .frame(minWidth: 15, maxWidth: 30)
             .multilineTextAlignment(.trailing)
@@ -105,7 +133,7 @@ struct SubjectBookChaptersView: View {
               parseInputEps()
             }
           Text("/").foregroundStyle(.secondary)
-          Text(subject.epsDesc).foregroundStyle(.secondary)
+          Text(epsDesc).foregroundStyle(.secondary)
           Text("话").foregroundStyle(.secondary)
             .padding(.trailing, 2)
           Button {
@@ -117,7 +145,7 @@ struct SubjectBookChaptersView: View {
         }
         .monospaced()
         HStack(alignment: .firstTextBaseline, spacing: 0) {
-          TextField("\(collectionVols)", text: $inputVols)
+          TextField("\(volStatus)", text: $inputVols)
             .keyboardType(.numberPad)
             .frame(minWidth: 15, maxWidth: 30)
             .multilineTextAlignment(.trailing)
@@ -128,7 +156,7 @@ struct SubjectBookChaptersView: View {
               parseInputVols()
             }
           Text("/").foregroundStyle(.secondary)
-          Text(subject.volumesDesc).foregroundStyle(.secondary)
+          Text(volsDesc).foregroundStyle(.secondary)
           Text("卷").foregroundStyle(.secondary)
             .padding(.trailing, 2)
           Button {
@@ -164,7 +192,7 @@ struct SubjectBookChaptersView: View {
         VStack {
           HStack(alignment: .firstTextBaseline, spacing: 0) {
             Text("Chap.").foregroundStyle(.secondary)
-            TextField("\(collectionEps)", text: $inputEps)
+            TextField("\(epStatus)", text: $inputEps)
               .keyboardType(.numberPad)
               .frame(minWidth: 50, maxWidth: 100)
               .multilineTextAlignment(.trailing)
@@ -175,7 +203,7 @@ struct SubjectBookChaptersView: View {
                 parseInputEps()
               }
             Text("/").foregroundStyle(.secondary)
-            Text(subject.epsDesc).foregroundStyle(.secondary)
+            Text(epsDesc).foregroundStyle(.secondary)
               .padding(.trailing, 5)
             Button {
               incrEps()
@@ -187,7 +215,7 @@ struct SubjectBookChaptersView: View {
           }.monospaced()
           HStack(alignment: .firstTextBaseline, spacing: 0) {
             Text("Vol. ").foregroundStyle(.secondary)
-            TextField("\(collectionVols)", text: $inputVols)
+            TextField("\(volStatus)", text: $inputVols)
               .keyboardType(.numberPad)
               .frame(minWidth: 50, maxWidth: 100)
               .multilineTextAlignment(.trailing)
@@ -198,7 +226,7 @@ struct SubjectBookChaptersView: View {
                 parseInputVols()
               }
             Text("/").foregroundStyle(.secondary)
-            Text(subject.volumesDesc).foregroundStyle(.secondary)
+            Text(volsDesc).foregroundStyle(.secondary)
               .padding(.trailing, 5)
             Button {
               incrVols()
@@ -241,7 +269,7 @@ struct SubjectBookChaptersView: View {
 
   return ScrollView {
     LazyVStack(alignment: .leading) {
-      SubjectBookChaptersView(subject: subject, compact: false)
+      SubjectBookChaptersView(subjectId: collection.subjectId, compact: false)
         .modelContainer(container)
     }
   }

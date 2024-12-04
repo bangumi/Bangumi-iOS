@@ -31,8 +31,8 @@ struct SubjectCollectionView: View {
   var body: some View {
     Section {
       VStack(alignment: .leading) {
-        if subject.typeEnum == .book {
-          SubjectBookChaptersView(subject: subject, compact: false)
+        if subject.typeEnum == .book && subject.userCollection != nil {
+          SubjectBookChaptersView(subjectId: subject.subjectId, compact: false)
         }
         BorderView(color: .linkText, padding: 5) {
           HStack {

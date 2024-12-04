@@ -28,17 +28,6 @@ extension DatabaseOperator {
     let list: [T] = try modelContext.fetch(fetchDescriptor)
     return list.first
   }
-
-  public func insertIfNeeded<T: PersistentModel>(
-    data: T,
-    predicate: Predicate<T>
-  ) throws {
-    let descriptor = FetchDescriptor<T>(predicate: predicate)
-    let savedCount = try modelContext.fetchCount(descriptor)
-    if savedCount == 0 {
-      modelContext.insert(data)
-    }
-  }
 }
 
 // MARK: - fetch

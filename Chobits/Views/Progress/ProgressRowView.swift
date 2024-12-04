@@ -114,10 +114,8 @@ struct ProgressRowView: View {
               }
             }.font(.callout)
           case .book:
-            if let subject = collection.subject {
-              SubjectBookChaptersView(subject: subject, compact: true)
-                .font(.callout)
-            }
+            SubjectBookChaptersView(subjectId: collection.subjectId, compact: true)
+              .font(.callout)
 
           default:
             if let stype = collection.subject?.typeEnum {

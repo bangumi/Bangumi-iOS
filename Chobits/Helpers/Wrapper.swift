@@ -7,7 +7,9 @@
 
 import SwiftUI
 
-@propertyWrapper @Observable class ObservableModel<T> {
+@propertyWrapper
+@Observable
+class ObservableModel<T> {
   var wrappedValue: T
 
   init(wrappedValue: T) {
