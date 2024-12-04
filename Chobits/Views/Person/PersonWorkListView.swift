@@ -56,10 +56,17 @@ struct PersonWorkListView: View {
                   Image(systemName: item.subject.type.icon)
                     .font(.footnote)
                     .foregroundStyle(.secondary)
-                  BorderView {
-                    Text(item.position.cn)
-                      .font(.caption)
+                  HStack {
+                    ForEach(item.positions) { position in
+                      HStack {
+                        BorderView {
+                          Text(position.type.cn).font(.caption)
+                        }
+                        Text(position.summary).font(.footnote)
+                      }
                       .foregroundStyle(.secondary)
+                      .lineLimit(1)
+                    }
                   }
                 }
               }.padding(.leading, 4)

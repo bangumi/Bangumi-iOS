@@ -5,6 +5,7 @@
 //  Created by Chuan Chuan on 2024/5/9.
 //
 
+import Flow
 import SwiftData
 import SwiftUI
 
@@ -22,7 +23,7 @@ struct PersonWorksView: View {
     loading = true
     Task {
       do {
-        let resp = try await Chii.shared.getPersonWorks(personId, limit: 10)
+        let resp = try await Chii.shared.getPersonWorks(personId, limit: 5)
         relations.append(contentsOf: resp.data)
       } catch {
         Notifier.shared.alert(error: error)
@@ -49,23 +50,41 @@ struct PersonWorksView: View {
         }.buttonStyle(.plain)
       }
     }
-    ScrollView(.horizontal, showsIndicators: false) {
-      LazyHStack(alignment: .top) {
-        ForEach(relations) { item in
+    VStack {
+      ForEach(relations) { item in
+        CardView {
           NavigationLink(value: NavDestination.subject(subjectId: item.subject.id)) {
-            VStack {
-              ImageView(img: item.subject.images?.common, width: 60, height: 80, overlay: .caption) {
-                Text(item.position.cn)
-                  .foregroundStyle(.white)
+            HStack {
+              ImageView(img: item.subject.images?.common, width: 64, height: 64, type: .subject)
+              VStack(alignment: .leading) {
+                Text(item.subject.name)
+                  .font(.callout)
+                  .foregroundStyle(.linkText)
                   .lineLimit(1)
-              }
-              Text(item.subject.name)
-                .multilineTextAlignment(.leading)
-                .lineLimit(2)
+                Text(item.subject.nameCN)
+                  .font(.footnote)
+                  .foregroundStyle(.secondary)
+                  .lineLimit(1)
+                HStack {
+                  Image(systemName: item.subject.type.icon)
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                  HFlow {
+                    ForEach(item.positions) { position in
+                      HStack {
+                        BorderView {
+                          Text(position.type.cn).font(.caption)
+                        }
+                        Text(position.summary).font(.footnote)
+                      }
+                      .foregroundStyle(.secondary)
+                      .lineLimit(1)
+                    }
+                  }
+                }
+              }.padding(.leading, 4)
               Spacer()
             }
-            .font(.caption)
-            .frame(width: 60, height: 145)
           }.buttonStyle(.plain)
         }
       }

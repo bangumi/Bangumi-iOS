@@ -157,7 +157,7 @@ struct CharacterCastDTO: Codable, Identifiable, Equatable {
 
 struct PersonWorkDTO: Codable, Identifiable, Equatable {
   var subject: SlimSubjectDTO
-  var position: SubjectStaffPosition
+  var positions: [SubjectStaffPosition]
 
   var id: Int {
     subject.id
@@ -168,7 +168,20 @@ struct PersonWorkDTO: Codable, Identifiable, Equatable {
   }
 }
 
-struct SubjectStaffPosition: Codable {
+struct SubjectStaffPosition: Codable, Identifiable, Equatable {
+  var type: SubjectStaffPositionType
+  var summary: String
+
+  var id: Int {
+    type.id
+  }
+
+  static func == (lhs: SubjectStaffPosition, rhs: SubjectStaffPosition) -> Bool {
+    lhs.type.id == rhs.type.id
+  }
+}
+
+struct SubjectStaffPositionType: Codable {
   var id: Int
   var en: String
   var cn: String
@@ -238,7 +251,7 @@ struct SubjectCharacterDTO: Codable, Identifiable, Equatable {
 
 struct SubjectStaffDTO: Codable, Identifiable, Equatable {
   var person: SlimPersonDTO
-  var position: SubjectStaffPosition
+  var positions: [SubjectStaffPosition]
 
   var id: Int {
     person.id

@@ -41,11 +41,17 @@ struct SubjectStaffListView: View {
                     .lineLimit(1)
                 }
               }.buttonStyle(.plain)
-              BorderView {
-                Text(item.position.cn)
-                  .font(.caption)
+              HFlow {
+                ForEach(item.positions) { position in
+                  HStack {
+                    BorderView {
+                      Text(position.type.cn).font(.caption)
+                    }
+                    Text(position.summary).font(.footnote)
+                  }
                   .foregroundStyle(.secondary)
                   .lineLimit(1)
+                }
               }
             }.padding(.leading, 4)
             Spacer()
