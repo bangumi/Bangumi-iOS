@@ -204,10 +204,10 @@ enum PhoneViewTab: Codable, CaseIterable, View {
 
 enum PadViewTab: Codable, CaseIterable, View {
   case timeline
-  case progress
   case discover
   case search
 
+  case progress
   case collection
   case notice
 
@@ -217,12 +217,12 @@ enum PadViewTab: Codable, CaseIterable, View {
     switch label {
     case "timeline":
       self = .timeline
-    case "progress":
-      self = .progress
     case "discover":
       self = .discover
     case "search":
       self = .search
+    case "progress":
+      self = .progress
     case "collection":
       self = .collection
     case "notice":
@@ -238,12 +238,12 @@ enum PadViewTab: Codable, CaseIterable, View {
     switch self {
     case .timeline:
       "动态"
-    case .progress:
-      "进度管理"
     case .discover:
       "发现"
     case .search:
       "搜索"
+    case .progress:
+      "进度管理"
     case .collection:
       "时光机"
     case .notice:
@@ -257,12 +257,12 @@ enum PadViewTab: Codable, CaseIterable, View {
     switch self {
     case .timeline:
       "timeline"
-    case .progress:
-      "progress"
     case .discover:
       "discover"
     case .search:
       "search"
+    case .progress:
+      "progress"
     case .collection:
       "collection"
     case .notice:
@@ -273,27 +273,21 @@ enum PadViewTab: Codable, CaseIterable, View {
   }
 
   var icon: String {
-    @AppStorage("hasUnreadNotice") var hasUnreadNotice: Bool = false
-
     switch self {
     case .timeline:
-      return "person"
-    case .progress:
-      return "square.grid.2x2.fill"
+      "person"
     case .discover:
-      return "waveform"
+      "waveform"
     case .search:
-      return "magnifyingglass"
+      "magnifyingglass"
+    case .progress:
+      "square.grid.2x2.fill"
     case .collection:
-      return "person.badge.clock"
+      "person.badge.clock"
     case .notice:
-      if hasUnreadNotice {
-        return "bell.badge.fill"
-      } else {
-        return "bell"
-      }
+      "bell"
     case .settings:
-      return "gear"
+      "gear"
     }
   }
 
@@ -301,12 +295,12 @@ enum PadViewTab: Codable, CaseIterable, View {
     switch self {
     case .timeline:
       ChiiTimelineView()
-    case .progress:
-      ChiiProgressView()
     case .discover:
       CalendarView()
     case .search:
       SearchView()
+    case .progress:
+      ChiiProgressView()
     case .collection:
       ChiiTimelineView()
     case .notice:

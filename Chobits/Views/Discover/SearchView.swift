@@ -199,6 +199,5 @@ struct SearchView: View {
         }
       }
     }
-    Spacer()
   }
 }
