@@ -1,0 +1,71 @@
+import Flow
+import SwiftData
+import SwiftUI
+
+struct SubjectStaffListView: View {
+  let subjectId: Int
+
+  func load(limit: Int, offset: Int) async -> PagedDTO<SubjectStaffDTO>? {
+    do {
+      let resp = try await Chii.shared.getSubjectStaffs(
+        subjectId, limit: limit, offset: offset)
+      return resp
+    } catch {
+      Notifier.shared.alert(error: error)
+    }
+    return nil
+  }
+
+  var body: some View {
+    ScrollView {
+      PageView<SubjectStaffDTO, _>(limit: 20, nextPageFunc: load) { item in
+        CardView {
+          HStack {
+            NavigationLink(value: NavDestination.person(personId: item.person.id)) {
+              ImageView(
+                img: item.person.images?.medium,
+                width: 60, height: 60, alignment: .top, type: .person
+              )
+            }
+            .buttonStyle(.plain)
+            VStack(alignment: .leading) {
+              NavigationLink(value: NavDestination.person(personId: item.person.id)) {
+                VStack(alignment: .leading) {
+                  Text(item.person.name)
+                    .font(.callout)
+                    .foregroundStyle(.linkText)
+                    .lineLimit(1)
+                  Text(item.person.nameCN)
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+                }
+              }.buttonStyle(.plain)
+              BorderView {
+                Text(item.position.cn)
+                  .font(.caption)
+                  .foregroundStyle(.secondary)
+                  .lineLimit(1)
+              }
+            }.padding(.leading, 4)
+            Spacer()
+          }
+        }
+      }
+      .padding(8)
+    }
+    .buttonStyle(.plain)
+    .navigationTitle("制作人员")
+    .navigationBarTitleDisplayMode(.inline)
+    .toolbar {
+      ToolbarItem(placement: .automatic) {
+        Image(systemName: "list.bullet.circle").foregroundStyle(.secondary)
+      }
+    }
+  }
+}
+
+#Preview {
+  let subject = Subject.previewAnime
+  return SubjectStaffListView(subjectId: subject.subjectId)
+}

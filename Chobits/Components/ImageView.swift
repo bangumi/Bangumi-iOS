@@ -11,6 +11,7 @@ import SwiftUI
 enum ImageType: String {
   case common
   case subject
+  case person
   case avatar
 }
 
@@ -69,6 +70,10 @@ struct ImageView<Overlay: View>: View {
               switch type {
               case .subject:
                 Image("noIconSubject")
+                  .resizable()
+                  .scaledToFit()
+              case .person:
+                Image("noIconPerson")
                   .resizable()
                   .scaledToFit()
               case .avatar:
