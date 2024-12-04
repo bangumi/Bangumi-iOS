@@ -42,7 +42,7 @@ struct SubjectRelationListView: View {
           HStack {
             NavigationLink(value: NavDestination.subject(subjectId: item.subject.id)) {
               ImageView(
-                img: item.subject.images?.medium,
+                img: item.subject.images?.common,
                 width: 60, height: 60, type: .subject
               )
             }

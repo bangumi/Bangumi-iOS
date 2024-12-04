@@ -7,7 +7,7 @@ struct CharacterCastItemView: View {
     HStack(alignment: .top) {
       NavigationLink(value: NavDestination.subject(subjectId: item.subject.id)) {
         ImageView(
-          img: item.subject.images?.medium,
+          img: item.subject.images?.common,
           width: 60, height: 60, alignment: .top,
           type: .subject, overlay: .caption
         ) {
