@@ -62,6 +62,14 @@ extension DatabaseOperator {
       where: #Predicate<UserSubjectCollection> {
         $0.subjectId == subjectId
       })
+    let episodes = try modelContext.fetch(
+      FetchDescriptor<Episode>(
+        predicate: #Predicate<Episode> {
+          $0.subjectId == subjectId
+        }))
+    for episode in episodes {
+      episode.collection = EpisodeCollectionType.none.rawValue
+    }
   }
 
   public func updateEpisodeCollections(subjectId: Int, sort: Float, type: EpisodeCollectionType)

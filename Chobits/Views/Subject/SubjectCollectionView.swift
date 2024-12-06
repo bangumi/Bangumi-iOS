@@ -62,7 +62,7 @@ struct SubjectCollectionView: View {
               .presentationDragIndicator(.visible)
               .presentationDetents(.init([.medium, .large]))
           })
-      }
+      }.task(refresh)
     }
   }
 }
