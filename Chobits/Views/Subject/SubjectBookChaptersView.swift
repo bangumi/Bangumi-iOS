@@ -15,8 +15,7 @@ struct SubjectBookChaptersView: View {
 
   @Environment(\.modelContext) var modelContext
 
-  @Query
-  private var collections: [UserSubjectCollection]
+  @Query private var collections: [UserSubjectCollection]
   private var collection: UserSubjectCollection? { collections.first }
 
   @State private var inputEps: String = ""

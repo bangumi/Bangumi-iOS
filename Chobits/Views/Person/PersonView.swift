@@ -19,8 +19,7 @@ struct PersonView: View {
   @State private var showSummary: Bool = false
   @State private var showInfobox: Bool = false
 
-  @Query
-  private var persons: [Person]
+  @Query private var persons: [Person]
   var person: Person? { persons.first }
 
   init(personId: Int) {

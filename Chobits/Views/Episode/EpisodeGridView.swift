@@ -20,14 +20,12 @@ struct EpisodeGridView: View {
   @State private var selected: Episode? = nil
   @State private var refreshed: Bool = false
 
-  @State private var episodeMains: [Episode] = []
-  @State private var episodeSps: [Episode] = []
+  @Query private var episodeMains: [Episode] = []
+  @Query private var episodeSps: [Episode] = []
 
   init(subjectId: Int) {
     self.subjectId = subjectId
-  }
 
-  func load() async {
     let mainType = EpisodeType.main.rawValue
     var mainDescriptor = FetchDescriptor<Episode>(
       predicate: #Predicate<Episode> {
@@ -41,12 +39,9 @@ struct EpisodeGridView: View {
         $0.type == spType && $0.subjectId == subjectId
       }, sortBy: [SortDescriptor(\.sort)])
     spDescriptor.fetchLimit = 10
-    do {
-      self.episodeMains = try modelContext.fetch(mainDescriptor)
-      self.episodeSps = try modelContext.fetch(spDescriptor)
-    } catch {
-      Notifier.shared.alert(error: error)
-    }
+
+    _episodeMains = Query(mainDescriptor)
+    _episodeSps = Query(spDescriptor)
   }
 
   func refresh() async {
@@ -58,7 +53,6 @@ struct EpisodeGridView: View {
     } catch {
       Notifier.shared.alert(error: error)
     }
-    await load()
   }
 
   var body: some View {
@@ -74,7 +68,6 @@ struct EpisodeGridView: View {
       }.buttonStyle(.plain)
     }.onAppear {
       Task {
-        await load()
         await refresh()
       }
     }

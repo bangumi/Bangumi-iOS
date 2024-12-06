@@ -14,8 +14,7 @@ struct SubjectLargeRowView: View {
 
   @Environment(\.modelContext) var modelContext
 
-  @Query
-  private var subjects: [Subject]
+  @Query private var subjects: [Subject]
   private var subject: Subject? { subjects.first }
 
   init(subjectId: Int) {

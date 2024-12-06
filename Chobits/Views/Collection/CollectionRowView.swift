@@ -13,12 +13,10 @@ struct CollectionRowView: View {
 
   @Environment(\.modelContext) var modelContext
 
-  @Query
-  private var subjects: [Subject]
+  @Query private var subjects: [Subject]
   private var subject: Subject? { subjects.first }
 
-  @Query
-  private var collections: [UserSubjectCollection]
+  @Query private var collections: [UserSubjectCollection]
   private var collection: UserSubjectCollection? { collections.first }
 
   init(subjectId: Int) {

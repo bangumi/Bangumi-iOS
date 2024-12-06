@@ -19,8 +19,7 @@ struct EpisodeCollectionBoxView: View {
 
   @State private var updating: Bool = false
 
-  @Query
-  private var episodes: [Episode]
+  @Query private var episodes: [Episode]
   private var episode: Episode? { episodes.first }
 
   init(subjectId: Int, episodeId: Int) {

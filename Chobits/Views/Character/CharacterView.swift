@@ -19,8 +19,7 @@ struct CharacterView: View {
   @State private var showSummary: Bool = false
   @State private var showInfobox: Bool = false
 
-  @Query
-  private var characters: [Character]
+  @Query private var characters: [Character]
   private var character: Character? { characters.first }
 
   init(characterId: Int) {

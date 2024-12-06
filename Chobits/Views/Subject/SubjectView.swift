@@ -18,8 +18,7 @@ struct SubjectView: View {
 
   @State private var refreshed: Bool = false
 
-  @Query
-  private var subjects: [Subject]
+  @Query private var subjects: [Subject]
   var subject: Subject? { subjects.first }
 
   init(subjectId: Int) {

@@ -20,8 +20,7 @@ struct SubjectRelationsView: View {
   @State private var relations: [SubjectRelationDTO] = []
   @State private var offprints: [SubjectRelationDTO] = []
 
-  @Query
-  private var subjects: [Subject]
+  @Query private var subjects: [Subject]
   var subject: Subject? { subjects.first }
 
   func load() {
