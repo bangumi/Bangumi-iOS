@@ -165,7 +165,7 @@ struct ChiiProgressView: View {
             .disabled(!searching && search.isEmpty)
           }
           .padding(.horizontal, 8)
-          .padding(.vertical, 4)
+          .padding(.vertical, 2)
           LazyVStack(alignment: .leading) {
             ForEach(collections, id: \.inner) { item in
               CardView {
