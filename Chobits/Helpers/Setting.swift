@@ -179,7 +179,7 @@ enum PhoneViewTab: Codable, CaseIterable, View {
     case .timeline:
       "person"
     case .progress:
-      "square.grid.2x2.fill"
+      "square.grid.2x2"
     case .discover:
       "waveform"
     case .search:
@@ -281,7 +281,7 @@ enum PadViewTab: Codable, CaseIterable, View {
     case .search:
       "magnifyingglass"
     case .progress:
-      "square.grid.2x2.fill"
+      "square.grid.2x2"
     case .collection:
       "person.badge.clock"
     case .notice:
