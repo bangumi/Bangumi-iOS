@@ -15,6 +15,8 @@ struct ChiiProgressView: View {
 
   @Environment(\.modelContext) var modelContext
 
+  @FocusState private var searching: Bool
+  @State private var search: String = ""
   @State private var subjectType: SubjectType = .none
   @State private var refreshing: Bool = false
   @State private var offset: Int = 0
@@ -28,7 +30,7 @@ struct ChiiProgressView: View {
     do {
       for type in SubjectType.progressTypes {
         let tvalue = type.rawValue
-        let desc = FetchDescriptor<UserSubjectCollection>(
+        let desc: FetchDescriptor<UserSubjectCollection> = FetchDescriptor<UserSubjectCollection>(
           predicate: #Predicate<UserSubjectCollection> {
             (tvalue == 0 || $0.subjectType == tvalue) && $0.type == doingType
           })
@@ -46,6 +48,9 @@ struct ChiiProgressView: View {
     var descriptor = FetchDescriptor<UserSubjectCollection>(
       predicate: #Predicate<UserSubjectCollection> {
         (stype == 0 || $0.subjectType == stype) && $0.type == doingType
+          && (search == ""
+            || ($0.subject?.name.localizedStandardContains(search) ?? false
+              || $0.subject?.nameCN.localizedStandardContains(search) ?? false))
       },
       sortBy: [
         SortDescriptor(\.updatedAt, order: .reverse)
@@ -142,6 +147,25 @@ struct ChiiProgressView: View {
               await load()
             }
           }
+          HStack {
+            TextField("搜索", text: $search)
+              .focused($searching)
+              .textFieldStyle(.roundedBorder)
+              .onChange(of: search) { _, _ in
+                Task {
+                  await load()
+                }
+              }
+            Button {
+              searching = false
+              search = ""
+            } label: {
+              Image(systemName: "xmark.circle")
+            }
+            .disabled(!searching && search.isEmpty)
+          }
+          .padding(.horizontal, 8)
+          .padding(.vertical, 4)
           LazyVStack(alignment: .leading) {
             ForEach(collections, id: \.inner) { item in
               CardView {
