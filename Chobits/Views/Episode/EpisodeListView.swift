@@ -168,6 +168,7 @@ struct EpisodeListView: View {
                       .foregroundStyle(Color(hex: episode.textColor))
                       .font(.footnote)
                   }
+                  .padding(2)
                   .strikethrough(episode.collection == EpisodeCollectionType.dropped.rawValue)
                   .background {
                     RoundedRectangle(cornerRadius: 5)
