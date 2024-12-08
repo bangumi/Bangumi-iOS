@@ -79,7 +79,7 @@ struct SubjectView: View {
         .toolbar {
           ToolbarItem(placement: .topBarTrailing) {
             Menu {
-              NavigationLink(destination: NavDestination.subjectStaffList(subjectId: subjectId)) {
+              NavigationLink(value: NavDestination.subjectStaffList(subjectId: subjectId)) {
                 Label("制作人员", systemImage: "person.2")
               }
               ShareLink(item: shareLink) {
