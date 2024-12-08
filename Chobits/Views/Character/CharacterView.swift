@@ -34,6 +34,16 @@ struct CharacterView: View {
     URL(string: "https://\(shareDomain)/character/\(characterId)")!
   }
 
+  var nameCN: String {
+    guard let character = character else {
+      return ""
+    }
+    if character.nameCN.isEmpty {
+      return character.name
+    }
+    return character.nameCN
+  }
+
   func refresh() async {
     if refreshed { return }
     do {
@@ -45,10 +55,15 @@ struct CharacterView: View {
     refreshed = true
   }
 
-  func shouldShowToggle(geometry: GeometryProxy) -> Bool {
+  func shouldShowToggle(
+    _ geometry: GeometryProxy,
+    font: UIFont.TextStyle = .body, limits: Int = 5
+  )
+    -> Bool
+  {
     let lines = Int(
-      geometry.size.height / UIFont.preferredFont(forTextStyle: .body).lineHeight)
-    if lines < 5 {
+      geometry.size.height / UIFont.preferredFont(forTextStyle: font).lineHeight)
+    if lines < limits {
       return false
     }
     return true
@@ -72,7 +87,7 @@ struct CharacterView: View {
                 HStack {
                   Label(character.roleEnum.description, systemImage: character.roleEnum.icon)
                   if character.collects > 0 {
-                    Text("(\(character.collects)人收藏)")
+                    Text("(\(character.collects)人收藏)").lineLimit(1)
                   }
                   Spacer()
                   if !isolationMode {
@@ -84,8 +99,17 @@ struct CharacterView: View {
                 }
                 .font(.footnote)
                 .foregroundStyle(.secondary)
+
+                Spacer()
+                Text(nameCN)
+                  .multilineTextAlignment(.leading)
+                  .truncationMode(.middle)
+                  .lineLimit(2)
+                  .textSelection(.enabled)
+                Spacer()
+
                 VStack(alignment: .leading) {
-                  ForEach(character.infobox, id: \.key) { item in
+                  ForEach(character.infobox.header(), id: \.key) { item in
                     HStack(alignment: .top) {
                       Text("\(item.key):").fixedSize(horizontal: false, vertical: true)
                       VStack(alignment: .leading) {
@@ -93,7 +117,6 @@ struct CharacterView: View {
                           HStack {
                             if let k = value.k {
                               Text("\(k):")
-                                .font(.caption)
                                 .foregroundStyle(.secondary)
                                 .lineLimit(1)
                             }
@@ -107,7 +130,7 @@ struct CharacterView: View {
                   }
                 }
                 .font(.footnote)
-                .frame(maxHeight: 110, alignment: .top)
+                .frame(maxHeight: 72, alignment: .top)
                 .clipped()
                 .sheet(isPresented: $showInfobox) {
                   ScrollView {
@@ -174,7 +197,7 @@ struct CharacterView: View {
                 }
                 .overlay(
                   GeometryReader { geometry in
-                    if shouldShowToggle(geometry: geometry) {
+                    if shouldShowToggle(geometry, font: .footnote) {
                       Button(action: {
                         showSummary.toggle()
                       }) {

@@ -34,6 +34,22 @@ struct PersonView: View {
     URL(string: "https://\(shareDomain)/person/\(personId)")!
   }
 
+  var nameCN: String {
+    guard let person = person else {
+      return ""
+    }
+    if person.nameCN.isEmpty {
+      return person.name
+    }
+    return person.nameCN
+  }
+
+  var careers: [String] {
+    guard let person = person else { return [] }
+    let vals = Set(person.career).sorted().map { PersonCareer($0).description }
+    return Array(vals)
+  }
+
   func refresh() async {
     if refreshed { return }
     do {
@@ -45,19 +61,18 @@ struct PersonView: View {
     refreshed = true
   }
 
-  func shouldShowToggle(geometry: GeometryProxy, limits: Int) -> Bool {
+  func shouldShowToggle(
+    _ geometry: GeometryProxy,
+    font: UIFont.TextStyle = .body, limits: Int = 5
+  )
+    -> Bool
+  {
     let lines = Int(
-      geometry.size.height / UIFont.preferredFont(forTextStyle: .body).lineHeight)
+      geometry.size.height / UIFont.preferredFont(forTextStyle: font).lineHeight)
     if lines < limits {
       return false
     }
     return true
-  }
-
-  var careers: [String] {
-    guard let person = person else { return [] }
-    let vals = Set(person.career).sorted().map { PersonCareer($0).description }
-    return Array(vals)
   }
 
   var body: some View {
@@ -78,7 +93,7 @@ struct PersonView: View {
                 HStack {
                   Label(person.typeEnum.description, systemImage: person.typeEnum.icon)
                   if person.collects > 0 {
-                    Text("(\(person.collects)人收藏)")
+                    Text("(\(person.collects)人收藏)").lineLimit(1)
                   }
                   Spacer()
                   // if person.lock {
@@ -94,8 +109,17 @@ struct PersonView: View {
                 }
                 .font(.footnote)
                 .foregroundStyle(.secondary)
+
+                Spacer()
+                Text(nameCN)
+                  .multilineTextAlignment(.leading)
+                  .truncationMode(.middle)
+                  .lineLimit(2)
+                  .textSelection(.enabled)
+                Spacer()
+
                 VStack(alignment: .leading) {
-                  ForEach(person.infobox, id: \.key) { item in
+                  ForEach(person.infobox.header(), id: \.key) { item in
                     HStack(alignment: .top) {
                       Text("\(item.key):").fixedSize(horizontal: false, vertical: true)
                       VStack(alignment: .leading) {
@@ -103,7 +127,6 @@ struct PersonView: View {
                           HStack {
                             if let k = value.k {
                               Text("\(k):")
-                                .font(.footnote)
                                 .foregroundStyle(.secondary)
                                 .lineLimit(1)
                             }
@@ -117,7 +140,7 @@ struct PersonView: View {
                   }
                 }
                 .font(.footnote)
-                .frame(maxHeight: 110, alignment: .top)
+                .frame(maxHeight: 72, alignment: .top)
                 .clipped()
                 .sheet(isPresented: $showInfobox) {
                   ScrollView {
@@ -196,7 +219,7 @@ struct PersonView: View {
                 }
                 .overlay(
                   GeometryReader { geometry in
-                    if shouldShowToggle(geometry: geometry, limits: 5) {
+                    if shouldShowToggle(geometry, font: .footnote) {
                       Button(action: {
                         showSummary.toggle()
                       }) {

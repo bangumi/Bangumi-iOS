@@ -829,13 +829,15 @@ components:
       type: object
     PersonWork:
       properties:
-        position:
-          $ref: '#/components/schemas/SubjectStaffPosition'
+        positions:
+          items:
+            $ref: '#/components/schemas/SubjectStaffPosition'
+          type: array
         subject:
           $ref: '#/components/schemas/SlimSubject'
       required:
         - subject
-        - position
+        - positions
       type: object
     Reaction:
       properties:
@@ -1009,6 +1011,8 @@ components:
           type: integer
         images:
           $ref: '#/components/schemas/SubjectImages'
+        info:
+          type: string
         locked:
           type: boolean
         name:
@@ -1039,6 +1043,7 @@ components:
         - name
         - nameCN
         - type
+        - info
         - locked
         - nsfw
       title: SlimSubject
@@ -1214,6 +1219,8 @@ components:
           type: integer
         images:
           $ref: '#/components/schemas/SubjectImages'
+        info:
+          type: string
         infobox:
           $ref: '#/components/schemas/Infobox'
         locked:
@@ -1269,6 +1276,7 @@ components:
         - eps
         - id
         - infobox
+        - info
         - metaTags
         - locked
         - name
@@ -1567,13 +1575,25 @@ components:
       properties:
         person:
           $ref: '#/components/schemas/SlimPerson'
-        position:
-          $ref: '#/components/schemas/SubjectStaffPosition'
+        positions:
+          items:
+            $ref: '#/components/schemas/SubjectStaffPosition'
+          type: array
       required:
         - person
-        - position
+        - positions
       type: object
     SubjectStaffPosition:
+      properties:
+        summary:
+          type: string
+        type:
+          $ref: '#/components/schemas/SubjectStaffPositionType'
+      required:
+        - type
+        - summary
+      type: object
+    SubjectStaffPositionType:
       properties:
         cn:
           type: string
@@ -2050,7 +2070,7 @@ info:
     关于订阅通知的 socket.io 相关的文档在
     <https://github.com/bangumi/GraphQL/blob/master/docs/socket.io.md>
   title: bangumi private api
-  version: 2024-12-03-12cb3c7
+  version: 2024-12-07-0338dcc
 openapi: 3.0.3
 paths:
   /p1/blocklist:
