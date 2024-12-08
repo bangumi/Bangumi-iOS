@@ -392,46 +392,6 @@ enum SubjectType: Int, Codable, Identifiable, CaseIterable {
       return "play.tv"
     }
   }
-
-  var authorityFields: [[String]] {
-    switch self {
-    case .none:
-      return []
-    case .book:
-      return [
-        ["发售日", "开始"],
-        ["作者", "作画"],
-        ["原作"],
-        ["出版社"],
-      ]
-    case .anime:
-      return [
-        ["放送开始", "上映年度"],
-        ["导演"],
-        ["原作"],
-        ["制作", "製作"],
-      ]
-    case .music:
-      return [
-        ["发售日期"],
-        ["艺术家"],
-      ]
-    case .game:
-      return [
-        ["发行日期"],
-        ["平台"],
-        ["游戏类型"],
-        ["游戏开发商", "开发商", "开发"],
-      ]
-    case .real:
-      return [
-        ["开始"],
-        ["导演"],
-        ["编剧"],
-        ["主演"],
-      ]
-    }
-  }
 }
 
 enum PersonCareer: String, Codable, CaseIterable {

@@ -47,7 +47,7 @@ struct PersonCastsView: View {
         }
       }
     }
-    .padding(.horizontal, 4)
+    .padding(.bottom, 8)
     .animation(.default, value: casts)
   }
 }

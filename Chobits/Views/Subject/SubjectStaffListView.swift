@@ -43,16 +43,18 @@ struct SubjectStaffListView: View {
               }.buttonStyle(.plain)
               HFlow {
                 ForEach(item.positions) { position in
-                  HStack {
-                    BorderView {
-                      Text(position.type.cn).font(.caption)
+                  if !position.type.cn.isEmpty {
+                    HStack {
+                      BorderView {
+                        Text(position.type.cn)
+                      }
                     }
-                    Text(position.summary).font(.footnote)
                   }
-                  .foregroundStyle(.secondary)
-                  .lineLimit(1)
                 }
               }
+              .font(.caption)
+              .foregroundStyle(.secondary)
+              .lineLimit(1)
             }.padding(.leading, 4)
             Spacer()
           }
@@ -65,7 +67,7 @@ struct SubjectStaffListView: View {
     .navigationBarTitleDisplayMode(.inline)
     .toolbar {
       ToolbarItem(placement: .automatic) {
-        Image(systemName: "list.bullet.circle").foregroundStyle(.secondary)
+        Image(systemName: "person.2").foregroundStyle(.secondary)
       }
     }
   }

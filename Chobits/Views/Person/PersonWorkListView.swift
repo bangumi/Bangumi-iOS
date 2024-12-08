@@ -62,7 +62,6 @@ struct PersonWorkListView: View {
                         BorderView {
                           Text(position.type.cn).font(.caption)
                         }
-                        Text(position.summary).font(.footnote)
                       }
                       .foregroundStyle(.secondary)
                       .lineLimit(1)

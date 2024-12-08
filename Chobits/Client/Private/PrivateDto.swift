@@ -74,6 +74,7 @@ struct SubjectDTO: Codable, Identifiable {
   var eps: Int
   var images: SubjectImages?
   var infobox: Infobox
+  var info: String
   var locked: Bool
   var metaTags: [String]
   var tags: [Tag]
@@ -93,6 +94,7 @@ struct SubjectDTO: Codable, Identifiable {
 struct SlimSubjectDTO: Codable, Identifiable {
   var id: Int
   var images: SubjectImages?
+  var info: String
   var locked: Bool
   var name: String
   var nameCN: String

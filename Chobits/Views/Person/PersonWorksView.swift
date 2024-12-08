@@ -75,20 +75,21 @@ struct PersonWorksView: View {
                         BorderView {
                           Text(position.type.cn).font(.caption)
                         }
-                        Text(position.summary).font(.footnote)
                       }
                       .foregroundStyle(.secondary)
                       .lineLimit(1)
                     }
                   }
                 }
-              }.padding(.leading, 4)
+              }
               Spacer()
             }
           }.buttonStyle(.plain)
         }
       }
-    }.animation(.default, value: relations)
+    }
+    .padding(.bottom, 8)
+    .animation(.default, value: relations)
   }
 }
 

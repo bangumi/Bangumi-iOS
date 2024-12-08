@@ -96,7 +96,7 @@ struct SubjectHeaderView: View {
 
         NavigationLink(value: NavDestination.subjectInfobox(subject: subject)) {
           HStack {
-            Text(subject.authority)
+            Text(subject.info)
               .font(.caption)
               .lineLimit(2)
             Spacer()

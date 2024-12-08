@@ -32,6 +32,7 @@ final class SubjectV1 {
   var eps: Int
   var images: SubjectImages?
   var infobox: Infobox
+  var info: String = ""
   var locked: Bool
   var metaTags: [String]
   var tags: [Tag]
@@ -72,34 +73,6 @@ final class SubjectV1 {
     return self.volumes > 0 ? "\(self.volumes)" : "??"
   }
 
-  var authority: String {
-    var items: [String] = []
-    switch typeEnum {
-    case .none:
-      return ""
-    case .book, .anime, .real:
-      if eps > 0 {
-        items.append("\(eps)话")
-      }
-    case .music, .game:
-      break
-    }
-    for fields in typeEnum.authorityFields {
-      for field in fields {
-        if let item = infobox.filter({ item in
-          item.key == field
-        }).first {
-          items.append(item.values.map(\.v).joined(separator: ","))
-        }
-      }
-    }
-    if items.count > 0 {
-      return items.joined(separator: " / ")
-    } else {
-      return ""
-    }
-  }
-
   init(_ item: SubjectDTO) {
     self.subjectId = item.id
     self.airtime = item.airtime
@@ -107,6 +80,7 @@ final class SubjectV1 {
     self.eps = item.eps
     self.images = item.images
     self.infobox = item.infobox.clean()
+    self.info = item.info
     self.locked = item.locked
     self.metaTags = item.metaTags
     self.tags = item.tags
@@ -148,6 +122,7 @@ final class SubjectV1 {
     self.eps = item.eps
     self.images = item.images
     self.infobox = item.infobox.clean()
+    self.info = item.info
     self.locked = item.locked
     self.metaTags = item.metaTags
     self.tags = item.tags

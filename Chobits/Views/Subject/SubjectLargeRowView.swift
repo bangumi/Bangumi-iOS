@@ -82,9 +82,9 @@ struct SubjectLargeRowView: View {
         }
 
         // meta
-        if let authority = subject?.authority {
+        if let info = subject?.info, !info.isEmpty {
           Spacer()
-          Text(authority)
+          Text(info)
             .font(.footnote)
             .foregroundStyle(.secondary)
             .lineLimit(2)
