@@ -119,7 +119,7 @@ struct SubjectRelationsView: View {
             VStack {
               Section {
                 // relation.id==1 -> 改编
-                if relation.relation.id > 1, relation.relation.cn.isEmpty {
+                if relation.relation.id > 1, !relation.relation.cn.isEmpty {
                   Text(relation.relation.cn)
                 } else {
                   Text(relation.subject.type.description)
