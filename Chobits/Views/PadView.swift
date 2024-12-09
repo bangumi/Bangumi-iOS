@@ -39,6 +39,14 @@ struct PadView: View {
     }
   }
 
+  func tabIcon(_ tab: PadViewTab) -> String {
+    if tab == PadViewTab.notice {
+      return hasUnreadNotice ? "bell.badge.fill" : "bell"
+    } else {
+      return tab.icon
+    }
+  }
+
   init() {
     let defaultTab = UserDefaults.standard.string(forKey: "defaultTab") ?? "discover"
     self.selectedTab = PadViewTab(defaultTab)
@@ -85,14 +93,9 @@ struct PadView: View {
         if isAuthenticated {
           Section("我的") {
             ForEach(PadViewTab.userTabs, id: \.self) { tab in
-              Label(tab.title, systemImage: tab.icon)
+              Label(tab.title, systemImage: tabIcon(tab))
             }
-            Label(
-              PadViewTab.notice.title,
-              systemImage: hasUnreadNotice ? "bell.badge.fill" : "bell"
-            )
-            .task(checkNotice)
-          }
+          }.task(checkNotice)
         }
 
         Section("其他") {
@@ -125,18 +128,9 @@ struct PadView: View {
                 .tag(tab)
                 .toolbar(.hidden, for: .tabBar)
                 .tabItem {
-                  Label(tab.title, systemImage: tab.icon).labelStyle(.iconOnly)
+                  Label(tab.title, systemImage: tabIcon(tab)).labelStyle(.iconOnly)
                 }
             }
-            PadViewTab.notice
-              .tag(PadViewTab.notice)
-              .toolbar(.hidden, for: .tabBar)
-              .tabItem {
-                Label(
-                  PadViewTab.notice.title,
-                  systemImage: hasUnreadNotice ? "bell.badge.fill" : "bell"
-                ).labelStyle(.iconOnly)
-              }
           }
           ForEach(PadViewTab.otherTabs, id: \.self) { tab in
             tab
