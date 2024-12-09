@@ -36,9 +36,15 @@ struct PersonCastItemView: View {
                   .foregroundStyle(.linkText)
                   .lineLimit(1)
                 HStack {
-                  Text(relation.subject.nameCN)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
+                  if relation.subject.nameCN.isEmpty {
+                    Text(relation.subject.type.description)
+                      .foregroundStyle(.secondary)
+                      .lineLimit(1)
+                  } else {
+                    Text(relation.subject.nameCN)
+                      .foregroundStyle(.secondary)
+                      .lineLimit(1)
+                  }
                   BorderView {
                     Text(relation.type.description)
                       .font(.caption)
@@ -46,6 +52,7 @@ struct PersonCastItemView: View {
                       .foregroundStyle(.secondary)
                   }
                 }
+                Divider()
               }.font(.footnote)
               ImageView(
                 img: relation.subject.images?.grid,
@@ -53,7 +60,7 @@ struct PersonCastItemView: View {
               )
             }.frame(minHeight: 40)
           }.buttonStyle(.plain)
-          Divider()
+
         }
       }
 

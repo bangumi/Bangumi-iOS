@@ -25,10 +25,17 @@ struct CharacterCastItemView: View {
             .lineLimit(1)
           Spacer()
         }.buttonStyle(.plain)
-        Label(item.subject.nameCN, systemImage: item.subject.type.icon)
-          .lineLimit(1)
-          .font(.footnote)
-          .foregroundStyle(.secondary)
+        if item.subject.nameCN.isEmpty {
+          Label(item.subject.type.description, systemImage: item.subject.type.icon)
+            .lineLimit(1)
+            .font(.footnote)
+            .foregroundStyle(.secondary)
+        } else {
+          Label(item.subject.nameCN, systemImage: item.subject.type.icon)
+            .lineLimit(1)
+            .font(.footnote)
+            .foregroundStyle(.secondary)
+        }
         Text(item.subject.info)
           .font(.caption)
           .lineLimit(1)
