@@ -45,6 +45,7 @@ struct PadView: View {
           ForEach(PadViewTab.mainTabs, id: \.self) { tab in
             tab
               .tag(tab)
+              .toolbar(.hidden, for: .tabBar)
               .tabItem {
                 Label(tab.title, systemImage: tab.icon).labelStyle(.iconOnly)
               }
@@ -53,6 +54,7 @@ struct PadView: View {
             ForEach(PadViewTab.userTabs, id: \.self) { tab in
               tab
                 .tag(tab)
+                .toolbar(.hidden, for: .tabBar)
                 .tabItem {
                   Label(tab.title, systemImage: tab.icon).labelStyle(.iconOnly)
                 }
@@ -61,6 +63,7 @@ struct PadView: View {
           ForEach(PadViewTab.otherTabs, id: \.self) { tab in
             tab
               .tag(tab)
+              .toolbar(.hidden, for: .tabBar)
               .tabItem {
                 Label(tab.title, systemImage: tab.icon).labelStyle(.iconOnly)
               }
