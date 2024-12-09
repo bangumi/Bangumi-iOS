@@ -5,23 +5,37 @@
 //  Created by Chuan Chuan on 2024/10/29.
 //
 
+import OSLog
 import SwiftUI
 
 struct PadView: View {
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
+  @AppStorage("isolationMode") var isolationMode: Bool = false
+  @AppStorage("hasUnreadNotice") var hasUnreadNotice: Bool = false
 
   @State private var selectedTab: PadViewTab? = .discover
   @State private var columns: NavigationSplitViewVisibility = .all
 
   @State private var profile: User?
 
-  func updateProfile() {
-    Task {
-      do {
-        profile = try await Chii.shared.getProfile()
-      } catch {
-        Notifier.shared.alert(error: error)
+  func updateProfile() async {
+    do {
+      profile = try await Chii.shared.getProfile()
+    } catch {
+      Notifier.shared.alert(error: error)
+    }
+  }
+
+  func checkNotice() async {
+    do {
+      let resp = try await Chii.shared.listNotice(limit: 1, unread: true)
+      if resp.total == 0 {
+        hasUnreadNotice = false
+      } else {
+        hasUnreadNotice = true
       }
+    } catch {
+      Logger.user.error("check notice failed: \(error)")
     }
   }
 
@@ -37,10 +51,10 @@ struct PadView: View {
           if isAuthenticated {
             if let me = profile {
               HStack {
-                ImageView(img: me.avatar?.medium, width: 32, height: 32)
+                ImageView(img: me.avatar?.medium, width: 40, height: 40)
                 VStack(alignment: .leading) {
                   Text("\(me.nickname)")
-                    .font(.callout)
+                    .font(.footnote)
                     .lineLimit(2)
                   // Text(me.group.description)
                   //   .font(.caption)
@@ -49,7 +63,7 @@ struct PadView: View {
                 Spacer()
               }
             } else {
-              ProgressView().onAppear(perform: updateProfile)
+              ProgressView().task(updateProfile)
             }
           } else {
             HStack {
@@ -73,6 +87,11 @@ struct PadView: View {
             ForEach(PadViewTab.userTabs, id: \.self) { tab in
               Label(tab.title, systemImage: tab.icon)
             }
+            Label(
+              PadViewTab.notice.title,
+              systemImage: hasUnreadNotice ? "bell.badge.fill" : "bell"
+            )
+            .task(checkNotice)
           }
         }
 
@@ -83,7 +102,12 @@ struct PadView: View {
         }
 
         Spacer()
-      }.navigationSplitViewColumnWidth(min: 160, ideal: 200, max: 240)
+      }
+      .navigationSplitViewColumnWidth(min: 160, ideal: 200, max: 240)
+      .refreshable {
+        await updateProfile()
+        await checkNotice()
+      }
     } detail: {
       NavigationStack {
         TabView(selection: $selectedTab) {
@@ -104,6 +128,15 @@ struct PadView: View {
                   Label(tab.title, systemImage: tab.icon).labelStyle(.iconOnly)
                 }
             }
+            PadViewTab.notice
+              .tag(PadViewTab.notice)
+              .toolbar(.hidden, for: .tabBar)
+              .tabItem {
+                Label(
+                  PadViewTab.notice.title,
+                  systemImage: hasUnreadNotice ? "bell.badge.fill" : "bell"
+                ).labelStyle(.iconOnly)
+              }
           }
           ForEach(PadViewTab.otherTabs, id: \.self) { tab in
             tab

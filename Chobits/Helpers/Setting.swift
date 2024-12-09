@@ -315,7 +315,7 @@ enum PadViewTab: Codable, CaseIterable, View {
   }
 
   static var userTabs: [Self] {
-    return [.progress, .collection, .notice]
+    return [.progress, .collection]
   }
 
   static var otherTabs: [Self] {
