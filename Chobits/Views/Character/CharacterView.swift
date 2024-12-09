@@ -85,7 +85,7 @@ struct CharacterView: View {
               ImageView(img: character.images?.medium, width: 120, height: 160, alignment: .top)
               VStack(alignment: .leading) {
                 HStack {
-                  Label(character.roleEnum.description, systemImage: character.roleEnum.icon)
+                  Image(systemName: character.roleEnum.icon)
                   if character.collects > 0 {
                     Text("(\(character.collects)人收藏)").lineLimit(1)
                   }
@@ -108,72 +108,18 @@ struct CharacterView: View {
                   .textSelection(.enabled)
                 Spacer()
 
-                VStack(alignment: .leading) {
-                  ForEach(character.infobox.header(), id: \.key) { item in
-                    HStack(alignment: .top) {
-                      Text("\(item.key):").fixedSize(horizontal: false, vertical: true)
-                      VStack(alignment: .leading) {
-                        ForEach(item.values, id: \.v) { value in
-                          HStack {
-                            if let k = value.k {
-                              Text("\(k):")
-                                .foregroundStyle(.secondary)
-                                .lineLimit(1)
-                            }
-                            Text(value.v)
-                              .textSelection(.enabled)
-                              .lineLimit(1)
-                          }
-                        }
-                      }
-                    }
+                NavigationLink(value: NavDestination.characterInfobox(character: character)) {
+                  HStack {
+                    InfoboxHeaderView(infobox: character.infobox)
+                      .foregroundStyle(.secondary)
+                    Spacer()
+                    Image(systemName: "chevron.right").foregroundStyle(.linkText)
                   }
                 }
-                .font(.footnote)
-                .frame(maxHeight: 72, alignment: .top)
-                .clipped()
-                .sheet(isPresented: $showInfobox) {
-                  ScrollView {
-                    LazyVStack(alignment: .leading) {
-                      Text("资料").font(.title3).padding(.vertical, 10)
-                      VStack(alignment: .leading) {
-                        ForEach(character.infobox, id: \.key) { item in
-                          HStack(alignment: .top) {
-                            Text("\(item.key):").fixedSize(horizontal: false, vertical: true)
-                            VStack(alignment: .leading) {
-                              ForEach(item.values, id: \.v) { value in
-                                HStack {
-                                  if let k = value.k {
-                                    Text("\(k):")
-                                      .font(.footnote)
-                                      .foregroundStyle(.secondary)
-                                      .lineLimit(1)
-                                  }
-                                  Text(value.v)
-                                    .textSelection(.enabled)
-                                    .lineLimit(1)
-                                }
-                              }
-                            }
-                          }
-                          Divider()
-                        }
-                      }
-                      .presentationDragIndicator(.visible)
-                      Spacer()
-                    }.padding()
-                  }
-                }
-                Spacer()
-                Button(action: {
-                  showInfobox.toggle()
-                }) {
-                  Text("more...")
-                    .font(.caption)
-                    .foregroundStyle(.linkText)
-                }
+                .buttonStyle(.plain)
+
               }.padding(.leading, 2)
-            }
+            }.frame(height: 160)
 
             /// summary
             Section {

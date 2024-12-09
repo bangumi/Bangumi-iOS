@@ -195,14 +195,26 @@ extension Infobox {
   }
 }
 
-struct InfoboxItem: Codable {
+struct InfoboxItem: Codable, Identifiable {
   var key: String
   var values: [InfoboxValue]
+
+  var id: String {
+    key
+  }
 }
 
-struct InfoboxValue: Codable {
+struct InfoboxValue: Codable, Identifiable {
   var k: String?
   var v: String
+
+  var id: String {
+    if let k = k {
+      return "\(k):\(v)"
+    } else {
+      return v
+    }
+  }
 }
 
 /// 收藏类型

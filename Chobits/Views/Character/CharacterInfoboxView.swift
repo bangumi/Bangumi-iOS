@@ -1,5 +1,5 @@
 //
-//  SubjectInfoboxView.swift
+//  CharacterInfoboxView.swift
 //  Chobits
 //
 //  Created by Chuan Chuan on 2024/5/9.
@@ -9,13 +9,13 @@ import Flow
 import SwiftData
 import SwiftUI
 
-struct SubjectInfoboxView: View {
-  @ObservableModel var subject: Subject
+struct CharacterInfoboxView: View {
+  @ObservableModel var character: Character
 
   var body: some View {
     ScrollView {
-      InfoboxView(infobox: subject.infobox)
-        .navigationTitle("条目信息")
+      InfoboxView(infobox: character.infobox)
+        .navigationTitle("角色信息")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
           ToolbarItem(placement: .automatic) {
@@ -29,9 +29,9 @@ struct SubjectInfoboxView: View {
 #Preview {
   let container = mockContainer()
 
-  let subject = Subject.previewAnime
-  container.mainContext.insert(subject)
+  let character = Character.preview
+  container.mainContext.insert(character)
 
-  return SubjectInfoboxView(subject: subject)
+  return CharacterInfoboxView(character: character)
     .modelContainer(container)
 }

@@ -41,34 +41,43 @@ struct PersonWorkListView: View {
       PageView<PersonWorkDTO, _>(limit: 10, reloader: reloader, nextPageFunc: load) { item in
         CardView {
           NavigationLink(value: NavDestination.subject(subjectId: item.subject.id)) {
-            HStack {
-              ImageView(img: item.subject.images?.common, width: 64, height: 64, type: .subject)
+            HStack(alignment: .top) {
+              ImageView(img: item.subject.images?.common, width: 60, height: 60, type: .subject)
               VStack(alignment: .leading) {
-                Text(item.subject.name)
-                  .font(.callout)
-                  .foregroundStyle(.linkText)
-                  .lineLimit(1)
-                Text(item.subject.nameCN)
-                  .font(.footnote)
-                  .foregroundStyle(.secondary)
-                  .lineLimit(1)
-                HStack {
-                  Image(systemName: item.subject.type.icon)
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-                  HStack {
-                    ForEach(item.positions) { position in
-                      HStack {
-                        BorderView {
-                          Text(position.type.cn).font(.caption)
-                        }
-                      }
-                      .foregroundStyle(.secondary)
+                VStack(alignment: .leading) {
+                  Text(item.subject.name)
+                    .font(.callout)
+                    .foregroundStyle(.linkText)
+                    .lineLimit(1)
+                  if item.subject.nameCN.isEmpty {
+                    Label(item.subject.type.description, systemImage: item.subject.type.icon)
                       .lineLimit(1)
+                      .font(.footnote)
+                      .foregroundStyle(.secondary)
+                  } else {
+                    Label(item.subject.nameCN, systemImage: item.subject.type.icon)
+                      .lineLimit(1)
+                      .font(.footnote)
+                      .foregroundStyle(.secondary)
+                  }
+                  Text(item.subject.info)
+                    .font(.caption)
+                    .lineLimit(1)
+                    .foregroundStyle(.secondary)
+                  Divider()
+                }.frame(height: 60)
+                HFlow {
+                  ForEach(item.positions) { position in
+                    HStack {
+                      BorderView {
+                        Text(position.type.cn).font(.caption)
+                      }
                     }
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
                   }
                 }
-              }.padding(.leading, 4)
+              }
               Spacer()
             }
           }

@@ -53,6 +53,7 @@ struct PersonCastItemView: View {
               )
             }.frame(minHeight: 40)
           }.buttonStyle(.plain)
+          Divider()
         }
       }
 

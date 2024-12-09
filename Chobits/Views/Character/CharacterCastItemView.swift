@@ -22,18 +22,17 @@ struct CharacterCastItemView: View {
           Text(item.subject.name)
             .font(.footnote)
             .foregroundStyle(.linkText)
-            .lineLimit(2)
-          Spacer()
-        }.buttonStyle(.plain)
-        HStack {
-          Image(systemName: item.subject.type.icon)
-          Text(item.subject.nameCN)
             .lineLimit(1)
           Spacer()
-        }
-        .font(.footnote)
-        .foregroundStyle(.secondary)
-        Spacer()
+        }.buttonStyle(.plain)
+        Label(item.subject.nameCN, systemImage: item.subject.type.icon)
+          .lineLimit(1)
+          .font(.footnote)
+          .foregroundStyle(.secondary)
+        Text(item.subject.info)
+          .font(.caption)
+          .lineLimit(1)
+          .foregroundStyle(.secondary)
       }
 
       VStack(alignment: .trailing) {
