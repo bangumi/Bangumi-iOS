@@ -53,40 +53,42 @@ struct ChiiTimelineView: View {
       }
     }
     .toolbar {
-      if isAuthenticated {
-        if let me = profile {
-          ToolbarItem(placement: .topBarLeading) {
-            HStack {
-              ImageView(img: me.avatar?.medium, width: 32, height: 32)
-              VStack(alignment: .leading) {
-                Text("\(me.nickname)")
-                  .font(.callout)
-                  .lineLimit(1)
-                //                Text(me.group.description)
-                //                  .font(.caption)
-                //                  .foregroundStyle(.secondary)
+      if UIDevice.current.userInterfaceIdiom == .phone {
+        if isAuthenticated {
+          if let me = profile {
+            ToolbarItem(placement: .topBarLeading) {
+              HStack {
+                ImageView(img: me.avatar?.medium, width: 32, height: 32)
+                VStack(alignment: .leading) {
+                  Text("\(me.nickname)")
+                    .font(.callout)
+                    .lineLimit(2)
+                  // Text(me.group.description)
+                  //   .font(.caption)
+                  //   .foregroundStyle(.secondary)
+                }
               }
+            }
+          } else {
+            ToolbarItem(placement: .topBarLeading) {
+              ProgressView().onAppear(perform: updateProfile)
             }
           }
         } else {
           ToolbarItem(placement: .topBarLeading) {
-            ProgressView().onAppear(perform: updateProfile)
+            ImageView(img: nil, width: 32, height: 32, type: .avatar)
           }
         }
-      } else {
-        ToolbarItem(placement: .topBarLeading) {
-          ImageView(img: nil, width: 32, height: 32, type: .avatar)
-        }
-      }
-      ToolbarItem(placement: .topBarTrailing) {
-        HStack {
-          if isAuthenticated, !isolationMode {
-            NavigationLink(value: NavDestination.notice) {
-              Image(systemName: hasUnreadNotice ? "bell.badge.fill" : "bell")
+        ToolbarItem(placement: .topBarTrailing) {
+          HStack {
+            if isAuthenticated, !isolationMode {
+              NavigationLink(value: NavDestination.notice) {
+                Image(systemName: hasUnreadNotice ? "bell.badge.fill" : "bell")
+              }
             }
-          }
-          NavigationLink(value: NavDestination.setting) {
-            Image(systemName: "gearshape")
+            NavigationLink(value: NavDestination.setting) {
+              Image(systemName: "gearshape")
+            }
           }
         }
       }

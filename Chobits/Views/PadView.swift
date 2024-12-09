@@ -10,8 +10,20 @@ import SwiftUI
 struct PadView: View {
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
 
-  @State private var selectedTab: PadViewTab?
+  @State private var selectedTab: PadViewTab? = .discover
   @State private var columns: NavigationSplitViewVisibility = .all
+
+  @State private var profile: User?
+
+  func updateProfile() {
+    Task {
+      do {
+        profile = try await Chii.shared.getProfile()
+      } catch {
+        Notifier.shared.alert(error: error)
+      }
+    }
+  }
 
   init() {
     let defaultTab = UserDefaults.standard.string(forKey: "defaultTab") ?? "discover"
@@ -22,22 +34,55 @@ struct PadView: View {
     NavigationSplitView(columnVisibility: $columns) {
       List(selection: $selectedTab) {
         Section {
+          if isAuthenticated {
+            if let me = profile {
+              HStack {
+                ImageView(img: me.avatar?.medium, width: 32, height: 32)
+                VStack(alignment: .leading) {
+                  Text("\(me.nickname)")
+                    .font(.callout)
+                    .lineLimit(2)
+                  // Text(me.group.description)
+                  //   .font(.caption)
+                  //   .foregroundStyle(.secondary)
+                }
+                Spacer()
+              }
+            } else {
+              ProgressView().onAppear(perform: updateProfile)
+            }
+          } else {
+            HStack {
+              ImageView(img: nil, width: 32, height: 32, type: .avatar)
+              Text("未登录")
+                .font(.callout)
+                .lineLimit(2)
+                .foregroundStyle(.secondary)
+              Spacer()
+            }
+          }
+        }
+
+        Section {
           ForEach(PadViewTab.mainTabs, id: \.self) { tab in
             Label(tab.title, systemImage: tab.icon)
           }
         }
         if isAuthenticated {
-          Section {
+          Section("我的") {
             ForEach(PadViewTab.userTabs, id: \.self) { tab in
               Label(tab.title, systemImage: tab.icon)
             }
           }
         }
-        Section {
+
+        Section("其他") {
           ForEach(PadViewTab.otherTabs, id: \.self) { tab in
             Label(tab.title, systemImage: tab.icon)
           }
         }
+
+        Spacer()
       }.navigationSplitViewColumnWidth(min: 160, ideal: 200, max: 240)
     } detail: {
       NavigationStack {
