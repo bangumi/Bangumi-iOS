@@ -37,12 +37,12 @@ struct SubjectRelationsView: View {
         let relationResp = try await Chii.shared.getSubjectRelations(subjectId, limit: 10)
         relations.append(contentsOf: relationResp.data)
 
-        var relationIds: [Int] = []
-        relationIds.append(contentsOf: relations.map { $0.subject.id })
-        relationIds.append(contentsOf: offprints.map { $0.subject.id })
+        var relationIDs: [Int] = []
+        relationIDs.append(contentsOf: relations.map { $0.subject.id })
+        relationIDs.append(contentsOf: offprints.map { $0.subject.id })
         let collectionDescriptor = FetchDescriptor<UserSubjectCollection>(
           predicate: #Predicate<UserSubjectCollection> {
-            relationIds.contains($0.subjectId)
+            relationIDs.contains($0.subjectId)
           })
         let collects = try modelContext.fetch(collectionDescriptor)
         for collection in collects {

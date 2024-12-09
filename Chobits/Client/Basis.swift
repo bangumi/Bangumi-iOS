@@ -250,7 +250,7 @@ enum CollectionType: Int, Codable, Identifiable, CaseIterable {
     case .collect:
       return "checkmark"
     case .do:
-      return "eye"
+      return "eyes"
     case .onHold:
       return "hourglass"
     case .dropped:

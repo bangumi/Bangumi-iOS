@@ -72,9 +72,24 @@ struct ProgressRowView: View {
   }
 
   var body: some View {
-    VStack(alignment: .leading) {
+    VStack(alignment: .leading, spacing: 4) {
       HStack {
-        ImageView(img: collection.subject?.images?.common, width: 72, height: 96, type: .subject)
+        if collection.priv {
+          ImageView(
+            img: collection.subject?.images?.common,
+            width: 72, height: 72, type: .subject, overlay: .badge
+          ) {
+            Image(systemName: "lock")
+              .padding(2)
+              .background(.red.opacity(0.8))
+              .padding(2)
+              .foregroundStyle(.white)
+              .font(.caption)
+              .clipShape(Capsule())
+          }
+        } else {
+          ImageView(img: collection.subject?.images?.common, width: 72, height: 72, type: .subject)
+        }
         VStack(alignment: .leading) {
           Text(collection.subject?.name ?? "")
             .font(.headline)
@@ -124,18 +139,6 @@ struct ProgressRowView: View {
                 .font(.callout)
             }
           }
-
-          Spacer()
-          HStack {
-            Text(collection.updatedAt.formatRelative)
-              .lineLimit(1)
-            Spacer()
-            if collection.priv {
-              Image(systemName: "lock.fill")
-            }
-          }
-          .font(.footnote)
-          .foregroundStyle(.secondary)
         }
       }
 

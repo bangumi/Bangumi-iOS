@@ -119,7 +119,7 @@ struct CollectionListView: View {
           }
           ScrollView {
             LazyVStack(alignment: .leading, spacing: 10) {
-              ForEach(collections, id: \.idx) { item in
+              ForEach(collections, id: \.inner) { item in
                 NavigationLink(value: NavDestination.subject(subjectId: item.inner.subjectId)) {
                   CollectionRowView(subjectId: item.inner.subjectId)
                 }

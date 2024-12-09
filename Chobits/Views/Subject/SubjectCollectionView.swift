@@ -39,7 +39,7 @@ struct SubjectCollectionView: View {
             Spacer()
             if let collection = subject.userCollection {
               if collection.priv {
-                Image(systemName: "lock.fill").foregroundStyle(.secondary)
+                Image(systemName: "lock")
               }
               Label(collection.message, systemImage: collection.typeEnum.icon)
               StarsView(score: Float(collection.rate), size: 16)

@@ -70,12 +70,12 @@ enum NavDestination: Hashable, View {
   }
 }
 
-struct EnumerateItem<T: Equatable>: Equatable, Identifiable {
+struct EnumerateItem<T: Equatable & Identifiable>: Equatable, Identifiable {
   var idx: Int
   var inner: T
 
-  var id: Int {
-    idx
+  var id: T.ID {
+    inner.id
   }
 
   static func == (lhs: EnumerateItem<T>, rhs: EnumerateItem<T>) -> Bool {

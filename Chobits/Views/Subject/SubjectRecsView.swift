@@ -12,9 +12,12 @@ import SwiftUI
 struct SubjectRecsView: View {
   let subjectId: Int
 
+  @Environment(\.modelContext) var modelContext
+
   @State private var loaded: Bool = false
   @State private var loading: Bool = false
   @State private var recs: [SubjectRecDTO] = []
+  @State private var collections: [Int: CollectionType] = [:]
 
   func load() {
     if loading || loaded {
@@ -25,6 +28,17 @@ struct SubjectRecsView: View {
       do {
         let resp = try await Chii.shared.getSubjectRecs(subjectId, limit: 10)
         recs.append(contentsOf: resp.data)
+
+        var subjectIDs: [Int] = []
+        subjectIDs.append(contentsOf: resp.data.map { $0.subject.id })
+        let collectionDescriptor = FetchDescriptor<UserSubjectCollection>(
+          predicate: #Predicate<UserSubjectCollection> {
+            subjectIDs.contains($0.subjectId)
+          })
+        let collects = try modelContext.fetch(collectionDescriptor)
+        for collection in collects {
+          self.collections[collection.subjectId] = collection.typeEnum
+        }
       } catch {
         Notifier.shared.alert(error: error)
       }
@@ -50,8 +64,23 @@ struct SubjectRecsView: View {
         ForEach(recs) { rec in
           NavigationLink(value: NavDestination.subject(subjectId: rec.subject.id)) {
             VStack {
-              ImageView(
-                img: rec.subject.images?.common, width: 72, height: 96, type: .subject)
+              if let ctype = collections[rec.subject.id] {
+                ImageView(
+                  img: rec.subject.images?.common,
+                  width: 72, height: 96, type: .subject, overlay: .caption
+                ) {
+                  HStack {
+                    Image(systemName: ctype.icon)
+                    Spacer()
+                    Text(ctype.description(type: rec.subject.type))
+                  }.padding(.horizontal, 4)
+                }
+              } else {
+                ImageView(
+                  img: rec.subject.images?.common,
+                  width: 72, height: 96, type: .subject
+                )
+              }
               Text(rec.subject.name)
                 .multilineTextAlignment(.leading)
                 .truncationMode(.middle)

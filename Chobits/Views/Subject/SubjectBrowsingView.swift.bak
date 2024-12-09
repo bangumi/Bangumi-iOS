@@ -499,7 +499,7 @@ struct SubjectBrowsingView: View {
 
         Divider()
 
-        ForEach(subjects, id: \.idx) { item in
+        ForEach(subjects, id: \.inner) { item in
           NavigationLink(value: NavDestination.subject(subjectId: item.inner)) {
             SubjectLargeRowView(subjectId: item.inner)
               .onAppear {
