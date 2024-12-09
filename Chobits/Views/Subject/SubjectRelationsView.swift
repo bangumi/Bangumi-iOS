@@ -118,10 +118,11 @@ struct SubjectRelationsView: View {
           NavigationLink(value: NavDestination.subject(subjectId: relation.subject.id)) {
             VStack {
               Section {
-                if relation.relation.cn.isEmpty {
-                  Text(relation.subject.type.description)
-                } else {
+                // relation.id==1 -> 改编
+                if relation.relation.id > 1, relation.relation.cn.isEmpty {
                   Text(relation.relation.cn)
+                } else {
+                  Text(relation.subject.type.description)
                 }
               }
               .lineLimit(1)
