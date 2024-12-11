@@ -147,7 +147,9 @@ struct BBCodeView: UIViewRepresentable {
     view.isEditable = false
     view.isSelectable = true
     view.isScrollEnabled = false
-    view.linkTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor(named: "LinkTextColor") ?? UIColor.systemBlue]
+    view.linkTextAttributes = [
+      NSAttributedString.Key.foregroundColor: UIColor(named: "LinkTextColor") ?? UIColor.systemBlue
+    ]
     view.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
     return view
   }
@@ -164,7 +166,8 @@ struct BBCodeView: UIViewRepresentable {
     }
 
     let fixedWidth = uiView.frame.size.width
-    let newSize = uiView.sizeThatFits(CGSize(width: fixedWidth, height: CGFloat.greatestFiniteMagnitude))
+    let newSize = uiView.sizeThatFits(
+      CGSize(width: fixedWidth, height: CGFloat.greatestFiniteMagnitude))
     uiView.frame.size = CGSize(width: max(newSize.width, fixedWidth), height: newSize.height)
     return
   }

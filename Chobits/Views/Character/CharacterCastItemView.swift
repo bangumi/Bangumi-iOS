@@ -9,8 +9,9 @@ struct CharacterCastItemView: View {
         ImageView(
           img: item.subject.images?.common,
           width: 60, height: 60, alignment: .top,
-          type: .subject, overlay: .caption
+          type: .subject
         ) {
+        } caption: {
           Text(item.type.description)
             .font(.caption)
             .foregroundStyle(.white)

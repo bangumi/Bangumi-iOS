@@ -36,7 +36,7 @@ struct NoticeView: View {
       } catch {
         Notifier.shared.alert(error: error)
       }
-      for i in 0 ..< notices.count {
+      for i in 0..<notices.count {
         notices[i].unread = false
       }
       updating = false

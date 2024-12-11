@@ -57,9 +57,9 @@ struct SubjectCharactersView: View {
           NavigationLink(value: NavDestination.character(characterId: item.character.id)) {
             VStack {
               ImageView(
-                img: item.character.images?.medium, width: 60, height: 80, alignment: .top,
-                overlay: .caption
+                img: item.character.images?.medium, width: 60, height: 80, alignment: .top
               ) {
+              } caption: {
                 Text(item.type.description)
                   .foregroundStyle(.white)
                   .lineLimit(1)

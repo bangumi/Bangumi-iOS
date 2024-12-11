@@ -55,10 +55,10 @@ struct SubjectHeaderView: View {
       .multilineTextAlignment(.leading)
       .textSelection(.enabled)
     HStack {
-      if subject.nsfw {
-        ImageView(
-          img: subject.images?.common, width: 120, height: 160, type: .subject, overlay: .badge
-        ) {
+      ImageView(
+        img: subject.images?.common, width: 120, height: 160, type: .subject
+      ) {
+        if subject.nsfw {
           Text("18+")
             .padding(2)
             .background(.red.opacity(0.8))
@@ -67,8 +67,6 @@ struct SubjectHeaderView: View {
             .font(.caption)
             .clipShape(Capsule())
         }
-      } else {
-        ImageView(img: subject.images?.common, width: 120, height: 160, type: .subject)
       }
       VStack(alignment: .leading) {
         HStack {

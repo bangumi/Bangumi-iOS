@@ -15,31 +15,28 @@ enum ImageType: String {
   case avatar
 }
 
-enum ImageOverlayType {
-  case badge
-  case caption
-}
-
-struct ImageView<Overlay: View>: View {
+struct ImageView<ImageBadge: View, ImageCaption: View>: View {
   let img: String?
   let width: CGFloat
   let height: CGFloat
   let alignment: Alignment
   let type: ImageType
-  let overlay: ImageOverlayType?
-  let content: () -> Overlay?
+  let badge: ImageBadge
+  let caption: ImageCaption
 
   init(
     img: String?, width: CGFloat, height: CGFloat, alignment: Alignment = .center,
-    type: ImageType = .common, overlay: ImageOverlayType?, @ViewBuilder content: @escaping () -> Overlay?
+    type: ImageType = .common,
+    @ViewBuilder badge: () -> ImageBadge,
+    @ViewBuilder caption: () -> ImageCaption
   ) {
     self.img = img
     self.width = width
     self.height = height
     self.alignment = alignment
     self.type = type
-    self.overlay = overlay
-    self.content = content
+    self.badge = badge()
+    self.caption = caption()
   }
 
   var imageURL: URL? {
@@ -93,42 +90,41 @@ struct ImageView<Overlay: View>: View {
         }
       }
       .frame(width: width, height: height, alignment: alignment)
-      if let overlay = overlay {
-        switch overlay {
-        case .badge:
-          VStack {
-            HStack {
-              content()
+
+      if ImageCaption.self != EmptyView.self {
+        VStack {
+          Spacer()
+          ZStack {
+            Rectangle()
+              .fill(
+                LinearGradient(
+                  gradient: Gradient(colors: [
+                    Color.black.opacity(0),
+                    Color.black.opacity(0),
+                    Color.black.opacity(0),
+                    Color.black.opacity(0),
+                    Color.black.opacity(0.1),
+                    Color.black.opacity(0.2),
+                    Color.black.opacity(0.3),
+                    Color.black.opacity(0.6),
+                  ]), startPoint: .top, endPoint: .bottom))
+            VStack {
               Spacer()
+              caption
             }
+            .font(.caption)
+            .foregroundStyle(.white)
+            .padding(.bottom, 2)
+          }
+        }
+      }
+      if ImageBadge.self != EmptyView.self {
+        VStack {
+          HStack {
+            badge
             Spacer()
           }
-        case .caption:
-          VStack {
-            Spacer()
-            ZStack {
-              Rectangle()
-                .fill(
-                  LinearGradient(
-                    gradient: Gradient(colors: [
-                      Color.black.opacity(0),
-                      Color.black.opacity(0),
-                      Color.black.opacity(0),
-                      Color.black.opacity(0),
-                      Color.black.opacity(0.1),
-                      Color.black.opacity(0.2),
-                      Color.black.opacity(0.3),
-                      Color.black.opacity(0.6),
-                    ]), startPoint: .top, endPoint: .bottom))
-              VStack {
-                Spacer()
-                content()
-              }
-              .font(.caption)
-              .foregroundStyle(.white)
-              .padding(.bottom, 2)
-            }
-          }
+          Spacer()
         }
       }
     }
@@ -137,40 +133,39 @@ struct ImageView<Overlay: View>: View {
   }
 }
 
-extension ImageView where Overlay == EmptyView {
-  init(img: String?, width: CGFloat, height: CGFloat, alignment: Alignment = .center,
-       type: ImageType = .common) {
+extension ImageView {
+  init(
+    img: String?, width: CGFloat, height: CGFloat, alignment: Alignment = .center,
+    type: ImageType = .common, @ViewBuilder badge: () -> ImageBadge
+  ) where ImageCaption == EmptyView {
     self.init(
       img: img, width: width, height: height, alignment: alignment,
-      type: type, overlay: nil) {}
+      type: type, badge: badge, caption: {})
+  }
+  init(
+    img: String?, width: CGFloat, height: CGFloat, alignment: Alignment = .center,
+    type: ImageType = .common
+  ) where ImageCaption == EmptyView, ImageBadge == EmptyView {
+    self.init(
+      img: img, width: width, height: height, alignment: alignment,
+      type: type, badge: {}, caption: {})
   }
 }
 
 #Preview {
   ScrollView {
     VStack {
-      ImageView(img: "https://lain.bgm.tv/pic/cover/l/5e/39/140534_cUj6H.jpg", width: 60, height: 80, overlay: .caption) {
-        HStack {
-          Text("abc")
-          Spacer()
-          Text("bcd")
-        }.padding(.horizontal, 4)
-      }
-      ImageView(img: "", width: 40, height: 60)
+      ImageView(img: "", width: 60, height: 60, type: .common)
+      ImageView(img: "", width: 60, height: 60, type: .subject)
       ImageView(img: "", width: 60, height: 60, type: .avatar)
-      ImageView(img: "https://lain.bgm.tv/pic/cover/l/5e/39/140534_cUj6H.jpg", width: 60, height: 60, alignment: .top)
-      ImageView(img: "", width: 80, height: 80, type: .subject)
-      ImageView(img: "https://lain.bgm.tv/pic/cover/l/5e/39/140534_cUj6H.jpg", width: 120, height: 160, overlay: .caption) {
-        HStack {
-          Text("abc")
-          Spacer()
-          Text("bcd")
-        }.padding(.horizontal, 4)
-      }
-      ImageView(img: "", width: 120, height: 160, overlay: .caption) {
-        Text("abc")
-      }
-      ImageView(img: "https://lain.bgm.tv/pic/cover/l/5e/39/140534_cUj6H.jpg", width: 60, height: 90, overlay: .badge) {
+      ImageView(img: "", width: 60, height: 60, type: .person)
+      ImageView(img: "", width: 40, height: 60)
+      ImageView(
+        img: "https://lain.bgm.tv/pic/cover/l/5e/39/140534_cUj6H.jpg", width: 60, height: 60,
+        alignment: .top)
+      ImageView(
+        img: "https://lain.bgm.tv/pic/cover/l/5e/39/140534_cUj6H.jpg", width: 60, height: 90
+      ) {
         Text("18+")
           .padding(2)
           .background(.red.opacity(0.8))
@@ -178,6 +173,27 @@ extension ImageView where Overlay == EmptyView {
           .foregroundStyle(.white)
           .font(.caption)
           .clipShape(Capsule())
+      }
+      ImageView(
+        img: "https://lain.bgm.tv/pic/cover/l/5e/39/140534_cUj6H.jpg", width: 90, height: 120
+      ) {
+        Text("18+")
+          .padding(2)
+          .background(.red.opacity(0.8))
+          .padding(2)
+          .foregroundStyle(.white)
+          .font(.caption)
+          .clipShape(Capsule())
+      } caption: {
+        HStack {
+          Text("abc")
+          Spacer()
+          Text("bcd")
+        }.padding(.horizontal, 4)
+      }
+      ImageView(img: "", width: 60, height: 80) {
+      } caption: {
+        Text("abc")
       }
     }.padding()
   }

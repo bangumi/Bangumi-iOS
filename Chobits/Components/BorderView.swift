@@ -35,7 +35,7 @@ struct BorderView<Content: View>: View {
             .inset(by: 1)
             .stroke(color, lineWidth: 1)
         }
-    }.padding(-padding+1)
+    }.padding(-padding + 1)
   }
 }
 

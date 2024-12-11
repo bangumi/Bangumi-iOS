@@ -73,8 +73,9 @@ struct SubjectRelationsView: View {
                 if let ctype = collections[offprint.subject.id] {
                   ImageView(
                     img: offprint.subject.images?.common,
-                    width: 60, height: 80, type: .subject, overlay: .caption
+                    width: 60, height: 80, type: .subject
                   ) {
+                  } caption: {
                     HStack {
                       Image(systemName: ctype.icon)
                       Spacer()
@@ -127,24 +128,19 @@ struct SubjectRelationsView: View {
               }
               .lineLimit(1)
               .font(.caption)
-
-              if let ctype = collections[relation.subject.id] {
-                ImageView(
-                  img: relation.subject.images?.common,
-                  width: 90, height: 120,
-                  type: .subject, overlay: .caption
-                ) {
+              ImageView(
+                img: relation.subject.images?.common,
+                width: 90, height: 120,
+                type: .subject
+              ) {
+              } caption: {
+                if let ctype = collections[relation.subject.id] {
                   HStack {
                     Image(systemName: ctype.icon)
                     Spacer()
                     Text(ctype.description(relation.subject.type))
                   }.padding(.horizontal, 4)
                 }
-              } else {
-                ImageView(
-                  img: relation.subject.images?.common,
-                  width: 90, height: 120, type: .subject
-                )
               }
               Text(relation.subject.name)
                 .font(.caption)

@@ -44,8 +44,9 @@ struct SubjectCharacterListView: View {
             NavigationLink(value: NavDestination.character(characterId: item.character.id)) {
               ImageView(
                 img: item.character.images?.medium,
-                width: 60, height: 90, alignment: .top, overlay: .caption
+                width: 60, height: 90, alignment: .top
               ) {
+              } caption: {
                 Text(item.type.description)
                   .font(.caption)
                   .foregroundStyle(.white)

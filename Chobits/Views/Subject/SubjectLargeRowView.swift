@@ -31,10 +31,10 @@ struct SubjectLargeRowView: View {
 
   var body: some View {
     HStack {
-      if subject?.nsfw ?? false {
-        ImageView(
-          img: subject?.images?.common, width: 90, height: 120, type: .subject, overlay: .badge
-        ) {
+      ImageView(
+        img: subject?.images?.common, width: 90, height: 120, type: .subject
+      ) {
+        if subject?.nsfw ?? false {
           Text("18+")
             .padding(2)
             .background(.red.opacity(0.8))
@@ -43,10 +43,7 @@ struct SubjectLargeRowView: View {
             .font(.caption)
             .clipShape(Capsule())
         }
-      } else {
-        ImageView(img: subject?.images?.common, width: 90, height: 120, type: .subject)
       }
-
       VStack(alignment: .leading) {
         // title
         HStack {

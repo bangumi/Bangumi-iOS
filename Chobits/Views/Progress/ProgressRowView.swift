@@ -74,11 +74,11 @@ struct ProgressRowView: View {
   var body: some View {
     VStack(alignment: .leading, spacing: 4) {
       HStack {
-        if collection.priv {
-          ImageView(
-            img: collection.subject?.images?.common,
-            width: 72, height: 72, type: .subject, overlay: .badge
-          ) {
+        ImageView(
+          img: collection.subject?.images?.common,
+          width: 72, height: 72, type: .subject
+        ) {
+          if collection.priv {
             Image(systemName: "lock")
               .padding(2)
               .background(.red.opacity(0.8))
@@ -87,8 +87,6 @@ struct ProgressRowView: View {
               .font(.caption)
               .clipShape(Capsule())
           }
-        } else {
-          ImageView(img: collection.subject?.images?.common, width: 72, height: 72, type: .subject)
         }
         VStack(alignment: .leading) {
           Text(collection.subject?.name ?? "")
