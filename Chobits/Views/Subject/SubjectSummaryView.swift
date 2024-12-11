@@ -28,12 +28,11 @@ struct SubjectSummaryView: View {
               Text(tag)
                 .font(.footnote)
                 .lineLimit(1)
-            }
+            }.padding(1)
           }
         }
       }
-      Text(subject.summary)
-        .font(.footnote)
+      Text(subject.summary.bbcode)
         .multilineTextAlignment(.leading)
         .lineLimit(5)
         .sheet(isPresented: $showSummary) {
@@ -54,7 +53,7 @@ struct SubjectSummaryView: View {
                 }
               }.animation(.default, value: tags)
               Divider()
-              BBCodeView(code:subject.summary)
+              BBCodeView(subject.summary)
               Divider()
             }.padding()
           }

@@ -122,35 +122,32 @@ struct CharacterView: View {
             }.frame(height: 160)
 
             /// summary
-            Section {
-              Text(character.summary)
-                .font(.footnote)
-                .padding(.bottom, 16)
-                .multilineTextAlignment(.leading)
-                .lineLimit(5)
-                .sheet(isPresented: $showSummary) {
-                  ScrollView {
-                    LazyVStack(alignment: .leading) {
-                      BBCodeView(code: character.summary)
-                      Divider()
-                    }.padding()
+            Text(character.summary.bbcode)
+              .padding(.bottom, 16)
+              .multilineTextAlignment(.leading)
+              .lineLimit(5)
+              .sheet(isPresented: $showSummary) {
+                ScrollView {
+                  LazyVStack(alignment: .leading) {
+                    BBCodeView(character.summary)
+                    Divider()
+                  }.padding()
+                }
+              }
+              .overlay(
+                GeometryReader { geometry in
+                  if shouldShowToggle(geometry, font: .footnote) {
+                    Button(action: {
+                      showSummary.toggle()
+                    }) {
+                      Text("more...")
+                        .font(.caption)
+                        .foregroundStyle(.linkText)
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
                   }
                 }
-                .overlay(
-                  GeometryReader { geometry in
-                    if shouldShowToggle(geometry, font: .footnote) {
-                      Button(action: {
-                        showSummary.toggle()
-                      }) {
-                        Text("more...")
-                          .font(.caption)
-                          .foregroundStyle(.linkText)
-                      }
-                      .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
-                    }
-                  }
-                )
-            }
+              )
 
             /// casts
             CharacterCastsView(characterId: characterId)

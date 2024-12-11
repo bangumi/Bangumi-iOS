@@ -143,35 +143,32 @@ struct PersonView: View {
             .padding(.bottom, 8)
 
             /// summary
-            Section {
-              Text(person.summary)
-                .font(.footnote)
-                .padding(.bottom, 16)
-                .multilineTextAlignment(.leading)
-                .lineLimit(5)
-                .sheet(isPresented: $showSummary) {
-                  ScrollView {
-                    LazyVStack(alignment: .leading) {
-                      BBCodeView(code: person.summary)
-                      Divider()
-                    }.padding()
+            Text(person.summary.bbcode)
+              .padding(.bottom, 16)
+              .multilineTextAlignment(.leading)
+              .lineLimit(5)
+              .sheet(isPresented: $showSummary) {
+                ScrollView {
+                  LazyVStack(alignment: .leading) {
+                    BBCodeView(person.summary)
+                    Divider()
+                  }.padding()
+                }
+              }
+              .overlay(
+                GeometryReader { geometry in
+                  if shouldShowToggle(geometry, font: .footnote) {
+                    Button(action: {
+                      showSummary.toggle()
+                    }) {
+                      Text("more...")
+                        .font(.caption)
+                        .foregroundStyle(.linkText)
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
                   }
                 }
-                .overlay(
-                  GeometryReader { geometry in
-                    if shouldShowToggle(geometry, font: .footnote) {
-                      Button(action: {
-                        showSummary.toggle()
-                      }) {
-                        Text("more...")
-                          .font(.caption)
-                          .foregroundStyle(.linkText)
-                      }
-                      .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
-                    }
-                  }
-                )
-            }
+              )
 
             /// casts
             PersonCastsView(personId: personId)

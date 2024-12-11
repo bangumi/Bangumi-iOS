@@ -9,6 +9,62 @@ import BBCode
 import SwiftUI
 import WebKit
 
+func BBCodeToHTML(code: String) -> String {
+  guard let body = try? BBCode().parse(bbcode: code) else {
+    return code
+  }
+  let html = """
+    <!doctype html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name='viewport' content='width=device-width, shrink-to-fit=YES' initial-scale='1.0' maximum-scale='1.0' minimum-scale='1.0' user-scalable='no'>
+        <style type="text/css">
+          :root {
+            color-scheme: light dark;
+          }
+          li:last-child {
+            margin-bottom: 1em;
+          }
+          pre code {
+            border: 1px solid #EEE;
+            border-radius: 0.5em;
+            padding: 1em;
+            display: block;
+            overflow: auto;
+          }
+          blockquote {
+            display: inline-block;
+            color: #666;
+          }
+          blockquote:before {
+            content: open-quote;
+            display: inline;
+            line-height: 0;
+            position: relative;
+            left: -0.5em;
+            color: #CCC;
+            font-size: 1em;
+          }
+          blockquote:after {
+            content: close-quote;
+            display: inline;
+            line-height: 0;
+            position: relative;
+            left: 0.5em;
+            color: #CCC;
+            font-size: 1em;
+          }
+        </style>
+      </head>
+      <body>
+        \(body)
+      </body>
+      </html>
+    """
+  return html
+}
+
 class BBCodeWebView: WKWebView {
   static let pool = WKProcessPool()
 
@@ -46,60 +102,12 @@ extension BBCodeWebView: WKNavigationDelegate {
 struct BBCodeView: UIViewRepresentable {
   let code: String
 
+  init(_ code: String) {
+    self.code = code
+  }
+
   var htmlString: String {
-    guard let body = try? BBCode().parse(bbcode: code) else {
-      return code
-    }
-    let html = """
-      <!doctype html>
-        <html>
-        <head>
-          <meta charset="utf-8">
-          <meta name='viewport' content='width=device-width, shrink-to-fit=YES' initial-scale='1.0' maximum-scale='1.0' minimum-scale='1.0' user-scalable='no'>
-          <style type="text/css">
-            :root {
-              color-scheme: light dark;
-            }
-            li:last-child {
-              margin-bottom: 1em;
-            }
-            pre code {
-              border: 1px solid #EEE;
-              border-radius: 0.5em;
-              padding: 1em;
-              display: block;
-              overflow: auto;
-            }
-            blockquote {
-              display: inline-block;
-              color: #666;
-            }
-            blockquote:before {
-              content: open-quote;
-              display: inline;
-              line-height: 0;
-              position: relative;
-              left: -0.5em;
-              color: #CCC;
-              font-size: 1em;
-            }
-            blockquote:after {
-              content: close-quote;
-              display: inline;
-              line-height: 0;
-              position: relative;
-              left: 0.5em;
-              color: #CCC;
-              font-size: 1em;
-            }
-          </style>
-        </head>
-        <body>
-          \(body)
-        </body>
-        </html>
-      """
-    return html
+    BBCodeToHTML(code: code)
   }
 
   func makeUIView(context: Context) -> WKWebView {
@@ -111,29 +119,43 @@ struct BBCodeView: UIViewRepresentable {
   }
 }
 
+extension String {
+  var bbcode: AttributedString {
+    let code = BBCodeToHTML(code: self)
+    guard let attr = try? NSAttributedString(
+      data: Data(code.utf8),
+      options: [.documentType: NSAttributedString.DocumentType.html],
+      documentAttributes: nil) else {
+      return AttributedString(self)
+    }
+    return AttributedString(attr)
+  }
+}
+
 #Preview {
+  let example = """
+    我是[b]粗体字[/b]
+    我是[i]斜体字[/i]
+    我是[u]下划线文字[/u]
+    我是[s]删除线文字[/s]
+    [center]居中文字[/center]
+    [left]居左文字[/left]
+    [right]居右文字[/right]
+    我是[mask]马赛克文字[/mask]
+    我是[color=red]彩[/color][color=green]色[/color][color=blue]的[/color][color=orange]哟[/color]
+    [size=10]不同[/size][size=14]大小的[/size][size=18]文字[/size]效果也可实现
+    Bangumi 番组计划: [url]https://chii.in/[/url]
+    带文字说明的网站链接：[url=https://chii.in]Bangumi 番组计划[/url]
+    存放于其他网络服务器的图片：[img]https://chii.in/img/ico/bgm88-31.gif[/img]
+    代码片段：[code]print("Hello, World!")[/code]
+    [quote]引用的片段[/quote]
+    (bgm38)
+    """
   ScrollView {
     Divider()
-    BBCodeView(
-      code: """
-        我是[b]粗体字[/b]
-        我是[i]斜体字[/i]
-        我是[u]下划线文字[/u]
-        我是[s]删除线文字[/s]
-        [center]居中文字[/center]
-        [left]居左文字[/left]
-        [right]居右文字[/right]
-        我是[mask]马赛克文字[/mask]
-        我是[color=red]彩[/color][color=green]色[/color][color=blue]的[/color][color=orange]哟[/color]
-        [size=10]不同[/size][size=14]大小的[/size][size=18]文字[/size]效果也可实现
-        Bangumi 番组计划: [url]https://chii.in/[/url]
-        带文字说明的网站链接：[url=https://chii.in]Bangumi 番组计划[/url]
-        存放于其他网络服务器的图片：[img]https://chii.in/img/ico/bgm88-31.gif[/img]
-        代码片段：[code]print("Hello, World!")[/code]
-        [quote]引用的片段[/quote]
-        (bgm38)
-        """
-    ).padding()
+    Text(example.bbcode).padding()
+    Divider()
+    BBCodeView(example).padding()
     Divider()
   }
 }
