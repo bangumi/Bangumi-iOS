@@ -30,6 +30,10 @@ func BBCodeToHTML(code: String, textSize: Int) -> String {
           li:last-child {
             margin-bottom: 1em;
           }
+          a {
+            color: #0084B4;
+            text-decoration: none;
+          }
           pre code {
             border: 1px solid #EEE;
             border-radius: 0.5em;
@@ -143,7 +147,7 @@ struct BBCodeView: UIViewRepresentable {
     view.isEditable = false
     view.isSelectable = true
     view.isScrollEnabled = false
-    view.linkTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.blue]
+    view.linkTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor(named: "LinkTextColor") ?? UIColor.systemBlue]
     view.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
     return view
   }
@@ -189,8 +193,8 @@ struct BBCodeView: UIViewRepresentable {
     传说中性能超强的人型电脑，故事第一话时被人弃置在垃圾场，后被我们的本须和秀树发现，并抱回家。由于开始时唧只会'唧，唧'的这样叫，所以秀树为其取名 '唧'TV版第二话「ちぃでかける」时发现小唧本身并没有安OS，不过因为拥有“学习程式”，所以可以通过对话和教导让她‘成长’起来。
     """
   ScrollView {
-//    Divider()
-//    BBCodeView(example)
+    Divider()
+    BBCodeView(example)
     Divider()
     BBCodeWebView(example)
     Divider()
