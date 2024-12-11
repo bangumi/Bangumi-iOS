@@ -32,10 +32,8 @@ struct SubjectSummaryView: View {
           }
         }
       }
-      Text(subject.summary)
-        .font(.footnote)
-        .multilineTextAlignment(.leading)
-        .lineLimit(5)
+      BBCodeWebView(subject.summary, textSize: 14)
+        .frame(height: 80)
         .sheet(isPresented: $showSummary) {
           ScrollView {
             LazyVStack(alignment: .leading) {
@@ -54,7 +52,7 @@ struct SubjectSummaryView: View {
                 }
               }.animation(.default, value: tags)
               Divider()
-              BBCodeView(subject.summary)
+              BBCodeWebView(subject.summary)
               Divider()
             }.padding()
           }

@@ -143,15 +143,12 @@ struct PersonView: View {
             .padding(.bottom, 8)
 
             /// summary
-            Text(person.summary)
-              .padding(.bottom, 16)
-              .font(.footnote)
-              .multilineTextAlignment(.leading)
-              .lineLimit(5)
+            BBCodeWebView(person.summary, textSize: 14)
+              .frame(height: 80)
               .sheet(isPresented: $showSummary) {
                 ScrollView {
                   LazyVStack(alignment: .leading) {
-                    BBCodeView(person.summary)
+                    BBCodeWebView(person.summary)
                     Divider()
                   }.padding()
                 }

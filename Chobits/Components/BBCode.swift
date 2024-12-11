@@ -9,7 +9,7 @@ import BBCode
 import SwiftUI
 import WebKit
 
-func BBCodeToHTML(code: String) -> String {
+func BBCodeToHTML(code: String, textSize: Int) -> String {
   guard let body = try? BBCode().parse(bbcode: code) else {
     return code
   }
@@ -22,6 +22,10 @@ func BBCodeToHTML(code: String) -> String {
         <style type="text/css">
           :root {
             color-scheme: light dark;
+          }
+          body {
+            font-size: \(textSize)px;
+            font-family: sans-serif;
           }
           li:last-child {
             margin-bottom: 1em;
@@ -65,7 +69,7 @@ func BBCodeToHTML(code: String) -> String {
   return html
 }
 
-class BBCodeWebView: WKWebView {
+class InlineWebView: WKWebView {
   static let pool = WKProcessPool()
 
   init(frame: CGRect) {
@@ -73,7 +77,7 @@ class BBCodeWebView: WKWebView {
     prefs.allowsContentJavaScript = true
     let config = WKWebViewConfiguration()
     config.defaultWebpagePreferences = prefs
-    config.processPool = BBCodeWebView.pool
+    config.processPool = InlineWebView.pool
     super.init(frame: frame, configuration: config)
     self.scrollView.isScrollEnabled = false
     self.scrollView.bounces = false
@@ -89,7 +93,7 @@ class BBCodeWebView: WKWebView {
   }
 }
 
-extension BBCodeWebView: WKNavigationDelegate {
+extension InlineWebView: WKNavigationDelegate {
   func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
     webView.evaluateJavaScript(
       "document.readyState",
@@ -99,19 +103,21 @@ extension BBCodeWebView: WKNavigationDelegate {
   }
 }
 
-struct BBCodeView: UIViewRepresentable {
+struct BBCodeWebView: UIViewRepresentable {
   let code: String
+  let textSize: Int
 
-  init(_ code: String) {
+  init(_ code: String, textSize: Int = 16) {
     self.code = code
+    self.textSize = textSize
   }
 
   var htmlString: String {
-    BBCodeToHTML(code: code)
+    BBCodeToHTML(code: code, textSize: textSize)
   }
 
   func makeUIView(context: Context) -> WKWebView {
-    return BBCodeWebView(frame: .zero)
+    return InlineWebView(frame: .zero)
   }
 
   func updateUIView(_ uiView: WKWebView, context: Context) {
@@ -119,21 +125,45 @@ struct BBCodeView: UIViewRepresentable {
   }
 }
 
-extension String {
-  var bbcode: AttributedString {
-    let code = BBCodeToHTML(code: self)
-    guard let attr = try? NSAttributedString(
-      data: Data(code.utf8),
-      options: [.documentType: NSAttributedString.DocumentType.html],
-      documentAttributes: nil) else {
-      return AttributedString(self)
+struct BBCodeView: UIViewRepresentable {
+  let code: String
+  let textSize: Int
+
+  init(_ code: String, textSize: Int = 16) {
+    self.code = code
+    self.textSize = textSize
+  }
+
+  var htmlString: String {
+    BBCodeToHTML(code: code, textSize: textSize)
+  }
+
+  func makeUIView(context: UIViewRepresentableContext<Self>) -> UITextView {
+    let view = UITextView(frame: .zero)
+    view.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+    return view
+  }
+
+  func updateUIView(_ uiView: UITextView, context: UIViewRepresentableContext<Self>) {
+    let data = Data(self.htmlString.utf8)
+    if let attributedString = try? NSAttributedString(
+      data: data, options: [.documentType: NSAttributedString.DocumentType.html],
+      documentAttributes: nil)
+    {
+      uiView.attributedText = attributedString
+    } else {
+      uiView.text = self.code
     }
-    return AttributedString(attr)
+    uiView.isEditable = false
+    uiView.isSelectable = true
+    uiView.isScrollEnabled = false
+    uiView.linkTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.blue]
   }
 }
 
 #Preview {
   let example = """
+    传说中性能超强的人型电脑，故事第一话时被人弃置在垃圾场，后被我们的本须和秀树发现，并抱回家。由于开始时唧只会'唧，唧'的这样叫，所以秀树为其取名 '唧'TV版第二话「ちぃでかける」时发现小唧本身并没有安OS，不过因为拥有“学习程式”，所以可以通过对话和教导让她‘成长’起来。
     我是[b]粗体字[/b]
     我是[i]斜体字[/i]
     我是[u]下划线文字[/u]
@@ -146,16 +176,21 @@ extension String {
     [size=10]不同[/size][size=14]大小的[/size][size=18]文字[/size]效果也可实现
     Bangumi 番组计划: [url]https://chii.in/[/url]
     带文字说明的网站链接：[url=https://chii.in]Bangumi 番组计划[/url]
-    存放于其他网络服务器的图片：[img]https://chii.in/img/ico/bgm88-31.gif[/img]
     代码片段：[code]print("Hello, World!")[/code]
     [quote]引用的片段[/quote]
-    (bgm38)
+    存放于其他网络服务器的图片：[img]https://chii.in/img/ico/bgm88-31.gif[/img]
+    (bgm38) (bgm24)
+
     """
   ScrollView {
     Divider()
-    Text(example.bbcode)
-    Divider()
     BBCodeView(example)
+    Divider()
+    BBCodeWebView(example)
+    Divider()
+    BBCodeWebView(example)
+    Divider()
+    BBCodeWebView(example)
     Divider()
   }
 }

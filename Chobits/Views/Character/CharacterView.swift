@@ -17,6 +17,7 @@ struct CharacterView: View {
 
   @State private var refreshed: Bool = false
   @State private var showSummary: Bool = false
+  @State private var summaryHeight: CGFloat = 0
   @State private var showInfobox: Bool = false
 
   @Query private var characters: [Character]
@@ -122,33 +123,26 @@ struct CharacterView: View {
             }.frame(height: 160)
 
             /// summary
-            Text(character.summary)
-              .font(.footnote)
-              .padding(.bottom, 16)
-              .multilineTextAlignment(.leading)
-              .lineLimit(5)
+            BBCodeWebView(character.summary, textSize: 14)
+              .frame(height: 80)
               .sheet(isPresented: $showSummary) {
                 ScrollView {
                   LazyVStack(alignment: .leading) {
-                    BBCodeView(character.summary)
+                    BBCodeWebView(character.summary)
                     Divider()
                   }.padding()
                 }
               }
-              .overlay(
-                GeometryReader { geometry in
-                  if shouldShowToggle(geometry, font: .footnote) {
-                    Button(action: {
-                      showSummary.toggle()
-                    }) {
-                      Text("more...")
-                        .font(.caption)
-                        .foregroundStyle(.linkText)
-                    }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
-                  }
-                }
-              )
+            HStack {
+              Spacer()
+              Button(action: {
+                showSummary.toggle()
+              }) {
+                Text("more...")
+                  .font(.caption)
+                  .foregroundStyle(.linkText)
+              }
+            }
 
             /// casts
             CharacterCastsView(characterId: characterId)
