@@ -78,7 +78,7 @@ struct SubjectRelationsView: View {
                     HStack {
                       Image(systemName: ctype.icon)
                       Spacer()
-                      Text(ctype.description(type: offprint.subject.type))
+                      Text(ctype.description(offprint.subject.type))
                     }.padding(.horizontal, 4)
                   }
                 } else {
@@ -137,7 +137,7 @@ struct SubjectRelationsView: View {
                   HStack {
                     Image(systemName: ctype.icon)
                     Spacer()
-                    Text(ctype.description(type: relation.subject.type))
+                    Text(ctype.description(relation.subject.type))
                   }.padding(.horizontal, 4)
                 }
               } else {

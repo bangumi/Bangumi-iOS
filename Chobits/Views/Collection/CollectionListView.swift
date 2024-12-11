@@ -107,7 +107,7 @@ struct CollectionListView: View {
         VStack {
           Picker("Collection Type", selection: $collectionType) {
             ForEach(CollectionType.allTypes()) { ctype in
-              Text("\(ctype.description(type: subjectType))(\(counts[ctype, default: 0]))").tag(
+              Text("\(ctype.description(subjectType))(\(counts[ctype, default: 0]))").tag(
                 ctype)
             }
           }

@@ -109,11 +109,11 @@ struct SubjectHeaderView: View {
         Spacer()
         HStack {
           Text(
-            "\(subject.collection.doing) 人\(CollectionType.do.description(type: subject.typeEnum))"
+            "\(subject.collection.doing) 人\(CollectionType.do.description(subject.typeEnum))"
           )
           Text("/")
           Text(
-            "\(subject.collection.collect) 人\(CollectionType.collect.description(type: subject.typeEnum))"
+            "\(subject.collection.collect) 人\(CollectionType.collect.description(subject.typeEnum))"
           )
           Spacer()
         }

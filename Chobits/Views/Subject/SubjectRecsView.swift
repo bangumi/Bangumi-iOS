@@ -72,7 +72,7 @@ struct SubjectRecsView: View {
                   HStack {
                     Image(systemName: ctype.icon)
                     Spacer()
-                    Text(ctype.description(type: rec.subject.type))
+                    Text(ctype.description(rec.subject.type))
                   }.padding(.horizontal, 4)
                 }
               } else {

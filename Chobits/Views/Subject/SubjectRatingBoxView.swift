@@ -74,27 +74,27 @@ struct SubjectRatingBoxView: View {
         HFlow(alignment: .center, spacing: 2) {
           Section {
             Text("\(subject.collection.wish)人")
-            Text(CollectionType.wish.description(type: subject.typeEnum))
+            Text(CollectionType.wish.description(subject.typeEnum))
           }
           Text("/").foregroundStyle(.secondary).padding(.horizontal, 5)
           Section {
             Text("\(subject.collection.collect)人")
-            Text(CollectionType.collect.description(type: subject.typeEnum))
+            Text(CollectionType.collect.description(subject.typeEnum))
           }
           Text("/").foregroundStyle(.secondary).padding(.horizontal, 5)
           Section {
             Text("\(subject.collection.doing)人")
-            Text(CollectionType.do.description(type: subject.typeEnum))
+            Text(CollectionType.do.description(subject.typeEnum))
           }
           Text("/").foregroundStyle(.secondary).padding(.horizontal, 5)
           Section {
             Text("\(subject.collection.onHold)人")
-            Text(CollectionType.onHold.description(type: subject.typeEnum))
+            Text(CollectionType.onHold.description(subject.typeEnum))
           }
           Text("/").foregroundStyle(.secondary).padding(.horizontal, 5)
           Section {
             Text("\(subject.collection.dropped)人")
-            Text(CollectionType.dropped.description(type: subject.typeEnum))
+            Text(CollectionType.dropped.description(subject.typeEnum))
           }
         }
         .font(.footnote)

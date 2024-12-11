@@ -47,6 +47,7 @@ struct TopicDTO: Codable, Identifiable, Equatable, Hashable {
 struct SubjectCommentDTO: Codable, Identifiable, Equatable, Hashable {
   var comment: String
   var rate: Int
+  var type: CollectionType
   var updatedAt: Int
   var user: User
 

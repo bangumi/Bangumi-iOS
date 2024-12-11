@@ -180,7 +180,7 @@ final class UserSubjectCollectionV1 {
   }
 
   var typeDesc: String {
-    return typeEnum.description(type: SubjectType(subjectType))
+    return typeEnum.description(SubjectType(subjectType))
   }
 
   var message: String {

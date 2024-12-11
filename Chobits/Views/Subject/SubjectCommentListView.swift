@@ -18,6 +18,17 @@ struct SubjectCommentListView: View {
   @State private var loadedIdx: [Int: Bool] = [:]
   @State private var comments: [EnumerateItem<SubjectCommentDTO>] = []
 
+  @Query private var subjects: [Subject]
+  private var subject: Subject? { subjects.first }
+
+  init(subjectId: Int) {
+    self.subjectId = subjectId
+    _subjects = Query(
+      filter: #Predicate<Subject> {
+        $0.subjectId == subjectId
+      })
+  }
+
   func fetch(limit: Int = 20) async -> [EnumerateItem<SubjectCommentDTO>] {
     fetching = true
     do {
@@ -82,10 +93,12 @@ struct SubjectCommentListView: View {
                 if comment.rate > 0 {
                   StarsView(score: Float(comment.rate), size: 10)
                 }
-                Text("@ \(comment.updatedAt.durationDisplay)")
-                  .lineLimit(1)
-                  .font(.caption)
-                  .foregroundStyle(.secondary)
+                Text(
+                  "\(comment.type.description(subject?.typeEnum)) @ \(comment.updatedAt.durationDisplay)"
+                )
+                .lineLimit(1)
+                .font(.caption)
+                .foregroundStyle(.secondary)
                 Spacer()
               }
               Text(comment.comment).font(.footnote)

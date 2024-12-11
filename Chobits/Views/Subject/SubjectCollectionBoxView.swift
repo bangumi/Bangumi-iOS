@@ -102,7 +102,7 @@ struct SubjectCollectionBoxView: View {
 
         Picker("Collection Type", selection: $collectionType) {
           ForEach(CollectionType.allTypes()) { ct in
-            Text("\(ct.description(type: subject.typeEnum))").tag(ct)
+            Text("\(ct.description(subject.typeEnum))").tag(ct)
           }
         }
         .pickerStyle(.segmented)

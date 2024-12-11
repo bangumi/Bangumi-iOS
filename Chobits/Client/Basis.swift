@@ -270,7 +270,7 @@ enum CollectionType: Int, Codable, Identifiable, CaseIterable {
     }
   }
 
-  func description(type: SubjectType?) -> String {
+  func description(_ type: SubjectType?) -> String {
     var action: String
     let type = type ?? .none
     switch type {
@@ -301,7 +301,7 @@ enum CollectionType: Int, Codable, Identifiable, CaseIterable {
 
   func message(type: SubjectType) -> String {
     var text = "我"
-    text += self.description(type: type)
+    text += self.description(type)
     switch type {
     case .book:
       text += "这本书"

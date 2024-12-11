@@ -15,6 +15,17 @@ struct SubjectCommentsView: View {
   @State private var refreshing: Bool = false
   @State private var comments: [SubjectCommentDTO] = []
 
+  @Query private var subjects: [Subject]
+  private var subject: Subject? { subjects.first }
+
+  init(subjectId: Int) {
+    self.subjectId = subjectId
+    _subjects = Query(
+      filter: #Predicate<Subject> {
+        $0.subjectId == subjectId
+      })
+  }
+
   func refresh() {
     if loaded {
       return
@@ -75,10 +86,12 @@ struct SubjectCommentsView: View {
               if comment.rate > 0 {
                 StarsView(score: Float(comment.rate), size: 10)
               }
-              Text("@ \(comment.updatedAt.durationDisplay)")
-                .lineLimit(1)
-                .font(.caption)
-                .foregroundStyle(.secondary)
+              Text(
+                "\(comment.type.description(subject?.typeEnum)) @ \(comment.updatedAt.durationDisplay)"
+              )
+              .lineLimit(1)
+              .font(.caption)
+              .foregroundStyle(.secondary)
               Spacer()
             }
             Text(comment.comment).font(.footnote)
