@@ -62,6 +62,8 @@
 		1998DD052CB11F9C00115E1F /* SubjectCommentsVIew.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1998DD042CB11F9700115E1F /* SubjectCommentsVIew.swift */; };
 		1998DD072CB1222400115E1F /* subject_comments.json in Resources */ = {isa = PBXBuildFile; fileRef = 1998DD062CB1221E00115E1F /* subject_comments.json */; };
 		1998DD092CB122BC00115E1F /* SubjectCommentListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1998DD082CB122B600115E1F /* SubjectCommentListView.swift */; };
+		19B2A70A2D087968001617BE /* BBCode in Frameworks */ = {isa = PBXBuildFile; productRef = 19B2A7092D087968001617BE /* BBCode */; };
+		19B2A7502D092240001617BE /* BBCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19B2A74F2D092240001617BE /* BBCode.swift */; };
 		19B87C252CFB313B00CB5B63 /* user_subject_collection_anime.json in Resources */ = {isa = PBXBuildFile; fileRef = 19B87C242CFB313700CB5B63 /* user_subject_collection_anime.json */; };
 		19B87C272CFB31A600CB5B63 /* user_subject_collection_book.json in Resources */ = {isa = PBXBuildFile; fileRef = 19B87C262CFB319F00CB5B63 /* user_subject_collection_book.json */; };
 		19B9002E2BED15B600405F0F /* PersonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19B9002D2BED15B600405F0F /* PersonView.swift */; };
@@ -80,7 +82,6 @@
 		19E0E5072BF34F0E00066EB7 /* CollectionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19E0E5062BF34F0E00066EB7 /* CollectionsView.swift */; };
 		19ECCDA12CFC21160092F715 /* PageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19ECCDA02CFC21160092F715 /* PageView.swift */; };
 		19ECCDA32CFC74C50092F715 /* user_subject_collections.json in Resources */ = {isa = PBXBuildFile; fileRef = 19ECCDA22CFC74C50092F715 /* user_subject_collections.json */; };
-		19ECCDC82CFC986E0092F715 /* Html.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19ECCDC72CFC986B0092F715 /* Html.swift */; };
 		19ECCDEF2CFD43CD0092F715 /* Wrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19ECCDEE2CFD43CA0092F715 /* Wrapper.swift */; };
 		19ECCE132CFD5B6B0092F715 /* CardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19ECCE122CFD5B6B0092F715 /* CardView.swift */; };
 		19ECCEC12CFF16860092F715 /* SubjectRecsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19ECCEC02CFF167F0092F715 /* SubjectRecsView.swift */; };
@@ -151,6 +152,7 @@
 		1998DD042CB11F9700115E1F /* SubjectCommentsVIew.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubjectCommentsVIew.swift; sourceTree = "<group>"; };
 		1998DD062CB1221E00115E1F /* subject_comments.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = subject_comments.json; sourceTree = "<group>"; };
 		1998DD082CB122B600115E1F /* SubjectCommentListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubjectCommentListView.swift; sourceTree = "<group>"; };
+		19B2A74F2D092240001617BE /* BBCode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BBCode.swift; sourceTree = "<group>"; };
 		19B87C242CFB313700CB5B63 /* user_subject_collection_anime.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = user_subject_collection_anime.json; sourceTree = "<group>"; };
 		19B87C262CFB319F00CB5B63 /* user_subject_collection_book.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = user_subject_collection_book.json; sourceTree = "<group>"; };
 		19B9002D2BED15B600405F0F /* PersonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonView.swift; sourceTree = "<group>"; };
@@ -169,7 +171,6 @@
 		19E0E5062BF34F0E00066EB7 /* CollectionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionsView.swift; sourceTree = "<group>"; };
 		19ECCDA02CFC21160092F715 /* PageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageView.swift; sourceTree = "<group>"; };
 		19ECCDA22CFC74C50092F715 /* user_subject_collections.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = user_subject_collections.json; sourceTree = "<group>"; };
-		19ECCDC72CFC986B0092F715 /* Html.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Html.swift; sourceTree = "<group>"; };
 		19ECCDEE2CFD43CA0092F715 /* Wrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Wrapper.swift; sourceTree = "<group>"; };
 		19ECCE122CFD5B6B0092F715 /* CardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardView.swift; sourceTree = "<group>"; };
 		19ECCEC02CFF167F0092F715 /* SubjectRecsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubjectRecsView.swift; sourceTree = "<group>"; };
@@ -199,6 +200,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				19BD24262BE9C53800595973 /* Kingfisher in Frameworks */,
+				19B2A70A2D087968001617BE /* BBCode in Frameworks */,
 				19671C732BDEB8B1000B4D99 /* KeychainSwift in Frameworks */,
 				1968C5DD2CD5010C00242103 /* Flow in Frameworks */,
 			);
@@ -250,6 +252,7 @@
 			children = (
 				19ECCE122CFD5B6B0092F715 /* CardView.swift */,
 				191CF1A52CC09F1E000EF819 /* BorderView.swift */,
+				19B2A74F2D092240001617BE /* BBCode.swift */,
 				19742A5B2D069AC3008791CC /* InfoboxView.swift */,
 				19ECCDA02CFC21160092F715 /* PageView.swift */,
 				19671C392BDEB55D000B4D99 /* ImageView.swift */,
@@ -380,7 +383,6 @@
 			children = (
 				197A19D92BE6733A00804B13 /* Error.swift */,
 				19F8C3D72BE73B820037D723 /* Navigation.swift */,
-				19ECCDC72CFC986B0092F715 /* Html.swift */,
 				19ECCDEE2CFD43CA0092F715 /* Wrapper.swift */,
 				197A19CA2BE5E59900804B13 /* Logger.swift */,
 				197A19CE2BE5E5E700804B13 /* Notifier.swift */,
@@ -445,6 +447,7 @@
 				19671C722BDEB8B1000B4D99 /* KeychainSwift */,
 				19BD24252BE9C53800595973 /* Kingfisher */,
 				1968C5DC2CD5010C00242103 /* Flow */,
+				19B2A7092D087968001617BE /* BBCode */,
 			);
 			productName = Chobits;
 			productReference = 19BB342B2BD239AB00E5C295 /* Chobits.app */;
@@ -478,6 +481,7 @@
 				191FEF252BDCF59B0047162A /* XCRemoteSwiftPackageReference "keychain-swift" */,
 				19BD24242BE9C53800595973 /* XCRemoteSwiftPackageReference "Kingfisher" */,
 				1968C5DB2CD5010C00242103 /* XCRemoteSwiftPackageReference "SwiftUI-Flow" */,
+				19B2A7082D087968001617BE /* XCRemoteSwiftPackageReference "bangumi-bbcode-swift" */,
 			);
 			productRefGroup = 19BB342C2BD239AB00E5C295 /* Products */;
 			projectDirPath = "";
@@ -550,7 +554,6 @@
 				19742A5C2D069AC3008791CC /* InfoboxView.swift in Sources */,
 				1930110E2C00F08A008DCEBF /* CollectionSubjectTypeView.swift in Sources */,
 				1909F3B42BECF9D100E3B8F0 /* CharacterView.swift in Sources */,
-				19ECCDC82CFC986E0092F715 /* Html.swift in Sources */,
 				19671C5E2BDEB55D000B4D99 /* LoadingView.swift in Sources */,
 				1998DCFD2CB10A5C00115E1F /* SubjectTopicListView.swift in Sources */,
 				19C2CE692BE330F60080A056 /* SubjectCollectionBoxView.swift in Sources */,
@@ -565,6 +568,7 @@
 				19ECCF392CFFDEDC0092F715 /* SubjectStaffListView.swift in Sources */,
 				19671C5B2BDEB55D000B4D99 /* CalendarView.swift in Sources */,
 				1915A89E2BF09E6B003DB76D /* SubjectRelationListView.swift in Sources */,
+				19B2A7502D092240001617BE /* BBCode.swift in Sources */,
 				19ECCF132CFF60430092F715 /* PersonCastListView.swift in Sources */,
 				19ECCF142CFF60430092F715 /* PersonCastsView.swift in Sources */,
 				19ECCF152CFF60430092F715 /* PersonCastItemView.swift in Sources */,
@@ -821,6 +825,14 @@
 				minimumVersion = 2.5.0;
 			};
 		};
+		19B2A7082D087968001617BE /* XCRemoteSwiftPackageReference "bangumi-bbcode-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/everpcpc/bangumi-bbcode-swift";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 		19BD24242BE9C53800595973 /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/onevcat/Kingfisher.git";
@@ -841,6 +853,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 1968C5DB2CD5010C00242103 /* XCRemoteSwiftPackageReference "SwiftUI-Flow" */;
 			productName = Flow;
+		};
+		19B2A7092D087968001617BE /* BBCode */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 19B2A7082D087968001617BE /* XCRemoteSwiftPackageReference "bangumi-bbcode-swift" */;
+			productName = BBCode;
 		};
 		19BD24252BE9C53800595973 /* Kingfisher */ = {
 			isa = XCSwiftPackageProductDependency;
