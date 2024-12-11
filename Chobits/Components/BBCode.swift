@@ -57,6 +57,9 @@ struct BBCodeView: UIViewRepresentable {
           <meta charset="utf-8">
           <meta name='viewport' content='width=device-width, shrink-to-fit=YES' initial-scale='1.0' maximum-scale='1.0' minimum-scale='1.0' user-scalable='no'>
           <style type="text/css">
+            :root {
+              color-scheme: light dark;
+            }
             li:last-child {
               margin-bottom: 1em;
             }
