@@ -153,9 +153,9 @@ extension String {
     """
   ScrollView {
     Divider()
-    Text(example.bbcode).padding()
+    Text(example.bbcode)
     Divider()
-    BBCodeView(example).padding()
+    BBCodeView(example)
     Divider()
   }
 }

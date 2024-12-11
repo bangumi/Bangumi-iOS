@@ -32,7 +32,8 @@ struct SubjectSummaryView: View {
           }
         }
       }
-      Text(subject.summary.bbcode)
+      Text(subject.summary)
+        .font(.footnote)
         .multilineTextAlignment(.leading)
         .lineLimit(5)
         .sheet(isPresented: $showSummary) {

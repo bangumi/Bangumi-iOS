@@ -143,8 +143,9 @@ struct PersonView: View {
             .padding(.bottom, 8)
 
             /// summary
-            Text(person.summary.bbcode)
+            Text(person.summary)
               .padding(.bottom, 16)
+              .font(.footnote)
               .multilineTextAlignment(.leading)
               .lineLimit(5)
               .sheet(isPresented: $showSummary) {

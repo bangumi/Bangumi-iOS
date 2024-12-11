@@ -11,10 +11,9 @@ struct InfoboxView: View {
           Text("\(item.key):").bold()
           VStack(alignment: .leading) {
             ForEach(item.values) { value in
-              HStack {
+              HStack(alignment: .top) {
                 if let k = value.k {
                   Text("\(k):")
-                    .font(.footnote)
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
                 }

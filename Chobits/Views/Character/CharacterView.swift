@@ -122,7 +122,8 @@ struct CharacterView: View {
             }.frame(height: 160)
 
             /// summary
-            Text(character.summary.bbcode)
+            Text(character.summary)
+              .font(.footnote)
               .padding(.bottom, 16)
               .multilineTextAlignment(.leading)
               .lineLimit(5)
