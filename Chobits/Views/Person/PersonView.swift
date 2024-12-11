@@ -86,7 +86,9 @@ struct PersonView: View {
 
             /// header
             HStack(alignment: .top) {
-              ImageView(img: person.images?.medium, width: 120, height: 160, alignment: .top)
+              ImageView(
+                img: person.images?.medium, width: 120, height: 160,
+                alignment: .top, large: person.images?.large)
               VStack(alignment: .leading) {
                 HStack {
                   Image(systemName: person.typeEnum.icon)

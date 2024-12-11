@@ -80,7 +80,20 @@ struct CharacterView: View {
 
             /// header
             HStack(alignment: .top) {
-              ImageView(img: character.images?.medium, width: 120, height: 160, alignment: .top)
+              ImageView(
+                img: character.images?.medium, width: 120, height: 160,
+                alignment: .top, large: character.images?.large
+              ) {
+                if character.nsfw {
+                  Text("18+")
+                    .padding(2)
+                    .background(.red.opacity(0.8))
+                    .padding(2)
+                    .foregroundStyle(.white)
+                    .font(.caption)
+                    .clipShape(Capsule())
+                }
+              }
               VStack(alignment: .leading) {
                 HStack {
                   Image(systemName: character.roleEnum.icon)

@@ -56,7 +56,8 @@ struct SubjectHeaderView: View {
       .textSelection(.enabled)
     HStack {
       ImageView(
-        img: subject.images?.common, width: 120, height: 160, type: .subject
+        img: subject.images?.common, width: 120, height: 160, type: .subject,
+        large: subject.images?.large
       ) {
         if subject.nsfw {
           Text("18+")

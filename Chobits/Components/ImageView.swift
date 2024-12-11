@@ -21,12 +21,13 @@ struct ImageView<ImageBadge: View, ImageCaption: View>: View {
   let height: CGFloat
   let alignment: Alignment
   let type: ImageType
+  let large: String?
   let badge: ImageBadge
   let caption: ImageCaption
 
   init(
-    img: String?, width: CGFloat, height: CGFloat, alignment: Alignment = .center,
-    type: ImageType = .common,
+    img: String?, width: CGFloat = 0, height: CGFloat = 0, alignment: Alignment = .center,
+    type: ImageType = .common, large: String? = nil,
     @ViewBuilder badge: () -> ImageBadge,
     @ViewBuilder caption: () -> ImageCaption
   ) {
@@ -35,6 +36,7 @@ struct ImageView<ImageBadge: View, ImageCaption: View>: View {
     self.height = height
     self.alignment = alignment
     self.type = type
+    self.large = large
     self.badge = badge()
     self.caption = caption()
   }
@@ -88,9 +90,7 @@ struct ImageView<ImageBadge: View, ImageCaption: View>: View {
             Image(systemName: "photo")
           }
         }
-      }
-      .frame(width: width, height: height, alignment: alignment)
-
+      }.frame(width: width, height: height, alignment: alignment)
       if ImageCaption.self != EmptyView.self {
         VStack {
           Spacer()
@@ -116,7 +116,7 @@ struct ImageView<ImageBadge: View, ImageCaption: View>: View {
             .foregroundStyle(.white)
             .padding(.bottom, 2)
           }
-        }
+        }.frame(width: width, height: height, alignment: .bottom)
       }
       if ImageBadge.self != EmptyView.self {
         VStack {
@@ -125,30 +125,53 @@ struct ImageView<ImageBadge: View, ImageCaption: View>: View {
             Spacer()
           }
           Spacer()
-        }
+        }.frame(width: width, height: height, alignment: .top)
       }
     }
-    .frame(width: width, height: height, alignment: .bottom)
+    .contextMenu {
+      if let large = large, let imageURL = URL(string: large) {
+        Button {
+          Task {
+            guard let data = try? await URLSession.shared.data(from: imageURL).0 else { return }
+            guard let img = UIImage(data: data) else { return }
+            UIImageWriteToSavedPhotosAlbum(img, nil, nil, nil)
+          }
+        } label: {
+          Label("保存", systemImage: "square.and.arrow.down")
+        }
+        ShareLink(item: imageURL)
+      }
+    } preview: {
+      if let large = large, !large.isEmpty {
+        KFImage(URL(string: large))
+          .fade(duration: 0.25)
+          .placeholder {
+            ProgressView()
+          }
+          .resizable()
+          .scaledToFit()
+      }
+    }
     .clipShape(RoundedRectangle(cornerRadius: 5))
   }
 }
 
 extension ImageView {
   init(
-    img: String?, width: CGFloat, height: CGFloat, alignment: Alignment = .center,
-    type: ImageType = .common, @ViewBuilder badge: () -> ImageBadge
+    img: String?, width: CGFloat = 0, height: CGFloat = 0, alignment: Alignment = .center,
+    type: ImageType = .common, large: String? = nil, @ViewBuilder badge: () -> ImageBadge
   ) where ImageCaption == EmptyView {
     self.init(
       img: img, width: width, height: height, alignment: alignment,
-      type: type, badge: badge, caption: {})
+      type: type, large: large, badge: badge, caption: {})
   }
   init(
-    img: String?, width: CGFloat, height: CGFloat, alignment: Alignment = .center,
-    type: ImageType = .common
+    img: String?, width: CGFloat = 0, height: CGFloat = 0, alignment: Alignment = .center,
+    type: ImageType = .common, large: String? = nil
   ) where ImageCaption == EmptyView, ImageBadge == EmptyView {
     self.init(
       img: img, width: width, height: height, alignment: alignment,
-      type: type, badge: {}, caption: {})
+      type: type, large: large, badge: {}, caption: {})
   }
 }
 
@@ -161,10 +184,11 @@ extension ImageView {
       ImageView(img: "", width: 60, height: 60, type: .person)
       ImageView(img: "", width: 40, height: 60)
       ImageView(
-        img: "https://lain.bgm.tv/pic/cover/l/5e/39/140534_cUj6H.jpg", width: 60, height: 60,
+        img: "https://lain.bgm.tv/pic/cover/m/5e/39/140534_cUj6H.jpg", width: 60, height: 60,
         alignment: .top)
       ImageView(
-        img: "https://lain.bgm.tv/pic/cover/l/5e/39/140534_cUj6H.jpg", width: 60, height: 90
+        img: "https://lain.bgm.tv/pic/cover/m/5e/39/140534_cUj6H.jpg", width: 60, height: 90,
+        large: "https://lain.bgm.tv/pic/cover/l/5e/39/140534_cUj6H.jpg"
       ) {
         Text("18+")
           .padding(2)
@@ -175,7 +199,7 @@ extension ImageView {
           .clipShape(Capsule())
       }
       ImageView(
-        img: "https://lain.bgm.tv/pic/cover/l/5e/39/140534_cUj6H.jpg", width: 90, height: 120
+        img: "https://lain.bgm.tv/pic/cover/c/5e/39/140534_cUj6H.jpg", width: 90, height: 120
       ) {
         Text("18+")
           .padding(2)
