@@ -13,12 +13,6 @@ import SwiftUI
 struct SubjectSummaryView: View {
   @ObservableModel var subject: Subject
 
-  @State private var showSummary = false
-
-  var tags: [Tag] {
-    return Array(subject.tags.sorted { $0.count > $1.count }.prefix(20))
-  }
-
   var body: some View {
     VStack(alignment: .leading) {
       if subject.metaTags.count > 0 {
@@ -33,40 +27,6 @@ struct SubjectSummaryView: View {
         }
       }
       BBCodeWebView(subject.summary, textSize: 14)
-        .frame(height: 80)
-        .sheet(isPresented: $showSummary) {
-          ScrollView {
-            LazyVStack(alignment: .leading) {
-              HFlow(alignment: .center, spacing: 2) {
-                ForEach(tags, id: \.name) { tag in
-                  BorderView {
-                    HStack {
-                      Text(tag.name)
-                        .font(.footnote)
-                        .lineLimit(1)
-                      Text("\(tag.count)")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                    }
-                  }.padding(1)
-                }
-              }.animation(.default, value: tags)
-              Divider()
-              BBCodeWebView(subject.summary)
-              Divider()
-            }.padding()
-          }
-        }
-      HStack {
-        Spacer()
-        Button(action: {
-          showSummary.toggle()
-        }) {
-          Text("more...")
-            .font(.caption)
-            .foregroundStyle(.linkText)
-        }
-      }
     }.padding(.vertical, 2)
   }
 }

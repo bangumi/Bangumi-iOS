@@ -30,6 +30,10 @@ struct SubjectRatingBoxView: View {
     return data
   }
 
+  var tags: [Tag] {
+    return Array(subject.tags.sorted { $0.count > $1.count }.prefix(20))
+  }
+
   var body: some View {
     GeometryReader { geometry in
       VStack(alignment: .leading) {
@@ -95,6 +99,22 @@ struct SubjectRatingBoxView: View {
         }
         .font(.footnote)
         .padding(.horizontal, 8)
+        HFlow(alignment: .center, spacing: 2) {
+          ForEach(tags, id: \.name) { tag in
+            BorderView {
+              HStack {
+                Text(tag.name)
+                  .font(.footnote)
+                  .lineLimit(1)
+                Text("\(tag.count)")
+                  .font(.caption)
+                  .foregroundStyle(.secondary)
+              }
+            }.padding(1)
+          }
+        }
+        .padding(.horizontal, 8)
+        .animation(.default, value: tags)
         Spacer()
       }
     }.padding()

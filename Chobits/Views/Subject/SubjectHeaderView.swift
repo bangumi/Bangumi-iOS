@@ -140,9 +140,8 @@ struct SubjectHeaderView: View {
             isPresented: $collectionDetail,
             content: {
               SubjectRatingBoxView(subject: subject)
-                .presentationDragIndicator(.visible)
-                .presentationDetents(.init([.medium]))
-            })
+            }
+          )
         } else {
           HStack {
             StarsView(score: 0, size: 12)

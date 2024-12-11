@@ -16,9 +16,6 @@ struct CharacterView: View {
   @AppStorage("isolationMode") var isolationMode: Bool = false
 
   @State private var refreshed: Bool = false
-  @State private var showSummary: Bool = false
-  @State private var summaryHeight: CGFloat = 0
-  @State private var showInfobox: Bool = false
 
   @Query private var characters: [Character]
   private var character: Character? { characters.first }
@@ -124,25 +121,6 @@ struct CharacterView: View {
 
             /// summary
             BBCodeWebView(character.summary, textSize: 14)
-              .frame(height: 80)
-              .sheet(isPresented: $showSummary) {
-                ScrollView {
-                  LazyVStack(alignment: .leading) {
-                    BBCodeWebView(character.summary)
-                    Divider()
-                  }.padding()
-                }
-              }
-            HStack {
-              Spacer()
-              Button(action: {
-                showSummary.toggle()
-              }) {
-                Text("more...")
-                  .font(.caption)
-                  .foregroundStyle(.linkText)
-              }
-            }
 
             /// casts
             CharacterCastsView(characterId: characterId)

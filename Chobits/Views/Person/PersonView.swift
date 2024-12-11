@@ -16,7 +16,6 @@ struct PersonView: View {
   @AppStorage("isolationMode") var isolationMode: Bool = false
 
   @State private var refreshed: Bool = false
-  @State private var showSummary: Bool = false
 
   @Query private var persons: [Person]
   var person: Person? { persons.first }
@@ -144,29 +143,6 @@ struct PersonView: View {
 
             /// summary
             BBCodeWebView(person.summary, textSize: 14)
-              .frame(height: 80)
-              .sheet(isPresented: $showSummary) {
-                ScrollView {
-                  LazyVStack(alignment: .leading) {
-                    BBCodeWebView(person.summary)
-                    Divider()
-                  }.padding()
-                }
-              }
-              .overlay(
-                GeometryReader { geometry in
-                  if shouldShowToggle(geometry, font: .footnote) {
-                    Button(action: {
-                      showSummary.toggle()
-                    }) {
-                      Text("more...")
-                        .font(.caption)
-                        .foregroundStyle(.linkText)
-                    }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
-                  }
-                }
-              )
 
             /// casts
             PersonCastsView(personId: personId)

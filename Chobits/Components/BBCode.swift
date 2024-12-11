@@ -140,6 +140,10 @@ struct BBCodeView: UIViewRepresentable {
 
   func makeUIView(context: UIViewRepresentableContext<Self>) -> UITextView {
     let view = UITextView(frame: .zero)
+    view.isEditable = false
+    view.isSelectable = true
+    view.isScrollEnabled = false
+    view.linkTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.blue]
     view.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
     return view
   }
@@ -154,16 +158,17 @@ struct BBCodeView: UIViewRepresentable {
     } else {
       uiView.text = self.code
     }
-    uiView.isEditable = false
-    uiView.isSelectable = true
-    uiView.isScrollEnabled = false
-    uiView.linkTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.blue]
+
+    let fixedWidth = uiView.frame.size.width
+    let newSize = uiView.sizeThatFits(CGSize(width: fixedWidth, height: CGFloat.greatestFiniteMagnitude))
+    uiView.frame.size = CGSize(width: max(newSize.width, fixedWidth), height: newSize.height)
+    return
   }
+
 }
 
 #Preview {
   let example = """
-    传说中性能超强的人型电脑，故事第一话时被人弃置在垃圾场，后被我们的本须和秀树发现，并抱回家。由于开始时唧只会'唧，唧'的这样叫，所以秀树为其取名 '唧'TV版第二话「ちぃでかける」时发现小唧本身并没有安OS，不过因为拥有“学习程式”，所以可以通过对话和教导让她‘成长’起来。
     我是[b]粗体字[/b]
     我是[i]斜体字[/i]
     我是[u]下划线文字[/u]
@@ -176,19 +181,16 @@ struct BBCodeView: UIViewRepresentable {
     [size=10]不同[/size][size=14]大小的[/size][size=18]文字[/size]效果也可实现
     Bangumi 番组计划: [url]https://chii.in/[/url]
     带文字说明的网站链接：[url=https://chii.in]Bangumi 番组计划[/url]
+    存放于其他网络服务器的图片：[img]https://chii.in/img/ico/bgm88-31.gif[/img]
     代码片段：[code]print("Hello, World!")[/code]
     [quote]引用的片段[/quote]
-    存放于其他网络服务器的图片：[img]https://chii.in/img/ico/bgm88-31.gif[/img]
     (bgm38) (bgm24)
 
+    传说中性能超强的人型电脑，故事第一话时被人弃置在垃圾场，后被我们的本须和秀树发现，并抱回家。由于开始时唧只会'唧，唧'的这样叫，所以秀树为其取名 '唧'TV版第二话「ちぃでかける」时发现小唧本身并没有安OS，不过因为拥有“学习程式”，所以可以通过对话和教导让她‘成长’起来。
     """
   ScrollView {
-    Divider()
-    BBCodeView(example)
-    Divider()
-    BBCodeWebView(example)
-    Divider()
-    BBCodeWebView(example)
+//    Divider()
+//    BBCodeView(example)
     Divider()
     BBCodeWebView(example)
     Divider()
