@@ -10,13 +10,17 @@ import SwiftUI
 import WebKit
 
 class BBCodeWebView: WKWebView {
+  static let pool = WKProcessPool()
+
   init(frame: CGRect) {
     let prefs = WKWebpagePreferences()
     prefs.allowsContentJavaScript = true
     let config = WKWebViewConfiguration()
     config.defaultWebpagePreferences = prefs
+    config.processPool = BBCodeWebView.pool
     super.init(frame: frame, configuration: config)
     self.scrollView.isScrollEnabled = false
+    self.scrollView.bounces = false
     self.navigationDelegate = self
   }
 
@@ -48,7 +52,7 @@ struct BBCodeView: UIViewRepresentable {
     }
     let html = """
       <!doctype html>
-        <html lang="zh-CN">
+        <html>
         <head>
           <meta charset="utf-8">
           <meta name='viewport' content='width=device-width, shrink-to-fit=YES' initial-scale='1.0' maximum-scale='1.0' minimum-scale='1.0' user-scalable='no'>

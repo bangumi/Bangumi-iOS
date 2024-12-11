@@ -54,13 +54,8 @@ struct SubjectSummaryView: View {
                 }
               }.animation(.default, value: tags)
               Divider()
-              Text("简介").font(.title3).padding(.vertical, 10)
-              Text(subject.summary)
-                .textSelection(.enabled)
-                .multilineTextAlignment(.leading)
-                .presentationDragIndicator(.visible)
-                .presentationDetents([.medium, .large])
-              Spacer()
+              BBCodeView(code:subject.summary)
+              Divider()
             }.padding()
           }
         }

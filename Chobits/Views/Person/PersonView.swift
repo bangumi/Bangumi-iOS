@@ -152,13 +152,8 @@ struct PersonView: View {
                 .sheet(isPresented: $showSummary) {
                   ScrollView {
                     LazyVStack(alignment: .leading) {
-                      Text("简介").font(.title3).padding(.vertical, 10)
-                      Text(person.summary)
-                        .textSelection(.enabled)
-                        .multilineTextAlignment(.leading)
-                        .presentationDragIndicator(.visible)
-                        .presentationDetents([.medium, .large])
-                      Spacer()
+                      BBCodeView(code: person.summary)
+                      Divider()
                     }.padding()
                   }
                 }

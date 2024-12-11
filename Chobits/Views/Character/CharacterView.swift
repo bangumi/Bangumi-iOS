@@ -131,13 +131,8 @@ struct CharacterView: View {
                 .sheet(isPresented: $showSummary) {
                   ScrollView {
                     LazyVStack(alignment: .leading) {
-                      Text("简介").font(.title3).padding(.vertical, 10)
-                      Text(character.summary)
-                        .textSelection(.enabled)
-                        .multilineTextAlignment(.leading)
-                        .presentationDragIndicator(.visible)
-                        .presentationDetents([.medium, .large])
-                      Spacer()
+                      BBCodeView(code: character.summary)
+                      Divider()
                     }.padding()
                   }
                 }
