@@ -8,10 +8,12 @@ update_preview_data:
 
 	# subject
 	curl -sSfLo "$(PREVIEW_PATH)/subject_anime.json" https://next.bgm.tv/p1/subjects/12
+	curl -sSfLo "$(PREVIEW_PATH)/subject_anime_episodes.json" https://next.bgm.tv/p1/subjects/12/episodes
 	curl -sSfLo "$(PREVIEW_PATH)/subject_book.json" https://next.bgm.tv/p1/subjects/497
+	curl -sSfLo "$(PREVIEW_PATH)/subject_music.json" https://next.bgm.tv/p1/subjects/4991
+	curl -sSfLo "$(PREVIEW_PATH)/subject_music_episodes.json" https://next.bgm.tv/p1/subjects/4991/episodes
 	curl -sSfLo "$(PREVIEW_PATH)/subject_topics.json" https://next.bgm.tv/p1/subjects/12/topics
 	curl -sSfLo "$(PREVIEW_PATH)/subject_comments.json" https://next.bgm.tv/p1/subjects/12/comments
-	curl -sSfLo "$(PREVIEW_PATH)/subject_episodes.json" https://next.bgm.tv/p1/subjects/12/episodes
 	curl -sSfLo "$(PREVIEW_PATH)/user_subject_collections.json" https://next.bgm.tv/p1/users/$(UID)/collections/subjects
 	curl -sSfLo "$(PREVIEW_PATH)/user_subject_collection_anime.json" https://next.bgm.tv/p1/users/$(UID)/collections/subjects/12
 	curl -sSfLo "$(PREVIEW_PATH)/user_subject_collection_book.json" https://next.bgm.tv/p1/users/$(UID)/collections/subjects/497

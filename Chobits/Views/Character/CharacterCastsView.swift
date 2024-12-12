@@ -31,22 +31,24 @@ struct CharacterCastsView: View {
   }
 
   var body: some View {
-    Divider()
-    HStack {
-      Text("出演作品")
-        .foregroundStyle(casts.count > 0 ? .primary : .secondary)
-        .font(.title3)
-        .onAppear(perform: load)
-      if loading {
-        ProgressView()
+    VStack(spacing: 2) {
+      HStack(alignment: .bottom) {
+        Text("出演作品")
+          .foregroundStyle(casts.count > 0 ? .primary : .secondary)
+          .font(.title3)
+          .onAppear(perform: load)
+        if loading {
+          ProgressView()
+        }
+        Spacer()
+        if casts.count > 0 {
+          NavigationLink(value: NavDestination.characterCastList(characterId: characterId)) {
+            Text("更多出演 »").font(.caption).foregroundStyle(.linkText)
+          }.buttonStyle(.plain)
+        }
       }
-      Spacer()
-      if casts.count > 0 {
-        NavigationLink(value: NavDestination.characterCastList(characterId: characterId)) {
-          Text("更多出演 »").font(.caption).foregroundStyle(.linkText)
-        }.buttonStyle(.plain)
-      }
-    }
+      Divider()
+    }.padding(.top, 5)
     LazyVStack {
       ForEach(casts, id: \.subject.id) { item in
         VStack {

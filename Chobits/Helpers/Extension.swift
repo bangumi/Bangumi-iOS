@@ -73,7 +73,7 @@ extension Date {
 extension Int {
   var dateDisplay: String {
     let date = Date(timeIntervalSince1970: TimeInterval(self))
-    return date.formatted(date: .omitted, time: .shortened)
+    return date.formatted(date: .numeric, time: .omitted)
   }
 
   var datetimeDisplay: String {

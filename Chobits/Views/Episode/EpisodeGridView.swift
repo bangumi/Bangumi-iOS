@@ -44,33 +44,34 @@ struct EpisodeGridView: View {
     _episodeSps = Query(spDescriptor)
   }
 
-  func refresh() async {
+  func refresh() {
     if refreshed { return }
     refreshed = true
 
-    do {
-      try await Chii.shared.loadEpisodes(subjectId)
-    } catch {
-      Notifier.shared.alert(error: error)
+    Task {
+      do {
+        try await Chii.shared.loadEpisodes(subjectId)
+      } catch {
+        Notifier.shared.alert(error: error)
+      }
     }
   }
 
   var body: some View {
-    HStack {
-      if isAuthenticated {
-        Text("观看进度管理:")
-      } else {
-        Text("章节列表:")
-      }
-      Spacer()
-      NavigationLink(value: NavDestination.episodeList(subjectId: subjectId)) {
-        Text("全部章节 »").font(.caption).foregroundStyle(.linkText)
-      }.buttonStyle(.plain)
-    }.onAppear {
-      Task {
-        await refresh()
-      }
-    }
+    VStack(spacing: 2) {
+      HStack(alignment: .bottom) {
+        if isAuthenticated {
+          Text("观看进度管理:")
+        } else {
+          Text("章节列表:")
+        }
+        Spacer()
+        NavigationLink(value: NavDestination.episodeList(subjectId: subjectId)) {
+          Text("全部章节 »").font(.caption).foregroundStyle(.linkText)
+        }.buttonStyle(.plain)
+      }.onAppear(perform: refresh)
+      Divider()
+    }.padding(.top, 5)
     HFlow(alignment: .center, spacing: 2) {
       ForEach(episodeMains) { episode in
         Button {
@@ -136,7 +137,7 @@ struct EpisodeGridView: View {
   let subject = Subject.previewAnime
   container.mainContext.insert(subject)
 
-  let episodes = Episode.previewList
+  let episodes = Episode.previewAnime
   for episode in episodes {
     container.mainContext.insert(episode)
   }

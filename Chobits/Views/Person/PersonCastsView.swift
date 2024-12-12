@@ -24,22 +24,24 @@ struct PersonCastsView: View {
   }
 
   var body: some View {
-    Divider()
-    HStack {
-      Text("最近出演角色")
-        .foregroundStyle(casts.count > 0 ? .primary : .secondary)
-        .font(.title3)
-        .onAppear(perform: load)
-      if loading {
-        ProgressView()
+    VStack(spacing: 2) {
+      HStack(alignment: .bottom) {
+        Text("最近出演角色")
+          .foregroundStyle(casts.count > 0 ? .primary : .secondary)
+          .font(.title3)
+          .onAppear(perform: load)
+        if loading {
+          ProgressView()
+        }
+        Spacer()
+        if casts.count > 0 {
+          NavigationLink(value: NavDestination.personCastList(personId: personId)) {
+            Text("更多角色 »").font(.caption).foregroundStyle(.linkText)
+          }.buttonStyle(.plain)
+        }
       }
-      Spacer()
-      if casts.count > 0 {
-        NavigationLink(value: NavDestination.personCastList(personId: personId)) {
-          Text("更多角色 »").font(.caption).foregroundStyle(.linkText)
-        }.buttonStyle(.plain)
-      }
-    }
+      Divider()
+    }.padding(.top, 5)
     VStack {
       ForEach(casts) { item in
         CardView {

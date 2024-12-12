@@ -170,7 +170,7 @@ struct ProgressRowView: View {
 
   let collection = UserSubjectCollection.previewAnime
   let subject = Subject.previewAnime
-  let episodes = Episode.previewList
+  let episodes = Episode.previewCollections
   container.mainContext.insert(subject)
   container.mainContext.insert(collection)
   collection.subject = subject

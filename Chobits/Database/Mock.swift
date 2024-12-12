@@ -52,6 +52,11 @@ extension Subject {
     let item = loadFixture(fixture: "subject_book.json", target: SubjectDTO.self)
     return Subject(item)
   }
+
+  static var previewMusic: Subject {
+    let item = loadFixture(fixture: "subject_music.json", target: SubjectDTO.self)
+    return Subject(item)
+  }
 }
 
 extension UserSubjectCollection {
@@ -71,7 +76,7 @@ extension UserSubjectCollection {
 }
 
 extension Episode {
-  static var previewList: [Episode] {
+  static var previewCollections: [Episode] {
     let collections =
       loadFixture(
         fixture: "episode_collections.json", target: PagedDTO<EpisodeCollectionDTO>.self
@@ -79,8 +84,20 @@ extension Episode {
     return collections.data.map { Episode($0) }
   }
 
+  static var previewAnime: [Episode] {
+    let items = loadFixture(
+      fixture: "subject_anime_episodes.json", target: PagedDTO<EpisodeDTO>.self)
+    return items.data.map { Episode($0) }
+  }
+
+  static var previewMusic: [Episode] {
+    let items = loadFixture(
+      fixture: "subject_music_episodes.json", target: PagedDTO<EpisodeDTO>.self)
+    return items.data.map { Episode($0) }
+  }
+
   static var preview: Episode {
-    return self.previewList.first!
+    return self.previewCollections.first!
   }
 }
 

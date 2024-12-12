@@ -33,22 +33,24 @@ struct SubjectTopicsView: View {
   }
 
   var body: some View {
-    Divider()
-    HStack {
-      Text("讨论版")
-        .foregroundStyle(topics.count > 0 ? .primary : .secondary)
-        .font(.title3)
-        .onAppear(perform: refresh)
-      if refreshing {
-        ProgressView()
+    VStack(spacing: 2) {
+      HStack(alignment: .bottom) {
+        Text("讨论版")
+          .foregroundStyle(topics.count > 0 ? .primary : .secondary)
+          .font(.title3)
+          .onAppear(perform: refresh)
+        if refreshing {
+          ProgressView()
+        }
+        Spacer()
+        if topics.count > 0 {
+          NavigationLink(value: NavDestination.subjectTopicList(subjectId: subjectId)) {
+            Text("更多讨论 »").font(.caption).foregroundStyle(.linkText)
+          }.buttonStyle(.plain)
+        }
       }
-      Spacer()
-      if topics.count > 0 {
-        NavigationLink(value: NavDestination.subjectTopicList(subjectId: subjectId)) {
-          Text("更多讨论 »").font(.caption).foregroundStyle(.linkText)
-        }.buttonStyle(.plain)
-      }
-    }
+      Divider()
+    }.padding(.top, 5)
     if topics.count == 0 {
       HStack {
         Spacer()

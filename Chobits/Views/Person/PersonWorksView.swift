@@ -34,22 +34,24 @@ struct PersonWorksView: View {
   }
 
   var body: some View {
-    Divider()
-    HStack {
-      Text("最近参与")
-        .foregroundStyle(relations.count > 0 ? .primary : .secondary)
-        .font(.title3)
-        .onAppear(perform: load)
-      if loading {
-        ProgressView()
+    VStack(spacing: 2) {
+      HStack(alignment: .bottom) {
+        Text("最近参与")
+          .foregroundStyle(relations.count > 0 ? .primary : .secondary)
+          .font(.title3)
+          .onAppear(perform: load)
+        if loading {
+          ProgressView()
+        }
+        Spacer()
+        if relations.count > 0 {
+          NavigationLink(value: NavDestination.personWorkList(personId: personId)) {
+            Text("更多作品 »").font(.caption).foregroundStyle(.linkText)
+          }.buttonStyle(.plain)
+        }
       }
-      Spacer()
-      if relations.count > 0 {
-        NavigationLink(value: NavDestination.personWorkList(personId: personId)) {
-          Text("更多作品 »").font(.caption).foregroundStyle(.linkText)
-        }.buttonStyle(.plain)
-      }
-    }
+      Divider()
+    }.padding(.top, 5)
     VStack {
       ForEach(relations) { item in
         CardView {

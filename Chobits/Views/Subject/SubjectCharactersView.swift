@@ -35,22 +35,24 @@ struct SubjectCharactersView: View {
   }
 
   var body: some View {
-    Divider()
-    HStack {
-      Text("角色介绍")
-        .foregroundStyle(relations.count > 0 ? .primary : .secondary)
-        .font(.title3)
-        .onAppear(perform: load)
-      if loading {
-        ProgressView()
+    VStack(spacing: 2) {
+      HStack(alignment: .bottom) {
+        Text("角色介绍")
+          .foregroundStyle(relations.count > 0 ? .primary : .secondary)
+          .font(.title3)
+          .onAppear(perform: load)
+        if loading {
+          ProgressView()
+        }
+        Spacer()
+        if relations.count > 0 {
+          NavigationLink(value: NavDestination.subjectCharacterList(subjectId: subjectId)) {
+            Text("更多角色 »").font(.caption).foregroundStyle(.linkText)
+          }.buttonStyle(.plain)
+        }
       }
-      Spacer()
-      if relations.count > 0 {
-        NavigationLink(value: NavDestination.subjectCharacterList(subjectId: subjectId)) {
-          Text("更多角色 »").font(.caption).foregroundStyle(.linkText)
-        }.buttonStyle(.plain)
-      }
-    }
+      Divider()
+    }.padding(.top, 5)
     ScrollView(.horizontal, showsIndicators: false) {
       LazyHStack(alignment: .top) {
         ForEach(relations, id: \.character.id) { item in

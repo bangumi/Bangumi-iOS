@@ -143,7 +143,7 @@ struct EpisodeCollectionBoxView: View {
   let subject = Subject.previewAnime
   container.mainContext.insert(subject)
 
-  let episodes = Episode.previewList
+  let episodes = Episode.previewCollections
   for episode in episodes {
     container.mainContext.insert(episode)
   }

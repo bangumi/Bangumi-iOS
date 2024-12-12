@@ -24,10 +24,10 @@ struct SubjectSummaryView: View {
                 .lineLimit(1)
             }.padding(1)
           }
-        }
+        }.padding(.vertical, 2)
       }
       BBCodeWebView(subject.summary, textSize: 14)
-    }.padding(.vertical, 2)
+    }
   }
 }
 

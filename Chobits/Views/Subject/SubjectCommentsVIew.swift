@@ -44,22 +44,24 @@ struct SubjectCommentsView: View {
   }
 
   var body: some View {
-    Divider()
-    HStack {
-      Text("吐槽箱")
-        .foregroundStyle(comments.count > 0 ? .primary : .secondary)
-        .font(.title3)
-        .onAppear(perform: refresh)
-      if refreshing {
-        ProgressView()
+    VStack(spacing: 2) {
+      HStack(alignment: .bottom) {
+        Text("吐槽箱")
+          .foregroundStyle(comments.count > 0 ? .primary : .secondary)
+          .font(.title3)
+          .onAppear(perform: refresh)
+        if refreshing {
+          ProgressView()
+        }
+        Spacer()
+        if comments.count > 0 {
+          NavigationLink(value: NavDestination.subjectCommentList(subjectId: subjectId)) {
+            Text("更多吐槽 »").font(.caption).foregroundStyle(.linkText)
+          }.buttonStyle(.plain)
+        }
       }
-      Spacer()
-      if comments.count > 0 {
-        NavigationLink(value: NavDestination.subjectCommentList(subjectId: subjectId)) {
-          Text("更多吐槽 »").font(.caption).foregroundStyle(.linkText)
-        }.buttonStyle(.plain)
-      }
-    }
+      Divider()
+    }.padding(.top, 5)
     if comments.count == 0 {
       HStack {
         Spacer()

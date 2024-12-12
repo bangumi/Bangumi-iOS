@@ -48,17 +48,19 @@ struct SubjectRecsView: View {
   }
 
   var body: some View {
-    Divider()
-    HStack {
-      Text("猜你喜欢")
-        .foregroundStyle(recs.count > 0 ? .primary : .secondary)
-        .font(.title3)
-        .onAppear(perform: load)
-      if loading {
-        ProgressView()
+    VStack(spacing: 2) {
+      HStack(alignment: .bottom) {
+        Text("猜你喜欢")
+          .foregroundStyle(recs.count > 0 ? .primary : .secondary)
+          .font(.title3)
+          .onAppear(perform: load)
+        if loading {
+          ProgressView()
+        }
+        Spacer()
       }
-      Spacer()
-    }
+      Divider()
+    }.padding(.top, 5)
     ScrollView(.horizontal, showsIndicators: false) {
       LazyHStack {
         ForEach(recs) { rec in

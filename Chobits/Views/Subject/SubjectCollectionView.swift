@@ -31,9 +31,6 @@ struct SubjectCollectionView: View {
   var body: some View {
     Section {
       VStack(alignment: .leading) {
-        if subject.typeEnum == .book && subject.userCollection != nil {
-          SubjectBookChaptersView(subjectId: subject.subjectId, compact: false)
-        }
         BorderView(color: .linkText, padding: 5) {
           HStack {
             Spacer()
@@ -52,6 +49,7 @@ struct SubjectCollectionView: View {
           .foregroundStyle(.linkText)
         }
         .padding(5)
+        .task(refresh)
         .onTapGesture {
           edit.toggle()
         }
@@ -61,8 +59,12 @@ struct SubjectCollectionView: View {
             SubjectCollectionBoxView(subject: subject)
               .presentationDragIndicator(.visible)
               .presentationDetents(.init([.medium, .large]))
-          })
-      }.task(refresh)
+          }
+        )
+        if subject.typeEnum == .book && subject.userCollection != nil {
+          SubjectBookChaptersView(subjectId: subject.subjectId, compact: false)
+        }
+      }
     }
   }
 }

@@ -58,13 +58,15 @@ struct SubjectRelationsView: View {
 
   var body: some View {
     if series {
-      Divider()
-      HStack {
-        Text("单行本")
-          .foregroundStyle(offprints.count > 0 ? .primary : .secondary)
-          .font(.title3)
-        Spacer()
-      }
+      VStack(spacing: 2) {
+        HStack(alignment: .bottom) {
+          Text("单行本")
+            .foregroundStyle(offprints.count > 0 ? .primary : .secondary)
+            .font(.title3)
+          Spacer()
+        }
+        Divider()
+      }.padding(.top, 5)
       ScrollView(.horizontal, showsIndicators: false) {
         LazyHStack {
           ForEach(offprints) { offprint in
@@ -97,22 +99,24 @@ struct SubjectRelationsView: View {
       }.animation(.default, value: offprints)
     }
 
-    Divider()
-    HStack {
-      Text("关联条目")
-        .foregroundStyle(relations.count > 0 ? .primary : .secondary)
-        .font(.title3)
-        .onAppear(perform: load)
-      if loading {
-        ProgressView()
+    VStack(spacing: 2) {
+      HStack(alignment: .bottom) {
+        Text("关联条目")
+          .foregroundStyle(relations.count > 0 ? .primary : .secondary)
+          .font(.title3)
+          .onAppear(perform: load)
+        if loading {
+          ProgressView()
+        }
+        Spacer()
+        if relations.count > 0 {
+          NavigationLink(value: NavDestination.subjectRelationList(subjectId: subjectId)) {
+            Text("更多条目 »").font(.caption).foregroundStyle(.linkText)
+          }.buttonStyle(.plain)
+        }
       }
-      Spacer()
-      if relations.count > 0 {
-        NavigationLink(value: NavDestination.subjectRelationList(subjectId: subjectId)) {
-          Text("更多条目 »").font(.caption).foregroundStyle(.linkText)
-        }.buttonStyle(.plain)
-      }
-    }
+      Divider()
+    }.padding(.top, 5)
     ScrollView(.horizontal, showsIndicators: false) {
       LazyHStack {
         ForEach(relations) { relation in

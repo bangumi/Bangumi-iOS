@@ -80,7 +80,7 @@ extension Chii {
     let db = try self.getDB()
     let type = try await db.getSubjectType(subjectId)
     switch type {
-    case .anime, .real:
+    case .anime, .music, .real:
       break
     default:
       return

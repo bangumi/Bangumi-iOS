@@ -5,6 +5,7 @@
 //  Created by Chuan Chuan on 2024/5/9.
 //
 
+import Flow
 import OSLog
 import SwiftData
 import SwiftUI
@@ -132,16 +133,15 @@ struct PersonView: View {
             }.frame(height: 160)
 
             /// career
-            HStack {
+            HFlow {
               ForEach(careers, id: \.self) { career in
                 BorderView {
                   Text(career)
-                    .font(.subheadline)
                 }
               }
             }
-            .padding(.horizontal, 4)
-            .padding(.bottom, 8)
+            .foregroundStyle(.secondary)
+            .padding(.horizontal, 2)
 
             /// summary
             BBCodeWebView(person.summary, textSize: 14)

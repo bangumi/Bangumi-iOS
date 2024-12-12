@@ -1339,12 +1339,30 @@ components:
           type: string
         rate:
           type: integer
+        type:
+          anyOf:
+            - enum:
+                - 1
+              type: number
+            - enum:
+                - 2
+              type: number
+            - enum:
+                - 3
+              type: number
+            - enum:
+                - 4
+              type: number
+            - enum:
+                - 5
+              type: number
         updatedAt:
           type: integer
         user:
           $ref: '#/components/schemas/SlimUser'
       required:
         - user
+        - type
         - rate
         - comment
         - updatedAt
@@ -1669,6 +1687,326 @@ components:
         - metaTags
         - summary
         - nsfw
+      type: object
+    Timeline:
+      properties:
+        batch:
+          type: boolean
+        cat:
+          anyOf:
+            - enum:
+                - 1
+              type: number
+            - enum:
+                - 2
+              type: number
+            - enum:
+                - 3
+              type: number
+            - enum:
+                - 4
+              type: number
+            - enum:
+                - 5
+              type: number
+            - enum:
+                - 6
+              type: number
+            - enum:
+                - 7
+              type: number
+            - enum:
+                - 8
+              type: number
+            - enum:
+                - 9
+              type: number
+        createdAt:
+          type: integer
+        id:
+          type: integer
+        image:
+          $ref: '#/components/schemas/TimelineImage'
+        memo:
+          $ref: '#/components/schemas/TimelineMemo'
+        replies:
+          type: integer
+        source:
+          anyOf:
+            - enum:
+                - 0
+              type: number
+            - enum:
+                - 1
+              type: number
+            - enum:
+                - 2
+              type: number
+            - enum:
+                - 3
+              type: number
+            - enum:
+                - 4
+              type: number
+            - enum:
+                - 5
+              type: number
+        type:
+          type: integer
+        uid:
+          type: integer
+        user:
+          $ref: '#/components/schemas/SlimUser'
+      required:
+        - id
+        - uid
+        - cat
+        - type
+        - memo
+        - image
+        - batch
+        - source
+        - replies
+        - createdAt
+      title: Timeline
+      type: object
+    TimelineImage:
+      properties:
+        group:
+          items:
+            properties:
+              id:
+                type: integer
+              images:
+                $ref: '#/components/schemas/Avatar'
+            required:
+              - id
+            type: object
+          type: array
+        mono:
+          items:
+            properties:
+              cat:
+                type: integer
+              id:
+                type: integer
+              images:
+                $ref: '#/components/schemas/PersonImages'
+            required:
+              - cat
+              - id
+            type: object
+          type: array
+        subject:
+          items:
+            properties:
+              id:
+                type: integer
+              images:
+                $ref: '#/components/schemas/SubjectImages'
+            required:
+              - id
+            type: object
+          type: array
+        user:
+          items:
+            properties:
+              images:
+                $ref: '#/components/schemas/Avatar'
+              uid:
+                type: integer
+            required:
+              - uid
+            type: object
+          type: array
+      title: TimelineImage
+      type: object
+    TimelineMemo:
+      properties:
+        blog:
+          properties:
+            desc:
+              type: string
+            id:
+              type: integer
+            title:
+              type: string
+          required:
+            - id
+            - title
+            - desc
+          type: object
+        daily:
+          properties:
+            group:
+              items:
+                properties:
+                  desc:
+                    type: string
+                  id:
+                    type: integer
+                  name:
+                    type: string
+                  title:
+                    type: string
+                required:
+                  - id
+                  - name
+                  - title
+                  - desc
+                type: object
+              type: array
+            user:
+              items:
+                properties:
+                  nickname:
+                    type: string
+                  uid:
+                    type: integer
+                  username:
+                    type: string
+                required:
+                  - uid
+                  - username
+                  - nickname
+                type: object
+              type: array
+          type: object
+        index:
+          properties:
+            desc:
+              type: string
+            id:
+              type: integer
+            title:
+              type: string
+          required:
+            - id
+            - title
+            - desc
+          type: object
+        mono:
+          items:
+            properties:
+              cat:
+                type: integer
+              id:
+                type: integer
+              name:
+                type: string
+            required:
+              - cat
+              - id
+              - name
+            type: object
+          type: array
+        progress:
+          properties:
+            batch:
+              properties:
+                epsTotal:
+                  type: string
+                epsUpdate:
+                  type: integer
+                subjectID:
+                  type: integer
+                subjectName:
+                  type: string
+                volsTotal:
+                  type: string
+                volsUpdate:
+                  type: integer
+              required:
+                - epsTotal
+                - epsUpdate
+                - volsTotal
+                - volsUpdate
+                - subjectID
+                - subjectName
+              type: object
+            single:
+              properties:
+                epID:
+                  type: integer
+                epName:
+                  type: string
+                epSort:
+                  type: integer
+                subjectID:
+                  type: integer
+                subjectName:
+                  type: string
+              required:
+                - epID
+                - epName
+                - epSort
+                - subjectID
+                - subjectName
+              type: object
+          type: object
+        status:
+          properties:
+            nickname:
+              properties:
+                after:
+                  type: string
+                before:
+                  type: string
+              required:
+                - before
+                - after
+              type: object
+            sign:
+              type: string
+            tsukkomi:
+              type: string
+          type: object
+        subject:
+          items:
+            properties:
+              comment:
+                type: string
+              id:
+                type: integer
+              name:
+                type: string
+              nameCN:
+                type: string
+              rate:
+                type: number
+              series:
+                type: boolean
+              type:
+                type: integer
+            required:
+              - id
+              - type
+              - name
+              - nameCN
+              - series
+              - comment
+              - rate
+            type: object
+          type: array
+        wiki:
+          properties:
+            subject:
+              properties:
+                id:
+                  type: integer
+                name:
+                  type: string
+                nameCN:
+                  type: string
+              required:
+                - id
+                - name
+                - nameCN
+              type: object
+          required:
+            - subject
+          type: object
+      title: TimelineMemo
       type: object
     Topic:
       properties:
@@ -2070,7 +2408,7 @@ info:
     关于订阅通知的 socket.io 相关的文档在
     <https://github.com/bangumi/GraphQL/blob/master/docs/socket.io.md>
   title: bangumi private api
-  version: 2024-12-07-0338dcc
+  version: 2024-12-11-1a520e6
 openapi: 3.0.3
 paths:
   /p1/blocklist:
@@ -4617,6 +4955,52 @@ paths:
       summary: 创建条目讨论
       tags:
         - subject
+  /p1/timeline:
+    get:
+      operationId: getTimeline
+      parameters:
+        - description: 'all: 全站, friends: 好友; 登录时默认为 friends, 未登录或没有好友时始终为 all'
+          in: query
+          name: mode
+          required: false
+          schema:
+            anyOf:
+              - enum:
+                  - all
+                type: string
+              - enum:
+                  - friends
+                type: string
+        - description: min 0
+          in: query
+          name: offset
+          required: false
+          schema:
+            default: 0
+            minimum: 0
+            type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Timeline'
+                type: array
+          description: Default Response
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                description: 意料之外的服务器错误
+          description: 意料之外的服务器错误
+      security:
+        - CookiesSession: []
+          HTTPBearer: []
+      summary: 获取时间线
+      tags:
+        - timeline
   /p1/trending/subjects:
     get:
       operationId: getTrendingSubjects
@@ -5362,6 +5746,35 @@ paths:
         - CookiesSession: []
           HTTPBearer: []
       summary: 获取用户创建的目录
+      tags:
+        - user
+  /p1/users/{username}/timeline:
+    get:
+      operationId: getUserTimeline
+      parameters:
+        - description: min 0
+          in: query
+          name: offset
+          required: false
+          schema:
+            default: 0
+            minimum: 0
+            type: integer
+        - in: path
+          name: username
+          required: true
+          schema:
+            minLength: 1
+            type: string
+      responses:
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                description: 意料之外的服务器错误
+          description: 意料之外的服务器错误
+      summary: 获取用户时间胶囊
       tags:
         - user
   /p1/wiki/ep/{episodeID}:

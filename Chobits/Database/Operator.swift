@@ -32,6 +32,15 @@ extension DatabaseOperator {
 
 // MARK: - fetch
 extension DatabaseOperator {
+  public func getSubject(_ id: Int) throws -> Subject? {
+    let subject = try self.fetchOne(
+      predicate: #Predicate<Subject> {
+        $0.subjectId == id
+      }
+    )
+    return subject
+  }
+
   public func getSubjectType(_ id: Int) throws -> SubjectType {
     let subject = try self.fetchOne(
       predicate: #Predicate<Subject> {
@@ -247,11 +256,23 @@ extension DatabaseOperator {
   public func saveEpisode(_ item: EpisodeDTO) throws {
     let episode = Episode(item)
     modelContext.insert(episode)
+    guard
+      let subject = try self.getSubject(item.subjectID)
+    else {
+      return
+    }
+    episode.subject = subject
   }
 
   public func saveEpisode(_ item: EpisodeCollectionDTO) throws {
     let episode = Episode(item)
     modelContext.insert(episode)
+    guard
+      let subject = try self.getSubject(item.episode.subjectID)
+    else {
+      return
+    }
+    episode.subject = subject
   }
 
   public func saveCharacter(_ item: CharacterDTO) throws {
