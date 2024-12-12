@@ -37,12 +37,12 @@ func BBCodeToHTML(code: String, textSize: Int) -> String {
           span.mask {
             background-color: #555;
             color: #555;
-            text-shadow: #555 0 0 10px;
+            border-radius: 2px;
+            box-shadow: #555 0 0 5px;
             -webkit-transition: all .5s linear;
           }
           span.mask:hover {
             color: #FFF;
-            text-shadow: #FFF 0 0 0px;
           }
           pre code {
             border: 1px solid #EEE;
