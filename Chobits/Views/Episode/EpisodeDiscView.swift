@@ -58,9 +58,6 @@ struct EpisodeDiscView: View {
           .font(.title3)
           .onAppear(perform: refresh)
         Spacer()
-        NavigationLink(value: NavDestination.episodeList(subjectId: subjectId)) {
-          Text("更多曲目 »").font(.caption).foregroundStyle(.linkText)
-        }.buttonStyle(.plain)
       }
       Divider()
     }.padding(.top, 5)
