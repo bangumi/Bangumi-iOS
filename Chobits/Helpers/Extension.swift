@@ -54,51 +54,31 @@ extension Color {
 }
 
 extension Date {
-  var formatAirdate: String {
-    let formatter = DateFormatter()
-    formatter.dateStyle = .medium
-    formatter.timeStyle = .none
-    return formatter.string(from: self)
-  }
-
   var formatCollectionDate: String {
     if self.timeIntervalSince1970 <= 0 {
       return ""
     }
-    let formatter = DateFormatter()
-    formatter.timeZone = TimeZone.current
-    formatter.dateStyle = .medium
-    formatter.timeStyle = .short
-    return formatter.string(from: self)
+    return self.formatted(date: .numeric, time: .shortened)
   }
 
   var formatRelative: String {
     if self.timeIntervalSinceNow > -604800 {
-      let formatter = RelativeDateTimeFormatter()
-      formatter.unitsStyle = .abbreviated
-      return formatter.localizedString(for: self, relativeTo: Date())
+      return self.formatted(.relative(presentation: .numeric))
     } else {
-      let formatter = DateFormatter()
-      formatter.dateStyle = .medium
-      formatter.timeStyle = .medium
-      return formatter.string(from: self)
+      return self.formatted(date: .numeric, time: .shortened)
     }
   }
 }
 
 extension Int {
   var dateDisplay: String {
-    let formatter = DateFormatter()
-    formatter.dateStyle = .medium
-    formatter.timeStyle = .none
-    return formatter.string(from: Date(timeIntervalSince1970: TimeInterval(self)))
+    let date = Date(timeIntervalSince1970: TimeInterval(self))
+    return date.formatted(date: .omitted, time: .shortened)
   }
 
   var datetimeDisplay: String {
-    let formatter = DateFormatter()
-    formatter.dateStyle = .medium
-    formatter.timeStyle = .medium
-    return formatter.string(from: Date(timeIntervalSince1970: TimeInterval(self)))
+    let date = Date(timeIntervalSince1970: TimeInterval(self))
+    return date.formatted(date: .numeric, time: .shortened)
   }
 
   var durationDisplay: String {
