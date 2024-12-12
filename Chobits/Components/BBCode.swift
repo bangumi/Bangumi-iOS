@@ -34,6 +34,16 @@ func BBCodeToHTML(code: String, textSize: Int) -> String {
             color: #0084B4;
             text-decoration: none;
           }
+          span.mask {
+            background-color: #555;
+            color: #555;
+            text-shadow: #555 0 0 10px;
+            -webkit-transition: all .5s linear;
+          }
+          span.mask:hover {
+            color: #FFF;
+            text-shadow: #FFF 0 0 0px;
+          }
           pre code {
             border: 1px solid #EEE;
             border-radius: 0.5em;
