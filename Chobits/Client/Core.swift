@@ -10,6 +10,7 @@ import KeychainSwift
 import OSLog
 import SwiftData
 import SwiftUI
+import CoreSpotlight
 
 enum BangumiAPI {
   case pub

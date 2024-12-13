@@ -54,7 +54,7 @@ struct EpisodeDiscView: View {
     VStack(spacing: 2) {
       HStack(alignment: .bottom) {
         Text("曲目列表:")
-          .foregroundStyle(.secondary)
+          .foregroundStyle(episodes.count > 0 ? .primary : .secondary)
           .font(.title3)
           .onAppear(perform: refresh)
         Spacer()

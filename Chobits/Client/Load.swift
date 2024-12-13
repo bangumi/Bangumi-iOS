@@ -34,6 +34,7 @@ extension Chii {
 
     try await db.saveSubject(item)
     try await db.commit()
+    await self.index(for: [item])
   }
 
   func loadUserSubjectCollection(_ subjectId: Int) async throws {
@@ -44,6 +45,7 @@ extension Chii {
     do {
       let item = try await self.getUserSubjectCollection(subjectId)
       try await db.saveUserSubjectCollection(item)
+      await self.index(for: [item.subject])
     } catch ChiiError.notFound(_) {
       Logger.collection.warning("collection not found for subject: \(subjectId)")
       try await db.deleteUserCollection(subjectId: subjectId)
@@ -65,6 +67,7 @@ extension Chii {
       for item in response.data {
         count += 1
         try await db.saveUserSubjectCollection(item)
+        await self.index(for: [item.subject])
       }
       Logger.api.info("loaded user collection: \(response.data.count), total: \(response.total)")
       offset += limit
