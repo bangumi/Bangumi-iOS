@@ -131,7 +131,9 @@ struct EpisodeGridView: View {
               Label("查看讨论...", systemImage: "bubble")
             }
           } preview: {
-            EpisodeInfoView(episode: episode).padding()
+            EpisodeInfoView(episode: episode)
+              .padding()
+              .frame(idealWidth: 320)
           }
       }
       if !episodeSps.isEmpty {
@@ -173,7 +175,9 @@ struct EpisodeGridView: View {
                 Label("查看讨论...", systemImage: "bubble")
               }
             } preview: {
-              EpisodeInfoView(episode: episode).padding()
+              EpisodeInfoView(episode: episode)
+                .padding()
+                .frame(idealWidth: 320)
             }
         }
       }

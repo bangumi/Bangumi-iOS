@@ -416,8 +416,11 @@ final class EpisodeV1 {
     self.init(collection.episode, collection: collection.type.rawValue)
   }
 
-  var title: String {
-    return "\(self.typeEnum.name).\(self.sort.episodeDisplay) \(self.name)"
+  var title: AttributedString {
+    var text = AttributedString("\(self.typeEnum.name).\(self.sort.episodeDisplay)")
+    text.foregroundColor = .secondary
+    text += AttributedString(" \(self.name)")
+    return text
   }
 
   var air: Date {

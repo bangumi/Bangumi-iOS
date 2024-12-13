@@ -13,6 +13,14 @@ struct EpisodeInfoView: View {
 
   @AppStorage("isolationMode") var isolationMode: Bool = false
 
+  func field(name: String, value: String) -> AttributedString {
+    var text = AttributedString(name + ": ")
+    var value = AttributedString(value)
+    value.foregroundColor = .secondary
+    text.append(value)
+    return text
+  }
+
   var body: some View {
     VStack(alignment: .leading, spacing: 5) {
       HStack(alignment: .bottom) {
@@ -37,19 +45,19 @@ struct EpisodeInfoView: View {
       }
       Divider()
       if !episode.name.isEmpty {
-        Text("标题: \(episode.name)")
+        Text(field(name: "标题", value: episode.name))
       }
       if !episode.nameCN.isEmpty {
-        Text("中文标题: \(episode.nameCN)")
+        Text(field(name: "中文标题", value: episode.nameCN))
       }
       if !episode.airdate.isEmpty {
-        Text("首播时间: \(episode.airdate)")
+        Text(field(name: "首播时间", value: episode.airdate))
       }
       if !episode.duration.isEmpty {
-        Text("时长: \(episode.duration)")
+        Text(field(name: "时长", value: episode.duration))
       }
       if episode.disc > 0 {
-        Text("Disc: \(episode.disc)")
+        Text(field(name: "Disc", value: "\(episode.disc)"))
       }
     }
   }

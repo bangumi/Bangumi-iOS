@@ -67,9 +67,9 @@ struct SubjectRatingView: View {
           }
           ChartView(
             title: "评分分布", data: chartData,
-            width: geometry.size.width, height: 240
+            width: geometry.size.width, height: 320
           )
-          .frame(width: geometry.size.width, height: 240)
+          .frame(width: geometry.size.width, height: 320)
           .background(Color.secondary.opacity(0.02))
           .clipShape(RoundedRectangle(cornerRadius: 10))
           HFlow(alignment: .center, spacing: 2) {

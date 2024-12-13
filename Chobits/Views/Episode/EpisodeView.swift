@@ -12,6 +12,7 @@ struct EpisodeView: View {
   let subjectId: Int
   let episodeId: Int
 
+  @AppStorage("shareDomain") var shareDomain: String = ShareDomain.chii.label
   @AppStorage("isolationMode") var isolationMode: Bool = false
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
 
@@ -42,6 +43,10 @@ struct EpisodeView: View {
     default:
       return false
     }
+  }
+
+  var shareLink: URL {
+    URL(string: "https://\(shareDomain)/ep/\(episodeId)")!
   }
 
   func updateSingle(type: EpisodeCollectionType) {
@@ -113,12 +118,24 @@ struct EpisodeView: View {
         }
         Divider()
         if let desc = episode?.desc, !desc.isEmpty {
-          Text("描述:")
           Text(desc).foregroundStyle(.secondary)
         }
         Spacer()
+      }.padding(.horizontal, 8)
+    }
+    .navigationTitle("章节详情")
+    .navigationBarTitleDisplayMode(.inline)
+    .toolbar {
+      ToolbarItem(placement: .topBarTrailing) {
+        Menu {
+          ShareLink(item: shareLink) {
+            Label("分享", systemImage: "square.and.arrow.up")
+          }
+        } label: {
+          Image(systemName: "ellipsis.circle")
+        }
       }
-    }.padding(.horizontal, 8)
+    }
   }
 }
 

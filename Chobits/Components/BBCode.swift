@@ -93,7 +93,6 @@ class InlineWebView: WKWebView {
     config.defaultWebpagePreferences = prefs
     config.processPool = InlineWebView.pool
     super.init(frame: frame, configuration: config)
-    self.scrollView.isScrollEnabled = false
     self.scrollView.bounces = false
     self.navigationDelegate = self
   }
@@ -103,6 +102,7 @@ class InlineWebView: WKWebView {
   }
 
   override var intrinsicContentSize: CGSize {
+    self.scrollView.isScrollEnabled = false
     return self.scrollView.contentSize
   }
 }
@@ -136,6 +136,7 @@ struct BBCodeWebView: UIViewRepresentable {
 
   func updateUIView(_ uiView: WKWebView, context: Context) {
     uiView.loadHTMLString(htmlString, baseURL: nil)
+    uiView.invalidateIntrinsicContentSize()
   }
 }
 
@@ -157,10 +158,11 @@ struct BBCodeView: UIViewRepresentable {
     view.isEditable = false
     view.isSelectable = true
     view.isScrollEnabled = false
+    view.textContainer.lineFragmentPadding = 0
+    view.textContainerInset = .zero
     view.linkTextAttributes = [
       NSAttributedString.Key.foregroundColor: UIColor(named: "LinkTextColor") ?? UIColor.systemBlue
     ]
-    view.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
     return view
   }
 
@@ -174,18 +176,42 @@ struct BBCodeView: UIViewRepresentable {
     } else {
       uiView.text = self.code
     }
-
-    let fixedWidth = uiView.frame.size.width
-    let newSize = uiView.sizeThatFits(
-      CGSize(width: fixedWidth, height: CGFloat.greatestFiniteMagnitude))
-    uiView.frame.size = CGSize(width: max(newSize.width, fixedWidth), height: newSize.height)
     return
   }
 
+  func sizeThatFits(_ proposal: ProposedViewSize, uiView: UITextView, context: Context) -> CGSize? {
+    let dimensions = proposal.replacingUnspecifiedDimensions(
+      by: .init(
+        width: 0,
+        height: CGFloat.greatestFiniteMagnitude
+      )
+    )
+    let calculatedHeight = calculateTextViewHeight(
+      containerSize: dimensions,
+      attributedString: uiView.attributedText
+    )
+    return .init(
+      width: dimensions.width,
+      height: calculatedHeight
+    )
+  }
+
+  private func calculateTextViewHeight(
+    containerSize: CGSize,
+    attributedString: NSAttributedString
+  ) -> CGFloat {
+    let boundingRect = attributedString.boundingRect(
+      with: .init(width: containerSize.width, height: .greatestFiniteMagnitude),
+      options: [.usesLineFragmentOrigin, .usesFontLeading],
+      context: nil
+    )
+    return boundingRect.height
+  }
 }
 
 #Preview {
   let example = """
+    传说中性能超强的人型电脑，故事第一话时被人弃置在垃圾场，后被我们的本须和秀树发现，并抱回家。由于开始时唧只会'唧，唧'的这样叫，所以秀树为其取名 '唧'TV版第二话「ちぃでかける」时发现小唧本身并没有安OS，不过因为拥有“学习程式”，所以可以通过对话和教导让她‘成长’起来。
     我是[b]粗体字[/b]
     我是[i]斜体字[/i]
     我是[u]下划线文字[/u]
