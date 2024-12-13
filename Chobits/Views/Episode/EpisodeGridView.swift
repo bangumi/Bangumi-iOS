@@ -121,7 +121,7 @@ struct EpisodeGridView: View {
               Button {
                 updateBatch(episode: episode)
               } label: {
-                Label("看到", systemImage: "checklist.checked")
+                Label("看到", systemImage: "checkmark.rectangle.stack")
               }
             }
             NavigationLink(
