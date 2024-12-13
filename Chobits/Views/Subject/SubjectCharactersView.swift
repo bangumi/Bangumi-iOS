@@ -53,6 +53,15 @@ struct SubjectCharactersView: View {
       }
       Divider()
     }.padding(.top, 5)
+    if relations.count == 0 {
+      HStack {
+        Spacer()
+        Text("暂无角色")
+          .font(.caption)
+          .foregroundStyle(.secondary)
+        Spacer()
+      }.padding(.bottom, 5)
+    }
     ScrollView(.horizontal, showsIndicators: false) {
       LazyHStack(alignment: .top) {
         ForEach(relations, id: \.character.id) { item in

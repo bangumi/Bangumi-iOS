@@ -118,12 +118,14 @@ struct EpisodeGridView: View {
                   Label(type.action, systemImage: type.icon)
                 }
               }
+              Divider()
               Button {
                 updateBatch(episode: episode)
               } label: {
                 Label("看到", systemImage: "checkmark.rectangle.stack")
               }
             }
+            Divider()
             NavigationLink(
               value: NavDestination.episode(
                 subjectId: episode.subjectId, episodeId: episode.episodeId)
@@ -172,6 +174,7 @@ struct EpisodeGridView: View {
                   }
                 }
               }
+              Divider()
               NavigationLink(
                 value: NavDestination.episode(
                   subjectId: episode.subjectId, episodeId: episode.episodeId)

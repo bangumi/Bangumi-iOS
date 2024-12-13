@@ -61,6 +61,15 @@ struct SubjectRecsView: View {
       }
       Divider()
     }.padding(.top, 5)
+    if recs.count == 0 {
+      HStack {
+        Spacer()
+        Text("暂无推荐")
+          .font(.caption)
+          .foregroundStyle(.secondary)
+        Spacer()
+      }.padding(.bottom, 5)
+    }
     ScrollView(.horizontal, showsIndicators: false) {
       LazyHStack {
         ForEach(recs) { rec in

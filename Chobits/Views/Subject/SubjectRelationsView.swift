@@ -117,6 +117,15 @@ struct SubjectRelationsView: View {
       }
       Divider()
     }.padding(.top, 5)
+    if relations.count == 0 {
+      HStack {
+        Spacer()
+        Text("暂无关联条目")
+          .font(.caption)
+          .foregroundStyle(.secondary)
+        Spacer()
+      }.padding(.bottom, 5)
+    }
     ScrollView(.horizontal, showsIndicators: false) {
       LazyHStack {
         ForEach(relations) { relation in

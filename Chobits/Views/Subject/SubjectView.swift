@@ -88,6 +88,7 @@ struct SubjectView: View {
               NavigationLink(value: NavDestination.subjectRating(subject: subject)) {
                 Label("评分分布", systemImage: "chart.bar.xaxis")
               }
+              Divider()
               ShareLink(item: shareLink) {
                 Label("分享", systemImage: "square.and.arrow.up")
               }
