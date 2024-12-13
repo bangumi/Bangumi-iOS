@@ -85,6 +85,9 @@ struct SubjectView: View {
               NavigationLink(value: NavDestination.subjectStaffList(subjectId: subjectId)) {
                 Label("制作人员", systemImage: "person.2")
               }
+              NavigationLink(value: NavDestination.subjectRating(subject: subject)) {
+                Label("评分分布", systemImage: "chart.bar.xaxis")
+              }
               ShareLink(item: shareLink) {
                 Label("分享", systemImage: "square.and.arrow.up")
               }

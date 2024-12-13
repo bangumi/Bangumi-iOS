@@ -11,8 +11,6 @@ import SwiftUI
 struct SubjectHeaderView: View {
   @ObservableModel var subject: Subject
 
-  @State private var collectionDetail = false
-
   var scoreDescription: String {
     let score = Int(subject.rating.score.rounded())
     return score.ratingDescription
@@ -127,20 +125,10 @@ struct SubjectHeaderView: View {
                 .foregroundStyle(.orange)
                 .font(.callout)
               Text("(\(subject.rating.total) 人评分)")
-                .foregroundStyle(.linkText)
+                .foregroundStyle(.secondary)
               Spacer()
             }
-          }
-          .font(.footnote)
-          .onTapGesture {
-            collectionDetail.toggle()
-          }
-          .sheet(
-            isPresented: $collectionDetail,
-            content: {
-              SubjectRatingBoxView(subject: subject)
-            }
-          )
+          }.font(.footnote)
         } else {
           HStack {
             StarsView(score: 0, size: 12)
