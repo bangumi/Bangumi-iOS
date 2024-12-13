@@ -78,6 +78,8 @@ struct SubjectLargeRowView: View {
           }
         }
 
+        Spacer()
+
         // meta
         if let info = subject?.info, !info.isEmpty {
           Spacer()

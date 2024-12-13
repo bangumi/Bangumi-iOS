@@ -50,6 +50,18 @@ struct EpisodeDiscView: View {
     }
   }
 
+  func episodeLine(_ episode: Episode) -> AttributedString {
+    var line = AttributedString("\(Int(episode.sort)) \(episode.name)")
+    line.font = .footnote
+    if !episode.nameCN.isEmpty {
+      var subline = AttributedString(" / \(episode.nameCN)")
+      subline.font = .caption
+      subline.foregroundColor = .secondary
+      line += subline
+    }
+    return line
+  }
+
   var body: some View {
     VStack(spacing: 2) {
       HStack(alignment: .bottom) {
@@ -68,8 +80,7 @@ struct EpisodeDiscView: View {
           .padding(.top, 5)
         Divider()
         ForEach(discs[disc] ?? []) { episode in
-          Text("\(Int(episode.sort)) \(episode.name)")
-            .lineLimit(1)
+          Text(episodeLine(episode)).lineLimit(1)
           Divider()
         }
       }
