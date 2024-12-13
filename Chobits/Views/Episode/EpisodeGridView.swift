@@ -128,7 +128,11 @@ struct EpisodeGridView: View {
               value: NavDestination.episode(
                 subjectId: episode.subjectId, episodeId: episode.episodeId)
             ) {
-              Label("查看讨论...", systemImage: "bubble")
+              if isolationMode {
+                Label("详情...", systemImage: "info")
+              } else {
+                Label("参与讨论...", systemImage: "bubble")
+              }
             }
           } preview: {
             EpisodeInfoView(episode: episode)
@@ -172,7 +176,11 @@ struct EpisodeGridView: View {
                 value: NavDestination.episode(
                   subjectId: episode.subjectId, episodeId: episode.episodeId)
               ) {
-                Label("查看讨论...", systemImage: "bubble")
+                if isolationMode {
+                  Label("详情...", systemImage: "info")
+                } else {
+                  Label("参与讨论...", systemImage: "bubble")
+                }
               }
             } preview: {
               EpisodeInfoView(episode: episode)
