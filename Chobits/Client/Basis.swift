@@ -746,6 +746,19 @@ enum EpisodeCollectionType: Int, Codable, Identifiable, CaseIterable {
     }
   }
 
+  var icon: String {
+    switch self {
+    case .none:
+      return "arrow.counterclockwise"
+    case .wish:
+      return "heart"
+    case .collect:
+      return "checkmark"
+    case .dropped:
+      return "trash"
+    }
+  }
+
   func otherTypes() -> [Self] {
     switch self {
     case .none:

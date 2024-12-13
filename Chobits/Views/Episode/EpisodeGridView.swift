@@ -13,12 +13,15 @@ import SwiftUI
 struct EpisodeGridView: View {
   let subjectId: Int
 
+  @AppStorage("isolationMode") var isolationMode: Bool = false
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
 
   @Environment(\.modelContext) var modelContext
 
-  @State private var selected: Episode? = nil
   @State private var refreshed: Bool = false
+
+  @Query private var subjects: [Subject]
+  private var subject: Subject? { subjects.first }
 
   @Query private var episodeMains: [Episode] = []
   @Query private var episodeSps: [Episode] = []
@@ -42,6 +45,7 @@ struct EpisodeGridView: View {
 
     _episodeMains = Query(mainDescriptor)
     _episodeSps = Query(spDescriptor)
+    _subjects = Query(filter: #Predicate<Subject> { $0.subjectId == subjectId })
   }
 
   func refresh() {
@@ -51,6 +55,30 @@ struct EpisodeGridView: View {
     Task {
       do {
         try await Chii.shared.loadEpisodes(subjectId)
+      } catch {
+        Notifier.shared.alert(error: error)
+      }
+    }
+  }
+
+  func updateSingle(episode: Episode, type: EpisodeCollectionType) {
+    Task {
+      do {
+        try await Chii.shared.updateEpisodeCollection(
+          subjectId: episode.subjectId, episodeId: episode.episodeId, type: type)
+        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+      } catch {
+        Notifier.shared.alert(error: error)
+      }
+    }
+  }
+
+  func updateBatch(episode: Episode) {
+    Task {
+      do {
+        try await Chii.shared.updateSubjectEpisodeCollection(
+          subjectId: subjectId, updateTo: episode.sort, type: .collect)
+        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
       } catch {
         Notifier.shared.alert(error: error)
       }
@@ -74,17 +102,37 @@ struct EpisodeGridView: View {
     }.padding(.top, 5)
     HFlow(alignment: .center, spacing: 2) {
       ForEach(episodeMains) { episode in
-        Button {
-          selected = episode
-        } label: {
-          Text("\(episode.sort.episodeDisplay)")
-            .foregroundStyle(Color(hex: episode.textColor))
-            .padding(3)
-            .background(Color(hex: episode.backgroundColor))
-            .border(Color(hex: episode.borderColor), width: 1)
-            .padding(2)
-            .strikethrough(episode.collection == EpisodeCollectionType.dropped.rawValue)
-        }
+        Text("\(episode.sort.episodeDisplay)")
+          .foregroundStyle(Color(hex: episode.textColor))
+          .padding(3)
+          .background(Color(hex: episode.backgroundColor))
+          .border(Color(hex: episode.borderColor), width: 1)
+          .padding(2)
+          .strikethrough(episode.collection == EpisodeCollectionType.dropped.rawValue)
+          .contextMenu {
+            if isAuthenticated, subject?.userCollection != nil {
+              ForEach(episode.collectionTypeEnum.otherTypes()) { type in
+                Button {
+                  updateSingle(episode: episode, type: type)
+                } label: {
+                  Label(type.action, systemImage: type.icon)
+                }
+              }
+              Button {
+                updateBatch(episode: episode)
+              } label: {
+                Label("看到", systemImage: "checklist.checked")
+              }
+            }
+            NavigationLink(
+              value: NavDestination.episode(
+                subjectId: episode.subjectId, episodeId: episode.episodeId)
+            ) {
+              Label("查看讨论...", systemImage: "bubble")
+            }
+          } preview: {
+            EpisodeInfoView(episode: episode).padding()
+          }
       }
       if !episodeSps.isEmpty {
         Text("SP")
@@ -101,31 +149,37 @@ struct EpisodeGridView: View {
           .padding(2)
           .bold()
         ForEach(episodeSps) { episode in
-          Button {
-            selected = episode
-          } label: {
-            Text("\(episode.sort.episodeDisplay)")
-              .foregroundStyle(Color(hex: episode.textColor))
-              .padding(3)
-              .background(Color(hex: episode.backgroundColor))
-              .border(Color(hex: episode.borderColor), width: 1)
-              .padding(2)
-              .strikethrough(episode.collection == EpisodeCollectionType.dropped.rawValue)
-          }
+          Text("\(episode.sort.episodeDisplay)")
+            .foregroundStyle(Color(hex: episode.textColor))
+            .padding(3)
+            .background(Color(hex: episode.backgroundColor))
+            .border(Color(hex: episode.borderColor), width: 1)
+            .padding(2)
+            .strikethrough(episode.collection == EpisodeCollectionType.dropped.rawValue)
+            .contextMenu {
+              if isAuthenticated, subject?.userCollection != nil {
+                ForEach(episode.collectionTypeEnum.otherTypes()) { type in
+                  Button {
+                    updateSingle(episode: episode, type: type)
+                  } label: {
+                    Label(type.action, systemImage: type.icon)
+                  }
+                }
+              }
+              NavigationLink(
+                value: NavDestination.episode(
+                  subjectId: episode.subjectId, episodeId: episode.episodeId)
+              ) {
+                Label("查看讨论...", systemImage: "bubble")
+              }
+            } preview: {
+              EpisodeInfoView(episode: episode).padding()
+            }
         }
       }
     }
     .animation(.default, value: episodeMains)
     .animation(.default, value: episodeSps)
-    .animation(.default, value: selected)
-    .sheet(
-      item: $selected,
-      content: { episode in
-        EpisodeCollectionBoxView(subjectId: subjectId, episodeId: episode.episodeId)
-          .presentationDragIndicator(.visible)
-          .presentationDetents(.init([.medium, .large]))
-      }
-    )
   }
 }
 

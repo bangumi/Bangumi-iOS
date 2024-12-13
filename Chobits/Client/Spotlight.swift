@@ -5,8 +5,8 @@
 //  Created by Chuan Chuan on 2024/12/13.
 //
 
-import OSLog
 import CoreSpotlight
+import OSLog
 
 extension CSSearchableItem {
   static func create(_ subject: SubjectDTO) -> CSSearchableItem {

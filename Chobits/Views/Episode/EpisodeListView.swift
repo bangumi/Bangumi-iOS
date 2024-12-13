@@ -12,17 +12,16 @@ import SwiftUI
 struct EpisodeListView: View {
   let subjectId: Int
 
+  @AppStorage("isolationMode") var isolationMode: Bool = false
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
 
   @Environment(\.modelContext) var modelContext
 
-  @State private var now: Date = Date()
   @State private var offset: Int = 0
   @State private var main: Bool = true
   @State private var filterCollection: Bool = false
   @State private var sortDesc: Bool = false
   @State private var exhausted: Bool = false
-  @State private var selected: Episode? = nil
   @State private var loadedIdx: [Int: Bool] = [:]
   @State private var episodes: [EnumerateItem<Episode>] = []
   @State private var countMain: Int = 0
@@ -151,74 +150,14 @@ struct EpisodeListView: View {
         }
     }.padding(.horizontal, 8)
     ScrollView {
-      LazyVStack {
+      LazyVStack(spacing: 10) {
         ForEach(episodes, id: \.inner.self) { item in
-          let episode = item.inner
-          Button {
-            selected = episode
-          } label: {
-            VStack(alignment: .leading) {
-              Text(episode.title)
-                .font(.headline)
-                .lineLimit(1)
-              HStack {
-                if isAuthenticated && episode.collectionTypeEnum != .none {
-                  BorderView(color: Color(hex: episode.borderColor), padding: 4) {
-                    Text("\(episode.collectionTypeEnum.description)")
-                      .foregroundStyle(Color(hex: episode.textColor))
-                      .font(.footnote)
-                  }
-                  .padding(2)
-                  .strikethrough(episode.collection == EpisodeCollectionType.dropped.rawValue)
-                  .background {
-                    RoundedRectangle(cornerRadius: 5)
-                      .fill(Color(hex: episode.backgroundColor))
-                  }
-                } else {
-                  if main {
-                    if episode.air > now {
-                      BorderView(padding: 4) {
-                        Text("未播")
-                          .foregroundStyle(.secondary)
-                          .font(.footnote)
-                      }
-                    } else {
-                      BorderView(color: .primary, padding: 4) {
-                        Text("已播")
-                          .foregroundStyle(.primary)
-                          .font(.footnote)
-                      }
-                    }
-                  } else {
-                    BorderView(color: .primary, padding: 4) {
-                      Text(episode.typeEnum.description)
-                        .foregroundStyle(.primary)
-                        .font(.footnote)
-                    }
-                  }
-                }
-
-                VStack(alignment: .leading) {
-                  if !episode.nameCN.isEmpty {
-                    Text(episode.nameCN)
-                      .lineLimit(1)
-                      .font(.subheadline)
-                  }
-                  HStack {
-                    Label("\(episode.duration)", systemImage: "clock")
-                    Label("\(episode.airdate)", systemImage: "calendar")
-                    Spacer()
-                    Label("+\(episode.comment)", systemImage: "bubble")
-                  }
-                  .font(.footnote)
-                  .foregroundStyle(.secondary)
-                  Divider()
-                }
-                Spacer()
-              }
-            }
+          NavigationLink(
+            value: NavDestination.episode(subjectId: subjectId, episodeId: item.inner.episodeId)
+          ) {
+            EpisodeRowView(episode: item.inner)
           }
-          .padding(.horizontal, 8)
+          .buttonStyle(.plain)
           .onAppear {
             Task {
               await loadNextPage(idx: item.idx)
@@ -226,7 +165,6 @@ struct EpisodeListView: View {
           }
         }
         if exhausted {
-          Divider()
           HStack {
             Spacer()
             Text("没有更多了")
@@ -252,14 +190,6 @@ struct EpisodeListView: View {
         await load()
       }
     }
-    .sheet(
-      item: $selected,
-      content: { episode in
-        EpisodeCollectionBoxView(subjectId: subjectId, episodeId: episode.episodeId)
-          .presentationDragIndicator(.visible)
-          .presentationDetents(.init([.medium, .large]))
-      }
-    )
   }
 }
 

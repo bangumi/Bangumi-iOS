@@ -5,12 +5,12 @@
 //  Created by Chuan Chuan on 2024/4/21.
 //
 
+import CoreSpotlight
 import Foundation
 import KeychainSwift
 import OSLog
 import SwiftData
 import SwiftUI
-import CoreSpotlight
 
 enum BangumiAPI {
   case pub
