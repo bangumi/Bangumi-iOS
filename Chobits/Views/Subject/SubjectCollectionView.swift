@@ -29,41 +29,39 @@ struct SubjectCollectionView: View {
   }
 
   var body: some View {
-    Section {
-      VStack(alignment: .leading) {
-        BorderView(color: .linkText, padding: 5) {
-          HStack {
-            Spacer()
-            if let collection = subject.userCollection {
-              if collection.priv {
-                Image(systemName: "lock")
-              }
-              Label(collection.message, systemImage: collection.typeEnum.icon)
-              StarsView(score: Float(collection.rate), size: 16)
-            } else {
-              Label("未收藏", systemImage: "plus")
-                .foregroundStyle(.secondary)
+    VStack(alignment: .leading) {
+      BorderView(color: .linkText, padding: 5) {
+        HStack {
+          Spacer()
+          if let collection = subject.userCollection {
+            if collection.priv {
+              Image(systemName: "lock")
             }
-            Spacer()
+            Label(collection.message, systemImage: collection.typeEnum.icon)
+            StarsView(score: Float(collection.rate), size: 16)
+          } else {
+            Label("未收藏", systemImage: "plus")
+              .foregroundStyle(.secondary)
           }
-          .foregroundStyle(.linkText)
+          Spacer()
         }
-        .padding(5)
-        .task(refresh)
-        .onTapGesture {
-          edit.toggle()
+        .foregroundStyle(.linkText)
+      }
+      .padding(5)
+      .task(refresh)
+      .onTapGesture {
+        edit.toggle()
+      }
+      .sheet(
+        isPresented: $edit,
+        content: {
+          SubjectCollectionBoxView(subject: subject)
+            .presentationDragIndicator(.visible)
+            .presentationDetents(.init([.medium, .large]))
         }
-        .sheet(
-          isPresented: $edit,
-          content: {
-            SubjectCollectionBoxView(subject: subject)
-              .presentationDragIndicator(.visible)
-              .presentationDetents(.init([.medium, .large]))
-          }
-        )
-        if subject.typeEnum == .book && subject.userCollection != nil {
-          SubjectBookChaptersView(subjectId: subject.subjectId, compact: false)
-        }
+      )
+      if subject.typeEnum == .book && subject.userCollection != nil {
+        SubjectBookChaptersView(subjectId: subject.subjectId, compact: false)
       }
     }
   }
