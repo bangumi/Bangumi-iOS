@@ -15,15 +15,7 @@ extension Logger {
 
   static let api = Logger(subsystem: subsystem, category: "api")
 
-  static let user = Logger(subsystem: subsystem, category: "user")
-
-  static let db = Logger(subsystem: subsystem, category: "db")
-
   static let spotlight = Logger(subsystem: subsystem, category: "spotlight")
 
   static let subject = Logger(subsystem: subsystem, category: "subject")
-
-  static let collection = Logger(subsystem: subsystem, category: "collection")
-
-  static let episode = Logger(subsystem: subsystem, category: "episode")
 }

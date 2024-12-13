@@ -28,11 +28,8 @@ extension Chii {
 
   func logout() {
     @AppStorage("collectionsUpdatedAt") var collectionsUpdatedAt: Int = 0
-    Logger.app.info("start logout")
     self.setAuthStatus(false)
-    Logger.app.info("clear keychain")
     self.keychain.delete("auth")
-    Logger.app.info("clear auth session")
     self.auth = nil
     self.profile = nil
     self.authorizedSession = nil

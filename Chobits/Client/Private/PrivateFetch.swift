@@ -11,7 +11,6 @@ import OSLog
 // MARK: - User
 extension Chii {
   func listNotice(limit: Int? = nil, unread: Bool? = nil) async throws -> PagedDTO<NoticeDTO> {
-    Logger.api.info("start get notify")
     let url = BangumiAPI.priv.build("p1/notify")
     var queryItems: [URLQueryItem] = []
     if let limit = limit {
@@ -23,7 +22,6 @@ extension Chii {
     let pageURL = url.appending(queryItems: queryItems)
     let data = try await self.request(url: pageURL, method: "GET", auth: .required)
     let resp: PagedDTO<NoticeDTO> = try self.decodeResponse(data)
-    Logger.api.info("finish get notify")
     return resp
   }
 }
@@ -31,11 +29,9 @@ extension Chii {
 // MARK: - Character
 extension Chii {
   func getCharacter(_ characterID: Int) async throws -> CharacterDTO {
-    Logger.api.info("start get character: \(characterID)")
     let url = BangumiAPI.priv.build("p1/characters/\(characterID)")
     let data = try await self.request(url: url, method: "GET")
     let character: CharacterDTO = try self.decodeResponse(data)
-    Logger.api.info("finish get character: \(characterID)")
     return character
   }
 
@@ -43,7 +39,6 @@ extension Chii {
     _ characterID: Int, type: CastType = .none, subjectType: SubjectType = .none, limit: Int = 20,
     offset: Int = 0
   ) async throws -> PagedDTO<CharacterCastDTO> {
-    Logger.api.info("start get character casts")
     let url = BangumiAPI.priv.build("p1/characters/\(characterID)/casts")
     var queryItems: [URLQueryItem] = [
       URLQueryItem(name: "limit", value: String(limit)),
@@ -58,14 +53,12 @@ extension Chii {
     let pageURL = url.appending(queryItems: queryItems)
     let data = try await self.request(url: pageURL, method: "GET")
     let resp: PagedDTO<CharacterCastDTO> = try self.decodeResponse(data)
-    Logger.api.info("finish get character casts")
     return resp
   }
 
   func getCharacterCollects(_ characterID: Int, limit: Int = 20, offset: Int = 0) async throws
     -> PagedDTO<PersonCollectDTO>
   {
-    Logger.api.info("start get character collects")
     let url = BangumiAPI.priv.build("p1/characters/\(characterID)/collects")
     let queryItems: [URLQueryItem] = [
       URLQueryItem(name: "limit", value: String(limit)),
@@ -74,14 +67,12 @@ extension Chii {
     let pageURL = url.appending(queryItems: queryItems)
     let data = try await self.request(url: pageURL, method: "GET")
     let resp: PagedDTO<PersonCollectDTO> = try self.decodeResponse(data)
-    Logger.api.info("finish get character collects")
     return resp
   }
 
   func getUserCharacterCollections(username: String, limit: Int = 20, offset: Int = 0) async throws
     -> PagedDTO<UserCharacterCollectionDTO>
   {
-    Logger.api.info("start get user character collections")
     let url = BangumiAPI.priv.build("p1/users/\(username)/collections/characters")
     let queryItems: [URLQueryItem] = [
       URLQueryItem(name: "limit", value: String(limit)),
@@ -90,18 +81,15 @@ extension Chii {
     let pageURL = url.appending(queryItems: queryItems)
     let data = try await self.request(url: pageURL, method: "GET")
     let resp: PagedDTO<UserCharacterCollectionDTO> = try self.decodeResponse(data)
-    Logger.api.info("finish get user character collections")
     return resp
   }
 
   func getUserCharacterCollection(username: String, characterID: Int) async throws
     -> UserCharacterCollectionDTO
   {
-    Logger.api.info("start get user character collection: \(characterID)")
     let url = BangumiAPI.priv.build("p1/users/\(username)/collections/characters/\(characterID)")
     let data = try await self.request(url: url, method: "GET")
     let collection: UserCharacterCollectionDTO = try self.decodeResponse(data)
-    Logger.api.info("finish get user character collection: \(characterID)")
     return collection
   }
 }
@@ -109,11 +97,9 @@ extension Chii {
 // MARK: - Person
 extension Chii {
   func getPerson(_ personID: Int) async throws -> PersonDTO {
-    Logger.api.info("start get person: \(personID)")
     let url = BangumiAPI.priv.build("p1/persons/\(personID)")
     let data = try await self.request(url: url, method: "GET")
     let person: PersonDTO = try self.decodeResponse(data)
-    Logger.api.info("finish get person: \(personID)")
     return person
   }
 
@@ -121,7 +107,6 @@ extension Chii {
     _ personID: Int, position: Int? = nil, subjectType: SubjectType = .none, limit: Int = 20,
     offset: Int = 0
   ) async throws -> PagedDTO<PersonWorkDTO> {
-    Logger.api.info("start get person works")
     let url = BangumiAPI.priv.build("p1/persons/\(personID)/works")
     var queryItems: [URLQueryItem] = [
       URLQueryItem(name: "limit", value: String(limit)),
@@ -136,7 +121,6 @@ extension Chii {
     let pageURL = url.appending(queryItems: queryItems)
     let data = try await self.request(url: pageURL, method: "GET")
     let resp: PagedDTO<PersonWorkDTO> = try self.decodeResponse(data)
-    Logger.api.info("finish get person works")
     return resp
   }
 
@@ -144,7 +128,6 @@ extension Chii {
     _ personID: Int, type: Int? = nil, subjectType: SubjectType? = nil, limit: Int = 20,
     offset: Int = 0
   ) async throws -> PagedDTO<PersonCastDTO> {
-    Logger.api.info("start get person casts")
     let url = BangumiAPI.priv.build("p1/persons/\(personID)/casts")
     var queryItems: [URLQueryItem] = [
       URLQueryItem(name: "limit", value: String(limit)),
@@ -159,14 +142,12 @@ extension Chii {
     let pageURL = url.appending(queryItems: queryItems)
     let data = try await self.request(url: pageURL, method: "GET")
     let resp: PagedDTO<PersonCastDTO> = try self.decodeResponse(data)
-    Logger.api.info("finish get person casts")
     return resp
   }
 
   func getPersonCollects(_ personID: Int, limit: Int = 20, offset: Int = 0) async throws
     -> PagedDTO<PersonCollectDTO>
   {
-    Logger.api.info("start get person collects")
     let url = BangumiAPI.priv.build("p1/persons/\(personID)/collects")
     let queryItems: [URLQueryItem] = [
       URLQueryItem(name: "limit", value: String(limit)),
@@ -175,14 +156,12 @@ extension Chii {
     let pageURL = url.appending(queryItems: queryItems)
     let data = try await self.request(url: pageURL, method: "GET")
     let resp: PagedDTO<PersonCollectDTO> = try self.decodeResponse(data)
-    Logger.api.info("finish get person collects")
     return resp
   }
 
   func getUserPersonCollections(username: String, limit: Int = 20, offset: Int = 0) async throws
     -> PagedDTO<UserPersonCollectionDTO>
   {
-    Logger.api.info("start get user person collections")
     let url = BangumiAPI.priv.build("p1/users/\(username)/collections/persons")
     let queryItems: [URLQueryItem] = [
       URLQueryItem(name: "limit", value: String(limit)),
@@ -191,18 +170,15 @@ extension Chii {
     let pageURL = url.appending(queryItems: queryItems)
     let data = try await self.request(url: pageURL, method: "GET")
     let resp: PagedDTO<UserPersonCollectionDTO> = try self.decodeResponse(data)
-    Logger.api.info("finish get user person collections")
     return resp
   }
 
   func getUserPersonCollection(username: String, personID: Int) async throws
     -> UserPersonCollectionDTO
   {
-    Logger.api.info("start get user person collection: \(personID)")
     let url = BangumiAPI.priv.build("p1/users/\(username)/collections/persons/\(personID)")
     let data = try await self.request(url: url, method: "GET")
     let collection: UserPersonCollectionDTO = try self.decodeResponse(data)
-    Logger.api.info("finish get user person collection: \(personID)")
     return collection
   }
 }
@@ -213,11 +189,9 @@ extension Chii {
     if self.mock {
       return loadFixture(fixture: "subject_anime.json", target: SubjectDTO.self)
     }
-    Logger.api.info("start get subject: \(subjectId)")
     let url = BangumiAPI.priv.build("p1/subjects/\(subjectId)")
     let data = try await self.request(url: url, method: "GET")
     let subject: SubjectDTO = try self.decodeResponse(data)
-    Logger.api.info("finish get subject: \(subjectId)")
     return subject
   }
 
@@ -228,7 +202,6 @@ extension Chii {
       return loadFixture(
         fixture: "subject_episodes.json", target: PagedDTO<EpisodeDTO>.self)
     }
-    Logger.api.info("start get subject episodes")
     let url = BangumiAPI.priv.build("p1/subjects/\(subjectId)/episodes")
     var queryItems: [URLQueryItem] = [
       URLQueryItem(name: "limit", value: String(limit)),
@@ -240,7 +213,6 @@ extension Chii {
     let pageURL = url.appending(queryItems: queryItems)
     let data = try await self.request(url: pageURL, method: "GET")
     let resp: PagedDTO<EpisodeDTO> = try self.decodeResponse(data)
-    Logger.api.info("finish get subject episodes")
     return resp
   }
 
@@ -250,7 +222,6 @@ extension Chii {
   )
     async throws -> PagedDTO<SubjectRelationDTO>
   {
-    Logger.api.info("start get subject relations")
     let url = BangumiAPI.priv.build("p1/subjects/\(subjectId)/relations")
     var queryItems: [URLQueryItem] = [
       URLQueryItem(name: "limit", value: String(limit)),
@@ -265,7 +236,6 @@ extension Chii {
     let pageURL = url.appending(queryItems: queryItems)
     let data = try await self.request(url: pageURL, method: "GET")
     let resp: PagedDTO<SubjectRelationDTO> = try self.decodeResponse(data)
-    Logger.api.info("finish get subject relations")
     return resp
   }
 
@@ -275,7 +245,6 @@ extension Chii {
   )
     async throws -> PagedDTO<SubjectCharacterDTO>
   {
-    Logger.api.info("start get subject characters")
     let url = BangumiAPI.priv.build("p1/subjects/\(subjectId)/characters")
     var queryItems: [URLQueryItem] = [
       URLQueryItem(name: "limit", value: String(limit)),
@@ -287,14 +256,12 @@ extension Chii {
     let pageURL = url.appending(queryItems: queryItems)
     let data = try await self.request(url: pageURL, method: "GET")
     let resp: PagedDTO<SubjectCharacterDTO> = try self.decodeResponse(data)
-    Logger.api.info("finish get subject characters")
     return resp
   }
 
   func getSubjectStaffs(_ subjectId: Int, position: Int? = nil, limit: Int = 20, offset: Int = 0)
     async throws -> PagedDTO<SubjectStaffDTO>
   {
-    Logger.api.info("start get subject staffs")
     let url = BangumiAPI.priv.build("p1/subjects/\(subjectId)/staffs")
     var queryItems: [URLQueryItem] = [
       URLQueryItem(name: "limit", value: String(limit)),
@@ -306,7 +273,6 @@ extension Chii {
     let pageURL = url.appending(queryItems: queryItems)
     let data = try await self.request(url: pageURL, method: "GET")
     let resp: PagedDTO<SubjectStaffDTO> = try self.decodeResponse(data)
-    Logger.api.info("finish get subject staffs")
     return resp
   }
 
@@ -316,7 +282,6 @@ extension Chii {
     if self.mock {
       return loadFixture(fixture: "subject_topics.json", target: PagedDTO<TopicDTO>.self)
     }
-    Logger.api.info("start get subject topics")
     let url = BangumiAPI.priv.build("p1/subjects/\(subjectId)/topics")
     let queryItems: [URLQueryItem] = [
       URLQueryItem(name: "limit", value: String(limit)),
@@ -325,7 +290,6 @@ extension Chii {
     let pageURL = url.appending(queryItems: queryItems)
     let data = try await self.request(url: pageURL, method: "GET")
     let resp: PagedDTO<TopicDTO> = try self.decodeResponse(data)
-    Logger.api.info("finish get subject topics")
     return resp
   }
 
@@ -336,7 +300,6 @@ extension Chii {
       return loadFixture(
         fixture: "subject_comments.json", target: PagedDTO<SubjectCommentDTO>.self)
     }
-    Logger.api.info("start get subject comments")
     let url = BangumiAPI.priv.build("p1/subjects/\(subjectId)/comments")
     let queryItems: [URLQueryItem] = [
       URLQueryItem(name: "limit", value: String(limit)),
@@ -345,7 +308,6 @@ extension Chii {
     let pageURL = url.appending(queryItems: queryItems)
     let data = try await self.request(url: pageURL, method: "GET")
     let resp: PagedDTO<SubjectCommentDTO> = try self.decodeResponse(data)
-    Logger.api.info("finish get subject comments")
     return resp
   }
 
@@ -354,13 +316,11 @@ extension Chii {
       return loadFixture(
         fixture: "user_subject_collection_anime.json", target: UserSubjectCollectionDTO.self)
     }
-    Logger.api.info("start get subject collection: \(subjectId)")
     let profile = try await self.getProfile()
     let url = BangumiAPI.priv.build(
       "p1/users/\(profile.username)/collections/subjects/\(subjectId)")
     let data = try await self.request(url: url, method: "GET")
     let collection: UserSubjectCollectionDTO = try self.decodeResponse(data)
-    Logger.api.info("finish get subject collection: \(subjectId)")
     return collection
   }
 
@@ -376,7 +336,6 @@ extension Chii {
       return loadFixture(
         fixture: "user_subject_collections.json", target: PagedDTO<UserSubjectCollectionDTO>.self)
     }
-    Logger.api.info("start get subject collections")
     let profile = try await self.getProfile()
     let url = BangumiAPI.priv.build("p1/users/\(profile.username)/collections/subjects")
     var queryItems = [
@@ -393,7 +352,6 @@ extension Chii {
     let pageURL = url.appending(queryItems: queryItems)
     let data = try await self.request(url: pageURL, method: "GET")
     let response: PagedDTO<UserSubjectCollectionDTO> = try self.decodeResponse(data)
-    Logger.api.info("finish get subject collections")
     return response
   }
 
@@ -406,8 +364,6 @@ extension Chii {
       return loadFixture(
         fixture: "episode_collections.json", target: PagedDTO<EpisodeCollectionDTO>.self)
     }
-    Logger.api.info(
-      "start get episode collections: \(subjectId), \(type.debugDescription), \(limit), \(offset)")
     var queries: [URLQueryItem] = [
       URLQueryItem(name: "limit", value: String(limit)),
       URLQueryItem(name: "offset", value: String(offset)),
@@ -421,15 +377,12 @@ extension Chii {
     .appending(queryItems: queries)
     let data = try await self.request(url: url, method: "GET", auth: .required)
     let resp: PagedDTO<EpisodeCollectionDTO> = try self.decodeResponse(data)
-    Logger.api.info(
-      "finish get episode collections: \(subjectId), \(type.debugDescription), \(limit), \(offset)")
     return resp
   }
 
   func getSubjectRecs(_ subjectId: Int, limit: Int = 10, offset: Int = 0) async throws -> PagedDTO<
     SubjectRecDTO
   > {
-    Logger.api.info("start get subject recs")
     let url = BangumiAPI.priv.build("p1/subjects/\(subjectId)/recs")
     let queryItems: [URLQueryItem] = [
       URLQueryItem(name: "limit", value: String(limit)),
@@ -438,7 +391,6 @@ extension Chii {
     let pageURL = url.appending(queryItems: queryItems)
     let data = try await self.request(url: pageURL, method: "GET")
     let resp: PagedDTO<SubjectRecDTO> = try self.decodeResponse(data)
-    Logger.api.info("finish get subject recs")
     return resp
   }
 }

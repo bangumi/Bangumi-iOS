@@ -55,8 +55,6 @@ actor Chii {
 
   init() {
     @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
-    Logger.app.info("new init chii client")
-
     self.keychain = KeychainSwift(keyPrefix: "com.everpcpc.chobits.")
     guard let plist = Bundle.main.infoDictionary else {
       fatalError("Could not find Info.plist")

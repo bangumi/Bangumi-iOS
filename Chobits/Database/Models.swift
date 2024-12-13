@@ -36,9 +36,7 @@ final class SubjectV1 {
   var locked: Bool
   var metaTags: [String]
   var tags: [Tag]
-  @Attribute(.spotlight)
   var name: String
-  @Attribute(.spotlight)
   var nameCN: String
   var nsfw: Bool
   var platform: SubjectPlatform

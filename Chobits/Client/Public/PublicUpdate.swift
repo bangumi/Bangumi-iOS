@@ -14,9 +14,6 @@ extension Chii {
     if self.mock {
       return
     }
-    Logger.api.info(
-      "start update subject collection: \(subjectId), eps: \(eps.debugDescription), vols: \(vols.debugDescription)"
-    )
     let url = BangumiAPI.pub.build("v0/users/-/collections/\(subjectId)")
     var body: [String: Any] = [:]
     if let epStatus = eps {
@@ -28,9 +25,6 @@ extension Chii {
     if body.count > 0 {
       _ = try await self.request(url: url, method: "POST", body: body, auth: .required)
     }
-    Logger.api.info(
-      "finish update subject collection: \(subjectId), eps: \(eps.debugDescription), vols: \(vols.debugDescription)"
-    )
     try await self.loadUserSubjectCollection(subjectId)
   }
 
@@ -41,7 +35,6 @@ extension Chii {
     if self.mock {
       return
     }
-    Logger.api.info("start update subject collection: \(subjectId)")
     let url = BangumiAPI.pub.build("v0/users/-/collections/\(subjectId)")
     var body: [String: Any] = [:]
     if let type = type {
@@ -62,7 +55,6 @@ extension Chii {
     if body.count > 0 {
       _ = try await self.request(url: url, method: "POST", body: body, auth: .required)
     }
-    Logger.api.info("finish update subject collection: \(subjectId)")
     try await self.loadUserSubjectCollection(subjectId)
   }
 
@@ -73,10 +65,6 @@ extension Chii {
       return
     }
     let db = try self.getDB()
-    Logger.api.info(
-      "start update subject episode collection: \(subjectId), -> \(updateTo) to \(type.description)"
-    )
-
     let episodeIds = try await db.getEpisodeIDs(subjectId: subjectId, sort: updateTo)
     let url = BangumiAPI.pub.build("v0/users/-/collections/\(subjectId)/episodes")
     let body: [String: Any] = [
@@ -84,8 +72,6 @@ extension Chii {
       "type": type.rawValue,
     ]
     _ = try await self.request(url: url, method: "PATCH", body: body, auth: .required)
-    Logger.api.info("finish update subject episode collection: \(subjectId), \(episodeIds)")
-
     try await db.updateEpisodeCollections(subjectId: subjectId, sort: updateTo, type: type)
     try await db.commit()
     try await self.loadUserSubjectCollection(subjectId)
@@ -98,15 +84,12 @@ extension Chii {
       return
     }
     let db = try self.getDB()
-    Logger.api.info("start update episode collection: \(episodeId)")
     let url = BangumiAPI.pub.build(
       "v0/users/-/collections/-/episodes/\(episodeId)")
     let body: [String: Any] = [
       "type": type.rawValue
     ]
     _ = try await self.request(url: url, method: "PUT", body: body, auth: .required)
-    Logger.api.info("finish update episode collection: \(episodeId)")
-
     try await db.updateEpisodeCollection(subjectId: subjectId, episodeId: episodeId, type: type)
     try await db.commit()
     try await self.loadUserSubjectCollection(subjectId)

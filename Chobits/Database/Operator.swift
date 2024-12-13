@@ -150,6 +150,21 @@ extension DatabaseOperator {
     return subject
   }
 
+  public func ensureEpisode(_ item: EpisodeDTO) throws -> Episode {
+    let eid = item.id
+    let fetched = try self.fetchOne(
+      predicate: #Predicate<Episode> {
+        $0.episodeId == eid
+      })
+    if let episode = fetched {
+      episode.update(item)
+      return episode
+    }
+    let episode = Episode(item)
+    modelContext.insert(episode)
+    return episode
+  }
+
   public func ensureCharacter(_ item: CharacterDTO) throws -> Character {
     let cid = item.id
     let fetched = try self.fetchOne(
@@ -254,25 +269,24 @@ extension DatabaseOperator {
   }
 
   public func saveEpisode(_ item: EpisodeDTO) throws {
-    let episode = Episode(item)
-    modelContext.insert(episode)
     guard
       let subject = try self.getSubject(item.subjectID)
     else {
       return
     }
+    let episode = try self.ensureEpisode(item)
     episode.subject = subject
   }
 
   public func saveEpisode(_ item: EpisodeCollectionDTO) throws {
-    let episode = Episode(item)
-    modelContext.insert(episode)
     guard
       let subject = try self.getSubject(item.episode.subjectID)
     else {
       return
     }
+    let episode = try self.ensureEpisode(item.episode)
     episode.subject = subject
+    episode.collection = item.type.rawValue
   }
 
   public func saveCharacter(_ item: CharacterDTO) throws {

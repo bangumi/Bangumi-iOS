@@ -5,6 +5,7 @@
 //  Created by Chuan Chuan on 2024/5/8.
 //
 
+import CoreSpotlight
 import SwiftData
 import SwiftUI
 
@@ -39,6 +40,18 @@ struct SettingsView: View {
       do {
         try modelContext.delete(model: UserSubjectCollection.self)
         try modelContext.delete(model: Episode.self)
+        Notifier.shared.notify(message: "退出登录成功")
+      } catch {
+        Notifier.shared.alert(error: error)
+      }
+    }
+  }
+
+  func reindex() {
+    Task {
+      do {
+        try await CSSearchableIndex.default().deleteAllSearchableItems()
+        Notifier.shared.notify(message: "Spotlight 索引清除成功")
       } catch {
         Notifier.shared.alert(error: error)
       }
@@ -108,15 +121,17 @@ struct SettingsView: View {
             "隐私声明", destination: URL(string: "https://www.everpcpc.com/privacy-policy/chobits/")!)
         }
       }
-
-      if isAuthenticated {
-        Section {
-          HStack {
-            Spacer()
-            Button(action: logout) {
-              Text("退出登录")
-            }.foregroundStyle(.red)
-            Spacer()
+      Section {
+        Button(role: .destructive) {
+          reindex()
+        } label: {
+          Text("清除 Spotlight 索引")
+        }
+        if isAuthenticated {
+          Button(role: .destructive) {
+            logout()
+          } label: {
+            Text("退出登录")
           }
         }
       }

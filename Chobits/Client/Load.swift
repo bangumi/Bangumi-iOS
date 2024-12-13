@@ -47,36 +47,10 @@ extension Chii {
       try await db.saveUserSubjectCollection(item)
       await self.index(for: [item.subject])
     } catch ChiiError.notFound(_) {
-      Logger.collection.warning("collection not found for subject: \(subjectId)")
+      Logger.subject.warning("collection not found for subject: \(subjectId)")
       try await db.deleteUserCollection(subjectId: subjectId)
     }
     try await db.commit()
-  }
-
-  func loadUserSubjectCollections(since: Int = 0) async throws -> Int {
-    let db = try self.getDB()
-    let limit: Int = 100
-    var offset: Int = 0
-    var count: Int = 0
-    while true {
-      let response = try await self.getUserSubjectCollections(
-        since: since, limit: limit, offset: offset)
-      if response.data.isEmpty {
-        break
-      }
-      for item in response.data {
-        count += 1
-        try await db.saveUserSubjectCollection(item)
-        await self.index(for: [item.subject])
-      }
-      Logger.api.info("loaded user collection: \(response.data.count), total: \(response.total)")
-      offset += limit
-      if offset >= response.total {
-        break
-      }
-    }
-    try await db.commit()
-    return count
   }
 
   func loadEpisodes(_ subjectId: Int, once: Bool = false) async throws {
@@ -152,6 +126,7 @@ extension Chii {
     }
     try await db.saveCharacter(item)
     try await db.commit()
+    await self.index(for: [item])
   }
 
   func loadPerson(_ pid: Int) async throws {
@@ -163,5 +138,6 @@ extension Chii {
     }
     try await db.savePerson(item)
     try await db.commit()
+    await self.index(for: [item])
   }
 }

@@ -56,7 +56,6 @@ struct SearchView: View {
       let resp = try await Chii.shared.search(
         keyword: text, type: subjectType, limit: limit, offset: offset)
       if offset > resp.total {
-        Logger.app.info("remote search exhausted at total count: \(resp.total)")
         exhausted = true
       }
       var result: [EnumerateItem<Subject>] = []

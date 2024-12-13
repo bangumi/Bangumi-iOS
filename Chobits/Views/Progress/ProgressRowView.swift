@@ -46,7 +46,7 @@ struct ProgressRowView: View {
         nextEpisode = nil
       }
     } catch {
-      Logger.episode.error("fetch next episode error: \(error)")
+      Logger.subject.error("fetch next episode error: \(error)")
     }
   }
 

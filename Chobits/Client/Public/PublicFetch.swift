@@ -16,12 +16,10 @@ extension Chii {
     if let profile = self.profile {
       return profile
     }
-    Logger.api.info("start get profile")
     let url = BangumiAPI.pub.build("v0/me")
     let data = try await self.request(url: url, method: "GET", auth: .required)
     let profile: User = try self.decodeResponse(data)
     self.profile = profile
-    Logger.api.info("finish get profile")
     return profile
   }
 
@@ -29,27 +27,22 @@ extension Chii {
     if self.mock {
       return loadFixture(fixture: "profile.json", target: User.self)
     }
-    Logger.api.info("start get user \(uid)")
     let url = BangumiAPI.pub.build("v0/users/\(uid)")
     let data = try await self.request(url: url, method: "GET")
     let user: User = try self.decodeResponse(data)
-    Logger.api.info("finish get user \(uid)")
     return user
   }
 
   func getCalendar() async throws -> [BangumiCalendarDTO] {
-    Logger.api.info("start get calendar")
     let url = BangumiAPI.pub.build("calendar")
     let data = try await self.request(url: url, method: "GET")
     let calendars: [BangumiCalendarDTO] = try self.decodeResponse(data)
-    Logger.api.info("finish get calendar")
     return calendars
   }
 
   func search(keyword: String, type: SubjectType = .none, limit: Int = 10, offset: Int = 0)
     async throws -> SubjectsResponse
   {
-    Logger.api.info("start search: \(keyword), \(type.name), \(limit), \(offset)")
     let queries: [URLQueryItem] = [
       URLQueryItem(name: "limit", value: String(limit)),
       URLQueryItem(name: "offset", value: String(offset)),
@@ -76,7 +69,6 @@ extension Chii {
       url: url, method: "POST", body: body
     )
     let resp: SubjectsResponse = try self.decodeResponse(data)
-    Logger.api.info("finish search: \(keyword), \(type.name), \(limit), \(offset)")
     return resp
   }
 
@@ -86,8 +78,6 @@ extension Chii {
     if self.mock {
       return loadFixture(fixture: "subjects.json", target: SubjectsResponse.self)
     }
-    Logger.api.info(
-      "start browsing subjects: \(type.description), \(limit), \(offset), \(filter.description)")
     var queries: [URLQueryItem] = [
       URLQueryItem(name: "type", value: String(type.rawValue)),
       URLQueryItem(name: "limit", value: String(limit)),
@@ -115,8 +105,6 @@ extension Chii {
       .appending(queryItems: queries)
     let data = try await self.request(url: url, method: "GET")
     let response: SubjectsResponse = try self.decodeResponse(data)
-    Logger.api.info(
-      "finish browsing subjects: \(type.description), \(limit), \(offset), \(filter.description)")
     return response
   }
 }

@@ -35,7 +35,7 @@ struct PadView: View {
         hasUnreadNotice = true
       }
     } catch {
-      Logger.user.error("check notice failed: \(error)")
+      Logger.app.error("check notice failed: \(error)")
     }
   }
 

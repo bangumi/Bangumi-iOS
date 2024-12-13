@@ -15,10 +15,12 @@ struct ChiiProgressView: View {
 
   @Environment(\.modelContext) var modelContext
 
+  @State private var refreshing: Bool = false
+  @State private var refreshProgress: CGFloat = 0
+
   @FocusState private var searching: Bool
   @State private var search: String = ""
   @State private var subjectType: SubjectType = .none
-  @State private var refreshing: Bool = false
   @State private var offset: Int = 0
   @State private var exhausted: Bool = false
   @State private var loadedIdx: [Int: Bool] = [:]
@@ -101,8 +103,7 @@ struct ChiiProgressView: View {
   func refresh() async {
     let now = Date()
     do {
-      let count = try await Chii.shared.loadUserSubjectCollections(
-        since: collectionsUpdatedAt)
+      let count = try await refreshCollections(since: collectionsUpdatedAt)
       if count > 0 {
         Notifier.shared.notify(message: "更新了 \(count) 条收藏")
       }
@@ -112,16 +113,52 @@ struct ChiiProgressView: View {
     collectionsUpdatedAt = Int(now.timeIntervalSince1970)
   }
 
+  func refreshCollections(since: Int = 0) async throws -> Int {
+    let db = try await Chii.shared.getDB()
+    refreshProgress = 0
+    let limit: Int = 100
+    var offset: Int = 0
+    var count: Int = 0
+    while true {
+      let resp = try await Chii.shared.getUserSubjectCollections(
+        since: since, limit: limit, offset: offset)
+      if resp.data.isEmpty {
+        break
+      }
+      for item in resp.data {
+        count += 1
+        try await db.saveUserSubjectCollection(item)
+        refreshProgress = CGFloat(count) / CGFloat(resp.total)
+      }
+      try await db.commit()
+      await Chii.shared.index(for: resp.data)
+      offset += limit
+      if offset >= resp.total {
+        break
+      }
+    }
+    try await db.commit()
+    return count
+  }
+
   var body: some View {
     VStack {
       if isAuthenticated {
         ScrollView {
           if refreshing {
-            HStack {
-              Spacer()
-              ProgressView()
-              Spacer()
-            }.frame(height: 40)
+            if collectionsUpdatedAt == 0 {
+              HStack {
+                ProgressView(value: refreshProgress)
+              }
+              .padding()
+              .frame(height: 40)
+            } else {
+              HStack {
+                Spacer()
+                ProgressView()
+                Spacer()
+              }.frame(height: 40)
+            }
           }
           Picker("Subject Type", selection: $subjectType) {
             ForEach(SubjectType.progressTypes) { type in
