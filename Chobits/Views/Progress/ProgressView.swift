@@ -131,7 +131,7 @@ struct ChiiProgressView: View {
         refreshProgress = CGFloat(count) / CGFloat(resp.total)
       }
       try await db.commit()
-      await Chii.shared.index(for: resp.data)
+      await Chii.shared.index(resp.data.map { $0.subject.searchable() })
       offset += limit
       if offset >= resp.total {
         break

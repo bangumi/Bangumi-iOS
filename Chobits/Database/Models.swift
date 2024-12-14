@@ -23,7 +23,7 @@ final class BangumiCalendarV0 {
 typealias Subject = SubjectV1
 
 @Model
-final class SubjectV1 {
+final class SubjectV1: Searchable {
   @Attribute(.unique)
   var subjectId: Int
 
@@ -218,7 +218,7 @@ final class UserSubjectCollectionV1 {
 typealias Character = CharacterV1
 
 @Model
-final class CharacterV1 {
+final class CharacterV1: Searchable {
   @Attribute(.unique)
   var characterId: Int
 
@@ -290,7 +290,7 @@ final class UserCharacterCollectionV1 {
 typealias Person = PersonV1
 
 @Model
-final class PersonV1 {
+final class PersonV1: Searchable {
   @Attribute(.unique)
   var personId: Int
 

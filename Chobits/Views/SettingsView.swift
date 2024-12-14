@@ -26,6 +26,9 @@ struct SettingsView: View {
   @State private var selectedDefaultProgressType: SubjectType = .anime
   @State private var isolationModeEnabled: Bool = false
 
+  @State private var refreshing: Bool = false
+  @State private var refreshProgress: CGFloat = 0
+
   func load() {
     selectedShareDomain = ShareDomain(shareDomain)
     selectedAuthDomain = AuthDomain(authDomain)
@@ -48,10 +51,30 @@ struct SettingsView: View {
   }
 
   func reindex() {
+    refreshing = true
+    refreshProgress = 0
+    let limit: Int = 100
+    var offset: Int = 0
     Task {
+      let db = try await Chii.shared.getDB()
       do {
         try await CSSearchableIndex.default().deleteAllSearchableItems()
         Notifier.shared.notify(message: "Spotlight 索引清除成功")
+        while true {
+          let resp = try await db.getSearchable(
+            Subject.self, limit: limit, offset: offset)
+          if resp.data.isEmpty {
+            break
+          }
+          await Chii.shared.index(resp.data)
+          refreshProgress = CGFloat(offset) / CGFloat(resp.total)
+          offset += limit
+          if offset >= resp.total {
+            break
+          }
+        }
+        Notifier.shared.notify(message: "Spotlight 索引重建完成")
+        refreshing = false
       } catch {
         Notifier.shared.alert(error: error)
       }
@@ -122,10 +145,17 @@ struct SettingsView: View {
         }
       }
       Section {
+        if refreshing {
+          HStack {
+            ProgressView(value: refreshProgress)
+          }
+          .padding()
+          .frame(height: 20)
+        }
         Button(role: .destructive) {
           reindex()
         } label: {
-          Text("清除 Spotlight 索引")
+          Text("重建 Spotlight 索引")
         }
         if isAuthenticated {
           Button(role: .destructive) {
@@ -134,7 +164,7 @@ struct SettingsView: View {
             Text("退出登录")
           }
         }
-      }
+      }.disabled(refreshing)
     }
     .navigationTitle("设置")
     .navigationBarTitleDisplayMode(.inline)

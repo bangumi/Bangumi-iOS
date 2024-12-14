@@ -10,6 +10,11 @@ import Foundation
 struct PagedDTO<T: Sendable & Codable>: Codable, Sendable {
   var data: [T]
   var total: Int
+
+  init(data: [T], total: Int) {
+    self.data = data
+    self.total = total
+  }
 }
 
 struct NoticeDTO: Codable, Identifiable, Equatable {
@@ -68,7 +73,7 @@ struct UserSubjectCollectionDTO: Codable {
   var subject: SubjectDTO
 }
 
-struct SubjectDTO: Codable, Identifiable {
+struct SubjectDTO: Codable, Identifiable, Searchable {
   var id: Int
   var airtime: SubjectAirtime
   var collection: SubjectCollection
@@ -103,7 +108,7 @@ struct SlimSubjectDTO: Codable, Identifiable {
   var type: SubjectType
 }
 
-struct CharacterDTO: Codable, Identifiable {
+struct CharacterDTO: Codable, Identifiable, Searchable {
   var collects: Int
   var comment: Int
   var id: Int
@@ -128,7 +133,7 @@ struct SlimCharacterDTO: Codable, Identifiable {
   var role: CharacterType
 }
 
-struct PersonDTO: Codable, Identifiable {
+struct PersonDTO: Codable, Identifiable, Searchable {
   var career: [PersonCareer]
   var collects: Int
   var comment: Int

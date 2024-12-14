@@ -21,96 +21,155 @@ func tokenize(text: String) -> [String] {
   return keywords
 }
 
-let SpotlightSearchDomain = "com.everpcpc.Chobits"
+protocol Searchable {
+  func searchable() -> SearchableItem
+}
 
-extension CSSearchableItem {
-  static func create(_ subject: SubjectDTO) -> CSSearchableItem {
-    let attributeSet = CSSearchableItemAttributeSet(contentType: .text)
-    attributeSet.title = subject.name
-    var displayName = subject.name
-    subject.infobox.aliases.forEach { displayName += " / \($0)" }
-    attributeSet.displayName = displayName
-    attributeSet.alternateNames = subject.infobox.aliases
-    attributeSet.contentDescription = subject.summary
-    if let image = subject.images?.medium, let imageURL = URL(string: image) {
-      attributeSet.thumbnailURL = imageURL
-    }
-    return CSSearchableItem(
-      uniqueIdentifier: "subject.\(subject.id)",
-      domainIdentifier: SpotlightSearchDomain,
-      attributeSet: attributeSet
-    )
+struct SearchableItem: Codable {
+  let catorgory: String
+  let identifier: Int
+  let title: String
+  let displayName: String
+  let alternateNames: [String]
+  let contentDescription: String
+  let thumbnailURL: String?
+
+  init(
+    catorgory: String,
+    identifier: Int,
+    title: String,
+    displayName: String,
+    alternateNames: [String],
+    contentDescription: String,
+    thumbnailURL: String? = nil
+  ) {
+    self.catorgory = catorgory
+    self.identifier = identifier
+    self.title = title
+    self.displayName = displayName
+    self.alternateNames = alternateNames
+    self.contentDescription = contentDescription
+    self.thumbnailURL = thumbnailURL
   }
 
-  static func create(_ person: PersonDTO) -> CSSearchableItem {
+  func index() -> CSSearchableItem {
     let attributeSet = CSSearchableItemAttributeSet(contentType: .text)
-    attributeSet.title = person.name
-    var displayName = person.name
-    person.infobox.aliases.forEach { displayName += " / \($0)" }
-    attributeSet.displayName = displayName
-    attributeSet.alternateNames = person.infobox.aliases
-    attributeSet.contentDescription = person.summary
-    if let image = person.images?.medium, let imageURL = URL(string: image) {
+    attributeSet.title = self.title.trimmingCharacters(in: .whitespacesAndNewlines)
+    attributeSet.displayName = self.displayName.trimmingCharacters(in: .whitespacesAndNewlines)
+    attributeSet.alternateNames = self.alternateNames
+    attributeSet.contentDescription = self.contentDescription.trimmingCharacters(
+      in: .whitespacesAndNewlines)
+    if let thumbnailURL = self.thumbnailURL, let imageURL = URL(string: thumbnailURL) {
       attributeSet.thumbnailURL = imageURL
     }
     return CSSearchableItem(
-      uniqueIdentifier: "person.\(person.id)",
-      domainIdentifier: SpotlightSearchDomain,
-      attributeSet: attributeSet
-    )
-  }
-
-  static func create(_ character: CharacterDTO) -> CSSearchableItem {
-    let attributeSet = CSSearchableItemAttributeSet(contentType: .text)
-    attributeSet.title = character.name
-    var displayName = character.name
-    character.infobox.aliases.forEach { displayName += " / \($0)" }
-    attributeSet.displayName = displayName
-    attributeSet.alternateNames = character.infobox.aliases
-    attributeSet.contentDescription = character.summary
-    if let image = character.images?.medium, let imageURL = URL(string: image) {
-      attributeSet.thumbnailURL = imageURL
-    }
-    return CSSearchableItem(
-      uniqueIdentifier: "character.\(character.id)",
-      domainIdentifier: SpotlightSearchDomain,
+      uniqueIdentifier: "\(self.catorgory).\(self.identifier)",
+      domainIdentifier: "com.everpcpc.Chobits",
       attributeSet: attributeSet
     )
   }
 }
 
+extension SubjectDTO {
+  func searchable() -> SearchableItem {
+    var displayName = self.name
+    self.infobox.aliases.forEach { displayName += " / \($0)" }
+    return SearchableItem(
+      catorgory: "subject",
+      identifier: self.id,
+      title: self.name,
+      displayName: displayName,
+      alternateNames: self.infobox.aliases,
+      contentDescription: self.summary,
+      thumbnailURL: self.images?.medium
+    )
+  }
+}
+
+extension Subject {
+  func searchable() -> SearchableItem {
+    var displayName = self.name
+    self.infobox.aliases.forEach { displayName += " / \($0)" }
+    return SearchableItem(
+      catorgory: "subject",
+      identifier: self.subjectId,
+      title: self.name,
+      displayName: displayName,
+      alternateNames: self.infobox.aliases,
+      contentDescription: self.summary,
+      thumbnailURL: self.images?.medium
+    )
+  }
+}
+
+extension PersonDTO {
+  func searchable() -> SearchableItem {
+    var displayName = self.name
+    self.infobox.aliases.forEach { displayName += " / \($0)" }
+    return SearchableItem(
+      catorgory: "person",
+      identifier: self.id,
+      title: self.name,
+      displayName: displayName,
+      alternateNames: self.infobox.aliases,
+      contentDescription: self.summary,
+      thumbnailURL: self.images?.medium
+    )
+  }
+}
+
+extension Person {
+  func searchable() -> SearchableItem {
+    var displayName = self.name
+    self.infobox.aliases.forEach { displayName += " / \($0)" }
+    return SearchableItem(
+      catorgory: "person",
+      identifier: self.personId,
+      title: self.name,
+      displayName: displayName,
+      alternateNames: self.infobox.aliases,
+      contentDescription: self.summary,
+      thumbnailURL: self.images?.medium
+    )
+  }
+}
+
+extension CharacterDTO {
+  func searchable() -> SearchableItem {
+    var displayName = self.name
+    self.infobox.aliases.forEach { displayName += " / \($0)" }
+    return SearchableItem(
+      catorgory: "character",
+      identifier: self.id,
+      title: self.name,
+      displayName: displayName,
+      alternateNames: self.infobox.aliases,
+      contentDescription: self.summary,
+      thumbnailURL: self.images?.medium
+    )
+  }
+}
+
+extension Character {
+  func searchable() -> SearchableItem {
+    var displayName = self.name
+    self.infobox.aliases.forEach { displayName += " / \($0)" }
+    return SearchableItem(
+      catorgory: "character",
+      identifier: self.characterId,
+      title: self.name,
+      displayName: displayName,
+      alternateNames: self.infobox.aliases,
+      contentDescription: self.summary,
+      thumbnailURL: self.images?.medium
+    )
+  }
+}
+
 extension Chii {
-  func index(for subjects: [SubjectDTO]) async {
-    let items = subjects.map { CSSearchableItem.create($0) }
+  func index(_ items: [SearchableItem]) async {
     do {
-      try await CSSearchableIndex.default().indexSearchableItems(items)
-    } catch {
-      Logger.spotlight.error("Failed to index: \(error)")
-    }
-  }
-
-  func index(for collections: [UserSubjectCollectionDTO]) async {
-    let items = collections.map { CSSearchableItem.create($0.subject) }
-    do {
-      try await CSSearchableIndex.default().indexSearchableItems(items)
-    } catch {
-      Logger.spotlight.error("Failed to index: \(error)")
-    }
-  }
-
-  func index(for people: [PersonDTO]) async {
-    let items = people.map { CSSearchableItem.create($0) }
-    do {
-      try await CSSearchableIndex.default().indexSearchableItems(items)
-    } catch {
-      Logger.spotlight.error("Failed to index: \(error)")
-    }
-  }
-
-  func index(for characters: [CharacterDTO]) async {
-    let items = characters.map { CSSearchableItem.create($0) }
-    do {
-      try await CSSearchableIndex.default().indexSearchableItems(items)
+      try await CSSearchableIndex.default().indexSearchableItems(items.map { $0.index() })
     } catch {
       Logger.spotlight.error("Failed to index: \(error)")
     }

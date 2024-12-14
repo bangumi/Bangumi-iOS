@@ -61,6 +61,22 @@ extension DatabaseOperator {
     let episodes = try modelContext.fetch(descriptor)
     return episodes.map { $0.episodeId }
   }
+
+  public func getSearchable<T: PersistentModel & Searchable>(
+    _ type: T.Type,
+    limit: Int = 20,
+    offset: Int = 0
+  ) throws -> PagedDTO<SearchableItem> {
+    let total = try modelContext.fetchCount(FetchDescriptor<T>())
+    var descriptor = FetchDescriptor<T>()
+    descriptor.fetchLimit = limit
+    descriptor.fetchOffset = offset
+    let items = try modelContext.fetch(descriptor)
+    return PagedDTO(
+      data: items.map { $0.searchable() },
+      total: total
+    )
+  }
 }
 
 // MARK: - delete,update user collection

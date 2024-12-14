@@ -34,7 +34,7 @@ extension Chii {
 
     try await db.saveSubject(item)
     try await db.commit()
-    await self.index(for: [item])
+    await self.index([item.searchable()])
   }
 
   func loadUserSubjectCollection(_ subjectId: Int) async throws {
@@ -45,7 +45,7 @@ extension Chii {
     do {
       let item = try await self.getUserSubjectCollection(subjectId)
       try await db.saveUserSubjectCollection(item)
-      await self.index(for: [item.subject])
+      await self.index([item.subject.searchable()])
     } catch ChiiError.notFound(_) {
       Logger.subject.warning("collection not found for subject: \(subjectId)")
       try await db.deleteUserCollection(subjectId: subjectId)
@@ -126,7 +126,7 @@ extension Chii {
     }
     try await db.saveCharacter(item)
     try await db.commit()
-    await self.index(for: [item])
+    await self.index([item.searchable()])
   }
 
   func loadPerson(_ pid: Int) async throws {
@@ -138,6 +138,6 @@ extension Chii {
     }
     try await db.savePerson(item)
     try await db.commit()
-    await self.index(for: [item])
+    await self.index([item.searchable()])
   }
 }
