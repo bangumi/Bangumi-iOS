@@ -9,52 +9,50 @@ import SwiftData
 import SwiftUI
 
 struct CollectionRowView: View {
-  let subjectId: Int
-
-  @Environment(\.modelContext) var modelContext
-
-  @Query private var subjects: [Subject]
-  private var subject: Subject? { subjects.first }
-
-  @Query private var collections: [UserSubjectCollection]
-  private var collection: UserSubjectCollection? { collections.first }
-
-  init(subjectId: Int) {
-    self.subjectId = subjectId
-
-    _subjects = Query(
-      filter: #Predicate<Subject> {
-        $0.subjectId == subjectId
-      })
-    _collections = Query(
-      filter: #Predicate<UserSubjectCollection> {
-        $0.subjectId == subjectId
-      })
-  }
+  @ObservableModel var collection: UserSubjectCollection
 
   var body: some View {
-    HStack {
-      ImageView(img: subject?.images?.common, width: 60, height: 60, type: .subject)
+    HStack(alignment: .top) {
+      NavigationLink(value: NavDestination.subject(collection.subjectId)) {
+        ImageView(img: collection.subject?.images?.common, width: 60, height: 60, type: .subject)
+      }
       VStack(alignment: .leading) {
-        Text(subject?.name ?? "").font(.headline)
-        Text(subject?.nameCN ?? "").font(.footnote).foregroundStyle(.secondary)
-        if let collection = collection {
-          HStack {
-            if collection.priv {
-              Image(systemName: "lock.fill").foregroundStyle(.accent)
-            }
-            Text(collection.updatedAt.formatCollectionDate)
+        NavigationLink(value: NavDestination.subject(collection.subjectId)) {
+          Text(collection.subject?.name ?? "")
+            .lineLimit(1)
+        }
+        Text(collection.subject?.nameCN ?? "")
+          .lineLimit(1)
+          .font(.footnote)
+          .foregroundStyle(.secondary)
+        Spacer()
+        HStack(alignment: .bottom) {
+          if collection.priv {
+            Image(systemName: "lock.fill").foregroundStyle(.accent)
+          }
+          Text(collection.updatedAt.formatCollectionDate)
+            .foregroundStyle(.secondary)
+            .lineLimit(1)
+          Spacer()
+          if collection.rate > 0 {
+            StarsView(score: Float(collection.rate), size: 12)
+          }
+        }.font(.footnote)
+        if !collection.comment.isEmpty {
+          VStack(alignment: .leading, spacing: 2) {
+            Divider()
+            Text(collection.comment)
+              .padding(2)
+              .font(.footnote)
+              .multilineTextAlignment(.leading)
+              .textSelection(.enabled)
               .foregroundStyle(.secondary)
-              .lineLimit(1)
-            Spacer()
-            if collection.rate > 0 {
-              StarsView(score: Float(collection.rate), size: 12)
-            }
-          }.font(.footnote)
+          }
         }
       }
     }
-    .frame(height: 60)
+    .buttonStyle(.navLink)
+    .frame(minHeight: 60)
     .padding(2)
     .clipShape(RoundedRectangle(cornerRadius: 10))
   }
@@ -67,10 +65,11 @@ struct CollectionRowView: View {
   let subject = Subject.previewAnime
   container.mainContext.insert(subject)
   container.mainContext.insert(collection)
+  collection.subject = subject
 
   return ScrollView {
     LazyVStack(alignment: .leading) {
-      CollectionRowView(subjectId: subject.subjectId)
+      CollectionRowView(collection: collection)
     }
   }
   .padding()

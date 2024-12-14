@@ -120,18 +120,15 @@ struct CollectionListView: View {
           ScrollView {
             LazyVStack(alignment: .leading, spacing: 10) {
               ForEach(collections, id: \.inner) { item in
-                NavigationLink(value: NavDestination.subject(item.inner.subjectId)) {
-                  CollectionRowView(subjectId: item.inner.subjectId)
-                }
-                .buttonStyle(.navLink)
-                .onAppear {
-                  Task {
-                    await loadNextPage(idx: item.idx)
+                CollectionRowView(collection: item.inner)
+                  .onAppear {
+                    Task {
+                      await loadNextPage(idx: item.idx)
+                    }
                   }
-                }
+                Divider()
               }
               if exhausted {
-                Divider()
                 HStack {
                   Spacer()
                   Text("没有更多了")

@@ -71,13 +71,15 @@ struct SubjectCollectionView: View {
         }
       )
       if let comment = collection?.comment, !comment.isEmpty {
-        BorderView(color: .secondary) {
+        VStack(spacing: 2) {
+          Divider()
           Text(comment)
             .padding(2)
             .font(.footnote)
+            .multilineTextAlignment(.leading)
             .textSelection(.enabled)
             .foregroundStyle(.secondary)
-        }.padding(2)
+        }
       }
       if collection?.subjectTypeEnum == .book {
         SubjectBookChaptersView(subjectId: subjectId, compact: false)
