@@ -5,6 +5,7 @@
 //  Created by Chuan Chuan on 2024/10/29.
 //
 
+import CoreSpotlight
 import OSLog
 import SwiftUI
 
@@ -15,6 +16,7 @@ struct PadView: View {
 
   @State private var selectedTab: PadViewTab? = .discover
   @State private var columns: NavigationSplitViewVisibility = .all
+  @State private var nav: NavigationPath = NavigationPath()
 
   @State private var profile: User?
 
@@ -112,7 +114,7 @@ struct PadView: View {
         await checkNotice()
       }
     } detail: {
-      NavigationStack {
+      NavigationStack(path: $nav) {
         TabView(selection: $selectedTab) {
           ForEach(PadViewTab.mainTabs, id: \.self) { tab in
             tab
@@ -143,6 +145,9 @@ struct PadView: View {
         }
         .navigationBarTitleDisplayMode(.inline)
         .navigationDestination(for: NavDestination.self) { $0 }
+      }
+      .onContinueUserActivity(CSSearchableItemActionType) { activity in
+        handleSearchActivity(activity, nav: $nav)
       }
     }
     .navigationSplitViewStyle(.balanced)

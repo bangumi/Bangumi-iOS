@@ -8,6 +8,7 @@
 import CoreSpotlight
 import NaturalLanguage
 import OSLog
+import SwiftUI
 
 func tokenize(text: String) -> [String] {
   // 设置分割粒度，.word分词，.paragraph分段落，.sentence分句，document
@@ -163,5 +164,33 @@ extension Character {
       contentDescription: self.summary,
       thumbnailURL: self.images?.medium
     )
+  }
+}
+
+@MainActor
+func handleSearchActivity(_ activity: NSUserActivity, nav: Binding<NavigationPath>) {
+  guard let userinfo = activity.userInfo as? [String: Any] else {
+    return
+  }
+  guard let identifier = userinfo["kCSSearchableItemActivityIdentifier"] as? String else {
+    return
+  }
+  let components = identifier.components(separatedBy: ".")
+  if components.count != 2 {
+    return
+  }
+  let category = components[0]
+  guard let id = Int(components[1]) else {
+    return
+  }
+  switch category {
+  case "subject":
+    nav.wrappedValue.append(NavDestination.subject(id))
+  case "character":
+    nav.wrappedValue.append(NavDestination.character(id))
+  case "person":
+    nav.wrappedValue.append(NavDestination.person(id))
+  default:
+    Notifier.shared.notify(message: "未知的搜索结果类型: \(identifier)")
   }
 }
