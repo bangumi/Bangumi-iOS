@@ -15,7 +15,21 @@ struct ProgressRowView: View {
   @Environment(\.modelContext) var modelContext
 
   @State private var updating: Bool = false
-  @State private var nextEpisode: Episode?
+
+  @Query private var pendingEpisodes: [Episode]
+  private var nextEpisode: Episode? { pendingEpisodes.first }
+
+  init(collection: UserSubjectCollection) {
+    _collection = ObservableModel(wrappedValue: collection)
+
+    let subjectId = collection.subjectId
+    var descriptor = FetchDescriptor<Episode>(
+      predicate: #Predicate<Episode> {
+        $0.subjectId == subjectId && $0.type == 0 && $0.collection == 0
+      }, sortBy: [SortDescriptor<Episode>(\.sort, order: .forward)])
+    descriptor.fetchLimit = 1
+    _pendingEpisodes = Query(descriptor)
+  }
 
   var totalEps: Int {
     collection.subject?.eps ?? 0
@@ -23,31 +37,6 @@ struct ProgressRowView: View {
 
   var totalVols: Int {
     collection.subject?.volumes ?? 0
-  }
-
-  func loadNextEpisode() async {
-    let subjectId = collection.subjectId
-    switch collection.subject?.typeEnum {
-    case .anime, .real:
-      break
-    default:
-      return
-    }
-    do {
-      var desc = FetchDescriptor<Episode>(
-        predicate: #Predicate<Episode> {
-          $0.subjectId == subjectId && $0.type == 0 && $0.collection == 0
-        }, sortBy: [SortDescriptor<Episode>(\.sort, order: .forward)])
-      desc.fetchLimit = 1
-      let episodes = try modelContext.fetch(desc)
-      if let episode = episodes.first {
-        nextEpisode = episode
-      } else {
-        nextEpisode = nil
-      }
-    } catch {
-      Logger.subject.error("fetch next episode error: \(error)")
-    }
   }
 
   func markNextWatched() {
@@ -63,7 +52,6 @@ struct ProgressRowView: View {
         try await Chii.shared.updateEpisodeCollection(
           subjectId: collection.subjectId, episodeId: episodeId, type: .collect)
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-        await loadNextEpisode()
       } catch {
         Notifier.shared.alert(error: error)
       }
@@ -166,9 +154,6 @@ struct ProgressRowView: View {
             .progressViewStyle(.linear)
         }
       }
-    }
-    .task {
-      await loadNextEpisode()
     }
   }
 }
