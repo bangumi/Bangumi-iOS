@@ -351,7 +351,6 @@
 				19671C3F2BDEB55D000B4D99 /* Core.swift */,
 				197A19D52BE6729A00804B13 /* Auth.swift */,
 				19BD24272BE9F22B00595973 /* Load.swift */,
-				194E75D12D0BC64E0070F5F8 /* Spotlight.swift */,
 			);
 			path = Client;
 			sourceTree = "<group>";
@@ -411,6 +410,7 @@
 				197A19CA2BE5E59900804B13 /* Logger.swift */,
 				197A19CE2BE5E5E700804B13 /* Notifier.swift */,
 				19BD242D2BEB2F3400595973 /* Setting.swift */,
+				194E75D12D0BC64E0070F5F8 /* Spotlight.swift */,
 				197A19D72BE672E000804B13 /* Extension.swift */,
 			);
 			path = Helpers;

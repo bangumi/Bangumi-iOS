@@ -233,5 +233,14 @@ extension Chii {
       }
     }
   }
+}
 
+extension Chii {
+  func index(_ items: [SearchableItem]) async {
+    do {
+      try await CSSearchableIndex.default().indexSearchableItems(items.map { $0.index() })
+    } catch {
+      Logger.spotlight.error("Failed to index: \(error)")
+    }
+  }
 }
