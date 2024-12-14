@@ -53,7 +53,7 @@ struct SettingsView: View {
   func reindex() {
     refreshing = true
     refreshProgress = 0
-    let limit: Int = 100
+    let limit: Int = 20
     var offset: Int = 0
     Task {
       let db = try await Chii.shared.getDB()
