@@ -42,9 +42,9 @@ struct CharacterCastsView: View {
         }
         Spacer()
         if casts.count > 0 {
-          NavigationLink(value: NavDestination.characterCastList(characterId: characterId)) {
-            Text("更多出演 »").font(.caption).foregroundStyle(.linkText)
-          }.buttonStyle(.plain)
+          NavigationLink(value: NavDestination.characterCastList(characterId)) {
+            Text("更多出演 »").font(.caption)
+          }.buttonStyle(.navLink)
         }
       }
       Divider()

@@ -52,7 +52,7 @@ struct SubjectView: View {
             SubjectHeaderView(subject: subject)
 
             if isAuthenticated {
-              SubjectCollectionView(subject: subject)
+              SubjectCollectionView(subjectId: subjectId)
             }
 
             if subject.typeEnum == .anime || subject.typeEnum == .real {
@@ -82,10 +82,10 @@ struct SubjectView: View {
         .toolbar {
           ToolbarItem(placement: .topBarTrailing) {
             Menu {
-              NavigationLink(value: NavDestination.subjectStaffList(subjectId: subjectId)) {
+              NavigationLink(value: NavDestination.subjectStaffList(subjectId)) {
                 Label("制作人员", systemImage: "person.2")
               }
-              NavigationLink(value: NavDestination.subjectRating(subject: subject)) {
+              NavigationLink(value: NavDestination.subjectRating(subject)) {
                 Label("评分分布", systemImage: "chart.bar.xaxis")
               }
               Divider()

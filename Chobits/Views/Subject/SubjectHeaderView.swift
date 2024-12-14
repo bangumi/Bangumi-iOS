@@ -91,7 +91,7 @@ struct SubjectHeaderView: View {
           .textSelection(.enabled)
         Spacer()
 
-        NavigationLink(value: NavDestination.subjectInfobox(subject: subject)) {
+        NavigationLink(value: NavDestination.subjectInfobox(subject)) {
           HStack {
             Text(subject.info)
               .font(.caption)
@@ -99,9 +99,7 @@ struct SubjectHeaderView: View {
             Spacer()
             Image(systemName: "chevron.right")
           }
-        }
-        .buttonStyle(.plain)
-        .foregroundStyle(.linkText)
+        }.buttonStyle(.navLink)
 
         Spacer()
         HStack {

@@ -46,9 +46,9 @@ struct SubjectCharactersView: View {
         }
         Spacer()
         if relations.count > 0 {
-          NavigationLink(value: NavDestination.subjectCharacterList(subjectId: subjectId)) {
-            Text("更多角色 »").font(.caption).foregroundStyle(.linkText)
-          }.buttonStyle(.plain)
+          NavigationLink(value: NavDestination.subjectCharacterList(subjectId)) {
+            Text("更多角色 »").font(.caption)
+          }.buttonStyle(.navLink)
         }
       }
       Divider()
@@ -65,8 +65,8 @@ struct SubjectCharactersView: View {
     ScrollView(.horizontal, showsIndicators: false) {
       LazyHStack(alignment: .top) {
         ForEach(relations, id: \.character.id) { item in
-          NavigationLink(value: NavDestination.character(characterId: item.character.id)) {
-            VStack {
+          VStack {
+            NavigationLink(value: NavDestination.character(item.character.id)) {
               ImageView(
                 img: item.character.images?.medium, width: 60, height: 80, alignment: .top
               ) {
@@ -75,15 +75,15 @@ struct SubjectCharactersView: View {
                   .foregroundStyle(.white)
                   .lineLimit(1)
               }
-              Text(item.character.name).font(.caption)
-              if let person = item.actors.first {
-                Text(person.name).foregroundStyle(.secondary).font(.caption)
-              }
-              Spacer()
+            }.buttonStyle(.plain)
+            Text(item.character.name).font(.caption)
+            if let person = item.actors.first {
+              Text(person.name).foregroundStyle(.secondary).font(.caption)
             }
-            .lineLimit(1)
-            .frame(width: 60, height: 120)
-          }.buttonStyle(.plain)
+            Spacer()
+          }
+          .lineLimit(1)
+          .frame(width: 60, height: 120)
         }
       }
     }.animation(.default, value: relations)

@@ -105,7 +105,6 @@ struct PersonView: View {
                     Label("评论: \(person.comment)", systemImage: "bubble")
                       .lineLimit(1)
                       .font(.footnote)
-                      .foregroundStyle(.linkText)
                   }
                 }
                 .font(.footnote)
@@ -119,15 +118,14 @@ struct PersonView: View {
                   .textSelection(.enabled)
                 Spacer()
 
-                NavigationLink(value: NavDestination.personInfobox(person: person)) {
+                NavigationLink(value: NavDestination.personInfobox(person)) {
                   HStack {
                     InfoboxHeaderView(infobox: person.infobox)
                       .foregroundStyle(.secondary)
                     Spacer()
-                    Image(systemName: "chevron.right").foregroundStyle(.linkText)
+                    Image(systemName: "chevron.right")
                   }
-                }
-                .buttonStyle(.plain)
+                }.buttonStyle(.navLink)
 
               }.padding(.leading, 2)
             }.frame(height: 160)

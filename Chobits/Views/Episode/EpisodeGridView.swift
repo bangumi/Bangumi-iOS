@@ -94,9 +94,9 @@ struct EpisodeGridView: View {
           Text("章节列表:")
         }
         Spacer()
-        NavigationLink(value: NavDestination.episodeList(subjectId: subjectId)) {
-          Text("全部章节 »").font(.caption).foregroundStyle(.linkText)
-        }.buttonStyle(.plain)
+        NavigationLink(value: NavDestination.episodeList(subjectId)) {
+          Text("全部章节 »").font(.caption)
+        }.buttonStyle(.navLink)
       }.onAppear(perform: refresh)
       Divider()
     }.padding(.top, 5)
@@ -126,10 +126,7 @@ struct EpisodeGridView: View {
               }
             }
             Divider()
-            NavigationLink(
-              value: NavDestination.episode(
-                subjectId: episode.subjectId, episodeId: episode.episodeId)
-            ) {
+            NavigationLink(value: NavDestination.episode(episode.subjectId, episode.episodeId)) {
               if isolationMode {
                 Label("详情...", systemImage: "info")
               } else {
@@ -175,10 +172,7 @@ struct EpisodeGridView: View {
                 }
               }
               Divider()
-              NavigationLink(
-                value: NavDestination.episode(
-                  subjectId: episode.subjectId, episodeId: episode.episodeId)
-              ) {
+              NavigationLink(value: NavDestination.episode(episode.subjectId, episode.episodeId)) {
                 if isolationMode {
                   Label("详情...", systemImage: "info")
                 } else {
@@ -193,6 +187,16 @@ struct EpisodeGridView: View {
         }
       }
     }
+    .padding(.leading, 10)
+    .overlay(
+      HStack {
+        Rectangle()
+          .frame(width: 5)
+          .foregroundStyle(Color(hex: 0x8EB021))
+          .offset(x: 0, y: 0)
+        Spacer()
+      }
+    )
     .animation(.default, value: episodeMains)
     .animation(.default, value: episodeSps)
   }

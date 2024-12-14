@@ -55,9 +55,9 @@ struct SubjectCommentsView: View {
         }
         Spacer()
         if comments.count > 0 {
-          NavigationLink(value: NavDestination.subjectCommentList(subjectId: subjectId)) {
-            Text("更多吐槽 »").font(.caption).foregroundStyle(.linkText)
-          }.buttonStyle(.plain)
+          NavigationLink(value: NavDestination.subjectCommentList(subjectId)) {
+            Text("更多吐槽 »").font(.caption)
+          }.buttonStyle(.navLink)
         }
       }
       Divider()
@@ -74,17 +74,16 @@ struct SubjectCommentsView: View {
     VStack {
       ForEach(comments) { comment in
         HStack(alignment: .top) {
-          NavigationLink(value: NavDestination.user(uid: comment.user.uid)) {
+          NavigationLink(value: NavDestination.user(comment.user.uid)) {
             ImageView(img: comment.user.avatar?.large, width: 32, height: 32, type: .avatar)
           }
           VStack(alignment: .leading) {
             HStack {
-              NavigationLink(value: NavDestination.user(uid: comment.user.uid)) {
+              NavigationLink(value: NavDestination.user(comment.user.uid)) {
                 Text(comment.user.nickname)
                   .font(.footnote)
                   .lineLimit(1)
-                  .foregroundStyle(.linkText)
-              }.buttonStyle(.plain)
+              }.buttonStyle(.navLink)
               if comment.rate > 0 {
                 StarsView(score: Float(comment.rate), size: 10)
               }

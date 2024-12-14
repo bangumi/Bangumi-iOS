@@ -500,7 +500,7 @@ struct SubjectBrowsingView: View {
         Divider()
 
         ForEach(subjects, id: \.inner) { item in
-          NavigationLink(value: NavDestination.subject(subjectId: item.inner)) {
+          NavigationLink(value: NavDestination.subject(item.inner)) {
             SubjectLargeRowView(subjectId: item.inner)
               .onAppear {
                 Task {

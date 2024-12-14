@@ -105,7 +105,6 @@ struct CharacterView: View {
                     Label("评论: \(character.comment)", systemImage: "bubble")
                       .lineLimit(1)
                       .font(.footnote)
-                      .foregroundStyle(.linkText)
                   }
                 }
                 .font(.footnote)
@@ -119,15 +118,14 @@ struct CharacterView: View {
                   .textSelection(.enabled)
                 Spacer()
 
-                NavigationLink(value: NavDestination.characterInfobox(character: character)) {
+                NavigationLink(value: NavDestination.characterInfobox(character)) {
                   HStack {
                     InfoboxHeaderView(infobox: character.infobox)
                       .foregroundStyle(.secondary)
                     Spacer()
-                    Image(systemName: "chevron.right").foregroundStyle(.linkText)
+                    Image(systemName: "chevron.right")
                   }
-                }
-                .buttonStyle(.plain)
+                }.buttonStyle(.navLink)
 
               }.padding(.leading, 2)
             }.frame(height: 160)

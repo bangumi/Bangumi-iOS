@@ -35,9 +35,9 @@ struct PersonCastsView: View {
         }
         Spacer()
         if casts.count > 0 {
-          NavigationLink(value: NavDestination.personCastList(personId: personId)) {
-            Text("更多角色 »").font(.caption).foregroundStyle(.linkText)
-          }.buttonStyle(.plain)
+          NavigationLink(value: NavDestination.personCastList(personId)) {
+            Text("更多角色 »").font(.caption)
+          }.buttonStyle(.navLink)
         }
       }
       Divider()

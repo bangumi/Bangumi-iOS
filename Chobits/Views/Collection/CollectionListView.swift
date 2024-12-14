@@ -120,10 +120,10 @@ struct CollectionListView: View {
           ScrollView {
             LazyVStack(alignment: .leading, spacing: 10) {
               ForEach(collections, id: \.inner) { item in
-                NavigationLink(value: NavDestination.subject(subjectId: item.inner.subjectId)) {
+                NavigationLink(value: NavDestination.subject(item.inner.subjectId)) {
                   CollectionRowView(subjectId: item.inner.subjectId)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.navLink)
                 .onAppear {
                   Task {
                     await loadNextPage(idx: item.idx)

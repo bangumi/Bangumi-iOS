@@ -5,20 +5,19 @@ struct PersonCastItemView: View {
 
   var body: some View {
     HStack(alignment: .top) {
-      NavigationLink(value: NavDestination.character(characterId: item.character.id)) {
+      NavigationLink(value: NavDestination.character(item.character.id)) {
         ImageView(
           img: item.character.images?.medium,
           width: 60, height: 60,
-          alignment: .top, type: .subject
+          alignment: .top, type: .person
         )
-      }.buttonStyle(.plain)
+      }
 
       VStack(alignment: .leading) {
-        NavigationLink(value: NavDestination.character(characterId: item.character.id)) {
+        NavigationLink(value: NavDestination.character(item.character.id)) {
           Text(item.character.name)
-            .foregroundStyle(.linkText)
             .lineLimit(2)
-        }.buttonStyle(.plain)
+        }
         Text(item.character.nameCN)
           .lineLimit(1)
           .font(.footnote)
@@ -29,41 +28,42 @@ struct PersonCastItemView: View {
 
       VStack(alignment: .trailing) {
         ForEach(item.relations) { relation in
-          NavigationLink(value: NavDestination.subject(subjectId: relation.subject.id)) {
-            HStack(alignment: .top) {
-              VStack(alignment: .trailing) {
+          HStack(alignment: .top) {
+            VStack(alignment: .trailing) {
+              NavigationLink(value: NavDestination.subject(relation.subject.id)) {
                 Text(relation.subject.name)
-                  .foregroundStyle(.linkText)
                   .lineLimit(1)
-                HStack {
-                  if relation.subject.nameCN.isEmpty {
-                    Text(relation.subject.type.description)
-                      .foregroundStyle(.secondary)
-                      .lineLimit(1)
-                  } else {
-                    Text(relation.subject.nameCN)
-                      .foregroundStyle(.secondary)
-                      .lineLimit(1)
-                  }
-                  BorderView {
-                    Text(relation.type.description)
-                      .font(.caption)
-                      .fixedSize(horizontal: true, vertical: true)
-                      .foregroundStyle(.secondary)
-                  }
+              }
+              HStack {
+                if relation.subject.nameCN.isEmpty {
+                  Text(relation.subject.type.description)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+                } else {
+                  Text(relation.subject.nameCN)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
                 }
-                Divider()
-              }.font(.footnote)
+                BorderView {
+                  Text(relation.type.description)
+                    .font(.caption)
+                    .fixedSize(horizontal: true, vertical: true)
+                    .foregroundStyle(.secondary)
+                }
+              }
+              Divider()
+            }.font(.footnote)
+            NavigationLink(value: NavDestination.subject(relation.subject.id)) {
               ImageView(
-                img: relation.subject.images?.grid,
+                img: relation.subject.images?.small,
                 width: 40, height: 40, alignment: .top, type: .subject
               )
-            }.frame(minHeight: 40)
-          }.buttonStyle(.plain)
-
+            }
+          }.frame(minHeight: 40)
         }
       }
-
-    }.frame(minHeight: 60)
+    }
+    .buttonStyle(.navLink)
+    .frame(minHeight: 60)
   }
 }

@@ -40,19 +40,17 @@ struct SubjectRelationListView: View {
       PageView<SubjectRelationDTO, _>(reloader: reloader, nextPageFunc: load) { item in
         CardView {
           HStack {
-            NavigationLink(value: NavDestination.subject(subjectId: item.subject.id)) {
+            NavigationLink(value: NavDestination.subject(item.subject.id)) {
               ImageView(
                 img: item.subject.images?.common,
                 width: 60, height: 60, type: .subject
               )
             }
-            .buttonStyle(.plain)
             VStack(alignment: .leading) {
-              NavigationLink(value: NavDestination.subject(subjectId: item.subject.id)) {
+              NavigationLink(value: NavDestination.subject(item.subject.id)) {
                 HStack {
                   VStack(alignment: .leading) {
                     Text(item.subject.name)
-                      .foregroundStyle(.linkText)
                       .lineLimit(1)
                     Text(item.subject.nameCN)
                       .font(.footnote)
@@ -64,7 +62,7 @@ struct SubjectRelationListView: View {
                   }
                   Spacer()
                 }
-              }.buttonStyle(.plain)
+              }
             }.padding(.leading, 4)
           }
         }

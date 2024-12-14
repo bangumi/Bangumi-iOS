@@ -10,17 +10,28 @@ import SwiftData
 import SwiftUI
 
 struct SubjectCollectionView: View {
-  @ObservableModel var subject: Subject
+  let subjectId: Int
 
   @Environment(\.modelContext) var modelContext
 
   @State private var refreshed: Bool = false
   @State private var edit: Bool = false
 
+  @Query private var collections: [UserSubjectCollection]
+  var collection: UserSubjectCollection? { collections.first }
+
+  init(subjectId: Int) {
+    self.subjectId = subjectId
+    let predicate = #Predicate<UserSubjectCollection> {
+      $0.subjectId == subjectId
+    }
+    _collections = Query(filter: predicate, sort: \UserSubjectCollection.subjectId)
+  }
+
   func refresh() async {
     if refreshed { return }
     do {
-      try await Chii.shared.loadUserSubjectCollection(subject.subjectId)
+      try await Chii.shared.loadUserSubjectCollection(subjectId)
     } catch {
       Notifier.shared.alert(error: error)
       return
@@ -33,7 +44,7 @@ struct SubjectCollectionView: View {
       BorderView(color: .linkText, padding: 5) {
         HStack {
           Spacer()
-          if let collection = subject.userCollection {
+          if let collection = collection {
             if collection.priv {
               Image(systemName: "lock")
             }
@@ -44,8 +55,7 @@ struct SubjectCollectionView: View {
               .foregroundStyle(.secondary)
           }
           Spacer()
-        }
-        .foregroundStyle(.linkText)
+        }.foregroundStyle(.linkText)
       }
       .padding(5)
       .task(refresh)
@@ -55,13 +65,22 @@ struct SubjectCollectionView: View {
       .sheet(
         isPresented: $edit,
         content: {
-          SubjectCollectionBoxView(subject: subject)
+          SubjectCollectionBoxView(subjectId: subjectId)
             .presentationDragIndicator(.visible)
             .presentationDetents(.init([.medium, .large]))
         }
       )
-      if subject.typeEnum == .book && subject.userCollection != nil {
-        SubjectBookChaptersView(subjectId: subject.subjectId, compact: false)
+      if let comment = collection?.comment, !comment.isEmpty {
+        BorderView(color: .secondary) {
+          Text(comment)
+            .padding(2)
+            .font(.footnote)
+            .textSelection(.enabled)
+            .foregroundStyle(.secondary)
+        }.padding(2)
+      }
+      if collection?.subjectTypeEnum == .book {
+        SubjectBookChaptersView(subjectId: subjectId, compact: false)
       }
     }
   }
@@ -78,7 +97,7 @@ struct SubjectCollectionView: View {
 
   return ScrollView {
     LazyVStack(alignment: .leading) {
-      SubjectCollectionView(subject: subject)
+      SubjectCollectionView(subjectId: subject.subjectId)
         .modelContainer(container)
     }
   }

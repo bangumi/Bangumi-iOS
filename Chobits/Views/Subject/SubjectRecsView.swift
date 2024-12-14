@@ -73,8 +73,8 @@ struct SubjectRecsView: View {
     ScrollView(.horizontal, showsIndicators: false) {
       LazyHStack {
         ForEach(recs) { rec in
-          NavigationLink(value: NavDestination.subject(subjectId: rec.subject.id)) {
-            VStack {
+          VStack {
+            NavigationLink(value: NavDestination.subject(rec.subject.id)) {
               ImageView(
                 img: rec.subject.images?.common,
                 width: 72, height: 96, type: .subject
@@ -88,15 +88,15 @@ struct SubjectRecsView: View {
                   }.padding(.horizontal, 4)
                 }
               }
-              Text(rec.subject.name)
-                .multilineTextAlignment(.leading)
-                .truncationMode(.middle)
-                .lineLimit(2)
-              Spacer()
-            }
-            .font(.caption)
-            .frame(width: 72, height: 140)
-          }.buttonStyle(.plain)
+            }.buttonStyle(.navLink)
+            Text(rec.subject.name)
+              .multilineTextAlignment(.leading)
+              .truncationMode(.middle)
+              .lineLimit(2)
+            Spacer()
+          }
+          .font(.caption)
+          .frame(width: 72, height: 140)
         }
       }
     }.animation(.default, value: recs)

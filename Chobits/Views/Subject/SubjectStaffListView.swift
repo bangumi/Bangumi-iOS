@@ -21,26 +21,24 @@ struct SubjectStaffListView: View {
       PageView<SubjectStaffDTO, _>(limit: 20, nextPageFunc: load) { item in
         CardView {
           HStack {
-            NavigationLink(value: NavDestination.person(personId: item.person.id)) {
+            NavigationLink(value: NavDestination.person(item.person.id)) {
               ImageView(
                 img: item.person.images?.medium,
                 width: 60, height: 60, alignment: .top, type: .person
               )
             }
-            .buttonStyle(.plain)
             VStack(alignment: .leading) {
-              NavigationLink(value: NavDestination.person(personId: item.person.id)) {
+              NavigationLink(value: NavDestination.person(item.person.id)) {
                 VStack(alignment: .leading) {
                   Text(item.person.name)
                     .font(.callout)
-                    .foregroundStyle(.linkText)
                     .lineLimit(1)
                   Text(item.person.nameCN)
                     .font(.footnote)
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
                 }
-              }.buttonStyle(.plain)
+              }
               HFlow {
                 ForEach(item.positions) { position in
                   if !position.type.cn.isEmpty {
@@ -62,7 +60,7 @@ struct SubjectStaffListView: View {
       }
       .padding(8)
     }
-    .buttonStyle(.plain)
+    .buttonStyle(.navLink)
     .navigationTitle("制作人员")
     .navigationBarTitleDisplayMode(.inline)
     .toolbar {

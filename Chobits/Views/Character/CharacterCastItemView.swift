@@ -5,7 +5,7 @@ struct CharacterCastItemView: View {
 
   var body: some View {
     HStack(alignment: .top) {
-      NavigationLink(value: NavDestination.subject(subjectId: item.subject.id)) {
+      NavigationLink(value: NavDestination.subject(item.subject.id)) {
         ImageView(
           img: item.subject.images?.common,
           width: 60, height: 60, alignment: .top,
@@ -16,54 +16,51 @@ struct CharacterCastItemView: View {
             .font(.caption)
             .foregroundStyle(.white)
         }
-      }.buttonStyle(.plain)
+      }
 
       VStack(alignment: .leading) {
-        NavigationLink(value: NavDestination.subject(subjectId: item.subject.id)) {
+        NavigationLink(value: NavDestination.subject(item.subject.id)) {
           Text(item.subject.name)
-            .font(.footnote)
-            .foregroundStyle(.linkText)
-            .lineLimit(1)
-          Spacer()
-        }.buttonStyle(.plain)
+        }
         if item.subject.nameCN.isEmpty {
           Label(item.subject.type.description, systemImage: item.subject.type.icon)
-            .lineLimit(1)
-            .font(.footnote)
             .foregroundStyle(.secondary)
         } else {
           Label(item.subject.nameCN, systemImage: item.subject.type.icon)
-            .lineLimit(1)
-            .font(.footnote)
             .foregroundStyle(.secondary)
         }
         Text(item.subject.info)
           .font(.caption)
-          .lineLimit(1)
           .foregroundStyle(.secondary)
       }
+      .lineLimit(1)
+      .font(.footnote)
+
+      Spacer()
 
       VStack(alignment: .trailing) {
         ForEach(item.actors) { person in
-          NavigationLink(value: NavDestination.person(personId: person.id)) {
-            HStack(alignment: .top) {
-              VStack(alignment: .trailing) {
+          HStack(alignment: .top) {
+            VStack(alignment: .trailing) {
+              NavigationLink(value: NavDestination.person(person.id)) {
                 Text(person.name)
-                  .foregroundStyle(.linkText)
-                  .lineLimit(1)
-                Text(person.nameCN)
-                  .foregroundStyle(.secondary)
-                  .lineLimit(1)
-              }.font(.footnote)
+              }
+              Text(person.nameCN)
+                .foregroundStyle(.secondary)
+            }
+            .lineLimit(1)
+            .font(.footnote)
+            NavigationLink(value: NavDestination.person(person.id)) {
               ImageView(
                 img: person.images?.grid,
-                width: 40, height: 40, alignment: .top, type: .subject
+                width: 40, height: 40, alignment: .top, type: .person
               )
             }
-          }.buttonStyle(.plain)
+          }
         }
       }
-
-    }.frame(minHeight: 60)
+    }
+    .buttonStyle(.navLink)
+    .frame(minHeight: 60)
   }
 }

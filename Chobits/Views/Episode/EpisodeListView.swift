@@ -152,17 +152,12 @@ struct EpisodeListView: View {
     ScrollView {
       LazyVStack(spacing: 10) {
         ForEach(episodes, id: \.inner.self) { item in
-          NavigationLink(
-            value: NavDestination.episode(subjectId: subjectId, episodeId: item.inner.episodeId)
-          ) {
-            EpisodeRowView(episode: item.inner)
-          }
-          .buttonStyle(.plain)
-          .onAppear {
-            Task {
-              await loadNextPage(idx: item.idx)
+          EpisodeRowView(episode: item.inner)
+            .onAppear {
+              Task {
+                await loadNextPage(idx: item.idx)
+              }
             }
-          }
         }
         if exhausted {
           HStack {
@@ -175,7 +170,6 @@ struct EpisodeListView: View {
         }
       }.padding(.horizontal, 8)
     }
-    .buttonStyle(.plain)
     .animation(.default, value: episodes)
     .navigationTitle("章节列表")
     .navigationBarTitleDisplayMode(.inline)

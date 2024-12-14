@@ -18,11 +18,10 @@ struct CollectionsView: View {
             HStack {
               Text("我的\(stype.description)").font(.title3)
               Spacer()
-              NavigationLink(value: NavDestination.collectionList(subjectType: stype)) {
+              NavigationLink(value: NavDestination.collectionList(stype)) {
                 Text("更多 »")
                   .font(.caption)
-                  .foregroundStyle(.linkText)
-              }.buttonStyle(.plain)
+              }.buttonStyle(.navLink)
             }.padding(.top, 8)
             CollectionSubjectTypeView(stype: stype)
           }.padding(.top, 5)

@@ -173,9 +173,7 @@ struct SearchView: View {
           LazyVStack(alignment: .leading) {
             ForEach(subjects, id: \.inner.self) { item in
               CardView {
-                NavigationLink(value: NavDestination.subject(subjectId: item.inner.subjectId)) {
-                  SubjectLargeRowView(subjectId: item.inner.subjectId)
-                }.buttonStyle(.plain)
+                SubjectLargeRowView(subjectId: item.inner.subjectId)
               }
               .onAppear {
                 Task {

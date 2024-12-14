@@ -41,7 +41,7 @@ struct SubjectCharacterListView: View {
       PageView<SubjectCharacterDTO, _>(limit: 10, reloader: reloader, nextPageFunc: load) { item in
         CardView {
           HStack {
-            NavigationLink(value: NavDestination.character(characterId: item.character.id)) {
+            NavigationLink(value: NavDestination.character(item.character.id)) {
               ImageView(
                 img: item.character.images?.medium,
                 width: 60, height: 90, alignment: .top
@@ -52,13 +52,11 @@ struct SubjectCharacterListView: View {
                   .foregroundStyle(.white)
               }
             }
-            .buttonStyle(.plain)
             VStack(alignment: .leading) {
-              NavigationLink(value: NavDestination.character(characterId: item.character.id)) {
+              NavigationLink(value: NavDestination.character(item.character.id)) {
                 HStack {
                   VStack(alignment: .leading) {
                     Text(item.character.name)
-                      .foregroundStyle(.linkText)
                       .lineLimit(1)
                     Text(item.character.nameCN)
                       .font(.footnote)
@@ -67,10 +65,10 @@ struct SubjectCharacterListView: View {
                   }
                   Spacer()
                 }
-              }.buttonStyle(.plain)
+              }
               HFlow {
                 ForEach(item.actors) { person in
-                  NavigationLink(value: NavDestination.person(personId: person.id)) {
+                  NavigationLink(value: NavDestination.person(person.id)) {
                     HStack {
                       ImageView(
                         img: person.images?.grid,
@@ -79,7 +77,6 @@ struct SubjectCharacterListView: View {
                       VStack(alignment: .leading) {
                         Text(person.name)
                           .font(.footnote)
-                          .foregroundStyle(.linkText)
                           .lineLimit(1)
                         Text(person.nameCN)
                           .font(.footnote)
@@ -87,7 +84,7 @@ struct SubjectCharacterListView: View {
                           .lineLimit(1)
                       }
                     }
-                  }.buttonStyle(.plain)
+                  }
                 }
               }
             }.padding(.leading, 4)

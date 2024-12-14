@@ -206,9 +206,7 @@ struct ChiiProgressView: View {
           LazyVStack(alignment: .leading) {
             ForEach(collections, id: \.inner) { item in
               CardView {
-                NavigationLink(value: NavDestination.subject(subjectId: item.inner.subjectId)) {
-                  ProgressRowView(collection: item.inner)
-                }.buttonStyle(.plain)
+                ProgressRowView(collection: item.inner)
               }
               .onAppear {
                 Task {

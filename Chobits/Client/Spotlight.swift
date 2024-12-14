@@ -64,7 +64,7 @@ struct SearchableItem: Codable {
     }
     return CSSearchableItem(
       uniqueIdentifier: "\(self.catorgory).\(self.identifier)",
-      domainIdentifier: "com.everpcpc.Chobits",
+      domainIdentifier: APP_DOMAIN,
       attributeSet: attributeSet
     )
   }

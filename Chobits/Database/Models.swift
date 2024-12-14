@@ -181,12 +181,16 @@ final class UserSubjectCollectionV1 {
     CollectionType(type)
   }
 
+  var subjectTypeEnum: SubjectType {
+    SubjectType(subjectType)
+  }
+
   var typeDesc: String {
-    return typeEnum.description(SubjectType(subjectType))
+    return typeEnum.description(subjectTypeEnum)
   }
 
   var message: String {
-    typeEnum.message(type: SubjectType(subjectType))
+    typeEnum.message(type: subjectTypeEnum)
   }
 
   init(_ item: UserSubjectCollectionDTO) {

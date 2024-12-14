@@ -31,17 +31,19 @@ struct SubjectLargeRowView: View {
 
   var body: some View {
     HStack {
-      ImageView(
-        img: subject?.images?.common, width: 90, height: 120, type: .subject
-      ) {
-        if subject?.nsfw ?? false {
-          Text("18+")
-            .padding(2)
-            .background(.red.opacity(0.8))
-            .padding(2)
-            .foregroundStyle(.white)
-            .font(.caption)
-            .clipShape(Capsule())
+      NavigationLink(value: NavDestination.subject(subjectId)) {
+        ImageView(
+          img: subject?.images?.common, width: 90, height: 120, type: .subject
+        ) {
+          if subject?.nsfw ?? false {
+            Text("18+")
+              .padding(2)
+              .background(.red.opacity(0.8))
+              .padding(2)
+              .foregroundStyle(.white)
+              .font(.caption)
+              .clipShape(Capsule())
+          }
         }
       }
       VStack(alignment: .leading) {
@@ -54,17 +56,18 @@ struct SubjectLargeRowView: View {
                   .foregroundStyle(.secondary)
                   .font(.footnote)
               }
-              Text(subject?.name ?? "")
-                .font(.headline)
-                .lineLimit(1)
-                .foregroundStyle(.linkText)
+              NavigationLink(value: NavDestination.subject(subjectId)) {
+                Text(subject?.name ?? "")
+                  .font(.headline)
+                  .lineLimit(1)
+              }.buttonStyle(.navLink)
             }
           }
           Spacer()
           if let rank = subject?.rating.rank, rank > 0 {
             Label(String(rank), systemImage: "chart.bar.xaxis")
+              .foregroundStyle(.accent)
               .font(.footnote)
-              .foregroundStyle(.linkText)
           }
         }
 

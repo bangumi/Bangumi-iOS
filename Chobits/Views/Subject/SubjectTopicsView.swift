@@ -44,9 +44,9 @@ struct SubjectTopicsView: View {
         }
         Spacer()
         if topics.count > 0 {
-          NavigationLink(value: NavDestination.subjectTopicList(subjectId: subjectId)) {
-            Text("更多讨论 »").font(.caption).foregroundStyle(.linkText)
-          }.buttonStyle(.plain)
+          NavigationLink(value: NavDestination.subjectTopicList(subjectId)) {
+            Text("更多讨论 »").font(.caption)
+          }.buttonStyle(.navLink)
         }
       }
       Divider()
@@ -64,12 +64,11 @@ struct SubjectTopicsView: View {
       ForEach(topics) { topic in
         VStack {
           HStack {
-            NavigationLink(value: NavDestination.topic(topic: topic)) {
+            NavigationLink(value: NavDestination.topic(topic)) {
               Text("\(topic.title)")
                 .font(.callout)
                 .lineLimit(1)
-                .foregroundStyle(.linkText)
-            }.buttonStyle(.plain)
+            }.buttonStyle(.navLink)
             Spacer()
             if topic.repliesCount > 0 {
               Text("(+\(topic.repliesCount))")
@@ -82,11 +81,10 @@ struct SubjectTopicsView: View {
               .lineLimit(1)
               .foregroundStyle(.secondary)
             Spacer()
-            NavigationLink(value: NavDestination.user(uid: topic.creator.uid)) {
+            NavigationLink(value: NavDestination.user(topic.creator.uid)) {
               Text(topic.creator.nickname)
                 .lineLimit(1)
-                .foregroundStyle(.accent)
-            }.buttonStyle(.plain)
+            }.buttonStyle(.navLink)
           }.font(.footnote)
         }.padding(.top, 2)
       }

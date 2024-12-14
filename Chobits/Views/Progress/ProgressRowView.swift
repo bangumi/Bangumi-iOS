@@ -74,28 +74,34 @@ struct ProgressRowView: View {
   var body: some View {
     VStack(alignment: .leading, spacing: 4) {
       HStack {
-        ImageView(
-          img: collection.subject?.images?.common,
-          width: 72, height: 72, type: .subject
-        ) {
-          if collection.priv {
-            Image(systemName: "lock")
-              .padding(2)
-              .background(.red.opacity(0.8))
-              .padding(2)
-              .foregroundStyle(.white)
-              .font(.caption)
-              .clipShape(Capsule())
+        NavigationLink(value: NavDestination.subject(collection.subjectId)) {
+          ImageView(
+            img: collection.subject?.images?.common,
+            width: 72, height: 72, type: .subject
+          ) {
+            if collection.priv {
+              Image(systemName: "lock")
+                .padding(2)
+                .background(.red.opacity(0.8))
+                .padding(2)
+                .foregroundStyle(.white)
+                .font(.caption)
+                .clipShape(Capsule())
+            }
           }
-        }
+        }.buttonStyle(.navLink)
         VStack(alignment: .leading) {
-          Text(collection.subject?.name ?? "")
-            .font(.headline)
-            .lineLimit(1)
-          Text(collection.subject?.nameCN ?? "")
-            .foregroundStyle(.secondary)
-            .font(.subheadline)
-            .lineLimit(1)
+          NavigationLink(value: NavDestination.subject(collection.subjectId)) {
+            VStack(alignment: .leading) {
+              Text(collection.subject?.name ?? "")
+                .font(.headline)
+                .lineLimit(1)
+              Text(collection.subject?.nameCN ?? "")
+                .foregroundStyle(.secondary)
+                .font(.subheadline)
+                .lineLimit(1)
+            }
+          }.buttonStyle(.plain)
 
           Spacer()
 
@@ -122,8 +128,10 @@ struct ProgressRowView: View {
                   }
                 }
               } else {
-                Image(systemName: "square.grid.2x2.fill")
-                  .foregroundStyle(.secondary)
+                NavigationLink(value: NavDestination.subject(collection.subjectId)) {
+                  Image(systemName: "square.grid.2x2.fill")
+                    .foregroundStyle(.secondary)
+                }.buttonStyle(.plain)
               }
             }.font(.callout)
           case .book:

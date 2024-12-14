@@ -69,12 +69,11 @@ struct SubjectTopicListView: View {
           let topic = item.inner
           VStack {
             HStack {
-              NavigationLink(value: NavDestination.topic(topic: topic)) {
+              NavigationLink(value: NavDestination.topic(topic)) {
                 Text("\(topic.title)")
                   .font(.callout)
                   .lineLimit(1)
-                  .foregroundStyle(.linkText)
-              }.buttonStyle(.plain)
+              }
               Spacer()
               if topic.repliesCount > 0 {
                 Text("(+\(topic.repliesCount))")
@@ -87,12 +86,12 @@ struct SubjectTopicListView: View {
                 .lineLimit(1)
                 .foregroundStyle(.secondary)
               Spacer()
-              NavigationLink(value: NavDestination.user(uid: topic.creator.uid)) {
+              NavigationLink(value: NavDestination.user(topic.creator.uid)) {
                 Text(topic.creator.nickname)
                   .lineLimit(1)
-                  .foregroundStyle(.accent)
-              }.buttonStyle(.plain)
+              }
             }.font(.footnote)
+            Divider()
           }
           .padding(.top, 2)
           .onAppear {
@@ -109,7 +108,6 @@ struct SubjectTopicListView: View {
           }
         }
         if exhausted {
-          Divider()
           HStack {
             Spacer()
             Text("没有更多了")
@@ -120,7 +118,7 @@ struct SubjectTopicListView: View {
         }
       }.padding(.horizontal, 8)
     }
-    .buttonStyle(.plain)
+    .buttonStyle(.navLink)
     .animation(.default, value: topics)
     .navigationTitle("讨论版")
     .navigationBarTitleDisplayMode(.inline)

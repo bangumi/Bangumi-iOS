@@ -24,6 +24,7 @@
 		194E75D22D0BC6540070F5F8 /* Spotlight.swift in Sources */ = {isa = PBXBuildFile; fileRef = 194E75D12D0BC64E0070F5F8 /* Spotlight.swift */; };
 		194E75D42D0BDF660070F5F8 /* EpisodeInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 194E75D32D0BDF600070F5F8 /* EpisodeInfoView.swift */; };
 		194E75D62D0BE7BE0070F5F8 /* EpisodeRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 194E75D52D0BE7B70070F5F8 /* EpisodeRowView.swift */; };
+		194E76982D0D3A360070F5F8 /* Style.swift in Sources */ = {isa = PBXBuildFile; fileRef = 194E76972D0D3A340070F5F8 /* Style.swift */; };
 		19671C542BDEB55D000B4D99 /* SubjectLargeRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19671C2E2BDEB55D000B4D99 /* SubjectLargeRowView.swift */; };
 		19671C552BDEB55D000B4D99 /* SubjectCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19671C302BDEB55D000B4D99 /* SubjectCollectionView.swift */; };
 		19671C562BDEB55D000B4D99 /* SubjectHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19671C312BDEB55D000B4D99 /* SubjectHeaderView.swift */; };
@@ -121,6 +122,7 @@
 		194E75D12D0BC64E0070F5F8 /* Spotlight.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Spotlight.swift; sourceTree = "<group>"; };
 		194E75D32D0BDF600070F5F8 /* EpisodeInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EpisodeInfoView.swift; sourceTree = "<group>"; };
 		194E75D52D0BE7B70070F5F8 /* EpisodeRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EpisodeRowView.swift; sourceTree = "<group>"; };
+		194E76972D0D3A340070F5F8 /* Style.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Style.swift; sourceTree = "<group>"; };
 		19671C2E2BDEB55D000B4D99 /* SubjectLargeRowView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubjectLargeRowView.swift; sourceTree = "<group>"; };
 		19671C302BDEB55D000B4D99 /* SubjectCollectionView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubjectCollectionView.swift; sourceTree = "<group>"; };
 		19671C312BDEB55D000B4D99 /* SubjectHeaderView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubjectHeaderView.swift; sourceTree = "<group>"; };
@@ -402,6 +404,7 @@
 		19B900412BEF035500405F0F /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
+				194E76972D0D3A340070F5F8 /* Style.swift */,
 				197A19D92BE6733A00804B13 /* Error.swift */,
 				19F8C3D72BE73B820037D723 /* Navigation.swift */,
 				19ECCDEE2CFD43CA0092F715 /* Wrapper.swift */,
@@ -608,6 +611,7 @@
 				19ECCEC12CFF16860092F715 /* SubjectRecsView.swift in Sources */,
 				1915A8A02BF09F4D003DB76D /* SubjectCharacterListView.swift in Sources */,
 				1998DD092CB122BC00115E1F /* SubjectCommentListView.swift in Sources */,
+				194E76982D0D3A360070F5F8 /* Style.swift in Sources */,
 				19671C602BDEB55D000B4D99 /* Basis.swift in Sources */,
 				194484232BF4C68B002EC925 /* CollectionListView.swift in Sources */,
 				19B900322BED1EF300405F0F /* SubjectInfoboxView.swift in Sources */,

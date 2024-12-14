@@ -10,7 +10,7 @@ import SwiftData
 import SwiftUI
 
 struct SubjectCollectionBoxView: View {
-  @ObservableModel var subject: Subject
+  let subjectId: Int
 
   @Environment(\.modelContext) var modelContext
   @Environment(\.dismiss) private var dismiss
@@ -24,12 +24,26 @@ struct SubjectCollectionBoxView: View {
 
   @State private var updating: Bool = false
 
+  @Query private var subjects: [Subject]
+  var subject: Subject? { subjects.first }
+
+  @Query private var collections: [UserSubjectCollection]
+  var collection: UserSubjectCollection? { collections.first }
+
+  init(subjectId: Int) {
+    self.subjectId = subjectId
+    self._subjects = Query(filter: #Predicate<Subject> { $0.subjectId == subjectId })
+    self._collections = Query(
+      filter: #Predicate<UserSubjectCollection> { $0.subjectId == subjectId })
+  }
+
   var recommendedTags: [String] {
-    return subject.tags.sorted(by: { $0.count > $1.count }).prefix(15).map { $0.name }
+    return subject?.tags.sorted(by: { $0.count > $1.count }).prefix(15).map { $0.name }
+      ?? []
   }
 
   var buttonText: String {
-    if subject.userCollection == nil {
+    if collection == nil {
       return priv ? "悄悄地添加" : "添加"
     } else {
       return priv ? "悄悄地更新" : "更新"
@@ -47,7 +61,7 @@ struct SubjectCollectionBoxView: View {
   }
 
   func load() {
-    if let collection = subject.userCollection {
+    if let collection = collection {
       self.collectionType = collection.typeEnum
       self.rate = collection.rate
       self.comment = collection.comment
@@ -62,7 +76,7 @@ struct SubjectCollectionBoxView: View {
     Task {
       do {
         try await Chii.shared.updateSubjectCollection(
-          subjectId: subject.subjectId,
+          subjectId: subjectId,
           type: collectionType,
           rate: rate,
           comment: comment,
@@ -96,13 +110,15 @@ struct SubjectCollectionBoxView: View {
           .frame(width: 40)
           .sensoryFeedback(.selection, trigger: priv)
         }.padding(.vertical, 5)
-        if let collection = subject.userCollection {
-          Text("上次更新：\(collection.updatedAt)").font(.caption).foregroundStyle(.secondary)
+        if let collection = collection {
+          Text("上次更新：\(collection.updatedAt.formatted(date: .complete, time: .complete))")
+            .font(.caption)
+            .foregroundStyle(.secondary)
         }
 
         Picker("Collection Type", selection: $collectionType) {
           ForEach(CollectionType.allTypes()) { ct in
-            Text("\(ct.description(subject.typeEnum))").tag(ct)
+            Text("\(ct.description(subject?.typeEnum))").tag(ct)
           }
         }
         .pickerStyle(.segmented)
@@ -173,7 +189,8 @@ struct SubjectCollectionBoxView: View {
           BorderView(color: .secondary.opacity(0.2), padding: 4) {
             TextField("吐槽", text: $comment, axis: .vertical)
               .multilineTextAlignment(.leading)
-              .lineLimit(5, reservesSpace: true)
+              .scrollDisabled(true)
+              .lineLimit(5...)
           }
         }
         Spacer()
@@ -198,6 +215,6 @@ struct SubjectCollectionBoxView: View {
 
   collection.subject = subject
 
-  return SubjectCollectionBoxView(subject: subject)
+  return SubjectCollectionBoxView(subjectId: subject.subjectId)
     .modelContainer(container)
 }

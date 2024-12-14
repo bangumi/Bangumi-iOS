@@ -93,11 +93,11 @@ struct CollectionSubjectTypeView: View {
           GridItem(.flexible()),
         ]) {
           ForEach(collections) { collection in
-            NavigationLink(value: NavDestination.subject(subjectId: collection.subjectId)) {
+            NavigationLink(value: NavDestination.subject(collection.subjectId)) {
               ImageView(
                 img: subjects[collection.subjectId]?.images?.common, width: 60, height: 60,
                 type: .subject)
-            }.buttonStyle(.plain)
+            }.buttonStyle(.navLink)
           }
         }
       }

@@ -18,9 +18,11 @@ struct EpisodeRowView: View {
 
   var body: some View {
     VStack(alignment: .leading) {
-      Text(episode.title)
-        .font(.headline)
-        .lineLimit(1)
+      NavigationLink(value: NavDestination.episode(episode.subjectId, episode.episodeId)) {
+        Text(episode.title)
+          .font(.headline)
+          .lineLimit(1)
+      }.buttonStyle(.navLink)
       HStack {
         if isAuthenticated && episode.collectionTypeEnum != .none {
           BorderView(color: Color(hex: episode.borderColor), padding: 4) {

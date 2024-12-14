@@ -76,16 +76,16 @@ struct CalendarWeekdayView: View {
       Text(calendar.weekday.cn).font(.title3)
       HFlow {
         ForEach(calendar.subjects, id: \.id) { subject in
-          NavigationLink(value: NavDestination.subject(subjectId: subject.id)) {
-            VStack {
+          VStack {
+            NavigationLink(value: NavDestination.subject(subject.id)) {
               ImageView(img: subject.images?.common, width: 80, height: 80, type: .subject)
-              Text(subject.name)
-                .font(.caption)
-                .multilineTextAlignment(.leading)
-                .lineLimit(1)
-                .frame(width: 80)
-            }
-          }.buttonStyle(.plain)
+            }.buttonStyle(.navLink)
+            Text(subject.name)
+              .font(.caption)
+              .multilineTextAlignment(.leading)
+              .lineLimit(1)
+              .frame(width: 80)
+          }
         }
       }
     }

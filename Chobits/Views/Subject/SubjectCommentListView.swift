@@ -79,17 +79,16 @@ struct SubjectCommentListView: View {
         ForEach(comments, id: \.inner.self) { item in
           let comment = item.inner
           HStack(alignment: .top) {
-            NavigationLink(value: NavDestination.user(uid: comment.user.uid)) {
+            NavigationLink(value: NavDestination.user(comment.user.uid)) {
               ImageView(img: comment.user.avatar?.large, width: 32, height: 32, type: .avatar)
             }
             VStack(alignment: .leading) {
               HStack {
-                NavigationLink(value: NavDestination.user(uid: comment.user.uid)) {
+                NavigationLink(value: NavDestination.user(comment.user.uid)) {
                   Text(comment.user.nickname)
                     .font(.footnote)
                     .lineLimit(1)
-                    .foregroundStyle(.linkText)
-                }.buttonStyle(.plain)
+                }
                 if comment.rate > 0 {
                   StarsView(score: Float(comment.rate), size: 10)
                 }
@@ -131,7 +130,7 @@ struct SubjectCommentListView: View {
         }
       }.padding(.horizontal, 8)
     }
-    .buttonStyle(.plain)
+    .buttonStyle(.navLink)
     .animation(.default, value: comments)
     .navigationTitle("吐槽")
     .navigationBarTitleDisplayMode(.inline)

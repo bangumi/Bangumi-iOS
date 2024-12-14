@@ -70,30 +70,26 @@ struct SubjectRelationsView: View {
       ScrollView(.horizontal, showsIndicators: false) {
         LazyHStack {
           ForEach(offprints) { offprint in
-            NavigationLink(value: NavDestination.subject(subjectId: offprint.subject.id)) {
+            NavigationLink(value: NavDestination.subject(offprint.subject.id)) {
               VStack {
-                if let ctype = collections[offprint.subject.id] {
-                  ImageView(
-                    img: offprint.subject.images?.common,
-                    width: 60, height: 80, type: .subject
-                  ) {
-                  } caption: {
+                ImageView(
+                  img: offprint.subject.images?.common,
+                  width: 60, height: 80, type: .subject
+                ) {
+                } caption: {
+                  if let ctype = collections[offprint.subject.id] {
                     HStack {
                       Image(systemName: ctype.icon)
                       Spacer()
                       Text(ctype.description(offprint.subject.type))
                     }.padding(.horizontal, 4)
                   }
-                } else {
-                  ImageView(
-                    img: offprint.subject.images?.common,
-                    width: 60, height: 80, type: .subject)
                 }
                 Spacer()
               }
               .font(.caption)
               .frame(width: 60, height: 90)
-            }.buttonStyle(.plain)
+            }.buttonStyle(.navLink)
           }
         }
       }.animation(.default, value: offprints)
@@ -110,9 +106,9 @@ struct SubjectRelationsView: View {
         }
         Spacer()
         if relations.count > 0 {
-          NavigationLink(value: NavDestination.subjectRelationList(subjectId: subjectId)) {
-            Text("更多条目 »").font(.caption).foregroundStyle(.linkText)
-          }.buttonStyle(.plain)
+          NavigationLink(value: NavDestination.subjectRelationList(subjectId)) {
+            Text("更多条目 »").font(.caption)
+          }.buttonStyle(.navLink)
         }
       }
       Divider()
@@ -129,18 +125,18 @@ struct SubjectRelationsView: View {
     ScrollView(.horizontal, showsIndicators: false) {
       LazyHStack {
         ForEach(relations) { relation in
-          NavigationLink(value: NavDestination.subject(subjectId: relation.subject.id)) {
-            VStack {
-              Section {
-                // relation.id==1 -> 改编
-                if relation.relation.id > 1, !relation.relation.cn.isEmpty {
-                  Text(relation.relation.cn)
-                } else {
-                  Text(relation.subject.type.description)
-                }
+          VStack {
+            Section {
+              // relation.id==1 -> 改编
+              if relation.relation.id > 1, !relation.relation.cn.isEmpty {
+                Text(relation.relation.cn)
+              } else {
+                Text(relation.subject.type.description)
               }
-              .lineLimit(1)
-              .font(.caption)
+            }
+            .lineLimit(1)
+            .font(.caption)
+            NavigationLink(value: NavDestination.subject(relation.subject.id)) {
               ImageView(
                 img: relation.subject.images?.common,
                 width: 90, height: 120,
@@ -155,14 +151,14 @@ struct SubjectRelationsView: View {
                   }.padding(.horizontal, 4)
                 }
               }
-              Text(relation.subject.name)
-                .font(.caption)
-                .multilineTextAlignment(.leading)
-                .truncationMode(.middle)
-                .lineLimit(2)
-              Spacer()
-            }.frame(width: 90, height: 185)
-          }.buttonStyle(.plain)
+            }.buttonStyle(.navLink)
+            Text(relation.subject.name)
+              .font(.caption)
+              .multilineTextAlignment(.leading)
+              .truncationMode(.middle)
+              .lineLimit(2)
+            Spacer()
+          }.frame(width: 90, height: 185)
         }
       }
     }.animation(.default, value: relations)

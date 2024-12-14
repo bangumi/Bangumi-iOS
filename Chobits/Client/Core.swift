@@ -12,6 +12,8 @@ import OSLog
 import SwiftData
 import SwiftUI
 
+let APP_DOMAIN = "com.everpcpc.chobits"
+
 enum BangumiAPI {
   case pub
   case priv
@@ -55,7 +57,7 @@ actor Chii {
 
   init() {
     @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
-    self.keychain = KeychainSwift(keyPrefix: "com.everpcpc.chobits.")
+    self.keychain = KeychainSwift(keyPrefix: "\(APP_DOMAIN).")
     guard let plist = Bundle.main.infoDictionary else {
       fatalError("Could not find Info.plist")
     }
