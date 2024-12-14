@@ -21,11 +21,7 @@ struct ChiiProgressView: View {
   @FocusState private var searching: Bool
   @State private var search: String = ""
   @State private var subjectType: SubjectType = .none
-  @State private var offset: Int = 0
-  @State private var exhausted: Bool = false
-  @State private var loadedIdx: [Int: Bool] = [:]
   @State private var counts: [SubjectType: Int] = [:]
-  @State private var collections: [EnumerateItem<(UserSubjectCollection)>] = []
 
   func loadCounts() async {
     let doingType = CollectionType.do.rawValue
@@ -42,62 +38,6 @@ struct ChiiProgressView: View {
     } catch {
       Notifier.shared.alert(error: error)
     }
-  }
-
-  func fetch(limit: Int = 20) async -> [EnumerateItem<UserSubjectCollection>] {
-    let stype = subjectType.rawValue
-    let doingType = CollectionType.do.rawValue
-    var descriptor = FetchDescriptor<UserSubjectCollection>(
-      predicate: #Predicate<UserSubjectCollection> {
-        (stype == 0 || $0.subjectType == stype) && $0.type == doingType
-          && (search == ""
-            || ($0.subject?.name.localizedStandardContains(search) ?? false
-              || $0.subject?.nameCN.localizedStandardContains(search) ?? false))
-      },
-      sortBy: [
-        SortDescriptor(\.updatedAt, order: .reverse)
-      ])
-    descriptor.fetchLimit = limit
-    descriptor.fetchOffset = offset
-    do {
-      let collections = try modelContext.fetch(descriptor)
-      if collections.count < limit {
-        exhausted = true
-      }
-      let result = collections.enumerated().map { (idx, collection) in
-        EnumerateItem(idx: idx + offset, inner: collection)
-      }
-      offset += limit
-      return result
-    } catch {
-      Notifier.shared.alert(error: error)
-    }
-    return []
-  }
-
-  func load() async {
-    offset = 0
-    exhausted = false
-    loadedIdx.removeAll()
-    collections.removeAll()
-    await loadCounts()
-    let collections = await fetch()
-    self.collections.append(contentsOf: collections)
-  }
-
-  func loadNextPage(idx: Int) async {
-    if exhausted {
-      return
-    }
-    if idx != offset - 3 {
-      return
-    }
-    if loadedIdx[idx, default: false] {
-      return
-    }
-    loadedIdx[idx] = true
-    let collections = await fetch()
-    self.collections.append(contentsOf: collections)
   }
 
   func refresh() async {
@@ -172,16 +112,16 @@ struct ChiiProgressView: View {
               return
             }
             Task {
-              await load()
+              await loadCounts()
               refreshing = true
               await refresh()
               refreshing = false
-              await load()
+              await loadCounts()
             }
           }
           .onChange(of: subjectType) {
             Task {
-              await load()
+              await loadCounts()
             }
           }
           HStack {
@@ -190,7 +130,7 @@ struct ChiiProgressView: View {
               .textFieldStyle(.roundedBorder)
               .onChange(of: search) { _, _ in
                 Task {
-                  await load()
+                  await loadCounts()
                 }
               }
             Button {
@@ -203,38 +143,18 @@ struct ChiiProgressView: View {
           }
           .padding(.horizontal, 8)
           .padding(.vertical, 2)
-          LazyVStack(alignment: .leading) {
-            ForEach(collections, id: \.inner) { item in
-              CardView {
-                ProgressRowView(collection: item.inner)
-              }
-              .onAppear {
-                Task {
-                  await loadNextPage(idx: item.idx)
-                }
-              }
-            }
-            if exhausted {
-              HStack {
-                Spacer()
-                Text("没有更多了")
-                  .font(.footnote)
-                  .foregroundStyle(.secondary)
-                Spacer()
-              }
-            }
-          }.padding(.horizontal, 8)
+          ChiiProgressListView(subjectType: subjectType, search: search)
+            .padding(.horizontal, 8)
         }
         .animation(.default, value: subjectType)
         .animation(.default, value: counts)
-        .animation(.default, value: collections)
         .refreshable {
           if refreshing {
             return
           }
           UIImpactFeedbackGenerator(style: .medium).impactOccurred()
           await refresh()
-          await load()
+          await loadCounts()
         }
         .navigationTitle("进度管理")
         .toolbarTitleDisplayMode(.inlineLarge)
@@ -249,5 +169,42 @@ struct ChiiProgressView: View {
           }
       }
     }
+  }
+}
+struct ChiiProgressListView: View {
+  let subjectType: SubjectType
+  let search: String
+
+  @Environment(\.modelContext) var modelContext
+
+  @Query var collections: [UserSubjectCollection]
+
+  init(subjectType: SubjectType, search: String) {
+    self.subjectType = subjectType
+    self.search = search
+
+    let stype = subjectType.rawValue
+    let doingType = CollectionType.do.rawValue
+    let descriptor = FetchDescriptor<UserSubjectCollection>(
+      predicate: #Predicate<UserSubjectCollection> {
+        (stype == 0 || $0.subjectType == stype) && $0.type == doingType
+          && (search == ""
+            || ($0.subject?.name.localizedStandardContains(search) ?? false
+              || $0.subject?.nameCN.localizedStandardContains(search) ?? false))
+      },
+      sortBy: [
+        SortDescriptor(\.updatedAt, order: .reverse)
+      ])
+    self._collections = Query(descriptor)
+  }
+
+  var body: some View {
+    LazyVStack(alignment: .leading) {
+      ForEach(collections) { item in
+        CardView {
+          ProgressRowView(collection: item)
+        }
+      }
+    }.animation(.default, value: collections)
   }
 }
