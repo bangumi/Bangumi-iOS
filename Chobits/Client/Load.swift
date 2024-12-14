@@ -53,7 +53,7 @@ extension Chii {
     try await db.commit()
   }
 
-  func loadEpisodes(_ subjectId: Int, once: Bool = false) async throws {
+  func loadEpisodes(_ subjectId: Int) async throws {
     let db = try self.getDB()
     let type = try await db.getSubjectType(subjectId)
     switch type {
@@ -78,9 +78,6 @@ extension Chii {
         for item in response.data {
           items.append(item)
         }
-        if once {
-          break
-        }
         offset += limit
         if offset > total {
           break
@@ -101,9 +98,6 @@ extension Chii {
         }
         for item in response.data {
           items.append(item)
-        }
-        if once {
-          break
         }
         offset += limit
         if offset > total {

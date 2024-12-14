@@ -59,6 +59,7 @@ struct ChiiProgressView: View {
     let limit: Int = 100
     var offset: Int = 0
     var count: Int = 0
+    var loaded: [Int] = []
     while true {
       let resp = try await Chii.shared.getUserSubjectCollections(
         since: since, limit: limit, offset: offset)
@@ -66,8 +67,9 @@ struct ChiiProgressView: View {
         break
       }
       for item in resp.data {
-        count += 1
         try await db.saveUserSubjectCollection(item)
+        count += 1
+        loaded.append(item.subject.id)
         refreshProgress = CGFloat(count) / CGFloat(resp.total)
       }
       try await db.commit()
@@ -78,7 +80,22 @@ struct ChiiProgressView: View {
       }
     }
     try await db.commit()
+    if since > 0 {
+      checkLoadEpisodes(loaded)
+    }
     return count
+  }
+
+  func checkLoadEpisodes(_ subjectIds: [Int]) {
+    Task.detached {
+      for subjectId in subjectIds {
+        do {
+          try await Chii.shared.loadEpisodes(subjectId)
+        } catch {
+          await Notifier.shared.alert(error: error)
+        }
+      }
+    }
   }
 
   var body: some View {
