@@ -13,7 +13,7 @@ struct SettingsView: View {
   @AppStorage("appearance") var appearance: String = AppearanceType.system.label
   @AppStorage("shareDomain") var shareDomain: String = ShareDomain.chii.label
   @AppStorage("authDomain") var authDomain: String = AuthDomain.origin.label
-  @AppStorage("defaultTab") var defaultTab: String = PhoneViewTab.discover.label
+  @AppStorage("defaultTab") var defaultTab: String = ChiiViewTab.discover.label
   @AppStorage("isolationMode") var isolationMode: Bool = false
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
 
@@ -22,7 +22,7 @@ struct SettingsView: View {
   @State private var selectedShareDomain: ShareDomain = .chii
   @State private var selectedAuthDomain: AuthDomain = .origin
   @State private var selectedAppearance: AppearanceType = .system
-  @State private var selectedDefaultTab: PhoneViewTab = .discover
+  @State private var selectedDefaultTab: ChiiViewTab = .discover
   @State private var selectedDefaultProgressType: SubjectType = .anime
   @State private var isolationModeEnabled: Bool = false
 
@@ -33,7 +33,7 @@ struct SettingsView: View {
     selectedShareDomain = ShareDomain(shareDomain)
     selectedAuthDomain = AuthDomain(authDomain)
     selectedAppearance = AppearanceType(appearance)
-    selectedDefaultTab = PhoneViewTab(defaultTab)
+    selectedDefaultTab = ChiiViewTab(defaultTab)
     isolationModeEnabled = isolationMode
   }
 
@@ -114,7 +114,7 @@ struct SettingsView: View {
           }
 
           Picker(selection: $selectedDefaultTab, label: Text("默认页面")) {
-            ForEach(PhoneViewTab.allCases, id: \.self) { tab in
+            ForEach(ChiiViewTab.defaultTabs, id: \.self) { tab in
               Text(tab.title).tag(tab)
             }
           }

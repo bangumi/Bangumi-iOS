@@ -127,85 +127,9 @@ enum AuthDomain: Codable, CaseIterable, Identifiable {
   }
 }
 
-enum PhoneViewTab: Codable, CaseIterable, View {
-  case timeline
-  case progress
-  case discover
-  case search
-
-  init(_ label: String) {
-    switch label {
-    case "timeline":
-      self = .timeline
-    case "progress":
-      self = .progress
-    case "discover":
-      self = .discover
-    case "search":
-      self = .search
-    default:
-      self = .timeline
-    }
-  }
-
-  var title: String {
-    switch self {
-    case .timeline:
-      "动态"
-    case .progress:
-      "进度管理"
-    case .discover:
-      "发现"
-    case .search:
-      "搜索"
-    }
-  }
-
-  var label: String {
-    switch self {
-    case .timeline:
-      "timeline"
-    case .progress:
-      "progress"
-    case .discover:
-      "discover"
-    case .search:
-      "search"
-    }
-  }
-
-  var icon: String {
-    switch self {
-    case .timeline:
-      "person"
-    case .progress:
-      "square.grid.2x2"
-    case .discover:
-      "waveform"
-    case .search:
-      "magnifyingglass"
-    }
-  }
-
-  var body: some View {
-    switch self {
-    case .timeline:
-      ChiiTimelineView()
-    case .progress:
-      ChiiProgressView()
-    case .discover:
-      CalendarView()
-    case .search:
-      SearchView()
-    }
-  }
-
-}
-
-enum PadViewTab: Codable, CaseIterable, View {
+enum ChiiViewTab: Equatable, Hashable, Identifiable {
   case timeline
   case discover
-  case search
 
   case progress
   case collection
@@ -219,8 +143,6 @@ enum PadViewTab: Codable, CaseIterable, View {
       self = .timeline
     case "discover":
       self = .discover
-    case "search":
-      self = .search
     case "progress":
       self = .progress
     case "collection":
@@ -234,14 +156,16 @@ enum PadViewTab: Codable, CaseIterable, View {
     }
   }
 
+  var id: Self {
+    return self
+  }
+
   var title: String {
     switch self {
     case .timeline:
       "动态"
     case .discover:
       "发现"
-    case .search:
-      "搜索"
     case .progress:
       "进度管理"
     case .collection:
@@ -259,8 +183,6 @@ enum PadViewTab: Codable, CaseIterable, View {
       "timeline"
     case .discover:
       "discover"
-    case .search:
-      "search"
     case .progress:
       "progress"
     case .collection:
@@ -277,8 +199,6 @@ enum PadViewTab: Codable, CaseIterable, View {
     case .timeline:
       "person"
     case .discover:
-      "waveform"
-    case .search:
       "magnifyingglass"
     case .progress:
       "square.grid.2x2"
@@ -291,34 +211,7 @@ enum PadViewTab: Codable, CaseIterable, View {
     }
   }
 
-  var body: some View {
-    switch self {
-    case .timeline:
-      ChiiTimelineView()
-    case .discover:
-      CalendarView()
-    case .search:
-      SearchView()
-    case .progress:
-      ChiiProgressView()
-    case .collection:
-      ChiiTimelineView()
-    case .notice:
-      NoticeView()
-    case .settings:
-      SettingsView()
-    }
-  }
-
-  static var mainTabs: [Self] {
-    return [.timeline, .discover, .search]
-  }
-
-  static var userTabs: [Self] {
-    return [.progress, .collection, .notice]
-  }
-
-  static var otherTabs: [Self] {
-    return [.settings]
+  static var defaultTabs: [Self] {
+    return [.timeline, .progress, .discover]
   }
 }

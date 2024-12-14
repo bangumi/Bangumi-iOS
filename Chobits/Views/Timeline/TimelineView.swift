@@ -47,43 +47,47 @@ struct ChiiTimelineView: View {
       }
     }
     .toolbar {
-      if UIDevice.current.userInterfaceIdiom == .phone {
-        if isAuthenticated {
-          if let me = profile {
-            ToolbarItem(placement: .topBarLeading) {
-              HStack {
-                ImageView(img: me.avatar?.medium, width: 32, height: 32)
-                VStack(alignment: .leading) {
-                  Text("\(me.nickname)")
-                    .font(.footnote)
-                    .lineLimit(2)
-                  // Text(me.group.description)
-                  //   .font(.caption)
-                  //   .foregroundStyle(.secondary)
-                }
+      if isAuthenticated {
+        if let me = profile {
+          ToolbarItem(placement: .topBarLeading) {
+            HStack {
+              ImageView(img: me.avatar?.medium, width: 32, height: 32)
+              VStack(alignment: .leading) {
+                Text("\(me.nickname)")
+                  .font(.footnote)
+                  .lineLimit(2)
+                // Text(me.group.description)
+                //   .font(.caption)
+                //   .foregroundStyle(.secondary)
               }
-            }
-          } else {
-            ToolbarItem(placement: .topBarLeading) {
-              ProgressView().task(updateProfile)
             }
           }
         } else {
           ToolbarItem(placement: .topBarLeading) {
-            ImageView(img: nil, width: 32, height: 32, type: .avatar)
+            ProgressView().task(updateProfile)
           }
         }
-        ToolbarItem(placement: .topBarTrailing) {
+      } else {
+        ToolbarItem(placement: .topBarLeading) {
           HStack {
-            if isAuthenticated, !isolationMode {
-              NavigationLink(value: NavDestination.notice) {
-                Image(systemName: hasUnreadNotice ? "bell.badge.fill" : "bell")
-                  .task(checkNotice)
-              }
+            ImageView(img: nil, width: 32, height: 32, type: .avatar)
+            Text("未登录")
+              .font(.footnote)
+              .lineLimit(2)
+              .foregroundStyle(.secondary)
+          }
+        }
+      }
+      ToolbarItem(placement: .topBarTrailing) {
+        HStack {
+          if isAuthenticated, !isolationMode {
+            NavigationLink(value: NavDestination.notice) {
+              Image(systemName: hasUnreadNotice ? "bell.badge.fill" : "bell")
+                .task(checkNotice)
             }
-            NavigationLink(value: NavDestination.setting) {
-              Image(systemName: "gearshape")
-            }
+          }
+          NavigationLink(value: NavDestination.setting) {
+            Image(systemName: "gearshape")
           }
         }
       }

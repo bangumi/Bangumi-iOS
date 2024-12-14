@@ -11,12 +11,16 @@ import SwiftUI
 struct PhoneView: View {
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
 
-  @State private var selectedTab: PhoneViewTab
+  @State private var selectedTab: ChiiViewTab
+
   @State private var nav: NavigationPath = NavigationPath()
+  @State private var searchQuery: String = ""
+  @State private var searchRemote: Bool = false
+  @State private var searching: Bool = false
 
   init() {
     let defaultTab = UserDefaults.standard.string(forKey: "defaultTab") ?? "discover"
-    self.selectedTab = PhoneViewTab(defaultTab)
+    self.selectedTab = ChiiViewTab(defaultTab)
   }
 
   var body: some View {
@@ -27,9 +31,9 @@ struct PhoneView: View {
           .navigationBarTitleDisplayMode(.inline)
           .navigationDestination(for: NavDestination.self) { $0 }
       }
-      .tag(PhoneViewTab.timeline)
+      .tag(ChiiViewTab.timeline)
       .tabItem {
-        Label(PhoneViewTab.timeline.title, systemImage: PhoneViewTab.timeline.icon)
+        Label(ChiiViewTab.timeline.title, systemImage: ChiiViewTab.timeline.icon)
       }
 
       if isAuthenticated {
@@ -38,35 +42,41 @@ struct PhoneView: View {
             .navigationBarTitleDisplayMode(.inline)
             .navigationDestination(for: NavDestination.self) { $0 }
         }
-        .tag(PhoneViewTab.progress)
+        .tag(ChiiViewTab.progress)
         .tabItem {
-          Label(PhoneViewTab.progress.title, systemImage: PhoneViewTab.progress.icon)
+          Label(ChiiViewTab.progress.title, systemImage: ChiiViewTab.progress.icon)
         }
       }
 
-      NavigationStack {
-        CalendarView()
+      Section {
+        NavigationStack(path: $nav) {
+          Section {
+            if searching {
+              SearchView(text: $searchQuery, remote: $searchRemote)
+            } else {
+              CalendarView()
+            }
+          }
           .navigationBarTitleDisplayMode(.inline)
           .navigationDestination(for: NavDestination.self) { $0 }
+        }
+        .searchable(text: $searchQuery, isPresented: $searching)
+        .onSubmit(of: .search) {
+          searchRemote = true
+        }
+        .onChange(of: searchQuery) {
+          searchRemote = false
+        }
+        .onContinueUserActivity(CSSearchableItemActionType) { activity in
+          handleSearchActivity(activity, nav: $nav)
+          selectedTab = .discover
+        }
       }
-      .tag(PhoneViewTab.discover)
+      .tag(ChiiViewTab.discover)
       .tabItem {
-        Label(PhoneViewTab.discover.title, systemImage: PhoneViewTab.discover.icon)
+        Label(ChiiViewTab.discover.title, systemImage: ChiiViewTab.discover.icon)
       }
 
-      NavigationStack(path: $nav) {
-        SearchView()
-          .navigationBarTitleDisplayMode(.inline)
-          .navigationDestination(for: NavDestination.self) { $0 }
-      }
-      .tag(PhoneViewTab.search)
-      .tabItem {
-        Label(PhoneViewTab.search.title, systemImage: PhoneViewTab.search.icon)
-      }
-      .onContinueUserActivity(CSSearchableItemActionType) { activity in
-        handleSearchActivity(activity, nav: $nav)
-        selectedTab = .search
-      }
     }
   }
 }

@@ -10,11 +10,10 @@ import SwiftData
 import SwiftUI
 
 struct SearchView: View {
-  @Environment(\.modelContext) var modelContext
+  @Binding var text: String
+  @Binding var remote: Bool
 
-  @FocusState private var searching: Bool
-  @State private var text: String = ""
-  @State private var remote: Bool = false
+  @Environment(\.modelContext) var modelContext
 
   @State private var subjectType: SubjectType = .none
   @State private var offset = 0
@@ -75,7 +74,7 @@ struct SearchView: View {
     return []
   }
 
-  func newSearch() async {
+  func newSearch() {
     offset = 0
     exhausted = false
     loadedIdx.removeAll()
@@ -83,12 +82,14 @@ struct SearchView: View {
     if text.isEmpty {
       return
     }
-    if remote {
-      let subjects = await remoteSearch()
-      self.subjects.append(contentsOf: subjects)
-    } else {
-      let subjects = await localSearch()
-      self.subjects.append(contentsOf: subjects)
+    Task {
+      if remote {
+        let subjects = await remoteSearch()
+        self.subjects.append(contentsOf: subjects)
+      } else {
+        let subjects = await localSearch()
+        self.subjects.append(contentsOf: subjects)
+      }
     }
   }
 
@@ -122,40 +123,16 @@ struct SearchView: View {
               Text(type.description).tag(type)
             }
           }
-          .pickerStyle(.menu)
-          .onChange(of: subjectType) { _, _ in
-            Task {
-              await newSearch()
-            }
+          .pickerStyle(.segmented)
+          .onChange(of: subjectType) {
+            newSearch()
           }
-          TextField("搜索", text: $text)
-            .focused($searching)
-            .textFieldStyle(.roundedBorder)
-            .onAppear {
-              if text.isEmpty {
-                searching = true
-              }
-            }
-            .onChange(of: text) { _, _ in
-              remote = false
-              Task {
-                await newSearch()
-              }
-            }
-            .onSubmit {
-              remote = true
-              Task {
-                await newSearch()
-              }
-            }
-          Button {
-            searching = false
-            remote = false
-            text = ""
-          } label: {
-            Image(systemName: "xmark.circle")
+          .onChange(of: $text.wrappedValue) {
+            newSearch()
           }
-          .disabled(!searching && text.isEmpty)
+          .onChange(of: $remote.wrappedValue) {
+            newSearch()
+          }
         }
       }.padding(8)
       if text.isEmpty {

@@ -40,10 +40,10 @@ struct ContentView: View {
 
   var body: some View {
     ZStack {
-      if UIDevice.current.userInterfaceIdiom == .phone {
-        PhoneView()
-      } else {
+      if UIDevice.current.userInterfaceIdiom == .pad, #available(iOS 18.0, *) {
         PadView()
+      } else {
+        PhoneView()
       }
       VStack(alignment: .center) {
         Spacer()

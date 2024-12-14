@@ -26,7 +26,7 @@ struct CollectionRowView: View {
           .font(.footnote)
           .foregroundStyle(.secondary)
         Spacer()
-        HStack(alignment: .bottom) {
+        HStack {
           if collection.priv {
             Image(systemName: "lock.fill").foregroundStyle(.accent)
           }
