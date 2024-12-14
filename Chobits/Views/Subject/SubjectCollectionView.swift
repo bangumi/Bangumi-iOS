@@ -71,7 +71,7 @@ struct SubjectCollectionView: View {
         }
       )
       if let comment = collection?.comment, !comment.isEmpty {
-        VStack(spacing: 2) {
+        VStack(alignment: .leading, spacing: 2) {
           Divider()
           Text(comment)
             .padding(2)
