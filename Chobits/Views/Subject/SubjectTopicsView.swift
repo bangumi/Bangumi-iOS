@@ -9,11 +9,10 @@ import SwiftData
 import SwiftUI
 
 struct SubjectTopicsView: View {
-  let subjectId: Int
+  @ObservableModel var subject: Subject
 
   @State private var loaded: Bool = false
   @State private var refreshing: Bool = false
-  @State private var topics: [TopicDTO] = []
 
   func refresh() {
     if loaded {
@@ -22,8 +21,8 @@ struct SubjectTopicsView: View {
     refreshing = true
     Task {
       do {
-        let resp = try await Chii.shared.getSubjectTopics(subjectId, limit: 5)
-        topics = resp.data
+        let resp = try await Chii.shared.getSubjectTopics(subject.subjectId, limit: 5)
+        subject.topics = resp.data
       } catch {
         Notifier.shared.alert(error: error)
       }
@@ -36,22 +35,22 @@ struct SubjectTopicsView: View {
     VStack(spacing: 2) {
       HStack(alignment: .bottom) {
         Text("讨论版")
-          .foregroundStyle(topics.count > 0 ? .primary : .secondary)
+          .foregroundStyle(subject.topics.count > 0 ? .primary : .secondary)
           .font(.title3)
           .onAppear(perform: refresh)
         if refreshing {
           ProgressView()
         }
         Spacer()
-        if topics.count > 0 {
-          NavigationLink(value: NavDestination.subjectTopicList(subjectId)) {
+        if subject.topics.count > 0 {
+          NavigationLink(value: NavDestination.subjectTopicList(subject.subjectId)) {
             Text("更多讨论 »").font(.caption)
           }.buttonStyle(.navLink)
         }
       }
       Divider()
     }.padding(.top, 5)
-    if topics.count == 0 {
+    if subject.topics.count == 0 {
       HStack {
         Spacer()
         Text("暂无讨论")
@@ -61,7 +60,7 @@ struct SubjectTopicsView: View {
       }.padding(.bottom, 5)
     }
     VStack {
-      ForEach(topics) { topic in
+      ForEach(subject.topics) { topic in
         VStack {
           HStack {
             NavigationLink(value: NavDestination.topic(topic)) {
@@ -89,7 +88,7 @@ struct SubjectTopicsView: View {
         }.padding(.top, 2)
       }
     }
-    .animation(.default, value: topics)
+    .animation(.default, value: subject.topics)
   }
 }
 
@@ -101,7 +100,7 @@ struct SubjectTopicsView: View {
 
   return ScrollView {
     LazyVStack(alignment: .leading) {
-      SubjectTopicsView(subjectId: subject.subjectId)
+      SubjectTopicsView(subject: subject)
         .modelContainer(container)
     }
   }.padding()

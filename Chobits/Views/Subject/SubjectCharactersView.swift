@@ -9,13 +9,10 @@ import SwiftData
 import SwiftUI
 
 struct SubjectCharactersView: View {
-  let subjectId: Int
-
-  @Environment(\.modelContext) var modelContext
+  @ObservableModel var subject: Subject
 
   @State private var loaded: Bool = false
   @State private var loading: Bool = false
-  @State private var relations: [SubjectCharacterDTO] = []
 
   func load() {
     if loading || loaded {
@@ -24,8 +21,8 @@ struct SubjectCharactersView: View {
     loading = true
     Task {
       do {
-        let resp = try await Chii.shared.getSubjectCharacters(subjectId, limit: 10)
-        relations.append(contentsOf: resp.data)
+        let resp = try await Chii.shared.getSubjectCharacters(subject.subjectId, limit: 10)
+        subject.characters = resp.data
       } catch {
         Notifier.shared.alert(error: error)
       }
@@ -38,22 +35,22 @@ struct SubjectCharactersView: View {
     VStack(spacing: 2) {
       HStack(alignment: .bottom) {
         Text("角色介绍")
-          .foregroundStyle(relations.count > 0 ? .primary : .secondary)
+          .foregroundStyle(subject.characters.count > 0 ? .primary : .secondary)
           .font(.title3)
           .onAppear(perform: load)
         if loading {
           ProgressView()
         }
         Spacer()
-        if relations.count > 0 {
-          NavigationLink(value: NavDestination.subjectCharacterList(subjectId)) {
+        if subject.characters.count > 0 {
+          NavigationLink(value: NavDestination.subjectCharacterList(subject.subjectId)) {
             Text("更多角色 »").font(.caption)
           }.buttonStyle(.navLink)
         }
       }
       Divider()
     }.padding(.top, 5)
-    if relations.count == 0 {
+    if subject.characters.count == 0 {
       HStack {
         Spacer()
         Text("暂无角色")
@@ -64,7 +61,7 @@ struct SubjectCharactersView: View {
     }
     ScrollView(.horizontal, showsIndicators: false) {
       LazyHStack(alignment: .top) {
-        ForEach(relations, id: \.character.id) { item in
+        ForEach(subject.characters, id: \.character.id) { item in
           VStack {
             NavigationLink(value: NavDestination.character(item.character.id)) {
               ImageView(
@@ -86,7 +83,7 @@ struct SubjectCharactersView: View {
           .frame(width: 60, height: 120)
         }
       }
-    }.animation(.default, value: relations)
+    }.animation(.default, value: subject.characters)
   }
 }
 
@@ -99,7 +96,7 @@ struct SubjectCharactersView: View {
   return NavigationStack {
     ScrollView {
       LazyVStack(alignment: .leading) {
-        SubjectCharactersView(subjectId: subject.subjectId)
+        SubjectCharactersView(subject: subject)
           .modelContainer(container)
       }
     }.padding()

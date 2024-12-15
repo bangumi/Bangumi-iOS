@@ -46,6 +46,14 @@ final class SubjectV1: Searchable {
   var type: Int
   var volumes: Int
 
+  var characters: [SubjectCharacterDTO] = []
+  var offprints: [SubjectRelationDTO] = []
+  var relations: [SubjectRelationDTO] = []
+  var recs: [SubjectRecDTO] = []
+
+  var topics: [TopicDTO] = []
+  var comments: [SubjectCommentDTO] = []
+
   @Relationship(deleteRule: .cascade, inverse: \UserSubjectCollection.subject)
   var userCollection: UserSubjectCollection?
 

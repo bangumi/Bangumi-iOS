@@ -10,13 +10,13 @@ import SwiftData
 import SwiftUI
 
 struct SubjectRecsView: View {
-  let subjectId: Int
+  @ObservableModel var subject: Subject
 
   @Environment(\.modelContext) var modelContext
 
   @State private var loaded: Bool = false
   @State private var loading: Bool = false
-  @State private var recs: [SubjectRecDTO] = []
+
   @State private var collections: [Int: CollectionType] = [:]
 
   func load() {
@@ -26,8 +26,8 @@ struct SubjectRecsView: View {
     loading = true
     Task {
       do {
-        let resp = try await Chii.shared.getSubjectRecs(subjectId, limit: 10)
-        recs.append(contentsOf: resp.data)
+        let resp = try await Chii.shared.getSubjectRecs(subject.subjectId, limit: 10)
+        subject.recs = resp.data
 
         var subjectIDs: [Int] = []
         subjectIDs.append(contentsOf: resp.data.map { $0.subject.id })
@@ -51,7 +51,7 @@ struct SubjectRecsView: View {
     VStack(spacing: 2) {
       HStack(alignment: .bottom) {
         Text("猜你喜欢")
-          .foregroundStyle(recs.count > 0 ? .primary : .secondary)
+          .foregroundStyle(subject.recs.count > 0 ? .primary : .secondary)
           .font(.title3)
           .onAppear(perform: load)
         if loading {
@@ -61,7 +61,7 @@ struct SubjectRecsView: View {
       }
       Divider()
     }.padding(.top, 5)
-    if recs.count == 0 {
+    if subject.recs.count == 0 {
       HStack {
         Spacer()
         Text("暂无推荐")
@@ -72,7 +72,7 @@ struct SubjectRecsView: View {
     }
     ScrollView(.horizontal, showsIndicators: false) {
       LazyHStack {
-        ForEach(recs) { rec in
+        ForEach(subject.recs) { rec in
           VStack {
             NavigationLink(value: NavDestination.subject(rec.subject.id)) {
               ImageView(
@@ -99,19 +99,19 @@ struct SubjectRecsView: View {
           .frame(width: 72, height: 140)
         }
       }
-    }.animation(.default, value: recs)
+    }.animation(.default, value: subject.recs)
   }
 }
 
 #Preview {
   let container = mockContainer()
 
-  let subject = Subject.previewBook
+  let subject = Subject.previewAnime
   container.mainContext.insert(subject)
 
   return ScrollView {
     LazyVStack(alignment: .leading) {
-      SubjectRecsView(subjectId: subject.subjectId)
+      SubjectRecsView(subject: subject)
         .modelContainer(container)
     }
   }.padding()

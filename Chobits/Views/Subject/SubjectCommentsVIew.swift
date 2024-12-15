@@ -9,22 +9,10 @@ import SwiftData
 import SwiftUI
 
 struct SubjectCommentsView: View {
-  let subjectId: Int
+  @ObservableModel var subject: Subject
 
   @State private var loaded: Bool = false
   @State private var refreshing: Bool = false
-  @State private var comments: [SubjectCommentDTO] = []
-
-  @Query private var subjects: [Subject]
-  private var subject: Subject? { subjects.first }
-
-  init(subjectId: Int) {
-    self.subjectId = subjectId
-    _subjects = Query(
-      filter: #Predicate<Subject> {
-        $0.subjectId == subjectId
-      })
-  }
 
   func refresh() {
     if loaded {
@@ -33,8 +21,8 @@ struct SubjectCommentsView: View {
     refreshing = true
     Task {
       do {
-        let resp = try await Chii.shared.getSubjectComments(subjectId, limit: 10)
-        comments = resp.data
+        let resp = try await Chii.shared.getSubjectComments(subject.subjectId, limit: 10)
+        subject.comments = resp.data
       } catch {
         Notifier.shared.alert(error: error)
       }
@@ -47,22 +35,22 @@ struct SubjectCommentsView: View {
     VStack(spacing: 2) {
       HStack(alignment: .bottom) {
         Text("吐槽箱")
-          .foregroundStyle(comments.count > 0 ? .primary : .secondary)
+          .foregroundStyle(subject.comments.count > 0 ? .primary : .secondary)
           .font(.title3)
           .onAppear(perform: refresh)
         if refreshing {
           ProgressView()
         }
         Spacer()
-        if comments.count > 0 {
-          NavigationLink(value: NavDestination.subjectCommentList(subjectId)) {
+        if subject.comments.count > 0 {
+          NavigationLink(value: NavDestination.subjectCommentList(subject.subjectId)) {
             Text("更多吐槽 »").font(.caption)
           }.buttonStyle(.navLink)
         }
       }
       Divider()
     }.padding(.top, 5)
-    if comments.count == 0 {
+    if subject.comments.count == 0 {
       HStack {
         Spacer()
         Text("暂无吐槽")
@@ -72,7 +60,7 @@ struct SubjectCommentsView: View {
       }.padding(.bottom, 5)
     }
     VStack {
-      ForEach(comments) { comment in
+      ForEach(subject.comments) { comment in
         HStack(alignment: .top) {
           NavigationLink(value: NavDestination.user(comment.user.uid)) {
             ImageView(img: comment.user.avatar?.large, width: 32, height: 32, type: .avatar)
@@ -88,7 +76,7 @@ struct SubjectCommentsView: View {
                 StarsView(score: Float(comment.rate), size: 10)
               }
               Text(
-                "\(comment.type.description(subject?.typeEnum)) @ \(comment.updatedAt.durationDisplay)"
+                "\(comment.type.description(subject.typeEnum)) @ \(comment.updatedAt.durationDisplay)"
               )
               .lineLimit(1)
               .font(.caption)
@@ -101,7 +89,7 @@ struct SubjectCommentsView: View {
         }
         .padding(.top, 2)
       }
-    }.animation(.default, value: comments)
+    }.animation(.default, value: subject.comments)
   }
 }
 
@@ -113,7 +101,7 @@ struct SubjectCommentsView: View {
 
   return ScrollView {
     LazyVStack(alignment: .leading) {
-      SubjectCommentsView(subjectId: subject.subjectId)
+      SubjectCommentsView(subject: subject)
         .modelContainer(container)
     }
   }.padding()

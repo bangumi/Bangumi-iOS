@@ -64,16 +64,16 @@ struct SubjectView: View {
             if subject.typeEnum == .music {
               EpisodeDiscView(subjectId: subjectId)
             } else {
-              SubjectCharactersView(subjectId: subjectId)
+              SubjectCharactersView(subject: subject)
             }
 
-            SubjectRelationsView(subjectId: subjectId, series: subject.series)
+            SubjectRelationsView(subject: subject)
 
-            SubjectRecsView(subjectId: subjectId)
+            SubjectRecsView(subject: subject)
 
             if !isolationMode {
-              SubjectTopicsView(subjectId: subjectId)
-              SubjectCommentsView(subjectId: subjectId)
+              SubjectTopicsView(subject: subject)
+              SubjectCommentsView(subject: subject)
             }
 
             Spacer()
