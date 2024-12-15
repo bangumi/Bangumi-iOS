@@ -141,28 +141,10 @@ struct ChiiProgressView: View {
               await loadCounts()
             }
           }
-          HStack {
-            TextField("搜索", text: $search)
-              .focused($searching)
-              .textFieldStyle(.roundedBorder)
-              .onChange(of: search) { _, _ in
-                Task {
-                  await loadCounts()
-                }
-              }
-            Button {
-              searching = false
-              search = ""
-            } label: {
-              Image(systemName: "xmark.circle")
-            }
-            .disabled(!searching && search.isEmpty)
-          }
-          .padding(.horizontal, 8)
-          .padding(.vertical, 2)
           ChiiProgressListView(subjectType: subjectType, search: search)
             .padding(.horizontal, 8)
         }
+        .searchable(text: $search)
         .animation(.default, value: subjectType)
         .animation(.default, value: counts)
         .refreshable {
