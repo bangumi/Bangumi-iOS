@@ -9,19 +9,18 @@ import SwiftData
 import SwiftUI
 
 struct CharacterCastsView: View {
-  var characterId: Int
+  @ObservableModel var character: Character
 
   @State private var loaded: Bool = false
   @State private var loading: Bool = false
-  @State private var casts: [CharacterCastDTO] = []
 
   func load() {
     if loading || loaded { return }
     loading = true
     Task {
       do {
-        let resp = try await Chii.shared.getCharacterCasts(characterId, limit: 5)
-        casts.append(contentsOf: resp.data)
+        let resp = try await Chii.shared.getCharacterCasts(character.characterId, limit: 5)
+        character.casts.append(contentsOf: resp.data)
       } catch {
         Notifier.shared.alert(error: error)
       }
@@ -34,15 +33,15 @@ struct CharacterCastsView: View {
     VStack(spacing: 2) {
       HStack(alignment: .bottom) {
         Text("出演作品")
-          .foregroundStyle(casts.count > 0 ? .primary : .secondary)
+          .foregroundStyle(character.casts.count > 0 ? .primary : .secondary)
           .font(.title3)
           .onAppear(perform: load)
         if loading {
           ProgressView()
         }
         Spacer()
-        if casts.count > 0 {
-          NavigationLink(value: NavDestination.characterCastList(characterId)) {
+        if character.casts.count > 0 {
+          NavigationLink(value: NavDestination.characterCastList(character.characterId)) {
             Text("更多出演 »").font(.caption)
           }.buttonStyle(.navLink)
         }
@@ -50,13 +49,13 @@ struct CharacterCastsView: View {
       Divider()
     }.padding(.top, 5)
     LazyVStack {
-      ForEach(casts, id: \.subject.id) { item in
+      ForEach(character.casts, id: \.subject.id) { item in
         VStack {
           CharacterCastItemView(item: item)
           Divider()
         }
       }
-    }.animation(.default, value: casts)
+    }.animation(.default, value: character.casts)
   }
 }
 
@@ -65,12 +64,10 @@ struct CharacterCastsView: View {
 
   let character = Character.preview
   container.mainContext.insert(character)
-  container.mainContext.insert(Subject.previewAnime)
-  container.mainContext.insert(Subject.previewBook)
 
   return ScrollView(showsIndicators: false) {
     LazyVStack(alignment: .leading) {
-      CharacterCastsView(characterId: character.characterId)
+      CharacterCastsView(character: character)
         .modelContainer(container)
     }.padding(.horizontal, 8)
   }

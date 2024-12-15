@@ -245,6 +245,8 @@ final class CharacterV1: Searchable {
   var role: Int
   var summary: String
 
+  var casts: [CharacterCastDTO] = []
+
   @Relationship(deleteRule: .cascade, inverse: \UserCharacterCollection.character)
   var userCollection: UserCharacterCollection?
 
@@ -317,6 +319,9 @@ final class PersonV1: Searchable {
   var nsfw: Bool
   var summary: String
   var type: Int
+
+  var casts: [PersonCastDTO] = []
+  var works: [PersonWorkDTO] = []
 
   @Relationship(deleteRule: .cascade, inverse: \UserPersonCollection.person)
   var userCollection: UserPersonCollection?

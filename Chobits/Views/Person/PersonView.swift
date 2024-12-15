@@ -145,10 +145,10 @@ struct PersonView: View {
             BBCodeWebView(person.summary, textSize: 14)
 
             /// casts
-            PersonCastsView(personId: personId)
+            PersonCastsView(person: person)
 
             /// works
-            PersonWorksView(personId: personId)
+            PersonWorksView(person: person)
 
           }.padding(.horizontal, 8)
         }

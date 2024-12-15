@@ -258,9 +258,9 @@
 			children = (
 				1909F3B32BECF9D100E3B8F0 /* CharacterView.swift */,
 				19742A5D2D069AD1008791CC /* CharacterInfoboxView.swift */,
-				19ECCF082CFF3D2D0092F715 /* CharacterCastItemView.swift */,
-				19ECCEE42CFF38CD0092F715 /* CharacterCastListView.swift */,
 				1915A8992BEFB942003DB76D /* CharacterCastsView.swift */,
+				19ECCEE42CFF38CD0092F715 /* CharacterCastListView.swift */,
+				19ECCF082CFF3D2D0092F715 /* CharacterCastItemView.swift */,
 			);
 			path = Character;
 			sourceTree = "<group>";
@@ -415,11 +415,11 @@
 			children = (
 				19B9002D2BED15B600405F0F /* PersonView.swift */,
 				19742A5F2D069AE1008791CC /* PersonInfoboxView.swift */,
-				19ECCF0D2CFF58490092F715 /* PersonWorksView.swift */,
-				19ECCF0C2CFF58490092F715 /* PersonWorkListView.swift */,
-				19ECCF102CFF60430092F715 /* PersonCastItemView.swift */,
-				19ECCF112CFF60430092F715 /* PersonCastListView.swift */,
 				19ECCF122CFF60430092F715 /* PersonCastsView.swift */,
+				19ECCF0D2CFF58490092F715 /* PersonWorksView.swift */,
+				19ECCF112CFF60430092F715 /* PersonCastListView.swift */,
+				19ECCF102CFF60430092F715 /* PersonCastItemView.swift */,
+				19ECCF0C2CFF58490092F715 /* PersonWorkListView.swift */,
 			);
 			path = Person;
 			sourceTree = "<group>";

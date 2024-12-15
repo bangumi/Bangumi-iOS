@@ -53,20 +53,6 @@ struct CharacterView: View {
     refreshed = true
   }
 
-  func shouldShowToggle(
-    _ geometry: GeometryProxy,
-    font: UIFont.TextStyle = .body, limits: Int = 5
-  )
-    -> Bool
-  {
-    let lines = Int(
-      geometry.size.height / UIFont.preferredFont(forTextStyle: font).lineHeight)
-    if lines < limits {
-      return false
-    }
-    return true
-  }
-
   var body: some View {
     Section {
       if let character = character {
@@ -134,7 +120,7 @@ struct CharacterView: View {
             BBCodeWebView(character.summary, textSize: 14)
 
             /// casts
-            CharacterCastsView(characterId: characterId)
+            CharacterCastsView(character: character)
           }.padding(.horizontal, 8)
         }
       } else {

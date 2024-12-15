@@ -2,19 +2,18 @@ import SwiftData
 import SwiftUI
 
 struct PersonCastsView: View {
-  var personId: Int
+  @ObservableModel var person: Person
 
   @State private var loaded: Bool = false
   @State private var loading: Bool = false
-  @State private var casts: [PersonCastDTO] = []
 
   func load() {
     if loading || loaded { return }
     loading = true
     Task {
       do {
-        let resp = try await Chii.shared.getPersonCasts(personId, limit: 5)
-        casts.append(contentsOf: resp.data)
+        let resp = try await Chii.shared.getPersonCasts(person.personId, limit: 5)
+        person.casts.append(contentsOf: resp.data)
       } catch {
         Notifier.shared.alert(error: error)
       }
@@ -27,15 +26,15 @@ struct PersonCastsView: View {
     VStack(spacing: 2) {
       HStack(alignment: .bottom) {
         Text("最近出演角色")
-          .foregroundStyle(casts.count > 0 ? .primary : .secondary)
+          .foregroundStyle(person.casts.count > 0 ? .primary : .secondary)
           .font(.title3)
           .onAppear(perform: load)
         if loading {
           ProgressView()
         }
         Spacer()
-        if casts.count > 0 {
-          NavigationLink(value: NavDestination.personCastList(personId)) {
+        if person.casts.count > 0 {
+          NavigationLink(value: NavDestination.personCastList(person.personId)) {
             Text("更多角色 »").font(.caption)
           }.buttonStyle(.navLink)
         }
@@ -43,14 +42,14 @@ struct PersonCastsView: View {
       Divider()
     }.padding(.top, 5)
     VStack {
-      ForEach(casts) { item in
+      ForEach(person.casts) { item in
         CardView {
           PersonCastItemView(item: item)
         }
       }
     }
     .padding(.bottom, 8)
-    .animation(.default, value: casts)
+    .animation(.default, value: person.casts)
   }
 }
 
@@ -62,7 +61,7 @@ struct PersonCastsView: View {
   return NavigationStack {
     ScrollView {
       LazyVStack(alignment: .leading) {
-        PersonCastsView(personId: person.personId)
+        PersonCastsView(person: person)
           .modelContainer(container)
       }.padding()
     }
