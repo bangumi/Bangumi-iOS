@@ -64,7 +64,7 @@ struct PersonCastsView: View {
       LazyVStack(alignment: .leading) {
         PersonCastsView(personId: person.personId)
           .modelContainer(container)
-      }
-    }.padding()
+      }.padding()
+    }
   }
 }

@@ -25,6 +25,20 @@
 		194E75D42D0BDF660070F5F8 /* EpisodeInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 194E75D32D0BDF600070F5F8 /* EpisodeInfoView.swift */; };
 		194E75D62D0BE7BE0070F5F8 /* EpisodeRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 194E75D52D0BE7B70070F5F8 /* EpisodeRowView.swift */; };
 		194E76982D0D3A360070F5F8 /* Style.swift in Sources */ = {isa = PBXBuildFile; fileRef = 194E76972D0D3A340070F5F8 /* Style.swift */; };
+		194E77492D0EFAF80070F5F8 /* character_casts.json in Resources */ = {isa = PBXBuildFile; fileRef = 194E773B2D0EFAF80070F5F8 /* character_casts.json */; };
+		194E774A2D0EFAF80070F5F8 /* person_works.json in Resources */ = {isa = PBXBuildFile; fileRef = 194E773F2D0EFAF80070F5F8 /* person_works.json */; };
+		194E774B2D0EFAF80070F5F8 /* subject_offprints.json in Resources */ = {isa = PBXBuildFile; fileRef = 194E77412D0EFAF80070F5F8 /* subject_offprints.json */; };
+		194E774C2D0EFAF80070F5F8 /* person_casts.json in Resources */ = {isa = PBXBuildFile; fileRef = 194E773D2D0EFAF80070F5F8 /* person_casts.json */; };
+		194E774D2D0EFAF80070F5F8 /* user_person_collection.json in Resources */ = {isa = PBXBuildFile; fileRef = 194E77472D0EFAF80070F5F8 /* user_person_collection.json */; };
+		194E774E2D0EFAF80070F5F8 /* user_person_collections.json in Resources */ = {isa = PBXBuildFile; fileRef = 194E77482D0EFAF80070F5F8 /* user_person_collections.json */; };
+		194E774F2D0EFAF80070F5F8 /* subject_characters.json in Resources */ = {isa = PBXBuildFile; fileRef = 194E77402D0EFAF80070F5F8 /* subject_characters.json */; };
+		194E77502D0EFAF80070F5F8 /* character_collects.json in Resources */ = {isa = PBXBuildFile; fileRef = 194E773C2D0EFAF80070F5F8 /* character_collects.json */; };
+		194E77512D0EFAF80070F5F8 /* user_character_collections.json in Resources */ = {isa = PBXBuildFile; fileRef = 194E77462D0EFAF80070F5F8 /* user_character_collections.json */; };
+		194E77522D0EFAF80070F5F8 /* person_collects.json in Resources */ = {isa = PBXBuildFile; fileRef = 194E773E2D0EFAF80070F5F8 /* person_collects.json */; };
+		194E77532D0EFAF80070F5F8 /* subject_recs.json in Resources */ = {isa = PBXBuildFile; fileRef = 194E77422D0EFAF80070F5F8 /* subject_recs.json */; };
+		194E77542D0EFAF80070F5F8 /* subject_relations.json in Resources */ = {isa = PBXBuildFile; fileRef = 194E77432D0EFAF80070F5F8 /* subject_relations.json */; };
+		194E77552D0EFAF80070F5F8 /* subject_staffs.json in Resources */ = {isa = PBXBuildFile; fileRef = 194E77442D0EFAF80070F5F8 /* subject_staffs.json */; };
+		194E77562D0EFAF80070F5F8 /* user_character_collection.json in Resources */ = {isa = PBXBuildFile; fileRef = 194E77452D0EFAF80070F5F8 /* user_character_collection.json */; };
 		19671C542BDEB55D000B4D99 /* SubjectLargeRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19671C2E2BDEB55D000B4D99 /* SubjectLargeRowView.swift */; };
 		19671C552BDEB55D000B4D99 /* SubjectCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19671C302BDEB55D000B4D99 /* SubjectCollectionView.swift */; };
 		19671C562BDEB55D000B4D99 /* SubjectHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19671C312BDEB55D000B4D99 /* SubjectHeaderView.swift */; };
@@ -123,6 +137,20 @@
 		194E75D32D0BDF600070F5F8 /* EpisodeInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EpisodeInfoView.swift; sourceTree = "<group>"; };
 		194E75D52D0BE7B70070F5F8 /* EpisodeRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EpisodeRowView.swift; sourceTree = "<group>"; };
 		194E76972D0D3A340070F5F8 /* Style.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Style.swift; sourceTree = "<group>"; };
+		194E773B2D0EFAF80070F5F8 /* character_casts.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = character_casts.json; sourceTree = "<group>"; };
+		194E773C2D0EFAF80070F5F8 /* character_collects.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = character_collects.json; sourceTree = "<group>"; };
+		194E773D2D0EFAF80070F5F8 /* person_casts.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = person_casts.json; sourceTree = "<group>"; };
+		194E773E2D0EFAF80070F5F8 /* person_collects.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = person_collects.json; sourceTree = "<group>"; };
+		194E773F2D0EFAF80070F5F8 /* person_works.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = person_works.json; sourceTree = "<group>"; };
+		194E77402D0EFAF80070F5F8 /* subject_characters.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = subject_characters.json; sourceTree = "<group>"; };
+		194E77412D0EFAF80070F5F8 /* subject_offprints.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = subject_offprints.json; sourceTree = "<group>"; };
+		194E77422D0EFAF80070F5F8 /* subject_recs.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = subject_recs.json; sourceTree = "<group>"; };
+		194E77432D0EFAF80070F5F8 /* subject_relations.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = subject_relations.json; sourceTree = "<group>"; };
+		194E77442D0EFAF80070F5F8 /* subject_staffs.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = subject_staffs.json; sourceTree = "<group>"; };
+		194E77452D0EFAF80070F5F8 /* user_character_collection.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = user_character_collection.json; sourceTree = "<group>"; };
+		194E77462D0EFAF80070F5F8 /* user_character_collections.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = user_character_collections.json; sourceTree = "<group>"; };
+		194E77472D0EFAF80070F5F8 /* user_person_collection.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = user_person_collection.json; sourceTree = "<group>"; };
+		194E77482D0EFAF80070F5F8 /* user_person_collections.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = user_person_collections.json; sourceTree = "<group>"; };
 		19671C2E2BDEB55D000B4D99 /* SubjectLargeRowView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubjectLargeRowView.swift; sourceTree = "<group>"; };
 		19671C302BDEB55D000B4D99 /* SubjectCollectionView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubjectCollectionView.swift; sourceTree = "<group>"; };
 		19671C312BDEB55D000B4D99 /* SubjectHeaderView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubjectHeaderView.swift; sourceTree = "<group>"; };
@@ -284,6 +312,20 @@
 			isa = PBXGroup;
 			children = (
 				19671C442BDEB55D000B4D99 /* Preview Assets.xcassets */,
+				194E773B2D0EFAF80070F5F8 /* character_casts.json */,
+				194E773C2D0EFAF80070F5F8 /* character_collects.json */,
+				194E773D2D0EFAF80070F5F8 /* person_casts.json */,
+				194E773E2D0EFAF80070F5F8 /* person_collects.json */,
+				194E773F2D0EFAF80070F5F8 /* person_works.json */,
+				194E77402D0EFAF80070F5F8 /* subject_characters.json */,
+				194E77412D0EFAF80070F5F8 /* subject_offprints.json */,
+				194E77422D0EFAF80070F5F8 /* subject_recs.json */,
+				194E77432D0EFAF80070F5F8 /* subject_relations.json */,
+				194E77442D0EFAF80070F5F8 /* subject_staffs.json */,
+				194E77452D0EFAF80070F5F8 /* user_character_collection.json */,
+				194E77462D0EFAF80070F5F8 /* user_character_collections.json */,
+				194E77472D0EFAF80070F5F8 /* user_person_collection.json */,
+				194E77482D0EFAF80070F5F8 /* user_person_collections.json */,
 				19C2CE602BE2538A0080A056 /* subject_book.json */,
 				19671C452BDEB55D000B4D99 /* subject_anime.json */,
 				19B2A8872D0B1034001617BE /* subject_anime_episodes.json */,
@@ -528,6 +570,20 @@
 				1998DD072CB1222400115E1F /* subject_comments.json in Resources */,
 				19B2A8892D0B1034001617BE /* subject_music_episodes.json in Resources */,
 				19B2A88A2D0B1034001617BE /* subject_anime_episodes.json in Resources */,
+				194E77492D0EFAF80070F5F8 /* character_casts.json in Resources */,
+				194E774A2D0EFAF80070F5F8 /* person_works.json in Resources */,
+				194E774B2D0EFAF80070F5F8 /* subject_offprints.json in Resources */,
+				194E774C2D0EFAF80070F5F8 /* person_casts.json in Resources */,
+				194E774D2D0EFAF80070F5F8 /* user_person_collection.json in Resources */,
+				194E774E2D0EFAF80070F5F8 /* user_person_collections.json in Resources */,
+				194E774F2D0EFAF80070F5F8 /* subject_characters.json in Resources */,
+				194E77502D0EFAF80070F5F8 /* character_collects.json in Resources */,
+				194E77512D0EFAF80070F5F8 /* user_character_collections.json in Resources */,
+				194E77522D0EFAF80070F5F8 /* person_collects.json in Resources */,
+				194E77532D0EFAF80070F5F8 /* subject_recs.json in Resources */,
+				194E77542D0EFAF80070F5F8 /* subject_relations.json in Resources */,
+				194E77552D0EFAF80070F5F8 /* subject_staffs.json in Resources */,
+				194E77562D0EFAF80070F5F8 /* user_character_collection.json in Resources */,
 				19C2CE652BE2ACE60080A056 /* profile.json in Resources */,
 				19C2CE612BE2538A0080A056 /* subject_book.json in Resources */,
 				19B87C272CFB31A600CB5B63 /* user_subject_collection_book.json in Resources */,

@@ -168,7 +168,7 @@ struct SubjectRelationsView: View {
 #Preview {
   let container = mockContainer()
 
-  let subject = Subject.previewAnime
+  let subject = Subject.previewBook
   container.mainContext.insert(subject)
 
   return ScrollView {
