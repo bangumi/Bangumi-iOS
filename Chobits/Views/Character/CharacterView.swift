@@ -46,6 +46,12 @@ struct CharacterView: View {
     if refreshed { return }
     do {
       try await Chii.shared.loadCharacter(characterId)
+
+      Task {
+        let respCasts = try await Chii.shared.getCharacterCasts(characterId, limit: 5)
+        character?.casts = respCasts.data
+      }
+
     } catch {
       Notifier.shared.alert(error: error)
       return
@@ -120,7 +126,7 @@ struct CharacterView: View {
             BBCodeWebView(character.summary, textSize: 14)
 
             /// casts
-            CharacterCastsView(character: character)
+            CharacterCastsView(characterId: characterId, casts: character.casts)
           }.padding(.horizontal, 8)
         }
       } else {

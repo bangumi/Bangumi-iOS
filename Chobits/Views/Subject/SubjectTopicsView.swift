@@ -9,48 +9,25 @@ import SwiftData
 import SwiftUI
 
 struct SubjectTopicsView: View {
-  @ObservableModel var subject: Subject
-
-  @State private var loaded: Bool = false
-  @State private var refreshing: Bool = false
-
-  func refresh() {
-    if loaded {
-      return
-    }
-    refreshing = true
-    Task {
-      do {
-        let resp = try await Chii.shared.getSubjectTopics(subject.subjectId, limit: 5)
-        subject.topics = resp.data
-      } catch {
-        Notifier.shared.alert(error: error)
-      }
-      refreshing = false
-      loaded = true
-    }
-  }
+  let subjectId: Int
+  let topics: [TopicDTO]
 
   var body: some View {
     VStack(spacing: 2) {
       HStack(alignment: .bottom) {
         Text("讨论版")
-          .foregroundStyle(subject.topics.count > 0 ? .primary : .secondary)
+          .foregroundStyle(topics.count > 0 ? .primary : .secondary)
           .font(.title3)
-          .onAppear(perform: refresh)
-        if refreshing {
-          ProgressView()
-        }
         Spacer()
-        if subject.topics.count > 0 {
-          NavigationLink(value: NavDestination.subjectTopicList(subject.subjectId)) {
+        if topics.count > 0 {
+          NavigationLink(value: NavDestination.subjectTopicList(subjectId)) {
             Text("更多讨论 »").font(.caption)
           }.buttonStyle(.navLink)
         }
       }
       Divider()
     }.padding(.top, 5)
-    if subject.topics.count == 0 {
+    if topics.count == 0 {
       HStack {
         Spacer()
         Text("暂无讨论")
@@ -60,7 +37,7 @@ struct SubjectTopicsView: View {
       }.padding(.bottom, 5)
     }
     VStack {
-      ForEach(subject.topics) { topic in
+      ForEach(topics) { topic in
         VStack {
           HStack {
             NavigationLink(value: NavDestination.topic(topic)) {
@@ -88,20 +65,19 @@ struct SubjectTopicsView: View {
         }.padding(.top, 2)
       }
     }
-    .animation(.default, value: subject.topics)
+    .animation(.default, value: topics)
   }
 }
 
 #Preview {
-  let container = mockContainer()
-
-  let subject = Subject.previewAnime
-  container.mainContext.insert(subject)
-
-  return ScrollView {
-    LazyVStack(alignment: .leading) {
-      SubjectTopicsView(subject: subject)
-        .modelContainer(container)
+  NavigationStack {
+    ScrollView {
+      LazyVStack(alignment: .leading) {
+        SubjectTopicsView(
+          subjectId: Subject.previewAnime.subjectId, topics: Subject.previewTopics
+        )
+        .modelContainer(mockContainer())
+      }.padding()
     }
-  }.padding()
+  }
 }

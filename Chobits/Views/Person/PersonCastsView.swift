@@ -2,39 +2,18 @@ import SwiftData
 import SwiftUI
 
 struct PersonCastsView: View {
-  @ObservableModel var person: Person
-
-  @State private var loaded: Bool = false
-  @State private var loading: Bool = false
-
-  func load() {
-    if loading || loaded { return }
-    loading = true
-    Task {
-      do {
-        let resp = try await Chii.shared.getPersonCasts(person.personId, limit: 5)
-        person.casts.append(contentsOf: resp.data)
-      } catch {
-        Notifier.shared.alert(error: error)
-      }
-      loading = false
-      loaded = true
-    }
-  }
+  let personId: Int
+  let casts: [PersonCastDTO]
 
   var body: some View {
     VStack(spacing: 2) {
       HStack(alignment: .bottom) {
         Text("最近出演角色")
-          .foregroundStyle(person.casts.count > 0 ? .primary : .secondary)
+          .foregroundStyle(casts.count > 0 ? .primary : .secondary)
           .font(.title3)
-          .onAppear(perform: load)
-        if loading {
-          ProgressView()
-        }
         Spacer()
-        if person.casts.count > 0 {
-          NavigationLink(value: NavDestination.personCastList(person.personId)) {
+        if casts.count > 0 {
+          NavigationLink(value: NavDestination.personCastList(personId)) {
             Text("更多角色 »").font(.caption)
           }.buttonStyle(.navLink)
         }
@@ -42,14 +21,14 @@ struct PersonCastsView: View {
       Divider()
     }.padding(.top, 5)
     VStack {
-      ForEach(person.casts) { item in
+      ForEach(casts) { item in
         CardView {
           PersonCastItemView(item: item)
         }
       }
     }
     .padding(.bottom, 8)
-    .animation(.default, value: person.casts)
+    .animation(.default, value: casts)
   }
 }
 
@@ -61,7 +40,7 @@ struct PersonCastsView: View {
   return NavigationStack {
     ScrollView {
       LazyVStack(alignment: .leading) {
-        PersonCastsView(person: person)
+        PersonCastsView(personId: person.personId, casts: person.casts)
           .modelContainer(container)
       }.padding()
     }

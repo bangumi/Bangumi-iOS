@@ -53,6 +53,17 @@ struct PersonView: View {
     if refreshed { return }
     do {
       try await Chii.shared.loadPerson(personId)
+
+      Task {
+        let respCasts = try await Chii.shared.getPersonCasts(personId, limit: 5)
+        person?.casts = respCasts.data
+      }
+
+      Task {
+        let respWorks = try await Chii.shared.getPersonWorks(personId, limit: 5)
+        person?.works = respWorks.data
+      }
+
     } catch {
       Notifier.shared.alert(error: error)
       return
@@ -145,10 +156,10 @@ struct PersonView: View {
             BBCodeWebView(person.summary, textSize: 14)
 
             /// casts
-            PersonCastsView(person: person)
+            PersonCastsView(personId: personId, casts: person.casts)
 
             /// works
-            PersonWorksView(person: person)
+            PersonWorksView(personId: personId, works: person.works)
 
           }.padding(.horizontal, 8)
         }

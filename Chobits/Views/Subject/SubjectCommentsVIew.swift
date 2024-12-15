@@ -5,52 +5,29 @@
 //  Created by Chuan Chuan on 2024/10/5.
 //
 
-import SwiftData
 import SwiftUI
 
 struct SubjectCommentsView: View {
-  @ObservableModel var subject: Subject
-
-  @State private var loaded: Bool = false
-  @State private var refreshing: Bool = false
-
-  func refresh() {
-    if loaded {
-      return
-    }
-    refreshing = true
-    Task {
-      do {
-        let resp = try await Chii.shared.getSubjectComments(subject.subjectId, limit: 10)
-        subject.comments = resp.data
-      } catch {
-        Notifier.shared.alert(error: error)
-      }
-      refreshing = false
-      loaded = true
-    }
-  }
+  let subjectId: Int
+  let subjectType: SubjectType
+  let comments: [SubjectCommentDTO]
 
   var body: some View {
     VStack(spacing: 2) {
       HStack(alignment: .bottom) {
         Text("吐槽箱")
-          .foregroundStyle(subject.comments.count > 0 ? .primary : .secondary)
+          .foregroundStyle(comments.count > 0 ? .primary : .secondary)
           .font(.title3)
-          .onAppear(perform: refresh)
-        if refreshing {
-          ProgressView()
-        }
         Spacer()
-        if subject.comments.count > 0 {
-          NavigationLink(value: NavDestination.subjectCommentList(subject.subjectId)) {
+        if comments.count > 0 {
+          NavigationLink(value: NavDestination.subjectCommentList(subjectId)) {
             Text("更多吐槽 »").font(.caption)
           }.buttonStyle(.navLink)
         }
       }
       Divider()
     }.padding(.top, 5)
-    if subject.comments.count == 0 {
+    if comments.count == 0 {
       HStack {
         Spacer()
         Text("暂无吐槽")
@@ -60,7 +37,7 @@ struct SubjectCommentsView: View {
       }.padding(.bottom, 5)
     }
     VStack {
-      ForEach(subject.comments) { comment in
+      ForEach(comments) { comment in
         HStack(alignment: .top) {
           NavigationLink(value: NavDestination.user(comment.user.uid)) {
             ImageView(img: comment.user.avatar?.large, width: 32, height: 32, type: .avatar)
@@ -76,7 +53,7 @@ struct SubjectCommentsView: View {
                 StarsView(score: Float(comment.rate), size: 10)
               }
               Text(
-                "\(comment.type.description(subject.typeEnum)) @ \(comment.updatedAt.durationDisplay)"
+                "\(comment.type.description(subjectType)) @ \(comment.updatedAt.durationDisplay)"
               )
               .lineLimit(1)
               .font(.caption)
@@ -89,20 +66,20 @@ struct SubjectCommentsView: View {
         }
         .padding(.top, 2)
       }
-    }.animation(.default, value: subject.comments)
+    }.animation(.default, value: comments)
   }
 }
 
 #Preview {
-  let container = mockContainer()
-
-  let subject = Subject.previewAnime
-  container.mainContext.insert(subject)
-
-  return ScrollView {
-    LazyVStack(alignment: .leading) {
-      SubjectCommentsView(subject: subject)
-        .modelContainer(container)
+  NavigationStack {
+    ScrollView {
+      LazyVStack(alignment: .leading) {
+        SubjectCommentsView(
+          subjectId: Subject.previewAnime.subjectId,
+          subjectType: Subject.previewAnime.typeEnum,
+          comments: Subject.previewComments
+        )
+      }.padding()
     }
-  }.padding()
+  }
 }

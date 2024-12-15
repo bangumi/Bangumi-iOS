@@ -57,6 +57,46 @@ extension Subject {
     let item = loadFixture(fixture: "subject_music.json", target: SubjectDTO.self)
     return Subject(item)
   }
+
+  static var previewCharacters: [SubjectCharacterDTO] {
+    let items = loadFixture(
+      fixture: "subject_characters.json", target: PagedDTO<SubjectCharacterDTO>.self)
+    return items.data
+  }
+
+  static var previewStaff: [SubjectStaffDTO] {
+    let items = loadFixture(fixture: "subject_staff.json", target: PagedDTO<SubjectStaffDTO>.self)
+    return items.data
+  }
+
+  static var previewOffprints: [SubjectRelationDTO] {
+    let items = loadFixture(
+      fixture: "subject_offprints.json", target: PagedDTO<SubjectRelationDTO>.self)
+    return items.data
+  }
+
+  static var previewRelations: [SubjectRelationDTO] {
+    let items = loadFixture(
+      fixture: "subject_relations.json", target: PagedDTO<SubjectRelationDTO>.self)
+    return items.data
+  }
+
+  static var previewRecs: [SubjectRecDTO] {
+    let items = loadFixture(fixture: "subject_recs.json", target: PagedDTO<SubjectRecDTO>.self)
+    return items.data
+  }
+
+  static var previewTopics: [TopicDTO] {
+    let items = loadFixture(fixture: "subject_topics.json", target: PagedDTO<TopicDTO>.self)
+    return items.data
+  }
+
+  static var previewComments: [SubjectCommentDTO] {
+    let items = loadFixture(
+      fixture: "subject_comments.json", target: PagedDTO<SubjectCommentDTO>.self)
+    return items.data
+  }
+
 }
 
 extension UserSubjectCollection {
@@ -106,11 +146,26 @@ extension Character {
     let item = loadFixture(fixture: "character.json", target: CharacterDTO.self)
     return Character(item)
   }
+
+  static var previewCasts: [CharacterCastDTO] {
+    let items = loadFixture(fixture: "character_casts.json", target: PagedDTO<CharacterCastDTO>.self)
+    return items.data
+  }
 }
 
 extension Person {
   static var preview: Person {
     let item = loadFixture(fixture: "person.json", target: PersonDTO.self)
     return Person(item)
+  }
+
+  static var previewWorks: [PersonWorkDTO] {
+    let items = loadFixture(fixture: "person_works.json", target: PagedDTO<PersonWorkDTO>.self)
+    return items.data
+  }
+
+  static var previewCasts: [PersonCastDTO] {
+    let items = loadFixture(fixture: "person_casts.json", target: PagedDTO<PersonCastDTO>.self)
+    return items.data
   }
 }

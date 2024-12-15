@@ -37,6 +37,41 @@ struct SubjectView: View {
     if refreshed { return }
     do {
       try await Chii.shared.loadSubject(subjectId)
+
+      Task {
+        let respCharacters = try await Chii.shared.getSubjectCharacters(subjectId, limit: 10)
+        subject?.characters = respCharacters.data
+      }
+
+      if subject?.typeEnum == .book, subject?.series ?? false {
+        Task {
+          let respOffprints = try await Chii.shared.getSubjectRelations(
+            subjectId, offprint: true, limit: 100)
+          subject?.offprints = respOffprints.data
+        }
+      }
+
+      Task {
+        let respRelations = try await Chii.shared.getSubjectRelations(subjectId, limit: 10)
+        subject?.relations = respRelations.data
+      }
+
+      Task {
+        let respRecs = try await Chii.shared.getSubjectRecs(subjectId, limit: 10)
+        subject?.recs = respRecs.data
+      }
+
+      if !isolationMode {
+        Task {
+          let respTopics = try await Chii.shared.getSubjectTopics(subjectId, limit: 5)
+          subject?.topics = respTopics.data
+        }
+        Task {
+          let respComments = try await Chii.shared.getSubjectComments(subjectId, limit: 5)
+          subject?.comments = respComments.data
+        }
+      }
+
     } catch {
       Notifier.shared.alert(error: error)
       return
@@ -64,16 +99,21 @@ struct SubjectView: View {
             if subject.typeEnum == .music {
               EpisodeDiscView(subjectId: subjectId)
             } else {
-              SubjectCharactersView(subject: subject)
+              SubjectCharactersView(subjectId: subjectId, characters: subject.characters)
             }
 
-            SubjectRelationsView(subject: subject)
+            if subject.typeEnum == .book, subject.series {
+              SubjectOffprintsView(subjectId: subjectId, offprints: subject.offprints)
+            }
 
-            SubjectRecsView(subject: subject)
+            SubjectRelationsView(subjectId: subjectId, relations: subject.relations)
+
+            SubjectRecsView(subjectId: subjectId, recs: subject.recs)
 
             if !isolationMode {
-              SubjectTopicsView(subject: subject)
-              SubjectCommentsView(subject: subject)
+              SubjectTopicsView(subjectId: subjectId, topics: subject.topics)
+              SubjectCommentsView(
+                subjectId: subjectId, subjectType: subject.typeEnum, comments: subject.comments)
             }
 
             Spacer()

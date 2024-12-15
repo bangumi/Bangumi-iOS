@@ -10,33 +10,17 @@ import SwiftData
 import SwiftUI
 
 struct SubjectRelationsView: View {
-  @ObservableModel var subject: Subject
+  let subjectId: Int
+  let relations: [SubjectRelationDTO]
 
   @Environment(\.modelContext) var modelContext
-
-  @State private var loaded: Bool = false
-  @State private var loading: Bool = false
 
   @State private var collections: [Int: CollectionType] = [:]
 
   func load() {
-    if loading || loaded {
-      return
-    }
-    loading = true
     Task {
       do {
-        if subject.typeEnum == .book, subject.series {
-          let offprintResp = try await Chii.shared.getSubjectRelations(
-            subject.subjectId, offprint: true, limit: 100)
-          subject.offprints = offprintResp.data
-        }
-        let relationResp = try await Chii.shared.getSubjectRelations(subject.subjectId, limit: 10)
-        subject.relations = relationResp.data
-
-        var relationIDs: [Int] = []
-        relationIDs.append(contentsOf: subject.offprints.map { $0.subject.id })
-        relationIDs.append(contentsOf: subject.relations.map { $0.subject.id })
+        let relationIDs = relations.map { $0.subject.id }
         let collectionDescriptor = FetchDescriptor<UserSubjectCollection>(
           predicate: #Predicate<UserSubjectCollection> {
             relationIDs.contains($0.subjectId)
@@ -48,69 +32,26 @@ struct SubjectRelationsView: View {
       } catch {
         Notifier.shared.alert(error: error)
       }
-      loading = false
-      loaded = true
     }
   }
 
   var body: some View {
-    if subject.series {
-      VStack(spacing: 2) {
-        HStack(alignment: .bottom) {
-          Text("单行本")
-            .foregroundStyle(subject.offprints.count > 0 ? .primary : .secondary)
-            .font(.title3)
-          Spacer()
-        }
-        Divider()
-      }.padding(.top, 5)
-      ScrollView(.horizontal, showsIndicators: false) {
-        LazyHStack {
-          ForEach(subject.offprints) { offprint in
-            NavigationLink(value: NavDestination.subject(offprint.subject.id)) {
-              VStack {
-                ImageView(
-                  img: offprint.subject.images?.common,
-                  width: 60, height: 80, type: .subject
-                ) {
-                } caption: {
-                  if let ctype = collections[offprint.subject.id] {
-                    HStack {
-                      Image(systemName: ctype.icon)
-                      Spacer()
-                      Text(ctype.description(offprint.subject.type))
-                    }.padding(.horizontal, 4)
-                  }
-                }
-                Spacer()
-              }
-              .font(.caption)
-              .frame(width: 60, height: 90)
-            }.buttonStyle(.navLink)
-          }
-        }
-      }.animation(.default, value: subject.offprints)
-    }
-
     VStack(spacing: 2) {
       HStack(alignment: .bottom) {
         Text("关联条目")
-          .foregroundStyle(subject.relations.count > 0 ? .primary : .secondary)
+          .foregroundStyle(relations.count > 0 ? .primary : .secondary)
           .font(.title3)
           .onAppear(perform: load)
-        if loading {
-          ProgressView()
-        }
         Spacer()
-        if subject.relations.count > 0 {
-          NavigationLink(value: NavDestination.subjectRelationList(subject.subjectId)) {
+        if relations.count > 0 {
+          NavigationLink(value: NavDestination.subjectRelationList(subjectId)) {
             Text("更多条目 »").font(.caption)
           }.buttonStyle(.navLink)
         }
       }
       Divider()
     }.padding(.top, 5)
-    if subject.relations.count == 0 {
+    if relations.count == 0 {
       HStack {
         Spacer()
         Text("暂无关联条目")
@@ -121,7 +62,7 @@ struct SubjectRelationsView: View {
     }
     ScrollView(.horizontal, showsIndicators: false) {
       LazyHStack {
-        ForEach(subject.relations) { relation in
+        ForEach(relations) { relation in
           VStack {
             Section {
               // relation.id==1 -> 改编
@@ -158,20 +99,17 @@ struct SubjectRelationsView: View {
           }.frame(width: 90, height: 185)
         }
       }
-    }.animation(.default, value: subject.relations)
+    }.animation(.default, value: relations)
   }
 }
 
 #Preview {
-  let container = mockContainer()
-
-  let subject = Subject.previewBook
-  container.mainContext.insert(subject)
-
-  return ScrollView {
+  ScrollView {
     LazyVStack(alignment: .leading) {
-      SubjectRelationsView(subject: subject)
-        .modelContainer(container)
-    }
-  }.padding()
+      SubjectRelationsView(
+        subjectId: Subject.previewBook.subjectId, relations: Subject.previewRelations
+      )
+      .modelContainer(mockContainer())
+    }.padding()
+  }
 }

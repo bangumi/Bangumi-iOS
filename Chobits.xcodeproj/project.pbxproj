@@ -39,6 +39,7 @@
 		194E77542D0EFAF80070F5F8 /* subject_relations.json in Resources */ = {isa = PBXBuildFile; fileRef = 194E77432D0EFAF80070F5F8 /* subject_relations.json */; };
 		194E77552D0EFAF80070F5F8 /* subject_staffs.json in Resources */ = {isa = PBXBuildFile; fileRef = 194E77442D0EFAF80070F5F8 /* subject_staffs.json */; };
 		194E77562D0EFAF80070F5F8 /* user_character_collection.json in Resources */ = {isa = PBXBuildFile; fileRef = 194E77452D0EFAF80070F5F8 /* user_character_collection.json */; };
+		194E77B82D0F46360070F5F8 /* SubjectOffprintsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 194E77B72D0F46300070F5F8 /* SubjectOffprintsView.swift */; };
 		19671C542BDEB55D000B4D99 /* SubjectLargeRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19671C2E2BDEB55D000B4D99 /* SubjectLargeRowView.swift */; };
 		19671C552BDEB55D000B4D99 /* SubjectCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19671C302BDEB55D000B4D99 /* SubjectCollectionView.swift */; };
 		19671C562BDEB55D000B4D99 /* SubjectHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19671C312BDEB55D000B4D99 /* SubjectHeaderView.swift */; };
@@ -151,6 +152,7 @@
 		194E77462D0EFAF80070F5F8 /* user_character_collections.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = user_character_collections.json; sourceTree = "<group>"; };
 		194E77472D0EFAF80070F5F8 /* user_person_collection.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = user_person_collection.json; sourceTree = "<group>"; };
 		194E77482D0EFAF80070F5F8 /* user_person_collections.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = user_person_collections.json; sourceTree = "<group>"; };
+		194E77B72D0F46300070F5F8 /* SubjectOffprintsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubjectOffprintsView.swift; sourceTree = "<group>"; };
 		19671C2E2BDEB55D000B4D99 /* SubjectLargeRowView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubjectLargeRowView.swift; sourceTree = "<group>"; };
 		19671C302BDEB55D000B4D99 /* SubjectCollectionView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubjectCollectionView.swift; sourceTree = "<group>"; };
 		19671C312BDEB55D000B4D99 /* SubjectHeaderView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubjectHeaderView.swift; sourceTree = "<group>"; };
@@ -277,6 +279,7 @@
 				19C2CE622BE2A4F10080A056 /* SubjectBookChaptersView.swift */,
 				19671C342BDEB55D000B4D99 /* SubjectSummaryView.swift */,
 				1909F3AA2BEC406500E3B8F0 /* SubjectCharactersView.swift */,
+				194E77B72D0F46300070F5F8 /* SubjectOffprintsView.swift */,
 				1909F39B2BEB98F600E3B8F0 /* SubjectRelationsView.swift */,
 				19ECCEC02CFF167F0092F715 /* SubjectRecsView.swift */,
 				1998DCFA2CB1066700115E1F /* SubjectTopicsView.swift */,
@@ -643,6 +646,7 @@
 				19C2CE692BE330F60080A056 /* SubjectCollectionBoxView.swift in Sources */,
 				191881412CD0804800B4DAD7 /* PadView.swift in Sources */,
 				19671C572BDEB55D000B4D99 /* SubjectRatingView.swift in Sources */,
+				194E77B82D0F46360070F5F8 /* SubjectOffprintsView.swift in Sources */,
 				19C2CE5D2BE1E7B10080A056 /* NotFoundView.swift in Sources */,
 				19742A602D069AE1008791CC /* PersonInfoboxView.swift in Sources */,
 				19ECCDEF2CFD43CD0092F715 /* Wrapper.swift in Sources */,

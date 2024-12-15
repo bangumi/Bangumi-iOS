@@ -9,48 +9,25 @@ import SwiftData
 import SwiftUI
 
 struct SubjectCharactersView: View {
-  @ObservableModel var subject: Subject
-
-  @State private var loaded: Bool = false
-  @State private var loading: Bool = false
-
-  func load() {
-    if loading || loaded {
-      return
-    }
-    loading = true
-    Task {
-      do {
-        let resp = try await Chii.shared.getSubjectCharacters(subject.subjectId, limit: 10)
-        subject.characters = resp.data
-      } catch {
-        Notifier.shared.alert(error: error)
-      }
-      loading = false
-      loaded = true
-    }
-  }
+  let subjectId: Int
+  let characters: [SubjectCharacterDTO]
 
   var body: some View {
     VStack(spacing: 2) {
       HStack(alignment: .bottom) {
         Text("角色介绍")
-          .foregroundStyle(subject.characters.count > 0 ? .primary : .secondary)
+          .foregroundStyle(characters.count > 0 ? .primary : .secondary)
           .font(.title3)
-          .onAppear(perform: load)
-        if loading {
-          ProgressView()
-        }
         Spacer()
-        if subject.characters.count > 0 {
-          NavigationLink(value: NavDestination.subjectCharacterList(subject.subjectId)) {
+        if characters.count > 0 {
+          NavigationLink(value: NavDestination.subjectCharacterList(subjectId)) {
             Text("更多角色 »").font(.caption)
           }.buttonStyle(.navLink)
         }
       }
       Divider()
     }.padding(.top, 5)
-    if subject.characters.count == 0 {
+    if characters.count == 0 {
       HStack {
         Spacer()
         Text("暂无角色")
@@ -61,7 +38,7 @@ struct SubjectCharactersView: View {
     }
     ScrollView(.horizontal, showsIndicators: false) {
       LazyHStack(alignment: .top) {
-        ForEach(subject.characters, id: \.character.id) { item in
+        ForEach(characters, id: \.character.id) { item in
           VStack {
             NavigationLink(value: NavDestination.character(item.character.id)) {
               ImageView(
@@ -83,22 +60,17 @@ struct SubjectCharactersView: View {
           .frame(width: 60, height: 120)
         }
       }
-    }.animation(.default, value: subject.characters)
+    }.animation(.default, value: characters)
   }
 }
 
 #Preview {
-  let container = mockContainer()
-
-  let subject = Subject.previewAnime
-  container.mainContext.insert(subject)
-
-  return NavigationStack {
+  NavigationStack {
     ScrollView {
       LazyVStack(alignment: .leading) {
-        SubjectCharactersView(subject: subject)
-          .modelContainer(container)
-      }
-    }.padding()
+        SubjectCharactersView(
+          subjectId: Subject.previewAnime.subjectId, characters: Subject.previewCharacters)
+      }.padding()
+    }
   }
 }

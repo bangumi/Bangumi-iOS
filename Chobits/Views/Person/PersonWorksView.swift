@@ -10,41 +10,18 @@ import SwiftData
 import SwiftUI
 
 struct PersonWorksView: View {
-  @ObservableModel var person: Person
-
-  @State private var loaded: Bool = false
-  @State private var loading: Bool = false
-
-  func load() {
-    if loading || loaded {
-      return
-    }
-    loading = true
-    Task {
-      do {
-        let resp = try await Chii.shared.getPersonWorks(person.personId, limit: 5)
-        person.works.append(contentsOf: resp.data)
-      } catch {
-        Notifier.shared.alert(error: error)
-      }
-      loading = false
-      loaded = true
-    }
-  }
+  let personId: Int
+  let works: [PersonWorkDTO]
 
   var body: some View {
     VStack(spacing: 2) {
       HStack(alignment: .bottom) {
         Text("最近参与")
-          .foregroundStyle(person.works.count > 0 ? .primary : .secondary)
+          .foregroundStyle(works.count > 0 ? .primary : .secondary)
           .font(.title3)
-          .onAppear(perform: load)
-        if loading {
-          ProgressView()
-        }
         Spacer()
-        if person.works.count > 0 {
-          NavigationLink(value: NavDestination.personWorkList(person.personId)) {
+        if works.count > 0 {
+          NavigationLink(value: NavDestination.personWorkList(personId)) {
             Text("更多作品 »").font(.caption)
           }.buttonStyle(.navLink)
         }
@@ -52,7 +29,7 @@ struct PersonWorksView: View {
       Divider()
     }.padding(.top, 5)
     VStack {
-      ForEach(person.works) { item in
+      ForEach(works) { item in
         CardView {
           HStack(alignment: .top) {
             NavigationLink(value: NavDestination.subject(item.subject.id)) {
@@ -100,7 +77,7 @@ struct PersonWorksView: View {
       }
     }
     .padding(.bottom, 8)
-    .animation(.default, value: person.works)
+    .animation(.default, value: works)
   }
 }
 
@@ -112,7 +89,7 @@ struct PersonWorksView: View {
   return NavigationStack {
     ScrollView {
       LazyVStack(alignment: .leading) {
-        PersonWorksView(person: person)
+        PersonWorksView(personId: person.personId, works: person.works)
           .modelContainer(container)
       }.padding()
     }

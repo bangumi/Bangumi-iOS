@@ -10,30 +10,20 @@ import SwiftData
 import SwiftUI
 
 struct SubjectRecsView: View {
-  @ObservableModel var subject: Subject
+  let subjectId: Int
+  let recs: [SubjectRecDTO]
 
   @Environment(\.modelContext) var modelContext
-
-  @State private var loaded: Bool = false
-  @State private var loading: Bool = false
 
   @State private var collections: [Int: CollectionType] = [:]
 
   func load() {
-    if loading || loaded {
-      return
-    }
-    loading = true
     Task {
       do {
-        let resp = try await Chii.shared.getSubjectRecs(subject.subjectId, limit: 10)
-        subject.recs = resp.data
-
-        var subjectIDs: [Int] = []
-        subjectIDs.append(contentsOf: resp.data.map { $0.subject.id })
+        let recIDs = recs.map { $0.subject.id }
         let collectionDescriptor = FetchDescriptor<UserSubjectCollection>(
           predicate: #Predicate<UserSubjectCollection> {
-            subjectIDs.contains($0.subjectId)
+            recIDs.contains($0.subjectId)
           })
         let collects = try modelContext.fetch(collectionDescriptor)
         for collection in collects {
@@ -42,8 +32,6 @@ struct SubjectRecsView: View {
       } catch {
         Notifier.shared.alert(error: error)
       }
-      loading = false
-      loaded = true
     }
   }
 
@@ -51,17 +39,14 @@ struct SubjectRecsView: View {
     VStack(spacing: 2) {
       HStack(alignment: .bottom) {
         Text("猜你喜欢")
-          .foregroundStyle(subject.recs.count > 0 ? .primary : .secondary)
+          .foregroundStyle(recs.count > 0 ? .primary : .secondary)
           .font(.title3)
           .onAppear(perform: load)
-        if loading {
-          ProgressView()
-        }
         Spacer()
       }
       Divider()
     }.padding(.top, 5)
-    if subject.recs.count == 0 {
+    if recs.count == 0 {
       HStack {
         Spacer()
         Text("暂无推荐")
@@ -72,7 +57,7 @@ struct SubjectRecsView: View {
     }
     ScrollView(.horizontal, showsIndicators: false) {
       LazyHStack {
-        ForEach(subject.recs) { rec in
+        ForEach(recs) { rec in
           VStack {
             NavigationLink(value: NavDestination.subject(rec.subject.id)) {
               ImageView(
@@ -99,20 +84,16 @@ struct SubjectRecsView: View {
           .frame(width: 72, height: 140)
         }
       }
-    }.animation(.default, value: subject.recs)
+    }.animation(.default, value: recs)
   }
 }
 
 #Preview {
-  let container = mockContainer()
-
-  let subject = Subject.previewAnime
-  container.mainContext.insert(subject)
-
-  return ScrollView {
+  ScrollView {
     LazyVStack(alignment: .leading) {
-      SubjectRecsView(subject: subject)
-        .modelContainer(container)
-    }
-  }.padding()
+      SubjectRecsView(
+        subjectId: Subject.previewAnime.subjectId, recs: Subject.previewRecs
+      ).modelContainer(mockContainer())
+    }.padding()
+  }
 }
