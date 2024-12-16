@@ -36,7 +36,6 @@ struct SubjectOffprintsView: View {
   }
 
   var body: some View {
-    let _ = Self._printChanges()
     VStack(spacing: 2) {
       HStack(alignment: .bottom) {
         Text("单行本")

@@ -35,7 +35,6 @@ struct SubjectRatingView: View {
   }
 
   var body: some View {
-    let _ = Self._printChanges()
     ScrollView {
       GeometryReader { geometry in
         VStack(alignment: .leading) {

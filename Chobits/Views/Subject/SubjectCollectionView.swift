@@ -14,9 +14,6 @@ struct SubjectCollectionView: View {
 
   @Environment(\.modelContext) var modelContext
 
-  @State private var refreshed: Bool = false
-  @State private var edit: Bool = false
-
   @Query private var collections: [UserSubjectCollection]
   var collection: UserSubjectCollection? { collections.first }
 
@@ -26,21 +23,31 @@ struct SubjectCollectionView: View {
   }
 
   var body: some View {
-    let _ = Self._printChanges()
+    if let collection = collection {
+      SubjectCollectionDetailView()
+        .environment(collection)
+    } else {
+      SubjectCollectionEmptyView()
+    }
+  }
+}
+
+struct SubjectCollectionDetailView: View {
+  @State private var edit: Bool = false
+
+  @Environment(Subject.self) var subject
+  @Environment(UserSubjectCollection.self) var collection
+
+  var body: some View {
     VStack(alignment: .leading) {
       BorderView(color: .linkText, padding: 5) {
         HStack {
           Spacer()
-          if let collection = collection {
-            if collection.priv {
-              Image(systemName: "lock")
-            }
-            Label(collection.message, systemImage: collection.typeEnum.icon)
-            StarsView(score: Float(collection.rate), size: 16)
-          } else {
-            Label("未收藏", systemImage: "plus")
-              .foregroundStyle(.secondary)
+          if collection.priv {
+            Image(systemName: "lock")
           }
+          Label(collection.message, systemImage: collection.typeEnum.icon)
+          StarsView(score: Float(collection.rate), size: 16)
           Spacer()
         }.foregroundStyle(.linkText)
       }
@@ -51,15 +58,15 @@ struct SubjectCollectionView: View {
       .sheet(
         isPresented: $edit,
         content: {
-          SubjectCollectionBoxView(subjectId: subjectId)
+          SubjectCollectionBoxView(collection: collection)
             .presentationDragIndicator(.visible)
             .presentationDetents(.init([.medium, .large]))
         }
       )
-      if let comment = collection?.comment, !comment.isEmpty {
+      if !collection.comment.isEmpty {
         VStack(alignment: .leading, spacing: 2) {
           Divider()
-          Text(comment)
+          Text(collection.comment)
             .padding(2)
             .font(.footnote)
             .multilineTextAlignment(.leading)
@@ -67,9 +74,40 @@ struct SubjectCollectionView: View {
             .foregroundStyle(.secondary)
         }
       }
-      if collection?.subjectTypeEnum == .book {
-        SubjectBookChaptersView(subjectId: subjectId, compact: false)
+      if subject.typeEnum == .book {
+        SubjectBookChaptersView(compact: false).environment(collection)
       }
+    }
+  }
+}
+
+struct SubjectCollectionEmptyView: View {
+  @State private var edit: Bool = false
+
+  @Environment(Subject.self) var subject
+
+  var body: some View {
+    VStack(alignment: .leading) {
+      BorderView(color: .linkText, padding: 5) {
+        HStack {
+          Spacer()
+          Label("未收藏", systemImage: "plus")
+            .foregroundStyle(.secondary)
+          Spacer()
+        }.foregroundStyle(.linkText)
+      }
+      .padding(5)
+      .onTapGesture {
+        edit.toggle()
+      }
+      .sheet(
+        isPresented: $edit,
+        content: {
+          SubjectCollectionBoxView(collection: nil)
+            .presentationDragIndicator(.visible)
+            .presentationDetents(.init([.medium, .large]))
+        }
+      )
     }
   }
 }
@@ -81,6 +119,7 @@ struct SubjectCollectionView: View {
   let collection = UserSubjectCollection.previewBook
   container.mainContext.insert(subject)
   container.mainContext.insert(collection)
+  collection.subject = subject
 
   return ScrollView {
     LazyVStack(alignment: .leading) {

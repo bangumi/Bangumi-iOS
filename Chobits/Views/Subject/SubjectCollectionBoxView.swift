@@ -10,10 +10,11 @@ import SwiftData
 import SwiftUI
 
 struct SubjectCollectionBoxView: View {
-  let subjectId: Int
+  let collection: UserSubjectCollection?
 
   @Environment(\.modelContext) var modelContext
   @Environment(\.dismiss) private var dismiss
+  @Environment(Subject.self) var subject
 
   @State private var collectionType: CollectionType = .do
   @State private var rate: Int = 0
@@ -24,22 +25,20 @@ struct SubjectCollectionBoxView: View {
 
   @State private var updating: Bool = false
 
-  @Query private var subjects: [Subject]
-  var subject: Subject? { subjects.first }
-
-  @Query private var collections: [UserSubjectCollection]
-  var collection: UserSubjectCollection? { collections.first }
-
-  init(subjectId: Int) {
-    self.subjectId = subjectId
-    self._subjects = Query(filter: #Predicate<Subject> { $0.subjectId == subjectId })
-    self._collections = Query(
-      filter: #Predicate<UserSubjectCollection> { $0.subjectId == subjectId })
+  init(collection: UserSubjectCollection?) {
+    self.collection = collection
+    if let collection = collection {
+      self.collectionType = collection.typeEnum
+      self.rate = collection.rate
+      self.comment = collection.comment
+      self.priv = collection.priv
+      self.tags = collection.tags
+      self.tagsInput = collection.tags.joined(separator: " ")
+    }
   }
 
   var recommendedTags: [String] {
-    return subject?.tags.sorted(by: { $0.count > $1.count }).prefix(15).map { $0.name }
-      ?? []
+    return subject.tags.sorted(by: { $0.count > $1.count }).prefix(15).map { $0.name }
   }
 
   var buttonText: String {
@@ -60,23 +59,12 @@ struct SubjectCollectionBoxView: View {
     return ""
   }
 
-  func load() {
-    if let collection = collection {
-      self.collectionType = collection.typeEnum
-      self.rate = collection.rate
-      self.comment = collection.comment
-      self.priv = collection.priv
-      self.tags = collection.tags
-      self.tagsInput = collection.tags.joined(separator: " ")
-    }
-  }
-
   func update() {
     self.updating = true
     Task {
       do {
         try await Chii.shared.updateSubjectCollection(
-          subjectId: subjectId,
+          subjectId: subject.subjectId,
           type: collectionType,
           rate: rate,
           comment: comment,
@@ -118,7 +106,7 @@ struct SubjectCollectionBoxView: View {
 
         Picker("Collection Type", selection: $collectionType) {
           ForEach(CollectionType.allTypes()) { ct in
-            Text("\(ct.description(subject?.typeEnum))").tag(ct)
+            Text("\(ct.description(subject.typeEnum))").tag(ct)
           }
         }
         .pickerStyle(.segmented)
@@ -199,7 +187,6 @@ struct SubjectCollectionBoxView: View {
       .animation(.default, value: priv)
       .animation(.default, value: rate)
       .padding()
-      .task(load)
     }
   }
 }
@@ -212,7 +199,9 @@ struct SubjectCollectionBoxView: View {
 
   container.mainContext.insert(collection)
   container.mainContext.insert(subject)
+  collection.subject = subject
 
-  return SubjectCollectionBoxView(subjectId: subject.subjectId)
+  return SubjectCollectionBoxView(collection: collection)
+    .environment(subject)
     .modelContainer(container)
 }

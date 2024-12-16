@@ -28,7 +28,7 @@ struct ChiiProgressView: View {
     do {
       for type in SubjectType.progressTypes {
         let tvalue = type.rawValue
-        let desc: FetchDescriptor<UserSubjectCollection> = FetchDescriptor<UserSubjectCollection>(
+        let desc = FetchDescriptor<UserSubjectCollection>(
           predicate: #Predicate<UserSubjectCollection> {
             (tvalue == 0 || $0.subjectType == tvalue) && $0.type == doingType
           })
@@ -40,8 +40,11 @@ struct ChiiProgressView: View {
     }
   }
 
-  func refresh() async {
+  func refresh(force: Bool = false) async {
     let now = Date()
+    if force {
+      collectionsUpdatedAt = 0
+    }
     do {
       let count = try await refreshCollections(since: collectionsUpdatedAt)
       if count > 0 {
@@ -157,6 +160,22 @@ struct ChiiProgressView: View {
         }
         .navigationTitle("进度管理")
         .toolbarTitleDisplayMode(.inlineLarge)
+        .toolbar {
+          ToolbarItem(placement: .topBarTrailing) {
+            Menu {
+              Button("刷新所有收藏", role: .destructive) {
+                Task {
+                  refreshing = true
+                  await refresh(force: true)
+                  refreshing = false
+                  await loadCounts()
+                }
+              }
+            } label: {
+              Image(systemName: "ellipsis.circle")
+            }
+          }
+        }
       } else {
         AuthView(slogan: "使用 Bangumi 管理观看进度")
           .toolbar {
@@ -197,9 +216,9 @@ struct ChiiProgressListView: View {
 
   var body: some View {
     LazyVStack(alignment: .leading) {
-      ForEach(collections) { item in
+      ForEach(collections) { collection in
         CardView {
-          ProgressRowView(subjectId: item.subjectId)
+          ProgressRowView(subjectId: collection.subjectId).environment(collection)
         }
       }
     }.animation(.default, value: collections)

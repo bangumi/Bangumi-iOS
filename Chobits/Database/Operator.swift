@@ -138,7 +138,6 @@ extension DatabaseOperator {
 extension DatabaseOperator {
   public func ensureSubject(_ item: SubjectDTO) throws -> Subject {
     let sid = item.id
-    let _ = try self.ensureSubjectDetail(sid)
     let fetched = try self.fetchOne(
       predicate: #Predicate<Subject> {
         $0.subjectId == sid
@@ -154,7 +153,6 @@ extension DatabaseOperator {
 
   public func ensureSubject(_ item: SubjectDTOV0) throws -> Subject {
     let sid = item.id
-    let _ = try self.ensureSubjectDetail(sid)
     let fetched = try self.fetchOne(
       predicate: #Predicate<Subject> {
         $0.subjectId == sid
@@ -166,19 +164,6 @@ extension DatabaseOperator {
     let subject = Subject(item)
     modelContext.insert(subject)
     return subject
-  }
-
-  public func ensureSubjectDetail(_ subjectId: Int) throws -> SubjectDetail {
-    let fetched = try self.fetchOne(
-      predicate: #Predicate<SubjectDetail> {
-        $0.subjectId == subjectId
-      })
-    if let detail = fetched {
-      return detail
-    }
-    let detail = SubjectDetail(subjectId)
-    modelContext.insert(detail)
-    return detail
   }
 
   public func ensureEpisode(_ item: EpisodeDTO) throws -> Episode {
@@ -294,8 +279,60 @@ extension DatabaseOperator {
   }
 
   public func saveUserSubjectCollection(_ item: UserSubjectCollectionDTO) throws {
-    let _ = try self.ensureSubject(item.subject)
-    let _ = try self.ensureUserSubjectCollection(item)
+    let subject = try self.ensureSubject(item.subject)
+    let collection = try self.ensureUserSubjectCollection(item)
+    if collection.subject == nil {
+      collection.subject = subject
+    }
+  }
+
+  public func saveSubjectCharacters(_ subjectId: Int, _ items: [SubjectCharacterDTO]) throws {
+    let subject = try self.getSubject(subjectId)
+    if subject?.characters != items {
+      subject?.characters = items
+    }
+  }
+
+  public func saveSubjectOffprints(_ subjectId: Int, _ items: [SubjectRelationDTO]) throws {
+    let subject = try self.getSubject(subjectId)
+    if subject?.offprints != items {
+      subject?.offprints = items
+    }
+  }
+
+  public func saveSubjectRelations(_ subjectId: Int, _ items: [SubjectRelationDTO]) throws {
+    let subject = try self.getSubject(subjectId)
+    if subject?.relations != items {
+      subject?.relations = items
+    }
+  }
+
+  public func saveSubjectRecs(_ subjectId: Int, _ items: [SubjectRecDTO]) throws {
+    let subject = try self.getSubject(subjectId)
+    if subject?.recs != items {
+      subject?.recs = items
+    }
+  }
+
+  public func saveSubjectReviews(_ subjectId: Int, _ items: [SubjectReviewDTO]) throws {
+    let subject = try self.getSubject(subjectId)
+    if subject?.reviews != items {
+      subject?.reviews = items
+    }
+  }
+
+  public func saveSubjectTopics(_ subjectId: Int, _ items: [TopicDTO]) throws {
+    let subject = try self.getSubject(subjectId)
+    if subject?.topics != items {
+      subject?.topics = items
+    }
+  }
+
+  public func saveSubjectComments(_ subjectId: Int, _ items: [SubjectCommentDTO]) throws {
+    let subject = try self.getSubject(subjectId)
+    if subject?.comments != items {
+      subject?.comments = items
+    }
   }
 
   public func saveEpisode(_ item: EpisodeDTO) throws {

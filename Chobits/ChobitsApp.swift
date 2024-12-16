@@ -19,7 +19,6 @@ struct ChobitsApp: App {
       BangumiCalendar.self,
       Episode.self,
       Subject.self,
-      SubjectDetail.self,
       UserSubjectCollection.self,
       Character.self,
       Person.self,

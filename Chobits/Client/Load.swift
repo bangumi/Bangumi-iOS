@@ -53,6 +53,56 @@ extension Chii {
     try await db.commit()
   }
 
+  func loadSubjectCharacters(_ subjectId: Int) async throws {
+    let db = try self.getDB()
+    let resp = try await Chii.shared.getSubjectCharacters(subjectId, limit: 10)
+    try await db.saveSubjectCharacters(subjectId, resp.data)
+    try await db.commit()
+  }
+
+  func loadSubjectOffprints(_ subjectId: Int) async throws {
+    let db = try self.getDB()
+    let resp = try await Chii.shared.getSubjectRelations(
+      subjectId, offprint: true, limit: 100)
+    try await db.saveSubjectOffprints(subjectId, resp.data)
+    try await db.commit()
+  }
+
+  func loadSubjectRelations(_ subjectId: Int) async throws {
+    let db = try self.getDB()
+    let resp = try await Chii.shared.getSubjectRelations(subjectId, limit: 10)
+    try await db.saveSubjectRelations(subjectId, resp.data)
+    try await db.commit()
+  }
+
+  func loadSubjectRecs(_ subjectId: Int) async throws {
+    let db = try self.getDB()
+    let resp = try await Chii.shared.getSubjectRecs(subjectId, limit: 10)
+    try await db.saveSubjectRecs(subjectId, resp.data)
+    try await db.commit()
+  }
+
+  func loadSubjectReviews(_ subjectId: Int) async throws {
+    let db = try self.getDB()
+    let resp = try await Chii.shared.getSubjectReviews(subjectId, limit: 5)
+    try await db.saveSubjectReviews(subjectId, resp.data)
+    try await db.commit()
+  }
+
+  func loadSubjectTopics(_ subjectId: Int) async throws {
+    let db = try self.getDB()
+    let resp = try await Chii.shared.getSubjectTopics(subjectId, limit: 5)
+    try await db.saveSubjectTopics(subjectId, resp.data)
+    try await db.commit()
+  }
+
+  func loadSubjectComments(_ subjectId: Int) async throws {
+    let db = try self.getDB()
+    let resp = try await Chii.shared.getSubjectComments(subjectId, limit: 10)
+    try await db.saveSubjectComments(subjectId, resp.data)
+    try await db.commit()
+  }
+
   func loadEpisodes(_ subjectId: Int) async throws {
     let db = try self.getDB()
     let type = try await db.getSubjectType(subjectId)
@@ -110,7 +160,9 @@ extension Chii {
       try await db.commit()
     }
   }
+}
 
+extension Chii {
   func loadCharacter(_ cid: Int) async throws {
     let db = try self.getDB()
     let item = try await self.getCharacter(cid)

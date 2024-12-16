@@ -9,9 +9,9 @@ import SwiftData
 import SwiftUI
 
 struct EpisodeInfoView: View {
-  @ObservableModel var episode: Episode
-
   @AppStorage("isolationMode") var isolationMode: Bool = false
+
+  @Environment(Episode.self) var episode
 
   func field(name: String, value: String) -> AttributedString {
     var text = AttributedString(name + ": ")
@@ -76,7 +76,7 @@ struct EpisodeInfoView: View {
   }
 
   return ScrollView {
-    EpisodeInfoView(episode: episodes.first!)
+    EpisodeInfoView().environment(episodes.first!)
       .modelContainer(container)
   }
 }

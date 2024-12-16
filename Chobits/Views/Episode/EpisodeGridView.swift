@@ -86,7 +86,6 @@ struct EpisodeGridView: View {
   }
 
   var body: some View {
-    let _ = Self._printChanges()
     VStack(spacing: 2) {
       HStack(alignment: .bottom) {
         if isAuthenticated {
@@ -135,7 +134,8 @@ struct EpisodeGridView: View {
               }
             }
           } preview: {
-            EpisodeInfoView(episode: episode)
+            EpisodeInfoView()
+              .environment(episode)
               .padding()
               .frame(idealWidth: 320)
           }
@@ -181,7 +181,8 @@ struct EpisodeGridView: View {
                 }
               }
             } preview: {
-              EpisodeInfoView(episode: episode)
+              EpisodeInfoView()
+                .environment(episode)
                 .padding()
                 .frame(idealWidth: 320)
             }

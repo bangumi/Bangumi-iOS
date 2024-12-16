@@ -95,7 +95,7 @@ struct EpisodeView: View {
     ScrollView {
       LazyVStack(alignment: .leading) {
         if let episode = episode {
-          EpisodeInfoView(episode: episode)
+          EpisodeInfoView().environment(episode)
         }
         if showCollectionBox {
           HStack {

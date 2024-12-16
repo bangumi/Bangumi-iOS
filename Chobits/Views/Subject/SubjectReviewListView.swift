@@ -54,12 +54,12 @@ struct SubjectReviewListView: View {
       LazyVStack(alignment: .leading) {
         ForEach(reviews, id: \.inner.self) { item in
           SubjectReviewItemView(item: item.inner)
-          .padding(.top, 2)
-          .onAppear {
-            Task {
-              await loadNextPage(idx: item.idx)
+            .padding(.top, 2)
+            .onAppear {
+              Task {
+                await loadNextPage(idx: item.idx)
+              }
             }
-          }
         }
         if fetching {
           HStack {

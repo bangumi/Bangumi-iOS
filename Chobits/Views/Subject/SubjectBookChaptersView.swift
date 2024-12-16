@@ -10,30 +10,15 @@ import SwiftData
 import SwiftUI
 
 struct SubjectBookChaptersView: View {
-  let subjectId: Int
   let compact: Bool
 
-  @Environment(\.modelContext) var modelContext
-
-  @Query private var subjects: [Subject]
-  private var subject: Subject? { subjects.first }
-
-  @Query private var collections: [UserSubjectCollection]
-  private var collection: UserSubjectCollection? { collections.first }
+  @Environment(UserSubjectCollection.self) var collection
 
   @State private var inputEps: String = ""
   @State private var eps: Int? = nil
   @State private var inputVols: String = ""
   @State private var vols: Int? = nil
   @State private var updating: Bool = false
-
-  init(subjectId: Int, compact: Bool = false) {
-    self.subjectId = subjectId
-    self.compact = compact
-
-    _subjects = Query(filter: #Predicate<Subject> { $0.subjectId == subjectId })
-    _collections = Query(filter: #Predicate<UserSubjectCollection> { $0.subjectId == subjectId })
-  }
 
   var updateButtonDisable: Bool {
     if updating {
@@ -43,19 +28,19 @@ struct SubjectBookChaptersView: View {
   }
 
   var epsDesc: String {
-    subject?.epsDesc ?? ""
+    collection.subject?.epsDesc ?? ""
   }
 
   var epStatus: Int {
-    collection?.epStatus ?? 0
+    collection.epStatus
   }
 
   var volsDesc: String {
-    subject?.volumesDesc ?? ""
+    collection.subject?.volumesDesc ?? ""
   }
 
   var volStatus: Int {
-    collection?.volStatus ?? 0
+    collection.volStatus
   }
 
   func parseInputEps() {
@@ -75,9 +60,6 @@ struct SubjectBookChaptersView: View {
   }
 
   func incrEps() {
-    guard let collection = collection else {
-      return
-    }
     if let value = eps {
       self.inputEps = "\(value+1)"
     } else {
@@ -86,9 +68,6 @@ struct SubjectBookChaptersView: View {
   }
 
   func incrVols() {
-    guard let collection = collection else {
-      return
-    }
     if let value = vols {
       self.inputVols = "\(value+1)"
     } else {
@@ -108,7 +87,7 @@ struct SubjectBookChaptersView: View {
     Task {
       do {
         try await Chii.shared.updateBookCollection(
-          subjectId: subjectId, eps: eps, vols: vols)
+          subjectId: collection.subjectId, eps: eps, vols: vols)
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
       } catch {
         Notifier.shared.alert(error: error)
@@ -265,12 +244,12 @@ struct SubjectBookChaptersView: View {
 
   container.mainContext.insert(collection)
   container.mainContext.insert(subject)
+  collection.subject = subject
 
   return ScrollView {
     LazyVStack(alignment: .leading) {
-      SubjectBookChaptersView(subjectId: subject.subjectId, compact: false)
-        .modelContainer(container)
-    }
-  }
-  .padding()
+      SubjectBookChaptersView(compact: false)
+        .environment(collection)
+    }.padding()
+  }.modelContainer(container)
 }

@@ -152,7 +152,7 @@ struct EpisodeListView: View {
     ScrollView {
       LazyVStack(spacing: 10) {
         ForEach(episodes, id: \.inner.self) { item in
-          EpisodeRowView(episode: item.inner)
+          EpisodeRowView().environment(item.inner)
             .onAppear {
               Task {
                 await loadNextPage(idx: item.idx)

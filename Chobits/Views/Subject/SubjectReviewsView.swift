@@ -5,7 +5,6 @@ struct SubjectReviewsView: View {
   let reviews: [SubjectReviewDTO]
 
   var body: some View {
-    let _ = Self._printChanges()
     VStack(spacing: 2) {
       HStack(alignment: .bottom) {
         Text("评论")

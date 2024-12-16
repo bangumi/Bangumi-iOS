@@ -9,10 +9,10 @@ import SwiftData
 import SwiftUI
 
 struct EpisodeRowView: View {
-  @ObservableModel var episode: Episode
-
   @AppStorage("isolationMode") var isolationMode: Bool = false
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
+
+  @Environment(Episode.self) var episode
 
   @State private var now: Date = Date()
 
@@ -92,7 +92,7 @@ struct EpisodeRowView: View {
 
   return ScrollView {
     LazyVStack {
-      EpisodeRowView(episode: episodes.first!)
+      EpisodeRowView().environment(episodes.first!)
         .modelContainer(container)
     }.padding()
   }

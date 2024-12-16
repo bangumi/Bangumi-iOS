@@ -32,7 +32,6 @@ struct SubjectReviewItemView: View {
           NavigationLink(value: NavDestination.user(item.user.username)) {
             Text(item.user.nickname)
               .lineLimit(1)
-              .font(.callout)
           }
           Text(item.entry.createdAt.datetimeDisplay)
             .lineLimit(1)
