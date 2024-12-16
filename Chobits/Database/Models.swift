@@ -46,17 +46,6 @@ final class SubjectV1: Searchable {
   var type: Int
   var volumes: Int
 
-  var characters: [SubjectCharacterDTO] = []
-  var offprints: [SubjectRelationDTO] = []
-  var relations: [SubjectRelationDTO] = []
-  var recs: [SubjectRecDTO] = []
-
-  var topics: [TopicDTO] = []
-  var comments: [SubjectCommentDTO] = []
-
-  @Relationship(deleteRule: .cascade, inverse: \UserSubjectCollection.subject)
-  var userCollection: UserSubjectCollection?
-
   var typeEnum: SubjectType {
     return SubjectType(type)
   }
@@ -164,6 +153,28 @@ final class SubjectV1: Searchable {
   }
 }
 
+typealias SubjectDetail = SubjectDetailV1
+
+@Model
+final class SubjectDetailV1 {
+  @Attribute(.unique)
+  var subjectId: Int
+
+
+  var characters: [SubjectCharacterDTO] = []
+  var offprints: [SubjectRelationDTO] = []
+  var relations: [SubjectRelationDTO] = []
+  var recs: [SubjectRecDTO] = []
+
+  var topics: [TopicDTO] = []
+  var comments: [SubjectCommentDTO] = []
+
+  init(_ subjectId: Int) {
+    self.subjectId = subjectId
+  }
+}
+
+
 typealias UserSubjectCollection = UserSubjectCollectionV1
 
 @Model
@@ -181,7 +192,7 @@ final class UserSubjectCollectionV1 {
   var priv: Bool
   var updatedAt: Date
 
-  var subject: Subject?
+  var alias: String = ""
 
   var typeEnum: CollectionType {
     CollectionType(type)
@@ -210,12 +221,19 @@ final class UserSubjectCollectionV1 {
     self.priv = item.`private`
     self.updatedAt = Date(timeIntervalSince1970: TimeInterval(item.updatedAt))
     self.subjectType = item.subject.type.rawValue
+    var aliases = [item.subject.name]
+    aliases.append(contentsOf: item.subject.infobox.aliases)
+    self.alias = aliases.joined(separator: ", ")
   }
 
   func update(_ item: UserSubjectCollectionDTO) {
     if self.rate != item.rate { self.rate = item.rate }
     if self.type != item.type.rawValue { self.type = item.type.rawValue }
-    if self.comment != item.comment { self.comment = item.comment }
+    if self.comment != item.comment {
+      // DEBUG:
+      print("==> comment update from: \(self.comment) to: \(item.comment)")
+      self.comment = item.comment
+    }
     if self.tags != item.tags { self.tags = item.tags }
     if self.epStatus != item.epStatus { self.epStatus = item.epStatus }
     if self.volStatus != item.volStatus { self.volStatus = item.volStatus }
@@ -225,6 +243,10 @@ final class UserSubjectCollectionV1 {
     if self.subjectType != item.subject.type.rawValue {
       self.subjectType = item.subject.type.rawValue
     }
+    var aliases = [item.subject.name]
+    aliases.append(contentsOf: item.subject.infobox.aliases)
+    let newAlias = aliases.joined(separator: ", ")
+    if self.alias != newAlias { self.alias = newAlias }
   }
 }
 

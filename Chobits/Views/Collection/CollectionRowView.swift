@@ -9,39 +9,53 @@ import SwiftData
 import SwiftUI
 
 struct CollectionRowView: View {
-  @ObservableModel var collection: UserSubjectCollection
+  let subjectId: Int
+
+  @Environment(\.modelContext) var modelContext
+
+  @Query private var subjects: [Subject]
+  var subject: Subject? { subjects.first }
+
+  @Query private var collections: [UserSubjectCollection]
+  var collection: UserSubjectCollection? { collections.first }
+
+  init(subjectId: Int) {
+    self.subjectId = subjectId
+    _subjects = Query(filter: #Predicate<Subject> { $0.subjectId == subjectId })
+    _collections = Query(filter: #Predicate<UserSubjectCollection> { $0.subjectId == subjectId })
+  }
 
   var body: some View {
     HStack(alignment: .top) {
-      NavigationLink(value: NavDestination.subject(collection.subjectId)) {
-        ImageView(img: collection.subject?.images?.common, width: 60, height: 60, type: .subject)
+      NavigationLink(value: NavDestination.subject(subjectId)) {
+        ImageView(img: subject?.images?.common, width: 60, height: 60, type: .subject)
       }
       VStack(alignment: .leading) {
-        NavigationLink(value: NavDestination.subject(collection.subjectId)) {
-          Text(collection.subject?.name ?? "")
+        NavigationLink(value: NavDestination.subject(subjectId)) {
+          Text(subject?.name ?? "")
             .lineLimit(1)
         }
-        Text(collection.subject?.nameCN ?? "")
+        Text(subject?.nameCN ?? "")
           .lineLimit(1)
           .font(.footnote)
           .foregroundStyle(.secondary)
         Spacer()
         HStack {
-          if collection.priv {
+          if collection?.priv ?? false {
             Image(systemName: "lock.fill").foregroundStyle(.accent)
           }
-          Text(collection.updatedAt.formatCollectionDate)
+          Text(collection?.updatedAt.formatCollectionDate ?? "")
             .foregroundStyle(.secondary)
             .lineLimit(1)
           Spacer()
-          if collection.rate > 0 {
-            StarsView(score: Float(collection.rate), size: 12)
+          if let rate = collection?.rate, rate > 0 {
+            StarsView(score: Float(rate), size: 12)
           }
         }.font(.footnote)
-        if !collection.comment.isEmpty {
+        if let comment = collection?.comment, !comment.isEmpty {
           VStack(alignment: .leading, spacing: 2) {
             Divider()
-            Text(collection.comment)
+            Text(comment)
               .padding(2)
               .font(.footnote)
               .multilineTextAlignment(.leading)
@@ -65,13 +79,10 @@ struct CollectionRowView: View {
   let subject = Subject.previewAnime
   container.mainContext.insert(subject)
   container.mainContext.insert(collection)
-  collection.subject = subject
 
   return ScrollView {
     LazyVStack(alignment: .leading) {
-      CollectionRowView(collection: collection)
-    }
+      CollectionRowView(subjectId: subject.subjectId)
+    }.padding().modelContainer(container)
   }
-  .padding()
-  .modelContainer(container)
 }

@@ -15,6 +15,9 @@ struct SubjectBookChaptersView: View {
 
   @Environment(\.modelContext) var modelContext
 
+  @Query private var subjects: [Subject]
+  private var subject: Subject? { subjects.first }
+
   @Query private var collections: [UserSubjectCollection]
   private var collection: UserSubjectCollection? { collections.first }
 
@@ -28,10 +31,8 @@ struct SubjectBookChaptersView: View {
     self.subjectId = subjectId
     self.compact = compact
 
-    let predicate = #Predicate<UserSubjectCollection> {
-      $0.subjectId == subjectId
-    }
-    self._collections = Query(filter: predicate, sort: \UserSubjectCollection.subjectId)
+    _subjects = Query(filter: #Predicate<Subject> { $0.subjectId == subjectId })
+    _collections = Query(filter: #Predicate<UserSubjectCollection> { $0.subjectId == subjectId })
   }
 
   var updateButtonDisable: Bool {
@@ -42,7 +43,7 @@ struct SubjectBookChaptersView: View {
   }
 
   var epsDesc: String {
-    collection?.subject?.epsDesc ?? ""
+    subject?.epsDesc ?? ""
   }
 
   var epStatus: Int {
@@ -50,7 +51,7 @@ struct SubjectBookChaptersView: View {
   }
 
   var volsDesc: String {
-    collection?.subject?.volumesDesc ?? ""
+    subject?.volumesDesc ?? ""
   }
 
   var volStatus: Int {
@@ -264,11 +265,10 @@ struct SubjectBookChaptersView: View {
 
   container.mainContext.insert(collection)
   container.mainContext.insert(subject)
-  collection.subject = subject
 
   return ScrollView {
     LazyVStack(alignment: .leading) {
-      SubjectBookChaptersView(subjectId: collection.subjectId, compact: false)
+      SubjectBookChaptersView(subjectId: subject.subjectId, compact: false)
         .modelContainer(container)
     }
   }

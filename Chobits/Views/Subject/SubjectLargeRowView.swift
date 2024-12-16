@@ -17,12 +17,13 @@ struct SubjectLargeRowView: View {
   @Query private var subjects: [Subject]
   private var subject: Subject? { subjects.first }
 
+  @Query private var collections: [UserSubjectCollection]
+  private var collection: UserSubjectCollection? { collections.first }
+
   init(subjectId: Int) {
     self.subjectId = subjectId
-    _subjects = Query(
-      filter: #Predicate<Subject> {
-        $0.subjectId == subjectId
-      })
+    _subjects = Query(filter: #Predicate<Subject> { $0.subjectId == subjectId })
+    _collections = Query(filter: #Predicate<UserSubjectCollection> { $0.subjectId == subjectId })
   }
 
   var metaTags: [String] {
@@ -131,7 +132,7 @@ struct SubjectLargeRowView: View {
               .foregroundStyle(.secondary)
           }
           Spacer()
-          if let collection = subject?.userCollection, collection.typeEnum != .none {
+          if let collection = collection, collection.typeEnum != .none {
             Label(collection.typeDesc, systemImage: collection.typeEnum.icon)
               .foregroundStyle(.accent)
           }
@@ -156,7 +157,6 @@ struct SubjectLargeRowView: View {
   for episode in episodes {
     container.mainContext.insert(episode)
   }
-  collection.subject = subject
 
   return ScrollView {
     LazyVStack(alignment: .leading) {

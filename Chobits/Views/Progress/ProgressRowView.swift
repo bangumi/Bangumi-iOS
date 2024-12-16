@@ -10,19 +10,27 @@ import SwiftData
 import SwiftUI
 
 struct ProgressRowView: View {
-  @ObservableModel var collection: UserSubjectCollection
+  let subjectId: Int
 
   @Environment(\.modelContext) var modelContext
 
   @State private var updating: Bool = false
 
+  @Query private var subjects: [Subject]
+  private var subject: Subject? { subjects.first }
+
+  @Query private var collections: [UserSubjectCollection]
+  private var collection: UserSubjectCollection? { collections.first }
+
   @Query private var pendingEpisodes: [Episode]
   private var nextEpisode: Episode? { pendingEpisodes.first }
 
-  init(collection: UserSubjectCollection) {
-    _collection = ObservableModel(wrappedValue: collection)
+  init(subjectId: Int) {
+    self.subjectId = subjectId
 
-    let subjectId = collection.subjectId
+    _subjects = Query(filter: #Predicate<Subject> { $0.subjectId == subjectId })
+    _collections = Query(filter: #Predicate<UserSubjectCollection> { $0.subjectId == subjectId })
+
     var descriptor = FetchDescriptor<Episode>(
       predicate: #Predicate<Episode> {
         $0.subjectId == subjectId && $0.type == 0 && $0.collection == 0
@@ -32,11 +40,11 @@ struct ProgressRowView: View {
   }
 
   var totalEps: Int {
-    collection.subject?.eps ?? 0
+    subject?.eps ?? 0
   }
 
   var totalVols: Int {
-    collection.subject?.volumes ?? 0
+    subject?.volumes ?? 0
   }
 
   func markNextWatched() {
@@ -50,7 +58,7 @@ struct ProgressRowView: View {
     Task {
       do {
         try await Chii.shared.updateEpisodeCollection(
-          subjectId: collection.subjectId, episodeId: episodeId, type: .collect)
+          subjectId: subjectId, episodeId: episodeId, type: .collect)
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
       } catch {
         Notifier.shared.alert(error: error)
@@ -62,12 +70,12 @@ struct ProgressRowView: View {
   var body: some View {
     VStack(alignment: .leading, spacing: 4) {
       HStack {
-        NavigationLink(value: NavDestination.subject(collection.subjectId)) {
+        NavigationLink(value: NavDestination.subject(subjectId)) {
           ImageView(
-            img: collection.subject?.images?.common,
+            img: subject?.images?.common,
             width: 72, height: 72, type: .subject
           ) {
-            if collection.priv {
+            if collection?.priv ?? false {
               Image(systemName: "lock")
                 .padding(2)
                 .background(.red.opacity(0.8))
@@ -79,12 +87,12 @@ struct ProgressRowView: View {
           }
         }.buttonStyle(.navLink)
         VStack(alignment: .leading) {
-          NavigationLink(value: NavDestination.subject(collection.subjectId)) {
+          NavigationLink(value: NavDestination.subject(subjectId)) {
             VStack(alignment: .leading) {
-              Text(collection.subject?.name ?? "")
+              Text(subject?.name ?? "")
                 .font(.headline)
                 .lineLimit(1)
-              Text(collection.subject?.nameCN ?? "")
+              Text(subject?.nameCN ?? "")
                 .foregroundStyle(.secondary)
                 .font(.subheadline)
                 .lineLimit(1)
@@ -93,10 +101,10 @@ struct ProgressRowView: View {
 
           Spacer()
 
-          switch collection.subject?.typeEnum {
+          switch subject?.typeEnum {
           case .anime, .real:
             HStack {
-              Text("\(collection.epStatus) / \(totalEps)")
+              Text("\(collection?.epStatus ?? 0) / \(totalEps)")
                 .foregroundStyle(.secondary)
               Spacer()
               if let episode = nextEpisode {
@@ -116,18 +124,18 @@ struct ProgressRowView: View {
                   }
                 }
               } else {
-                NavigationLink(value: NavDestination.subject(collection.subjectId)) {
+                NavigationLink(value: NavDestination.subject(subjectId)) {
                   Image(systemName: "square.grid.2x2.fill")
                     .foregroundStyle(.secondary)
                 }.buttonStyle(.plain)
               }
             }.font(.callout)
           case .book:
-            SubjectBookChaptersView(subjectId: collection.subjectId, compact: true)
+            SubjectBookChaptersView(subjectId: subjectId, compact: true)
               .font(.callout)
 
           default:
-            if let stype = collection.subject?.typeEnum {
+            if let stype = subject?.typeEnum {
               Label(stype.description, systemImage: stype.icon)
                 .foregroundStyle(.accent)
                 .font(.callout)
@@ -137,17 +145,20 @@ struct ProgressRowView: View {
       }
 
       Section {
-        switch collection.subject?.typeEnum {
+        switch subject?.typeEnum {
         case .book:
           VStack(spacing: 1) {
-            ProgressView(value: Float(min(totalEps, collection.epStatus)), total: Float(totalEps))
             ProgressView(
-              value: Float(min(totalVols, collection.volStatus)), total: Float(totalVols))
+              value: Float(min(totalEps, collection?.epStatus ?? 0)), total: Float(totalEps))
+            ProgressView(
+              value: Float(min(totalVols, collection?.volStatus ?? 0)), total: Float(totalVols))
           }.progressViewStyle(.linear)
 
         case .anime, .real:
-          ProgressView(value: Float(min(totalEps, collection.epStatus)), total: Float(totalEps))
-            .progressViewStyle(.linear)
+          ProgressView(
+            value: Float(min(totalEps, collection?.epStatus ?? 0)), total: Float(totalEps)
+          )
+          .progressViewStyle(.linear)
 
         default:
           ProgressView(value: 0, total: 0)
@@ -166,16 +177,14 @@ struct ProgressRowView: View {
   let episodes = Episode.previewCollections
   container.mainContext.insert(subject)
   container.mainContext.insert(collection)
-  collection.subject = subject
   for episode in episodes {
     container.mainContext.insert(episode)
   }
 
   return ScrollView {
     LazyVStack(alignment: .leading) {
-      ProgressRowView(collection: collection)
-    }
+      ProgressRowView(subjectId: subject.subjectId)
+        .modelContainer(container)
+    }.padding()
   }
-  .padding()
-  .modelContainer(container)
 }

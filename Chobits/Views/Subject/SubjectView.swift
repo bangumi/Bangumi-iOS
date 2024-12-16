@@ -22,12 +22,13 @@ struct SubjectView: View {
   @Query private var subjects: [Subject]
   var subject: Subject? { subjects.first }
 
+  @Query private var details: [SubjectDetail]
+  var detail: SubjectDetail? { details.first }
+
   init(subjectId: Int) {
     self.subjectId = subjectId
-    _subjects = Query(
-      filter: #Predicate<Subject> {
-        $0.subjectId == subjectId
-      })
+    _subjects = Query(filter: #Predicate<Subject> { $0.subjectId == subjectId })
+    _details = Query(filter: #Predicate<SubjectDetail> { $0.subjectId == subjectId })
   }
 
   var shareLink: URL {
@@ -41,42 +42,42 @@ struct SubjectView: View {
 
       Task {
         let respCharacters = try await Chii.shared.getSubjectCharacters(subjectId, limit: 10)
-        if subject?.characters != respCharacters.data {
-          subject?.characters = respCharacters.data
+        if detail?.characters != respCharacters.data {
+          detail?.characters = respCharacters.data
         }
       }
       if subject?.typeEnum == .book, subject?.series ?? false {
         Task {
           let respOffprints = try await Chii.shared.getSubjectRelations(
             subjectId, offprint: true, limit: 100)
-          if subject?.offprints != respOffprints.data {
-            subject?.offprints = respOffprints.data
+          if detail?.offprints != respOffprints.data {
+            detail?.offprints = respOffprints.data
           }
         }
       }
       Task {
         let respRelations = try await Chii.shared.getSubjectRelations(subjectId, limit: 10)
-        if subject?.relations != respRelations.data {
-          subject?.relations = respRelations.data
+        if detail?.relations != respRelations.data {
+          detail?.relations = respRelations.data
         }
       }
       Task {
         let respRecs = try await Chii.shared.getSubjectRecs(subjectId, limit: 10)
-        if subject?.recs != respRecs.data {
-          subject?.recs = respRecs.data
+        if detail?.recs != respRecs.data {
+          detail?.recs = respRecs.data
         }
       }
       if !isolationMode {
         Task {
           let respTopics = try await Chii.shared.getSubjectTopics(subjectId, limit: 5)
-          if subject?.topics != respTopics.data {
-            subject?.topics = respTopics.data
+          if detail?.topics != respTopics.data {
+            detail?.topics = respTopics.data
           }
         }
         Task {
           let respComments = try await Chii.shared.getSubjectComments(subjectId, limit: 5)
-          if subject?.comments != respComments.data {
-            subject?.comments = respComments.data
+          if detail?.comments != respComments.data {
+            detail?.comments = respComments.data
           }
         }
       }
@@ -91,7 +92,7 @@ struct SubjectView: View {
   var body: some View {
     let _ = Self._printChanges()
     Section {
-      if let subject = subject {
+      if let subject = subject, let detail = detail {
         ScrollView(showsIndicators: false) {
           LazyVStack(alignment: .leading) {
             SubjectHeaderView(subjectId: subjectId)
@@ -120,21 +121,21 @@ struct SubjectView: View {
             if subject.typeEnum == .music {
               EpisodeDiscView(subjectId: subjectId)
             } else {
-              SubjectCharactersView(subjectId: subjectId, characters: subject.characters)
+              SubjectCharactersView(subjectId: subjectId, characters: detail.characters)
             }
 
             if subject.typeEnum == .book, subject.series {
-              SubjectOffprintsView(subjectId: subjectId, offprints: subject.offprints)
+              SubjectOffprintsView(subjectId: subjectId, offprints: detail.offprints)
             }
 
-            SubjectRelationsView(subjectId: subjectId, relations: subject.relations)
+            SubjectRelationsView(subjectId: subjectId, relations: detail.relations)
 
-            SubjectRecsView(subjectId: subjectId, recs: subject.recs)
+            SubjectRecsView(subjectId: subjectId, recs: detail.recs)
 
             if !isolationMode {
-              SubjectTopicsView(subjectId: subjectId, topics: subject.topics)
+              SubjectTopicsView(subjectId: subjectId, topics: detail.topics)
               SubjectCommentsView(
-                subjectId: subjectId, subjectType: subject.typeEnum, comments: subject.comments)
+                subjectId: subjectId, subjectType: subject.typeEnum, comments: detail.comments)
             }
 
             Spacer()

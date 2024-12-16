@@ -213,8 +213,6 @@ struct SubjectCollectionBoxView: View {
   container.mainContext.insert(collection)
   container.mainContext.insert(subject)
 
-  collection.subject = subject
-
   return SubjectCollectionBoxView(subjectId: subject.subjectId)
     .modelContainer(container)
 }

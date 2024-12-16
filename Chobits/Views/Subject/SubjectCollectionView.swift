@@ -22,10 +22,7 @@ struct SubjectCollectionView: View {
 
   init(subjectId: Int) {
     self.subjectId = subjectId
-    let predicate = #Predicate<UserSubjectCollection> {
-      $0.subjectId == subjectId
-    }
-    _collections = Query(filter: predicate, sort: \UserSubjectCollection.subjectId)
+    _collections = Query(filter: #Predicate<UserSubjectCollection> { $0.subjectId == subjectId })
   }
 
   func refresh() async {
@@ -96,7 +93,6 @@ struct SubjectCollectionView: View {
   let collection = UserSubjectCollection.previewBook
   container.mainContext.insert(subject)
   container.mainContext.insert(collection)
-  collection.subject = subject
 
   return ScrollView {
     LazyVStack(alignment: .leading) {

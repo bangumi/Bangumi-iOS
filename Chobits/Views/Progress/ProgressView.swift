@@ -187,9 +187,7 @@ struct ChiiProgressListView: View {
     let descriptor = FetchDescriptor<UserSubjectCollection>(
       predicate: #Predicate<UserSubjectCollection> {
         (stype == 0 || $0.subjectType == stype) && $0.type == doingType
-          && (search == ""
-            || ($0.subject?.name.localizedStandardContains(search) ?? false
-              || $0.subject?.nameCN.localizedStandardContains(search) ?? false))
+          && (search == "" || $0.alias.localizedStandardContains(search))
       },
       sortBy: [
         SortDescriptor(\.updatedAt, order: .reverse)
@@ -201,7 +199,7 @@ struct ChiiProgressListView: View {
     LazyVStack(alignment: .leading) {
       ForEach(collections) { item in
         CardView {
-          ProgressRowView(collection: item)
+          ProgressRowView(subjectId: item.subjectId)
         }
       }
     }.animation(.default, value: collections)

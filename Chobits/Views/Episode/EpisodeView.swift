@@ -26,17 +26,21 @@ struct EpisodeView: View {
   @Query private var episodes: [Episode]
   private var episode: Episode? { episodes.first }
 
+  @Query private var collections: [UserSubjectCollection]
+  private var collection: UserSubjectCollection? { collections.first }
+
   init(subjectId: Int, episodeId: Int) {
     self.subjectId = subjectId
     self.episodeId = episodeId
 
     _subjects = Query(filter: #Predicate<Subject> { $0.subjectId == subjectId })
     _episodes = Query(filter: #Predicate<Episode> { $0.episodeId == episodeId })
+    _collections = Query(filter: #Predicate<UserSubjectCollection> { $0.subjectId == subjectId })
   }
 
   var showCollectionBox: Bool {
     if !isAuthenticated { return false }
-    if subject?.userCollection == nil { return false }
+    if collection == nil { return false }
     switch subject?.typeEnum {
     case .anime, .real:
       return true
