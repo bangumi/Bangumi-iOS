@@ -31,7 +31,7 @@ struct SubjectReviewsView: View {
     }
     VStack {
       ForEach(reviews) { review in
-        SubjectReviewItemView(item: review)
+        SubjectReviewItemView(item: review).padding(.top, 2)
       }
     }
     .animation(.default, value: reviews)

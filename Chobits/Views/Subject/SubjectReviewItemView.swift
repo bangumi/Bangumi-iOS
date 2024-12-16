@@ -19,12 +19,10 @@ struct SubjectReviewItemView: View {
           alignment: .top, type: .avatar
         )
       }
-      VStack(alignment: .leading, spacing: 4) {
+      VStack(alignment: .leading) {
         NavigationLink(value: NavDestination.blog(item.entry.id)) {
           HStack(alignment: .bottom) {
-            Text(item.entry.title)
-              .font(.callout)
-              .lineLimit(1)
+            Text(item.entry.title).lineLimit(1)
             Spacer()
             Text("更多 »").font(.caption)
           }
@@ -32,7 +30,9 @@ struct SubjectReviewItemView: View {
         HStack {
           Text("by").foregroundStyle(.secondary)
           NavigationLink(value: NavDestination.user(item.user.username)) {
-            Text(item.user.nickname).lineLimit(1)
+            Text(item.user.nickname)
+              .lineLimit(1)
+              .font(.callout)
           }
           Text(item.entry.createdAt.datetimeDisplay)
             .lineLimit(1)
@@ -40,12 +40,11 @@ struct SubjectReviewItemView: View {
           Text("(+\(item.entry.replies))")
             .foregroundStyle(.orange)
         }.font(.footnote)
-        Text(item.entry.summary.trimmingCharacters(in: .whitespacesAndNewlines))
+        Text(item.entry.summary)
           .font(.caption)
           .lineLimit(3)
       }
       Spacer()
-    }
-    .buttonStyle(.navLink)
+    }.buttonStyle(.navLink)
   }
 }

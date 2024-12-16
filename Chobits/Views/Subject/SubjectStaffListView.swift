@@ -29,16 +29,14 @@ struct SubjectStaffListView: View {
             }
             VStack(alignment: .leading) {
               NavigationLink(value: NavDestination.person(item.person.id)) {
-                VStack(alignment: .leading) {
-                  Text(item.person.name)
-                    .font(.callout)
-                    .lineLimit(1)
-                  Text(item.person.nameCN)
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
-                }
+                Text(item.person.name)
+                  .font(.callout)
+                  .lineLimit(1)
               }
+              Text(item.person.nameCN)
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+                .lineLimit(1)
               HFlow {
                 ForEach(item.positions) { position in
                   if !position.type.cn.isEmpty {

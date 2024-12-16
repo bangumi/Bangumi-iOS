@@ -113,7 +113,6 @@ struct CharacterView: View {
                 NavigationLink(value: NavDestination.infobox("角色信息", character.infobox)) {
                   HStack {
                     InfoboxHeaderView(infobox: character.infobox)
-                      .foregroundStyle(.secondary)
                     Spacer()
                     Image(systemName: "chevron.right")
                   }

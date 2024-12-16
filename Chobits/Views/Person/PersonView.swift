@@ -71,20 +71,6 @@ struct PersonView: View {
     refreshed = true
   }
 
-  func shouldShowToggle(
-    _ geometry: GeometryProxy,
-    font: UIFont.TextStyle = .body, limits: Int = 5
-  )
-    -> Bool
-  {
-    let lines = Int(
-      geometry.size.height / UIFont.preferredFont(forTextStyle: font).lineHeight)
-    if lines < limits {
-      return false
-    }
-    return true
-  }
-
   var body: some View {
     Section {
       if let person = person {
@@ -132,7 +118,6 @@ struct PersonView: View {
                 NavigationLink(value: NavDestination.infobox("人物信息", person.infobox)) {
                   HStack {
                     InfoboxHeaderView(infobox: person.infobox)
-                      .foregroundStyle(.secondary)
                     Spacer()
                     Image(systemName: "chevron.right")
                   }
