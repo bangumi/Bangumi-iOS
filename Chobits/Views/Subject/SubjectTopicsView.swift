@@ -13,6 +13,7 @@ struct SubjectTopicsView: View {
   let topics: [TopicDTO]
 
   var body: some View {
+    let _ = Self._printChanges()
     VStack(spacing: 2) {
       HStack(alignment: .bottom) {
         Text("讨论版")

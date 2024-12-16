@@ -285,23 +285,11 @@ extension DatabaseOperator {
   }
 
   public func saveEpisode(_ item: EpisodeDTO) throws {
-    guard
-      let subject = try self.getSubject(item.subjectID)
-    else {
-      return
-    }
-    let episode = try self.ensureEpisode(item)
-    episode.subject = subject
+    let _ = try self.ensureEpisode(item)
   }
 
   public func saveEpisode(_ item: EpisodeCollectionDTO) throws {
-    guard
-      let subject = try self.getSubject(item.episode.subjectID)
-    else {
-      return
-    }
     let episode = try self.ensureEpisode(item.episode)
-    episode.subject = subject
     episode.collection = item.type.rawValue
   }
 

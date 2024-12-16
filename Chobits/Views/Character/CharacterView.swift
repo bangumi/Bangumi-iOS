@@ -110,7 +110,7 @@ struct CharacterView: View {
                   .textSelection(.enabled)
                 Spacer()
 
-                NavigationLink(value: NavDestination.characterInfobox(character)) {
+                NavigationLink(value: NavDestination.infobox("角色信息", character.infobox)) {
                   HStack {
                     InfoboxHeaderView(infobox: character.infobox)
                       .foregroundStyle(.secondary)

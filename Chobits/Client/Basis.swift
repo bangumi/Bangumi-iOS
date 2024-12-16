@@ -207,7 +207,7 @@ extension Infobox {
   }
 }
 
-struct InfoboxItem: Codable, Identifiable {
+struct InfoboxItem: Codable, Identifiable, Hashable {
   var key: String
   var values: [InfoboxValue]
 
@@ -216,7 +216,7 @@ struct InfoboxItem: Codable, Identifiable {
   }
 }
 
-struct InfoboxValue: Codable, Identifiable {
+struct InfoboxValue: Codable, Identifiable, Hashable {
   var k: String?
   var v: String
 

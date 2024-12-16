@@ -5,12 +5,13 @@
 //  Created by Chuan Chuan on 2024/4/27.
 //
 
+import Flow
 import OSLog
 import SwiftData
 import SwiftUI
 
 struct SubjectView: View {
-  var subjectId: Int
+  let subjectId: Int
 
   @AppStorage("shareDomain") var shareDomain: String = ShareDomain.chii.label
   @AppStorage("isolationMode") var isolationMode: Bool = false
@@ -23,10 +24,10 @@ struct SubjectView: View {
 
   init(subjectId: Int) {
     self.subjectId = subjectId
-    let predicate = #Predicate<Subject> {
-      $0.subjectId == subjectId
-    }
-    _subjects = Query(filter: predicate, sort: \Subject.subjectId)
+    _subjects = Query(
+      filter: #Predicate<Subject> {
+        $0.subjectId == subjectId
+      })
   }
 
   var shareLink: URL {
@@ -42,7 +43,6 @@ struct SubjectView: View {
         let respCharacters = try await Chii.shared.getSubjectCharacters(subjectId, limit: 10)
         subject?.characters = respCharacters.data
       }
-
       if subject?.typeEnum == .book, subject?.series ?? false {
         Task {
           let respOffprints = try await Chii.shared.getSubjectRelations(
@@ -50,17 +50,14 @@ struct SubjectView: View {
           subject?.offprints = respOffprints.data
         }
       }
-
       Task {
         let respRelations = try await Chii.shared.getSubjectRelations(subjectId, limit: 10)
         subject?.relations = respRelations.data
       }
-
       Task {
         let respRecs = try await Chii.shared.getSubjectRecs(subjectId, limit: 10)
         subject?.recs = respRecs.data
       }
-
       if !isolationMode {
         Task {
           let respTopics = try await Chii.shared.getSubjectTopics(subjectId, limit: 5)
@@ -80,21 +77,33 @@ struct SubjectView: View {
   }
 
   var body: some View {
+    let _ = Self._printChanges()
     Section {
       if let subject = subject {
         ScrollView(showsIndicators: false) {
           LazyVStack(alignment: .leading) {
-            SubjectHeaderView(subject: subject)
+            SubjectHeaderView(subjectId: subjectId)
 
-            if isAuthenticated {
-              SubjectCollectionView(subjectId: subjectId)
-            }
+//            if isAuthenticated {
+//              SubjectCollectionView(subjectId: subjectId)
+//            }
 
             if subject.typeEnum == .anime || subject.typeEnum == .real {
               EpisodeGridView(subjectId: subjectId)
             }
 
-            SubjectSummaryView(subject: subject)
+            if subject.metaTags.count > 0 {
+              HFlow(alignment: .center, spacing: 4) {
+                ForEach(subject.metaTags, id: \.self) { tag in
+                  BorderView {
+                    Text(tag)
+                      .font(.footnote)
+                      .lineLimit(1)
+                  }.padding(1)
+                }
+              }.padding(.vertical, 2)
+            }
+            BBCodeWebView(subject.summary, textSize: 14)
 
             if subject.typeEnum == .music {
               EpisodeDiscView(subjectId: subjectId)

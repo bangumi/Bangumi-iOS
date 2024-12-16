@@ -57,9 +57,6 @@ final class SubjectV1: Searchable {
   @Relationship(deleteRule: .cascade, inverse: \UserSubjectCollection.subject)
   var userCollection: UserSubjectCollection?
 
-  @Relationship(deleteRule: .cascade, inverse: \Episode.subject)
-  var episodes: [Episode]?
-
   var typeEnum: SubjectType {
     return SubjectType(type)
   }
@@ -400,8 +397,6 @@ final class EpisodeV1 {
   var lock: Bool
 
   var collection: Int?
-
-  var subject: Subject?
 
   var typeEnum: EpisodeType {
     return EpisodeType(type)

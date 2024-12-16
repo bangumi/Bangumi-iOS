@@ -9,22 +9,40 @@ import SwiftData
 import SwiftUI
 
 struct SubjectHeaderView: View {
-  @ObservableModel var subject: Subject
+  let subjectId: Int
+
+  @Query private var subjects: [Subject]
+  var subject: Subject? { subjects.first }
+
+  init(subjectId: Int) {
+    self.subjectId = subjectId
+    _subjects = Query(
+      filter: #Predicate<Subject> {
+        $0.subjectId == subjectId
+      })
+  }
 
   var scoreDescription: String {
+    guard let subject = subject else { return "" }
     let score = Int(subject.rating.score.rounded())
     return score.ratingDescription
   }
 
   var nameCN: String {
+    guard let subject = subject else { return "" }
     if subject.nameCN.isEmpty {
       return subject.name
     }
     return subject.nameCN
   }
 
+  var type: SubjectType {
+    subject?.typeEnum ?? .none
+  }
+
   var body: some View {
-    if subject.locked {
+    let _ = Self._printChanges()
+    if subject?.locked ?? false {
       ZStack {
         HStack {
           Image("Musume")
@@ -48,16 +66,16 @@ struct SubjectHeaderView: View {
           .padding(.horizontal, 1)
       }
     }
-    Text(subject.name)
+    Text(subject?.name ?? "")
       .font(.title2.bold())
       .multilineTextAlignment(.leading)
       .textSelection(.enabled)
     HStack {
       ImageView(
-        img: subject.images?.common, width: 120, height: 160, type: .subject,
-        large: subject.images?.large
+        img: subject?.images?.common, width: 120, height: 160, type: .subject,
+        large: subject?.images?.large
       ) {
-        if subject.nsfw {
+        if subject?.nsfw ?? false {
           Text("18+")
             .padding(2)
             .background(.red.opacity(0.8))
@@ -69,11 +87,11 @@ struct SubjectHeaderView: View {
       }
       VStack(alignment: .leading) {
         HStack {
-          if subject.typeEnum != .none {
-            Label(subject.category, systemImage: subject.typeEnum.icon)
+          if type != .none {
+            Label(subject?.category ?? "", systemImage: type.icon)
           }
-          if subject.airtime.date != "" {
-            Label(subject.airtime.date, systemImage: "calendar")
+          if let date = subject?.airtime.date, !date.isEmpty {
+            Label(date, systemImage: "calendar")
               .font(.caption)
               .foregroundStyle(.secondary)
               .lineLimit(1)
@@ -91,67 +109,76 @@ struct SubjectHeaderView: View {
           .textSelection(.enabled)
         Spacer()
 
-        NavigationLink(value: NavDestination.subjectInfobox(subject)) {
-          HStack {
-            Text(subject.info)
-              .font(.caption)
-              .lineLimit(2)
-            Spacer()
-            Image(systemName: "chevron.right")
-          }
-        }.buttonStyle(.navLink)
+        if let subject = subject {
+          NavigationLink(value: NavDestination.infobox("条目信息", subject.infobox)) {
+            HStack {
+              Text(subject.info)
+                .font(.caption)
+                .lineLimit(2)
+              Spacer()
+              Image(systemName: "chevron.right")
+            }
+          }.buttonStyle(.navLink)
+        }
 
         Spacer()
-        HStack {
-          Text(
-            "\(subject.collection.doing) 人\(CollectionType.do.description(subject.typeEnum))"
-          )
-          Text("/")
-          Text(
-            "\(subject.collection.collect) 人\(CollectionType.collect.description(subject.typeEnum))"
-          )
-          Spacer()
-        }
-        .font(.footnote)
-        .foregroundStyle(.secondary)
 
-        if subject.rating.total > 10 {
+        if let collection = subject?.collection {
           HStack {
-            if subject.rating.score > 0 {
-              StarsView(score: Float(subject.rating.score), size: 12)
-              Text("\(subject.rating.score.rateDisplay)")
-                .foregroundStyle(.orange)
-                .font(.callout)
-              Text("(\(subject.rating.total) 人评分)")
-                .foregroundStyle(.secondary)
-              Spacer()
-            }
-          }.font(.footnote)
-        } else {
-          HStack {
-            StarsView(score: 0, size: 12)
-            Text("(少于 10 人评分)")
-              .foregroundStyle(.secondary)
+            Text(
+              "\(collection.doing) 人\(CollectionType.do.description(type))"
+            )
+            Text("/")
+            Text(
+              "\(collection.collect) 人\(CollectionType.collect.description(type))"
+            )
+            Spacer()
           }
           .font(.footnote)
+          .foregroundStyle(.secondary)
+        }
+
+        if let rating = subject?.rating {
+          if rating.total > 10 {
+            HStack {
+              if rating.score > 0 {
+                StarsView(score: Float(rating.score), size: 12)
+                Text("\(rating.score.rateDisplay)")
+                  .foregroundStyle(.orange)
+                  .font(.callout)
+                Text("(\(rating.total) 人评分)")
+                  .foregroundStyle(.secondary)
+                Spacer()
+              }
+            }.font(.footnote)
+          } else {
+            HStack {
+              StarsView(score: 0, size: 12)
+              Text("(少于 10 人评分)")
+                .foregroundStyle(.secondary)
+            }
+            .font(.footnote)
+          }
         }
       }
     }
 
-    if subject.rating.rank > 0 && subject.rating.rank < 1000 {
-      BorderView(color: .accent, padding: 5) {
-        HStack {
-          Spacer()
-          Label(
-            "Bangumi \(subject.typeEnum.name.capitalized) Ranked:",
-            systemImage: "chart.bar.xaxis"
-          )
-          Text("#\(subject.rating.rank)")
-          Spacer()
-        }
-        .font(.callout)
-        .foregroundStyle(.accent)
-      }.padding(5)
+    if let rating = subject?.rating {
+      if rating.rank > 0 && rating.rank < 1000 {
+        BorderView(color: .accent, padding: 5) {
+          HStack {
+            Spacer()
+            Label(
+              "Bangumi \(type.name.capitalized ) Ranked:",
+              systemImage: "chart.bar.xaxis"
+            )
+            Text("#\(rating.rank)")
+            Spacer()
+          }
+          .font(.callout)
+          .foregroundStyle(.accent)
+        }.padding(5)
+      }
     }
   }
 }
@@ -159,12 +186,12 @@ struct SubjectHeaderView: View {
 #Preview {
   let container = mockContainer()
 
-  @Bindable var subject = Subject.previewBook
+  let subject = Subject.previewBook
   container.mainContext.insert(subject)
 
   return ScrollView {
     LazyVStack(alignment: .leading) {
-      SubjectHeaderView(subject: subject)
+      SubjectHeaderView(subjectId: subject.subjectId)
         .modelContainer(container)
     }
   }.padding()

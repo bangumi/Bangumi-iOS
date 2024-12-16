@@ -13,6 +13,7 @@ struct SubjectCharactersView: View {
   let characters: [SubjectCharacterDTO]
 
   var body: some View {
+    let _ = Self._printChanges()
     VStack(spacing: 2) {
       HStack(alignment: .bottom) {
         Text("角色介绍")

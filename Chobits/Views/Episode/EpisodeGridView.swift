@@ -20,8 +20,8 @@ struct EpisodeGridView: View {
 
   @State private var refreshed: Bool = false
 
-  @Query private var subjects: [Subject]
-  private var subject: Subject? { subjects.first }
+  @Query private var collections: [UserSubjectCollection]
+  private var collection: UserSubjectCollection? { collections.first }
 
   @Query private var episodeMains: [Episode] = []
   @Query private var episodeSps: [Episode] = []
@@ -45,7 +45,7 @@ struct EpisodeGridView: View {
 
     _episodeMains = Query(mainDescriptor)
     _episodeSps = Query(spDescriptor)
-    _subjects = Query(filter: #Predicate<Subject> { $0.subjectId == subjectId })
+    _collections = Query(filter: #Predicate<UserSubjectCollection> { $0.subjectId == subjectId })
   }
 
   func refresh() {
@@ -86,6 +86,7 @@ struct EpisodeGridView: View {
   }
 
   var body: some View {
+    let _ = Self._printChanges()
     VStack(spacing: 2) {
       HStack(alignment: .bottom) {
         if isAuthenticated {
@@ -110,7 +111,7 @@ struct EpisodeGridView: View {
           .padding(2)
           .strikethrough(episode.collection == EpisodeCollectionType.dropped.rawValue)
           .contextMenu {
-            if isAuthenticated, subject?.userCollection != nil {
+            if isAuthenticated, collection != nil {
               ForEach(episode.collectionTypeEnum.otherTypes()) { type in
                 Button {
                   updateSingle(episode: episode, type: type)
@@ -162,7 +163,7 @@ struct EpisodeGridView: View {
             .padding(2)
             .strikethrough(episode.collection == EpisodeCollectionType.dropped.rawValue)
             .contextMenu {
-              if isAuthenticated, subject?.userCollection != nil {
+              if isAuthenticated, collection != nil {
                 ForEach(episode.collectionTypeEnum.otherTypes()) { type in
                   Button {
                     updateSingle(episode: episode, type: type)

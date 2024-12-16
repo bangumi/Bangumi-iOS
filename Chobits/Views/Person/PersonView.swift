@@ -129,7 +129,7 @@ struct PersonView: View {
                   .textSelection(.enabled)
                 Spacer()
 
-                NavigationLink(value: NavDestination.personInfobox(person)) {
+                NavigationLink(value: NavDestination.infobox("人物信息", person.infobox)) {
                   HStack {
                     InfoboxHeaderView(infobox: person.infobox)
                       .foregroundStyle(.secondary)

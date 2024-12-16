@@ -148,7 +148,8 @@ extension Character {
   }
 
   static var previewCasts: [CharacterCastDTO] {
-    let items = loadFixture(fixture: "character_casts.json", target: PagedDTO<CharacterCastDTO>.self)
+    let items = loadFixture(
+      fixture: "character_casts.json", target: PagedDTO<CharacterCastDTO>.self)
     return items.data
   }
 }

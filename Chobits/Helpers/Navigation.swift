@@ -10,8 +10,8 @@ import SwiftUI
 
 enum NavDestination: Hashable, View {
   case user(_ uid: String)
+  case infobox(_ title: String, _ infobox: Infobox)
   case subject(_ subjectId: Int)
-  case subjectInfobox(_ subject: Subject)
   case subjectRating(_ subject: Subject)
   case subjectRelationList(_ subjectId: Int)
   case subjectCharacterList(_ subjectId: Int)
@@ -21,10 +21,8 @@ enum NavDestination: Hashable, View {
   case episode(_ subjectId: Int, _ episodeId: Int)
   case episodeList(_ subjectId: Int)
   case character(_ characterId: Int)
-  case characterInfobox(_ character: Character)
   case characterCastList(_ characterId: Int)
   case person(_ personId: Int)
-  case personInfobox(_ person: Person)
   case personCastList(_ personId: Int)
   case personWorkList(_ personId: Int)
   case collectionList(_ subjectType: SubjectType)
@@ -40,10 +38,10 @@ enum NavDestination: Hashable, View {
       NoticeView()
     case .user(let uid):
       UserView(uid: uid)
+    case .infobox(let title, let infobox):
+      InfoboxView(title: title, infobox: infobox)
     case .subject(let subjectId):
       SubjectView(subjectId: subjectId)
-    case .subjectInfobox(let subject):
-      SubjectInfoboxView(subject: subject)
     case .subjectRating(let subject):
       SubjectRatingView(subject: subject)
     case .subjectRelationList(let subjectId):
@@ -62,14 +60,10 @@ enum NavDestination: Hashable, View {
       EpisodeListView(subjectId: subjectId)
     case .character(let characterId):
       CharacterView(characterId: characterId)
-    case .characterInfobox(let character):
-      CharacterInfoboxView(character: character)
     case .characterCastList(let characterId):
       CharacterCastListView(characterId: characterId)
     case .person(let personId):
       PersonView(personId: personId)
-    case .personInfobox(let person):
-      PersonInfoboxView(person: person)
     case .personCastList(let personId):
       PersonCastListView(personId: personId)
     case .personWorkList(let personId):

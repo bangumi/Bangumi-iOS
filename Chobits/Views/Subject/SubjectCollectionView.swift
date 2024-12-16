@@ -40,6 +40,7 @@ struct SubjectCollectionView: View {
   }
 
   var body: some View {
+    let _ = Self._printChanges()
     VStack(alignment: .leading) {
       BorderView(color: .linkText, padding: 5) {
         HStack {

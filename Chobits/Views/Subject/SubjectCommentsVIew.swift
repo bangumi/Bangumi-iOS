@@ -13,6 +13,7 @@ struct SubjectCommentsView: View {
   let comments: [SubjectCommentDTO]
 
   var body: some View {
+    let _ = Self._printChanges()
     VStack(spacing: 2) {
       HStack(alignment: .bottom) {
         Text("吐槽箱")
