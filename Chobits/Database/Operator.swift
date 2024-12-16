@@ -286,55 +286,6 @@ extension DatabaseOperator {
     }
   }
 
-  public func saveSubjectCharacters(_ subjectId: Int, _ items: [SubjectCharacterDTO]) throws {
-    let subject = try self.getSubject(subjectId)
-    if subject?.characters != items {
-      subject?.characters = items
-    }
-  }
-
-  public func saveSubjectOffprints(_ subjectId: Int, _ items: [SubjectRelationDTO]) throws {
-    let subject = try self.getSubject(subjectId)
-    if subject?.offprints != items {
-      subject?.offprints = items
-    }
-  }
-
-  public func saveSubjectRelations(_ subjectId: Int, _ items: [SubjectRelationDTO]) throws {
-    let subject = try self.getSubject(subjectId)
-    if subject?.relations != items {
-      subject?.relations = items
-    }
-  }
-
-  public func saveSubjectRecs(_ subjectId: Int, _ items: [SubjectRecDTO]) throws {
-    let subject = try self.getSubject(subjectId)
-    if subject?.recs != items {
-      subject?.recs = items
-    }
-  }
-
-  public func saveSubjectReviews(_ subjectId: Int, _ items: [SubjectReviewDTO]) throws {
-    let subject = try self.getSubject(subjectId)
-    if subject?.reviews != items {
-      subject?.reviews = items
-    }
-  }
-
-  public func saveSubjectTopics(_ subjectId: Int, _ items: [TopicDTO]) throws {
-    let subject = try self.getSubject(subjectId)
-    if subject?.topics != items {
-      subject?.topics = items
-    }
-  }
-
-  public func saveSubjectComments(_ subjectId: Int, _ items: [SubjectCommentDTO]) throws {
-    let subject = try self.getSubject(subjectId)
-    if subject?.comments != items {
-      subject?.comments = items
-    }
-  }
-
   public func saveEpisode(_ item: EpisodeDTO) throws {
     let _ = try self.ensureEpisode(item)
   }

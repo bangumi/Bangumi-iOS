@@ -42,28 +42,50 @@ struct SubjectView: View {
       }
 
       Task {
-        try await Chii.shared.loadSubjectCharacters(subjectId)
+        let resp = try await Chii.shared.getSubjectCharacters(subjectId, limit: 10)
+        if subject?.characters != resp.data {
+          subject?.characters = resp.data
+        }
       }
       if subject?.typeEnum == .book, subject?.series ?? false {
         Task {
-          try await Chii.shared.loadSubjectOffprints(subjectId)
+          let resp = try await Chii.shared.getSubjectRelations(
+            subjectId, offprint: true, limit: 100)
+          if subject?.offprints != resp.data {
+            subject?.offprints = resp.data
+          }
         }
       }
       Task {
-        try await Chii.shared.loadSubjectRelations(subjectId)
+        let resp = try await Chii.shared.getSubjectRelations(subjectId, limit: 10)
+        if subject?.relations != resp.data {
+          subject?.relations = resp.data
+        }
       }
       Task {
-        try await Chii.shared.loadSubjectRecs(subjectId)
+        let resp = try await Chii.shared.getSubjectRecs(subjectId, limit: 10)
+        if subject?.recs != resp.data {
+          subject?.recs = resp.data
+        }
       }
       if !isolationMode {
         Task {
-          try await Chii.shared.loadSubjectReviews(subjectId)
+          let resp = try await Chii.shared.getSubjectReviews(subjectId, limit: 5)
+          if subject?.reviews != resp.data {
+            subject?.reviews = resp.data
+          }
         }
         Task {
-          try await Chii.shared.loadSubjectTopics(subjectId)
+          let resp = try await Chii.shared.getSubjectTopics(subjectId, limit: 5)
+          if subject?.topics != resp.data {
+            subject?.topics = resp.data
+          }
         }
         Task {
-          try await Chii.shared.loadSubjectComments(subjectId)
+          let resp = try await Chii.shared.getSubjectComments(subjectId, limit: 5)
+          if subject?.comments != resp.data {
+            subject?.comments = resp.data
+          }
         }
       }
     } catch {
