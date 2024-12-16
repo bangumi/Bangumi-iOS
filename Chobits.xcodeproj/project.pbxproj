@@ -40,6 +40,10 @@
 		194E77552D0EFAF80070F5F8 /* subject_staffs.json in Resources */ = {isa = PBXBuildFile; fileRef = 194E77442D0EFAF80070F5F8 /* subject_staffs.json */; };
 		194E77562D0EFAF80070F5F8 /* user_character_collection.json in Resources */ = {isa = PBXBuildFile; fileRef = 194E77452D0EFAF80070F5F8 /* user_character_collection.json */; };
 		194E77B82D0F46360070F5F8 /* SubjectOffprintsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 194E77B72D0F46300070F5F8 /* SubjectOffprintsView.swift */; };
+		194E783B2D10337B0070F5F8 /* SubjectReviewListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 194E78392D10337B0070F5F8 /* SubjectReviewListView.swift */; };
+		194E783C2D10337B0070F5F8 /* SubjectReviewsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 194E783A2D10337B0070F5F8 /* SubjectReviewsView.swift */; };
+		194E78422D10350C0070F5F8 /* subject_reviews.json in Resources */ = {isa = PBXBuildFile; fileRef = 194E78412D10350C0070F5F8 /* subject_reviews.json */; };
+		194E78442D1035720070F5F8 /* SubjectReviewItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 194E78432D1035670070F5F8 /* SubjectReviewItemView.swift */; };
 		19671C542BDEB55D000B4D99 /* SubjectLargeRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19671C2E2BDEB55D000B4D99 /* SubjectLargeRowView.swift */; };
 		19671C552BDEB55D000B4D99 /* SubjectCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19671C302BDEB55D000B4D99 /* SubjectCollectionView.swift */; };
 		19671C562BDEB55D000B4D99 /* SubjectHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19671C312BDEB55D000B4D99 /* SubjectHeaderView.swift */; };
@@ -149,6 +153,10 @@
 		194E77472D0EFAF80070F5F8 /* user_person_collection.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = user_person_collection.json; sourceTree = "<group>"; };
 		194E77482D0EFAF80070F5F8 /* user_person_collections.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = user_person_collections.json; sourceTree = "<group>"; };
 		194E77B72D0F46300070F5F8 /* SubjectOffprintsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubjectOffprintsView.swift; sourceTree = "<group>"; };
+		194E78392D10337B0070F5F8 /* SubjectReviewListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubjectReviewListView.swift; sourceTree = "<group>"; };
+		194E783A2D10337B0070F5F8 /* SubjectReviewsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubjectReviewsView.swift; sourceTree = "<group>"; };
+		194E78412D10350C0070F5F8 /* subject_reviews.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = subject_reviews.json; sourceTree = "<group>"; };
+		194E78432D1035670070F5F8 /* SubjectReviewItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubjectReviewItemView.swift; sourceTree = "<group>"; };
 		19671C2E2BDEB55D000B4D99 /* SubjectLargeRowView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubjectLargeRowView.swift; sourceTree = "<group>"; };
 		19671C302BDEB55D000B4D99 /* SubjectCollectionView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubjectCollectionView.swift; sourceTree = "<group>"; };
 		19671C312BDEB55D000B4D99 /* SubjectHeaderView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubjectHeaderView.swift; sourceTree = "<group>"; };
@@ -224,6 +232,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		194E783D2D1033DE0070F5F8 /* Blog */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Blog; sourceTree = "<group>"; };
 		1998DCCC2CAE8A9800115E1F /* Database */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Database; sourceTree = "<group>"; };
 		1998DCDE2CAF398800115E1F /* Public */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Public; sourceTree = "<group>"; };
 		1998DCDF2CAF99FE00115E1F /* Private */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Private; sourceTree = "<group>"; };
@@ -271,13 +280,16 @@
 				194E77B72D0F46300070F5F8 /* SubjectOffprintsView.swift */,
 				1909F39B2BEB98F600E3B8F0 /* SubjectRelationsView.swift */,
 				19ECCEC02CFF167F0092F715 /* SubjectRecsView.swift */,
+				194E783A2D10337B0070F5F8 /* SubjectReviewsView.swift */,
 				1998DCFA2CB1066700115E1F /* SubjectTopicsView.swift */,
 				1998DD042CB11F9700115E1F /* SubjectCommentsVIew.swift */,
 				19ECCF382CFFDEDC0092F715 /* SubjectStaffListView.swift */,
 				1915A89F2BF09F4D003DB76D /* SubjectCharacterListView.swift */,
 				1915A89D2BF09E6B003DB76D /* SubjectRelationListView.swift */,
+				194E78392D10337B0070F5F8 /* SubjectReviewListView.swift */,
 				1998DCFC2CB10A5700115E1F /* SubjectTopicListView.swift */,
 				1998DD082CB122B600115E1F /* SubjectCommentListView.swift */,
+				194E78432D1035670070F5F8 /* SubjectReviewItemView.swift */,
 				19671C2E2BDEB55D000B4D99 /* SubjectLargeRowView.swift */,
 			);
 			path = Subject;
@@ -323,6 +335,7 @@
 				19B2A8872D0B1034001617BE /* subject_anime_episodes.json */,
 				19B2A8882D0B1034001617BE /* subject_music_episodes.json */,
 				19B2A8852D0B0EC5001617BE /* subject_music.json */,
+				194E78412D10350C0070F5F8 /* subject_reviews.json */,
 				19B87C242CFB313700CB5B63 /* user_subject_collection_anime.json */,
 				19B87C262CFB319F00CB5B63 /* user_subject_collection_book.json */,
 				1998DCFE2CB10B7900115E1F /* subject_topics.json */,
@@ -347,6 +360,7 @@
 				19B9003E2BEEE20500405F0F /* Discover */,
 				19B9003D2BEEE1C400405F0F /* Progress */,
 				197A19E52BE69B0600804B13 /* Episode */,
+				194E783D2D1033DE0070F5F8 /* Blog */,
 				19671C362BDEB55D000B4D99 /* Subject */,
 				1909F3B22BECF9A900E3B8F0 /* Character */,
 				19B9002C2BED158700405F0F /* Person */,
@@ -492,6 +506,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
+				194E783D2D1033DE0070F5F8 /* Blog */,
 				1998DCCC2CAE8A9800115E1F /* Database */,
 				1998DCDE2CAF398800115E1F /* Public */,
 				1998DCDF2CAF99FE00115E1F /* Private */,
@@ -570,6 +585,7 @@
 				194E774F2D0EFAF80070F5F8 /* subject_characters.json in Resources */,
 				194E77502D0EFAF80070F5F8 /* character_collects.json in Resources */,
 				194E77512D0EFAF80070F5F8 /* user_character_collections.json in Resources */,
+				194E78422D10350C0070F5F8 /* subject_reviews.json in Resources */,
 				194E77522D0EFAF80070F5F8 /* person_collects.json in Resources */,
 				194E77532D0EFAF80070F5F8 /* subject_recs.json in Resources */,
 				194E77542D0EFAF80070F5F8 /* subject_relations.json in Resources */,
@@ -596,6 +612,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				197A19CB2BE5E59900804B13 /* Logger.swift in Sources */,
+				194E78442D1035720070F5F8 /* SubjectReviewItemView.swift in Sources */,
 				1909F3AB2BEC406500E3B8F0 /* SubjectCharactersView.swift in Sources */,
 				197A19CF2BE5E5E700804B13 /* Notifier.swift in Sources */,
 				1909F39C2BEB98F600E3B8F0 /* SubjectRelationsView.swift in Sources */,
@@ -612,6 +629,8 @@
 				19671C692BDEB55D000B4D99 /* AuthView.swift in Sources */,
 				19ECCF0E2CFF58490092F715 /* PersonWorksView.swift in Sources */,
 				19ECCF0F2CFF58490092F715 /* PersonWorkListView.swift in Sources */,
+				194E783B2D10337B0070F5F8 /* SubjectReviewListView.swift in Sources */,
+				194E783C2D10337B0070F5F8 /* SubjectReviewsView.swift in Sources */,
 				191CF1A62CC09F25000EF819 /* BorderView.swift in Sources */,
 				194E75D62D0BE7BE0070F5F8 /* EpisodeRowView.swift in Sources */,
 				19B900402BEEE23600405F0F /* ChartView.swift in Sources */,

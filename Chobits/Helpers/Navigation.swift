@@ -9,13 +9,14 @@ import Foundation
 import SwiftUI
 
 enum NavDestination: Hashable, View {
-  case user(_ uid: String)
+  case user(_ username: String)
   case infobox(_ title: String, _ infobox: Infobox)
   case subject(_ subjectId: Int)
   case subjectRating(_ subject: Subject)
   case subjectRelationList(_ subjectId: Int)
   case subjectCharacterList(_ subjectId: Int)
   case subjectStaffList(_ subjectId: Int)
+  case subjectReviewList(_ subjectId: Int)
   case subjectTopicList(_ subjectId: Int)
   case subjectCommentList(_ subjectId: Int)
   case episode(_ subjectId: Int, _ episodeId: Int)
@@ -27,6 +28,7 @@ enum NavDestination: Hashable, View {
   case personWorkList(_ personId: Int)
   case collectionList(_ subjectType: SubjectType)
   case topic(_ topic: TopicDTO)
+  case blog(_ blogId: Int)
   case setting
   case notice
 
@@ -36,8 +38,8 @@ enum NavDestination: Hashable, View {
       SettingsView()
     case .notice:
       NoticeView()
-    case .user(let uid):
-      UserView(uid: uid)
+    case .user(let username):
+      UserView(username: username)
     case .infobox(let title, let infobox):
       InfoboxView(title: title, infobox: infobox)
     case .subject(let subjectId):
@@ -50,6 +52,8 @@ enum NavDestination: Hashable, View {
       SubjectCharacterListView(subjectId: subjectId)
     case .subjectStaffList(let subjectId):
       SubjectStaffListView(subjectId: subjectId)
+    case .subjectReviewList(let subjectId):
+      SubjectReviewListView(subjectId: subjectId)
     case .subjectTopicList(let subjectId):
       SubjectTopicListView(subjectId: subjectId)
     case .subjectCommentList(let subjectId):
@@ -72,6 +76,8 @@ enum NavDestination: Hashable, View {
       CollectionListView(subjectType: subjectType)
     case .topic(let topic):
       TopicView(topic: topic)
+    case .blog(let blogId):
+      BlogView(blogId: blogId)
     }
   }
 }

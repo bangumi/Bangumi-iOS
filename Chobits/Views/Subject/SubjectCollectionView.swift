@@ -25,17 +25,6 @@ struct SubjectCollectionView: View {
     _collections = Query(filter: #Predicate<UserSubjectCollection> { $0.subjectId == subjectId })
   }
 
-  func refresh() async {
-    if refreshed { return }
-    do {
-      try await Chii.shared.loadUserSubjectCollection(subjectId)
-    } catch {
-      Notifier.shared.alert(error: error)
-      return
-    }
-    refreshed = true
-  }
-
   var body: some View {
     let _ = Self._printChanges()
     VStack(alignment: .leading) {
@@ -56,7 +45,6 @@ struct SubjectCollectionView: View {
         }.foregroundStyle(.linkText)
       }
       .padding(5)
-      .task(refresh)
       .onTapGesture {
         edit.toggle()
       }

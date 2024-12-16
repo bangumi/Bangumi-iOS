@@ -86,6 +86,12 @@ extension Subject {
     return items.data
   }
 
+  static var previewReviews: [SubjectReviewDTO] {
+    let items = loadFixture(
+      fixture: "subject_reviews.json", target: PagedDTO<SubjectReviewDTO>.self)
+    return items.data
+  }
+
   static var previewTopics: [TopicDTO] {
     let items = loadFixture(fixture: "subject_topics.json", target: PagedDTO<TopicDTO>.self)
     return items.data

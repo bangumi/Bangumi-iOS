@@ -8,19 +8,19 @@
 import SwiftUI
 
 struct UserView: View {
-  let uid: String
+  let username: String
 
   @AppStorage("shareDomain") var shareDomain: String = ShareDomain.chii.label
 
   @State private var user: User?
 
   var shareLink: URL {
-    URL(string: "https://\(shareDomain)/user/\(uid)")!
+    URL(string: "https://\(shareDomain)/user/\(username)")!
   }
 
   func load() async {
     do {
-      user = try await Chii.shared.getUser(uid: uid)
+      user = try await Chii.shared.getUser(username)
     } catch {
       Notifier.shared.alert(error: error)
     }
@@ -84,6 +84,6 @@ struct UserView: View {
 #Preview {
   let container = mockContainer()
 
-  return UserView(uid: "873244")
+  return UserView(username: "873244")
     .modelContainer(container)
 }

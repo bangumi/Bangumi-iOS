@@ -160,12 +160,12 @@ final class SubjectDetailV1 {
   @Attribute(.unique)
   var subjectId: Int
 
-
   var characters: [SubjectCharacterDTO] = []
   var offprints: [SubjectRelationDTO] = []
   var relations: [SubjectRelationDTO] = []
   var recs: [SubjectRecDTO] = []
 
+  var reviews: [SubjectReviewDTO] = []
   var topics: [TopicDTO] = []
   var comments: [SubjectCommentDTO] = []
 
@@ -173,7 +173,6 @@ final class SubjectDetailV1 {
     self.subjectId = subjectId
   }
 }
-
 
 typealias UserSubjectCollection = UserSubjectCollectionV1
 

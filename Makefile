@@ -17,6 +17,7 @@ update_preview_data:
 	curl -sSfLo "$(PREVIEW_PATH)/subject_characters.json" https://next.bgm.tv/p1/subjects/12/characters
 	curl -sSfLo "$(PREVIEW_PATH)/subject_staffs.json" https://next.bgm.tv/p1/subjects/12/staffs
 	curl -sSfLo "$(PREVIEW_PATH)/subject_recs.json" https://next.bgm.tv/p1/subjects/12/recs
+	curl -sSfLo "$(PREVIEW_PATH)/subject_reviews.json" https://next.bgm.tv/p1/subjects/12/reviews
 	curl -sSfLo "$(PREVIEW_PATH)/subject_topics.json" https://next.bgm.tv/p1/subjects/12/topics
 	curl -sSfLo "$(PREVIEW_PATH)/subject_comments.json" https://next.bgm.tv/p1/subjects/12/comments
 	curl -sSfLo "$(PREVIEW_PATH)/user_subject_collections.json" https://next.bgm.tv/p1/users/$(UID)/collections/subjects

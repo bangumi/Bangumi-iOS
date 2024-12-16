@@ -338,3 +338,19 @@ struct SubjectRecDTO: Codable, Identifiable, Equatable {
     lhs.subject.id == rhs.subject.id
   }
 }
+
+struct SubjectReviewDTO: Codable, Identifiable, Hashable {
+  var id: Int
+  var user: User
+  var entry: SlimBlogEntryDTO
+}
+
+struct SlimBlogEntryDTO: Codable, Hashable, Identifiable {
+  var id: Int
+  var title: String
+  var summary: String
+  var replies: Int
+  var type: Int
+  var createdAt: Int
+  var updatedAt: Int
+}

@@ -18,6 +18,7 @@ struct SubjectView: View {
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
 
   @State private var refreshed: Bool = false
+  @State private var refreshing: Bool = false
 
   @Query private var subjects: [Subject]
   var subject: Subject? { subjects.first }
@@ -37,8 +38,15 @@ struct SubjectView: View {
 
   func refresh() async {
     if refreshed { return }
+    if refreshing { return }
+    refreshing = true
     do {
       try await Chii.shared.loadSubject(subjectId)
+      refreshed = true
+
+      if isAuthenticated {
+        try await Chii.shared.loadUserSubjectCollection(subjectId)
+      }
 
       Task {
         let respCharacters = try await Chii.shared.getSubjectCharacters(subjectId, limit: 10)
@@ -69,13 +77,19 @@ struct SubjectView: View {
       }
       if !isolationMode {
         Task {
+          let respReviews = try await Chii.shared.getSubjectReviews(subjectId, limit: 5)
+          if detail?.reviews != respReviews.data {
+            detail?.reviews = respReviews.data
+          }
+        }
+        Task {
           let respTopics = try await Chii.shared.getSubjectTopics(subjectId, limit: 5)
           if detail?.topics != respTopics.data {
             detail?.topics = respTopics.data
           }
         }
         Task {
-          let respComments = try await Chii.shared.getSubjectComments(subjectId, limit: 5)
+          let respComments = try await Chii.shared.getSubjectComments(subjectId, limit: 10)
           if detail?.comments != respComments.data {
             detail?.comments = respComments.data
           }
@@ -84,9 +98,9 @@ struct SubjectView: View {
 
     } catch {
       Notifier.shared.alert(error: error)
-      return
+      refreshed = true
     }
-    refreshed = true
+    refreshing = false
   }
 
   var body: some View {
@@ -133,6 +147,7 @@ struct SubjectView: View {
             SubjectRecsView(subjectId: subjectId, recs: detail.recs)
 
             if !isolationMode {
+              SubjectReviewsView(subjectId: subjectId, reviews: detail.reviews)
               SubjectTopicsView(subjectId: subjectId, topics: detail.topics)
               SubjectCommentsView(
                 subjectId: subjectId, subjectType: subject.typeEnum, comments: detail.comments)

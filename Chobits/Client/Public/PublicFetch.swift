@@ -23,11 +23,11 @@ extension Chii {
     return profile
   }
 
-  func getUser(uid: String) async throws -> User {
+  func getUser(_ username: String) async throws -> User {
     if self.mock {
       return loadFixture(fixture: "profile.json", target: User.self)
     }
-    let url = BangumiAPI.pub.build("v0/users/\(uid)")
+    let url = BangumiAPI.pub.build("v0/users/\(username)")
     let data = try await self.request(url: url, method: "GET")
     let user: User = try self.decodeResponse(data)
     return user

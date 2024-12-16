@@ -64,8 +64,7 @@ struct SubjectCommentsView: View {
             Text(comment.comment).font(.footnote)
           }
           Spacer()
-        }
-        .padding(.top, 2)
+        }.padding(.top, 2)
       }
     }.animation(.default, value: comments)
   }

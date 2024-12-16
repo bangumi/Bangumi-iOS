@@ -458,4 +458,21 @@ extension Chii {
     let resp: PagedDTO<SubjectRecDTO> = try self.decodeResponse(data)
     return resp
   }
+
+  func getSubjectReviews(_ subjectId: Int, limit: Int = 5, offset: Int = 0) async throws
+    -> PagedDTO<SubjectReviewDTO>
+  {
+    if self.mock {
+      return loadFixture(fixture: "subject_reviews.json", target: PagedDTO<SubjectReviewDTO>.self)
+    }
+    let url = BangumiAPI.priv.build("p1/subjects/\(subjectId)/reviews")
+    let queryItems: [URLQueryItem] = [
+      URLQueryItem(name: "limit", value: String(limit)),
+      URLQueryItem(name: "offset", value: String(offset)),
+    ]
+    let pageURL = url.appending(queryItems: queryItems)
+    let data = try await self.request(url: pageURL, method: "GET")
+    let resp: PagedDTO<SubjectReviewDTO> = try self.decodeResponse(data)
+    return resp
+  }
 }
