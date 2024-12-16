@@ -41,31 +41,43 @@ struct SubjectView: View {
 
       Task {
         let respCharacters = try await Chii.shared.getSubjectCharacters(subjectId, limit: 10)
-        subject?.characters = respCharacters.data
+        if subject?.characters != respCharacters.data {
+          subject?.characters = respCharacters.data
+        }
       }
       if subject?.typeEnum == .book, subject?.series ?? false {
         Task {
           let respOffprints = try await Chii.shared.getSubjectRelations(
             subjectId, offprint: true, limit: 100)
-          subject?.offprints = respOffprints.data
+          if subject?.offprints != respOffprints.data {
+            subject?.offprints = respOffprints.data
+          }
         }
       }
       Task {
         let respRelations = try await Chii.shared.getSubjectRelations(subjectId, limit: 10)
-        subject?.relations = respRelations.data
+        if subject?.relations != respRelations.data {
+          subject?.relations = respRelations.data
+        }
       }
       Task {
         let respRecs = try await Chii.shared.getSubjectRecs(subjectId, limit: 10)
-        subject?.recs = respRecs.data
+        if subject?.recs != respRecs.data {
+          subject?.recs = respRecs.data
+        }
       }
       if !isolationMode {
         Task {
           let respTopics = try await Chii.shared.getSubjectTopics(subjectId, limit: 5)
-          subject?.topics = respTopics.data
+          if subject?.topics != respTopics.data {
+            subject?.topics = respTopics.data
+          }
         }
         Task {
           let respComments = try await Chii.shared.getSubjectComments(subjectId, limit: 5)
-          subject?.comments = respComments.data
+          if subject?.comments != respComments.data {
+            subject?.comments = respComments.data
+          }
         }
       }
 
@@ -84,9 +96,9 @@ struct SubjectView: View {
           LazyVStack(alignment: .leading) {
             SubjectHeaderView(subjectId: subjectId)
 
-//            if isAuthenticated {
-//              SubjectCollectionView(subjectId: subjectId)
-//            }
+            if isAuthenticated {
+              SubjectCollectionView(subjectId: subjectId)
+            }
 
             if subject.typeEnum == .anime || subject.typeEnum == .real {
               EpisodeGridView(subjectId: subjectId)

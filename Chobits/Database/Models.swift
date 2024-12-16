@@ -125,41 +125,42 @@ final class SubjectV1: Searchable {
   }
 
   func update(_ item: SubjectDTO) {
-    self.airtime = item.airtime
-    self.collection = item.collection
-    self.eps = item.eps
-    self.images = item.images
-    self.infobox = item.infobox.clean()
-    self.info = item.info
-    self.locked = item.locked
-    self.metaTags = item.metaTags
-    self.tags = item.tags
-    self.name = item.name
-    self.nameCN = item.nameCN
-    self.nsfw = item.nsfw
-    self.platform = item.platform
-    self.rating = item.rating
-    self.series = item.series
-    self.summary = item.summary
-    self.type = item.type.rawValue
-    self.volumes = item.volumes
+    if self.airtime != item.airtime { self.airtime = item.airtime }
+    if self.collection != item.collection { self.collection = item.collection }
+    if self.eps != item.eps { self.eps = item.eps }
+    if self.images != item.images { self.images = item.images }
+    if self.infobox != item.infobox.clean() { self.infobox = item.infobox.clean() }
+    if self.info != item.info { self.info = item.info }
+    if self.locked != item.locked { self.locked = item.locked }
+    if self.metaTags != item.metaTags { self.metaTags = item.metaTags }
+    if self.tags != item.tags { self.tags = item.tags }
+    if self.name != item.name { self.name = item.name }
+    if self.nameCN != item.nameCN { self.nameCN = item.nameCN }
+    if self.nsfw != item.nsfw { self.nsfw = item.nsfw }
+    if self.platform != item.platform { self.platform = item.platform }
+    if self.rating != item.rating { self.rating = item.rating }
+    if self.series != item.series { self.series = item.series }
+    if self.summary != item.summary { self.summary = item.summary }
+    if self.type != item.type.rawValue { self.type = item.type.rawValue }
+    if self.volumes != item.volumes { self.volumes = item.volumes }
   }
 
   func update(_ item: SubjectDTOV0) {
-    self.collection = item.collection
-    self.eps = item.eps
-    self.images = item.images
-    self.locked = item.locked
-    self.metaTags = item.metaTags
-    self.tags = item.tags
-    self.name = item.name
-    self.nameCN = item.nameCn
-    self.nsfw = item.nsfw
-    self.rating = SubjectRating(item.rating)
-    self.series = item.series
-    self.summary = item.summary
-    self.type = item.type.rawValue
-    self.volumes = item.volumes
+    if self.collection != item.collection { self.collection = item.collection }
+    if self.eps != item.eps { self.eps = item.eps }
+    if self.images != item.images { self.images = item.images }
+    if self.locked != item.locked { self.locked = item.locked }
+    if self.metaTags != item.metaTags { self.metaTags = item.metaTags }
+    if self.tags != item.tags { self.tags = item.tags }
+    if self.name != item.name { self.name = item.name }
+    if self.nameCN != item.nameCn { self.nameCN = item.nameCn }
+    if self.nsfw != item.nsfw { self.nsfw = item.nsfw }
+    let newRating = SubjectRating(item.rating)
+    if self.rating != newRating { self.rating = newRating }
+    if self.series != item.series { self.series = item.series }
+    if self.summary != item.summary { self.summary = item.summary }
+    if self.type != item.type.rawValue { self.type = item.type.rawValue }
+    if self.volumes != item.volumes { self.volumes = item.volumes }
   }
 }
 
@@ -212,15 +213,18 @@ final class UserSubjectCollectionV1 {
   }
 
   func update(_ item: UserSubjectCollectionDTO) {
-    self.rate = item.rate
-    self.type = item.type.rawValue
-    self.comment = item.comment
-    self.tags = item.tags
-    self.epStatus = item.epStatus
-    self.volStatus = item.volStatus
-    self.priv = item.`private`
-    self.updatedAt = Date(timeIntervalSince1970: TimeInterval(item.updatedAt))
-    self.subjectType = item.subject.type.rawValue
+    if self.rate != item.rate { self.rate = item.rate }
+    if self.type != item.type.rawValue { self.type = item.type.rawValue }
+    if self.comment != item.comment { self.comment = item.comment }
+    if self.tags != item.tags { self.tags = item.tags }
+    if self.epStatus != item.epStatus { self.epStatus = item.epStatus }
+    if self.volStatus != item.volStatus { self.volStatus = item.volStatus }
+    if self.priv != item.`private` { self.priv = item.`private` }
+    let newDate = Date(timeIntervalSince1970: TimeInterval(item.updatedAt))
+    if self.updatedAt != newDate { self.updatedAt = newDate }
+    if self.subjectType != item.subject.type.rawValue {
+      self.subjectType = item.subject.type.rawValue
+    }
   }
 }
 
@@ -266,16 +270,16 @@ final class CharacterV1: Searchable {
   }
 
   func update(_ item: CharacterDTO) {
-    self.collects = item.collects
-    self.comment = item.comment
-    self.images = item.images
-    self.infobox = item.infobox.clean()
-    self.lock = item.lock
-    self.name = item.name
-    self.nameCN = item.nameCN
-    self.nsfw = item.nsfw
-    self.role = item.role.rawValue
-    self.summary = item.summary
+    if self.collects != item.collects { self.collects = item.collects }
+    if self.comment != item.comment { self.comment = item.comment }
+    if self.images != item.images { self.images = item.images }
+    if self.infobox != item.infobox.clean() { self.infobox = item.infobox.clean() }
+    if self.lock != item.lock { self.lock = item.lock }
+    if self.name != item.name { self.name = item.name }
+    if self.nameCN != item.nameCN { self.nameCN = item.nameCN }
+    if self.nsfw != item.nsfw { self.nsfw = item.nsfw }
+    if self.role != item.role.rawValue { self.role = item.role.rawValue }
+    if self.summary != item.summary { self.summary = item.summary }
   }
 }
 
@@ -294,7 +298,8 @@ final class UserCharacterCollectionV1 {
   }
 
   func update(_ item: UserCharacterCollectionDTO) {
-    self.createdAt = Date(timeIntervalSince1970: TimeInterval(item.createdAt))
+    let newDate = Date(timeIntervalSince1970: TimeInterval(item.createdAt))
+    if self.createdAt != newDate { self.createdAt = newDate }
   }
 }
 
@@ -343,17 +348,18 @@ final class PersonV1: Searchable {
   }
 
   func update(_ item: PersonDTO) {
-    self.career = item.career.map(\.rawValue)
-    self.collects = item.collects
-    self.comment = item.comment
-    self.images = item.images
-    self.infobox = item.infobox.clean()
-    self.lock = item.lock
-    self.name = item.name
-    self.nameCN = item.nameCN
-    self.nsfw = item.nsfw
-    self.summary = item.summary
-    self.type = item.type.rawValue
+    let newCareer = item.career.map(\.rawValue)
+    if self.career != newCareer { self.career = newCareer }
+    if self.collects != item.collects { self.collects = item.collects }
+    if self.comment != item.comment { self.comment = item.comment }
+    if self.images != item.images { self.images = item.images }
+    if self.infobox != item.infobox.clean() { self.infobox = item.infobox.clean() }
+    if self.lock != item.lock { self.lock = item.lock }
+    if self.name != item.name { self.name = item.name }
+    if self.nameCN != item.nameCN { self.nameCN = item.nameCN }
+    if self.nsfw != item.nsfw { self.nsfw = item.nsfw }
+    if self.summary != item.summary { self.summary = item.summary }
+    if self.type != item.type.rawValue { self.type = item.type.rawValue }
   }
 
 }
@@ -373,7 +379,8 @@ final class UserPersonCollectionV1 {
   }
 
   func update(_ item: UserPersonCollectionDTO) {
-    self.createdAt = Date(timeIntervalSince1970: TimeInterval(item.createdAt))
+    let newDate = Date(timeIntervalSince1970: TimeInterval(item.createdAt))
+    if self.createdAt != newDate { self.createdAt = newDate }
   }
 }
 
@@ -505,16 +512,16 @@ final class EpisodeV1 {
   }
 
   func update(_ item: EpisodeDTO) {
-    self.subjectId = item.subjectID
-    self.type = item.type.rawValue
-    self.sort = item.sort
-    self.name = item.name
-    self.nameCN = item.nameCN
-    self.duration = item.duration
-    self.airdate = item.airdate
-    self.comment = item.comment
-    self.desc = item.desc
-    self.disc = item.disc
-    self.lock = item.lock
+    if self.subjectId != item.subjectID { self.subjectId = item.subjectID }
+    if self.type != item.type.rawValue { self.type = item.type.rawValue }
+    if self.sort != item.sort { self.sort = item.sort }
+    if self.name != item.name { self.name = item.name }
+    if self.nameCN != item.nameCN { self.nameCN = item.nameCN }
+    if self.duration != item.duration { self.duration = item.duration }
+    if self.airdate != item.airdate { self.airdate = item.airdate }
+    if self.comment != item.comment { self.comment = item.comment }
+    if self.desc != item.desc { self.desc = item.desc }
+    if self.disc != item.disc { self.disc = item.disc }
+    if self.lock != item.lock { self.lock = item.lock }
   }
 }

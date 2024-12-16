@@ -8,7 +8,7 @@
 import Foundation
 import OSLog
 
-struct SubjectImages: Codable {
+struct SubjectImages: Codable, Hashable {
   var large: String
   var common: String
   var medium: String
@@ -16,7 +16,7 @@ struct SubjectImages: Codable {
   var grid: String
 }
 
-struct Images: Codable {
+struct Images: Codable, Hashable {
   var large: String
   var medium: String
   var small: String
@@ -76,13 +76,9 @@ enum UserGroup: Int, Codable {
   }
 }
 
-struct Tag: Codable, Equatable {
+struct Tag: Codable, Hashable {
   var name: String
   var count: Int
-
-  static func == (lhs: Tag, rhs: Tag) -> Bool {
-    return lhs.name == rhs.name && lhs.count == rhs.count
-  }
 }
 
 struct Weekday: Codable {
@@ -92,7 +88,7 @@ struct Weekday: Codable {
   var id: Int
 }
 
-struct SubjectAirtime: Codable {
+struct SubjectAirtime: Codable, Hashable {
   var date: String
   var month: Int
   var weekday: Int
@@ -126,7 +122,7 @@ extension SubjectCollection {
   }
 }
 
-struct SubjectPlatform: Codable {
+struct SubjectPlatform: Codable, Hashable {
   var alias: String
   var enableHeader: Bool?
   var id: Int
@@ -150,7 +146,7 @@ struct SubjectPlatform: Codable {
   }
 }
 
-struct SubjectRating: Codable {
+struct SubjectRating: Codable, Hashable {
   var count: [Int]
   var total: Int
   var score: Float

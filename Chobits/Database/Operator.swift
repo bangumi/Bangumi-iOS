@@ -281,7 +281,9 @@ extension DatabaseOperator {
   public func saveUserSubjectCollection(_ item: UserSubjectCollectionDTO) throws {
     let subject = try self.ensureSubject(item.subject)
     let collection = try self.ensureUserSubjectCollection(item)
-    collection.subject = subject
+    if collection.subject == nil {
+      collection.subject = subject
+    }
   }
 
   public func saveEpisode(_ item: EpisodeDTO) throws {
@@ -290,7 +292,9 @@ extension DatabaseOperator {
 
   public func saveEpisode(_ item: EpisodeCollectionDTO) throws {
     let episode = try self.ensureEpisode(item.episode)
-    episode.collection = item.type.rawValue
+    if episode.collection != item.type.rawValue {
+      episode.collection = item.type.rawValue
+    }
   }
 
   public func saveCharacter(_ item: CharacterDTO) throws {
@@ -304,12 +308,16 @@ extension DatabaseOperator {
   public func saveUserCharacterCollection(_ item: UserCharacterCollectionDTO) throws {
     let character = try self.ensureCharacter(item.character)
     let collection = try self.ensureUserCharacterCollection(item)
-    collection.character = character
+    if collection.character == nil {
+      collection.character = character
+    }
   }
 
   public func saveUserPersonCollection(_ item: UserPersonCollectionDTO) throws {
     let person = try self.ensurePerson(item.person)
     let collection = try self.ensureUserPersonCollection(item)
-    collection.person = person
+    if collection.person == nil {
+      collection.person = person
+    }
   }
 }
