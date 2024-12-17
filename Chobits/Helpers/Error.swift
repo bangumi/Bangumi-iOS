@@ -48,7 +48,7 @@ enum ChiiError: Error, CustomStringConvertible {
   }
 
   init(notice: String) {
-    self = .generic(notice)
+    self = .notice(notice)
   }
 
   init(ignore: String) {
@@ -85,7 +85,7 @@ enum ChiiError: Error, CustomStringConvertible {
     case .generic(let message):
       return message
     case .notice(let message):
-      return message
+      return "Error: \(message)"
     case .ignore(let message):
       return "Ignore Error: \(message)"
     }
