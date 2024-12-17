@@ -82,7 +82,7 @@ struct SubjectView: View {
           }
         }
         Task {
-          let resp = try await Chii.shared.getSubjectComments(subjectId, limit: 5)
+          let resp = try await Chii.shared.getSubjectComments(subjectId, limit: 10)
           if subject?.comments != resp.data {
             subject?.comments = resp.data
           }
