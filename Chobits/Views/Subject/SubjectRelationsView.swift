@@ -75,19 +75,23 @@ struct SubjectRelationsView: View {
             .lineLimit(1)
             .font(.caption)
             NavigationLink(value: NavDestination.subject(relation.subject.id)) {
-              ImageView(
-                img: relation.subject.images?.common,
-                width: 90, height: 120,
-                type: .subject
-              ) {
-              } caption: {
-                if let ctype = collections[relation.subject.id] {
+              if let ctype = collections[relation.subject.id] {
+                ImageView(
+                  img: relation.subject.images?.common,
+                  width: 90, height: 120, type: .subject
+                ) {
+                } caption: {
                   HStack {
                     Image(systemName: ctype.icon)
                     Spacer()
                     Text(ctype.description(relation.subject.type))
                   }.padding(.horizontal, 4)
                 }
+              } else {
+                ImageView(
+                  img: relation.subject.images?.common,
+                  width: 90, height: 120, type: .subject
+                )
               }
             }.buttonStyle(.navLink)
             Text(relation.subject.name)

@@ -50,18 +50,23 @@ struct SubjectOffprintsView: View {
         ForEach(offprints) { offprint in
           NavigationLink(value: NavDestination.subject(offprint.subject.id)) {
             VStack {
-              ImageView(
-                img: offprint.subject.images?.common,
-                width: 60, height: 80, type: .subject
-              ) {
-              } caption: {
-                if let ctype = collections[offprint.subject.id] {
+              if let ctype = collections[offprint.subject.id] {
+                ImageView(
+                  img: offprint.subject.images?.common,
+                  width: 60, height: 80, type: .subject
+                ) {
+                } caption: {
                   HStack {
                     Image(systemName: ctype.icon)
                     Spacer()
                     Text(ctype.description(offprint.subject.type))
                   }.padding(.horizontal, 4)
                 }
+              } else {
+                ImageView(
+                  img: offprint.subject.images?.common,
+                  width: 60, height: 80, type: .subject
+                )
               }
               Spacer()
             }
