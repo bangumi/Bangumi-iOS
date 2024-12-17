@@ -144,10 +144,13 @@ extension Chii {
       response = sresponse
     } catch let error as NSError where error.domain == NSURLErrorDomain {
       Logger.api.error("request NSURLErrorDomain: \(error)")
-      if error.code == NSURLErrorCancelled {
-        throw ChiiError(ignore: "NSURLErrorCancelled")
-      } else {
-        throw ChiiError(request: "NSURLErrorDomain: \(error)")
+      switch error.code {
+      case NSURLErrorNotConnectedToInternet:
+        throw ChiiError(notice: "没有网络连接，请检查网络设置或权限后重试")
+      case NSURLErrorCancelled:
+        throw ChiiError(ignore: "请求已取消")
+      default:
+        throw ChiiError(request: "\(error)")
       }
     } catch {
       Logger.api.error("request error: \(error)")

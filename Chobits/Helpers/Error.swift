@@ -36,6 +36,7 @@ enum ChiiError: Error, CustomStringConvertible {
   case notAuthorized(String)
   case notFound(String)
   case generic(String)
+  case notice(String)
   case ignore(String)
 
   init(request: String) {
@@ -44,6 +45,10 @@ enum ChiiError: Error, CustomStringConvertible {
 
   init(message: String) {
     self = .generic(message)
+  }
+
+  init(notice: String) {
+    self = .generic(notice)
   }
 
   init(ignore: String) {
@@ -78,6 +83,8 @@ enum ChiiError: Error, CustomStringConvertible {
     case .notFound(let error):
       return "Not Found!\n\(error)"
     case .generic(let message):
+      return message
+    case .notice(let message):
       return message
     case .ignore(let message):
       return "Ignore Error: \(message)"

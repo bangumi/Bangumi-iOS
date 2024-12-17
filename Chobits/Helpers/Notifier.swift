@@ -20,6 +20,9 @@ class Notifier {
 
   func alert(error: ChiiError) {
     switch error {
+    case .notice:
+      Logger.app.info("notice: \(error)")
+      self.notify(message: error.description)
     case .ignore:
       Logger.app.warning("ignore error: \(error)")
     default:
