@@ -144,8 +144,25 @@ struct ChiiProgressView: View {
               await loadCounts()
             }
           }
-          ChiiProgressListView(subjectType: subjectType, search: search)
-            .padding(.horizontal, 8)
+          if collectionsUpdatedAt > 0 {
+            ChiiProgressListView(subjectType: subjectType, search: search)
+              .padding(.horizontal, 8)
+          } else {
+            if refreshing {
+              ProgressView()
+                .padding()
+                .frame(height: 40)
+            } else {
+              VStack {
+                Spacer()
+                Text("没有收藏数据，请下拉刷新")
+                  .font(.title3)
+                  .foregroundColor(.secondary)
+                Spacer()
+              }
+              .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
+          }
         }
         .searchable(text: $search)
         .animation(.default, value: subjectType)
