@@ -198,6 +198,19 @@ final class UserSubjectCollectionV1 {
     typeEnum.message(type: subjectTypeEnum)
   }
 
+  init(_ subjectId: Int) {
+    self.subjectId = subjectId
+    self.rate = 0
+    self.type = 0
+    self.subjectType = 0
+    self.comment = ""
+    self.tags = []
+    self.epStatus = 0
+    self.volStatus = 0
+    self.priv = false
+    self.updatedAt = Date(timeIntervalSince1970: 0)
+  }
+
   init(_ item: UserSubjectCollectionDTO) {
     self.subjectId = item.subject.id
     self.rate = item.rate

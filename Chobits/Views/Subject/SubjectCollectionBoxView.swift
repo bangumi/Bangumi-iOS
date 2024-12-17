@@ -10,11 +10,10 @@ import SwiftData
 import SwiftUI
 
 struct SubjectCollectionBoxView: View {
-  let collection: UserSubjectCollection?
-
   @Environment(\.modelContext) var modelContext
   @Environment(\.dismiss) private var dismiss
   @Environment(Subject.self) var subject
+  @Environment(UserSubjectCollection.self) var collection
 
   @State private var collectionType: CollectionType = .do
   @State private var rate: Int = 0
@@ -25,24 +24,12 @@ struct SubjectCollectionBoxView: View {
 
   @State private var updating: Bool = false
 
-  init(collection: UserSubjectCollection?) {
-    self.collection = collection
-    if let collection = collection {
-      self.collectionType = collection.typeEnum
-      self.rate = collection.rate
-      self.comment = collection.comment
-      self.priv = collection.priv
-      self.tags = collection.tags
-      self.tagsInput = collection.tags.joined(separator: " ")
-    }
-  }
-
   var recommendedTags: [String] {
     return subject.tags.sorted(by: { $0.count > $1.count }).prefix(15).map { $0.name }
   }
 
   var buttonText: String {
-    if collection == nil {
+    if collection.typeEnum == .none {
       return priv ? "悄悄地添加" : "添加"
     } else {
       return priv ? "悄悄地更新" : "更新"
@@ -57,6 +44,15 @@ struct SubjectCollectionBoxView: View {
       return "\(rate.ratingDescription) \(rate)"
     }
     return ""
+  }
+
+  func load() {
+    self.collectionType = collection.typeEnum
+    self.rate = collection.rate
+    self.comment = collection.comment
+    self.priv = collection.priv
+    self.tags = collection.tags
+    self.tagsInput = collection.tags.joined(separator: " ")
   }
 
   func update() {
@@ -98,7 +94,7 @@ struct SubjectCollectionBoxView: View {
           .frame(width: 40)
           .sensoryFeedback(.selection, trigger: priv)
         }.padding(.vertical, 5)
-        if let collection = collection {
+        if collection.updatedAt.timeIntervalSince1970 > 0 {
           Text("上次更新：\(collection.updatedAt.formatted(date: .complete, time: .complete))")
             .font(.caption)
             .foregroundStyle(.secondary)
@@ -183,6 +179,7 @@ struct SubjectCollectionBoxView: View {
         }
         Spacer()
       }
+      .onAppear(perform: load)
       .disabled(updating)
       .animation(.default, value: priv)
       .animation(.default, value: rate)
@@ -201,7 +198,8 @@ struct SubjectCollectionBoxView: View {
   container.mainContext.insert(subject)
   collection.subject = subject
 
-  return SubjectCollectionBoxView(collection: collection)
+  return SubjectCollectionBoxView()
     .environment(subject)
+    .environment(collection)
     .modelContainer(container)
 }

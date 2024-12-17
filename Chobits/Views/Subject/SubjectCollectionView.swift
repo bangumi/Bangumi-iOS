@@ -58,7 +58,8 @@ struct SubjectCollectionDetailView: View {
       .sheet(
         isPresented: $edit,
         content: {
-          SubjectCollectionBoxView(collection: collection)
+          SubjectCollectionBoxView()
+            .environment(collection)
             .presentationDragIndicator(.visible)
             .presentationDetents(.init([.medium, .large]))
         }
@@ -103,7 +104,8 @@ struct SubjectCollectionEmptyView: View {
       .sheet(
         isPresented: $edit,
         content: {
-          SubjectCollectionBoxView(collection: nil)
+          SubjectCollectionBoxView()
+            .environment(UserSubjectCollection(subject.subjectId))
             .presentationDragIndicator(.visible)
             .presentationDetents(.init([.medium, .large]))
         }
