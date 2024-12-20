@@ -12,6 +12,7 @@ import SwiftUI
 struct ChiiProgressView: View {
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
   @AppStorage("collectionsUpdatedAt") var collectionsUpdatedAt: Int = 0
+  @AppStorage("progressMode") var progressMode: String = ProgressMode.list.label
 
   @Environment(\.modelContext) var modelContext
 
@@ -104,92 +105,102 @@ struct ChiiProgressView: View {
   var body: some View {
     VStack {
       if isAuthenticated {
-        ScrollView {
-          if refreshing {
-            if collectionsUpdatedAt == 0 {
-              HStack {
-                ProgressView(value: refreshProgress)
-              }
-              .padding()
-              .frame(height: 40)
-            } else {
-              HStack {
-                Spacer()
-                ProgressView()
-                Spacer()
-              }.frame(height: 40)
-            }
-          }
-          Picker("Subject Type", selection: $subjectType) {
-            ForEach(SubjectType.progressTypes) { type in
-              Text("\(type.description)(\(counts[type, default: 0]))").tag(type)
-            }
-          }
-          .padding(.horizontal, 8)
-          .pickerStyle(.segmented)
-          .onAppear {
-            if !counts.isEmpty {
-              return
-            }
-            Task {
-              await loadCounts()
-              refreshing = true
-              await refresh()
-              refreshing = false
-              await loadCounts()
-            }
-          }
-          .onChange(of: subjectType) {
-            Task {
-              await loadCounts()
-            }
-          }
-          if collectionsUpdatedAt > 0 {
-            ChiiProgressListView(subjectType: subjectType, search: search)
-              .padding(.horizontal, 8)
-          } else {
+        GeometryReader { geo in
+          ScrollView {
             if refreshing {
-              ProgressView()
+              if collectionsUpdatedAt == 0 {
+                HStack {
+                  ProgressView(value: refreshProgress)
+                }
                 .padding()
                 .frame(height: 40)
-            } else {
-              VStack {
-                Spacer()
-                Text("没有收藏数据，请下拉刷新")
-                  .font(.title3)
-                  .foregroundColor(.secondary)
-                Spacer()
+              } else {
+                HStack {
+                  Spacer()
+                  ProgressView()
+                  Spacer()
+                }.frame(height: 40)
               }
-              .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
+            Picker("Subject Type", selection: $subjectType) {
+              ForEach(SubjectType.progressTypes) { type in
+                Text("\(type.description)(\(counts[type, default: 0]))").tag(type)
+              }
+            }
+            .padding(.horizontal, 8)
+            .pickerStyle(.segmented)
+            .onAppear {
+              if !counts.isEmpty {
+                return
+              }
+              Task {
+                await loadCounts()
+                refreshing = true
+                await refresh()
+                refreshing = false
+                await loadCounts()
+              }
+            }
+            .onChange(of: subjectType) {
+              Task {
+                await loadCounts()
+              }
+            }
+            if collectionsUpdatedAt > 0 {
+              switch ProgressMode(progressMode) {
+              case .list:
+                ProgressListView(subjectType: subjectType, search: search)
+                  .padding(.horizontal, 8)
+              case .tile:
+                ProgressTileView(
+                  subjectType: subjectType, search: search, width: geo.size.width
+                )
+                .padding(.horizontal, 8)
+              }
+            } else {
+              if refreshing {
+                ProgressView()
+                  .padding()
+                  .frame(height: 40)
+              } else {
+                VStack {
+                  Spacer()
+                  Text("没有收藏数据，请下拉刷新")
+                    .font(.title3)
+                    .foregroundColor(.secondary)
+                  Spacer()
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+              }
             }
           }
-        }
-        .searchable(text: $search)
-        .animation(.default, value: subjectType)
-        .animation(.default, value: counts)
-        .refreshable {
-          if refreshing {
-            return
+          .searchable(text: $search)
+          .animation(.default, value: subjectType)
+          .animation(.default, value: counts)
+          .refreshable {
+            if refreshing {
+              return
+            }
+            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+            await refresh()
+            await loadCounts()
           }
-          UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-          await refresh()
-          await loadCounts()
-        }
-        .navigationTitle("进度管理")
-        .toolbarTitleDisplayMode(.inlineLarge)
-        .toolbar {
-          ToolbarItem(placement: .topBarTrailing) {
-            Menu {
-              Button("刷新所有收藏", role: .destructive) {
-                Task {
-                  refreshing = true
-                  await refresh(force: true)
-                  refreshing = false
-                  await loadCounts()
+          .navigationTitle("进度管理")
+          .toolbarTitleDisplayMode(.inlineLarge)
+          .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+              Menu {
+                Button("刷新所有收藏", role: .destructive) {
+                  Task {
+                    refreshing = true
+                    await refresh(force: true)
+                    refreshing = false
+                    await loadCounts()
+                  }
                 }
+              } label: {
+                Image(systemName: "ellipsis.circle")
               }
-            } label: {
-              Image(systemName: "ellipsis.circle")
             }
           }
         }
@@ -204,40 +215,5 @@ struct ChiiProgressView: View {
           }
       }
     }
-  }
-}
-struct ChiiProgressListView: View {
-  let subjectType: SubjectType
-  let search: String
-
-  @Environment(\.modelContext) var modelContext
-
-  @Query var collections: [UserSubjectCollection]
-
-  init(subjectType: SubjectType, search: String) {
-    self.subjectType = subjectType
-    self.search = search
-
-    let stype = subjectType.rawValue
-    let doingType = CollectionType.do.rawValue
-    let descriptor = FetchDescriptor<UserSubjectCollection>(
-      predicate: #Predicate<UserSubjectCollection> {
-        (stype == 0 || $0.subjectType == stype) && $0.type == doingType
-          && (search == "" || $0.alias.localizedStandardContains(search))
-      },
-      sortBy: [
-        SortDescriptor(\.updatedAt, order: .reverse)
-      ])
-    self._collections = Query(descriptor)
-  }
-
-  var body: some View {
-    LazyVStack(alignment: .leading) {
-      ForEach(collections) { collection in
-        CardView {
-          ProgressRowView(subjectId: collection.subjectId).environment(collection)
-        }
-      }
-    }.animation(.default, value: collections)
   }
 }

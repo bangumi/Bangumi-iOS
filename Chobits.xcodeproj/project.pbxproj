@@ -17,6 +17,8 @@
 		1918813F2CD0803100B4DAD7 /* PhoneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1918813E2CD0802E00B4DAD7 /* PhoneView.swift */; };
 		191881412CD0804800B4DAD7 /* PadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 191881402CD0804600B4DAD7 /* PadView.swift */; };
 		191CF1A62CC09F25000EF819 /* BorderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 191CF1A52CC09F1E000EF819 /* BorderView.swift */; };
+		192E30392D15AA8700A6A486 /* ProgressTileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 192E30382D15AA8700A6A486 /* ProgressTileView.swift */; };
+		192E305E2D15BF2300A6A486 /* WaterfallGrid in Frameworks */ = {isa = PBXBuildFile; productRef = 192E305D2D15BF2300A6A486 /* WaterfallGrid */; };
 		1930110E2C00F08A008DCEBF /* CollectionSubjectTypeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1930110D2C00F08A008DCEBF /* CollectionSubjectTypeView.swift */; };
 		1943C5082C08CD2E0067ACDB /* StarsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1943C5072C08CD2E0067ACDB /* StarsView.swift */; };
 		194484232BF4C68B002EC925 /* CollectionListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 194484222BF4C68B002EC925 /* CollectionListView.swift */; };
@@ -52,7 +54,7 @@
 		19671C5B2BDEB55D000B4D99 /* CalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19671C372BDEB55D000B4D99 /* CalendarView.swift */; };
 		19671C5D2BDEB55D000B4D99 /* ImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19671C392BDEB55D000B4D99 /* ImageView.swift */; };
 		19671C5E2BDEB55D000B4D99 /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19671C3A2BDEB55D000B4D99 /* LoadingView.swift */; };
-		19671C5F2BDEB55D000B4D99 /* ProgressRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19671C3B2BDEB55D000B4D99 /* ProgressRowView.swift */; };
+		19671C5F2BDEB55D000B4D99 /* ProgressListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19671C3B2BDEB55D000B4D99 /* ProgressListView.swift */; };
 		19671C602BDEB55D000B4D99 /* Basis.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19671C3D2BDEB55D000B4D99 /* Basis.swift */; };
 		19671C622BDEB55D000B4D99 /* Core.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19671C3F2BDEB55D000B4D99 /* Core.swift */; };
 		19671C662BDEB55D000B4D99 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 19671C442BDEB55D000B4D99 /* Preview Assets.xcassets */; };
@@ -130,6 +132,7 @@
 		1918813E2CD0802E00B4DAD7 /* PhoneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneView.swift; sourceTree = "<group>"; };
 		191881402CD0804600B4DAD7 /* PadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PadView.swift; sourceTree = "<group>"; };
 		191CF1A52CC09F1E000EF819 /* BorderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BorderView.swift; sourceTree = "<group>"; };
+		192E30382D15AA8700A6A486 /* ProgressTileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressTileView.swift; sourceTree = "<group>"; };
 		1930110D2C00F08A008DCEBF /* CollectionSubjectTypeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionSubjectTypeView.swift; sourceTree = "<group>"; };
 		1943C5072C08CD2E0067ACDB /* StarsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StarsView.swift; sourceTree = "<group>"; };
 		194484222BF4C68B002EC925 /* CollectionListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionListView.swift; sourceTree = "<group>"; };
@@ -165,7 +168,7 @@
 		19671C372BDEB55D000B4D99 /* CalendarView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CalendarView.swift; sourceTree = "<group>"; };
 		19671C392BDEB55D000B4D99 /* ImageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageView.swift; sourceTree = "<group>"; };
 		19671C3A2BDEB55D000B4D99 /* LoadingView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
-		19671C3B2BDEB55D000B4D99 /* ProgressRowView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProgressRowView.swift; sourceTree = "<group>"; };
+		19671C3B2BDEB55D000B4D99 /* ProgressListView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProgressListView.swift; sourceTree = "<group>"; };
 		19671C3D2BDEB55D000B4D99 /* Basis.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Basis.swift; sourceTree = "<group>"; };
 		19671C3F2BDEB55D000B4D99 /* Core.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Core.swift; sourceTree = "<group>"; };
 		19671C442BDEB55D000B4D99 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
@@ -249,6 +252,7 @@
 				19BD24262BE9C53800595973 /* Kingfisher in Frameworks */,
 				19B2A70A2D087968001617BE /* BBCode in Frameworks */,
 				19671C732BDEB8B1000B4D99 /* KeychainSwift in Frameworks */,
+				192E305E2D15BF2300A6A486 /* WaterfallGrid in Frameworks */,
 				1968C5DD2CD5010C00242103 /* Flow in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -433,7 +437,8 @@
 			isa = PBXGroup;
 			children = (
 				19671C4B2BDEB55D000B4D99 /* ProgressView.swift */,
-				19671C3B2BDEB55D000B4D99 /* ProgressRowView.swift */,
+				192E30382D15AA8700A6A486 /* ProgressTileView.swift */,
+				19671C3B2BDEB55D000B4D99 /* ProgressListView.swift */,
 			);
 			path = Progress;
 			sourceTree = "<group>";
@@ -520,6 +525,7 @@
 				19BD24252BE9C53800595973 /* Kingfisher */,
 				1968C5DC2CD5010C00242103 /* Flow */,
 				19B2A7092D087968001617BE /* BBCode */,
+				192E305D2D15BF2300A6A486 /* WaterfallGrid */,
 			);
 			productName = Chobits;
 			productReference = 19BB342B2BD239AB00E5C295 /* Chobits.app */;
@@ -554,6 +560,7 @@
 				19BD24242BE9C53800595973 /* XCRemoteSwiftPackageReference "Kingfisher" */,
 				1968C5DB2CD5010C00242103 /* XCRemoteSwiftPackageReference "SwiftUI-Flow" */,
 				19B2A7082D087968001617BE /* XCRemoteSwiftPackageReference "bangumi-bbcode-swift" */,
+				192E305C2D15BF2300A6A486 /* XCRemoteSwiftPackageReference "WaterfallGrid" */,
 			);
 			productRefGroup = 19BB342C2BD239AB00E5C295 /* Products */;
 			projectDirPath = "";
@@ -624,7 +631,7 @@
 				19671C582BDEB55D000B4D99 /* SubjectView.swift in Sources */,
 				19671C6F2BDEB55D000B4D99 /* ChobitsApp.swift in Sources */,
 				19671C552BDEB55D000B4D99 /* SubjectCollectionView.swift in Sources */,
-				19671C5F2BDEB55D000B4D99 /* ProgressRowView.swift in Sources */,
+				19671C5F2BDEB55D000B4D99 /* ProgressListView.swift in Sources */,
 				19E0E5072BF34F0E00066EB7 /* CollectionsView.swift in Sources */,
 				19671C692BDEB55D000B4D99 /* AuthView.swift in Sources */,
 				19ECCF0E2CFF58490092F715 /* PersonWorksView.swift in Sources */,
@@ -678,6 +685,7 @@
 				1998DD092CB122BC00115E1F /* SubjectCommentListView.swift in Sources */,
 				194E76982D0D3A360070F5F8 /* Style.swift in Sources */,
 				19671C602BDEB55D000B4D99 /* Basis.swift in Sources */,
+				192E30392D15AA8700A6A486 /* ProgressTileView.swift in Sources */,
 				194484232BF4C68B002EC925 /* CollectionListView.swift in Sources */,
 				197A19D12BE6304D00804B13 /* EpisodeView.swift in Sources */,
 				19671C6C2BDEB55D000B4D99 /* ProgressView.swift in Sources */,
@@ -912,6 +920,14 @@
 				minimumVersion = 24.0.0;
 			};
 		};
+		192E305C2D15BF2300A6A486 /* XCRemoteSwiftPackageReference "WaterfallGrid" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/paololeonardi/WaterfallGrid";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.1.0;
+			};
+		};
 		1968C5DB2CD5010C00242103 /* XCRemoteSwiftPackageReference "SwiftUI-Flow" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/tevelee/SwiftUI-Flow";
@@ -939,6 +955,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		192E305D2D15BF2300A6A486 /* WaterfallGrid */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 192E305C2D15BF2300A6A486 /* XCRemoteSwiftPackageReference "WaterfallGrid" */;
+			productName = WaterfallGrid;
+		};
 		19671C722BDEB8B1000B4D99 /* KeychainSwift */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 191FEF252BDCF59B0047162A /* XCRemoteSwiftPackageReference "keychain-swift" */;

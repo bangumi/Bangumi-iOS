@@ -75,10 +75,6 @@ struct PadView: View {
           selectedTab = .discover
         }
       }
-
-      Tab(ChiiViewTab.settings.title, systemImage: ChiiViewTab.settings.icon, value: .settings) {
-        SettingsView()
-      }.defaultVisibility(.hidden, for: .tabBar)
     }.tabViewStyle(.sidebarAdaptable)
   }
 }

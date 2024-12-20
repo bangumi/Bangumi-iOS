@@ -57,6 +57,7 @@ struct ImageView<ImageBadge: View, ImageCaption: View>: View {
               .resizable()
               .scaledToFill()
               .alignmentGuide(.top, computeValue: { _ in 0 })
+              .frame(width: width, height: height, alignment: alignment)
           } else {
             KFImage(imageURL)
               .fade(duration: 0.25)
@@ -65,32 +66,34 @@ struct ImageView<ImageBadge: View, ImageCaption: View>: View {
           }
         } else {
           if width > 0, height > 0 {
-            if width == height {
-              switch type {
-              case .subject:
-                Image("noIconSubject")
-                  .resizable()
-                  .scaledToFit()
-              case .person:
-                Image("noIconPerson")
-                  .resizable()
-                  .scaledToFit()
-              case .avatar:
-                Image("noIconAvatar")
-                  .resizable()
-                  .scaledToFit()
-              default:
-                Image(systemName: "photo")
+            Section {
+              if width == height {
+                switch type {
+                case .subject:
+                  Image("noIconSubject")
+                    .resizable()
+                    .scaledToFit()
+                case .person:
+                  Image("noIconPerson")
+                    .resizable()
+                    .scaledToFit()
+                case .avatar:
+                  Image("noIconAvatar")
+                    .resizable()
+                    .scaledToFit()
+                default:
+                  Image(systemName: "photo")
+                }
+              } else {
+                Rectangle()
+                  .foregroundStyle(.secondary.opacity(0.2))
               }
-            } else {
-              Rectangle()
-                .foregroundStyle(.secondary.opacity(0.2))
-            }
+            }.frame(width: width, height: height, alignment: alignment)
           } else {
             Image(systemName: "photo")
           }
         }
-      }.frame(width: width, height: height, alignment: alignment)
+      }
       if ImageCaption.self != EmptyView.self {
         VStack {
           Spacer()

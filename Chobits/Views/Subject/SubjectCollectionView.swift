@@ -76,7 +76,7 @@ struct SubjectCollectionDetailView: View {
         }
       }
       if subject.typeEnum == .book {
-        SubjectBookChaptersView(compact: false).environment(collection)
+        SubjectBookChaptersView(mode: .large).environment(collection)
       }
     }
   }

@@ -1,15 +1,44 @@
-//
-//  ProgressRowView.swift
-//  Chobits
-//
-//  Created by Chuan Chuan on 2024/4/21.
-//
-
 import OSLog
 import SwiftData
 import SwiftUI
 
-struct ProgressRowView: View {
+struct ProgressListView: View {
+  let subjectType: SubjectType
+  let search: String
+
+  @Environment(\.modelContext) var modelContext
+
+  @Query var collections: [UserSubjectCollection]
+
+  init(subjectType: SubjectType, search: String) {
+    self.subjectType = subjectType
+    self.search = search
+
+    let stype = subjectType.rawValue
+    let doingType = CollectionType.do.rawValue
+    let descriptor = FetchDescriptor<UserSubjectCollection>(
+      predicate: #Predicate<UserSubjectCollection> {
+        (stype == 0 || $0.subjectType == stype) && $0.type == doingType
+          && (search == "" || $0.alias.localizedStandardContains(search))
+      },
+      sortBy: [
+        SortDescriptor(\.updatedAt, order: .reverse)
+      ])
+    self._collections = Query(descriptor)
+  }
+
+  var body: some View {
+    LazyVStack(alignment: .leading) {
+      ForEach(collections) { collection in
+        CardView {
+          ProgressListItemView(subjectId: collection.subjectId).environment(collection)
+        }
+      }
+    }.animation(.default, value: collections)
+  }
+}
+
+struct ProgressListItemView: View {
   let subjectId: Int
 
   @Environment(UserSubjectCollection.self) var collection
@@ -123,8 +152,7 @@ struct ProgressRowView: View {
               }
             }.font(.callout)
           case .book:
-            SubjectBookChaptersView(compact: true)
-              .font(.callout)
+            SubjectBookChaptersView(mode: .row)
 
           default:
             Label(
@@ -167,6 +195,7 @@ struct ProgressRowView: View {
 
   let collection = UserSubjectCollection.previewAnime
   let subject = Subject.previewAnime
+  collection.subject = subject
   let episodes = Episode.previewCollections
   container.mainContext.insert(subject)
   container.mainContext.insert(collection)
@@ -176,7 +205,9 @@ struct ProgressRowView: View {
 
   return ScrollView {
     LazyVStack(alignment: .leading) {
-      ProgressRowView(subjectId: subject.subjectId)
+      ProgressListItemView(subjectId: subject.subjectId)
+        .environment(collection)
+        .environment(subject)
         .modelContainer(container)
     }.padding()
   }

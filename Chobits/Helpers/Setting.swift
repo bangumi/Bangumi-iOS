@@ -127,6 +127,44 @@ enum AuthDomain: Codable, CaseIterable, Identifiable {
   }
 }
 
+enum ProgressMode: Codable, CaseIterable, Identifiable {
+  case list
+  case tile
+
+  init(_ label: String) {
+    switch label {
+    case "list":
+      self = .list
+    case "tile":
+      self = .tile
+    default:
+      self = .list
+    }
+  }
+
+  var id: Self {
+    return self
+  }
+
+  var label: String {
+    switch self {
+    case .list:
+      "list"
+    case .tile:
+      "tile"
+    }
+  }
+
+  var desc: String {
+    switch self {
+    case .list:
+      "列表"
+    case .tile:
+      "平铺"
+    }
+  }
+}
+
 enum ChiiViewTab: Equatable, Hashable, Identifiable {
   case timeline
   case discover
