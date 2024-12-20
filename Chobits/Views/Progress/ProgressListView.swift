@@ -16,7 +16,7 @@ struct ProgressListView: View {
 
     let stype = subjectType.rawValue
     let doingType = CollectionType.do.rawValue
-    let descriptor = FetchDescriptor<UserSubjectCollection>(
+    var descriptor = FetchDescriptor<UserSubjectCollection>(
       predicate: #Predicate<UserSubjectCollection> {
         (stype == 0 || $0.subjectType == stype) && $0.type == doingType
           && (search == "" || $0.alias.localizedStandardContains(search))
@@ -24,6 +24,7 @@ struct ProgressListView: View {
       sortBy: [
         SortDescriptor(\.updatedAt, order: .reverse)
       ])
+    descriptor.fetchLimit = 100
     self._collections = Query(descriptor)
   }
 
