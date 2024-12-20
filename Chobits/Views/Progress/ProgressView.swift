@@ -12,7 +12,7 @@ import SwiftUI
 struct ChiiProgressView: View {
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
   @AppStorage("collectionsUpdatedAt") var collectionsUpdatedAt: Int = 0
-  @AppStorage("progressMode") var progressMode: String = ProgressMode.list.label
+  @AppStorage("progressMode") var progressMode: String = ProgressMode.tile.label
 
   @Environment(\.modelContext) var modelContext
 
