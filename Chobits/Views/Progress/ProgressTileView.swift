@@ -54,7 +54,7 @@ struct ProgressTileView: View {
 
   var body: some View {
     HStack(alignment: .top, spacing: 8) {
-      ForEach(Array(items.keys), id: \.self) { idx in
+      ForEach(Array(items.keys.sorted()), id: \.self) { idx in
         LazyVStack(alignment: .leading, spacing: 8) {
           ForEach(items[idx] ?? []) { collection in
             CardView(padding: 8) {
