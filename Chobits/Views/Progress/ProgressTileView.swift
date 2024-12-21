@@ -1,6 +1,5 @@
 import SwiftData
 import SwiftUI
-import WaterfallGrid
 
 struct ProgressTileView: View {
   let subjectType: SubjectType
@@ -12,8 +11,19 @@ struct ProgressTileView: View {
   @Query var collections: [UserSubjectCollection]
 
   var columns: Int {
-    let columns = Int(width / 160)
+    let columns = Int((width - 16) / 160)
     return columns > 0 ? columns : 1
+  }
+
+  var columnWidth: CGFloat {
+    let minWidth: CGFloat = 160
+    let maxWidth: CGFloat = (width - 8 * (CGFloat(columns) + 1)) / CGFloat(columns)
+    return max(maxWidth, minWidth)
+  }
+
+  var items: [Int: [UserSubjectCollection]] {
+    Dictionary(grouping: collections.enumerated(), by: { $0.offset % columns })
+      .mapValues { $0.map { $1 } }
   }
 
   init(subjectType: SubjectType, search: String, width: CGFloat) {
@@ -23,7 +33,7 @@ struct ProgressTileView: View {
 
     let stype = subjectType.rawValue
     let doingType = CollectionType.do.rawValue
-    var descriptor = FetchDescriptor<UserSubjectCollection>(
+    let descriptor = FetchDescriptor<UserSubjectCollection>(
       predicate: #Predicate<UserSubjectCollection> {
         (stype == 0 || $0.subjectType == stype) && $0.type == doingType
           && (search == "" || $0.alias.localizedStandardContains(search))
@@ -31,16 +41,21 @@ struct ProgressTileView: View {
       sortBy: [
         SortDescriptor(\.updatedAt, order: .reverse)
       ])
-    descriptor.fetchLimit = 100
     self._collections = Query(descriptor)
   }
 
   var body: some View {
-    WaterfallGrid(collections) { collection in
-      CardView {
-        ProgressTileItemView(subjectId: collection.subjectId).environment(collection)
+    HStack(alignment: .top, spacing: 8) {
+      ForEach(Array(items.keys.sorted()), id: \.self) { idx in
+        LazyVStack {
+          ForEach(items[idx] ?? [], id: \.self) { collection in
+            CardView {
+              ProgressTileItemView(subjectId: collection.subjectId).environment(collection)
+            }
+          }
+        }.frame(width: columnWidth, alignment: .top)
       }
-    }.gridStyle(columns: columns, spacing: 8)
+    }.padding(.horizontal, 8)
   }
 }
 

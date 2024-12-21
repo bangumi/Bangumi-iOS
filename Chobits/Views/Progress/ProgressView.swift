@@ -150,12 +150,10 @@ struct ChiiProgressView: View {
               switch ProgressMode(progressMode) {
               case .list:
                 ProgressListView(subjectType: subjectType, search: search)
-                  .padding(.horizontal, 8)
               case .tile:
                 ProgressTileView(
                   subjectType: subjectType, search: search, width: geo.size.width
                 )
-                .padding(.horizontal, 8)
               }
             } else {
               if refreshing {
