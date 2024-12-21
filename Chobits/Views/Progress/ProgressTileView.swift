@@ -39,6 +39,11 @@ struct ProgressTileView: View {
     return columns > 0 ? columns : 1
   }
 
+  var cardWidth: CGFloat {
+    let columns = CGFloat(self.columns)
+    return (width - 16 - columns * 8 + 8) / columns
+  }
+
   var items: [[UserSubjectCollection]] {
     let columnCount = columns
     var result: [[UserSubjectCollection]] = Array(repeating: [], count: columnCount)
@@ -49,12 +54,13 @@ struct ProgressTileView: View {
   }
 
   var body: some View {
-    HStack(alignment: .top) {
+    HStack(alignment: .top, spacing: 8) {
       ForEach(items, id: \.self) { data in
         LazyVStack(alignment: .leading, spacing: 8) {
           ForEach(data) { collection in
-            CardView {
-              ProgressTileItemView(subjectId: collection.subjectId).environment(collection)
+            CardView(padding: 8) {
+              ProgressTileItemView(subjectId: collection.subjectId, width: cardWidth)
+                .environment(collection)
             }
           }
         }
@@ -67,6 +73,7 @@ struct ProgressTileView: View {
 
 struct ProgressTileItemView: View {
   let subjectId: Int
+  let width: CGFloat
 
   @Environment(UserSubjectCollection.self) var collection
   @Environment(\.modelContext) var modelContext
@@ -76,8 +83,9 @@ struct ProgressTileItemView: View {
   @Query private var pendingEpisodes: [Episode]
   private var nextEpisode: Episode? { pendingEpisodes.first }
 
-  init(subjectId: Int) {
+  init(subjectId: Int, width: CGFloat) {
     self.subjectId = subjectId
+    self.width = width
     var descriptor = FetchDescriptor<Episode>(
       predicate: #Predicate<Episode> {
         $0.subjectId == subjectId && $0.type == 0 && $0.collection == 0
@@ -92,6 +100,14 @@ struct ProgressTileItemView: View {
 
   var totalVols: Int {
     collection.subject?.volumes ?? 0
+  }
+
+  var imageWidth: CGFloat {
+    width - 16
+  }
+
+  var imageHeight: CGFloat {
+    imageWidth * 1.4
   }
 
   func markNextWatched() {
@@ -124,6 +140,7 @@ struct ProgressTileItemView: View {
               .clipShape(Capsule())
           }
         }
+        .imageStyle(width: imageWidth, height: imageHeight)
         .imageType(.subject)
       }.buttonStyle(.navLink)
 
@@ -220,7 +237,7 @@ struct ProgressTileItemView: View {
 
   return ScrollView {
     LazyVStack(alignment: .leading) {
-      ProgressTileItemView(subjectId: subject.subjectId)
+      ProgressTileItemView(subjectId: subject.subjectId, width: 160)
         .environment(collection)
         .environment(subject)
         .modelContainer(container)
