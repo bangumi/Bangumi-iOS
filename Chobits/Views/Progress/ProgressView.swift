@@ -14,7 +14,6 @@ struct ChiiProgressView: View {
 
   @FocusState private var searching: Bool
   @State private var search: String = ""
-  @State private var searchInput: String = ""
   @State private var subjectType: SubjectType = .none
   @State private var counts: [SubjectType: Int] = [:]
 
@@ -166,17 +165,9 @@ struct ChiiProgressView: View {
               }
             }
           }
-          .searchable(text: $searchInput)
+          .searchable(text: $search)
           .animation(.default, value: subjectType)
           .animation(.default, value: counts)
-          .onChange(of: searchInput) { _, val in
-            if progressMode == ProgressMode.list.label {
-              search = val
-            }
-          }
-          .onSubmit(of: .search) {
-            search = searchInput
-          }
           .refreshable {
             if refreshing {
               return

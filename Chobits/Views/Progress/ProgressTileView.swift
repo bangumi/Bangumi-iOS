@@ -13,16 +13,6 @@ struct ProgressTileView: View {
 
   @Query var collections: [UserSubjectCollection]
 
-  var columns: Int {
-    let columns = Int((width - 16) / 160)
-    return columns > 0 ? columns : 1
-  }
-
-  var items: [Int: [UserSubjectCollection]] {
-    Dictionary(grouping: collections.enumerated(), by: { $0.offset % columns })
-      .mapValues { $0.map { $1 } }
-  }
-
   init(subjectType: SubjectType, search: String, width: CGFloat) {
     self.subjectType = subjectType
     self.search = search
@@ -44,13 +34,33 @@ struct ProgressTileView: View {
     self._collections = Query(descriptor)
   }
 
+  var columns: Int {
+    let columns = Int((width - 16) / 160)
+    return columns > 0 ? columns : 1
+  }
+
+  var items: [[UserSubjectCollection]] {
+    let columnCount = columns
+    var result: [[UserSubjectCollection]] = Array(repeating: [], count: columnCount)
+    for (index, collection) in collections.enumerated() {
+      result[index % columnCount].append(collection)
+    }
+    return result
+  }
+
   var body: some View {
-    WaterfallGrid(collections) { collection in
-      CardView {
-        ProgressTileItemView(subjectId: collection.subjectId).environment(collection)
+    HStack(alignment: .top) {
+      ForEach(items, id: \.self) { data in
+        LazyVStack(alignment: .leading, spacing: 8) {
+          ForEach(data) { collection in
+            CardView {
+              ProgressTileItemView(subjectId: collection.subjectId).environment(collection)
+            }
+          }
+        }
       }
     }
-    .gridStyle(columns: columns, spacing: 8)
+    .animation(.default, value: collections)
     .padding(.horizontal, 8)
   }
 }

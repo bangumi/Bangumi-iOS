@@ -127,14 +127,7 @@ struct SettingsView: View {
             }
           }
           .onChange(of: selectedProgressMode) { _, _ in
-            switch selectedProgressMode {
-            case .tile:
-              progressMode = selectedProgressMode.label
-              selectedProgressLimit = 50
-              progressLimit = selectedProgressLimit
-            default:
-              progressMode = selectedProgressMode.label
-            }
+            progressMode = selectedProgressMode.label
           }
 
           Picker(selection: $selectedProgressLimit, label: Text("进度管理数量")) {
@@ -145,7 +138,6 @@ struct SettingsView: View {
           .onChange(of: selectedProgressLimit) { _, _ in
             progressLimit = selectedProgressLimit
           }
-          .disabled(selectedProgressMode == .tile)
         }
       }
 
