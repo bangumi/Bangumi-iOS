@@ -1,10 +1,3 @@
-//
-//  BBCode.swift
-//  Chobits
-//
-//  Created by Chuan Chuan on 2024/12/1.
-//
-
 import BBCode
 import SwiftUI
 import WebKit

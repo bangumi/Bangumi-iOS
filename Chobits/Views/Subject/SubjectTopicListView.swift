@@ -1,10 +1,3 @@
-//
-//  SubjectTopicListView.swift
-//  Chobits
-//
-//  Created by Chuan Chuan on 2024/10/5.
-//
-
 import OSLog
 import SwiftData
 import SwiftUI

@@ -1,10 +1,3 @@
-//
-//  SubjectRecsView.swift
-//  Chobits
-//
-//  Created by Chuan Chuan on 2024/12/3.
-//
-
 import Foundation
 import SwiftData
 import SwiftUI
@@ -61,10 +54,7 @@ struct SubjectRecsView: View {
           VStack {
             NavigationLink(value: NavDestination.subject(rec.subject.id)) {
               if let ctype = collections[rec.subject.id] {
-                ImageView(
-                  img: rec.subject.images?.common,
-                  width: 72, height: 96, type: .subject
-                ) {
+                ImageView(img: rec.subject.images?.common) {
                 } caption: {
                   HStack {
                     Image(systemName: ctype.icon)
@@ -72,11 +62,12 @@ struct SubjectRecsView: View {
                     Text(ctype.description(rec.subject.type))
                   }.padding(.horizontal, 4)
                 }
+                .imageStyle(width: 72, height: 96)
+                .imageType(.subject)
               } else {
-                ImageView(
-                  img: rec.subject.images?.common,
-                  width: 72, height: 96, type: .subject
-                )
+                ImageView(img: rec.subject.images?.common)
+                  .imageStyle(width: 72, height: 96)
+                  .imageType(.subject)
               }
             }.buttonStyle(.navLink)
             Text(rec.subject.name)

@@ -1,10 +1,3 @@
-//
-//  ContentView.swift
-//  Chobits
-//
-//  Created by Chuan Chuan on 2024/4/19.
-//
-
 import OSLog
 import SwiftData
 import SwiftUI

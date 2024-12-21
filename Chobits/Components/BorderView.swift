@@ -1,10 +1,3 @@
-//
-//  BorderView.swift
-//  Chobits
-//
-//  Created by Chuan Chuan on 2024/10/17.
-//
-
 import SwiftUI
 
 /// A view that has rounded border

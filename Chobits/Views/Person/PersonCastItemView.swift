@@ -6,11 +6,9 @@ struct PersonCastItemView: View {
   var body: some View {
     HStack(alignment: .top) {
       NavigationLink(value: NavDestination.character(item.character.id)) {
-        ImageView(
-          img: item.character.images?.medium,
-          width: 60, height: 60,
-          alignment: .top, type: .person
-        )
+        ImageView(img: item.character.images?.medium)
+          .imageStyle(width: 60, height: 60, alignment: .top)
+          .imageType(.person)
       }
 
       VStack(alignment: .leading) {
@@ -54,10 +52,9 @@ struct PersonCastItemView: View {
               Divider()
             }.font(.footnote)
             NavigationLink(value: NavDestination.subject(relation.subject.id)) {
-              ImageView(
-                img: relation.subject.images?.small,
-                width: 40, height: 40, alignment: .top, type: .subject
-              )
+              ImageView(img: relation.subject.images?.small)
+                .imageStyle(width: 40, height: 40, alignment: .top)
+                .imageType(.subject)
             }
           }.frame(minHeight: 40)
         }

@@ -1,10 +1,3 @@
-//
-//  SubjectRelationListView.swift
-//  Chobits
-//
-//  Created by Chuan Chuan on 2024/5/12.
-//
-
 import SwiftData
 import SwiftUI
 
@@ -41,10 +34,9 @@ struct SubjectRelationListView: View {
         CardView {
           HStack {
             NavigationLink(value: NavDestination.subject(item.subject.id)) {
-              ImageView(
-                img: item.subject.images?.common,
-                width: 60, height: 60, type: .subject
-              )
+              ImageView(img: item.subject.images?.common)
+                .imageStyle(width: 60, height: 60)
+                .imageType(.subject)
             }
             VStack(alignment: .leading) {
               NavigationLink(value: NavDestination.subject(item.subject.id)) {

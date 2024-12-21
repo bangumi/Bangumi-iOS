@@ -1,10 +1,3 @@
-//
-//  SubjectLargeRowView.swift
-//  Chobits
-//
-//  Created by Chuan Chuan on 2024/4/26.
-//
-
 import Flow
 import SwiftData
 import SwiftUI
@@ -33,9 +26,7 @@ struct SubjectLargeRowView: View {
   var body: some View {
     HStack {
       NavigationLink(value: NavDestination.subject(subjectId)) {
-        ImageView(
-          img: subject?.images?.common, width: 90, height: 120, type: .subject
-        ) {
+        ImageView(img: subject?.images?.common) {
           if subject?.nsfw ?? false {
             Text("18+")
               .padding(2)
@@ -46,6 +37,8 @@ struct SubjectLargeRowView: View {
               .clipShape(Capsule())
           }
         }
+        .imageStyle(width: 90, height: 120)
+        .imageType(.subject)
       }
       VStack(alignment: .leading) {
         // title

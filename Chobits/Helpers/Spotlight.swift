@@ -1,10 +1,3 @@
-//
-//  Spotlight.swift
-//  Chobits
-//
-//  Created by Chuan Chuan on 2024/12/13.
-//
-
 import CoreSpotlight
 import NaturalLanguage
 import OSLog

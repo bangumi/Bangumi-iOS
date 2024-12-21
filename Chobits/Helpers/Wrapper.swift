@@ -1,10 +1,3 @@
-//
-//  Wrapper.swift
-//  Chobits
-//
-//  Created by Chuan Chuan on 2024/12/2.
-//
-
 import SwiftUI
 
 @propertyWrapper

@@ -1,10 +1,3 @@
-//
-//  SubjectCharacterListView.swift
-//  Chobits
-//
-//  Created by Chuan Chuan on 2024/5/12.
-//
-
 import Flow
 import SwiftData
 import SwiftUI
@@ -42,15 +35,13 @@ struct SubjectCharacterListView: View {
         CardView {
           HStack {
             NavigationLink(value: NavDestination.character(item.character.id)) {
-              ImageView(
-                img: item.character.images?.medium,
-                width: 60, height: 90, alignment: .top
-              ) {
+              ImageView(img: item.character.images?.medium) {
               } caption: {
                 Text(item.type.description)
                   .font(.caption)
                   .foregroundStyle(.white)
               }
+              .imageStyle(width: 60, height: 90, alignment: .top)
             }
             VStack(alignment: .leading) {
               NavigationLink(value: NavDestination.character(item.character.id)) {
@@ -70,10 +61,9 @@ struct SubjectCharacterListView: View {
                 ForEach(item.actors) { person in
                   NavigationLink(value: NavDestination.person(person.id)) {
                     HStack {
-                      ImageView(
-                        img: person.images?.grid,
-                        width: 40, height: 40, alignment: .top, type: .subject
-                      )
+                      ImageView(img: person.images?.grid)
+                        .imageStyle(width: 40, height: 40, alignment: .top)
+                        .imageType(.person)
                       VStack(alignment: .leading) {
                         Text(person.name)
                           .font(.footnote)

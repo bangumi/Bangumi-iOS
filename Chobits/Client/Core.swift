@@ -1,10 +1,3 @@
-//
-//  Core.swift
-//  Chobits
-//
-//  Created by Chuan Chuan on 2024/4/21.
-//
-
 import CoreSpotlight
 import Foundation
 import KeychainSwift

@@ -1,10 +1,3 @@
-//
-//  SubjectHeaderView.swift
-//  Chobits
-//
-//  Created by Chuan Chuan on 2024/4/28.
-//
-
 import SwiftData
 import SwiftUI
 
@@ -31,10 +24,7 @@ struct SubjectHeaderView: View {
       .multilineTextAlignment(.leading)
       .textSelection(.enabled)
     HStack {
-      ImageView(
-        img: subject.images?.common, width: 120, height: 160, type: .subject,
-        large: subject.images?.large
-      ) {
+      ImageView(img: subject.images?.common) {
         if subject.nsfw {
           Text("18+")
             .padding(2)
@@ -45,6 +35,8 @@ struct SubjectHeaderView: View {
             .clipShape(Capsule())
         }
       }
+      .imageStyle(width: 120, height: 160)
+      .imageType(.subject)
       VStack(alignment: .leading) {
         HStack {
           if type != .none {

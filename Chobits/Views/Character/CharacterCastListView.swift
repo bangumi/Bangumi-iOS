@@ -1,10 +1,3 @@
-//
-//  CharacterCastListView.swift
-//  Chobits
-//
-//  Created by Chuan Chuan on 2024/12/3.
-//
-
 import Flow
 import SwiftData
 import SwiftUI

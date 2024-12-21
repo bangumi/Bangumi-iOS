@@ -1,10 +1,3 @@
-//
-//  PersonWorkListView.swift
-//  Chobits
-//
-//  Created by Chuan Chuan on 2024/5/12.
-//
-
 import Flow
 import SwiftData
 import SwiftUI
@@ -42,7 +35,9 @@ struct PersonWorkListView: View {
         CardView {
           HStack(alignment: .top) {
             NavigationLink(value: NavDestination.subject(item.subject.id)) {
-              ImageView(img: item.subject.images?.common, width: 60, height: 60, type: .subject)
+              ImageView(img: item.subject.images?.common)
+                .imageStyle(width: 60, height: 60)
+                .imageType(.subject)
             }
             VStack(alignment: .leading) {
               VStack(alignment: .leading) {

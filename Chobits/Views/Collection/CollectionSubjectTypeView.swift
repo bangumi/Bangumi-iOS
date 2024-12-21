@@ -1,10 +1,3 @@
-//
-//  CollectionSubjectTypeView.swift
-//  Chobits
-//
-//  Created by Chuan Chuan on 2024/5/24.
-//
-
 import SwiftData
 import SwiftUI
 
@@ -94,9 +87,9 @@ struct CollectionSubjectTypeView: View {
         ]) {
           ForEach(collections) { collection in
             NavigationLink(value: NavDestination.subject(collection.subjectId)) {
-              ImageView(
-                img: subjects[collection.subjectId]?.images?.common, width: 60, height: 60,
-                type: .subject)
+              ImageView(img: subjects[collection.subjectId]?.images?.common)
+                .imageStyle(width: 60, height: 60)
+                .imageType(.subject)
             }.buttonStyle(.navLink)
           }
         }

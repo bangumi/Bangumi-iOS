@@ -1,10 +1,3 @@
-//
-//  Extension.swift
-//  Chobits
-//
-//  Created by Chuan Chuan on 2024/5/4.
-//
-
 import Foundation
 import OSLog
 import SwiftUI

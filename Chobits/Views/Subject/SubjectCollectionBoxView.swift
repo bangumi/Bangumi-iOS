@@ -1,10 +1,3 @@
-//
-//  SubjectCollectionBoxView.swift
-//  Chobits
-//
-//  Created by Chuan Chuan on 2024/5/2.
-//
-
 import Flow
 import SwiftData
 import SwiftUI

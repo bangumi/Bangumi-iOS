@@ -1,10 +1,3 @@
-//
-//  CharacterSubjectsView.swift
-//  Chobits
-//
-//  Created by Chuan Chuan on 2024/5/11.
-//
-
 import SwiftData
 import SwiftUI
 

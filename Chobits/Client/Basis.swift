@@ -1,10 +1,3 @@
-//
-//  Basis.swift
-//  Chobits
-//
-//  Created by Chuan Chuan on 2024/4/26.
-//
-
 import Foundation
 import OSLog
 

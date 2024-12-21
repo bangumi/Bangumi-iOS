@@ -1,10 +1,3 @@
-//
-//  CalendarView.swift
-//  Chobits
-//
-//  Created by Chuan Chuan on 2024/4/26.
-//
-
 import Flow
 import OSLog
 import SwiftData
@@ -78,7 +71,9 @@ struct CalendarWeekdayView: View {
         ForEach(calendar.subjects, id: \.id) { subject in
           VStack {
             NavigationLink(value: NavDestination.subject(subject.id)) {
-              ImageView(img: subject.images?.common, width: 80, height: 80, type: .subject)
+              ImageView(img: subject.images?.common)
+                .imageStyle(width: 80, height: 80)
+                .imageType(.subject)
             }.buttonStyle(.navLink)
             Text(subject.name)
               .font(.caption)

@@ -99,10 +99,7 @@ struct ProgressListItemView: View {
     VStack(alignment: .leading, spacing: 4) {
       HStack {
         NavigationLink(value: NavDestination.subject(subjectId)) {
-          ImageView(
-            img: collection.subject?.images?.common,
-            width: 72, height: 72, type: .subject
-          ) {
+          ImageView(img: collection.subject?.images?.common) {
             if collection.priv {
               Image(systemName: "lock")
                 .padding(2)
@@ -113,6 +110,8 @@ struct ProgressListItemView: View {
                 .clipShape(Capsule())
             }
           }
+          .imageStyle(width: 72, height: 72)
+          .imageType(.subject)
         }.buttonStyle(.navLink)
         VStack(alignment: .leading) {
           NavigationLink(value: NavDestination.subject(subjectId)) {

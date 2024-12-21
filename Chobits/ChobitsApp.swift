@@ -1,10 +1,3 @@
-//
-//  ChobitsApp.swift
-//  Chobits
-//
-//  Created by Chuan Chuan on 2024/4/19.
-//
-
 import SwiftData
 import SwiftUI
 

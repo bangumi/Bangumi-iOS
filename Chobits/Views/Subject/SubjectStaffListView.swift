@@ -22,10 +22,9 @@ struct SubjectStaffListView: View {
         CardView {
           HStack {
             NavigationLink(value: NavDestination.person(item.person.id)) {
-              ImageView(
-                img: item.person.images?.medium,
-                width: 60, height: 60, alignment: .top, type: .person
-              )
+              ImageView(img: item.person.images?.medium)
+                .imageStyle(width: 60, height: 60, alignment: .top)
+                .imageType(.person)
             }
             VStack(alignment: .leading) {
               NavigationLink(value: NavDestination.person(item.person.id)) {

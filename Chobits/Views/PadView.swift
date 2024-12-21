@@ -1,10 +1,3 @@
-//
-//  PadView.swift
-//  Chobits
-//
-//  Created by Chuan Chuan on 2024/10/29.
-//
-
 import CoreSpotlight
 import OSLog
 import SwiftUI

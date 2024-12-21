@@ -1,10 +1,3 @@
-//
-//  SubjectReviewsRowView.swift
-//  Chobits
-//
-//  Created by Chuan Chuan on 2024/12/16.
-//
-
 import SwiftUI
 
 struct SubjectReviewItemView: View {
@@ -13,11 +6,9 @@ struct SubjectReviewItemView: View {
   var body: some View {
     HStack(alignment: .top) {
       NavigationLink(value: NavDestination.user(item.user.username)) {
-        ImageView(
-          img: item.user.avatar?.large,
-          width: 60, height: 60,
-          alignment: .top, type: .avatar
-        )
+        ImageView(img: item.user.avatar?.large)
+          .imageStyle(width: 60, height: 60, alignment: .top)
+          .imageType(.avatar)
       }
       VStack(alignment: .leading) {
         NavigationLink(value: NavDestination.blog(item.entry.id)) {

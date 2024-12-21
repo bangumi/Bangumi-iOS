@@ -1,10 +1,3 @@
-//
-//  PageView.swift
-//  Chobits
-//
-//  Created by Chuan Chuan on 2024/12/1.
-//
-
 import SwiftUI
 
 /// A view that loads data continuously.

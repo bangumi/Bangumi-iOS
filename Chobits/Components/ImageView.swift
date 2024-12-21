@@ -1,41 +1,72 @@
-//
-//  ImageView.swift
-//  Chobits
-//
-//  Created by Chuan Chuan on 2024/4/26.
-//
-
 import Kingfisher
 import SwiftUI
 
-enum ImageType: String {
+public enum ImageType: String, Sendable {
   case common
   case subject
   case person
   case avatar
 }
 
-struct ImageView<ImageBadge: View, ImageCaption: View>: View {
-  let img: String?
+struct ImageTypeKey: EnvironmentKey {
+  static let defaultValue = ImageType.common
+}
+
+extension EnvironmentValues {
+  var imageType: ImageType {
+    get { self[ImageTypeKey.self] }
+    set { self[ImageTypeKey.self] = newValue }
+  }
+}
+
+extension View {
+  public func imageType(_ type: ImageType) -> some View {
+    self.environment(\.imageType, type)
+  }
+}
+
+struct ImageViewStyle {
   let width: CGFloat
   let height: CGFloat
   let alignment: Alignment
-  let type: ImageType
+}
+
+struct ImageViewStyleKey: EnvironmentKey {
+  static let defaultValue = ImageViewStyle(width: 0, height: 0, alignment: .center)
+}
+
+extension EnvironmentValues {
+  var imageStyle: ImageViewStyle {
+    get { self[ImageViewStyleKey.self] }
+    set { self[ImageViewStyleKey.self] = newValue }
+  }
+}
+
+extension View {
+  public func imageStyle(width: CGFloat = 0, height: CGFloat = 0, alignment: Alignment = .center)
+    -> some View
+  {
+    let style = ImageViewStyle(width: width, height: height, alignment: alignment)
+    return self.environment(\.imageStyle, style)
+  }
+}
+
+struct ImageView<ImageBadge: View, ImageCaption: View>: View {
+  let img: String?
   let large: String?
+
   let badge: ImageBadge
   let caption: ImageCaption
 
+  @Environment(\.imageStyle) var style
+  @Environment(\.imageType) var type
+
   init(
-    img: String?, width: CGFloat = 0, height: CGFloat = 0, alignment: Alignment = .center,
-    type: ImageType = .common, large: String? = nil,
+    img: String?, large: String? = nil,
     @ViewBuilder badge: () -> ImageBadge,
     @ViewBuilder caption: () -> ImageCaption
   ) {
     self.img = img
-    self.width = width
-    self.height = height
-    self.alignment = alignment
-    self.type = type
     self.large = large
     self.badge = badge()
     self.caption = caption()
@@ -51,13 +82,13 @@ struct ImageView<ImageBadge: View, ImageCaption: View>: View {
     ZStack {
       Section {
         if let imageURL = imageURL {
-          if width > 0, height > 0 {
+          if style.width > 0, style.height > 0 {
             KFImage(imageURL)
               .fade(duration: 0.25)
               .resizable()
               .scaledToFill()
               .alignmentGuide(.top, computeValue: { _ in 0 })
-              .frame(width: width, height: height, alignment: alignment)
+              .frame(width: style.width, height: style.height, alignment: style.alignment)
           } else {
             KFImage(imageURL)
               .fade(duration: 0.25)
@@ -65,9 +96,9 @@ struct ImageView<ImageBadge: View, ImageCaption: View>: View {
               .scaledToFit()
           }
         } else {
-          if width > 0, height > 0 {
+          if style.width > 0, style.height > 0 {
             Section {
-              if width == height {
+              if style.width == style.height {
                 switch type {
                 case .subject:
                   Image("noIconSubject")
@@ -88,7 +119,7 @@ struct ImageView<ImageBadge: View, ImageCaption: View>: View {
                 Rectangle()
                   .foregroundStyle(.secondary.opacity(0.2))
               }
-            }.frame(width: width, height: height, alignment: alignment)
+            }.frame(width: style.width, height: style.height, alignment: style.alignment)
           } else {
             Image(systemName: "photo")
           }
@@ -119,7 +150,11 @@ struct ImageView<ImageBadge: View, ImageCaption: View>: View {
             .foregroundStyle(.white)
             .padding(.bottom, 2)
           }
-        }.frame(width: width, height: height, alignment: .bottom)
+        }.frame(
+          width: style.width == 0 ? .infinity : style.width,
+          height: style.height == 0 ? .infinity : style.height,
+          alignment: .bottom
+        )
       }
       if ImageBadge.self != EmptyView.self {
         VStack {
@@ -128,7 +163,11 @@ struct ImageView<ImageBadge: View, ImageCaption: View>: View {
             Spacer()
           }
           Spacer()
-        }.frame(width: width, height: height, alignment: .top)
+        }.frame(
+          width: style.width == 0 ? .infinity : style.width,
+          height: style.height == 0 ? .infinity : style.height,
+          alignment: .top
+        )
       }
     }
     .contextMenu {
@@ -161,36 +200,42 @@ struct ImageView<ImageBadge: View, ImageCaption: View>: View {
 
 extension ImageView {
   init(
-    img: String?, width: CGFloat = 0, height: CGFloat = 0, alignment: Alignment = .center,
-    type: ImageType = .common, large: String? = nil, @ViewBuilder badge: () -> ImageBadge
+    img: String?, large: String? = nil,
+    @ViewBuilder badge: () -> ImageBadge
   ) where ImageCaption == EmptyView {
     self.init(
-      img: img, width: width, height: height, alignment: alignment,
-      type: type, large: large, badge: badge, caption: {})
+      img: img, large: large, badge: badge, caption: {})
   }
   init(
-    img: String?, width: CGFloat = 0, height: CGFloat = 0, alignment: Alignment = .center,
-    type: ImageType = .common, large: String? = nil
+    img: String?, large: String? = nil
   ) where ImageCaption == EmptyView, ImageBadge == EmptyView {
-    self.init(
-      img: img, width: width, height: height, alignment: alignment,
-      type: type, large: large, badge: {}, caption: {})
+    self.init(img: img, large: large, badge: {}, caption: {})
   }
 }
 
 #Preview {
   ScrollView {
     VStack {
-      ImageView(img: "", width: 60, height: 60, type: .common)
-      ImageView(img: "", width: 60, height: 60, type: .subject)
-      ImageView(img: "", width: 60, height: 60, type: .avatar)
-      ImageView(img: "", width: 60, height: 60, type: .person)
-      ImageView(img: "", width: 40, height: 60)
+      ImageView(img: "").imageType(.common)
+        .imageStyle(width: 60, height: 60)
+        .imageType(.common)
+      ImageView(img: "")
+        .imageStyle(width: 60, height: 60)
+        .imageType(.subject)
+      ImageView(img: "")
+        .imageStyle(width: 60, height: 60)
+        .imageType(.person)
+      ImageView(img: "")
+        .imageStyle(width: 60, height: 60)
+        .imageType(.avatar)
+      ImageView(img: "")
+        .imageStyle(width: 40, height: 60)
+        .imageType(.common)
       ImageView(
-        img: "https://lain.bgm.tv/pic/cover/m/5e/39/140534_cUj6H.jpg", width: 60, height: 60,
-        alignment: .top)
+        img: "https://lain.bgm.tv/pic/cover/m/5e/39/140534_cUj6H.jpg"
+      ).imageStyle(width: 60, height: 60, alignment: .top)
       ImageView(
-        img: "https://lain.bgm.tv/pic/cover/m/5e/39/140534_cUj6H.jpg", width: 60, height: 90,
+        img: "https://lain.bgm.tv/pic/cover/m/5e/39/140534_cUj6H.jpg",
         large: "https://lain.bgm.tv/pic/cover/l/5e/39/140534_cUj6H.jpg"
       ) {
         Text("18+")
@@ -200,10 +245,8 @@ extension ImageView {
           .foregroundStyle(.white)
           .font(.caption)
           .clipShape(Capsule())
-      }
-      ImageView(
-        img: "https://lain.bgm.tv/pic/cover/c/5e/39/140534_cUj6H.jpg", width: 90, height: 120
-      ) {
+      }.imageStyle(width: 60, height: 90)
+      ImageView(img: "https://lain.bgm.tv/pic/cover/c/5e/39/140534_cUj6H.jpg") {
         Text("18+")
           .padding(2)
           .background(.red.opacity(0.8))
@@ -217,12 +260,11 @@ extension ImageView {
           Spacer()
           Text("bcd")
         }.padding(.horizontal, 4)
-      }
-      ImageView(img: "", width: 60, height: 80) {
+      }.imageStyle(width: 90, height: 120)
+      ImageView(img: "") {
       } caption: {
         Text("abc")
-      }
+      }.imageStyle(width: 60, height: 80)
     }.padding()
   }
 }
-

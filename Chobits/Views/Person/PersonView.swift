@@ -1,10 +1,3 @@
-//
-//  PersonView.swift
-//  Chobits
-//
-//  Created by Chuan Chuan on 2024/5/9.
-//
-
 import Flow
 import OSLog
 import SwiftData
@@ -84,9 +77,9 @@ struct PersonView: View {
 
             /// header
             HStack(alignment: .top) {
-              ImageView(
-                img: person.images?.medium, width: 120, height: 160,
-                alignment: .top, large: person.images?.large)
+              ImageView(img: person.images?.medium, large: person.images?.large)
+                .imageStyle(width: 120, height: 160, alignment: .top)
+                .imageType(.person)
               VStack(alignment: .leading) {
                 HStack {
                   Image(systemName: person.typeEnum.icon)

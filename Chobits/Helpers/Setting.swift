@@ -1,10 +1,3 @@
-//
-//  Setting.swift
-//  Chobits
-//
-//  Created by Chuan Chuan on 2024/5/8.
-//
-
 import Foundation
 import SwiftUI
 

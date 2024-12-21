@@ -6,16 +6,14 @@ struct CharacterCastItemView: View {
   var body: some View {
     HStack(alignment: .top) {
       NavigationLink(value: NavDestination.subject(item.subject.id)) {
-        ImageView(
-          img: item.subject.images?.common,
-          width: 60, height: 60, alignment: .top,
-          type: .subject
-        ) {
+        ImageView(img: item.subject.images?.common) {
         } caption: {
           Text(item.type.description)
             .font(.caption)
             .foregroundStyle(.white)
         }
+        .imageStyle(width: 60, height: 60, alignment: .top)
+        .imageType(.subject)
       }
 
       VStack(alignment: .leading) {
@@ -51,10 +49,14 @@ struct CharacterCastItemView: View {
             .lineLimit(1)
             .font(.footnote)
             NavigationLink(value: NavDestination.person(person.id)) {
-              ImageView(
-                img: person.images?.grid,
-                width: 40, height: 40, alignment: .top, type: .person
-              )
+              ImageView(img: person.images?.grid) {
+              } caption: {
+                Text("Actor")
+                  .font(.caption)
+                  .foregroundStyle(.white)
+              }
+              .imageStyle(width: 40, height: 40, alignment: .top)
+              .imageType(.person)
             }
           }
         }

@@ -1,10 +1,3 @@
-//
-//  Style.swift
-//  Chobits
-//
-//  Created by Chuan Chuan on 2024/12/14.
-//
-
 import SwiftUI
 
 struct NavlinkButtonStyle: PrimitiveButtonStyle {

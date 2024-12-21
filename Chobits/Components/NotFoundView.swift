@@ -1,10 +1,3 @@
-//
-//  NotFoundView.swift
-//  Chobits
-//
-//  Created by Chuan Chuan on 2024/5/1.
-//
-
 import SwiftUI
 
 struct NotFoundView: View {

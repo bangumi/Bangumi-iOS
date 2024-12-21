@@ -1,10 +1,3 @@
-//
-//  SubjectCharactersView.swift
-//  Chobits
-//
-//  Created by Chuan Chuan on 2024/5/9.
-//
-
 import SwiftData
 import SwiftUI
 
@@ -41,14 +34,13 @@ struct SubjectCharactersView: View {
         ForEach(characters, id: \.character.id) { item in
           VStack {
             NavigationLink(value: NavDestination.character(item.character.id)) {
-              ImageView(
-                img: item.character.images?.medium, width: 60, height: 80, alignment: .top
-              ) {
+              ImageView(img: item.character.images?.medium) {
               } caption: {
                 Text(item.type.description)
                   .foregroundStyle(.white)
                   .lineLimit(1)
               }
+              .imageStyle(width: 60, height: 80, alignment: .top)
             }.buttonStyle(.plain)
             Text(item.character.name).font(.caption)
             if let person = item.actors.first {

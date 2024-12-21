@@ -1,10 +1,3 @@
-//
-//  Response.swift
-//  Chobits
-//
-//  Created by Chuan Chuan on 2024/4/26.
-//
-
 struct TokenResponse: Codable {
   var accessToken: String
   var expiresIn: UInt

@@ -1,10 +1,3 @@
-//
-//  SubjectView.swift
-//  Chobits
-//
-//  Created by Chuan Chuan on 2024/4/27.
-//
-
 import Flow
 import OSLog
 import SwiftData

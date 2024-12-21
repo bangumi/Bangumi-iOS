@@ -1,10 +1,3 @@
-//
-//  SubjectBookChaptersView.swift
-//  Chobits
-//
-//  Created by Chuan Chuan on 2024/5/2.
-//
-
 import Foundation
 import SwiftData
 import SwiftUI

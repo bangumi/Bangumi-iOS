@@ -1,10 +1,3 @@
-//
-//  CollectionListView.swift
-//  Chobits
-//
-//  Created by Chuan Chuan on 2024/5/15.
-//
-
 import SwiftData
 import SwiftUI
 

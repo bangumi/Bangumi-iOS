@@ -1,9 +1,3 @@
-//
-//  NoticeRowView.swift
-//  Chobits
-//
-//  Created by Chuan Chuan on 2024/10/4.
-//
 // ref: https://github.com/bangumi/server-private/blob/master/lib/notify.ts
 
 import Foundation
@@ -20,7 +14,9 @@ struct NoticeRowView: View {
           .foregroundStyle(.accent)
       }
       NavigationLink(value: NavDestination.user(notice.sender.uid)) {
-        ImageView(img: notice.sender.avatar?.large, width: 40, height: 40, type: .avatar)
+        ImageView(img: notice.sender.avatar?.large)
+          .imageStyle(width: 40, height: 40)
+          .imageType(.avatar)
       }
       VStack(alignment: .leading) {
         HStack {

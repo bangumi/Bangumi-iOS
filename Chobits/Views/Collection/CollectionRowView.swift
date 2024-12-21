@@ -1,10 +1,3 @@
-//
-//  CollectionRowView.swift
-//  Chobits
-//
-//  Created by Chuan Chuan on 2024/5/15.
-//
-
 import SwiftData
 import SwiftUI
 
@@ -28,7 +21,9 @@ struct CollectionRowView: View {
   var body: some View {
     HStack(alignment: .top) {
       NavigationLink(value: NavDestination.subject(subjectId)) {
-        ImageView(img: subject?.images?.common, width: 60, height: 60, type: .subject)
+        ImageView(img: subject?.images?.common)
+          .imageStyle(width: 60, height: 60)
+          .imageType(.subject)
       }
       VStack(alignment: .leading) {
         NavigationLink(value: NavDestination.subject(subjectId)) {

@@ -1,10 +1,3 @@
-//
-//  Request.swift
-//  Chobits
-//
-//  Created by Chuan Chuan on 2024/6/5.
-//
-
 import Foundation
 
 struct SubjectsBrowseFilterDTO {

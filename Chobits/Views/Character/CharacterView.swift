@@ -1,10 +1,3 @@
-//
-//  CharacterView.swift
-//  Chobits
-//
-//  Created by Chuan Chuan on 2024/5/9.
-//
-
 import OSLog
 import SwiftData
 import SwiftUI
@@ -72,10 +65,7 @@ struct CharacterView: View {
 
             /// header
             HStack(alignment: .top) {
-              ImageView(
-                img: character.images?.medium, width: 120, height: 160,
-                alignment: .top, large: character.images?.large
-              ) {
+              ImageView(img: character.images?.medium, large: character.images?.large) {
                 if character.nsfw {
                   Text("18+")
                     .padding(2)
@@ -86,6 +76,8 @@ struct CharacterView: View {
                     .clipShape(Capsule())
                 }
               }
+              .imageStyle(width: 120, height: 160)
+              .imageType(.person)
               VStack(alignment: .leading) {
                 HStack {
                   Image(systemName: character.roleEnum.icon)

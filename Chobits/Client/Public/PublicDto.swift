@@ -1,10 +1,3 @@
-//
-//  PublicDto.swift
-//  Chobits
-//
-//  Created by Chuan Chuan on 2024/4/21.
-//
-
 import Foundation
 
 struct AppInfo: Codable {

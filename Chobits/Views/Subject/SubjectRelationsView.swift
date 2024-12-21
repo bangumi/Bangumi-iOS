@@ -1,10 +1,3 @@
-//
-//  SubjectRelationsView.swift
-//  Chobits
-//
-//  Created by Chuan Chuan on 2024/5/8.
-//
-
 import Foundation
 import SwiftData
 import SwiftUI
@@ -76,10 +69,7 @@ struct SubjectRelationsView: View {
             .font(.caption)
             NavigationLink(value: NavDestination.subject(relation.subject.id)) {
               if let ctype = collections[relation.subject.id] {
-                ImageView(
-                  img: relation.subject.images?.common,
-                  width: 90, height: 120, type: .subject
-                ) {
+                ImageView(img: relation.subject.images?.common) {
                 } caption: {
                   HStack {
                     Image(systemName: ctype.icon)
@@ -87,11 +77,12 @@ struct SubjectRelationsView: View {
                     Text(ctype.description(relation.subject.type))
                   }.padding(.horizontal, 4)
                 }
+                .imageStyle(width: 90, height: 120)
+                .imageType(.subject)
               } else {
-                ImageView(
-                  img: relation.subject.images?.common,
-                  width: 90, height: 120, type: .subject
-                )
+                ImageView(img: relation.subject.images?.common)
+                  .imageStyle(width: 90, height: 120)
+                  .imageType(.subject)
               }
             }.buttonStyle(.navLink)
             Text(relation.subject.name)

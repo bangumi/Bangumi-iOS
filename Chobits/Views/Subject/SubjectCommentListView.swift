@@ -1,10 +1,3 @@
-//
-//  SubjectCommentListView.swift
-//  Chobits
-//
-//  Created by Chuan Chuan on 2024/10/5.
-//
-
 import OSLog
 import SwiftData
 import SwiftUI
@@ -80,7 +73,9 @@ struct SubjectCommentListView: View {
           let comment = item.inner
           HStack(alignment: .top) {
             NavigationLink(value: NavDestination.user(comment.user.uid)) {
-              ImageView(img: comment.user.avatar?.large, width: 32, height: 32, type: .avatar)
+              ImageView(img: comment.user.avatar?.large)
+                .imageStyle(width: 32, height: 32)
+                .imageType(.avatar)
             }
             VStack(alignment: .leading) {
               HStack {

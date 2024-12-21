@@ -1,10 +1,3 @@
-//
-//  EpisodeGridView.swift
-//  Chobits
-//
-//  Created by Chuan Chuan on 2024/5/5.
-//
-
 import Flow
 import OSLog
 import SwiftData

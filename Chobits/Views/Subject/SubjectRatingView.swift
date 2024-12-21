@@ -1,10 +1,3 @@
-//
-//  SubjectRatingView.swift
-//  Chobits
-//
-//  Created by Chuan Chuan on 2024/4/28.
-//
-
 import Flow
 import SwiftUI
 

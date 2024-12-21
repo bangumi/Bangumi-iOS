@@ -1,10 +1,3 @@
-//
-//  EpisodeListView.swift
-//  Chobits
-//
-//  Created by Chuan Chuan on 2024/5/5.
-//
-
 import OSLog
 import SwiftData
 import SwiftUI

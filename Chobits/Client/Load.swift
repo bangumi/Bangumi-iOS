@@ -1,10 +1,3 @@
-//
-//  Load.swift
-//  Chobits
-//
-//  Created by Chuan Chuan on 2024/5/7.
-//
-
 import Foundation
 import OSLog
 import SwiftData

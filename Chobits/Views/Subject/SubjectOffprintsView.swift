@@ -1,10 +1,3 @@
-//
-//  SubjectOffprintsView.swift
-//  Chobits
-//
-//  Created by Chuan Chuan on 2024/12/16.
-//
-
 import Foundation
 import SwiftData
 import SwiftUI
@@ -51,10 +44,7 @@ struct SubjectOffprintsView: View {
           NavigationLink(value: NavDestination.subject(offprint.subject.id)) {
             VStack {
               if let ctype = collections[offprint.subject.id] {
-                ImageView(
-                  img: offprint.subject.images?.common,
-                  width: 60, height: 80, type: .subject
-                ) {
+                ImageView(img: offprint.subject.images?.common) {
                 } caption: {
                   HStack {
                     Image(systemName: ctype.icon)
@@ -62,11 +52,12 @@ struct SubjectOffprintsView: View {
                     Text(ctype.description(offprint.subject.type))
                   }.padding(.horizontal, 4)
                 }
+                .imageStyle(width: 60, height: 80)
+                .imageType(.subject)
               } else {
-                ImageView(
-                  img: offprint.subject.images?.common,
-                  width: 60, height: 80, type: .subject
-                )
+                ImageView(img: offprint.subject.images?.common)
+                  .imageStyle(width: 60, height: 80)
+                  .imageType(.subject)
               }
               Spacer()
             }

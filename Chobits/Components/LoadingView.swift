@@ -1,10 +1,3 @@
-//
-//  LoadingView.swift
-//  Chobits
-//
-//  Created by Chuan Chuan on 2024/4/28.
-//
-
 import SwiftUI
 
 struct LoadingView: View {

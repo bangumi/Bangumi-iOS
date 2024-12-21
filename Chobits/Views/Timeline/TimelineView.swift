@@ -1,10 +1,3 @@
-//
-//  TimelineView.swift
-//  Chobits
-//
-//  Created by Chuan Chuan on 2024/4/19.
-//
-
 import OSLog
 import SwiftData
 import SwiftUI
@@ -51,7 +44,9 @@ struct ChiiTimelineView: View {
         if let me = profile {
           ToolbarItem(placement: .topBarLeading) {
             HStack {
-              ImageView(img: me.avatar?.medium, width: 32, height: 32)
+              ImageView(img: me.avatar?.medium)
+                .imageStyle(width: 32, height: 32)
+                .imageType(.avatar)
               VStack(alignment: .leading) {
                 Text("\(me.nickname)")
                   .font(.footnote)
@@ -70,7 +65,9 @@ struct ChiiTimelineView: View {
       } else {
         ToolbarItem(placement: .topBarLeading) {
           HStack {
-            ImageView(img: nil, width: 32, height: 32, type: .avatar)
+            ImageView(img: nil)
+              .imageStyle(width: 32, height: 32)
+              .imageType(.avatar)
             Text("未登录")
               .font(.footnote)
               .lineLimit(2)
