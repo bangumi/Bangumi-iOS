@@ -9,8 +9,6 @@ struct CharacterCastItemView: View {
         ImageView(img: item.subject.images?.common) {
         } caption: {
           Text(item.type.description)
-            .font(.caption)
-            .foregroundStyle(.white)
         }
         .imageStyle(width: 60, height: 60, alignment: .top)
         .imageType(.subject)
@@ -52,8 +50,6 @@ struct CharacterCastItemView: View {
               ImageView(img: person.images?.grid) {
               } caption: {
                 Text("Actor")
-                  .font(.caption)
-                  .foregroundStyle(.white)
               }
               .imageStyle(width: 40, height: 40, alignment: .top)
               .imageType(.person)

@@ -61,6 +61,9 @@ struct ImageView<ImageBadge: View, ImageCaption: View>: View {
   @Environment(\.imageStyle) var style
   @Environment(\.imageType) var type
 
+  @State private var width: CGFloat = 0
+  @State private var height: CGFloat = 0
+
   init(
     img: String?, large: String? = nil,
     @ViewBuilder badge: () -> ImageBadge,
@@ -125,49 +128,40 @@ struct ImageView<ImageBadge: View, ImageCaption: View>: View {
           }
         }
       }
+      .onGeometryChange(for: CGSize.self) { proxy in
+        proxy.size
+      } action: { newSize in
+        self.width = newSize.width
+        self.height = newSize.height
+      }
       if ImageCaption.self != EmptyView.self {
-        VStack {
-          Spacer()
-          ZStack {
-            Rectangle()
-              .fill(
-                LinearGradient(
-                  gradient: Gradient(colors: [
-                    Color.black.opacity(0),
-                    Color.black.opacity(0),
-                    Color.black.opacity(0),
-                    Color.black.opacity(0),
-                    Color.black.opacity(0.1),
-                    Color.black.opacity(0.2),
-                    Color.black.opacity(0.3),
-                    Color.black.opacity(0.6),
-                  ]), startPoint: .top, endPoint: .bottom))
-            VStack {
-              Spacer()
-              caption
-            }
-            .font(.caption)
-            .foregroundStyle(.white)
-            .padding(.bottom, 2)
+        ZStack {
+          Rectangle()
+            .fill(
+              LinearGradient(
+                gradient: Gradient(colors: [
+                  Color.black.opacity(0),
+                  Color.black.opacity(0),
+                  Color.black.opacity(0),
+                  Color.black.opacity(0),
+                  Color.black.opacity(0.1),
+                  Color.black.opacity(0.2),
+                  Color.black.opacity(0.3),
+                  Color.black.opacity(0.6),
+                ]), startPoint: .top, endPoint: .bottom))
+          VStack {
+            Spacer()
+            caption
           }
-        }.frame(
-          width: style.width == 0 ? .infinity : style.width,
-          height: style.height == 0 ? .infinity : style.height,
-          alignment: .bottom
-        )
+          .font(.caption)
+          .foregroundStyle(.white)
+          .padding(.bottom, 2)
+        }.frame(width: width, height: height, alignment: .bottom)
       }
       if ImageBadge.self != EmptyView.self {
-        VStack {
-          HStack {
-            badge
-            Spacer()
-          }
-          Spacer()
-        }.frame(
-          width: style.width == 0 ? .infinity : style.width,
-          height: style.height == 0 ? .infinity : style.height,
-          alignment: .top
-        )
+        ZStack {
+          badge
+        }.frame(width: width, height: height, alignment: .topLeading)
       }
     }
     .contextMenu {
@@ -265,6 +259,17 @@ extension ImageView {
       } caption: {
         Text("abc")
       }.imageStyle(width: 60, height: 80)
+      ImageView(img: "https://lain.bgm.tv/pic/cover/l/5e/39/140534_cUj6H.jpg") {
+        Text("18+")
+          .padding(2)
+          .background(.red.opacity(0.8))
+          .padding(2)
+          .foregroundStyle(.white)
+          .font(.caption)
+          .clipShape(Capsule())
+      } caption: {
+        Text("天道花怜")
+      }
     }.padding()
   }
 }

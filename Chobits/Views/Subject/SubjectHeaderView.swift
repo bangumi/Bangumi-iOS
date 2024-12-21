@@ -24,7 +24,7 @@ struct SubjectHeaderView: View {
       .multilineTextAlignment(.leading)
       .textSelection(.enabled)
     HStack {
-      ImageView(img: subject.images?.common) {
+      ImageView(img: subject.images?.large, large: subject.images?.large) {
         if subject.nsfw {
           Text("18+")
             .padding(2)

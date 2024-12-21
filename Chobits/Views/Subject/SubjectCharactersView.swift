@@ -36,9 +36,7 @@ struct SubjectCharactersView: View {
             NavigationLink(value: NavDestination.character(item.character.id)) {
               ImageView(img: item.character.images?.medium) {
               } caption: {
-                Text(item.type.description)
-                  .foregroundStyle(.white)
-                  .lineLimit(1)
+                Text(item.type.description).lineLimit(1)
               }
               .imageStyle(width: 60, height: 80, alignment: .top)
             }.buttonStyle(.plain)

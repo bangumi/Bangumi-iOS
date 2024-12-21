@@ -38,8 +38,6 @@ struct SubjectCharacterListView: View {
               ImageView(img: item.character.images?.medium) {
               } caption: {
                 Text(item.type.description)
-                  .font(.caption)
-                  .foregroundStyle(.white)
               }
               .imageStyle(width: 60, height: 90, alignment: .top)
             }
