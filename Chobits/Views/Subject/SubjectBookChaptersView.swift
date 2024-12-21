@@ -112,7 +112,7 @@ struct SubjectBookChaptersView: View {
             Text("Chap.").foregroundStyle(.secondary)
             TextField("\(epStatus)", text: $inputEps)
               .keyboardType(.numberPad)
-              .frame(minWidth: 50, maxWidth: 100)
+              .frame(minWidth: 50, maxWidth: 77)
               .multilineTextAlignment(.trailing)
               .fixedSize(horizontal: true, vertical: false)
               .padding(.trailing, 2)
@@ -135,7 +135,7 @@ struct SubjectBookChaptersView: View {
             Text("Vol. ").foregroundStyle(.secondary)
             TextField("\(volStatus)", text: $inputVols)
               .keyboardType(.numberPad)
-              .frame(minWidth: 50, maxWidth: 100)
+              .frame(minWidth: 50, maxWidth: 77)
               .multilineTextAlignment(.trailing)
               .fixedSize(horizontal: true, vertical: false)
               .padding(.trailing, 2)
@@ -243,7 +243,7 @@ struct SubjectBookChaptersView: View {
             HStack(alignment: .firstTextBaseline, spacing: 0) {
               TextField("\(epStatus)", text: $inputEps)
                 .keyboardType(.numberPad)
-                .frame(minWidth: 20, maxWidth: 40)
+                .frame(minWidth: 20, maxWidth: 42)
                 .multilineTextAlignment(.trailing)
                 .fixedSize(horizontal: true, vertical: false)
                 .padding(.trailing, 2)
@@ -264,7 +264,7 @@ struct SubjectBookChaptersView: View {
             HStack(alignment: .firstTextBaseline, spacing: 0) {
               TextField("\(volStatus)", text: $inputVols)
                 .keyboardType(.numberPad)
-                .frame(minWidth: 20, maxWidth: 40)
+                .frame(minWidth: 20, maxWidth: 42)
                 .multilineTextAlignment(.trailing)
                 .fixedSize(horizontal: true, vertical: false)
                 .padding(.trailing, 2)
@@ -290,6 +290,7 @@ struct SubjectBookChaptersView: View {
               } label: {
                 Image(systemName: "checkmark.circle")
               }
+              .font(.title3)
               .disabled(true)
               .hidden()
               .buttonStyle(.plain)
