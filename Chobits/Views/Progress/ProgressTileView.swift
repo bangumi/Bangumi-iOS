@@ -1,5 +1,6 @@
 import SwiftData
 import SwiftUI
+import WaterfallGrid
 
 struct ProgressTileView: View {
   let subjectType: SubjectType
@@ -15,12 +16,6 @@ struct ProgressTileView: View {
   var columns: Int {
     let columns = Int((width - 16) / 160)
     return columns > 0 ? columns : 1
-  }
-
-  var columnWidth: CGFloat {
-    let minWidth: CGFloat = 160
-    let maxWidth: CGFloat = (width - 8 * (CGFloat(columns) + 1)) / CGFloat(columns)
-    return max(maxWidth, minWidth)
   }
 
   var items: [Int: [UserSubjectCollection]] {
@@ -50,17 +45,13 @@ struct ProgressTileView: View {
   }
 
   var body: some View {
-    HStack(alignment: .top, spacing: 8) {
-      ForEach(Array(items.keys.sorted()), id: \.self) { idx in
-        LazyVStack {
-          ForEach(items[idx] ?? [], id: \.self) { collection in
-            CardView {
-              ProgressTileItemView(subjectId: collection.subjectId).environment(collection)
-            }
-          }
-        }.frame(width: columnWidth, alignment: .top)
+    WaterfallGrid(collections) { collection in
+      CardView {
+        ProgressTileItemView(subjectId: collection.subjectId).environment(collection)
       }
-    }.padding(.horizontal, 8)
+    }
+    .gridStyle(columns: columns, spacing: 8)
+    .padding(.horizontal, 8)
   }
 }
 
