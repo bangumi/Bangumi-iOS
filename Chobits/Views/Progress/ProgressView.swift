@@ -12,6 +12,8 @@ struct ChiiProgressView: View {
   @State private var refreshing: Bool = false
   @State private var refreshProgress: CGFloat = 0
 
+  @State private var width: CGFloat = 0
+
   @FocusState private var searching: Bool
   @State private var search: String = ""
   @State private var subjectType: SubjectType = .none
@@ -98,100 +100,103 @@ struct ChiiProgressView: View {
   var body: some View {
     VStack {
       if isAuthenticated {
-        GeometryReader { geo in
-          ScrollView {
-            if refreshing {
-              if collectionsUpdatedAt == 0 {
-                HStack {
-                  ProgressView(value: refreshProgress)
-                }
-                .padding()
-                .frame(height: 40)
-              } else {
-                HStack {
-                  Spacer()
-                  ProgressView()
-                  Spacer()
-                }.frame(height: 40)
+        ScrollView {
+          if refreshing {
+            if collectionsUpdatedAt == 0 {
+              HStack {
+                ProgressView(value: refreshProgress)
               }
-            }
-            Picker("Subject Type", selection: $subjectType) {
-              ForEach(SubjectType.progressTypes) { type in
-                Text("\(type.description)(\(counts[type, default: 0]))").tag(type)
-              }
-            }
-            .padding(.horizontal, 8)
-            .pickerStyle(.segmented)
-            .onAppear {
-              if !counts.isEmpty {
-                return
-              }
-              Task {
-                await loadCounts()
-                refreshing = true
-                await refresh()
-                refreshing = false
-                await loadCounts()
-              }
-            }
-            .onChange(of: subjectType) {
-              Task {
-                await loadCounts()
-              }
-            }
-            if collectionsUpdatedAt > 0 {
-              switch ProgressMode(progressMode) {
-              case .list:
-                ProgressListView(subjectType: subjectType, search: search)
-              case .tile:
-                ProgressTileView(
-                  subjectType: subjectType, search: search, width: geo.size.width
-                )
-              }
+              .padding()
+              .frame(height: 40)
             } else {
-              if refreshing {
+              HStack {
+                Spacer()
                 ProgressView()
-                  .padding()
-                  .frame(height: 40)
-              } else {
-                VStack {
-                  Spacer()
-                  Text("没有收藏数据，请下拉刷新")
-                    .font(.title3)
-                    .foregroundColor(.secondary)
-                  Spacer()
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-              }
+                Spacer()
+              }.frame(height: 40)
             }
           }
-          .searchable(text: $search)
-          .animation(.default, value: subjectType)
-          .animation(.default, value: counts)
-          .refreshable {
-            if refreshing {
+          Picker("Subject Type", selection: $subjectType) {
+            ForEach(SubjectType.progressTypes) { type in
+              Text("\(type.description)(\(counts[type, default: 0]))").tag(type)
+            }
+          }
+          .padding(.horizontal, 8)
+          .pickerStyle(.segmented)
+          .onAppear {
+            if !counts.isEmpty {
               return
             }
-            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-            await refresh()
-            await loadCounts()
+            Task {
+              await loadCounts()
+              refreshing = true
+              await refresh()
+              refreshing = false
+              await loadCounts()
+            }
           }
-          .navigationTitle("进度管理")
-          .toolbarTitleDisplayMode(.inlineLarge)
-          .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-              Menu {
-                Button("刷新所有收藏", role: .destructive) {
-                  Task {
-                    refreshing = true
-                    await refresh(force: true)
-                    refreshing = false
-                    await loadCounts()
-                  }
-                }
-              } label: {
-                Image(systemName: "ellipsis.circle")
+          .onChange(of: subjectType) {
+            Task {
+              await loadCounts()
+            }
+          }
+          if collectionsUpdatedAt > 0 {
+            switch ProgressMode(progressMode) {
+            case .list:
+              ProgressListView(subjectType: subjectType, search: search)
+            case .tile:
+              ProgressTileView(subjectType: subjectType, search: search, width: width)
+            }
+          } else {
+            if refreshing {
+              ProgressView()
+                .padding()
+                .frame(height: 40)
+            } else {
+              VStack {
+                Spacer()
+                Text("没有收藏数据，请下拉刷新")
+                  .font(.title3)
+                  .foregroundColor(.secondary)
+                Spacer()
               }
+              .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
+          }
+        }
+        .searchable(text: $search)
+        .animation(.default, value: subjectType)
+        .animation(.default, value: counts)
+        .onGeometryChange(for: CGSize.self) { proxy in
+          proxy.size
+        } action: { newSize in
+          if self.width != newSize.width {
+            self.width = newSize.width
+          }
+        }
+        .refreshable {
+          if refreshing {
+            return
+          }
+          UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+          await refresh()
+          await loadCounts()
+        }
+        .navigationTitle("进度管理")
+        .toolbarTitleDisplayMode(.inlineLarge)
+        .toolbar {
+          ToolbarItem(placement: .topBarTrailing) {
+            Menu {
+              Button("刷新所有收藏", role: .destructive) {
+                Task {
+                  refreshing = true
+                  await refresh(force: true)
+                  refreshing = false
+                  await loadCounts()
+                }
+              }
+            } label: {
+              Image(systemName: "ellipsis.circle")
             }
           }
         }

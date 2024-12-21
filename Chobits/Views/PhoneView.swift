@@ -21,7 +21,6 @@ struct PhoneView: View {
 
       NavigationStack {
         ChiiTimelineView()
-          .navigationBarTitleDisplayMode(.inline)
           .navigationDestination(for: NavDestination.self) { $0 }
       }
       .tag(ChiiViewTab.timeline)
@@ -32,7 +31,6 @@ struct PhoneView: View {
       if isAuthenticated {
         NavigationStack {
           ChiiProgressView()
-            .navigationBarTitleDisplayMode(.inline)
             .navigationDestination(for: NavDestination.self) { $0 }
         }
         .tag(ChiiViewTab.progress)
@@ -49,9 +47,7 @@ struct PhoneView: View {
             } else {
               CalendarView()
             }
-          }
-          .navigationBarTitleDisplayMode(.inline)
-          .navigationDestination(for: NavDestination.self) { $0 }
+          }.navigationDestination(for: NavDestination.self) { $0 }
         }
         .searchable(text: $searchQuery, isPresented: $searching)
         .onSubmit(of: .search) {

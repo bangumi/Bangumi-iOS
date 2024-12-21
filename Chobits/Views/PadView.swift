@@ -26,7 +26,6 @@ struct PadView: View {
       Tab(ChiiViewTab.timeline.title, systemImage: ChiiViewTab.timeline.icon, value: .timeline) {
         NavigationStack {
           ChiiTimelineView()
-            .navigationBarTitleDisplayMode(.inline)
             .navigationDestination(for: NavDestination.self) { $0 }
         }
       }
@@ -35,7 +34,6 @@ struct PadView: View {
         Tab(ChiiViewTab.progress.title, systemImage: ChiiViewTab.progress.icon, value: .progress) {
           NavigationStack {
             ChiiProgressView()
-              .navigationBarTitleDisplayMode(.inline)
               .navigationDestination(for: NavDestination.self) { $0 }
           }
         }
@@ -52,9 +50,7 @@ struct PadView: View {
             } else {
               CalendarView()
             }
-          }
-          .navigationBarTitleDisplayMode(.inline)
-          .navigationDestination(for: NavDestination.self) { $0 }
+          }.navigationDestination(for: NavDestination.self) { $0 }
         }
         .searchable(text: $searchQuery, isPresented: $searching, placement: .toolbar)
         .onSubmit(of: .search) {
