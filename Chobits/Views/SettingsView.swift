@@ -16,6 +16,7 @@ struct SettingsView: View {
   @AppStorage("defaultTab") var defaultTab: String = ChiiViewTab.discover.label
   @AppStorage("progressMode") var progressMode: String = ProgressMode.list
     .label
+  @AppStorage("progressLimit") var progressLimit: Int = 50
   @AppStorage("isolationMode") var isolationMode: Bool = false
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
 
@@ -26,7 +27,7 @@ struct SettingsView: View {
   @State private var selectedAppearance: AppearanceType = .system
   @State private var selectedDefaultTab: ChiiViewTab = .discover
   @State private var selectedProgressMode: ProgressMode = .list
-  @State private var selectedDefaultProgressType: SubjectType = .anime
+  @State private var selectedProgressLimit: Int = 50
   @State private var isolationModeEnabled: Bool = false
 
   @State private var refreshing: Bool = false
@@ -38,6 +39,7 @@ struct SettingsView: View {
     selectedAppearance = AppearanceType(appearance)
     selectedDefaultTab = ChiiViewTab(defaultTab)
     selectedProgressMode = ProgressMode(progressMode)
+    selectedProgressLimit = progressLimit
     isolationModeEnabled = isolationMode
   }
 
@@ -133,6 +135,15 @@ struct SettingsView: View {
           }
           .onChange(of: selectedProgressMode) { _, _ in
             progressMode = selectedProgressMode.label
+          }
+
+          Picker(selection: $selectedProgressLimit, label: Text("进度管理数量")) {
+            Text("50").tag(50)
+            Text("100").tag(100)
+            Text("无限制").tag(0)
+          }
+          .onChange(of: selectedProgressLimit) { _, _ in
+            progressLimit = selectedProgressLimit
           }
         }
       }
