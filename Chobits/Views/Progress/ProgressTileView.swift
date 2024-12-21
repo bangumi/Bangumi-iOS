@@ -44,20 +44,19 @@ struct ProgressTileView: View {
     return (width - 16 - columns * 8 + 8) / columns
   }
 
-  var items: [[UserSubjectCollection]] {
-    let columnCount = columns
-    var result: [[UserSubjectCollection]] = Array(repeating: [], count: columnCount)
+  var items: [Int: [UserSubjectCollection]] {
+    var result: [Int: [UserSubjectCollection]] = [:]
     for (index, collection) in collections.enumerated() {
-      result[index % columnCount].append(collection)
+      result[index % columns, default: []].append(collection)
     }
     return result
   }
 
   var body: some View {
     HStack(alignment: .top, spacing: 8) {
-      ForEach(items, id: \.self) { data in
+      ForEach(Array(items.keys), id: \.self) { idx in
         LazyVStack(alignment: .leading, spacing: 8) {
-          ForEach(data) { collection in
+          ForEach(items[idx] ?? []) { collection in
             CardView(padding: 8) {
               ProgressTileItemView(subjectId: collection.subjectId, width: cardWidth)
                 .environment(collection)
