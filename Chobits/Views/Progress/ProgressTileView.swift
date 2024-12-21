@@ -113,7 +113,7 @@ struct ProgressTileItemView: View {
   var body: some View {
     VStack(alignment: .leading, spacing: 8) {
       NavigationLink(value: NavDestination.subject(subjectId)) {
-        ImageView(img: collection.subject?.images?.large) {
+        ImageView(img: collection.subject?.images?.resize(.r400)) {
           if collection.priv {
             Image(systemName: "lock")
               .padding(2)

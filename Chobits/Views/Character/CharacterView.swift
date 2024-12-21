@@ -65,7 +65,7 @@ struct CharacterView: View {
 
             /// header
             HStack(alignment: .top) {
-              ImageView(img: character.images?.large, large: character.images?.large) {
+              ImageView(img: character.images?.large, large: character.images?.resize(.r400)) {
                 if character.nsfw {
                   Text("18+")
                     .padding(2)

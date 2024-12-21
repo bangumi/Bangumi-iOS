@@ -1,12 +1,29 @@
 import Foundation
 import OSLog
 
+let HTTPS = "https"
+let CDN_DOMAIN = "lain.bgm.tv"
+
+enum ImageSize: Int {
+  case r100 = 100
+  case r200 = 200
+  case r400 = 400
+  case r600 = 600
+  case r800 = 800
+  case r1200 = 1200
+}
+
 struct SubjectImages: Codable, Hashable {
   var large: String
   var common: String
   var medium: String
   var small: String
   var grid: String
+
+  func resize(_ size: ImageSize) -> String {
+    guard let url = URL(string: large) else { return "" }
+    return "\(url.scheme ?? HTTPS)://\(url.host ?? CDN_DOMAIN)/r/\(size.rawValue)\(url.path)"
+  }
 }
 
 struct Images: Codable, Hashable {
@@ -14,6 +31,11 @@ struct Images: Codable, Hashable {
   var medium: String
   var small: String
   var grid: String
+
+  func resize(_ size: ImageSize) -> String {
+    guard let url = URL(string: large) else { return "" }
+    return "\(url.scheme ?? HTTPS)://\(url.host ?? CDN_DOMAIN)/r/\(size.rawValue)\(url.path)"
+  }
 }
 
 struct Avatar: Codable, Hashable {
