@@ -41,7 +41,7 @@ struct ProgressTileView: View {
 
   var cardWidth: CGFloat {
     let columns = CGFloat(self.columns)
-    return (width - 16 - columns * 8 + 8) / columns
+    return ((width - 16 - columns * 8 + 8) / columns) - 16
   }
 
   var items: [Int: [UserSubjectCollection]] {
@@ -60,6 +60,7 @@ struct ProgressTileView: View {
             CardView(padding: 8) {
               ProgressTileItemView(subjectId: collection.subjectId, width: cardWidth)
                 .environment(collection)
+                .frame(width: cardWidth)
             }
           }
         }
@@ -101,12 +102,8 @@ struct ProgressTileItemView: View {
     collection.subject?.volumes ?? 0
   }
 
-  var imageWidth: CGFloat {
-    width - 16
-  }
-
   var imageHeight: CGFloat {
-    imageWidth * 1.4
+    width * 1.4
   }
 
   func markNextWatched() {
@@ -139,7 +136,7 @@ struct ProgressTileItemView: View {
               .clipShape(Capsule())
           }
         }
-        .imageStyle(width: imageWidth, height: imageHeight)
+        .imageStyle(width: width, height: imageHeight)
         .imageType(.subject)
       }.buttonStyle(.navLink)
 
