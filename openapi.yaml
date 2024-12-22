@@ -111,6 +111,30 @@ components:
         - public
       title: BlogEntry
       type: object
+    Calendar:
+      additionalProperties:
+        items:
+          properties:
+            subject:
+              $ref: '#/components/schemas/SlimSubject'
+            watchers:
+              type: integer
+          required:
+            - subject
+            - watchers
+          type: object
+        type: array
+      type: object
+    CalendarItem:
+      properties:
+        subject:
+          $ref: '#/components/schemas/SlimSubject'
+        watchers:
+          type: integer
+      required:
+        - subject
+        - watchers
+      type: object
     Character:
       properties:
         collects:
@@ -187,6 +211,30 @@ components:
         - subject
         - type
       type: object
+    CollectionType:
+      description: |-
+        条目收藏状态
+          - 1 = 想看
+          - 2 = 看过
+          - 3 = 在看
+          - 4 = 搁置
+          - 5 = 抛弃
+      enum:
+        - 1
+        - 2
+        - 3
+        - 4
+        - 5
+      type: integer
+      x-enum-varnames:
+        - Wish
+        - Collect
+        - Doing
+        - OnHold
+        - Dropped
+      x-ms-enum:
+        modelAsString: false
+        name: CollectionType
     CreateTopic:
       example:
         cf-turnstile-response: 10000000-aaaa-bbbb-cccc-000000000001
@@ -281,28 +329,7 @@ components:
         subjectID:
           type: integer
         type:
-          anyOf:
-            - enum:
-                - 0
-              type: number
-            - enum:
-                - 1
-              type: number
-            - enum:
-                - 2
-              type: number
-            - enum:
-                - 3
-              type: number
-            - enum:
-                - 4
-              type: number
-            - enum:
-                - 5
-              type: number
-            - enum:
-                - 6
-              type: number
+          $ref: '#/components/schemas/EpisodeType'
       required:
         - id
         - subjectID
@@ -318,6 +345,27 @@ components:
         - lock
       title: Episode
       type: object
+    EpisodeCollectionStatus:
+      description: |-
+        剧集收藏状态
+          - 0 = 撤消/删除
+          - 1 = 想看
+          - 2 = 看过
+          - 3 = 抛弃
+      enum:
+        - 0
+        - 1
+        - 2
+        - 3
+      type: integer
+      x-enum-varnames:
+        - None
+        - Wish
+        - Done
+        - Dropped
+      x-ms-enum:
+        modelAsString: false
+        name: EpisodeCollectionStatus
     EpisodeComments:
       allOf:
         - properties:
@@ -356,6 +404,36 @@ components:
             - replies
           type: object
       type: object
+    EpisodeType:
+      description: |-
+        话数类型
+          - 0 = 本篇
+          - 1 = 特别篇
+          - 2 = OP
+          - 3 = ED
+          - 4 = 预告/宣传/广告
+          - 5 = MAD
+          - 6 = 其他
+      enum:
+        - 0
+        - 1
+        - 2
+        - 3
+        - 4
+        - 5
+        - 6
+      type: integer
+      x-enum-varnames:
+        - Normal
+        - Special
+        - OP
+        - ED
+        - Pre
+        - MAD
+        - Other
+      x-ms-enum:
+        modelAsString: false
+        name: EpisodeType
     EpisodeWikiInfo:
       properties:
         date:
@@ -379,28 +457,7 @@ components:
         summary:
           type: string
         type:
-          anyOf:
-            - enum:
-                - 0
-              type: number
-            - enum:
-                - 1
-              type: number
-            - enum:
-                - 2
-              type: number
-            - enum:
-                - 3
-              type: number
-            - enum:
-                - 4
-              type: number
-            - enum:
-                - 5
-              type: number
-            - enum:
-                - 6
-              type: number
+          $ref: '#/components/schemas/EpisodeType'
       required:
         - id
         - subjectID
@@ -428,6 +485,21 @@ components:
         - message
         - statusCode
       type: object
+    FilterMode:
+      description: |-
+        过滤模式
+          - all = 全站
+          - friends = 好友
+      enum:
+        - all
+        - friends
+      type: string
+      x-enum-varnames:
+        - All
+        - Friends
+      x-ms-enum:
+        modelAsString: true
+        name: FilterMode
     Friend:
       properties:
         createdAt:
@@ -853,22 +925,7 @@ components:
         summary:
           type: string
         typeID:
-          anyOf:
-            - enum:
-                - 1
-              type: number
-            - enum:
-                - 2
-              type: number
-            - enum:
-                - 3
-              type: number
-            - enum:
-                - 4
-              type: number
-            - enum:
-                - 6
-              type: number
+          $ref: '#/components/schemas/SubjectType'
       required:
         - id
         - name
@@ -1019,6 +1076,26 @@ components:
         - nsfw
       title: SlimCharacter
       type: object
+    SlimGroup:
+      properties:
+        icon:
+          $ref: '#/components/schemas/Avatar'
+        id:
+          type: integer
+        name:
+          type: string
+        nsfw:
+          type: boolean
+        title:
+          type: string
+      required:
+        - id
+        - name
+        - nsfw
+        - title
+        - icon
+      title: SlimGroup
+      type: object
     SlimIndex:
       properties:
         createdAt:
@@ -1097,22 +1174,7 @@ components:
         nsfw:
           type: boolean
         type:
-          anyOf:
-            - enum:
-                - 1
-              type: number
-            - enum:
-                - 2
-              type: number
-            - enum:
-                - 3
-              type: number
-            - enum:
-                - 4
-              type: number
-            - enum:
-                - 6
-              type: number
+          $ref: '#/components/schemas/SubjectType'
       required:
         - id
         - name
@@ -1327,22 +1389,7 @@ components:
             $ref: '#/components/schemas/SubjectTag'
           type: array
         type:
-          anyOf:
-            - enum:
-                - 1
-              type: number
-            - enum:
-                - 2
-              type: number
-            - enum:
-                - 3
-              type: number
-            - enum:
-                - 4
-              type: number
-            - enum:
-                - 6
-              type: number
+          $ref: '#/components/schemas/SubjectType'
         volumes:
           type: integer
       required:
@@ -1415,22 +1462,7 @@ components:
         rate:
           type: integer
         type:
-          anyOf:
-            - enum:
-                - 1
-              type: number
-            - enum:
-                - 2
-              type: number
-            - enum:
-                - 3
-              type: number
-            - enum:
-                - 4
-              type: number
-            - enum:
-                - 5
-              type: number
+          $ref: '#/components/schemas/CollectionType'
         updatedAt:
           type: integer
         user:
@@ -1545,22 +1577,7 @@ components:
         summary:
           type: string
         type:
-          anyOf:
-            - enum:
-                - 1
-              type: number
-            - enum:
-                - 2
-              type: number
-            - enum:
-                - 3
-              type: number
-            - enum:
-                - 4
-              type: number
-            - enum:
-                - 6
-              type: number
+          $ref: '#/components/schemas/SubjectType'
       required:
         - name
         - type
@@ -1678,6 +1695,31 @@ components:
         - entry
       title: SubjectReview
       type: object
+    SubjectSort:
+      default: rank
+      description: |-
+        条目排序方式
+          - rank = 排名
+          - trends = 热度
+          - collects = 收藏数
+          - date = 发布日期
+          - title = 标题
+      enum:
+        - rank
+        - trends
+        - collects
+        - date
+        - title
+      type: string
+      x-enum-varnames:
+        - Rank
+        - Trends
+        - Collects
+        - Date
+        - Title
+      x-ms-enum:
+        modelAsString: true
+        name: SubjectSort
     SubjectStaff:
       properties:
         person:
@@ -1727,6 +1769,32 @@ components:
         - count
       title: SubjectTag
       type: object
+    SubjectType:
+      description: |-
+        条目类型
+          - 1 = 书籍
+          - 2 = 动画
+          - 3 = 音乐
+          - 4 = 游戏
+          - 6 = 三次元
+
+          没有 5
+      enum:
+        - 1
+        - 2
+        - 3
+        - 4
+        - 6
+      type: integer
+      x-enum-varnames:
+        - Book
+        - Anime
+        - Music
+        - Game
+        - Real
+      x-ms-enum:
+        modelAsString: false
+        name: SubjectType
     SubjectWikiInfo:
       properties:
         availablePlatform:
@@ -1750,22 +1818,7 @@ components:
         summary:
           type: string
         typeID:
-          anyOf:
-            - enum:
-                - 1
-              type: number
-            - enum:
-                - 2
-              type: number
-            - enum:
-                - 3
-              type: number
-            - enum:
-                - 4
-              type: number
-            - enum:
-                - 6
-              type: number
+          $ref: '#/components/schemas/SubjectType'
       required:
         - id
         - name
@@ -1782,64 +1835,17 @@ components:
         batch:
           type: boolean
         cat:
-          anyOf:
-            - enum:
-                - 1
-              type: number
-            - enum:
-                - 2
-              type: number
-            - enum:
-                - 3
-              type: number
-            - enum:
-                - 4
-              type: number
-            - enum:
-                - 5
-              type: number
-            - enum:
-                - 6
-              type: number
-            - enum:
-                - 7
-              type: number
-            - enum:
-                - 8
-              type: number
-            - enum:
-                - 9
-              type: number
+          $ref: '#/components/schemas/TimelineCat'
         createdAt:
           type: integer
         id:
           type: integer
-        image:
-          $ref: '#/components/schemas/TimelineImage'
         memo:
           $ref: '#/components/schemas/TimelineMemo'
         replies:
           type: integer
         source:
-          anyOf:
-            - enum:
-                - 0
-              type: number
-            - enum:
-                - 1
-              type: number
-            - enum:
-                - 2
-              type: number
-            - enum:
-                - 3
-              type: number
-            - enum:
-                - 4
-              type: number
-            - enum:
-                - 5
-              type: number
+          $ref: '#/components/schemas/TimelineSource'
         type:
           type: integer
         uid:
@@ -1852,143 +1858,79 @@ components:
         - cat
         - type
         - memo
-        - image
         - batch
         - source
         - replies
         - createdAt
       title: Timeline
       type: object
-    TimelineImage:
-      properties:
-        group:
-          items:
-            properties:
-              id:
-                type: integer
-              images:
-                $ref: '#/components/schemas/Avatar'
-            required:
-              - id
-            type: object
-          type: array
-        mono:
-          items:
-            properties:
-              cat:
-                type: integer
-              id:
-                type: integer
-              images:
-                $ref: '#/components/schemas/PersonImages'
-            required:
-              - cat
-              - id
-            type: object
-          type: array
-        subject:
-          items:
-            properties:
-              id:
-                type: integer
-              images:
-                $ref: '#/components/schemas/SubjectImages'
-            required:
-              - id
-            type: object
-          type: array
-        user:
-          items:
-            properties:
-              images:
-                $ref: '#/components/schemas/Avatar'
-              uid:
-                type: integer
-            required:
-              - uid
-            type: object
-          type: array
-      title: TimelineImage
-      type: object
+    TimelineCat:
+      description: |-
+        时间线类型
+          - 1 = 日常行为
+          - 2 = 维基操作
+          - 3 = 收藏条目
+          - 4 = 收视进度
+          - 5 = 状态
+          - 6 = 日志
+          - 7 = 目录
+          - 8 = 人物
+          - 9 = 天窗
+      enum:
+        - 1
+        - 2
+        - 3
+        - 4
+        - 5
+        - 6
+        - 7
+        - 8
+        - 9
+      type: integer
+      x-enum-varnames:
+        - Daily
+        - Wiki
+        - Subject
+        - Progress
+        - Status
+        - Blog
+        - Index
+        - Mono
+        - Doujin
+      x-ms-enum:
+        modelAsString: true
+        name: TimelineCat
     TimelineMemo:
       properties:
         blog:
-          properties:
-            desc:
-              type: string
-            id:
-              type: integer
-            title:
-              type: string
-          required:
-            - id
-            - title
-            - desc
-          type: object
+          $ref: '#/components/schemas/SlimBlogEntry'
         daily:
           properties:
-            group:
+            groups:
               items:
-                properties:
-                  desc:
-                    type: string
-                  id:
-                    type: integer
-                  name:
-                    type: string
-                  title:
-                    type: string
-                required:
-                  - id
-                  - name
-                  - title
-                  - desc
-                type: object
+                $ref: '#/components/schemas/SlimGroup'
               type: array
-            user:
+            users:
               items:
-                properties:
-                  nickname:
-                    type: string
-                  uid:
-                    type: integer
-                  username:
-                    type: string
-                required:
-                  - uid
-                  - username
-                  - nickname
-                type: object
+                $ref: '#/components/schemas/SlimUser'
               type: array
           type: object
         index:
-          properties:
-            desc:
-              type: string
-            id:
-              type: integer
-            title:
-              type: string
-          required:
-            - id
-            - title
-            - desc
-          type: object
+          $ref: '#/components/schemas/SlimIndex'
         mono:
-          items:
-            properties:
-              cat:
-                type: integer
-              id:
-                type: integer
-              name:
-                type: string
-            required:
-              - cat
-              - id
-              - name
-            type: object
-          type: array
+          properties:
+            characters:
+              items:
+                $ref: '#/components/schemas/SlimCharacter'
+              type: array
+            persons:
+              items:
+                $ref: '#/components/schemas/SlimPerson'
+              type: array
+          required:
+            - characters
+            - persons
+          type: object
         progress:
           properties:
             batch:
@@ -1997,40 +1939,26 @@ components:
                   type: string
                 epsUpdate:
                   type: integer
-                subjectID:
-                  type: integer
-                subjectName:
-                  type: string
+                subject:
+                  $ref: '#/components/schemas/SlimSubject'
                 volsTotal:
                   type: string
                 volsUpdate:
                   type: integer
               required:
                 - epsTotal
-                - epsUpdate
                 - volsTotal
-                - volsUpdate
-                - subjectID
-                - subjectName
+                - subject
               type: object
             single:
               properties:
-                epID:
-                  type: integer
-                epName:
-                  type: string
-                epSort:
-                  type: integer
-                subjectID:
-                  type: integer
-                subjectName:
-                  type: string
+                episode:
+                  $ref: '#/components/schemas/Episode'
+                subject:
+                  $ref: '#/components/schemas/SlimSubject'
               required:
-                - epID
-                - epName
-                - epSort
-                - subjectID
-                - subjectName
+                - episode
+                - subject
               type: object
           type: object
         status:
@@ -2055,24 +1983,12 @@ components:
             properties:
               comment:
                 type: string
-              id:
-                type: integer
-              name:
-                type: string
-              nameCN:
-                type: string
               rate:
                 type: number
-              series:
-                type: boolean
-              type:
-                type: integer
+              subject:
+                $ref: '#/components/schemas/SlimSubject'
             required:
-              - id
-              - type
-              - name
-              - nameCN
-              - series
+              - subject
               - comment
               - rate
             type: object
@@ -2080,23 +1996,37 @@ components:
         wiki:
           properties:
             subject:
-              properties:
-                id:
-                  type: integer
-                name:
-                  type: string
-                nameCN:
-                  type: string
-              required:
-                - id
-                - name
-                - nameCN
-              type: object
-          required:
-            - subject
+              $ref: '#/components/schemas/SlimSubject'
           type: object
       title: TimelineMemo
       type: object
+    TimelineSource:
+      description: |-
+        时间线来源
+          - 0 = 网站
+          - 1 = 移动端
+          - 2 = https://bgm.tv/onair
+          - 3 = https://netaba.re/
+          - 4 = WP
+          - 5 = API
+      enum:
+        - 0
+        - 1
+        - 2
+        - 3
+        - 4
+        - 5
+      type: integer
+      x-enum-varnames:
+        - Web
+        - Mobile
+        - OnAir
+        - InTouch
+        - WP
+        - API
+      x-ms-enum:
+        modelAsString: true
+        name: TimelineSource
     Topic:
       properties:
         createdAt:
@@ -2201,6 +2131,8 @@ components:
           type: string
         group:
           type: integer
+        homepage:
+          $ref: '#/components/schemas/UserHomepage'
         id:
           example: 1
           type: integer
@@ -2256,6 +2188,7 @@ components:
         - location
         - bio
         - networkServices
+        - homepage
       title: User
       type: object
     UserCharacterCollection:
@@ -2460,22 +2393,7 @@ components:
             type: string
           type: array
         type:
-          anyOf:
-            - enum:
-                - 1
-              type: number
-            - enum:
-                - 2
-              type: number
-            - enum:
-                - 3
-              type: number
-            - enum:
-                - 4
-              type: number
-            - enum:
-                - 5
-              type: number
+          $ref: '#/components/schemas/CollectionType'
         updatedAt:
           type: integer
         volStatus:
@@ -2496,19 +2414,7 @@ components:
         episode:
           $ref: '#/components/schemas/Episode'
         type:
-          anyOf:
-            - enum:
-                - 0
-              type: number
-            - enum:
-                - 1
-              type: number
-            - enum:
-                - 2
-              type: number
-            - enum:
-                - 3
-              type: number
+          $ref: '#/components/schemas/EpisodeCollectionStatus'
       required:
         - episode
         - type
@@ -2540,7 +2446,7 @@ info:
     关于订阅通知的 socket.io 相关的文档在
     <https://github.com/bangumi/GraphQL/blob/master/docs/socket.io.md>
   title: bangumi private api
-  version: 2024-12-15-f1d64a9
+  version: 2024-12-22-382bf5a
 openapi: 3.0.3
 paths:
   /p1/blocklist:
@@ -2649,6 +2555,29 @@ paths:
       summary: 将用户从绝交列表移出
       tags:
         - user
+  /p1/calendar:
+    get:
+      operationId: getCalendar
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Calendar'
+          description: Default Response
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                description: 意料之外的服务器错误
+          description: 意料之外的服务器错误
+      security:
+        - CookiesSession: []
+          HTTPBearer: []
+      summary: 获取每日放送
+      tags:
+        - calendar
   /p1/characters/{characterID}:
     get:
       operationId: getCharacter
@@ -2695,27 +2624,11 @@ paths:
     get:
       operationId: getCharacterCasts
       parameters:
-        - description: 条目类型
-          in: query
+        - in: query
           name: subjectType
           required: false
           schema:
-            anyOf:
-              - enum:
-                  - 1
-                type: number
-              - enum:
-                  - 2
-                type: number
-              - enum:
-                  - 3
-                type: number
-              - enum:
-                  - 4
-                type: number
-              - enum:
-                  - 6
-                type: number
+            $ref: '#/components/schemas/SubjectType'
         - description: '角色出场类型: 主角，配角，客串'
           in: query
           name: type
@@ -2755,6 +2668,7 @@ paths:
                       $ref: '#/components/schemas/CharacterSubject'
                     type: array
                   total:
+                    description: limit+offset 为参数的请求表示总条数，page 为参数的请求表示总页数
                     type: integer
                 required:
                   - data
@@ -2824,6 +2738,7 @@ paths:
                       $ref: '#/components/schemas/PersonCollect'
                     type: array
                   total:
+                    description: limit+offset 为参数的请求表示总条数，page 为参数的请求表示总页数
                     type: integer
                 required:
                   - data
@@ -2911,6 +2826,24 @@ paths:
       summary: 标记通知为已读
       tags:
         - user
+  /p1/debug:
+    get:
+      description: debug 路由
+      operationId: debug
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: {}
+          description: Default Response
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                description: 意料之外的服务器错误
+          description: 意料之外的服务器错误
+      summary: debug
   /p1/groups/-/posts/{postID}:
     delete:
       operationId: deleteGroupPost
@@ -3265,6 +3198,7 @@ paths:
                       $ref: '#/components/schemas/GroupMember'
                     type: array
                   total:
+                    description: limit+offset 为参数的请求表示总条数，page 为参数的请求表示总页数
                     type: integer
                 required:
                   - data
@@ -3356,6 +3290,7 @@ paths:
                       $ref: '#/components/schemas/Topic'
                     type: array
                   total:
+                    description: limit+offset 为参数的请求表示总条数，page 为参数的请求表示总页数
                     type: integer
                 required:
                   - data
@@ -3626,6 +3561,7 @@ paths:
                       $ref: '#/components/schemas/Notice'
                     type: array
                   total:
+                    description: limit+offset 为参数的请求表示总条数，page 为参数的请求表示总页数
                     type: integer
                 required:
                   - data
@@ -3705,27 +3641,11 @@ paths:
     get:
       operationId: getPersonCasts
       parameters:
-        - description: 条目类型
-          in: query
+        - in: query
           name: subjectType
           required: false
           schema:
-            anyOf:
-              - enum:
-                  - 1
-                type: number
-              - enum:
-                  - 2
-                type: number
-              - enum:
-                  - 3
-                type: number
-              - enum:
-                  - 4
-                type: number
-              - enum:
-                  - 6
-                type: number
+            $ref: '#/components/schemas/SubjectType'
         - description: '角色出场类型: 主角，配角，客串'
           in: query
           name: type
@@ -3765,6 +3685,7 @@ paths:
                       $ref: '#/components/schemas/PersonCharacter'
                     type: array
                   total:
+                    description: limit+offset 为参数的请求表示总条数，page 为参数的请求表示总页数
                     type: integer
                 required:
                   - data
@@ -3834,6 +3755,7 @@ paths:
                       $ref: '#/components/schemas/PersonCollect'
                     type: array
                   total:
+                    description: limit+offset 为参数的请求表示总条数，page 为参数的请求表示总页数
                     type: integer
                 required:
                   - data
@@ -3870,27 +3792,11 @@ paths:
     get:
       operationId: getPersonWorks
       parameters:
-        - description: 条目类型
-          in: query
+        - in: query
           name: subjectType
           required: false
           schema:
-            anyOf:
-              - enum:
-                  - 1
-                type: number
-              - enum:
-                  - 2
-                type: number
-              - enum:
-                  - 3
-                type: number
-              - enum:
-                  - 4
-                type: number
-              - enum:
-                  - 6
-                type: number
+            $ref: '#/components/schemas/SubjectType'
         - description: 职位
           in: query
           name: position
@@ -3930,6 +3836,7 @@ paths:
                       $ref: '#/components/schemas/PersonWork'
                     type: array
                   total:
+                    description: limit+offset 为参数的请求表示总条数，page 为参数的请求表示总页数
                     type: integer
                 required:
                   - data
@@ -3962,6 +3869,93 @@ paths:
       summary: 获取人物的参与作品
       tags:
         - person
+  /p1/subjects:
+    get:
+      operationId: getSubjects
+      parameters:
+        - in: query
+          name: type
+          required: true
+          schema:
+            $ref: '#/components/schemas/SubjectType'
+        - in: query
+          name: sort
+          required: true
+          schema:
+            $ref: '#/components/schemas/SubjectSort'
+        - description: min 1
+          in: query
+          name: page
+          required: false
+          schema:
+            default: 1
+            minimum: 1
+            type: integer
+        - description: >-
+            每种条目类型分类不同，具体参考 https://github.com/bangumi/common 的
+            subject_platforms.yaml
+          in: query
+          name: cat
+          required: false
+          schema:
+            type: integer
+        - description: 是否为系列，仅对书籍类型的条目有效
+          in: query
+          name: series
+          required: false
+          schema:
+            type: boolean
+        - description: 年份
+          in: query
+          name: year
+          required: false
+          schema:
+            type: integer
+        - description: 月份
+          in: query
+          name: month
+          required: false
+          schema:
+            type: integer
+        - in: query
+          name: tags
+          required: false
+          schema:
+            items:
+              description: wiki 标签，包括 分类/来源/类型/题材/地区/受众 等
+              type: string
+            type: array
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  data:
+                    items:
+                      $ref: '#/components/schemas/Subject'
+                    type: array
+                  total:
+                    description: limit+offset 为参数的请求表示总条数，page 为参数的请求表示总页数
+                    type: integer
+                required:
+                  - data
+                  - total
+                type: object
+          description: Default Response
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                description: 意料之外的服务器错误
+          description: 意料之外的服务器错误
+      security:
+        - CookiesSession: []
+          HTTPBearer: []
+      summary: 获取条目列表
+      tags:
+        - subject
   /p1/subjects/-/episode/-/comments/{commentID}:
     delete:
       operationId: deleteSubjectEpComment
@@ -4583,6 +4577,7 @@ paths:
                       $ref: '#/components/schemas/SubjectCharacter'
                     type: array
                   total:
+                    description: limit+offset 为参数的请求表示总条数，page 为参数的请求表示总页数
                     type: integer
                 required:
                   - data
@@ -4606,27 +4601,11 @@ paths:
     get:
       operationId: getSubjectComments
       parameters:
-        - description: 收藏类型
-          in: query
+        - in: query
           name: type
           required: false
           schema:
-            anyOf:
-              - enum:
-                  - 1
-                type: number
-              - enum:
-                  - 2
-                type: number
-              - enum:
-                  - 3
-                type: number
-              - enum:
-                  - 4
-                type: number
-              - enum:
-                  - 5
-                type: number
+            $ref: '#/components/schemas/CollectionType'
         - description: max 100
           in: query
           name: limit
@@ -4660,6 +4639,7 @@ paths:
                       $ref: '#/components/schemas/SubjectComment'
                     type: array
                   total:
+                    description: limit+offset 为参数的请求表示总条数，page 为参数的请求表示总页数
                     type: integer
                 required:
                   - data
@@ -4683,33 +4663,11 @@ paths:
     get:
       operationId: getSubjectEpisodes
       parameters:
-        - description: 剧集类型
-          in: query
+        - in: query
           name: type
           required: false
           schema:
-            anyOf:
-              - enum:
-                  - 0
-                type: number
-              - enum:
-                  - 1
-                type: number
-              - enum:
-                  - 2
-                type: number
-              - enum:
-                  - 3
-                type: number
-              - enum:
-                  - 4
-                type: number
-              - enum:
-                  - 5
-                type: number
-              - enum:
-                  - 6
-                type: number
+            $ref: '#/components/schemas/EpisodeType'
         - description: max 1000
           in: query
           name: limit
@@ -4743,6 +4701,7 @@ paths:
                       $ref: '#/components/schemas/Episode'
                     type: array
                   total:
+                    description: limit+offset 为参数的请求表示总条数，page 为参数的请求表示总页数
                     type: integer
                 required:
                   - data
@@ -4799,6 +4758,7 @@ paths:
                       $ref: '#/components/schemas/SubjectRec'
                     type: array
                   total:
+                    description: limit+offset 为参数的请求表示总条数，page 为参数的请求表示总页数
                     type: integer
                 required:
                   - data
@@ -4822,27 +4782,11 @@ paths:
     get:
       operationId: getSubjectRelations
       parameters:
-        - description: 条目类型
-          in: query
+        - in: query
           name: type
           required: false
           schema:
-            anyOf:
-              - enum:
-                  - 1
-                type: number
-              - enum:
-                  - 2
-                type: number
-              - enum:
-                  - 3
-                type: number
-              - enum:
-                  - 4
-                type: number
-              - enum:
-                  - 6
-                type: number
+            $ref: '#/components/schemas/SubjectType'
         - description: 是否单行本
           in: query
           name: offprint
@@ -4883,6 +4827,7 @@ paths:
                       $ref: '#/components/schemas/SubjectRelation'
                     type: array
                   total:
+                    description: limit+offset 为参数的请求表示总条数，page 为参数的请求表示总页数
                     type: integer
                 required:
                   - data
@@ -4939,6 +4884,7 @@ paths:
                       $ref: '#/components/schemas/SubjectReview'
                     type: array
                   total:
+                    description: limit+offset 为参数的请求表示总条数，page 为参数的请求表示总页数
                     type: integer
                 required:
                   - data
@@ -5001,6 +4947,7 @@ paths:
                       $ref: '#/components/schemas/SubjectStaff'
                     type: array
                   total:
+                    description: limit+offset 为参数的请求表示总条数，page 为参数的请求表示总页数
                     type: integer
                 required:
                   - data
@@ -5057,6 +5004,7 @@ paths:
                       $ref: '#/components/schemas/Topic'
                     type: array
                   total:
+                    description: limit+offset 为参数的请求表示总条数，page 为参数的请求表示总页数
                     type: integer
                 required:
                   - data
@@ -5147,18 +5095,12 @@ paths:
     get:
       operationId: getTimeline
       parameters:
-        - description: 'all: 全站, friends: 好友; 登录时默认为 friends, 未登录或没有好友时始终为 all'
+        - description: 登录时默认为 friends, 未登录或没有好友时始终为 all
           in: query
           name: mode
           required: false
           schema:
-            anyOf:
-              - enum:
-                  - all
-                type: string
-              - enum:
-                  - friends
-                type: string
+            $ref: '#/components/schemas/FilterMode'
         - description: min 0
           in: query
           name: offset
@@ -5193,27 +5135,11 @@ paths:
     get:
       operationId: getTrendingSubjects
       parameters:
-        - description: 条目类型
-          in: query
+        - in: query
           name: type
           required: true
           schema:
-            anyOf:
-              - enum:
-                  - 1
-                type: number
-              - enum:
-                  - 2
-                type: number
-              - enum:
-                  - 3
-                type: number
-              - enum:
-                  - 4
-                type: number
-              - enum:
-                  - 6
-                type: number
+            $ref: '#/components/schemas/SubjectType'
         - description: max 100
           in: query
           name: limit
@@ -5242,6 +5168,7 @@ paths:
                       $ref: '#/components/schemas/TrendingSubject'
                     type: array
                   total:
+                    description: limit+offset 为参数的请求表示总条数，page 为参数的请求表示总页数
                     type: integer
                 required:
                   - data
@@ -5255,6 +5182,9 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
                 description: 意料之外的服务器错误
           description: 意料之外的服务器错误
+      security:
+        - CookiesSession: []
+          HTTPBearer: []
       summary: 获取热门条目
       tags:
         - trending
@@ -5327,33 +5257,11 @@ paths:
     get:
       operationId: getUserSubjectCollectionEpisodesBySubjectID
       parameters:
-        - description: 剧集类型
-          in: query
+        - in: query
           name: type
           required: false
           schema:
-            anyOf:
-              - enum:
-                  - 0
-                type: number
-              - enum:
-                  - 1
-                type: number
-              - enum:
-                  - 2
-                type: number
-              - enum:
-                  - 3
-                type: number
-              - enum:
-                  - 4
-                type: number
-              - enum:
-                  - 5
-                type: number
-              - enum:
-                  - 6
-                type: number
+            $ref: '#/components/schemas/EpisodeType'
         - description: max 1000
           in: query
           name: limit
@@ -5388,6 +5296,7 @@ paths:
                       $ref: '#/components/schemas/UserSubjectEpisodeCollection'
                     type: array
                   total:
+                    description: limit+offset 为参数的请求表示总条数，page 为参数的请求表示总页数
                     type: integer
                 required:
                   - data
@@ -5671,48 +5580,16 @@ paths:
     get:
       operationId: getUserSubjectCollections
       parameters:
-        - description: 条目类型
-          in: query
+        - in: query
           name: subjectType
           required: false
           schema:
-            anyOf:
-              - enum:
-                  - 1
-                type: number
-              - enum:
-                  - 2
-                type: number
-              - enum:
-                  - 3
-                type: number
-              - enum:
-                  - 4
-                type: number
-              - enum:
-                  - 6
-                type: number
-        - description: 收藏类型
-          in: query
+            $ref: '#/components/schemas/SubjectType'
+        - in: query
           name: type
           required: false
           schema:
-            anyOf:
-              - enum:
-                  - 1
-                type: number
-              - enum:
-                  - 2
-                type: number
-              - enum:
-                  - 3
-                type: number
-              - enum:
-                  - 4
-                type: number
-              - enum:
-                  - 5
-                type: number
+            $ref: '#/components/schemas/CollectionType'
         - description: 起始时间戳
           in: query
           name: since
@@ -5754,6 +5631,7 @@ paths:
                       $ref: '#/components/schemas/UserSubjectCollection'
                     type: array
                   total:
+                    description: limit+offset 为参数的请求表示总条数，page 为参数的请求表示总页数
                     type: integer
                 required:
                   - data
@@ -5876,6 +5754,7 @@ paths:
                       $ref: '#/components/schemas/Friend'
                     type: array
                   total:
+                    description: limit+offset 为参数的请求表示总条数，page 为参数的请求表示总页数
                     type: integer
                 required:
                   - data
@@ -5962,6 +5841,9 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
                 description: 意料之外的服务器错误
           description: 意料之外的服务器错误
+      security:
+        - CookiesSession: []
+          HTTPBearer: []
       summary: 获取用户时间胶囊
       tags:
         - user
@@ -6066,28 +5948,7 @@ paths:
                     summary:
                       type: string
                     type:
-                      anyOf:
-                        - enum:
-                            - 0
-                          type: number
-                        - enum:
-                            - 1
-                          type: number
-                        - enum:
-                            - 2
-                          type: number
-                        - enum:
-                            - 3
-                          type: number
-                        - enum:
-                            - 4
-                          type: number
-                        - enum:
-                            - 5
-                          type: number
-                        - enum:
-                            - 6
-                          type: number
+                      $ref: '#/components/schemas/EpisodeType'
                   type: object
               required:
                 - commitMessage
@@ -6380,22 +6241,7 @@ paths:
                 summary:
                   type: string
                 type:
-                  anyOf:
-                    - enum:
-                        - 1
-                      type: number
-                    - enum:
-                        - 2
-                      type: number
-                    - enum:
-                        - 3
-                      type: number
-                    - enum:
-                        - 4
-                      type: number
-                    - enum:
-                        - 6
-                      type: number
+                  $ref: '#/components/schemas/SubjectType'
               required:
                 - name
                 - type
