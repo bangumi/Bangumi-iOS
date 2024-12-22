@@ -13,14 +13,14 @@ struct NoticeRowView: View {
           .frame(width: 10, height: 10)
           .foregroundStyle(.accent)
       }
-      NavigationLink(value: NavDestination.user(notice.sender.uid)) {
+      NavigationLink(value: NavDestination.user(notice.sender.username)) {
         ImageView(img: notice.sender.avatar?.large)
           .imageStyle(width: 40, height: 40)
           .imageType(.avatar)
       }
       VStack(alignment: .leading) {
         HStack {
-          NavigationLink(value: NavDestination.user(notice.sender.uid)) {
+          NavigationLink(value: NavDestination.user(notice.sender.username)) {
             Text(notice.sender.nickname)
               .lineLimit(1)
           }.buttonStyle(.navLink)

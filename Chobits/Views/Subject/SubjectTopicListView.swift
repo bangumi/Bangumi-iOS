@@ -79,7 +79,7 @@ struct SubjectTopicListView: View {
                 .lineLimit(1)
                 .foregroundStyle(.secondary)
               Spacer()
-              NavigationLink(value: NavDestination.user(topic.creator.uid)) {
+              NavigationLink(value: NavDestination.user(topic.creator.username)) {
                 Text(topic.creator.nickname)
                   .lineLimit(1)
               }

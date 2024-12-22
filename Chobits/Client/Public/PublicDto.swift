@@ -22,30 +22,6 @@ struct Auth: Codable {
   }
 }
 
-struct User: Codable, Hashable {
-  var id: Int
-  var username: String
-  var nickname: String
-  var avatar: Avatar?
-  var sign: String
-
-  init() {
-    self.id = 0
-    self.username = ""
-    self.nickname = "匿名"
-    self.avatar = nil
-    self.sign = ""
-  }
-
-  var uid: String {
-    if username == "" {
-      return String(id)
-    } else {
-      return username
-    }
-  }
-}
-
 struct SubjectDTOV0: Codable {
   var id: Int
   var type: SubjectType

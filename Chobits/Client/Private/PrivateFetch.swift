@@ -3,6 +3,21 @@ import OSLog
 
 // MARK: - User
 extension Chii {
+  // TODO: fix respond type
+  func getProfile() async throws -> SlimUserDTO {
+    if self.mock {
+      return loadFixture(fixture: "profile.json", target: SlimUserDTO.self)
+    }
+    if let profile = self.profile {
+      return profile
+    }
+    let url = BangumiAPI.priv.build("p1/me")
+    let data = try await self.request(url: url, method: "GET", auth: .required)
+    let profile: SlimUserDTO = try self.decodeResponse(data)
+    self.profile = profile
+    return profile
+  }
+
   func listNotice(limit: Int? = nil, unread: Bool? = nil) async throws -> PagedDTO<NoticeDTO> {
     let url = BangumiAPI.priv.build("p1/notify")
     var queryItems: [URLQueryItem] = []

@@ -41,7 +41,7 @@ actor Chii {
   let appInfo: AppInfo
 
   var auth: Auth?
-  var profile: User?
+  var profile: SlimUserDTO?
   var anonymousSession: URLSession?
   var authorizedSession: URLSession?
 

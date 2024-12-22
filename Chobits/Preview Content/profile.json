@@ -1,13 +1,15 @@
 {
+  "id": 26024,
+  "username": "everpcpc",
+  "nickname": "蜜瓜改二@五月病🍭",
   "avatar": {
-    "large": "https://lain.bgm.tv/pic/user/l/000/87/32/873244.jpg?r=1714270163&hd=1",
-    "medium": "https://lain.bgm.tv/r/200/pic/user/l/000/87/32/873244.jpg?r=1714270163&hd=1",
-    "small": "https://lain.bgm.tv/r/100/pic/user/l/000/87/32/873244.jpg?r=1714270163&hd=1"
+    "small": "https://lain.bgm.tv/pic/user/s/000/02/60/26024.jpg?r=1714469564&hd=1",
+    "medium": "https://lain.bgm.tv/pic/user/m/000/02/60/26024.jpg?r=1714469564&hd=1",
+    "large": "https://lain.bgm.tv/pic/user/l/000/02/60/26024.jpg?r=1714469564&hd=1"
   },
-  "sign": "はーい、三水戦しゅうごーう！桜の下でお花見、しちゃお",
-  "url": "https://bgm.tv/user/873244",
-  "username": "873244",
-  "nickname": "蜜瓜",
-  "id": 873244,
-  "group": 10
+  "sign": "",
+  "joinedAt": 0,
+  "permission": {
+    "subjectWikiEdit": true
+  }
 }

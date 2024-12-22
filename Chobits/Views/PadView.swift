@@ -14,7 +14,7 @@ struct PadView: View {
   @State private var searchRemote: Bool = false
   @State private var searching: Bool = false
 
-  @State private var profile: User?
+  @State private var profile: SlimUserDTO?
 
   init() {
     let defaultTab = UserDefaults.standard.string(forKey: "defaultTab") ?? "discover"

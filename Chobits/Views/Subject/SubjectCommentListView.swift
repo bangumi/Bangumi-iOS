@@ -72,14 +72,14 @@ struct SubjectCommentListView: View {
         ForEach(comments, id: \.inner.self) { item in
           let comment = item.inner
           HStack(alignment: .top) {
-            NavigationLink(value: NavDestination.user(comment.user.uid)) {
+            NavigationLink(value: NavDestination.user(comment.user.username)) {
               ImageView(img: comment.user.avatar?.large)
                 .imageStyle(width: 32, height: 32)
                 .imageType(.avatar)
             }
             VStack(alignment: .leading) {
               HStack {
-                NavigationLink(value: NavDestination.user(comment.user.uid)) {
+                NavigationLink(value: NavDestination.user(comment.user.username)) {
                   Text(comment.user.nickname)
                     .font(.footnote)
                     .lineLimit(1)

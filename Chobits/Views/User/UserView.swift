@@ -5,7 +5,7 @@ struct UserView: View {
 
   @AppStorage("shareDomain") var shareDomain: String = ShareDomain.chii.label
 
-  @State private var user: User?
+  @State private var user: SlimUserDTO?
 
   var shareLink: URL {
     URL(string: "https://\(shareDomain)/user/\(username)")!
@@ -35,11 +35,7 @@ struct UserView: View {
                 //     .font(.footnote)
                 //     .foregroundStyle(.secondary)
                 // }
-                if user.username != "" {
-                  Text("@\(user.username)")
-                } else {
-                  Text("@\(user.id)")
-                }
+                Text("@\(user.username)")
               }
               .foregroundStyle(.secondary)
               .font(.footnote)

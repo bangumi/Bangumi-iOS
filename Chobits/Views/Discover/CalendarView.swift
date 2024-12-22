@@ -64,11 +64,13 @@ struct CalendarView: View {
           Text("每日放送")
             .font(.title)
             .padding(.top, 10)
-          Text("\(today.formatted(date: .complete, time: .omitted))")
-            .font(.footnote)
-            .foregroundStyle(.secondary)
-          Text("本季度共 \(total) 部番组，今日上映 \(todayTotal) 部。共 \(todayWatchers) 人收看今日番组。")
-            .foregroundStyle(.secondary)
+          VStack {
+            Text("\(today.formatted(date: .complete, time: .omitted))")
+            Text("本季度共 \(total) 部番组，今日上映 \(todayTotal) 部。")
+            Text("共 \(todayWatchers) 人收看今日番组。")
+          }
+          .font(.footnote)
+          .foregroundStyle(.secondary)
         }.padding(.horizontal, 8)
         LazyVStack {
           ForEach(sortedCalendars) { calendar in
@@ -106,13 +108,13 @@ struct CalendarWeekdayView: View {
                   .multilineTextAlignment(.leading)
                   .padding(.horizontal, 2)
               }
-              .imageStyle(width: 96, height: 128)
+              .imageStyle(width: 80, height: 120)
               .imageType(.subject)
             }.buttonStyle(.navLink)
             Text(item.subject.name)
               .font(.caption)
               .lineLimit(1)
-              .frame(width: 96)
+              .frame(width: 80)
           }
         }
       }

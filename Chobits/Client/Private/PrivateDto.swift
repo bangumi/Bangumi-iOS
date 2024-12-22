@@ -10,10 +10,28 @@ struct PagedDTO<T: Sendable & Codable>: Codable, Sendable {
   }
 }
 
+struct SlimUserDTO: Codable, Identifiable, Hashable {
+  var id: Int
+  var username: String
+  var nickname: String
+  var avatar: Avatar?
+  var sign: String
+  var joinedAt: Int?
+
+  init() {
+    self.id = 0
+    self.username = ""
+    self.nickname = "匿名"
+    self.avatar = nil
+    self.sign = ""
+    self.joinedAt = 0
+  }
+}
+
 struct NoticeDTO: Codable, Identifiable, Hashable {
   var id: Int
   var postID: Int
-  var sender: User
+  var sender: SlimUserDTO
   var title: String
   var topicID: Int
   var type: Int
@@ -23,7 +41,7 @@ struct NoticeDTO: Codable, Identifiable, Hashable {
   init() {
     self.id = 0
     self.postID = 0
-    self.sender = User()
+    self.sender = SlimUserDTO()
     self.title = ""
     self.topicID = 0
     self.type = 0
@@ -35,7 +53,7 @@ struct NoticeDTO: Codable, Identifiable, Hashable {
 struct TopicDTO: Codable, Identifiable, Hashable {
   var id: Int
   var parentID: Int
-  var creator: User
+  var creator: SlimUserDTO
   var title: String
   var repliesCount: Int
   var createdAt: Int
@@ -47,7 +65,7 @@ struct SubjectCommentDTO: Codable, Identifiable, Hashable {
   var rate: Int
   var type: CollectionType
   var updatedAt: Int
-  var user: User
+  var user: SlimUserDTO
 
   var id: Int {
     user.id
@@ -257,7 +275,7 @@ struct SlimPersonDTO: Codable, Identifiable, Hashable {
 }
 
 struct PersonCollectDTO: Codable, Identifiable {
-  var user: User
+  var user: SlimUserDTO
   var createdAt: Int
 
   var id: Int {
@@ -309,7 +327,7 @@ struct SubjectRecDTO: Codable, Identifiable, Hashable {
 
 struct SubjectReviewDTO: Codable, Identifiable, Hashable {
   var id: Int
-  var user: User
+  var user: SlimUserDTO
   var entry: SlimBlogEntryDTO
 }
 
@@ -333,7 +351,7 @@ struct TimelineDTO: Codable, Identifiable {
   var source: TimelineSource
   var replies: Int
   var createdAt: Int
-  var user: User
+  var user: SlimUserDTO
 }
 
 struct TimelineMemoDTO: Codable {
@@ -349,7 +367,7 @@ struct TimelineMemoDTO: Codable {
 
 struct TimelineDailyDTO: Codable {
   var groups: [SlimGroupDTO]?
-  var users: [User]?
+  var users: [SlimUserDTO]?
 }
 
 struct SlimGroupDTO: Codable, Identifiable {

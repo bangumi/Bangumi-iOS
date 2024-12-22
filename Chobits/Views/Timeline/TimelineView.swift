@@ -7,7 +7,7 @@ struct ChiiTimelineView: View {
   @AppStorage("isolationMode") var isolationMode: Bool = false
   @AppStorage("hasUnreadNotice") var hasUnreadNotice: Bool = false
 
-  @State private var profile: User?
+  @State private var profile: SlimUserDTO?
 
   func updateProfile() async {
     do {

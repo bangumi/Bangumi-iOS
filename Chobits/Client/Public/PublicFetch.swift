@@ -2,27 +2,14 @@ import Foundation
 import OSLog
 
 extension Chii {
-  func getProfile() async throws -> User {
+  // FIXME: use private
+  func getUser(_ username: String) async throws -> SlimUserDTO {
     if self.mock {
-      return loadFixture(fixture: "profile.json", target: User.self)
-    }
-    if let profile = self.profile {
-      return profile
-    }
-    let url = BangumiAPI.pub.build("v0/me")
-    let data = try await self.request(url: url, method: "GET", auth: .required)
-    let profile: User = try self.decodeResponse(data)
-    self.profile = profile
-    return profile
-  }
-
-  func getUser(_ username: String) async throws -> User {
-    if self.mock {
-      return loadFixture(fixture: "profile.json", target: User.self)
+      return loadFixture(fixture: "profile.json", target: SlimUserDTO.self)
     }
     let url = BangumiAPI.pub.build("v0/users/\(username)")
     let data = try await self.request(url: url, method: "GET")
-    let user: User = try self.decodeResponse(data)
+    let user: SlimUserDTO = try self.decodeResponse(data)
     return user
   }
 
