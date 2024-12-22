@@ -3,6 +3,7 @@ import SwiftUI
 
 struct CollectionSubjectTypeView: View {
   let stype: SubjectType
+  let width: CGFloat
 
   @Environment(\.modelContext) var modelContext
 
@@ -11,7 +12,17 @@ struct CollectionSubjectTypeView: View {
   @State private var collections: [UserSubjectCollection] = []
   @State private var subjects: [Int: Subject] = [:]
 
+  var columnCount: Int {
+    let columns = Int((width - 16) / 80)
+    return columns > 0 ? columns : 1
+  }
+
+  var columns: [GridItem] {
+    Array(repeating: .init(.flexible()), count: columnCount)
+  }
+
   func load() async {
+    if width == 0 { return }
     let stypeVal = stype.rawValue
     let ctypeVal = collectionType.rawValue
     var descriptor = FetchDescriptor<UserSubjectCollection>(
@@ -21,7 +32,7 @@ struct CollectionSubjectTypeView: View {
       sortBy: [
         SortDescriptor<UserSubjectCollection>(\.updatedAt, order: .reverse)
       ])
-    descriptor.fetchLimit = 10
+    descriptor.fetchLimit = columnCount * 2
     do {
       collections = try modelContext.fetch(descriptor)
       for collection in collections {
@@ -71,6 +82,11 @@ struct CollectionSubjectTypeView: View {
           await load()
         }
       }
+      .onChange(of: width) { _, _ in
+        Task {
+          await load()
+        }
+      }
       .onAppear {
         Task {
           await load()
@@ -78,35 +94,16 @@ struct CollectionSubjectTypeView: View {
         }
       }
       if collections.count > 0 {
-        LazyVGrid(columns: [
-          GridItem(.flexible()),
-          GridItem(.flexible()),
-          GridItem(.flexible()),
-          GridItem(.flexible()),
-          GridItem(.flexible()),
-        ]) {
+        LazyVGrid(columns: columns) {
           ForEach(collections) { collection in
             NavigationLink(value: NavDestination.subject(collection.subjectId)) {
               ImageView(img: subjects[collection.subjectId]?.images?.common)
-                .imageStyle(width: 60, height: 60)
+                .imageStyle(width: 80, height: 80)
                 .imageType(.subject)
             }.buttonStyle(.navLink)
           }
         }
       }
-    }
-    .animation(.default, value: collections)
-  }
-}
-
-#Preview {
-  let container = mockContainer()
-
-  return NavigationStack {
-    ScrollView {
-      CollectionSubjectTypeView(stype: .anime)
-        .modelContainer(container)
-    }
-    .padding(.horizontal, 8)
+    }.animation(.default, value: collections)
   }
 }

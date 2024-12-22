@@ -106,7 +106,8 @@ struct CalendarWeekdayView: View {
   }
 
   var columnCount: Int {
-    Int((width - 24) / 108)
+    let columns = Int((width - 16) / 100)
+    return columns > 0 ? columns : 1
   }
 
   var columns: [GridItem] {
@@ -116,7 +117,7 @@ struct CalendarWeekdayView: View {
   var body: some View {
     VStack {
       Text(weekday).font(.title3)
-      LazyVGrid(columns: columns, spacing: 8) {
+      LazyVGrid(columns: columns) {
         ForEach(calendar.items, id: \.subject) { item in
           VStack {
             NavigationLink(value: NavDestination.subject(item.subject.id)) {

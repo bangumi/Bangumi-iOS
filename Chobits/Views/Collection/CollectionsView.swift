@@ -3,6 +3,9 @@ import SwiftData
 import SwiftUI
 
 struct CollectionsView: View {
+
+  @State private var width: CGFloat = 0
+
   var body: some View {
     ScrollView(showsIndicators: false) {
       LazyVStack(alignment: .leading) {
@@ -16,11 +19,16 @@ struct CollectionsView: View {
                   .font(.caption)
               }.buttonStyle(.navLink)
             }.padding(.top, 8)
-            CollectionSubjectTypeView(stype: stype)
+            CollectionSubjectTypeView(stype: stype, width: width)
           }.padding(.top, 5)
         }
+      }.padding(.horizontal, 8)
+    }.onGeometryChange(for: CGSize.self) { proxy in
+      proxy.size
+    } action: { newSize in
+      if self.width != newSize.width {
+        self.width = newSize.width
       }
-      Spacer()
     }
   }
 }
