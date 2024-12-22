@@ -3,20 +3,18 @@ import OSLog
 import SwiftData
 import SwiftUI
 
-typealias BangumiCalendar = BangumiCalendarV0
+typealias BangumiCalendar = BangumiCalendarV1
 
 @Model
-final class BangumiCalendarV0 {
+final class BangumiCalendarV1 {
   @Attribute(.unique)
-  var weekdayId: Int
+  var weekday: Int
 
-  var weekday: Weekday
-  var subjects: [CalendarSubjectDTO]
+  var items: [BangumiCalendarItemDTO]
 
-  init(_ item: BangumiCalendarDTO) {
-    self.weekdayId = item.weekday.id
-    self.weekday = item.weekday
-    self.subjects = item.items
+  init(weekday: Int, items: [BangumiCalendarItemDTO]) {
+    self.weekday = weekday
+    self.items = items
   }
 }
 

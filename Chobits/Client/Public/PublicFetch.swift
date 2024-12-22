@@ -26,13 +26,6 @@ extension Chii {
     return user
   }
 
-  func getCalendar() async throws -> [BangumiCalendarDTO] {
-    let url = BangumiAPI.pub.build("calendar")
-    let data = try await self.request(url: url, method: "GET")
-    let calendars: [BangumiCalendarDTO] = try self.decodeResponse(data)
-    return calendars
-  }
-
   func search(keyword: String, type: SubjectType = .none, limit: Int = 10, offset: Int = 0)
     async throws -> SubjectsResponse
   {

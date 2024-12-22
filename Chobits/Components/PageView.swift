@@ -3,7 +3,7 @@ import SwiftUI
 /// A view that loads data continuously.
 ///
 struct PageView<T, C>: View
-where C: View, T: Identifiable & Equatable & Codable & Sendable {
+where C: View, T: Identifiable & Hashable & Codable & Sendable {
   typealias Item = T
   typealias Content = C
 

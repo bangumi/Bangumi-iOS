@@ -10,7 +10,7 @@ struct PagedDTO<T: Sendable & Codable>: Codable, Sendable {
   }
 }
 
-struct NoticeDTO: Codable, Identifiable, Equatable {
+struct NoticeDTO: Codable, Identifiable, Hashable {
   var id: Int
   var postID: Int
   var sender: User
@@ -32,7 +32,7 @@ struct NoticeDTO: Codable, Identifiable, Equatable {
   }
 }
 
-struct TopicDTO: Codable, Identifiable, Equatable, Hashable {
+struct TopicDTO: Codable, Identifiable, Hashable {
   var id: Int
   var parentID: Int
   var creator: User
@@ -42,7 +42,7 @@ struct TopicDTO: Codable, Identifiable, Equatable, Hashable {
   var updatedAt: Int
 }
 
-struct SubjectCommentDTO: Codable, Identifiable, Equatable, Hashable {
+struct SubjectCommentDTO: Codable, Identifiable, Hashable {
   var comment: String
   var rate: Int
   var type: CollectionType
@@ -90,7 +90,7 @@ struct SubjectDTO: Codable, Identifiable, Searchable {
   var volumes: Int
 }
 
-struct SlimSubjectDTO: Codable, Identifiable {
+struct SlimSubjectDTO: Codable, Identifiable, Hashable {
   var id: Int
   var images: SubjectImages?
   var info: String
@@ -100,6 +100,13 @@ struct SlimSubjectDTO: Codable, Identifiable {
   var nsfw: Bool
   var type: SubjectType
 }
+
+struct BangumiCalendarItemDTO: Codable {
+  var watchers: Int
+  var subject: SlimSubjectDTO
+}
+
+typealias BangumiCalendarDTO = [String: [BangumiCalendarItemDTO]]
 
 struct CharacterDTO: Codable, Identifiable, Searchable {
   var collects: Int
@@ -116,7 +123,7 @@ struct CharacterDTO: Codable, Identifiable, Searchable {
   var summary: String
 }
 
-struct SlimCharacterDTO: Codable, Identifiable {
+struct SlimCharacterDTO: Codable, Identifiable, Hashable {
   var id: Int
   var images: Images?
   var lock: Bool
@@ -142,7 +149,7 @@ struct PersonDTO: Codable, Identifiable, Searchable {
   var type: PersonType
 }
 
-struct CharacterCastDTO: Codable, Identifiable, Equatable {
+struct CharacterCastDTO: Codable, Identifiable, Hashable {
   var actors: [SlimPersonDTO]
   var subject: SlimSubjectDTO
   var type: CastType
@@ -150,46 +157,34 @@ struct CharacterCastDTO: Codable, Identifiable, Equatable {
   var id: Int {
     subject.id
   }
-
-  static func == (lhs: CharacterCastDTO, rhs: CharacterCastDTO) -> Bool {
-    lhs.subject.id == rhs.subject.id
-  }
 }
 
-struct PersonWorkDTO: Codable, Identifiable, Equatable {
+struct PersonWorkDTO: Codable, Identifiable, Hashable {
   var subject: SlimSubjectDTO
   var positions: [SubjectStaffPosition]
 
   var id: Int {
     subject.id
   }
-
-  static func == (lhs: PersonWorkDTO, rhs: PersonWorkDTO) -> Bool {
-    lhs.subject.id == rhs.subject.id
-  }
 }
 
-struct SubjectStaffPosition: Codable, Identifiable, Equatable {
+struct SubjectStaffPosition: Codable, Identifiable, Hashable {
   var type: SubjectStaffPositionType
   var summary: String
 
   var id: Int {
     type.id
   }
-
-  static func == (lhs: SubjectStaffPosition, rhs: SubjectStaffPosition) -> Bool {
-    lhs.type.id == rhs.type.id
-  }
 }
 
-struct SubjectStaffPositionType: Codable {
+struct SubjectStaffPositionType: Codable, Identifiable, Hashable {
   var id: Int
   var en: String
   var cn: String
   var jp: String
 }
 
-struct SubjectRelationType: Codable {
+struct SubjectRelationType: Codable, Identifiable, Hashable {
   var id: Int
   var en: String
   var cn: String
@@ -197,7 +192,7 @@ struct SubjectRelationType: Codable {
   var desc: String
 }
 
-struct EpisodeDTO: Codable, Identifiable, Equatable {
+struct EpisodeDTO: Codable, Identifiable, Hashable {
   var id: Int
   var subjectID: Int
   var type: EpisodeType
@@ -221,7 +216,7 @@ struct EpisodeCollectionDTO: Codable {
   var type: EpisodeCollectionType
 }
 
-struct SubjectRelationDTO: Codable, Identifiable, Equatable {
+struct SubjectRelationDTO: Codable, Identifiable, Hashable {
   var order: Int
   var subject: SlimSubjectDTO
   var relation: SubjectRelationType
@@ -229,13 +224,9 @@ struct SubjectRelationDTO: Codable, Identifiable, Equatable {
   var id: Int {
     subject.id
   }
-
-  static func == (lhs: SubjectRelationDTO, rhs: SubjectRelationDTO) -> Bool {
-    lhs.subject.id == rhs.subject.id
-  }
 }
 
-struct SubjectCharacterDTO: Codable, Identifiable, Equatable {
+struct SubjectCharacterDTO: Codable, Identifiable, Hashable {
   var character: SlimCharacterDTO
   var actors: [SlimPersonDTO]
   var type: CastType
@@ -244,26 +235,18 @@ struct SubjectCharacterDTO: Codable, Identifiable, Equatable {
   var id: Int {
     character.id
   }
-
-  static func == (lhs: SubjectCharacterDTO, rhs: SubjectCharacterDTO) -> Bool {
-    lhs.character.id == rhs.character.id
-  }
 }
 
-struct SubjectStaffDTO: Codable, Identifiable, Equatable {
+struct SubjectStaffDTO: Codable, Identifiable, Hashable {
   var person: SlimPersonDTO
   var positions: [SubjectStaffPosition]
 
   var id: Int {
     person.id
   }
-
-  static func == (lhs: SubjectStaffDTO, rhs: SubjectStaffDTO) -> Bool {
-    lhs.person.id == rhs.person.id
-  }
 }
 
-struct SlimPersonDTO: Codable, Identifiable {
+struct SlimPersonDTO: Codable, Identifiable, Hashable {
   var id: Int
   var name: String
   var nameCN: String
@@ -282,20 +265,16 @@ struct PersonCollectDTO: Codable, Identifiable {
   }
 }
 
-struct PersonCastDTO: Codable, Identifiable, Equatable {
+struct PersonCastDTO: Codable, Identifiable, Hashable {
   var character: SlimCharacterDTO
   var relations: [CharacterSubjectRelationDTO]
 
   var id: Int {
     character.id
   }
-
-  static func == (lhs: PersonCastDTO, rhs: PersonCastDTO) -> Bool {
-    lhs.character.id == rhs.character.id
-  }
 }
 
-struct CharacterSubjectRelationDTO: Codable, Identifiable {
+struct CharacterSubjectRelationDTO: Codable, Identifiable, Hashable {
   var subject: SlimSubjectDTO
   var type: CastType
 
@@ -318,17 +297,13 @@ struct UserPersonCollectionDTO: Codable {
   var createdAt: Int
 }
 
-struct SubjectRecDTO: Codable, Identifiable, Equatable {
+struct SubjectRecDTO: Codable, Identifiable, Hashable {
   var subject: SlimSubjectDTO
   var sim: Float
   var count: Int
 
   var id: Int {
     subject.id
-  }
-
-  static func == (lhs: SubjectRecDTO, rhs: SubjectRecDTO) -> Bool {
-    lhs.subject.id == rhs.subject.id
   }
 }
 

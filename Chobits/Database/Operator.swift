@@ -258,8 +258,8 @@ extension DatabaseOperator {
 
 // MARK: - save
 extension DatabaseOperator {
-  public func saveCalendarItem(_ item: BangumiCalendarDTO) throws {
-    let cal = BangumiCalendar(item)
+  public func saveCalendarItem(weekday: Int, items: [BangumiCalendarItemDTO]) throws {
+    let cal = BangumiCalendar(weekday: weekday, items: items)
     modelContext.insert(cal)
   }
 

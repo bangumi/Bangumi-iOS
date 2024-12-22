@@ -96,13 +96,6 @@ struct Tag: Codable, Hashable {
   var count: Int
 }
 
-struct Weekday: Codable {
-  var en: String
-  var cn: String
-  var ja: String
-  var id: Int
-}
-
 struct SubjectAirtime: Codable, Hashable {
   var date: String
   var month: Int

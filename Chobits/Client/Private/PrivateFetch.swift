@@ -233,6 +233,13 @@ extension Chii {
     return subject
   }
 
+  func getCalendar() async throws -> BangumiCalendarDTO {
+    let url = BangumiAPI.priv.build("p1/calendar")
+    let data = try await self.request(url: url, method: "GET")
+    let calendars: BangumiCalendarDTO = try self.decodeResponse(data)
+    return calendars
+  }
+
   func getSubjectEpisodes(
     _ subjectId: Int, type: EpisodeType? = nil, limit: Int = 100, offset: Int = 0
   ) async throws -> PagedDTO<EpisodeDTO> {

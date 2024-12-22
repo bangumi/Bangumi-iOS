@@ -22,7 +22,7 @@ struct Auth: Codable {
   }
 }
 
-struct User: Codable, Equatable, Hashable {
+struct User: Codable, Hashable {
   var id: Int
   var username: String
   var nickname: String
@@ -37,10 +37,6 @@ struct User: Codable, Equatable, Hashable {
     self.sign = ""
   }
 
-  static func == (lhs: User, rhs: User) -> Bool {
-    return lhs.id == rhs.id && lhs.username == rhs.username && lhs.nickname == rhs.nickname
-  }
-
   var uid: String {
     if username == "" {
       return String(id)
@@ -48,20 +44,6 @@ struct User: Codable, Equatable, Hashable {
       return username
     }
   }
-}
-
-struct BangumiCalendarDTO: Codable {
-  var weekday: Weekday
-  var items: [CalendarSubjectDTO]
-}
-
-struct CalendarSubjectDTO: Codable {
-  var id: Int
-  var type: SubjectType
-  var name: String
-  var nameCn: String
-  var summary: String
-  var images: SubjectImages?
 }
 
 struct SubjectDTOV0: Codable {
@@ -90,5 +72,4 @@ struct SubjectRatingV0: Codable {
   var total: Int
   var score: Float
   var rank: Int
-
 }

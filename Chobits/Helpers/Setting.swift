@@ -158,7 +158,7 @@ enum ProgressMode: Codable, CaseIterable, Identifiable {
   }
 }
 
-enum ChiiViewTab: Equatable, Hashable, Identifiable {
+enum ChiiViewTab: Hashable, Identifiable {
   case timeline
   case discover
 

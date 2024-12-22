@@ -7,8 +7,12 @@ extension Chii {
   func loadCalendar() async throws {
     let db = try self.getDB()
     let response = try await self.getCalendar()
-    for item in response {
-      try await db.saveCalendarItem(item)
+    for (weekday, items) in response {
+      guard let weekday = Int(weekday) else {
+        Logger.subject.error("invalid weekday: \(weekday)")
+        continue
+      }
+      try await db.saveCalendarItem(weekday: weekday, items: items)
     }
     try await db.commit()
   }
