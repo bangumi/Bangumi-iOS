@@ -40,3 +40,7 @@ update_preview_data:
 	curl -sSfLo "$(PREVIEW_PATH)/person_collects.json" https://next.bgm.tv/p1/persons/3862/collects
 	curl -sSfLo "$(PREVIEW_PATH)/user_person_collection.json" https://next.bgm.tv/p1/users/$(UID)/collections/persons/3862
 	curl -sSfLo "$(PREVIEW_PATH)/user_person_collections.json" https://next.bgm.tv/p1/users/$(UID)/collections/persons
+
+	# timeline
+	curl -sSfLo "$(PREVIEW_PATH)/timeline.json" https://next.bgm.tv/p1/timeline
+	curl -sSfLo "$(PREVIEW_PATH)/user_timeline.json" https://next.bgm.tv/p1/users/$(UID)/timeline

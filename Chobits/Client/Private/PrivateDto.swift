@@ -322,3 +322,118 @@ struct SlimBlogEntryDTO: Codable, Hashable, Identifiable {
   var createdAt: Int
   var updatedAt: Int
 }
+
+struct TimelineDTO: Codable, Identifiable {
+  var id: Int
+  var uid: Int
+  var cat: TimelineCat
+  var type: Int
+  var memo: TimelineMemoDTO
+  var batch: Bool
+  var source: TimelineSource
+  var replies: Int
+  var createdAt: Int
+  var user: User
+}
+
+struct TimelineMemoDTO: Codable {
+  var blog: SlimBlogEntryDTO?
+  var daily: TimelineDailyDTO?
+  var index: SlimIndexDTO?
+  var mono: TimelineMonoDTO?
+  var progress: TimelineProgressDTO?
+  var status: TimelineStatusDTO?
+  var subject: [TimelineSubjectDTO]?
+  var wiki: TimelineWikiDTO?
+}
+
+struct TimelineDailyDTO: Codable {
+  var groups: [SlimGroupDTO]?
+  var users: [User]?
+}
+
+struct SlimGroupDTO: Codable, Identifiable {
+  var id: Int
+  var name: String
+  var nsfw: Bool
+  var title: String
+  var icon: Avatar
+}
+
+struct TimelineMonoDTO: Codable {
+  var characters: [SlimCharacterDTO]
+  var persons: [SlimPersonDTO]
+}
+
+struct TimelineProgressDTO: Codable {
+  var batch: TimelineBatchProgressDTO?
+  var single: TimelineSingleProgressDTO?
+}
+
+struct TimelineBatchProgressDTO: Codable {
+  var epsTotal: String
+  var volsTotal: String
+  var epsUpdate: Int?
+  var volsUpdate: Int?
+  var subject: SlimSubjectDTO
+}
+
+struct TimelineSingleProgressDTO: Codable {
+  var episode: EpisodeDTO
+  var subject: SlimSubjectDTO
+}
+
+struct TimelineStatusDTO: Codable {
+  var nickname: TimelineNicknameDTO?
+  var sign: String?
+  var tsukkomi: String?
+}
+
+struct TimelineNicknameDTO: Codable {
+  var before: String
+  var after: String
+}
+
+struct TimelineSubjectDTO: Codable {
+  var subject: SlimSubjectDTO
+  var comment: String
+  var rate: Float
+}
+
+struct TimelineWikiDTO: Codable {
+  var subject: SlimSubjectDTO?
+}
+
+struct SlimIndexDTO: Codable, Identifiable {
+  var id: Int
+  var type: Int
+  var title: String
+  var total: Int
+  var createdAt: Int
+}
+
+enum TimelineCat: Int, Codable {
+  case daily = 1
+  case wiki = 2
+  case subject = 3
+  case progress = 4
+  case status = 5
+  case blog = 6
+  case index = 7
+  case mono = 8
+  case doujin = 9
+}
+
+enum TimelineSource: Int, Codable {
+  case web = 0
+  case mobile = 1
+  case onAir = 2
+  case inTouch = 3
+  case wp = 4
+  case api = 5
+}
+
+enum FilterMode: String, Codable {
+  case all
+  case friends
+}
