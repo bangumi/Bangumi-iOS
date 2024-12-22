@@ -1,6 +1,5 @@
 import SwiftData
 import SwiftUI
-import WaterfallGrid
 
 struct ProgressTileView: View {
   let subjectType: SubjectType
