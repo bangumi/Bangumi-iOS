@@ -1,14 +1,14 @@
 import SwiftUI
 
 struct NavlinkButtonStyle: PrimitiveButtonStyle {
-  // @GestureState var isPressing = false
+  @GestureState var isPressing = false
 
   func makeBody(configuration: Configuration) -> some View {
     configuration.label
       .foregroundColor(.linkText)
       // .compositingGroup()
-      // .scaleEffect(isPressing ? 0.95 : 1)
-      // .animation(.spring(), value: isPressing)
+      .scaleEffect(isPressing ? 0.95 : 1)
+      .animation(.spring(), value: isPressing)
       .simultaneousGesture(
         TapGesture().onEnded {
           configuration.trigger()

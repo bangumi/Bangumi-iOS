@@ -1,4 +1,3 @@
-import Flow
 import OSLog
 import SwiftData
 import SwiftUI
@@ -10,6 +9,7 @@ func getWeekday(_ date: Date) -> Int {
 struct CalendarView: View {
 
   @State private var refreshed: Bool = false
+  @State private var width: CGFloat = 0
 
   @Query(sort: \BangumiCalendar.weekday)
   private var calendars: [BangumiCalendar]
@@ -74,12 +74,20 @@ struct CalendarView: View {
         }.padding(.horizontal, 8)
         LazyVStack {
           ForEach(sortedCalendars) { calendar in
-            CalendarWeekdayView()
+            CalendarWeekdayView(width: width)
               .environment(calendar)
               .padding(.vertical, 10)
           }
         }.padding(.horizontal, 8)
-      }.refreshable {
+      }
+      .onGeometryChange(for: CGSize.self) { proxy in
+        proxy.size
+      } action: { newSize in
+        if self.width != newSize.width {
+          self.width = newSize.width
+        }
+      }
+      .refreshable {
         refreshed = false
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
         await refreshCalendar()
@@ -89,16 +97,26 @@ struct CalendarView: View {
 }
 
 struct CalendarWeekdayView: View {
+  let width: CGFloat
+
   @Environment(BangumiCalendar.self) var calendar
 
   var weekday: String {
     return Calendar.current.weekdaySymbols[calendar.weekday % 7]
   }
 
+  var columnCount: Int {
+    Int((width - 24) / 108)
+  }
+
+  var columns: [GridItem] {
+    Array(repeating: GridItem(.flexible()), count: columnCount)
+  }
+
   var body: some View {
     VStack {
       Text(weekday).font(.title3)
-      HFlow {
+      LazyVGrid(columns: columns, spacing: 8) {
         ForEach(calendar.items, id: \.subject) { item in
           VStack {
             NavigationLink(value: NavDestination.subject(item.subject.id)) {
@@ -106,16 +124,16 @@ struct CalendarWeekdayView: View {
               } caption: {
                 Text(item.subject.nameCN)
                   .multilineTextAlignment(.leading)
+                  .lineLimit(2)
                   .padding(.horizontal, 2)
               }
-              .imageStyle(width: 80, height: 120)
+              .imageStyle(width: 100, height: 140)
               .imageType(.subject)
-            }.buttonStyle(.navLink)
+            }.buttonStyle(.plain)
             Text(item.subject.name)
               .font(.caption)
               .lineLimit(1)
-              .frame(width: 80)
-          }
+          }.frame(width: 100)
         }
       }
     }
