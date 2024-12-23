@@ -115,11 +115,7 @@ struct PersonView: View {
                 }
 
                 NavigationLink(value: NavDestination.infobox("人物信息", person.infobox)) {
-                  HStack {
-                    InfoboxHeaderView(infobox: person.infobox)
-                    Spacer()
-                    Image(systemName: "chevron.right")
-                  }
+                  InfoboxHeaderView(infobox: person.infobox)
                 }.buttonStyle(.plain)
 
               }.padding(.leading, 2)
