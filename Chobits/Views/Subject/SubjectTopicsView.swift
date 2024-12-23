@@ -42,7 +42,7 @@ struct SubjectTopicsView: View {
             if topic.repliesCount > 0 {
               Text("(+\(topic.repliesCount))")
                 .font(.footnote)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(.orange)
             }
           }
           HStack {
