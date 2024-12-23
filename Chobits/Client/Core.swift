@@ -71,7 +71,7 @@ actor Chii {
     self.appInfo = AppInfo(
       clientId: clientId,
       clientSecret: clientSecret,
-      callbackURL: "bangumi://oauth/callback"
+      callbackURL: "chii://oauth/callback"
     )
   }
 

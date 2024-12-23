@@ -6,7 +6,10 @@ struct PhoneView: View {
 
   @State private var selectedTab: ChiiViewTab
 
-  @State private var nav: NavigationPath = NavigationPath()
+  @State private var timelineNav: NavigationPath = NavigationPath()
+  @State private var progressNav: NavigationPath = NavigationPath()
+  @State private var discoverNav: NavigationPath = NavigationPath()
+
   @State private var searchQuery: String = ""
   @State private var searchRemote: Bool = false
   @State private var searching: Bool = false
@@ -19,7 +22,7 @@ struct PhoneView: View {
   var body: some View {
     TabView(selection: $selectedTab) {
 
-      NavigationStack {
+      NavigationStack(path: $timelineNav) {
         ChiiTimelineView()
           .navigationDestination(for: NavDestination.self) { $0 }
       }
@@ -27,9 +30,12 @@ struct PhoneView: View {
       .tabItem {
         Label(ChiiViewTab.timeline.title, systemImage: ChiiViewTab.timeline.icon)
       }
+      .onOpenURL { url in
+        handleChiiURL(url, nav: $timelineNav)
+      }
 
       if isAuthenticated {
-        NavigationStack {
+        NavigationStack(path: $progressNav) {
           ChiiProgressView()
             .navigationDestination(for: NavDestination.self) { $0 }
         }
@@ -37,35 +43,38 @@ struct PhoneView: View {
         .tabItem {
           Label(ChiiViewTab.progress.title, systemImage: ChiiViewTab.progress.icon)
         }
+        .onOpenURL { url in
+          handleChiiURL(url, nav: $progressNav)
+        }
       }
 
-      Section {
-        NavigationStack(path: $nav) {
-          Section {
-            if searching {
-              SearchView(text: $searchQuery, remote: $searchRemote)
-            } else {
-              CalendarView()
-            }
-          }.navigationDestination(for: NavDestination.self) { $0 }
-        }
-        .searchable(text: $searchQuery, isPresented: $searching)
-        .onSubmit(of: .search) {
-          searchRemote = true
-        }
-        .onChange(of: searchQuery) {
-          searchRemote = false
-        }
-        .onContinueUserActivity(CSSearchableItemActionType) { activity in
-          handleSearchActivity(activity, nav: $nav)
-          selectedTab = .discover
-        }
+      NavigationStack(path: $discoverNav) {
+        Section {
+          if searching {
+            SearchView(text: $searchQuery, remote: $searchRemote)
+          } else {
+            CalendarView()
+          }
+        }.navigationDestination(for: NavDestination.self) { $0 }
       }
       .tag(ChiiViewTab.discover)
       .tabItem {
         Label(ChiiViewTab.discover.title, systemImage: ChiiViewTab.discover.icon)
       }
-
+      .searchable(text: $searchQuery, isPresented: $searching)
+      .onSubmit(of: .search) {
+        searchRemote = true
+      }
+      .onChange(of: searchQuery) {
+        searchRemote = false
+      }
+      .onOpenURL { url in
+        handleChiiURL(url, nav: $discoverNav)
+      }
+      .onContinueUserActivity(CSSearchableItemActionType) { activity in
+        handleSearchActivity(activity, nav: $discoverNav)
+        selectedTab = .discover
+      }
     }
   }
 }

@@ -85,3 +85,40 @@ enum NavDestination: Hashable, View {
     }
   }
 }
+
+@MainActor
+func handleChiiURL(_ url: URL, nav: Binding<NavigationPath>) {
+  if url.scheme != "chii" {
+    return
+  }
+  switch url.host {
+  case "subject":
+    if let subjectId = url.pathComponents.first.flatMap({ Int($0) }) {
+      nav.wrappedValue.append(NavDestination.subject(subjectId))
+      return
+    }
+  case "character":
+    if let characterId = url.pathComponents.first.flatMap({ Int($0) }) {
+      nav.wrappedValue.append(NavDestination.character(characterId))
+      return
+    }
+  case "person":
+    if let personId = url.pathComponents.first.flatMap({ Int($0) }) {
+      nav.wrappedValue.append(NavDestination.person(personId))
+      return
+    }
+  case "group":
+    if let groupId = url.pathComponents.first.flatMap({ Int($0) }) {
+      nav.wrappedValue.append(NavDestination.group(groupId))
+      return
+    }
+  case "index":
+    if let indexId = url.pathComponents.first.flatMap({ Int($0) }) {
+      nav.wrappedValue.append(NavDestination.index(indexId))
+      return
+    }
+  default:
+    break
+  }
+  Notifier.shared.notify(message: "未知的 chii URL: \(url)")
+}
