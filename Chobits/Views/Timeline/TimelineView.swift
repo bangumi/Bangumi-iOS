@@ -8,6 +8,7 @@ struct ChiiTimelineView: View {
   @AppStorage("hasUnreadNotice") var hasUnreadNotice: Bool = false
 
   @State private var profile: SlimUserDTO?
+  @State private var logoutConfirm: Bool = false
 
   func updateProfile() async {
     do {
@@ -32,12 +33,19 @@ struct ChiiTimelineView: View {
 
   var body: some View {
     VStack {
-      if isAuthenticated {
-        CollectionsView()
-          .padding(.horizontal, 8)
-      } else {
+      if !isAuthenticated {
         AuthView(slogan: "Bangumi 让你的 ACG 生活更美好")
+          .frame(height: 200)
       }
+    }
+    .alert("退出登录", isPresented: $logoutConfirm) {
+      Button("确定", role: .destructive) {
+        Task {
+          await Chii.shared.logout()
+        }
+      }
+    } message: {
+      Text("确定要退出登录吗？")
     }
     .toolbar {
       if isAuthenticated {
@@ -54,6 +62,17 @@ struct ChiiTimelineView: View {
                 // Text(me.group.description)
                 //   .font(.caption)
                 //   .foregroundStyle(.secondary)
+              }
+            }
+            .contextMenu {
+              NavigationLink(value: NavDestination.collections) {
+                Label("时光机", systemImage: "star")
+              }
+              Divider()
+              Button(role: .destructive) {
+                logoutConfirm = true
+              } label: {
+                Text("退出登录")
               }
             }
           }

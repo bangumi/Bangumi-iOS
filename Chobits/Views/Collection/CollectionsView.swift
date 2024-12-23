@@ -23,24 +23,15 @@ struct CollectionsView: View {
           }.padding(.top, 5)
         }
       }.padding(.horizontal, 8)
-    }.onGeometryChange(for: CGSize.self) { proxy in
+    }
+    .navigationTitle("时光机")
+    .navigationBarTitleDisplayMode(.inline)
+    .onGeometryChange(for: CGSize.self) { proxy in
       proxy.size
     } action: { newSize in
       if self.width != newSize.width {
         self.width = newSize.width
       }
     }
-  }
-}
-
-#Preview {
-  let container = mockContainer()
-
-  return NavigationStack {
-    ScrollView {
-      CollectionsView()
-        .modelContainer(container)
-    }
-    .padding(.horizontal, 8)
   }
 }

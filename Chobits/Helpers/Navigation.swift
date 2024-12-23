@@ -2,6 +2,11 @@ import Foundation
 import SwiftUI
 
 enum NavDestination: Hashable, View {
+  case setting
+  case notice
+  case collections
+  case collectionList(_ subjectType: SubjectType)
+
   case user(_ username: String)
   case infobox(_ title: String, _ infobox: Infobox)
   case subject(_ subjectId: Int)
@@ -19,11 +24,8 @@ enum NavDestination: Hashable, View {
   case person(_ personId: Int)
   case personCastList(_ personId: Int)
   case personWorkList(_ personId: Int)
-  case collectionList(_ subjectType: SubjectType)
   case topic(_ topic: TopicDTO)
   case blog(_ blogId: Int)
-  case setting
-  case notice
 
   var body: some View {
     switch self {
@@ -31,6 +33,11 @@ enum NavDestination: Hashable, View {
       SettingsView()
     case .notice:
       NoticeView()
+    case .collections:
+      CollectionsView()
+    case .collectionList(let subjectType):
+      CollectionListView(subjectType: subjectType)
+
     case .user(let username):
       UserView(username: username)
     case .infobox(let title, let infobox):
@@ -65,8 +72,6 @@ enum NavDestination: Hashable, View {
       PersonCastListView(personId: personId)
     case .personWorkList(let personId):
       PersonWorkListView(personId: personId)
-    case .collectionList(let subjectType):
-      CollectionListView(subjectType: subjectType)
     case .topic(let topic):
       TopicView(topic: topic)
     case .blog(let blogId):

@@ -21,6 +21,10 @@ extension DatabaseOperator {
     let list: [T] = try modelContext.fetch(fetchDescriptor)
     return list.first
   }
+
+  public func truncate<T: PersistentModel>(_ model: T.Type) throws {
+    try modelContext.delete(model: model)
+  }
 }
 
 // MARK: - fetch

@@ -25,6 +25,7 @@ struct SettingsView: View {
 
   @State private var refreshing: Bool = false
   @State private var refreshProgress: CGFloat = 0
+  @State private var logoutConfirm: Bool = false
 
   func load() {
     selectedShareDomain = ShareDomain(shareDomain)
@@ -34,19 +35,6 @@ struct SettingsView: View {
     selectedProgressMode = ProgressMode(progressMode)
     selectedProgressLimit = progressLimit
     isolationModeEnabled = isolationMode
-  }
-
-  func logout() {
-    Task {
-      await Chii.shared.logout()
-      do {
-        try modelContext.delete(model: UserSubjectCollection.self)
-        try modelContext.delete(model: Episode.self)
-        Notifier.shared.notify(message: "退出登录成功")
-      } catch {
-        Notifier.shared.alert(error: error)
-      }
-    }
   }
 
   func reindex() {
@@ -176,9 +164,18 @@ struct SettingsView: View {
         }
         if isAuthenticated {
           Button(role: .destructive) {
-            logout()
+            logoutConfirm = true
           } label: {
             Text("退出登录")
+          }
+          .alert("退出登录", isPresented: $logoutConfirm) {
+            Button("确定", role: .destructive) {
+              Task {
+                await Chii.shared.logout()
+              }
+            }
+          } message: {
+            Text("确定要退出登录吗？")
           }
         }
       }.disabled(refreshing)

@@ -19,14 +19,23 @@ extension Chii {
     return baseURL.appending(queryItems: queries)
   }
 
-  func logout() {
+  func logout() async {
     @AppStorage("collectionsUpdatedAt") var collectionsUpdatedAt: Int = 0
+
     self.setAuthStatus(false)
     self.keychain.delete("auth")
     self.auth = nil
     self.profile = nil
     self.authorizedSession = nil
     collectionsUpdatedAt = 0
+    do {
+      let db = try self.getDB()
+      try await db.truncate(UserSubjectCollection.self)
+      try await db.truncate(Episode.self)
+      await Notifier.shared.notify(message: "退出登录成功")
+    } catch {
+      await Notifier.shared.alert(error: error)
+    }
   }
 
   func getAuthFromKeychain() throws -> Auth? {
