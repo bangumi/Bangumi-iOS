@@ -47,12 +47,9 @@ struct CharacterCastItemView: View {
             .lineLimit(1)
             .font(.footnote)
             NavigationLink(value: NavDestination.person(person.id)) {
-              ImageView(img: person.images?.grid) {
-              } caption: {
-                Text("Actor")
-              }
-              .imageStyle(width: 40, height: 40, alignment: .top)
-              .imageType(.person)
+              ImageView(img: person.images?.grid)
+                .imageStyle(width: 40, height: 40, alignment: .top)
+                .imageType(.person)
             }
           }
         }

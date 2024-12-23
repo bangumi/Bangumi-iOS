@@ -1,4 +1,3 @@
-import Flow
 import OSLog
 import SwiftData
 import SwiftUI
@@ -36,10 +35,10 @@ struct PersonView: View {
     return person.nameCN
   }
 
-  var careers: [String] {
-    guard let person = person else { return [] }
+  var careers: String {
+    guard let person = person else { return "" }
     let vals = Set(person.career).sorted().map { PersonCareer($0).description }
-    return Array(vals)
+    return vals.joined(separator: " / ")
   }
 
   func refresh() async {
@@ -108,27 +107,23 @@ struct PersonView: View {
                   .textSelection(.enabled)
                 Spacer()
 
+                if !careers.isEmpty {
+                  Text(careers)
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+                }
+
                 NavigationLink(value: NavDestination.infobox("人物信息", person.infobox)) {
                   HStack {
                     InfoboxHeaderView(infobox: person.infobox)
                     Spacer()
                     Image(systemName: "chevron.right")
                   }
-                }.buttonStyle(.navLink)
+                }.buttonStyle(.plain)
 
               }.padding(.leading, 2)
             }.frame(height: 160)
-
-            /// career
-            HFlow {
-              ForEach(careers, id: \.self) { career in
-                BorderView {
-                  Text(career)
-                }
-              }
-            }
-            .foregroundStyle(.secondary)
-            .padding(.horizontal, 2)
 
             /// summary
             BBCodeWebView(person.summary, textSize: 14)

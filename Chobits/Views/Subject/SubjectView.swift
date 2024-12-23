@@ -1,4 +1,3 @@
-import Flow
 import OSLog
 import SwiftData
 import SwiftUI
@@ -130,9 +129,6 @@ struct SubjectDetailView: View {
           EpisodeGridView(subjectId: subject.subjectId)
         }
 
-        if subject.metaTags.count > 0 {
-          SubjectMetaTagsView(tags: subject.metaTags)
-        }
         BBCodeWebView(subject.summary, textSize: 14)
 
         if subject.typeEnum == .music {
@@ -179,22 +175,6 @@ struct SubjectDetailView: View {
     }
     .navigationTitle(subject.name)
     .navigationBarTitleDisplayMode(.inline)
-  }
-}
-
-struct SubjectMetaTagsView: View {
-  let tags: [String]
-
-  var body: some View {
-    HFlow(alignment: .center, spacing: 4) {
-      ForEach(tags, id: \.self) { tag in
-        BorderView {
-          Text(tag)
-            .font(.footnote)
-            .lineLimit(1)
-        }.padding(1)
-      }
-    }.padding(.vertical, 2)
   }
 }
 

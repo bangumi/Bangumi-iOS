@@ -15,6 +15,21 @@ struct SubjectHeaderView: View {
     subject.typeEnum
   }
 
+  var metaTags: String {
+    subject.metaTags.joined(separator: " / ")
+  }
+
+  var collectStats: String {
+    var text = ""
+    if subject.collection.doing > 0 {
+      text += "\(subject.collection.doing) 人\(CollectionType.do.description(type))"
+    }
+    if subject.collection.collect > 0 {
+      text += " / \(subject.collection.collect) 人\(CollectionType.collect.description(type))"
+    }
+    return text
+  }
+
   var body: some View {
     if subject.locked {
       SubjectLockView()
@@ -35,7 +50,7 @@ struct SubjectHeaderView: View {
             .clipShape(Capsule())
         }
       }
-      .imageStyle(width: 120, height: 160)
+      .imageStyle(width: 120, height: 168)
       .imageType(.subject)
       VStack(alignment: .leading) {
         HStack {
@@ -61,6 +76,13 @@ struct SubjectHeaderView: View {
           .textSelection(.enabled)
         Spacer()
 
+        if !metaTags.isEmpty {
+          Text(metaTags)
+            .font(.footnote)
+            .foregroundStyle(.secondary)
+            .lineLimit(1)
+        }
+
         NavigationLink(value: NavDestination.infobox("条目信息", subject.infobox)) {
           HStack {
             Text(subject.info)
@@ -71,20 +93,12 @@ struct SubjectHeaderView: View {
           }
         }.buttonStyle(.navLink)
 
-        Spacer()
-
-        HStack {
-          Text(
-            "\(subject.collection.doing) 人\(CollectionType.do.description(type))"
-          )
-          Text("/")
-          Text(
-            "\(subject.collection.collect) 人\(CollectionType.collect.description(type))"
-          )
-          Spacer()
+        if !collectStats.isEmpty {
+          Text(collectStats)
+            .font(.footnote)
+            .foregroundStyle(.secondary)
+            .lineLimit(1)
         }
-        .font(.footnote)
-        .foregroundStyle(.secondary)
 
         if subject.rating.total > 10 {
           HStack {
@@ -95,6 +109,7 @@ struct SubjectHeaderView: View {
                 .font(.callout)
               Text("(\(subject.rating.total) 人评分)")
                 .foregroundStyle(.secondary)
+                .lineLimit(1)
               Spacer()
             }
           }.font(.footnote)
@@ -103,8 +118,7 @@ struct SubjectHeaderView: View {
             StarsView(score: 0, size: 12)
             Text("(少于 10 人评分)")
               .foregroundStyle(.secondary)
-          }
-          .font(.footnote)
+          }.font(.footnote)
         }
       }
     }

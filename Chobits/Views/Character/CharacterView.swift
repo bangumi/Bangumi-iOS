@@ -108,7 +108,7 @@ struct CharacterView: View {
                     Spacer()
                     Image(systemName: "chevron.right")
                   }
-                }.buttonStyle(.navLink)
+                }.buttonStyle(.plain)
 
               }.padding(.leading, 2)
             }.frame(height: 160)
