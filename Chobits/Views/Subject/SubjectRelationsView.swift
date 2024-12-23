@@ -54,7 +54,7 @@ struct SubjectRelationsView: View {
       }.padding(.bottom, 5)
     }
     ScrollView(.horizontal, showsIndicators: false) {
-      LazyHStack {
+      LazyHStack(alignment: .top) {
         ForEach(relations) { relation in
           VStack {
             Section {

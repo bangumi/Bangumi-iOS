@@ -5,6 +5,8 @@ import SwiftUI
 struct SubjectCharacterListView: View {
   let subjectId: Int
 
+  @AppStorage("isolationMode") var isolationMode: Bool = false
+
   @State private var castType: CastType = .none
   @State private var reloader = false
 
@@ -42,18 +44,24 @@ struct SubjectCharacterListView: View {
               .imageStyle(width: 60, height: 90, alignment: .top)
             }
             VStack(alignment: .leading) {
-              NavigationLink(value: NavDestination.character(item.character.id)) {
-                HStack {
-                  VStack(alignment: .leading) {
+              VStack(alignment: .leading) {
+                NavigationLink(value: NavDestination.character(item.character.id)) {
+                  HStack {
                     Text(item.character.name)
+                      .foregroundStyle(.linkText)
                       .lineLimit(1)
-                    Text(item.character.nameCN)
-                      .font(.footnote)
-                      .foregroundStyle(.secondary)
-                      .lineLimit(1)
+                    Spacer()
+                    if let comment = item.character.comment, comment > 0, !isolationMode {
+                      Text("(+\(comment))")
+                        .font(.caption)
+                        .foregroundStyle(.orange)
+                    }
                   }
-                  Spacer()
                 }
+                Text(item.character.nameCN)
+                  .font(.footnote)
+                  .foregroundStyle(.secondary)
+                  .lineLimit(1)
               }
               HFlow {
                 ForEach(item.actors) { person in
@@ -64,6 +72,7 @@ struct SubjectCharacterListView: View {
                         .imageType(.person)
                       VStack(alignment: .leading) {
                         Text(person.name)
+                          .foregroundStyle(.linkText)
                           .font(.footnote)
                           .lineLimit(1)
                         Text(person.nameCN)

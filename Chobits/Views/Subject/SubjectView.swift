@@ -34,7 +34,7 @@ struct SubjectView: View {
       }
 
       Task {
-        let resp = try await Chii.shared.getSubjectCharacters(subjectId, limit: 10)
+        let resp = try await Chii.shared.getSubjectCharacters(subjectId, limit: 12)
         if subject?.characters != resp.data {
           subject?.characters = resp.data
         }

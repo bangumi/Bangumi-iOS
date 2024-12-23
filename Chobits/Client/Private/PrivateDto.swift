@@ -149,6 +149,7 @@ struct SlimCharacterDTO: Codable, Identifiable, Hashable {
   var nameCN: String
   var nsfw: Bool
   var role: CharacterType
+  var comment: Int?
 }
 
 struct PersonDTO: Codable, Identifiable, Searchable {
@@ -272,6 +273,7 @@ struct SlimPersonDTO: Codable, Identifiable, Hashable {
   var images: Images?
   var lock: Bool
   var nsfw: Bool
+  var comment: Int?
 }
 
 struct PersonCollectDTO: Codable, Identifiable {

@@ -76,7 +76,7 @@ struct CharacterView: View {
                     .clipShape(Capsule())
                 }
               }
-              .imageStyle(width: 120, height: 160)
+              .imageStyle(width: 120, height: 160, alignment: .top)
               .imageType(.person)
               VStack(alignment: .leading) {
                 HStack {

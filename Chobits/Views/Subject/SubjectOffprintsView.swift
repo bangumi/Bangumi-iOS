@@ -39,7 +39,7 @@ struct SubjectOffprintsView: View {
       Divider()
     }.padding(.top, 5)
     ScrollView(.horizontal, showsIndicators: false) {
-      LazyHStack {
+      LazyHStack(alignment: .top) {
         ForEach(offprints) { offprint in
           NavigationLink(value: NavDestination.subject(offprint.subject.id)) {
             VStack {

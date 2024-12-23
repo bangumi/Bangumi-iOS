@@ -5,6 +5,28 @@ struct SubjectCharactersView: View {
   let subjectId: Int
   let characters: [SubjectCharacterDTO]
 
+  @AppStorage("isolationMode") var isolationMode: Bool = false
+
+  var rowCount: Int {
+    let count = characters.count / 3
+    if count > 3 {
+      return 3
+    }
+    return count
+  }
+
+  var rows: [GridItem] {
+    return Array(repeating: GridItem(.fixed(60)), count: rowCount)
+  }
+
+  var height: CGFloat {
+    let height = CGFloat(rowCount) * 64
+    if height > 0 {
+      return height
+    }
+    return 2
+  }
+
   var body: some View {
     VStack(spacing: 2) {
       HStack(alignment: .bottom) {
@@ -18,8 +40,8 @@ struct SubjectCharactersView: View {
           }.buttonStyle(.navLink)
         }
       }
-      Divider()
     }.padding(.top, 5)
+    Divider()
     if characters.count == 0 {
       HStack {
         Spacer()
@@ -27,29 +49,61 @@ struct SubjectCharactersView: View {
           .font(.caption)
           .foregroundStyle(.secondary)
         Spacer()
-      }.padding(.bottom, 5)
+      }.padding(5)
     }
     ScrollView(.horizontal, showsIndicators: false) {
-      LazyHStack(alignment: .top) {
+      LazyHGrid(rows: rows, alignment: .top) {
         ForEach(characters, id: \.character.id) { item in
-          VStack {
+          HStack(alignment: .top) {
             NavigationLink(value: NavDestination.character(item.character.id)) {
-              ImageView(img: item.character.images?.medium) {
-              } caption: {
-                Text(item.type.description).lineLimit(1)
+              ImageView(img: item.character.images?.grid)
+                .imageStyle(width: 60, height: 60, alignment: .top)
+                .imageType(.person)
+                .padding(2)
+                .shadow(radius: 2)
+            }.buttonStyle(.navLink)
+            VStack(alignment: .leading, spacing: 2) {
+              HStack {
+                NavigationLink(value: NavDestination.character(item.character.id)) {
+                  Text(item.character.name)
+                    .font(.footnote)
+                    .lineLimit(1)
+                }.buttonStyle(.navLink)
+                Spacer()
+                if let comment = item.character.comment, comment > 0, !isolationMode {
+                  Text("(+\(comment))")
+                    .font(.caption)
+                    .lineLimit(1)
+                    .foregroundStyle(.orange)
+                }
               }
-              .imageStyle(width: 60, height: 80, alignment: .top)
-            }.buttonStyle(.plain)
-            Text(item.character.name).font(.caption)
-            if let person = item.actors.first {
-              Text(person.name).foregroundStyle(.secondary).font(.caption)
+              Divider()
+              HStack {
+                BorderView(padding: 2) {
+                  Text(item.type.description)
+                }
+                if !item.character.nameCN.isEmpty {
+                  Text(item.character.nameCN)
+                    .lineLimit(1)
+                }
+                Spacer()
+              }
+              .font(.caption)
+              .foregroundStyle(.secondary)
+              if let actor = item.actors.first {
+                HStack {
+                  Text("CV:").foregroundStyle(.secondary)
+                  NavigationLink(value: NavDestination.person(actor.id)) {
+                    Text(actor.name)
+                      .lineLimit(1)
+                  }.buttonStyle(.navLink)
+                }.font(.caption)
+              }
+              Spacer()
             }
-            Spacer()
-          }
-          .lineLimit(1)
-          .frame(width: 60, height: 120)
+          }.frame(width: 180)
         }
-      }
+      }.frame(height: height)
     }.animation(.default, value: characters)
   }
 }
@@ -59,7 +113,8 @@ struct SubjectCharactersView: View {
     ScrollView {
       LazyVStack(alignment: .leading) {
         SubjectCharactersView(
-          subjectId: Subject.previewAnime.subjectId, characters: Subject.previewCharacters)
+          subjectId: Subject.previewAnime.subjectId,
+          characters: Subject.previewCharacters)
       }.padding()
     }
   }

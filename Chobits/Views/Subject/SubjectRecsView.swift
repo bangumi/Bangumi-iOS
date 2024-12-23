@@ -49,7 +49,7 @@ struct SubjectRecsView: View {
       }.padding(.bottom, 5)
     }
     ScrollView(.horizontal, showsIndicators: false) {
-      LazyHStack {
+      LazyHStack(alignment: .top) {
         ForEach(recs) { rec in
           VStack {
             NavigationLink(value: NavDestination.subject(rec.subject.id)) {
