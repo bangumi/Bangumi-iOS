@@ -37,6 +37,7 @@ struct ChiiTimelineView: View {
         AuthView(slogan: "Bangumi 让你的 ACG 生活更美好")
           .frame(height: 200)
       }
+      TimelineListView()
     }
     .alert("退出登录", isPresented: $logoutConfirm) {
       Button("确定", role: .destructive) {
@@ -109,11 +110,4 @@ struct ChiiTimelineView: View {
       }
     }
   }
-}
-
-#Preview {
-  let container = mockContainer()
-
-  return ChiiTimelineView()
-    .modelContainer(container)
 }
