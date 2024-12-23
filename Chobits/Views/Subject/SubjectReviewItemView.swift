@@ -32,7 +32,6 @@ struct SubjectReviewItemView: View {
         }.font(.footnote)
         Text(item.entry.summary)
           .font(.caption)
-          .lineLimit(3)
       }
       Spacer()
     }.buttonStyle(.navLink)

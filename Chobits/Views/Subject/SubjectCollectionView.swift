@@ -31,6 +31,10 @@ struct SubjectCollectionDetailView: View {
   @Environment(Subject.self) var subject
   @Environment(UserSubjectCollection.self) var collection
 
+  var tags: String {
+    collection.tags.joined(separator: " / ")
+  }
+
   var body: some View {
     VStack(alignment: .leading) {
       BorderView(color: .linkText, padding: 5) {
@@ -57,9 +61,16 @@ struct SubjectCollectionDetailView: View {
             .presentationDetents(.init([.medium, .large]))
         }
       )
+
+      if !tags.isEmpty {
+        Text(tags)
+          .padding(2)
+          .font(.footnote)
+          .foregroundStyle(.secondary)
+      }
+      Divider()
       if !collection.comment.isEmpty {
-        VStack(alignment: .leading, spacing: 2) {
-          Divider()
+        CardView {
           Text(collection.comment)
             .padding(2)
             .font(.footnote)
@@ -68,6 +79,7 @@ struct SubjectCollectionDetailView: View {
             .foregroundStyle(.secondary)
         }
       }
+
       if subject.typeEnum == .book {
         SubjectBookChaptersView(mode: .large).environment(collection)
       }
