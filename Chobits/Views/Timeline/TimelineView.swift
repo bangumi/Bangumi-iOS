@@ -32,22 +32,26 @@ struct ChiiTimelineView: View {
   }
 
   var body: some View {
-    VStack {
+    ScrollView {
       if !isAuthenticated {
         AuthView(slogan: "Bangumi 让你的 ACG 生活更美好")
-          .frame(height: 200)
+          .frame(height: 100)
+          .padding(.horizontal, 8)
+          .alert("退出登录", isPresented: $logoutConfirm) {
+            Button("确定", role: .destructive) {
+              Task {
+                await Chii.shared.logout()
+              }
+            }
+          } message: {
+            Text("确定要退出登录吗？")
+          }
       }
       TimelineListView()
+        .padding(.horizontal, 8)
     }
-    .alert("退出登录", isPresented: $logoutConfirm) {
-      Button("确定", role: .destructive) {
-        Task {
-          await Chii.shared.logout()
-        }
-      }
-    } message: {
-      Text("确定要退出登录吗？")
-    }
+    .navigationTitle("时间线")
+    .navigationBarTitleDisplayMode(.inline)
     .toolbar {
       if isAuthenticated {
         if let me = profile {

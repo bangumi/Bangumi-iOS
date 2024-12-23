@@ -494,7 +494,7 @@ extension Chii {
 
 // MARK: - Timeline
 extension Chii {
-  func getTimeline(mode: FilterMode = .friends, limit: Int = 20, offset: Int = 0) async throws
+  func getTimeline(mode: TimelineMode = .friends, limit: Int = 20, offset: Int = 0) async throws
     -> [TimelineDTO]
   {
     if self.mock {

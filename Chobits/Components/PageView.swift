@@ -72,7 +72,7 @@ where C: View, T: Identifiable & Hashable & Codable & Sendable {
   }
 
   public var body: some View {
-    LazyVStack {
+    LazyVStack(alignment: .leading) {
       ForEach(items) { item in
         content(item.inner).onAppear {
           Task {

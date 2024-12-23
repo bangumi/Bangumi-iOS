@@ -343,7 +343,7 @@ struct SlimBlogEntryDTO: Codable, Hashable, Identifiable {
   var updatedAt: Int
 }
 
-struct TimelineDTO: Codable, Identifiable {
+struct TimelineDTO: Codable, Identifiable, Hashable {
   var id: Int
   var uid: Int
   var cat: TimelineCat
@@ -356,7 +356,7 @@ struct TimelineDTO: Codable, Identifiable {
   var user: SlimUserDTO
 }
 
-struct TimelineMemoDTO: Codable {
+struct TimelineMemoDTO: Codable, Hashable {
   var blog: SlimBlogEntryDTO?
   var daily: TimelineDailyDTO?
   var index: SlimIndexDTO?
@@ -367,12 +367,12 @@ struct TimelineMemoDTO: Codable {
   var wiki: TimelineWikiDTO?
 }
 
-struct TimelineDailyDTO: Codable {
+struct TimelineDailyDTO: Codable, Hashable {
   var groups: [SlimGroupDTO]?
   var users: [SlimUserDTO]?
 }
 
-struct SlimGroupDTO: Codable, Identifiable {
+struct SlimGroupDTO: Codable, Identifiable, Hashable {
   var id: Int
   var name: String
   var nsfw: Bool
@@ -380,17 +380,17 @@ struct SlimGroupDTO: Codable, Identifiable {
   var icon: Avatar
 }
 
-struct TimelineMonoDTO: Codable {
+struct TimelineMonoDTO: Codable, Hashable {
   var characters: [SlimCharacterDTO]
   var persons: [SlimPersonDTO]
 }
 
-struct TimelineProgressDTO: Codable {
+struct TimelineProgressDTO: Codable, Hashable {
   var batch: TimelineBatchProgressDTO?
   var single: TimelineSingleProgressDTO?
 }
 
-struct TimelineBatchProgressDTO: Codable {
+struct TimelineBatchProgressDTO: Codable, Hashable {
   var epsTotal: String
   var volsTotal: String
   var epsUpdate: Int?
@@ -398,33 +398,33 @@ struct TimelineBatchProgressDTO: Codable {
   var subject: SlimSubjectDTO
 }
 
-struct TimelineSingleProgressDTO: Codable {
+struct TimelineSingleProgressDTO: Codable, Hashable {
   var episode: EpisodeDTO
   var subject: SlimSubjectDTO
 }
 
-struct TimelineStatusDTO: Codable {
+struct TimelineStatusDTO: Codable, Hashable {
   var nickname: TimelineNicknameDTO?
   var sign: String?
   var tsukkomi: String?
 }
 
-struct TimelineNicknameDTO: Codable {
+struct TimelineNicknameDTO: Codable, Hashable {
   var before: String
   var after: String
 }
 
-struct TimelineSubjectDTO: Codable {
+struct TimelineSubjectDTO: Codable, Hashable {
   var subject: SlimSubjectDTO
   var comment: String
   var rate: Float
 }
 
-struct TimelineWikiDTO: Codable {
+struct TimelineWikiDTO: Codable, Hashable {
   var subject: SlimSubjectDTO?
 }
 
-struct SlimIndexDTO: Codable, Identifiable {
+struct SlimIndexDTO: Codable, Identifiable, Hashable {
   var id: Int
   var type: Int
   var title: String
@@ -453,7 +453,7 @@ enum TimelineSource: Int, Codable {
   case api = 5
 }
 
-enum FilterMode: String, Codable {
+enum TimelineMode: String, Codable {
   case all
   case friends
 }

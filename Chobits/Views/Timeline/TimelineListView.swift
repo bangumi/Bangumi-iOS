@@ -3,9 +3,21 @@ import SwiftData
 import SwiftUI
 
 struct TimelineListView: View {
-  @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
+  @State private var reloader = false
+
+  func load(limit: Int, offset: Int) async -> PagedDTO<TimelineDTO>? {
+    do {
+      let resp = try await Chii.shared.getTimeline(limit: limit, offset: offset)
+      return PagedDTO(data: resp, total: 1000)
+    } catch {
+      Notifier.shared.alert(error: error)
+    }
+    return nil
+  }
 
   var body: some View {
-    Text("🚧")
+    PageView<TimelineDTO, _>(reloader: reloader, nextPageFunc: load) { item in
+      TimelineItemView(item: item)
+    }
   }
 }

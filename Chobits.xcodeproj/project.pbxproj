@@ -238,6 +238,8 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		190C3AE62D197913004ECCE6 /* Group */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Group; sourceTree = "<group>"; };
+		190C3AEA2D19830F004ECCE6 /* Index */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Index; sourceTree = "<group>"; };
 		194E783D2D1033DE0070F5F8 /* Blog */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Blog; sourceTree = "<group>"; };
 		1998DCCC2CAE8A9800115E1F /* Database */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Database; sourceTree = "<group>"; };
 		1998DCDE2CAF398800115E1F /* Public */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Public; sourceTree = "<group>"; };
@@ -361,6 +363,8 @@
 		19671C4D2BDEB55D000B4D99 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				190C3AEA2D19830F004ECCE6 /* Index */,
+				190C3AE62D197913004ECCE6 /* Group */,
 				1998DD002CB10E7E00115E1F /* Topic */,
 				1998DCF62CB023B000115E1F /* User */,
 				1998DCF22CAFDA5400115E1F /* Timeline */,
@@ -515,6 +519,8 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
+				190C3AE62D197913004ECCE6 /* Group */,
+				190C3AEA2D19830F004ECCE6 /* Index */,
 				194E783D2D1033DE0070F5F8 /* Blog */,
 				1998DCCC2CAE8A9800115E1F /* Database */,
 				1998DCDE2CAF398800115E1F /* Public */,
