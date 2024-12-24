@@ -300,6 +300,10 @@ struct EpisodeDTO: Codable, Identifiable, Hashable {
   var title: String {
     return "\(self.type.name).\(self.sort.episodeDisplay) \(self.name)"
   }
+
+  var link: String {
+    "chii://episode/\(id)"
+  }
 }
 
 struct EpisodeCollectionDTO: Codable {
@@ -539,6 +543,23 @@ enum TimelineSource: Int, Codable {
   case inTouch = 3
   case wp = 4
   case api = 5
+
+  var desc: String {
+    switch self {
+    case .web:
+      return "web"
+    case .mobile:
+      return "mobile"
+    case .onAir:
+      return "OnAir"
+    case .inTouch:
+      return "InTouch"
+    case .wp:
+      return "WP"
+    case .api:
+      return "API"
+    }
+  }
 }
 
 enum TimelineMode: String, Codable {
