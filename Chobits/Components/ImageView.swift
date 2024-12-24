@@ -51,6 +51,15 @@ extension View {
   }
 }
 
+extension View {
+  public func imageLink(_ link: String) -> some View {
+    let url = URL(string: link) ?? URL(string: "")!
+    return Link(destination: url) {
+      self
+    }
+  }
+}
+
 struct ImageView<ImageBadge: View, ImageCaption: View>: View {
   let img: String?
   let large: String?

@@ -30,9 +30,16 @@ struct PadView: View {
         NavigationStack(path: $timelineNav) {
           ChiiTimelineView()
             .navigationDestination(for: NavDestination.self) { $0 }
-        }.onOpenURL { url in
-          handleChiiURL(url, nav: $timelineNav)
-        }
+        }.environment(
+          \.openURL,
+          OpenURLAction { url in
+            if handleChiiURL(url, nav: $timelineNav) {
+              return .handled
+            } else {
+              return .systemAction
+            }
+          }
+        )
       }
 
       if isAuthenticated {
@@ -40,9 +47,16 @@ struct PadView: View {
           NavigationStack(path: $progressNav) {
             ChiiProgressView()
               .navigationDestination(for: NavDestination.self) { $0 }
-          }.onOpenURL { url in
-            handleChiiURL(url, nav: $progressNav)
-          }
+          }.environment(
+            \.openURL,
+            OpenURLAction { url in
+              if handleChiiURL(url, nav: $progressNav) {
+                return .handled
+              } else {
+                return .systemAction
+              }
+            }
+          )
         }
       }
 
@@ -66,9 +80,16 @@ struct PadView: View {
         .onChange(of: searchQuery) {
           searchRemote = false
         }
-        .onOpenURL { url in
-          handleChiiURL(url, nav: $discoverNav)
-        }
+        .environment(
+          \.openURL,
+          OpenURLAction { url in
+            if handleChiiURL(url, nav: $discoverNav) {
+              return .handled
+            } else {
+              return .systemAction
+            }
+          }
+        )
         .onContinueUserActivity(CSSearchableItemActionType) { activity in
           handleSearchActivity(activity, nav: $discoverNav)
           selectedTab = .discover

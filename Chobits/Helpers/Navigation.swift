@@ -1,4 +1,5 @@
 import Foundation
+import OSLog
 import SwiftUI
 
 enum NavDestination: Hashable, View {
@@ -87,38 +88,40 @@ enum NavDestination: Hashable, View {
 }
 
 @MainActor
-func handleChiiURL(_ url: URL, nav: Binding<NavigationPath>) {
+func handleChiiURL(_ url: URL, nav: Binding<NavigationPath>) -> Bool {
   if url.scheme != "chii" {
-    return
+    return false
   }
+  Logger.app.info("chii URL: \(url)")
+  let components = url.pathComponents.dropFirst()
   switch url.host {
+  case "user":
+    if let username = components.first {
+      nav.wrappedValue.append(NavDestination.user(username))
+    }
   case "subject":
-    if let subjectId = url.pathComponents.first.flatMap({ Int($0) }) {
+    if let subjectId = components.first.flatMap({ Int($0) }) {
       nav.wrappedValue.append(NavDestination.subject(subjectId))
-      return
     }
   case "character":
-    if let characterId = url.pathComponents.first.flatMap({ Int($0) }) {
+    if let characterId = components.first.flatMap({ Int($0) }) {
       nav.wrappedValue.append(NavDestination.character(characterId))
-      return
     }
   case "person":
-    if let personId = url.pathComponents.first.flatMap({ Int($0) }) {
+    if let personId = components.first.flatMap({ Int($0) }) {
       nav.wrappedValue.append(NavDestination.person(personId))
-      return
     }
   case "group":
-    if let groupId = url.pathComponents.first.flatMap({ Int($0) }) {
+    if let groupId = components.first.flatMap({ Int($0) }) {
       nav.wrappedValue.append(NavDestination.group(groupId))
-      return
     }
   case "index":
-    if let indexId = url.pathComponents.first.flatMap({ Int($0) }) {
+    if let indexId = components.first.flatMap({ Int($0) }) {
       nav.wrappedValue.append(NavDestination.index(indexId))
-      return
     }
   default:
+    Notifier.shared.notify(message: "未知的 chii URL: \(url)")
     break
   }
-  Notifier.shared.notify(message: "未知的 chii URL: \(url)")
+  return true
 }

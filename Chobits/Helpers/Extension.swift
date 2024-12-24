@@ -2,6 +2,14 @@ import Foundation
 import OSLog
 import SwiftUI
 
+extension String {
+  func withLink(_ link: String) -> AttributedString {
+    var str = AttributedString(self)
+    str.link = URL(string: link)
+    str.foregroundColor = .linkText
+    return str
+  }
+}
 extension Int {
   var ratingDescription: String {
     let desc: [String: String] = [

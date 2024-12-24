@@ -98,6 +98,9 @@ struct SlimUserDTO: Codable, Identifiable, Hashable {
   var sign: String
   var joinedAt: Int?
 
+  var link: String {
+    "chii://user/\(username)"
+  }
 }
 
 struct NoticeDTO: Codable, Identifiable, Hashable {
@@ -178,6 +181,10 @@ struct SlimSubjectDTO: Codable, Identifiable, Hashable {
   var nameCN: String
   var nsfw: Bool
   var type: SubjectType
+
+  var link: String {
+    "chii://subject/\(id)"
+  }
 }
 
 struct BangumiCalendarItemDTO: Codable {
@@ -211,6 +218,10 @@ struct SlimCharacterDTO: Codable, Identifiable, Hashable {
   var nsfw: Bool
   var role: CharacterType
   var comment: Int?
+
+  var link: String {
+    "chii://character/\(id)"
+  }
 }
 
 struct PersonDTO: Codable, Identifiable, Searchable {
@@ -335,6 +346,10 @@ struct SlimPersonDTO: Codable, Identifiable, Hashable {
   var lock: Bool
   var nsfw: Bool
   var comment: Int?
+
+  var link: String {
+    "chii://person/\(id)"
+  }
 }
 
 struct PersonCollectDTO: Codable, Identifiable {
@@ -402,6 +417,10 @@ struct SlimBlogEntryDTO: Codable, Hashable, Identifiable {
   var type: Int
   var createdAt: Int
   var updatedAt: Int
+
+  var link: String {
+    "chii://blog/\(id)"
+  }
 }
 
 struct TimelineDTO: Codable, Identifiable, Hashable {
@@ -439,6 +458,10 @@ struct SlimGroupDTO: Codable, Identifiable, Hashable {
   var nsfw: Bool
   var title: String
   var icon: Avatar
+
+  var link: String {
+    "chii://group/\(id)"
+  }
 }
 
 struct TimelineMonoDTO: Codable, Hashable {
@@ -491,6 +514,10 @@ struct SlimIndexDTO: Codable, Identifiable, Hashable {
   var title: String
   var total: Int
   var createdAt: Int
+
+  var link: String {
+    "chii://index/\(id)"
+  }
 }
 
 enum TimelineCat: Int, Codable {

@@ -30,9 +30,16 @@ struct PhoneView: View {
       .tabItem {
         Label(ChiiViewTab.timeline.title, systemImage: ChiiViewTab.timeline.icon)
       }
-      .onOpenURL { url in
-        handleChiiURL(url, nav: $timelineNav)
-      }
+      .environment(
+        \.openURL,
+        OpenURLAction { url in
+          if handleChiiURL(url, nav: $timelineNav) {
+            return .handled
+          } else {
+            return .systemAction
+          }
+        }
+      )
 
       if isAuthenticated {
         NavigationStack(path: $progressNav) {
@@ -43,9 +50,16 @@ struct PhoneView: View {
         .tabItem {
           Label(ChiiViewTab.progress.title, systemImage: ChiiViewTab.progress.icon)
         }
-        .onOpenURL { url in
-          handleChiiURL(url, nav: $progressNav)
-        }
+        .environment(
+          \.openURL,
+          OpenURLAction { url in
+            if handleChiiURL(url, nav: $progressNav) {
+              return .handled
+            } else {
+              return .systemAction
+            }
+          }
+        )
       }
 
       Section {
@@ -65,9 +79,16 @@ struct PhoneView: View {
         .onChange(of: searchQuery) {
           searchRemote = false
         }
-        .onOpenURL { url in
-          handleChiiURL(url, nav: $discoverNav)
-        }
+        .environment(
+          \.openURL,
+          OpenURLAction { url in
+            if handleChiiURL(url, nav: $discoverNav) {
+              return .handled
+            } else {
+              return .systemAction
+            }
+          }
+        )
         .onContinueUserActivity(CSSearchableItemActionType) { activity in
           handleSearchActivity(activity, nav: $discoverNav)
           selectedTab = .discover

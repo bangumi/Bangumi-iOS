@@ -82,7 +82,7 @@
 		1998DCFB2CB1066F00115E1F /* SubjectTopicsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1998DCFA2CB1066700115E1F /* SubjectTopicsView.swift */; };
 		1998DCFD2CB10A5C00115E1F /* SubjectTopicListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1998DCFC2CB10A5700115E1F /* SubjectTopicListView.swift */; };
 		1998DCFF2CB10B7F00115E1F /* subject_topics.json in Resources */ = {isa = PBXBuildFile; fileRef = 1998DCFE2CB10B7900115E1F /* subject_topics.json */; };
-		1998DD052CB11F9C00115E1F /* SubjectCommentsVIew.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1998DD042CB11F9700115E1F /* SubjectCommentsVIew.swift */; };
+		1998DD052CB11F9C00115E1F /* SubjectCommentsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1998DD042CB11F9700115E1F /* SubjectCommentsView.swift */; };
 		1998DD072CB1222400115E1F /* subject_comments.json in Resources */ = {isa = PBXBuildFile; fileRef = 1998DD062CB1221E00115E1F /* subject_comments.json */; };
 		1998DD092CB122BC00115E1F /* SubjectCommentListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1998DD082CB122B600115E1F /* SubjectCommentListView.swift */; };
 		19B2A70A2D087968001617BE /* BBCode in Frameworks */ = {isa = PBXBuildFile; productRef = 19B2A7092D087968001617BE /* BBCode */; };
@@ -198,7 +198,7 @@
 		1998DCFA2CB1066700115E1F /* SubjectTopicsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubjectTopicsView.swift; sourceTree = "<group>"; };
 		1998DCFC2CB10A5700115E1F /* SubjectTopicListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubjectTopicListView.swift; sourceTree = "<group>"; };
 		1998DCFE2CB10B7900115E1F /* subject_topics.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = subject_topics.json; sourceTree = "<group>"; };
-		1998DD042CB11F9700115E1F /* SubjectCommentsVIew.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubjectCommentsVIew.swift; sourceTree = "<group>"; };
+		1998DD042CB11F9700115E1F /* SubjectCommentsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubjectCommentsView.swift; sourceTree = "<group>"; };
 		1998DD062CB1221E00115E1F /* subject_comments.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = subject_comments.json; sourceTree = "<group>"; };
 		1998DD082CB122B600115E1F /* SubjectCommentListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubjectCommentListView.swift; sourceTree = "<group>"; };
 		19B2A74F2D092240001617BE /* BBCode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BBCode.swift; sourceTree = "<group>"; };
@@ -290,7 +290,7 @@
 				19ECCEC02CFF167F0092F715 /* SubjectRecsView.swift */,
 				194E783A2D10337B0070F5F8 /* SubjectReviewsView.swift */,
 				1998DCFA2CB1066700115E1F /* SubjectTopicsView.swift */,
-				1998DD042CB11F9700115E1F /* SubjectCommentsVIew.swift */,
+				1998DD042CB11F9700115E1F /* SubjectCommentsView.swift */,
 				19ECCF382CFFDEDC0092F715 /* SubjectStaffListView.swift */,
 				1915A89F2BF09F4D003DB76D /* SubjectCharacterListView.swift */,
 				1915A89D2BF09E6B003DB76D /* SubjectRelationListView.swift */,
@@ -699,7 +699,7 @@
 				194484232BF4C68B002EC925 /* CollectionListView.swift in Sources */,
 				197A19D12BE6304D00804B13 /* EpisodeView.swift in Sources */,
 				19671C6C2BDEB55D000B4D99 /* ProgressView.swift in Sources */,
-				1998DD052CB11F9C00115E1F /* SubjectCommentsVIew.swift in Sources */,
+				1998DD052CB11F9C00115E1F /* SubjectCommentsView.swift in Sources */,
 				197A19D62BE6729A00804B13 /* Auth.swift in Sources */,
 				1943C5082C08CD2E0067ACDB /* StarsView.swift in Sources */,
 				197A19D82BE672E000804B13 /* Extension.swift in Sources */,
