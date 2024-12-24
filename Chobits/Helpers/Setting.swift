@@ -194,7 +194,7 @@ enum ChiiViewTab: Hashable, Identifiable {
   var title: String {
     switch self {
     case .timeline:
-      "动态"
+      "时间线"
     case .discover:
       "发现"
     case .progress:

@@ -50,8 +50,10 @@ struct SubjectHeaderView: View {
             .clipShape(Capsule())
         }
       }
-      .imageStyle(width: 120, height: 168)
+      .imageStyle(width: 120, height: 160)
       .imageType(.subject)
+      .padding(4)
+      .shadow(radius: 4)
       VStack(alignment: .leading) {
         HStack {
           if type != .none {

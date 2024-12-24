@@ -97,7 +97,7 @@ struct SubjectRelationsView: View {
             Spacer()
           }.frame(width: 90, height: 190)
         }
-      }
+      }.padding(.horizontal, 2)
     }.animation(.default, value: relations)
   }
 }

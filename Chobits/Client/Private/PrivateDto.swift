@@ -28,6 +28,10 @@ struct Profile: Codable, Identifiable, Hashable {
     case joinedAt
   }
 
+  var link: String {
+    "chii://user/\(username)"
+  }
+
   init() {
     self.id = 0
     self.username = ""

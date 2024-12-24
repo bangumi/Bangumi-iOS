@@ -83,7 +83,7 @@ struct SubjectRecsView: View {
           .font(.caption)
           .frame(width: 72, height: 144)
         }
-      }
+      }.padding(.horizontal, 2)
     }.animation(.default, value: recs)
   }
 }

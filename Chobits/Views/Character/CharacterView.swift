@@ -78,6 +78,8 @@ struct CharacterView: View {
               }
               .imageStyle(width: 120, height: 160, alignment: .top)
               .imageType(.person)
+              .padding(4)
+              .shadow(radius: 4)
               VStack(alignment: .leading) {
                 HStack {
                   Image(systemName: character.roleEnum.icon)
