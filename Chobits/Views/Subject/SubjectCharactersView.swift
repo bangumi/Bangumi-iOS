@@ -20,7 +20,7 @@ struct SubjectCharactersView: View {
   }
 
   var height: CGFloat {
-    let height = CGFloat(rowCount) * 64
+    let height = CGFloat(rowCount) * 68
     if height > 0 {
       return height
     }
@@ -66,7 +66,7 @@ struct SubjectCharactersView: View {
               HStack {
                 NavigationLink(value: NavDestination.character(item.character.id)) {
                   Text(item.character.name)
-                    .font(.footnote)
+                    .font(.callout)
                     .lineLimit(1)
                 }.buttonStyle(.navLink)
                 Spacer()
@@ -81,15 +81,15 @@ struct SubjectCharactersView: View {
               HStack {
                 BorderView(padding: 2) {
                   Text(item.type.description)
+                    .font(.caption)
                 }
                 if !item.character.nameCN.isEmpty {
                   Text(item.character.nameCN)
+                    .font(.footnote)
                     .lineLimit(1)
                 }
                 Spacer()
-              }
-              .font(.caption)
-              .foregroundStyle(.secondary)
+              }.foregroundStyle(.secondary)
               if let actor = item.actors.first {
                 HStack {
                   Text("CV:").foregroundStyle(.secondary)
