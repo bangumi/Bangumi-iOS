@@ -8,7 +8,7 @@ struct TimelineItemView: View {
   var body: some View {
     CardView {
       HStack(alignment: .top) {
-        ImageView(img: item.user.avatar?.medium)
+        ImageView(img: item.user.avatar?.large)
           .imageStyle(width: 40, height: 40)
           .imageType(.avatar)
           .imageLink(item.user.link)

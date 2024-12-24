@@ -41,7 +41,7 @@ struct ChiiTimelineView: View {
                 Text("退出登录")
               }
             } label: {
-              ImageView(img: profile.avatar?.medium)
+              ImageView(img: profile.avatar?.large)
                 .imageStyle(width: 32, height: 32)
                 .imageType(.avatar)
             }
