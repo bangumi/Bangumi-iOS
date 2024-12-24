@@ -5,19 +5,16 @@ struct CharacterCastItemView: View {
 
   var body: some View {
     HStack(alignment: .top) {
-      NavigationLink(value: NavDestination.subject(item.subject.id)) {
-        ImageView(img: item.subject.images?.common) {
-        } caption: {
-          Text(item.type.description)
-        }
-        .imageStyle(width: 60, height: 60, alignment: .top)
-        .imageType(.subject)
+      ImageView(img: item.subject.images?.common) {
+      } caption: {
+        Text(item.type.description)
       }
+      .imageStyle(width: 60, height: 60, alignment: .top)
+      .imageType(.subject)
+      .imageLink(item.subject.link)
 
       VStack(alignment: .leading) {
-        NavigationLink(value: NavDestination.subject(item.subject.id)) {
-          Text(item.subject.name)
-        }
+        Text(item.subject.name.withLink(item.subject.link))
         if item.subject.nameCN.isEmpty {
           Label(item.subject.type.description, systemImage: item.subject.type.icon)
             .foregroundStyle(.secondary)
@@ -38,19 +35,16 @@ struct CharacterCastItemView: View {
         ForEach(item.actors) { person in
           HStack(alignment: .top) {
             VStack(alignment: .trailing) {
-              NavigationLink(value: NavDestination.person(person.id)) {
-                Text(person.name)
-              }
+              Text(person.name.withLink(person.link))
               Text(person.nameCN)
                 .foregroundStyle(.secondary)
             }
             .lineLimit(1)
             .font(.footnote)
-            NavigationLink(value: NavDestination.person(person.id)) {
-              ImageView(img: person.images?.grid)
-                .imageStyle(width: 40, height: 40, alignment: .top)
-                .imageType(.person)
-            }
+            ImageView(img: person.images?.grid)
+              .imageStyle(width: 40, height: 40, alignment: .top)
+              .imageType(.person)
+              .imageLink(person.link)
           }
         }
       }

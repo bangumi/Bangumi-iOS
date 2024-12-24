@@ -34,6 +34,7 @@ struct SubjectOffprintsView: View {
         Text("单行本")
           .foregroundStyle(offprints.count > 0 ? .primary : .secondary)
           .font(.title3)
+          .onAppear(perform: load)
         Spacer()
       }
       Divider()
@@ -41,29 +42,28 @@ struct SubjectOffprintsView: View {
     ScrollView(.horizontal, showsIndicators: false) {
       LazyHStack(alignment: .top) {
         ForEach(offprints) { offprint in
-          NavigationLink(value: NavDestination.subject(offprint.subject.id)) {
-            VStack {
-              if let ctype = collections[offprint.subject.id] {
-                ImageView(img: offprint.subject.images?.common) {
-                } caption: {
-                  HStack {
-                    Image(systemName: ctype.icon)
-                    Spacer()
-                    Text(ctype.description(offprint.subject.type))
-                  }.padding(.horizontal, 4)
-                }
-                .imageStyle(width: 60, height: 80)
-                .imageType(.subject)
-              } else {
-                ImageView(img: offprint.subject.images?.common)
-                  .imageStyle(width: 60, height: 80)
-                  .imageType(.subject)
-              }
-              Spacer()
+          if let ctype = collections[offprint.subject.id] {
+            ImageView(img: offprint.subject.images?.common) {
+            } caption: {
+              HStack {
+                Image(systemName: ctype.icon)
+                Spacer()
+                Text(ctype.description(offprint.subject.type))
+              }.padding(.horizontal, 4)
             }
-            .font(.caption)
-            .frame(width: 60, height: 90)
-          }.buttonStyle(.navLink)
+            .imageStyle(width: 60, height: 80)
+            .imageType(.subject)
+            .imageLink(offprint.subject.link)
+            .padding(2)
+            .shadow(radius: 2)
+          } else {
+            ImageView(img: offprint.subject.images?.common)
+              .imageStyle(width: 60, height: 80)
+              .imageType(.subject)
+              .imageLink(offprint.subject.link)
+              .padding(2)
+              .shadow(radius: 2)
+          }
         }
       }
     }.animation(.default, value: offprints)

@@ -18,7 +18,7 @@ enum NavDestination: Hashable, View {
   case subjectReviewList(_ subjectId: Int)
   case subjectTopicList(_ subjectId: Int)
   case subjectCommentList(_ subjectId: Int)
-  case episode(_ subjectId: Int, _ episodeId: Int)
+  case episode(_ episodeId: Int)
   case episodeList(_ subjectId: Int)
   case character(_ characterId: Int)
   case characterCastList(_ characterId: Int)
@@ -61,8 +61,8 @@ enum NavDestination: Hashable, View {
       SubjectTopicListView(subjectId: subjectId)
     case .subjectCommentList(let subjectId):
       SubjectCommentListView(subjectId: subjectId)
-    case .episode(let subjectId, let episodeId):
-      EpisodeView(subjectId: subjectId, episodeId: episodeId)
+    case .episode(let episodeId):
+      EpisodeView(episodeId: episodeId)
     case .episodeList(let subjectId):
       EpisodeListView(subjectId: subjectId)
     case .character(let characterId):
@@ -103,6 +103,10 @@ func handleChiiURL(_ url: URL, nav: Binding<NavigationPath>) -> Bool {
     if let subjectId = components.first.flatMap({ Int($0) }) {
       nav.wrappedValue.append(NavDestination.subject(subjectId))
     }
+  case "episode":
+    if let episodeId = components.first.flatMap({ Int($0) }) {
+      nav.wrappedValue.append(NavDestination.episode(episodeId))
+    }
   case "character":
     if let characterId = components.first.flatMap({ Int($0) }) {
       nav.wrappedValue.append(NavDestination.character(characterId))
@@ -118,6 +122,10 @@ func handleChiiURL(_ url: URL, nav: Binding<NavigationPath>) -> Bool {
   case "index":
     if let indexId = components.first.flatMap({ Int($0) }) {
       nav.wrappedValue.append(NavDestination.index(indexId))
+    }
+  case "blog":
+    if let blogId = components.first.flatMap({ Int($0) }) {
+      nav.wrappedValue.append(NavDestination.blog(blogId))
     }
   default:
     Notifier.shared.notify(message: "未知的 chii URL: \(url)")

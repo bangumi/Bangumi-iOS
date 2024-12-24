@@ -67,31 +67,35 @@ struct SubjectRelationsView: View {
             }
             .lineLimit(1)
             .font(.caption)
-            NavigationLink(value: NavDestination.subject(relation.subject.id)) {
-              if let ctype = collections[relation.subject.id] {
-                ImageView(img: relation.subject.images?.common) {
-                } caption: {
-                  HStack {
-                    Image(systemName: ctype.icon)
-                    Spacer()
-                    Text(ctype.description(relation.subject.type))
-                  }.padding(.horizontal, 4)
-                }
+            if let ctype = collections[relation.subject.id] {
+              ImageView(img: relation.subject.images?.common) {
+              } caption: {
+                HStack {
+                  Image(systemName: ctype.icon)
+                  Spacer()
+                  Text(ctype.description(relation.subject.type))
+                }.padding(.horizontal, 4)
+              }
+              .imageStyle(width: 90, height: 120)
+              .imageType(.subject)
+              .imageLink(relation.subject.link)
+              .padding(2)
+              .shadow(radius: 2)
+            } else {
+              ImageView(img: relation.subject.images?.common)
                 .imageStyle(width: 90, height: 120)
                 .imageType(.subject)
-              } else {
-                ImageView(img: relation.subject.images?.common)
-                  .imageStyle(width: 90, height: 120)
-                  .imageType(.subject)
-              }
-            }.buttonStyle(.navLink)
+                .imageLink(relation.subject.link)
+                .padding(2)
+                .shadow(radius: 2)
+            }
             Text(relation.subject.name)
               .font(.caption)
               .multilineTextAlignment(.leading)
               .truncationMode(.middle)
               .lineLimit(2)
             Spacer()
-          }.frame(width: 90, height: 185)
+          }.frame(width: 90, height: 190)
         }
       }
     }.animation(.default, value: relations)

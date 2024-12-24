@@ -5,32 +5,23 @@ struct SubjectReviewItemView: View {
 
   var body: some View {
     HStack(alignment: .top) {
-      NavigationLink(value: NavDestination.user(item.user.username)) {
-        ImageView(img: item.user.avatar?.large)
-          .imageStyle(width: 60, height: 60, alignment: .top)
-          .imageType(.avatar)
-      }
+      ImageView(img: item.user.avatar?.large)
+        .imageStyle(width: 60, height: 60, alignment: .top)
+        .imageType(.avatar)
+        .imageLink(item.user.link)
       VStack(alignment: .leading) {
-        NavigationLink(value: NavDestination.blog(item.entry.id)) {
-          HStack(alignment: .bottom) {
-            Text(item.entry.title).lineLimit(1)
-            Spacer()
-            Text("更多 »").font(.caption)
-          }
-        }
+        Text(item.entry.title.withLink(item.entry.link)).lineLimit(1)
         HStack {
           Text("by").foregroundStyle(.secondary)
-          NavigationLink(value: NavDestination.user(item.user.username)) {
-            Text(item.user.nickname)
-              .lineLimit(1)
-          }
+          Text(item.user.nickname.withLink(item.user.link))
+            .lineLimit(1)
           Text(item.entry.createdAt.datetimeDisplay)
             .lineLimit(1)
             .foregroundStyle(.secondary)
           Text("(+\(item.entry.replies))")
             .foregroundStyle(.orange)
         }.font(.footnote)
-        Text(item.entry.summary)
+        Text(AttributedString("\(item.entry.summary)...") + " 更多 »".withLink(item.entry.link))
           .font(.caption)
       }
       Spacer()

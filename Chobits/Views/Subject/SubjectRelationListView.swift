@@ -33,34 +33,30 @@ struct SubjectRelationListView: View {
       PageView<SubjectRelationDTO, _>(reloader: reloader, nextPageFunc: load) { item in
         CardView {
           HStack {
-            NavigationLink(value: NavDestination.subject(item.subject.id)) {
-              ImageView(img: item.subject.images?.common)
-                .imageStyle(width: 60, height: 60)
-                .imageType(.subject)
-            }
+            ImageView(img: item.subject.images?.common)
+              .imageStyle(width: 60, height: 60)
+              .imageType(.subject)
+              .imageLink(item.subject.link)
             VStack(alignment: .leading) {
-              NavigationLink(value: NavDestination.subject(item.subject.id)) {
-                HStack {
-                  VStack(alignment: .leading) {
-                    Text(item.subject.name)
-                      .lineLimit(1)
-                    Text(item.subject.nameCN)
-                      .font(.footnote)
-                      .foregroundStyle(.secondary)
-                      .lineLimit(1)
-                    Label(item.relation.cn, systemImage: item.subject.type.icon)
-                      .font(.footnote)
-                      .foregroundStyle(.secondary)
-                  }
-                  Spacer()
+              HStack {
+                VStack(alignment: .leading) {
+                  Text(item.subject.name.withLink(item.subject.link))
+                    .lineLimit(1)
+                  Text(item.subject.nameCN)
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+                  Label(item.relation.cn, systemImage: item.subject.type.icon)
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
                 }
+                Spacer()
               }
             }.padding(.leading, 4)
           }
         }
       }.padding(8)
     }
-    .buttonStyle(.plain)
     .navigationTitle("关联条目")
     .navigationBarTitleDisplayMode(.inline)
     .toolbar {

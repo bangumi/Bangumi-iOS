@@ -36,26 +36,24 @@ struct SubjectCharacterListView: View {
       PageView<SubjectCharacterDTO, _>(limit: 10, reloader: reloader, nextPageFunc: load) { item in
         CardView {
           HStack {
-            NavigationLink(value: NavDestination.character(item.character.id)) {
-              ImageView(img: item.character.images?.medium) {
-              } caption: {
-                Text(item.type.description)
-              }
-              .imageStyle(width: 60, height: 90, alignment: .top)
+            ImageView(img: item.character.images?.medium) {
+            } caption: {
+              Text(item.type.description)
             }
+            .imageStyle(width: 60, height: 90, alignment: .top)
+            .imageType(.person)
+            .imageLink(item.character.link)
             VStack(alignment: .leading) {
               VStack(alignment: .leading) {
-                NavigationLink(value: NavDestination.character(item.character.id)) {
-                  HStack {
-                    Text(item.character.name)
-                      .foregroundStyle(.linkText)
-                      .lineLimit(1)
-                    Spacer()
-                    if let comment = item.character.comment, comment > 0, !isolationMode {
-                      Text("(+\(comment))")
-                        .font(.caption)
-                        .foregroundStyle(.orange)
-                    }
+                HStack {
+                  Text(item.character.name.withLink(item.character.link))
+                    .foregroundStyle(.linkText)
+                    .lineLimit(1)
+                  Spacer()
+                  if let comment = item.character.comment, comment > 0, !isolationMode {
+                    Text("(+\(comment))")
+                      .font(.caption)
+                      .foregroundStyle(.orange)
                   }
                 }
                 Text(item.character.nameCN)
@@ -65,21 +63,20 @@ struct SubjectCharacterListView: View {
               }
               HFlow {
                 ForEach(item.actors) { person in
-                  NavigationLink(value: NavDestination.person(person.id)) {
-                    HStack {
-                      ImageView(img: person.images?.grid)
-                        .imageStyle(width: 40, height: 40, alignment: .top)
-                        .imageType(.person)
-                      VStack(alignment: .leading) {
-                        Text(person.name)
-                          .foregroundStyle(.linkText)
-                          .font(.footnote)
-                          .lineLimit(1)
-                        Text(person.nameCN)
-                          .font(.footnote)
-                          .foregroundStyle(.secondary)
-                          .lineLimit(1)
-                      }
+                  HStack {
+                    ImageView(img: person.images?.grid)
+                      .imageStyle(width: 40, height: 40, alignment: .top)
+                      .imageType(.person)
+                      .imageLink(person.link)
+                    VStack(alignment: .leading) {
+                      Text(person.name.withLink(person.link))
+                        .foregroundStyle(.linkText)
+                        .font(.footnote)
+                        .lineLimit(1)
+                      Text(person.nameCN)
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
                     }
                   }
                 }

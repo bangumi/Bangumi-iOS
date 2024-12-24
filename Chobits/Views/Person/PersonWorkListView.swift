@@ -34,18 +34,15 @@ struct PersonWorkListView: View {
       PageView<PersonWorkDTO, _>(limit: 10, reloader: reloader, nextPageFunc: load) { item in
         CardView {
           HStack(alignment: .top) {
-            NavigationLink(value: NavDestination.subject(item.subject.id)) {
-              ImageView(img: item.subject.images?.common)
-                .imageStyle(width: 60, height: 60)
-                .imageType(.subject)
-            }
+            ImageView(img: item.subject.images?.common)
+              .imageStyle(width: 60, height: 60)
+              .imageType(.subject)
+              .imageLink(item.subject.link)
             VStack(alignment: .leading) {
               VStack(alignment: .leading) {
-                NavigationLink(value: NavDestination.subject(item.subject.id)) {
-                  Text(item.subject.name)
-                    .font(.callout)
-                    .lineLimit(1)
-                }
+                Text(item.subject.name.withLink(item.subject.link))
+                  .font(.callout)
+                  .lineLimit(1)
                 if item.subject.nameCN.isEmpty {
                   Label(item.subject.type.description, systemImage: item.subject.type.icon)
                     .lineLimit(1)

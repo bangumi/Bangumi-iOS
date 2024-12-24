@@ -21,17 +21,14 @@ struct SubjectStaffListView: View {
       PageView<SubjectStaffDTO, _>(limit: 20, nextPageFunc: load) { item in
         CardView {
           HStack {
-            NavigationLink(value: NavDestination.person(item.person.id)) {
-              ImageView(img: item.person.images?.medium)
-                .imageStyle(width: 60, height: 60, alignment: .top)
-                .imageType(.person)
-            }
+            ImageView(img: item.person.images?.medium)
+              .imageStyle(width: 60, height: 60, alignment: .top)
+              .imageType(.person)
+              .imageLink(item.person.link)
             VStack(alignment: .leading) {
-              NavigationLink(value: NavDestination.person(item.person.id)) {
-                Text(item.person.name)
-                  .font(.callout)
-                  .lineLimit(1)
-              }
+              Text(item.person.name.withLink(item.person.link))
+                .font(.callout)
+                .lineLimit(1)
               Text(item.person.nameCN)
                 .font(.footnote)
                 .foregroundStyle(.secondary)

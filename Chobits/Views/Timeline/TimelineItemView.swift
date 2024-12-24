@@ -131,11 +131,9 @@ struct TimelineItemView: View {
                     .foregroundColor(.secondary)
                 }
               case 1, 2, 3:
-                if let episode = item.memo.progress?.single?.episode,
-                  let subject = item.memo.progress?.single?.subject
-                {
+                if let episode = item.memo.progress?.single?.episode {
                   Text("\(EpisodeCollectionType(item.type).description)")
-                  NavigationLink(value: NavDestination.episode(subject.id, episode.id)) {
+                  NavigationLink(value: NavDestination.episode(episode.id)) {
                     Text(episode.title)
                   }
                 } else {

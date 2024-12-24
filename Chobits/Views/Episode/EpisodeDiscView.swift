@@ -44,7 +44,7 @@ struct EpisodeDiscView: View {
   }
 
   func episodeLine(_ episode: Episode) -> AttributedString {
-    var line = AttributedString("\(Int(episode.sort)) \(episode.name)")
+    var line = "\(Int(episode.sort)) \(episode.name)".withLink(episode.link)
     line.font = .footnote
     if !episode.nameCN.isEmpty {
       var subline = AttributedString(" / \(episode.nameCN)")
@@ -73,9 +73,7 @@ struct EpisodeDiscView: View {
           .padding(.top, 5)
         Divider()
         ForEach(discs[disc] ?? []) { episode in
-          NavigationLink(value: NavDestination.episode(episode.subjectId, episode.episodeId)) {
-            Text(episodeLine(episode)).lineLimit(1)
-          }.buttonStyle(.navLink)
+          Text(episodeLine(episode)).lineLimit(1)
           Divider()
         }
       }

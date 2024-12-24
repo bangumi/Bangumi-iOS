@@ -2,7 +2,6 @@ import SwiftData
 import SwiftUI
 
 struct EpisodeView: View {
-  let subjectId: Int
   let episodeId: Int
 
   @AppStorage("shareDomain") var shareDomain: String = ShareDomain.chii.label
@@ -14,78 +13,69 @@ struct EpisodeView: View {
 
   @State private var updating: Bool = false
 
-  @Query private var subjects: [Subject]
-  private var subject: Subject? { subjects.first }
-
   @Query private var episodes: [Episode]
   private var episode: Episode? { episodes.first }
 
-  @Query private var collections: [UserSubjectCollection]
-  private var collection: UserSubjectCollection? { collections.first }
-
-  init(subjectId: Int, episodeId: Int) {
-    self.subjectId = subjectId
+  init(episodeId: Int) {
     self.episodeId = episodeId
 
-    _subjects = Query(filter: #Predicate<Subject> { $0.subjectId == subjectId })
     _episodes = Query(filter: #Predicate<Episode> { $0.episodeId == episodeId })
-    _collections = Query(filter: #Predicate<UserSubjectCollection> { $0.subjectId == subjectId })
   }
 
-  var showCollectionBox: Bool {
-    if !isAuthenticated { return false }
-    if collection == nil { return false }
-    switch subject?.typeEnum {
-    case .anime, .real:
-      return true
-    default:
-      return false
-    }
-  }
+  // var showCollectionBox: Bool {
+  //   if !isAuthenticated { return false }
+  //   if collection == nil { return false }
+  //   switch subject?.typeEnum {
+  //   case .anime, .real:
+  //     return true
+  //   default:
+  //     return false
+  //   }
+  // }
 
   var shareLink: URL {
     URL(string: "https://\(shareDomain)/ep/\(episodeId)")!
   }
 
-  func updateSingle(type: EpisodeCollectionType) {
-    if updating { return }
-    updating = true
-    Task {
-      do {
-        try await Chii.shared.updateEpisodeCollection(
-          subjectId: subjectId, episodeId: episodeId, type: type)
-        try await Chii.shared.loadUserSubjectCollection(
-          username: profile.username, subjectId: subjectId)
-        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-        updating = false
-        dismiss()
-      } catch {
-        updating = false
-        Notifier.shared.alert(error: error)
-      }
-    }
-  }
+  // func updateSingle(type: EpisodeCollectionType) {
+  //   if updating { return }
+  //   updating = true
+  //   Task {
+  //     do {
+  //       try await Chii.shared.updateEpisodeCollection(
+  //         subjectId: subjectId, episodeId: episodeId, type: type)
+  //       try await Chii.shared.loadUserSubjectCollection(
+  //         username: profile.username, subjectId: subjectId)
+  //       UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+  //       updating = false
+  //       dismiss()
+  //     } catch {
+  //       updating = false
+  //       Notifier.shared.alert(error: error)
+  //     }
+  //   }
+  // }
 
-  func updateBatch() {
-    if updating { return }
-    guard let episode = episode else {
-      Notifier.shared.alert(message: "Episode not found")
-      return
-    }
-    updating = true
-    Task {
-      do {
-        try await Chii.shared.updateSubjectEpisodeCollection(
-          subjectId: subjectId, updateTo: episode.sort, type: .collect)
-        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-        updating = false
-        dismiss()
-      } catch {
-        updating = false
-        Notifier.shared.alert(error: error)
-      }
-    }
-  }
+  // func updateBatch() {
+  //   if updating { return }
+  //   guard let episode = episode else {
+  //     Notifier.shared.alert(message: "Episode not found")
+  //     return
+  //   }
+  //   updating = true
+  //   Task {
+  //     do {
+  //       try await Chii.shared.updateSubjectEpisodeCollection(
+  //         subjectId: subjectId, updateTo: episode.sort, type: .collect)
+  //       UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+  //       updating = false
+  //       dismiss()
+  //     } catch {
+  //       updating = false
+  //       Notifier.shared.alert(error: error)
+  //     }
+  //   }
+  // }
 
   var body: some View {
     ScrollView {
@@ -93,29 +83,29 @@ struct EpisodeView: View {
         if let episode = episode {
           EpisodeInfoView().environment(episode)
         }
-        if showCollectionBox {
-          HStack {
-            ForEach(episode?.collectionTypeEnum.otherTypes() ?? []) { type in
-              Button {
-                updateSingle(type: type)
-              } label: {
-                Text(type.action)
-              }
-            }.buttonStyle(.borderedProminent)
-            Button {
-              updateBatch()
-            } label: {
-              Text("看到")
-            }
-            .buttonStyle(.bordered)
-            .foregroundStyle(.accent)
-            Spacer()
-            Text(episode?.collectionTypeEnum.description ?? "")
-              .font(.footnote)
-              .foregroundStyle(.accent)
-          }
-          .disabled(updating)
-        }
+        // if showCollectionBox {
+        //   HStack {
+        //     ForEach(episode?.collectionTypeEnum.otherTypes() ?? []) { type in
+        //       Button {
+        //         updateSingle(type: type)
+        //       } label: {
+        //         Text(type.action)
+        //       }
+        //     }.buttonStyle(.borderedProminent)
+        //     Button {
+        //       updateBatch()
+        //     } label: {
+        //       Text("看到")
+        //     }
+        //     .buttonStyle(.bordered)
+        //     .foregroundStyle(.accent)
+        //     Spacer()
+        //     Text(episode?.collectionTypeEnum.description ?? "")
+        //       .font(.footnote)
+        //       .foregroundStyle(.accent)
+        //   }
+        //   .disabled(updating)
+        // }
         Divider()
         if let desc = episode?.desc, !desc.isEmpty {
           Text(desc).foregroundStyle(.secondary)
@@ -151,8 +141,6 @@ struct EpisodeView: View {
     container.mainContext.insert(episode)
   }
 
-  return EpisodeView(
-    subjectId: subject.subjectId, episodeId: episodes.first!.episodeId
-  )
-  .modelContainer(container)
+  return EpisodeView(episodeId: episodes.first!.episodeId)
+    .modelContainer(container)
 }

@@ -5,17 +5,14 @@ struct PersonCastItemView: View {
 
   var body: some View {
     HStack(alignment: .top) {
-      NavigationLink(value: NavDestination.character(item.character.id)) {
-        ImageView(img: item.character.images?.medium)
-          .imageStyle(width: 60, height: 60, alignment: .top)
-          .imageType(.person)
-      }
+      ImageView(img: item.character.images?.medium)
+        .imageStyle(width: 60, height: 60, alignment: .top)
+        .imageType(.person)
+        .imageLink(item.character.link)
 
       VStack(alignment: .leading) {
-        NavigationLink(value: NavDestination.character(item.character.id)) {
-          Text(item.character.name)
-            .lineLimit(2)
-        }
+        Text(item.character.name.withLink(item.character.link))
+          .lineLimit(2)
         Text(item.character.nameCN)
           .lineLimit(1)
           .font(.footnote)
@@ -28,10 +25,8 @@ struct PersonCastItemView: View {
         ForEach(item.relations) { relation in
           HStack(alignment: .top) {
             VStack(alignment: .trailing) {
-              NavigationLink(value: NavDestination.subject(relation.subject.id)) {
-                Text(relation.subject.name)
-                  .lineLimit(1)
-              }
+              Text(relation.subject.name.withLink(relation.subject.link))
+                .lineLimit(1)
               HStack {
                 if relation.subject.nameCN.isEmpty {
                   Text(relation.subject.type.description)
@@ -51,11 +46,10 @@ struct PersonCastItemView: View {
               }
               Divider()
             }.font(.footnote)
-            NavigationLink(value: NavDestination.subject(relation.subject.id)) {
-              ImageView(img: relation.subject.images?.small)
-                .imageStyle(width: 40, height: 40, alignment: .top)
-                .imageType(.subject)
-            }
+            ImageView(img: relation.subject.images?.small)
+              .imageStyle(width: 40, height: 40, alignment: .top)
+              .imageType(.subject)
+              .imageLink(relation.subject.link)
           }.frame(minHeight: 40)
         }
       }

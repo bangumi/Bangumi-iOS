@@ -124,7 +124,7 @@ struct EpisodeGridView: View {
               }
             }
             Divider()
-            NavigationLink(value: NavDestination.episode(episode.subjectId, episode.episodeId)) {
+            NavigationLink(value: NavDestination.episode(episode.episodeId)) {
               if isolationMode {
                 Label("详情...", systemImage: "info")
               } else {
@@ -171,7 +171,7 @@ struct EpisodeGridView: View {
                 }
               }
               Divider()
-              NavigationLink(value: NavDestination.episode(episode.subjectId, episode.episodeId)) {
+              NavigationLink(value: NavDestination.episode(episode.episodeId)) {
                 if isolationMode {
                   Label("详情...", systemImage: "info")
                 } else {

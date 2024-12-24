@@ -96,11 +96,10 @@ struct CollectionSubjectTypeView: View {
       if collections.count > 0 {
         LazyVGrid(columns: columns) {
           ForEach(collections) { collection in
-            NavigationLink(value: NavDestination.subject(collection.subjectId)) {
-              ImageView(img: subjects[collection.subjectId]?.images?.common)
-                .imageStyle(width: 80, height: 80)
-                .imageType(.subject)
-            }.buttonStyle(.navLink)
+            ImageView(img: subjects[collection.subjectId]?.images?.common)
+              .imageStyle(width: 80, height: 80)
+              .imageType(.subject)
+              .imageLink(collection.subject?.link)
           }
         }
       }

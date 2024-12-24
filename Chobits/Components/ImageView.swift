@@ -52,8 +52,8 @@ extension View {
 }
 
 extension View {
-  public func imageLink(_ link: String) -> some View {
-    let url = URL(string: link) ?? URL(string: "")!
+  public func imageLink(_ link: String?) -> some View {
+    let url = URL(string: link ?? "") ?? URL(string: "")!
     return Link(destination: url) {
       self
     }

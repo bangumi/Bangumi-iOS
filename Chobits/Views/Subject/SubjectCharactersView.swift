@@ -55,20 +55,17 @@ struct SubjectCharactersView: View {
       LazyHGrid(rows: rows, alignment: .top) {
         ForEach(characters, id: \.character.id) { item in
           HStack(alignment: .top) {
-            NavigationLink(value: NavDestination.character(item.character.id)) {
-              ImageView(img: item.character.images?.grid)
-                .imageStyle(width: 60, height: 60, alignment: .top)
-                .imageType(.person)
-                .padding(2)
-                .shadow(radius: 2)
-            }.buttonStyle(.navLink)
+            ImageView(img: item.character.images?.grid)
+              .imageStyle(width: 60, height: 60, alignment: .top)
+              .imageType(.person)
+              .imageLink(item.character.link)
+              .padding(2)
+              .shadow(radius: 2)
             VStack(alignment: .leading, spacing: 2) {
               HStack {
-                NavigationLink(value: NavDestination.character(item.character.id)) {
-                  Text(item.character.name)
-                    .font(.callout)
-                    .lineLimit(1)
-                }.buttonStyle(.navLink)
+                Text(item.character.name.withLink(item.character.link))
+                  .font(.callout)
+                  .lineLimit(1)
                 Spacer()
                 if let comment = item.character.comment, comment > 0, !isolationMode {
                   Text("(+\(comment))")
@@ -93,10 +90,8 @@ struct SubjectCharactersView: View {
               if let actor = item.actors.first {
                 HStack {
                   Text("CV:").foregroundStyle(.secondary)
-                  NavigationLink(value: NavDestination.person(actor.id)) {
-                    Text(actor.name)
-                      .lineLimit(1)
-                  }.buttonStyle(.navLink)
+                  Text(actor.name.withLink(actor.link))
+                    .lineLimit(1)
                 }.font(.caption)
               }
               Spacer()

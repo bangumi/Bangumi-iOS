@@ -77,6 +77,10 @@ final class SubjectV1: Searchable {
     return self.volumes > 0 ? "\(self.volumes)" : "??"
   }
 
+  var link: String {
+    return "chii://subject/\(subjectId)"
+  }
+
   init(_ item: SubjectDTO) {
     self.subjectId = item.id
     self.airtime = item.airtime
@@ -272,6 +276,10 @@ final class CharacterV1: Searchable {
     return CharacterType(role)
   }
 
+  var link: String {
+    return "chii://character/\(characterId)"
+  }
+
   init(_ item: CharacterDTO) {
     self.characterId = item.id
     self.collects = item.collects
@@ -347,6 +355,10 @@ final class PersonV1: Searchable {
 
   var typeEnum: PersonType {
     return PersonType(type)
+  }
+
+  var link: String {
+    return "chii://person/\(personId)"
   }
 
   init(_ item: PersonDTO) {
@@ -455,6 +467,17 @@ final class EpisodeV1 {
     text.foregroundColor = .secondary
     text += AttributedString(" \(self.name)")
     return text
+  }
+
+  var titleLink: AttributedString {
+    var text = AttributedString("\(self.typeEnum.name).\(self.sort.episodeDisplay) ")
+    text.foregroundColor = .secondary
+    text += self.name.withLink(self.link)
+    return text
+  }
+
+  var link: String {
+    return "chii://episode/\(episodeId)"
   }
 
   var air: Date {

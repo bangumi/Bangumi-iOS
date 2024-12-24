@@ -34,7 +34,7 @@ struct SubjectTopicsView: View {
         VStack {
           HStack {
             NavigationLink(value: NavDestination.topic(topic)) {
-              Text("\(topic.title)")
+              Text(topic.title)
                 .font(.callout)
                 .lineLimit(1)
             }.buttonStyle(.navLink)
@@ -50,10 +50,8 @@ struct SubjectTopicsView: View {
               .lineLimit(1)
               .foregroundStyle(.secondary)
             Spacer()
-            NavigationLink(value: NavDestination.user(topic.creator.username)) {
-              Text(topic.creator.nickname)
-                .lineLimit(1)
-            }.buttonStyle(.navLink)
+            Text(topic.creator.nickname.withLink(topic.creator.link))
+              .lineLimit(1)
           }.font(.footnote)
         }.padding(.top, 2)
       }

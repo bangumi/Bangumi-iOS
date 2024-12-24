@@ -131,21 +131,20 @@ struct ProgressTileItemView: View {
 
   var body: some View {
     VStack(alignment: .leading, spacing: 8) {
-      NavigationLink(value: NavDestination.subject(subjectId)) {
-        ImageView(img: collection.subject?.images?.resize(.r400)) {
-          if collection.priv {
-            Image(systemName: "lock")
-              .padding(2)
-              .background(.red.opacity(0.8))
-              .padding(2)
-              .foregroundStyle(.white)
-              .font(.caption)
-              .clipShape(Capsule())
-          }
+      ImageView(img: collection.subject?.images?.resize(.r400)) {
+        if collection.priv {
+          Image(systemName: "lock")
+            .padding(2)
+            .background(.red.opacity(0.8))
+            .padding(2)
+            .foregroundStyle(.white)
+            .font(.caption)
+            .clipShape(Capsule())
         }
-        .imageStyle(width: width, height: imageHeight)
-        .imageType(.subject)
-      }.buttonStyle(.navLink)
+      }
+      .imageStyle(width: width, height: imageHeight)
+      .imageType(.subject)
+      .imageLink(collection.subject?.link)
 
       VStack(alignment: .leading, spacing: 4) {
         NavigationLink(value: NavDestination.subject(subjectId)) {

@@ -25,21 +25,20 @@ struct SubjectLargeRowView: View {
 
   var body: some View {
     HStack {
-      NavigationLink(value: NavDestination.subject(subjectId)) {
-        ImageView(img: subject?.images?.common) {
-          if subject?.nsfw ?? false {
-            Text("18+")
-              .padding(2)
-              .background(.red.opacity(0.8))
-              .padding(2)
-              .foregroundStyle(.white)
-              .font(.caption)
-              .clipShape(Capsule())
-          }
+      ImageView(img: subject?.images?.common) {
+        if subject?.nsfw ?? false {
+          Text("18+")
+            .padding(2)
+            .background(.red.opacity(0.8))
+            .padding(2)
+            .foregroundStyle(.white)
+            .font(.caption)
+            .clipShape(Capsule())
         }
-        .imageStyle(width: 90, height: 120)
-        .imageType(.subject)
       }
+      .imageStyle(width: 90, height: 120)
+      .imageType(.subject)
+      .imageLink(subject?.link)
       VStack(alignment: .leading) {
         // title
         HStack {
@@ -50,11 +49,9 @@ struct SubjectLargeRowView: View {
                   .foregroundStyle(.secondary)
                   .font(.footnote)
               }
-              NavigationLink(value: NavDestination.subject(subjectId)) {
-                Text(subject?.name ?? "")
-                  .font(.headline)
-                  .lineLimit(1)
-              }.buttonStyle(.navLink)
+              Text(subject?.name.withLink(subject?.link) ?? "")
+                .font(.headline)
+                .lineLimit(1)
             }
           }
           Spacer()

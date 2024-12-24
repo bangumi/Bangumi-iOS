@@ -20,16 +20,13 @@ struct CollectionRowView: View {
 
   var body: some View {
     HStack(alignment: .top) {
-      NavigationLink(value: NavDestination.subject(subjectId)) {
-        ImageView(img: subject?.images?.common)
-          .imageStyle(width: 60, height: 60)
-          .imageType(.subject)
-      }
+      ImageView(img: subject?.images?.common)
+        .imageStyle(width: 60, height: 60)
+        .imageType(.subject)
+        .imageLink(subject?.link)
       VStack(alignment: .leading) {
-        NavigationLink(value: NavDestination.subject(subjectId)) {
-          Text(subject?.name ?? "")
-            .lineLimit(1)
-        }
+        Text(subject?.name.withLink(subject?.link) ?? "")
+          .lineLimit(1)
         Text(subject?.nameCN ?? "")
           .lineLimit(1)
           .font(.footnote)

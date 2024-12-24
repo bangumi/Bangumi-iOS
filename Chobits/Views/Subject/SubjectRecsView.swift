@@ -52,24 +52,28 @@ struct SubjectRecsView: View {
       LazyHStack(alignment: .top) {
         ForEach(recs) { rec in
           VStack {
-            NavigationLink(value: NavDestination.subject(rec.subject.id)) {
-              if let ctype = collections[rec.subject.id] {
-                ImageView(img: rec.subject.images?.common) {
-                } caption: {
-                  HStack {
-                    Image(systemName: ctype.icon)
-                    Spacer()
-                    Text(ctype.description(rec.subject.type))
-                  }.padding(.horizontal, 4)
-                }
+            if let ctype = collections[rec.subject.id] {
+              ImageView(img: rec.subject.images?.common) {
+              } caption: {
+                HStack {
+                  Image(systemName: ctype.icon)
+                  Spacer()
+                  Text(ctype.description(rec.subject.type))
+                }.padding(.horizontal, 4)
+              }
+              .imageStyle(width: 72, height: 96)
+              .imageType(.subject)
+              .imageLink(rec.subject.link)
+              .padding(2)
+              .shadow(radius: 2)
+            } else {
+              ImageView(img: rec.subject.images?.common)
                 .imageStyle(width: 72, height: 96)
                 .imageType(.subject)
-              } else {
-                ImageView(img: rec.subject.images?.common)
-                  .imageStyle(width: 72, height: 96)
-                  .imageType(.subject)
-              }
-            }.buttonStyle(.navLink)
+                .imageLink(rec.subject.link)
+                .padding(2)
+                .shadow(radius: 2)
+            }
             Text(rec.subject.name)
               .multilineTextAlignment(.leading)
               .truncationMode(.middle)
@@ -77,7 +81,7 @@ struct SubjectRecsView: View {
             Spacer()
           }
           .font(.caption)
-          .frame(width: 72, height: 140)
+          .frame(width: 72, height: 144)
         }
       }
     }.animation(.default, value: recs)
