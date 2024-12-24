@@ -38,20 +38,7 @@ struct ChiiTimelineView: View {
     .toolbar {
       if isAuthenticated {
         ToolbarItem(placement: .topBarLeading) {
-          HStack {
-            ImageView(img: profile.avatar?.medium)
-              .imageStyle(width: 32, height: 32)
-              .imageType(.avatar)
-            VStack(alignment: .leading) {
-              Text("\(profile.nickname)")
-                .font(.footnote)
-                .lineLimit(2)
-              // Text(me.group.description)
-              //   .font(.caption)
-              //   .foregroundStyle(.secondary)
-            }
-          }
-          .contextMenu {
+          Menu {
             NavigationLink(value: NavDestination.collections) {
               Label("时光机", systemImage: "star")
             }
@@ -61,7 +48,21 @@ struct ChiiTimelineView: View {
             } label: {
               Text("退出登录")
             }
-          }
+          } label: {
+            HStack {
+              ImageView(img: profile.avatar?.medium)
+                .imageStyle(width: 32, height: 32)
+                .imageType(.avatar)
+              VStack(alignment: .leading) {
+                Text("\(profile.nickname)")
+                  .font(.footnote)
+                  .lineLimit(2)
+                // Text(me.group.description)
+                //   .font(.caption)
+                //   .foregroundStyle(.secondary)
+              }
+            }
+          }.buttonStyle(.plain)
         }
       } else {
         ToolbarItem(placement: .topBarLeading) {
