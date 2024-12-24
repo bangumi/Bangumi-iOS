@@ -44,7 +44,7 @@ class SignInViewModel: NSObject, ASWebAuthenticationPresentationContextProviding
       do {
         try await Chii.shared.exchangeForAccessToken(code: authorizationCode)
       } catch {
-        Notifier.shared.alert(message: "failed to exchange for access token")
+        Notifier.shared.alert(message: "failed to exchange for access token: \(error)")
       }
     }
   }

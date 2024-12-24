@@ -48,6 +48,8 @@ struct ProgressListView: View {
 struct ProgressListItemView: View {
   let subjectId: Int
 
+  @AppStorage("profile") var profile: Profile = Profile()
+
   @Environment(UserSubjectCollection.self) var collection
 
   @Environment(\.modelContext) var modelContext
@@ -87,6 +89,8 @@ struct ProgressListItemView: View {
       do {
         try await Chii.shared.updateEpisodeCollection(
           subjectId: subjectId, episodeId: episodeId, type: .collect)
+        try await Chii.shared.loadUserSubjectCollection(
+          username: profile.username, subjectId: subjectId)
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
       } catch {
         Notifier.shared.alert(error: error)

@@ -11,6 +11,8 @@ enum BookChapterMode {
 struct SubjectBookChaptersView: View {
   let mode: BookChapterMode
 
+  @AppStorage("profile") var profile: Profile = Profile()
+
   @Environment(UserSubjectCollection.self) var collection
 
   @State private var inputEps: String = ""
@@ -87,6 +89,9 @@ struct SubjectBookChaptersView: View {
       do {
         try await Chii.shared.updateBookCollection(
           subjectId: collection.subjectId, eps: eps, vols: vols)
+        try await Chii.shared.loadUserSubjectCollection(
+          username: profile.username, subjectId: collection.subjectId)
+
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
       } catch {
         Notifier.shared.alert(error: error)

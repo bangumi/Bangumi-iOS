@@ -3,9 +3,15 @@ import SwiftData
 import SwiftUI
 
 struct ContentView: View {
+  @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
+  @AppStorage("profile") var profile: Profile = Profile()
+
   @State var notifier = Notifier.shared
 
   func refreshProfile() async {
+    if !isAuthenticated {
+      return
+    }
     var tries = 0
     while true {
       if tries > 3 {
@@ -13,9 +19,10 @@ struct ContentView: View {
       }
       tries += 1
       do {
-        Notifier.shared.notify(message: "正在获取当前用户信息")
-        _ = try await Chii.shared.getProfile()
+        Notifier.shared.notify(message: "正在更新当前用户信息")
+        profile = try await Chii.shared.getProfile()
         await Chii.shared.setAuthStatus(true)
+        Logger.api.info("refresh profile success: \(profile.rawValue)")
         return
       } catch ChiiError.requireLogin {
         Notifier.shared.notify(message: "请登录")

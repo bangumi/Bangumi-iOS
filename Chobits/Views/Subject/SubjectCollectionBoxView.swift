@@ -3,6 +3,8 @@ import SwiftData
 import SwiftUI
 
 struct SubjectCollectionBoxView: View {
+  @AppStorage("profile") var profile: Profile = Profile()
+
   @Environment(\.modelContext) var modelContext
   @Environment(\.dismiss) private var dismiss
   @Environment(Subject.self) var subject
@@ -60,6 +62,8 @@ struct SubjectCollectionBoxView: View {
           priv: priv,
           tags: tags
         )
+        try await Chii.shared.loadUserSubjectCollection(
+          username: profile.username, subjectId: subject.subjectId)
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
         dismiss()
       } catch {

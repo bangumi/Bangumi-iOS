@@ -18,7 +18,6 @@ extension Chii {
     if body.count > 0 {
       _ = try await self.request(url: url, method: "POST", body: body, auth: .required)
     }
-    try await self.loadUserSubjectCollection(subjectId)
   }
 
   func updateSubjectCollection(
@@ -48,7 +47,6 @@ extension Chii {
     if body.count > 0 {
       _ = try await self.request(url: url, method: "POST", body: body, auth: .required)
     }
-    try await self.loadUserSubjectCollection(subjectId)
   }
 
   func updateSubjectEpisodeCollection(
@@ -67,7 +65,6 @@ extension Chii {
     _ = try await self.request(url: url, method: "PATCH", body: body, auth: .required)
     try await db.updateEpisodeCollections(subjectId: subjectId, sort: updateTo, type: type)
     try await db.commit()
-    try await self.loadUserSubjectCollection(subjectId)
   }
 
   func updateEpisodeCollection(subjectId: Int, episodeId: Int, type: EpisodeCollectionType)
@@ -85,6 +82,5 @@ extension Chii {
     _ = try await self.request(url: url, method: "PUT", body: body, auth: .required)
     try await db.updateEpisodeCollection(subjectId: subjectId, episodeId: episodeId, type: type)
     try await db.commit()
-    try await self.loadUserSubjectCollection(subjectId)
   }
 }

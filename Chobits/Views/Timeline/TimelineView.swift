@@ -4,19 +4,11 @@ import SwiftUI
 
 struct ChiiTimelineView: View {
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
+  @AppStorage("profile") var profile: Profile = Profile()
   @AppStorage("isolationMode") var isolationMode: Bool = false
   @AppStorage("hasUnreadNotice") var hasUnreadNotice: Bool = false
 
-  @State private var profile: SlimUserDTO?
   @State private var logoutConfirm: Bool = false
-
-  func updateProfile() async {
-    do {
-      profile = try await Chii.shared.getProfile()
-    } catch {
-      Notifier.shared.alert(error: error)
-    }
-  }
 
   func checkNotice() async {
     do {
@@ -37,15 +29,6 @@ struct ChiiTimelineView: View {
         AuthView(slogan: "Bangumi 让你的 ACG 生活更美好")
           .frame(height: 100)
           .padding(.horizontal, 8)
-          .alert("退出登录", isPresented: $logoutConfirm) {
-            Button("确定", role: .destructive) {
-              Task {
-                await Chii.shared.logout()
-              }
-            }
-          } message: {
-            Text("确定要退出登录吗？")
-          }
       }
       TimelineListView()
         .padding(.horizontal, 8)
@@ -54,36 +37,30 @@ struct ChiiTimelineView: View {
     .navigationBarTitleDisplayMode(.inline)
     .toolbar {
       if isAuthenticated {
-        if let me = profile {
-          ToolbarItem(placement: .topBarLeading) {
-            HStack {
-              ImageView(img: me.avatar?.medium)
-                .imageStyle(width: 32, height: 32)
-                .imageType(.avatar)
-              VStack(alignment: .leading) {
-                Text("\(me.nickname)")
-                  .font(.footnote)
-                  .lineLimit(2)
-                // Text(me.group.description)
-                //   .font(.caption)
-                //   .foregroundStyle(.secondary)
-              }
-            }
-            .contextMenu {
-              NavigationLink(value: NavDestination.collections) {
-                Label("时光机", systemImage: "star")
-              }
-              Divider()
-              Button(role: .destructive) {
-                logoutConfirm = true
-              } label: {
-                Text("退出登录")
-              }
+        ToolbarItem(placement: .topBarLeading) {
+          HStack {
+            ImageView(img: profile.avatar?.medium)
+              .imageStyle(width: 32, height: 32)
+              .imageType(.avatar)
+            VStack(alignment: .leading) {
+              Text("\(profile.nickname)")
+                .font(.footnote)
+                .lineLimit(2)
+              // Text(me.group.description)
+              //   .font(.caption)
+              //   .foregroundStyle(.secondary)
             }
           }
-        } else {
-          ToolbarItem(placement: .topBarLeading) {
-            ProgressView().task(updateProfile)
+          .contextMenu {
+            NavigationLink(value: NavDestination.collections) {
+              Label("时光机", systemImage: "star")
+            }
+            Divider()
+            Button(role: .destructive) {
+              logoutConfirm = true
+            } label: {
+              Text("退出登录")
+            }
           }
         }
       } else {
@@ -112,6 +89,15 @@ struct ChiiTimelineView: View {
           }
         }
       }
+    }
+    .alert("退出登录", isPresented: $logoutConfirm) {
+      Button("确定", role: .destructive) {
+        Task {
+          await Chii.shared.logout()
+        }
+      }
+    } message: {
+      Text("确定要退出登录吗？")
     }
   }
 }

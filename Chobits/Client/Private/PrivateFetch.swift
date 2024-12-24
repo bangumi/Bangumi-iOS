@@ -1,20 +1,19 @@
 import Foundation
-import OSLog
+import SwiftUI
 
 // MARK: - User
 extension Chii {
   // TODO: fix respond type
-  func getProfile() async throws -> SlimUserDTO {
+  func getProfile() async throws -> Profile {
     if self.mock {
-      return loadFixture(fixture: "profile.json", target: SlimUserDTO.self)
-    }
-    if let profile = self.profile {
-      return profile
+      return loadFixture(fixture: "profile.json", target: Profile.self)
     }
     let url = BangumiAPI.priv.build("p1/me")
     let data = try await self.request(url: url, method: "GET", auth: .required)
-    let profile: SlimUserDTO = try self.decodeResponse(data)
-    self.profile = profile
+    guard let rawValue = String(data: data, encoding: .utf8) else {
+      throw ChiiError.request("profile data error")
+    }
+    let profile = try Profile(from: rawValue)
     return profile
   }
 
@@ -388,20 +387,25 @@ extension Chii {
     return resp
   }
 
-  func getUserSubjectCollection(_ subjectId: Int) async throws -> UserSubjectCollectionDTO {
+  func getUserSubjectCollection(username: String, subjectId: Int) async throws
+    -> UserSubjectCollectionDTO
+  {
     if self.mock {
       return loadFixture(
         fixture: "user_subject_collection_anime.json", target: UserSubjectCollectionDTO.self)
     }
-    let profile = try await self.getProfile()
+    if username.isEmpty {
+      throw ChiiError.notAuthorized("username is empty")
+    }
     let url = BangumiAPI.priv.build(
-      "p1/users/\(profile.username)/collections/subjects/\(subjectId)")
+      "p1/users/\(username)/collections/subjects/\(subjectId)")
     let data = try await self.request(url: url, method: "GET")
     let collection: UserSubjectCollectionDTO = try self.decodeResponse(data)
     return collection
   }
 
   func getUserSubjectCollections(
+    username: String,
     type: CollectionType = .none,
     subjectType: SubjectType = .none,
     since: Int = 0, limit: Int = 100, offset: Int = 0
@@ -413,8 +417,10 @@ extension Chii {
       return loadFixture(
         fixture: "user_subject_collections.json", target: PagedDTO<UserSubjectCollectionDTO>.self)
     }
-    let profile = try await self.getProfile()
-    let url = BangumiAPI.priv.build("p1/users/\(profile.username)/collections/subjects")
+    if username.isEmpty {
+      throw ChiiError.notAuthorized("username is empty")
+    }
+    let url = BangumiAPI.priv.build("p1/users/\(username)/collections/subjects")
     var queryItems = [
       URLQueryItem(name: "since", value: String(since)),
       URLQueryItem(name: "limit", value: String(limit)),

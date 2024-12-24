@@ -3,7 +3,6 @@ import Foundation
 import KeychainSwift
 import OSLog
 import SwiftData
-import SwiftUI
 
 let APP_DOMAIN = "com.everpcpc.chobits"
 
@@ -41,7 +40,6 @@ actor Chii {
   let appInfo: AppInfo
 
   var auth: Auth?
-  var profile: SlimUserDTO?
   var anonymousSession: URLSession?
   var authorizedSession: URLSession?
 
@@ -49,7 +47,6 @@ actor Chii {
   var mock: Bool = false
 
   init() {
-    @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
     self.keychain = KeychainSwift(keyPrefix: "\(APP_DOMAIN).")
     guard let plist = Bundle.main.infoDictionary else {
       fatalError("Could not find Info.plist")
@@ -93,13 +90,11 @@ actor Chii {
 
 extension Chii {
   func setAuthStatus(_ authroized: Bool) {
-    @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
-    isAuthenticated = authroized
+    UserDefaults.standard.set(authroized, forKey: "isAuthenticated")
   }
 
   func isAuthenticated() -> Bool {
-    @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
-    return isAuthenticated
+    return UserDefaults.standard.bool(forKey: "isAuthenticated")
   }
 
   func decodeResponse<T: Codable>(_ data: Data) throws -> T {

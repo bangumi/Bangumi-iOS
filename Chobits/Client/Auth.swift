@@ -1,11 +1,10 @@
 import Foundation
 import OSLog
-import SwiftUI
 
 extension Chii {
   func getOAuthBase() -> String {
-    @AppStorage("authDomain") var authDomain: String = AuthDomain.origin.label
-    return "https://\(authDomain)/oauth"
+    let domain = UserDefaults.standard.string(forKey: "authDomain") ?? AuthDomain.origin.label
+    return "https://\(domain)/oauth"
   }
 
   func buildOAuthURL() -> URL {
@@ -20,14 +19,12 @@ extension Chii {
   }
 
   func logout() async {
-    @AppStorage("collectionsUpdatedAt") var collectionsUpdatedAt: Int = 0
-
     self.setAuthStatus(false)
     self.keychain.delete("auth")
     self.auth = nil
-    self.profile = nil
     self.authorizedSession = nil
-    collectionsUpdatedAt = 0
+    UserDefaults.standard.set(0, forKey: "collectionsUpdatedAt")
+    UserDefaults.standard.set("", forKey: "profile")
     do {
       let db = try self.getDB()
       try await db.truncate(UserSubjectCollection.self)
@@ -68,6 +65,8 @@ extension Chii {
     ]
     let data = try await self.request(url: url, method: "POST", body: body, auth: .disabled)
     _ = try self.saveAuthResponse(data: data)
+    let profile = try await self.getProfile()
+    UserDefaults.standard.set(profile.rawValue, forKey: "profile")
     self.setAuthStatus(true)
   }
 

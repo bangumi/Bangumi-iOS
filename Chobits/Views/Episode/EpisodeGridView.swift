@@ -8,6 +8,7 @@ struct EpisodeGridView: View {
 
   @AppStorage("isolationMode") var isolationMode: Bool = false
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
+  @AppStorage("profile") var profile: Profile = Profile()
 
   @Environment(\.modelContext) var modelContext
 
@@ -59,6 +60,8 @@ struct EpisodeGridView: View {
       do {
         try await Chii.shared.updateEpisodeCollection(
           subjectId: episode.subjectId, episodeId: episode.episodeId, type: type)
+        try await Chii.shared.loadUserSubjectCollection(
+          username: profile.username, subjectId: subjectId)
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
       } catch {
         Notifier.shared.alert(error: error)
@@ -71,6 +74,8 @@ struct EpisodeGridView: View {
       do {
         try await Chii.shared.updateSubjectEpisodeCollection(
           subjectId: subjectId, updateTo: episode.sort, type: .collect)
+        try await Chii.shared.loadUserSubjectCollection(
+          username: profile.username, subjectId: subjectId)
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
       } catch {
         Notifier.shared.alert(error: error)

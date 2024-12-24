@@ -1,4 +1,5 @@
 import Foundation
+import OSLog
 
 struct PagedDTO<T: Sendable & Codable>: Codable, Sendable {
   var data: [T]
@@ -10,13 +11,22 @@ struct PagedDTO<T: Sendable & Codable>: Codable, Sendable {
   }
 }
 
-struct SlimUserDTO: Codable, Identifiable, Hashable {
+struct Profile: Codable, Identifiable, Hashable {
   var id: Int
   var username: String
   var nickname: String
   var avatar: Avatar?
   var sign: String
   var joinedAt: Int?
+
+  enum CodingKeys: String, CodingKey {
+    case id
+    case username
+    case nickname
+    case avatar
+    case sign
+    case joinedAt
+  }
 
   init() {
     self.id = 0
@@ -26,6 +36,68 @@ struct SlimUserDTO: Codable, Identifiable, Hashable {
     self.sign = ""
     self.joinedAt = 0
   }
+
+  init(from: String) throws {
+    guard let data = from.data(using: .utf8) else {
+      throw ChiiError(message: "profile data error")
+    }
+    let result = try JSONDecoder().decode(Profile.self, from: data)
+    self = result
+  }
+
+  func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(id, forKey: .id)
+    try container.encode(username, forKey: .username)
+    try container.encode(nickname, forKey: .nickname)
+    try container.encode(avatar, forKey: .avatar)
+    try container.encode(sign, forKey: .sign)
+    try container.encode(joinedAt, forKey: .joinedAt)
+  }
+
+  init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.id = try container.decode(Int.self, forKey: .id)
+    self.username = try container.decode(String.self, forKey: .username)
+    self.nickname = try container.decode(String.self, forKey: .nickname)
+    self.avatar = try container.decodeIfPresent(Avatar.self, forKey: .avatar)
+    self.sign = try container.decode(String.self, forKey: .sign)
+    self.joinedAt = try container.decodeIfPresent(Int.self, forKey: .joinedAt)
+  }
+}
+
+extension Profile: RawRepresentable {
+  public typealias RawValue = String
+
+  public init?(rawValue: RawValue) {
+    if rawValue.isEmpty {
+      self.init()
+      return
+    }
+    guard let result = try? Profile(from: rawValue) else {
+      return nil
+    }
+    self = result
+  }
+
+  public var rawValue: RawValue {
+    guard let data = try? JSONEncoder().encode(self),
+      let result = String(data: data, encoding: .utf8)
+    else {
+      return ""
+    }
+    return result
+  }
+}
+
+struct SlimUserDTO: Codable, Identifiable, Hashable {
+  var id: Int
+  var username: String
+  var nickname: String
+  var avatar: Avatar?
+  var sign: String
+  var joinedAt: Int?
+
 }
 
 struct NoticeDTO: Codable, Identifiable, Hashable {
@@ -37,17 +109,6 @@ struct NoticeDTO: Codable, Identifiable, Hashable {
   var type: Int
   var unread: Bool
   var createdAt: Int
-
-  init() {
-    self.id = 0
-    self.postID = 0
-    self.sender = SlimUserDTO()
-    self.title = ""
-    self.topicID = 0
-    self.type = 0
-    self.unread = false
-    self.createdAt = 0
-  }
 }
 
 struct TopicDTO: Codable, Identifiable, Hashable {

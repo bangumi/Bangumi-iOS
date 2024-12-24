@@ -8,6 +8,7 @@ struct EpisodeView: View {
   @AppStorage("shareDomain") var shareDomain: String = ShareDomain.chii.label
   @AppStorage("isolationMode") var isolationMode: Bool = false
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
+  @AppStorage("profile") var profile: Profile = Profile()
 
   @Environment(\.dismiss) private var dismiss
 
@@ -53,6 +54,8 @@ struct EpisodeView: View {
       do {
         try await Chii.shared.updateEpisodeCollection(
           subjectId: subjectId, episodeId: episodeId, type: type)
+        try await Chii.shared.loadUserSubjectCollection(
+          username: profile.username, subjectId: subjectId)
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
         updating = false
         dismiss()

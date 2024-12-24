@@ -48,32 +48,34 @@ struct PhoneView: View {
         }
       }
 
-      NavigationStack(path: $discoverNav) {
-        Section {
-          if searching {
-            SearchView(text: $searchQuery, remote: $searchRemote)
-          } else {
-            CalendarView()
-          }
-        }.navigationDestination(for: NavDestination.self) { $0 }
+      Section {
+        NavigationStack(path: $discoverNav) {
+          Section {
+            if searching {
+              SearchView(text: $searchQuery, remote: $searchRemote)
+            } else {
+              CalendarView()
+            }
+          }.navigationDestination(for: NavDestination.self) { $0 }
+        }
+        .searchable(text: $searchQuery, isPresented: $searching)
+        .onSubmit(of: .search) {
+          searchRemote = true
+        }
+        .onChange(of: searchQuery) {
+          searchRemote = false
+        }
+        .onOpenURL { url in
+          handleChiiURL(url, nav: $discoverNav)
+        }
+        .onContinueUserActivity(CSSearchableItemActionType) { activity in
+          handleSearchActivity(activity, nav: $discoverNav)
+          selectedTab = .discover
+        }
       }
       .tag(ChiiViewTab.discover)
       .tabItem {
         Label(ChiiViewTab.discover.title, systemImage: ChiiViewTab.discover.icon)
-      }
-      .searchable(text: $searchQuery, isPresented: $searching)
-      .onSubmit(of: .search) {
-        searchRemote = true
-      }
-      .onChange(of: searchQuery) {
-        searchRemote = false
-      }
-      .onOpenURL { url in
-        handleChiiURL(url, nav: $discoverNav)
-      }
-      .onContinueUserActivity(CSSearchableItemActionType) { activity in
-        handleSearchActivity(activity, nav: $discoverNav)
-        selectedTab = .discover
       }
     }
   }

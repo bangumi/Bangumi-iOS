@@ -172,14 +172,3 @@ struct NoticeRowView: View {
     Divider()
   }
 }
-
-#Preview {
-  let container = mockContainer()
-
-  return ScrollView {
-    LazyVStack(alignment: .leading) {
-      NoticeRowView(notice: .constant(NoticeDTO()))
-        .modelContainer(container)
-    }
-  }.padding()
-}

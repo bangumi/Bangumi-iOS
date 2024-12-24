@@ -34,13 +34,13 @@ extension Chii {
     await self.index([item.searchable()])
   }
 
-  func loadUserSubjectCollection(_ subjectId: Int) async throws {
+  func loadUserSubjectCollection(username: String, subjectId: Int) async throws {
     if !self.isAuthenticated() {
       return
     }
     let db = try self.getDB()
     do {
-      let item = try await self.getUserSubjectCollection(subjectId)
+      let item = try await self.getUserSubjectCollection(username: username, subjectId: subjectId)
       try await db.saveUserSubjectCollection(item)
       await self.index([item.subject.searchable()])
     } catch ChiiError.notFound(_) {

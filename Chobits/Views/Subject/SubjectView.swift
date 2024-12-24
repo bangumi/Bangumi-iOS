@@ -7,6 +7,7 @@ struct SubjectView: View {
 
   @AppStorage("isolationMode") var isolationMode: Bool = false
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
+  @AppStorage("profile") var profile: Profile = Profile()
 
   @State private var refreshed: Bool = false
   @State private var refreshing: Bool = false
@@ -29,7 +30,8 @@ struct SubjectView: View {
 
       if isAuthenticated {
         Task {
-          try await Chii.shared.loadUserSubjectCollection(subjectId)
+          try await Chii.shared.loadUserSubjectCollection(
+            username: profile.username, subjectId: subjectId)
         }
       }
 

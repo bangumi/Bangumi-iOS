@@ -4,6 +4,7 @@ import SwiftUI
 
 struct ChiiProgressView: View {
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
+  @AppStorage("profile") var profile: Profile = Profile()
   @AppStorage("collectionsUpdatedAt") var collectionsUpdatedAt: Int = 0
   @AppStorage("progressMode") var progressMode: String = ProgressMode.tile.label
 
@@ -61,6 +62,7 @@ struct ChiiProgressView: View {
     var loaded: [Int] = []
     while true {
       let resp = try await Chii.shared.getUserSubjectCollections(
+        username: profile.username,
         since: since, limit: limit, offset: offset)
       if resp.data.isEmpty {
         break
