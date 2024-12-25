@@ -500,35 +500,39 @@ extension Chii {
 
 // MARK: - Timeline
 extension Chii {
-  func getTimeline(mode: TimelineMode = .friends, limit: Int = 20, offset: Int = 0) async throws
+  func getTimeline(mode: TimelineMode = .friends, limit: Int = 20, until: Int? = nil) async throws
     -> [TimelineDTO]
   {
     if self.mock {
       return loadFixture(fixture: "timeline.json", target: [TimelineDTO].self)
     }
     let url = BangumiAPI.priv.build("p1/timeline")
-    let queryItems: [URLQueryItem] = [
+    var queryItems: [URLQueryItem] = [
       URLQueryItem(name: "mode", value: mode.rawValue),
       URLQueryItem(name: "limit", value: String(limit)),
-      URLQueryItem(name: "offset", value: String(offset)),
     ]
+    if let until = until {
+      queryItems.append(URLQueryItem(name: "until", value: String(until)))
+    }
     let pageURL = url.appending(queryItems: queryItems)
     let data = try await self.request(url: pageURL, method: "GET")
     let resp: [TimelineDTO] = try self.decodeResponse(data)
     return resp
   }
 
-  func getUserTimeline(username: String, limit: Int = 20, offset: Int = 0) async throws
+  func getUserTimeline(username: String, limit: Int = 20, until: Int? = nil) async throws
     -> [TimelineDTO]
   {
     if self.mock {
       return loadFixture(fixture: "user_timeline.json", target: [TimelineDTO].self)
     }
     let url = BangumiAPI.priv.build("p1/users/\(username)/timeline")
-    let queryItems: [URLQueryItem] = [
-      URLQueryItem(name: "limit", value: String(limit)),
-      URLQueryItem(name: "offset", value: String(offset)),
+    var queryItems: [URLQueryItem] = [
+      URLQueryItem(name: "limit", value: String(limit))
     ]
+    if let until = until {
+      queryItems.append(URLQueryItem(name: "until", value: String(until)))
+    }
     let pageURL = url.appending(queryItems: queryItems)
     let data = try await self.request(url: pageURL, method: "GET")
     let resp: [TimelineDTO] = try self.decodeResponse(data)

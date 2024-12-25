@@ -56,7 +56,7 @@ extension TimelineDTO {
       }
 
     case .wiki:
-      text += AttributedString(" \(TimelineNewSubjectType(self.type).desc)")
+      text += AttributedString(" \(TimelineNewSubjectType(self.type).desc) ")
       if let subject = self.memo.wiki?.subject {
         text += subject.name.withLink(subject.link)
       } else {
@@ -69,7 +69,7 @@ extension TimelineDTO {
         text += AttributedString(" \(self.memo.subject?.count ?? 0)")
         text += AttributedString(" \(TimelineSubjectBatchType(self.type).desc)")
       } else {
-        text += AttributedString(" \(TimelineSubjectActionType(self.type).desc)")
+        text += AttributedString(" \(TimelineSubjectActionType(self.type).desc) ")
         if let collect = self.memo.subject?.first {
           text += collect.subject.name.withLink(collect.subject.link)
         } else {
@@ -157,13 +157,13 @@ extension TimelineDTO {
               text += AttributedString(" 没有收藏角色或人物")
             }
           } else {
-            text += AttributedString(" 收藏了 ")
+            text += AttributedString(" 收藏了")
             if let character = mono.characters.first {
-              text += AttributedString(" 角色 ")
+              text += AttributedString("角色 ")
               text += character.name.withLink(character.link)
             }
             if let person = mono.persons.first {
-              text += AttributedString(" 人物 ")
+              text += AttributedString("人物 ")
               text += person.name.withLink(person.link)
             }
           }
