@@ -5,7 +5,7 @@ struct SubjectTinyView: View {
   let subject: SlimSubjectDTO
 
   var body: some View {
-    BorderView(color: .secondary.opacity(0.2), cornerRadius: 10) {
+    BorderView(color: .secondary.opacity(0.2), cornerRadius: 8) {
       HStack {
         ImageView(img: subject.images?.grid)
           .imageStyle(width: 32, height: 32)
@@ -32,7 +32,7 @@ struct SubjectSmallView: View {
   let subject: SlimSubjectDTO
 
   var body: some View {
-    BorderView(color: .secondary.opacity(0.2), cornerRadius: 10) {
+    BorderView(color: .secondary.opacity(0.2), cornerRadius: 8) {
       HStack {
         ImageView(img: subject.images?.common)
           .imageStyle(width: 48, height: 64)

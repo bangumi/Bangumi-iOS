@@ -66,20 +66,21 @@ struct TimelineListView: View {
           HStack {
             Text("Hi! \(profile.nickname.withLink(profile.link))")
               .font(.title3)
-              .padding(8)
             Spacer()
             Button {
               showInput = true
             } label: {
               Label("吐槽", systemImage: "square.and.pencil")
                 .font(.footnote)
-            }.buttonStyle(.borderedProminent)
+            }
+            .buttonStyle(.borderedProminent)
+            .disabled(true)
           }
         } else {
           AuthView(slogan: "Bangumi 让你的 ACG 生活更美好")
             .frame(height: 100)
         }
-      }.padding(.horizontal, 8)
+      }.padding(8)
       LazyVStack(alignment: .leading, spacing: 16) {
         ForEach(items) { item in
           TimelineItemView(item: item)

@@ -153,7 +153,7 @@ enum ProgressMode: Codable, CaseIterable, Identifiable {
     case .list:
       "列表"
     case .tile:
-      "平铺"
+      "瀑布流"
     }
   }
 }

@@ -33,10 +33,11 @@ struct TimelineItemView: View {
                   .padding(.horizontal, 8)
               }
               if !collect.comment.isEmpty {
-                BorderView(color: .secondary.opacity(0.2)) {
-                  Text(collect.comment)
-                    .font(.callout)
-                    .padding(4)
+                BorderView(color: .secondary.opacity(0.2), cornerRadius: 8) {
+                  HStack {
+                    Text(collect.comment).font(.callout)
+                    Spacer()
+                  }.padding(4)
                 }
               }
               SubjectSmallView(subject: collect.subject)
