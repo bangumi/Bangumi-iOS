@@ -167,7 +167,7 @@ final class SubjectV1: Searchable {
 typealias UserSubjectCollection = UserSubjectCollectionV1
 
 @Model
-final class UserSubjectCollectionV1 {
+final class UserSubjectCollectionV1: Searchable {
   @Attribute(.unique)
   var subjectId: Int
 

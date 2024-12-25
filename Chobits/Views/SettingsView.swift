@@ -49,7 +49,7 @@ struct SettingsView: View {
         Notifier.shared.notify(message: "Spotlight 索引清除成功")
         while true {
           let resp = try await db.getSearchable(
-            Subject.self, limit: limit, offset: offset)
+            UserSubjectCollection.self, limit: limit, offset: offset)
           if resp.data.isEmpty {
             break
           }

@@ -31,7 +31,6 @@ extension Chii {
 
     try await db.saveSubject(item)
     try await db.commit()
-    await self.index([item.searchable()])
   }
 
   func loadUserSubjectCollection(username: String, subjectId: Int) async throws {
@@ -119,7 +118,6 @@ extension Chii {
     }
     try await db.saveCharacter(item)
     try await db.commit()
-    await self.index([item.searchable()])
   }
 
   func loadPerson(_ pid: Int) async throws {
@@ -131,6 +129,5 @@ extension Chii {
     }
     try await db.savePerson(item)
     try await db.commit()
-    await self.index([item.searchable()])
   }
 }
