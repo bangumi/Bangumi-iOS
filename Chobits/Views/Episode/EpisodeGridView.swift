@@ -135,7 +135,7 @@ struct EpisodeGridView: View {
             EpisodeInfoView()
               .environment(episode)
               .padding()
-              .frame(idealWidth: 320)
+              .frame(idealWidth: 360)
           }
       }
       if !episodeSps.isEmpty {
@@ -182,7 +182,7 @@ struct EpisodeGridView: View {
               EpisodeInfoView()
                 .environment(episode)
                 .padding()
-                .frame(idealWidth: 320)
+                .frame(idealWidth: 360)
             }
         }
       }

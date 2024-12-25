@@ -14,6 +14,46 @@ struct TimelineItemView: View {
       VStack(alignment: .leading) {
         Text(item.desc)
         switch item.cat {
+        case .subject:
+          if item.batch {
+            ScrollView(.horizontal, showsIndicators: false) {
+              HStack {
+                ForEach(item.memo.subject?.prefix(5) ?? [], id: \.subject) { collect in
+                  ImageView(img: collect.subject.images?.common)
+                    .imageStyle(width: 60, height: 85)
+                    .imageType(.subject)
+                    .imageLink(collect.subject.link)
+                }
+              }.frame(height: 90)
+            }
+          } else {
+            if let collect = item.memo.subject?.first {
+              if collect.rate > 0 {
+                StarsView(score: collect.rate, size: 12)
+                  .padding(.horizontal, 8)
+              }
+              if !collect.comment.isEmpty {
+                BorderView(color: .secondary.opacity(0.2)) {
+                  Text(collect.comment)
+                    .font(.callout)
+                    .padding(4)
+                }
+              }
+              SubjectSmallView(subject: collect.subject)
+            }
+          }
+
+        case .progress:
+          switch item.type {
+          case 0:
+            if let subject = item.memo.progress?.batch?.subject {
+              SubjectTinyView(subject: subject)
+            }
+          default:
+            if let subject = item.memo.progress?.single?.subject {
+              SubjectTinyView(subject: subject)
+            }
+          }
         case .status:
           switch item.type {
           case 0:
