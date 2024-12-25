@@ -2,6 +2,11 @@ import Foundation
 import OSLog
 import SwiftUI
 
+protocol Linkable {
+  var name: String { get }
+  var link: String { get }
+}
+
 enum NavDestination: Hashable, View {
   case setting
   case notice

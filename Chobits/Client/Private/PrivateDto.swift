@@ -11,7 +11,7 @@ struct PagedDTO<T: Sendable & Codable>: Codable, Sendable {
   }
 }
 
-struct Profile: Codable, Identifiable, Hashable {
+struct Profile: Codable, Identifiable, Hashable, Linkable {
   var id: Int
   var username: String
   var nickname: String
@@ -26,6 +26,10 @@ struct Profile: Codable, Identifiable, Hashable {
     case avatar
     case sign
     case joinedAt
+  }
+
+  var name: String {
+    nickname.isEmpty ? "用户\(username)" : nickname
   }
 
   var link: String {
@@ -94,13 +98,17 @@ extension Profile: RawRepresentable {
   }
 }
 
-struct SlimUserDTO: Codable, Identifiable, Hashable {
+struct SlimUserDTO: Codable, Identifiable, Hashable, Linkable {
   var id: Int
   var username: String
   var nickname: String
   var avatar: Avatar?
   var sign: String
   var joinedAt: Int?
+
+  var name: String {
+    nickname.isEmpty ? "用户\(username)" : nickname
+  }
 
   var link: String {
     "chii://user/\(username)"
@@ -176,7 +184,7 @@ struct SubjectDTO: Codable, Identifiable, Searchable {
   var volumes: Int
 }
 
-struct SlimSubjectDTO: Codable, Identifiable, Hashable {
+struct SlimSubjectDTO: Codable, Identifiable, Hashable, Linkable {
   var id: Int
   var images: SubjectImages?
   var info: String
@@ -213,7 +221,7 @@ struct CharacterDTO: Codable, Identifiable, Searchable {
   var summary: String
 }
 
-struct SlimCharacterDTO: Codable, Identifiable, Hashable {
+struct SlimCharacterDTO: Codable, Identifiable, Hashable, Linkable {
   var id: Int
   var images: Images?
   var lock: Bool
@@ -287,7 +295,7 @@ struct SubjectRelationType: Codable, Identifiable, Hashable {
   var desc: String
 }
 
-struct EpisodeDTO: Codable, Identifiable, Hashable {
+struct EpisodeDTO: Codable, Identifiable, Hashable, Linkable {
   var id: Int
   var subjectID: Int
   var type: EpisodeType
@@ -345,7 +353,7 @@ struct SubjectStaffDTO: Codable, Identifiable, Hashable {
   }
 }
 
-struct SlimPersonDTO: Codable, Identifiable, Hashable {
+struct SlimPersonDTO: Codable, Identifiable, Hashable, Linkable {
   var id: Int
   var name: String
   var nameCN: String
@@ -417,7 +425,7 @@ struct SubjectReviewDTO: Codable, Identifiable, Hashable {
   var entry: SlimBlogEntryDTO
 }
 
-struct SlimBlogEntryDTO: Codable, Hashable, Identifiable {
+struct SlimBlogEntryDTO: Codable, Hashable, Identifiable, Linkable {
   var id: Int
   var title: String
   var summary: String
@@ -425,6 +433,10 @@ struct SlimBlogEntryDTO: Codable, Hashable, Identifiable {
   var type: Int
   var createdAt: Int
   var updatedAt: Int
+
+  var name: String {
+    title
+  }
 
   var link: String {
     "chii://blog/\(id)"
@@ -460,7 +472,7 @@ struct TimelineDailyDTO: Codable, Hashable {
   var users: [SlimUserDTO]?
 }
 
-struct SlimGroupDTO: Codable, Identifiable, Hashable {
+struct SlimGroupDTO: Codable, Identifiable, Hashable, Linkable {
   var id: Int
   var name: String
   var nsfw: Bool
@@ -516,12 +528,16 @@ struct TimelineWikiDTO: Codable, Hashable {
   var subject: SlimSubjectDTO?
 }
 
-struct SlimIndexDTO: Codable, Identifiable, Hashable {
+struct SlimIndexDTO: Codable, Identifiable, Hashable, Linkable {
   var id: Int
   var type: Int
   var title: String
   var total: Int
   var createdAt: Int
+
+  var name: String {
+    title
+  }
 
   var link: String {
     "chii://index/\(id)"

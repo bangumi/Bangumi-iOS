@@ -17,7 +17,9 @@ extension TimelineDTO {
         text += AttributedString(" 注册成为了 Bangumi 成员")
       case 2:
         if self.batch {
-          text += AttributedString(" 将 \(self.memo.daily?.users?.count ?? 0) 位成员加为了好友")
+          text += AttributedString(" 将 ")
+          text += genBatch(self.memo.daily?.users ?? [])
+          text += AttributedString(" \(self.memo.daily?.users?.count ?? 0) 位用户加为了好友")
         } else {
           text += AttributedString(" 将 ")
           if let user = self.memo.daily?.users?.first {
@@ -29,7 +31,9 @@ extension TimelineDTO {
         }
       case 3:
         if self.batch {
-          text += AttributedString(" 加入了 \(self.memo.daily?.groups?.count ?? 0) 个小组")
+          text += AttributedString(" 加入了 ")
+          text += genBatch(self.memo.daily?.groups ?? [])
+          text += AttributedString(" \(self.memo.daily?.groups?.count ?? 0) 个小组")
         } else {
           text += AttributedString(" 加入了 ")
           if let group = self.memo.daily?.groups?.first {
@@ -41,7 +45,9 @@ extension TimelineDTO {
         }
       case 4:
         if self.batch {
-          text += AttributedString(" 创建了 \(self.memo.daily?.groups?.count ?? 0) 个小组")
+          text += AttributedString(" 创建了 ")
+          text += genBatch(self.memo.daily?.groups ?? [])
+          text += AttributedString(" \(self.memo.daily?.groups?.count ?? 0) 个小组")
         } else {
           text += AttributedString(" 创建了 ")
           if let group = self.memo.daily?.groups?.first {
@@ -65,9 +71,10 @@ extension TimelineDTO {
 
     case .subject:
       if self.batch {
-        text += AttributedString(" \(TimelineSubjectActionType(self.type).desc)")
-        text += AttributedString(" \(self.memo.subject?.count ?? 0)")
-        text += AttributedString(" \(TimelineSubjectBatchType(self.type).desc)")
+        text += AttributedString(" \(TimelineSubjectActionType(self.type).desc) ")
+        text += genBatch(self.memo.subject?.map(\.subject) ?? [])
+        text += AttributedString(
+          " \(self.memo.subject?.count ?? 0) \(TimelineSubjectBatchType(self.type).desc)")
       } else {
         text += AttributedString(" \(TimelineSubjectActionType(self.type).desc) ")
         if let collect = self.memo.subject?.first {
@@ -93,7 +100,7 @@ extension TimelineDTO {
           } else {
             text += AttributedString(" 完成了 ")
             text += batch.subject.name.withLink(batch.subject.link)
-            text += AttributedString("\(batch.epsUpdate ?? 0) of \(batch.epsTotal) 话")
+            text += AttributedString(" \(batch.epsUpdate ?? 0) of \(batch.epsTotal) 话")
           }
         } else {
           text += self.unknown("行动")
@@ -150,9 +157,13 @@ extension TimelineDTO {
         case 1:
           if self.batch {
             if mono.characters.count > 0 {
-              text += AttributedString(" 收藏了 \(mono.characters.count) 个角色")
+              text += AttributedString(" 收藏了 ")
+              text += genBatch(mono.characters)
+              text += AttributedString(" \(mono.characters.count) 个角色")
             } else if mono.persons.count > 0 {
-              text += AttributedString(" 收藏了 \(mono.persons.count) 个人物")
+              text += AttributedString(" 收藏了 ")
+              text += genBatch(mono.persons)
+              text += AttributedString(" \(mono.persons.count) 个人物")
             } else {
               text += AttributedString(" 没有收藏角色或人物")
             }
@@ -179,6 +190,21 @@ extension TimelineDTO {
     }
     return text
   }
+}
+
+func genBatch<T: Linkable>(_ items: [T], limit: Int = 5) -> AttributedString {
+  var text = AttributedString()
+  for (idx, item) in items.enumerated() {
+    if idx >= limit {
+      text += AttributedString(" 等")
+      break
+    }
+    if idx > 0 {
+      text += AttributedString("、")
+    }
+    text += item.name.withLink(item.link)
+  }
+  return text
 }
 
 enum TimelineSubjectActionType: Int, Codable {
@@ -260,7 +286,7 @@ enum TimelineSubjectBatchType: Int, Codable {
   var desc: String {
     switch self {
     case .unknown:
-      return "神秘的条目"
+      return "个条目"
     case .book:
       return "本书"
     case .anime:
