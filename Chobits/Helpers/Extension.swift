@@ -65,8 +65,23 @@ extension Date {
   }
 
   var formatRelative: String {
-    if self.timeIntervalSinceNow > -604800 {
-      return self.formatted(.relative(presentation: .numeric))
+    let timeInterval = -self.timeIntervalSinceNow
+    if timeInterval < 86400 {  // Within 24 hours
+      if timeInterval < 60 {
+        return "刚刚"
+      } else {
+        let hours = Int(timeInterval) / 3600
+        let minutes = Int(timeInterval) % 3600 / 60
+        if hours > 0 {
+          return "\(hours)小时\(minutes)分钟前"
+        } else {
+          return "\(minutes)分钟前"
+        }
+      }
+    } else if timeInterval < 604800 {  // Within 7 days
+      let days = Int(timeInterval) / 86400
+      let hours = Int(timeInterval) % 86400 / 3600
+      return "\(days)天\(hours)小时前"
     } else {
       return self.formatted(date: .numeric, time: .shortened)
     }

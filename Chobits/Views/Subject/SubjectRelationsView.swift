@@ -69,6 +69,9 @@ struct SubjectRelationsView: View {
             .font(.caption)
             if let ctype = collections[relation.subject.id] {
               ImageView(img: relation.subject.images?.common) {
+                if relation.subject.nsfw {
+                  NSFWBadgeView()
+                }
               } caption: {
                 HStack {
                   Image(systemName: ctype.icon)
@@ -82,12 +85,16 @@ struct SubjectRelationsView: View {
               .padding(2)
               .shadow(radius: 2)
             } else {
-              ImageView(img: relation.subject.images?.common)
-                .imageStyle(width: 90, height: 120)
-                .imageType(.subject)
-                .imageLink(relation.subject.link)
-                .padding(2)
-                .shadow(radius: 2)
+              ImageView(img: relation.subject.images?.common) {
+                if relation.subject.nsfw {
+                  NSFWBadgeView()
+                }
+              }
+              .imageStyle(width: 90, height: 120)
+              .imageType(.subject)
+              .imageLink(relation.subject.link)
+              .padding(2)
+              .shadow(radius: 2)
             }
             Text(relation.subject.name)
               .font(.caption)

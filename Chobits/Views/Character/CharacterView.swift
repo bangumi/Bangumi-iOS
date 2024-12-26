@@ -67,13 +67,7 @@ struct CharacterView: View {
             HStack(alignment: .top) {
               ImageView(img: character.images?.large, large: character.images?.resize(.r400)) {
                 if character.nsfw {
-                  Text("18+")
-                    .padding(2)
-                    .background(.red.opacity(0.8))
-                    .padding(2)
-                    .foregroundStyle(.white)
-                    .font(.caption)
-                    .clipShape(Capsule())
+                  NSFWBadgeView()
                 }
               }
               .imageStyle(width: 120, height: 160, alignment: .top)

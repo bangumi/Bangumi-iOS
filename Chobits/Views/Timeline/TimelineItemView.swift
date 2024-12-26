@@ -76,7 +76,7 @@ struct TimelineItemView: View {
         default:
           EmptyView()
         }
-        Text("\(item.createdAt.datetimeDisplay) · \(item.source.desc)")
+        Text("\(item.createdAt.durationDisplay) · \(item.source.desc)")
           .font(.caption)
           .foregroundStyle(.secondary)
         Divider()

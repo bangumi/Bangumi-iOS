@@ -26,6 +26,24 @@ struct CardView<Content: View>: View {
   }
 }
 
+struct NSFWBadgeView: View {
+  @AppStorage("showNSFWBadge") var showNSFWBadge: Bool = true
+
+  var body: some View {
+    if showNSFWBadge {
+      Text("18+")
+        .padding(2)
+        .background(.red.opacity(0.8))
+        .padding(2)
+        .foregroundStyle(.white)
+        .font(.caption)
+        .clipShape(Capsule())
+    } else {
+      EmptyView()
+    }
+  }
+}
+
 #Preview {
   VStack {
     Spacer()

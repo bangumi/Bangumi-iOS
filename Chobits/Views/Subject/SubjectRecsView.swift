@@ -54,6 +54,9 @@ struct SubjectRecsView: View {
           VStack {
             if let ctype = collections[rec.subject.id] {
               ImageView(img: rec.subject.images?.common) {
+                if rec.subject.nsfw {
+                  NSFWBadgeView()
+                }
               } caption: {
                 HStack {
                   Image(systemName: ctype.icon)
@@ -67,12 +70,16 @@ struct SubjectRecsView: View {
               .padding(2)
               .shadow(radius: 2)
             } else {
-              ImageView(img: rec.subject.images?.common)
-                .imageStyle(width: 72, height: 96)
-                .imageType(.subject)
-                .imageLink(rec.subject.link)
-                .padding(2)
-                .shadow(radius: 2)
+              ImageView(img: rec.subject.images?.common) {
+                if rec.subject.nsfw {
+                  NSFWBadgeView()
+                }
+              }
+              .imageStyle(width: 72, height: 96)
+              .imageType(.subject)
+              .imageLink(rec.subject.link)
+              .padding(2)
+              .shadow(radius: 2)
             }
             Text(rec.subject.name)
               .multilineTextAlignment(.leading)

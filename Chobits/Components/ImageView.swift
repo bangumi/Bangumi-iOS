@@ -56,7 +56,7 @@ extension View {
     let url = URL(string: link ?? "") ?? URL(string: "")!
     return Link(destination: url) {
       self
-    }
+    }.buttonStyle(.plain)
   }
 }
 
@@ -241,22 +241,10 @@ extension ImageView {
         img: "https://lain.bgm.tv/pic/cover/m/5e/39/140534_cUj6H.jpg",
         large: "https://lain.bgm.tv/pic/cover/l/5e/39/140534_cUj6H.jpg"
       ) {
-        Text("18+")
-          .padding(2)
-          .background(.red.opacity(0.8))
-          .padding(2)
-          .foregroundStyle(.white)
-          .font(.caption)
-          .clipShape(Capsule())
+        NSFWBadgeView()
       }.imageStyle(width: 60, height: 90)
       ImageView(img: "https://lain.bgm.tv/pic/cover/c/5e/39/140534_cUj6H.jpg") {
-        Text("18+")
-          .padding(2)
-          .background(.red.opacity(0.8))
-          .padding(2)
-          .foregroundStyle(.white)
-          .font(.caption)
-          .clipShape(Capsule())
+        NSFWBadgeView()
       } caption: {
         HStack {
           Text("abc")
@@ -269,13 +257,7 @@ extension ImageView {
         Text("abc")
       }.imageStyle(width: 60, height: 80)
       ImageView(img: "https://lain.bgm.tv/pic/cover/l/5e/39/140534_cUj6H.jpg") {
-        Text("18+")
-          .padding(2)
-          .background(.red.opacity(0.8))
-          .padding(2)
-          .foregroundStyle(.white)
-          .font(.caption)
-          .clipShape(Capsule())
+        NSFWBadgeView()
       } caption: {
         Text("天道花怜")
       }

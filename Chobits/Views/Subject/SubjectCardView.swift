@@ -5,7 +5,11 @@ struct SubjectTinyView: View {
   let subject: SlimSubjectDTO
 
   var body: some View {
-    BorderView(color: .secondary.opacity(0.2), cornerRadius: 8) {
+    BorderView(
+      color: .secondary.opacity(0.2),
+      background: .secondary.opacity(0.01),
+      padding: 0, cornerRadius: 8
+    ) {
       HStack {
         ImageView(img: subject.images?.grid)
           .imageStyle(width: 32, height: 32)
@@ -15,9 +19,8 @@ struct SubjectTinyView: View {
             .lineLimit(1)
         }
         Spacer()
-      }.padding(4)
+      }.padding(5)
     }
-    .background(.ultraThinMaterial)
     .frame(height: 40)
     .contextMenu {
       NavigationLink(value: NavDestination.subject(subject.id)) {
@@ -35,11 +38,19 @@ struct SubjectSmallView: View {
   let subject: SlimSubjectDTO
 
   var body: some View {
-    BorderView(color: .secondary.opacity(0.2), cornerRadius: 8) {
+    BorderView(
+      color: .secondary.opacity(0.2),
+      background: .secondary.opacity(0.01),
+      padding: 0, cornerRadius: 8
+    ) {
       HStack {
-        ImageView(img: subject.images?.common)
-          .imageStyle(width: 48, height: 64)
-          .imageType(.subject)
+        ImageView(img: subject.images?.common) {
+          if subject.nsfw {
+            NSFWBadgeView()
+          }
+        }
+        .imageStyle(width: 48, height: 64)
+        .imageType(.subject)
         VStack(alignment: .leading) {
           Text("\(subject.nameCN.isEmpty ? subject.name : subject.nameCN)")
             .lineLimit(1)
@@ -49,9 +60,8 @@ struct SubjectSmallView: View {
             .lineLimit(2)
         }
         Spacer()
-      }.padding(4)
+      }.padding(5)
     }
-    .background(.ultraThinMaterial)
     .frame(height: 72)
     .contextMenu {
       NavigationLink(value: NavDestination.subject(subject.id)) {
@@ -76,9 +86,13 @@ struct SubjectCardView: View {
   var body: some View {
     VStack(alignment: .leading, spacing: 5) {
       HStack(alignment: .top) {
-        ImageView(img: subject.images?.common)
-          .imageStyle(width: 72, height: 96)
-          .imageType(.subject)
+        ImageView(img: subject.images?.common) {
+          if subject.nsfw {
+            NSFWBadgeView()
+          }
+        }
+        .imageStyle(width: 72, height: 96)
+        .imageType(.subject)
         VStack(alignment: .leading) {
           Text(subject.name)
             .font(.headline)

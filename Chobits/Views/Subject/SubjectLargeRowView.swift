@@ -27,13 +27,7 @@ struct SubjectLargeRowView: View {
     HStack {
       ImageView(img: subject?.images?.common) {
         if subject?.nsfw ?? false {
-          Text("18+")
-            .padding(2)
-            .background(.red.opacity(0.8))
-            .padding(2)
-            .foregroundStyle(.white)
-            .font(.caption)
-            .clipShape(Capsule())
+          NSFWBadgeView()
         }
       }
       .imageStyle(width: 90, height: 120)

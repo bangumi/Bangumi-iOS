@@ -41,13 +41,7 @@ struct SubjectHeaderView: View {
     HStack {
       ImageView(img: subject.images?.large, large: subject.images?.resize(.r400)) {
         if subject.nsfw {
-          Text("18+")
-            .padding(2)
-            .background(.red.opacity(0.8))
-            .padding(2)
-            .foregroundStyle(.white)
-            .font(.caption)
-            .clipShape(Capsule())
+          NSFWBadgeView()
         }
       }
       .imageStyle(width: 120, height: 160)

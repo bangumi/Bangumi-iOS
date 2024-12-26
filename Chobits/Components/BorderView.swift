@@ -4,15 +4,18 @@ import SwiftUI
 ///
 struct BorderView<Content: View>: View {
   let color: Color
+  let background: Color?
   let padding: CGFloat
   let cornerRadius: CGFloat
   let content: () -> Content
 
   public init(
-    color: Color = .secondary, padding: CGFloat = 2, cornerRadius: CGFloat = 5,
+    color: Color = .secondary, background: Color? = nil,
+    padding: CGFloat = 2, cornerRadius: CGFloat = 5,
     @ViewBuilder content: @escaping () -> Content
   ) {
     self.color = color
+    self.background = background
     self.padding = padding
     self.cornerRadius = cornerRadius
     self.content = content
@@ -28,7 +31,10 @@ struct BorderView<Content: View>: View {
             .inset(by: 1)
             .stroke(color, lineWidth: 1)
         }
-    }.padding(-padding + 1)
+    }
+    .background(background)
+    .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
+    .padding(-padding + 1)
   }
 }
 
@@ -42,6 +48,9 @@ struct BorderView<Content: View>: View {
       Text("Hello, World!")
     }
     BorderView(color: .accent, padding: 1) {
+      Text("Hello, World!")
+    }
+    BorderView(color: .red, background: .accent, padding: 2) {
       Text("Hello, World!")
     }
     Spacer()

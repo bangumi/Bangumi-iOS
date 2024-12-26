@@ -12,6 +12,7 @@ struct SettingsView: View {
   @AppStorage("progressLimit") var progressLimit: Int = 50
   @AppStorage("isolationMode") var isolationMode: Bool = false
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
+  @AppStorage("showNSFWBadge") var showNSFWBadge: Bool = true
 
   @Environment(\.modelContext) var modelContext
 
@@ -125,6 +126,10 @@ struct SettingsView: View {
           }
           .onChange(of: selectedProgressLimit) { _, _ in
             progressLimit = selectedProgressLimit
+          }
+
+          Toggle(isOn: $showNSFWBadge) {
+            Text("显示 NSFW 标记")
           }
         }
       }
