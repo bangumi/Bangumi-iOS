@@ -4,13 +4,18 @@ import SwiftUI
 
 struct TimelineItemView: View {
   let item: TimelineDTO
+  let previous: TimelineDTO?
 
   var body: some View {
     HStack(alignment: .top) {
-      ImageView(img: item.user.avatar?.large)
-        .imageStyle(width: 40, height: 40)
-        .imageType(.avatar)
-        .imageLink(item.user.link)
+      if item.user.id != previous?.user.id {
+        ImageView(img: item.user.avatar?.large)
+          .imageStyle(width: 40, height: 40)
+          .imageType(.avatar)
+          .imageLink(item.user.link)
+      } else {
+        Rectangle().fill(Color.clear).frame(width: 40, height: 40)
+      }
       VStack(alignment: .leading) {
         Text(item.desc)
         switch item.cat {

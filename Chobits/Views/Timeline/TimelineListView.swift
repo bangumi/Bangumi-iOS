@@ -82,13 +82,14 @@ struct TimelineListView: View {
         }
       }.padding(8)
       LazyVStack(alignment: .leading, spacing: 16) {
-        ForEach(items) { item in
-          TimelineItemView(item: item)
-            .onAppear {
-              Task {
-                await loadNextPage(item)
-              }
+        ForEach(items.indices, id: \.self) { idx in
+          TimelineItemView(
+            item: items[idx], previous: idx == items.startIndex ? nil : items[idx - 1]
+          ).onAppear {
+            Task {
+              await loadNextPage(items[idx])
             }
+          }
         }
         if loading {
           HStack {
