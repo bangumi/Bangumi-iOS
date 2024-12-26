@@ -190,14 +190,14 @@ extension DatabaseOperator {
     }
     let episode = Episode(item)
     modelContext.insert(episode)
-    if let subject = item.subject {
-      let subject = try self.ensureSubject(subject)
+    if let slim = item.subject {
+      let subject = try self.ensureSubject(slim)
       if episode.subject == nil {
         episode.subject = subject
       }
     } else {
       let subject = try self.getSubject(item.subjectID)
-      if episode.subject == nil {
+      if episode.subject == nil, let subject = subject {
         episode.subject = subject
       }
     }

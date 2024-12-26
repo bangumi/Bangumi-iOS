@@ -10,6 +10,8 @@ struct EpisodeListView: View {
 
   @Environment(\.modelContext) var modelContext
 
+  @State private var refreshed: Bool = false
+
   @State private var offset: Int = 0
   @State private var main: Bool = true
   @State private var filterCollection: Bool = false
@@ -103,6 +105,17 @@ struct EpisodeListView: View {
     self.episodes.append(contentsOf: items)
   }
 
+  func refresh() async {
+    if refreshed { return }
+    refreshed = true
+
+    do {
+      try await Chii.shared.loadEpisodes(subjectId)
+    } catch {
+      Notifier.shared.alert(error: error)
+    }
+  }
+
   var body: some View {
     HStack {
       Image(systemName: filterCollection ? "eye.slash.circle.fill" : "eye.circle.fill")
@@ -173,6 +186,9 @@ struct EpisodeListView: View {
     }
     .onAppear {
       Task {
+        await loadCounts()
+        await load()
+        await refresh()
         await loadCounts()
         await load()
       }
