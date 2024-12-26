@@ -148,6 +148,21 @@ extension DatabaseOperator {
     return subject
   }
 
+  public func ensureSubject(_ item: SlimSubjectDTO) throws -> Subject {
+    let sid = item.id
+    let fetched = try self.fetchOne(
+      predicate: #Predicate<Subject> {
+        $0.subjectId == sid
+      })
+    if let subject = fetched {
+      subject.update(item)
+      return subject
+    }
+    let subject = Subject(item)
+    modelContext.insert(subject)
+    return subject
+  }
+
   public func ensureSubject(_ item: SubjectDTOV0) throws -> Subject {
     let sid = item.id
     let fetched = try self.fetchOne(
@@ -175,6 +190,17 @@ extension DatabaseOperator {
     }
     let episode = Episode(item)
     modelContext.insert(episode)
+    if let subject = item.subject {
+      let subject = try self.ensureSubject(subject)
+      if episode.subject == nil {
+        episode.subject = subject
+      }
+    } else {
+      let subject = try self.getSubject(item.subjectID)
+      if episode.subject == nil {
+        episode.subject = subject
+      }
+    }
     return episode
   }
 

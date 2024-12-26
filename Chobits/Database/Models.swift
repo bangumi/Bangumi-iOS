@@ -81,6 +81,19 @@ final class SubjectV1: Searchable {
     return "chii://subject/\(subjectId)"
   }
 
+  var slim: SlimSubjectDTO {
+    SlimSubjectDTO(
+      id: subjectId,
+      images: images,
+      info: info,
+      locked: locked,
+      name: name,
+      nameCN: nameCN,
+      nsfw: nsfw,
+      type: SubjectType(type)
+    )
+  }
+
   init(_ item: SubjectDTO) {
     self.subjectId = item.id
     self.airtime = item.airtime
@@ -101,6 +114,28 @@ final class SubjectV1: Searchable {
     self.summary = item.summary
     self.type = item.type.rawValue
     self.volumes = item.volumes
+  }
+
+  init(_ item: SlimSubjectDTO) {
+    self.subjectId = item.id
+    self.airtime = SubjectAirtime(date: "")
+    self.collection = [:]
+    self.eps = 0
+    self.images = item.images
+    self.infobox = []
+    self.info = item.info
+    self.locked = item.locked
+    self.metaTags = []
+    self.tags = []
+    self.name = item.name
+    self.nameCN = item.nameCN
+    self.nsfw = item.nsfw
+    self.platform = SubjectPlatform(name: "")
+    self.rating = SubjectRating()
+    self.series = false
+    self.summary = ""
+    self.type = item.type.rawValue
+    self.volumes = 0
   }
 
   init(_ item: SubjectDTOV0) {
@@ -143,6 +178,16 @@ final class SubjectV1: Searchable {
     if self.summary != item.summary { self.summary = item.summary }
     if self.type != item.type.rawValue { self.type = item.type.rawValue }
     if self.volumes != item.volumes { self.volumes = item.volumes }
+  }
+
+  func update(_ item: SlimSubjectDTO) {
+    if self.images != item.images { self.images = item.images }
+    if self.info != item.info { self.info = item.info }
+    if self.locked != item.locked { self.locked = item.locked }
+    if self.name != item.name { self.name = item.name }
+    if self.nameCN != item.nameCN { self.nameCN = item.nameCN }
+    if self.nsfw != item.nsfw { self.nsfw = item.nsfw }
+    if self.type != item.type.rawValue { self.type = item.type.rawValue }
   }
 
   func update(_ item: SubjectDTOV0) {
@@ -432,6 +477,8 @@ final class EpisodeV1 {
   var disc: Int
 
   var collection: Int?
+
+  var subject: Subject?
 
   var typeEnum: EpisodeType {
     return EpisodeType(type)

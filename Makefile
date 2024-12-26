@@ -8,6 +8,7 @@ update_preview_data:
 
 	# subject
 	curl -sSfLo "$(PREVIEW_PATH)/subject_anime.json" https://next.bgm.tv/p1/subjects/12
+	curl -sSfLo "$(PREVIEW_PATH)/subject_anime_episode.json" https://next.bgm.tv/p1/subjects/-/episodes/1027
 	curl -sSfLo "$(PREVIEW_PATH)/subject_anime_episodes.json" https://next.bgm.tv/p1/subjects/12/episodes
 	curl -sSfLo "$(PREVIEW_PATH)/subject_book.json" https://next.bgm.tv/p1/subjects/497
 	curl -sSfLo "$(PREVIEW_PATH)/subject_music.json" https://next.bgm.tv/p1/subjects/4991

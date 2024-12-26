@@ -106,6 +106,18 @@ extension Chii {
       try await db.commit()
     }
   }
+
+  func loadEpisode(_ episodeId: Int) async throws {
+    let db = try self.getDB()
+    if self.isAuthenticated() {
+      let item = try await self.getEpisodeCollection(episodeId)
+      try await db.saveEpisode(item)
+    } else {
+      let item = try await self.getSubjectEpisode(episodeId)
+      try await db.saveEpisode(item)
+    }
+    try await db.commit()
+  }
 }
 
 extension Chii {

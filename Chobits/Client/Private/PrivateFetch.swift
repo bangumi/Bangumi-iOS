@@ -254,6 +254,16 @@ extension Chii {
     return calendars
   }
 
+  func getSubjectEpisode(_ episodeId: Int) async throws -> EpisodeDTO {
+    if self.mock {
+      return loadFixture(fixture: "subject_anime_episode.json", target: EpisodeDTO.self)
+    }
+    let url = BangumiAPI.priv.build("p1/subjects/-/episodes/\(episodeId)")
+    let data = try await self.request(url: url, method: "GET")
+    let episode: EpisodeDTO = try self.decodeResponse(data)
+    return episode
+  }
+
   func getSubjectEpisodes(
     _ subjectId: Int, type: EpisodeType? = nil, limit: Int = 100, offset: Int = 0
   ) async throws -> PagedDTO<EpisodeDTO> {
@@ -272,6 +282,41 @@ extension Chii {
     let pageURL = url.appending(queryItems: queryItems)
     let data = try await self.request(url: pageURL, method: "GET")
     let resp: PagedDTO<EpisodeDTO> = try self.decodeResponse(data)
+    return resp
+  }
+
+  func getEpisodeCollection(_ episodeId: Int) async throws -> EpisodeCollectionDTO {
+    if self.mock {
+      return loadFixture(fixture: "episode_collection.json", target: EpisodeCollectionDTO.self)
+    }
+    let url = BangumiAPI.priv.build("p1/users/-/collections/subjects/-/episodes/\(episodeId)")
+    let data = try await self.request(url: url, method: "GET", auth: .required)
+    let collection: EpisodeCollectionDTO = try self.decodeResponse(data)
+    return collection
+  }
+
+  func getEpisodeCollections(
+    _ subjectId: Int, type: EpisodeType? = nil, limit: Int = 100, offset: Int = 0
+  )
+    async throws -> PagedDTO<EpisodeCollectionDTO>
+  {
+    if self.mock {
+      return loadFixture(
+        fixture: "episode_collections.json", target: PagedDTO<EpisodeCollectionDTO>.self)
+    }
+    var queries: [URLQueryItem] = [
+      URLQueryItem(name: "limit", value: String(limit)),
+      URLQueryItem(name: "offset", value: String(offset)),
+    ]
+    if let type = type {
+      queries.append(URLQueryItem(name: "episode_type", value: String(type.rawValue)))
+    }
+    let url = BangumiAPI.priv.build(
+      "p1/users/-/collections/subjects/\(subjectId)/episodes"
+    )
+    .appending(queryItems: queries)
+    let data = try await self.request(url: url, method: "GET", auth: .required)
+    let resp: PagedDTO<EpisodeCollectionDTO> = try self.decodeResponse(data)
     return resp
   }
 
@@ -436,31 +481,6 @@ extension Chii {
     let data = try await self.request(url: pageURL, method: "GET")
     let response: PagedDTO<UserSubjectCollectionDTO> = try self.decodeResponse(data)
     return response
-  }
-
-  func getEpisodeCollections(
-    _ subjectId: Int, type: EpisodeType? = nil, limit: Int = 100, offset: Int = 0
-  )
-    async throws -> PagedDTO<EpisodeCollectionDTO>
-  {
-    if self.mock {
-      return loadFixture(
-        fixture: "episode_collections.json", target: PagedDTO<EpisodeCollectionDTO>.self)
-    }
-    var queries: [URLQueryItem] = [
-      URLQueryItem(name: "limit", value: String(limit)),
-      URLQueryItem(name: "offset", value: String(offset)),
-    ]
-    if let type = type {
-      queries.append(URLQueryItem(name: "episode_type", value: String(type.rawValue)))
-    }
-    let url = BangumiAPI.priv.build(
-      "p1/users/-/collections/subjects/\(subjectId)/episodes"
-    )
-    .appending(queryItems: queries)
-    let data = try await self.request(url: url, method: "GET", auth: .required)
-    let resp: PagedDTO<EpisodeCollectionDTO> = try self.decodeResponse(data)
-    return resp
   }
 
   func getSubjectRecs(_ subjectId: Int, limit: Int = 10, offset: Int = 0) async throws -> PagedDTO<
