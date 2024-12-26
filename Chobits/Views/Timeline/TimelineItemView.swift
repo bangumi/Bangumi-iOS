@@ -14,7 +14,7 @@ struct TimelineItemView: View {
           .imageType(.avatar)
           .imageLink(item.user.link)
       } else {
-        Rectangle().fill(Color.clear).frame(width: 40, height: 40)
+        Rectangle().fill(.clear).frame(width: 40, height: 40)
       }
       VStack(alignment: .leading) {
         Text(item.desc)

@@ -16,7 +16,10 @@ struct SubjectTinyView: View {
         }
         Spacer()
       }.padding(4)
-    }.contextMenu {
+    }
+    .background(.ultraThinMaterial)
+    .frame(height: 40)
+    .contextMenu {
       NavigationLink(value: NavDestination.subject(subject.id)) {
         Label("查看详情", systemImage: "magnifyingglass")
       }
@@ -48,6 +51,7 @@ struct SubjectSmallView: View {
         Spacer()
       }.padding(4)
     }
+    .background(.ultraThinMaterial)
     .frame(height: 72)
     .contextMenu {
       NavigationLink(value: NavDestination.subject(subject.id)) {
