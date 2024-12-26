@@ -305,9 +305,9 @@ struct EpisodeDTO: Codable, Identifiable, Hashable, Linkable {
   var duration: String
   var airdate: String
   var comment: Int
-  var desc: String
   var disc: Int
-  var lock: Bool
+  var desc: String?
+  var subject: SlimSubjectDTO?
 
   var title: String {
     return "\(self.type.name).\(self.sort.episodeDisplay) \(self.name)"

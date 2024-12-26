@@ -430,7 +430,6 @@ final class EpisodeV1 {
   var comment: Int
   var desc: String
   var disc: Int
-  var lock: Bool
 
   var collection: Int?
 
@@ -452,9 +451,8 @@ final class EpisodeV1 {
     self.duration = item.duration
     self.airdate = item.airdate
     self.comment = item.comment
-    self.desc = item.desc
+    self.desc = item.desc ?? ""
     self.disc = item.disc
-    self.lock = item.lock
     self.collection = collection
   }
 
@@ -560,8 +558,8 @@ final class EpisodeV1 {
     if self.duration != item.duration { self.duration = item.duration }
     if self.airdate != item.airdate { self.airdate = item.airdate }
     if self.comment != item.comment { self.comment = item.comment }
-    if self.desc != item.desc { self.desc = item.desc }
+    let desc = item.desc ?? ""
+    if self.desc != desc { self.desc = desc }
     if self.disc != item.disc { self.disc = item.disc }
-    if self.lock != item.lock { self.lock = item.lock }
   }
 }
