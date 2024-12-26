@@ -57,6 +57,11 @@ struct SubjectSmallView: View {
       NavigationLink(value: NavDestination.subject(subject.id)) {
         Label("查看详情", systemImage: "magnifyingglass")
       }
+      if subject.type == .anime || subject.type == .real {
+        NavigationLink(value: NavDestination.episodeList(subject.id)) {
+          Label("章节列表", systemImage: "list.bullet")
+        }
+      }
     } preview: {
       SubjectCardView(subject: subject)
         .padding()
