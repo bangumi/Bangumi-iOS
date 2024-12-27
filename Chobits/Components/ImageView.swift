@@ -155,8 +155,8 @@ struct ImageView<ImageBadge: View, ImageCaption: View>: View {
                   Color.black.opacity(0),
                   Color.black.opacity(0.1),
                   Color.black.opacity(0.2),
-                  Color.black.opacity(0.3),
-                  Color.black.opacity(0.6),
+                  Color.black.opacity(0.4),
+                  Color.black.opacity(0.8),
                 ]), startPoint: .top, endPoint: .bottom))
           VStack {
             Spacer()

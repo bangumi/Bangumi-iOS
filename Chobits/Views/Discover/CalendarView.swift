@@ -106,7 +106,7 @@ struct CalendarWeekdayView: View {
   }
 
   var columnCount: Int {
-    let columns = Int((width - 16) / 100)
+    let columns = Int((width - 16) / 110)
     return columns > 0 ? columns : 1
   }
 
@@ -122,18 +122,15 @@ struct CalendarWeekdayView: View {
           VStack {
             ImageView(img: item.subject.images?.common) {
             } caption: {
-              Text(item.subject.nameCN)
+              Text(item.subject.title)
                 .multilineTextAlignment(.leading)
                 .lineLimit(2)
                 .padding(.horizontal, 2)
             }
-            .imageStyle(width: 100, height: 140)
+            .imageStyle(width: 110, height: 140)
             .imageType(.subject)
             .imageLink(item.subject.link)
-            Text(item.subject.name)
-              .font(.caption)
-              .lineLimit(1)
-          }.frame(width: 100)
+          }
         }
       }
     }

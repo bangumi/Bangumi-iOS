@@ -197,6 +197,10 @@ struct SlimSubjectDTO: Codable, Identifiable, Hashable, Linkable {
   var link: String {
     "chii://subject/\(id)"
   }
+
+  var title: String {
+    nameCN.isEmpty ? name : nameCN
+  }
 }
 
 struct BangumiCalendarItemDTO: Codable {
