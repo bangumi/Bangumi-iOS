@@ -21,13 +21,18 @@ struct TimelineItemView: View {
         switch item.cat {
         case .subject:
           if item.batch {
+            let subjects = item.memo.subject?.map(\.subject).filter { $0.images != nil } ?? []
             ScrollView(.horizontal, showsIndicators: false) {
               HStack {
-                ForEach(item.memo.subject?.prefix(5) ?? [], id: \.subject) { collect in
-                  ImageView(img: collect.subject.images?.common)
-                    .imageStyle(width: 60, height: 72)
-                    .imageType(.subject)
-                    .imageLink(collect.subject.link)
+                ForEach(subjects.prefix(5)) { subject in
+                  ImageView(img: subject.images?.common) {
+                    if subject.nsfw {
+                      NSFWBadgeView()
+                    }
+                  }
+                  .imageStyle(width: 60, height: 72)
+                  .imageType(.subject)
+                  .imageLink(subject.link)
                 }
               }.frame(height: 75)
             }
@@ -76,9 +81,13 @@ struct TimelineItemView: View {
         default:
           EmptyView()
         }
-        Text("\(item.createdAt.durationDisplay) · \(item.source.desc)")
-          .font(.caption)
-          .foregroundStyle(.secondary)
+        Menu {
+          Text("\(item.createdAt.datetimeDisplay)")
+        } label: {
+          Text("\(item.createdAt.durationDisplay) · \(item.source.desc)")
+            .font(.caption)
+            .foregroundStyle(.secondary)
+        }.buttonStyle(.plain)
         Divider()
       }
       Spacer()
