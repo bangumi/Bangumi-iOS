@@ -548,7 +548,7 @@ final class EpisodeV1 {
   var borderColor: Int {
     switch self.collectionTypeEnum {
     case .none:
-      if air > Date() {
+      if air > Date() || air.timeIntervalSince1970 == 0 {
         return 0x909090
       } else {
         return 0x00A8FF
@@ -565,7 +565,7 @@ final class EpisodeV1 {
   var backgroundColor: Int {
     switch self.collectionTypeEnum {
     case .none:
-      if air > Date() {
+      if air > Date() || air.timeIntervalSince1970 == 0 {
         return 0xe0e0e0
       } else {
         return 0xDAEAFF
@@ -582,7 +582,7 @@ final class EpisodeV1 {
   var textColor: Int {
     switch self.collectionTypeEnum {
     case .none:
-      if air > Date() {
+      if air > Date() || air.timeIntervalSince1970 == 0 {
         return 0x909090
       } else {
         return 0x0066CC
