@@ -73,8 +73,12 @@ extension TimelineDTO {
       if self.batch {
         text += AttributedString(" \(TimelineSubjectActionType(self.type).desc) ")
         text += genBatch(self.memo.subject?.map(\.subject) ?? [])
-        text += AttributedString(
-          " \(self.memo.subject?.count ?? 0) \(TimelineSubjectBatchType(self.type).desc)")
+        let count = self.memo.subject?.count ?? 0
+        var typeID = self.memo.subject?.first?.subject.type.rawValue ?? 0
+        if typeID == 0 {
+          typeID = self.type
+        }
+        text += AttributedString(" \(count) \(TimelineSubjectBatchType(typeID).desc)")
       } else {
         text += AttributedString(" \(TimelineSubjectActionType(self.type).desc) ")
         if let collect = self.memo.subject?.first {
