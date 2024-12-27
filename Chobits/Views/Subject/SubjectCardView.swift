@@ -49,7 +49,7 @@ struct SubjectSmallView: View {
             NSFWBadgeView()
           }
         }
-        .imageStyle(width: 48, height: 64)
+        .imageStyle(width: 60, height: 72)
         .imageType(.subject)
         VStack(alignment: .leading) {
           Text("\(subject.nameCN.isEmpty ? subject.name : subject.nameCN)")
@@ -62,7 +62,7 @@ struct SubjectSmallView: View {
         Spacer()
       }.padding(5)
     }
-    .frame(height: 72)
+    .frame(height: 80)
     .contextMenu {
       NavigationLink(value: NavDestination.subject(subject.id)) {
         Label("查看详情", systemImage: "magnifyingglass")

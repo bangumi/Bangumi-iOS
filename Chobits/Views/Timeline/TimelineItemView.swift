@@ -25,11 +25,11 @@ struct TimelineItemView: View {
               HStack {
                 ForEach(item.memo.subject?.prefix(5) ?? [], id: \.subject) { collect in
                   ImageView(img: collect.subject.images?.common)
-                    .imageStyle(width: 60, height: 85)
+                    .imageStyle(width: 60, height: 72)
                     .imageType(.subject)
                     .imageLink(collect.subject.link)
                 }
-              }.frame(height: 90)
+              }.frame(height: 75)
             }
           } else {
             if let collect = item.memo.subject?.first {
