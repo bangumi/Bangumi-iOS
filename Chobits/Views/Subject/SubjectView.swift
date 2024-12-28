@@ -1,3 +1,4 @@
+import BBCode
 import OSLog
 import SwiftData
 import SwiftUI
@@ -131,7 +132,7 @@ struct SubjectDetailView: View {
           EpisodeGridView(subjectId: subject.subjectId)
         }
 
-        BBCodeWebView(subject.summary, textSize: 14)
+        BBCodeView(subject.summary, textSize: 14).padding(2)
 
         if subject.typeEnum == .music {
           EpisodeDiscView(subjectId: subject.subjectId)

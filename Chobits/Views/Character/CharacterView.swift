@@ -1,3 +1,4 @@
+import BBCode
 import OSLog
 import SwiftData
 import SwiftUI
@@ -106,7 +107,7 @@ struct CharacterView: View {
             }.frame(height: 160)
 
             /// summary
-            BBCodeWebView(character.summary, textSize: 14)
+            BBCodeView(character.summary, textSize: 14).padding(2)
 
             /// casts
             CharacterCastsView(characterId: characterId, casts: character.casts)

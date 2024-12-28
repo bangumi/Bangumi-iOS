@@ -89,7 +89,6 @@
 		1998DD072CB1222400115E1F /* subject_comments.json in Resources */ = {isa = PBXBuildFile; fileRef = 1998DD062CB1221E00115E1F /* subject_comments.json */; };
 		1998DD092CB122BC00115E1F /* SubjectCommentListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1998DD082CB122B600115E1F /* SubjectCommentListView.swift */; };
 		19B2A70A2D087968001617BE /* BBCode in Frameworks */ = {isa = PBXBuildFile; productRef = 19B2A7092D087968001617BE /* BBCode */; };
-		19B2A7502D092240001617BE /* BBCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19B2A74F2D092240001617BE /* BBCode.swift */; };
 		19B2A8842D0B06C9001617BE /* EpisodeDiscView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19B2A8832D0B06C9001617BE /* EpisodeDiscView.swift */; };
 		19B2A8862D0B0EC5001617BE /* subject_music.json in Resources */ = {isa = PBXBuildFile; fileRef = 19B2A8852D0B0EC5001617BE /* subject_music.json */; };
 		19B2A8892D0B1034001617BE /* subject_music_episodes.json in Resources */ = {isa = PBXBuildFile; fileRef = 19B2A8882D0B1034001617BE /* subject_music_episodes.json */; };
@@ -207,7 +206,6 @@
 		1998DD042CB11F9700115E1F /* SubjectCommentsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubjectCommentsView.swift; sourceTree = "<group>"; };
 		1998DD062CB1221E00115E1F /* subject_comments.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = subject_comments.json; sourceTree = "<group>"; };
 		1998DD082CB122B600115E1F /* SubjectCommentListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubjectCommentListView.swift; sourceTree = "<group>"; };
-		19B2A74F2D092240001617BE /* BBCode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BBCode.swift; sourceTree = "<group>"; };
 		19B2A8832D0B06C9001617BE /* EpisodeDiscView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EpisodeDiscView.swift; sourceTree = "<group>"; };
 		19B2A8852D0B0EC5001617BE /* subject_music.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = subject_music.json; sourceTree = "<group>"; };
 		19B2A8872D0B1034001617BE /* subject_anime_episodes.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = subject_anime_episodes.json; sourceTree = "<group>"; };
@@ -315,7 +313,6 @@
 			children = (
 				19ECCE122CFD5B6B0092F715 /* CardView.swift */,
 				191CF1A52CC09F1E000EF819 /* BorderView.swift */,
-				19B2A74F2D092240001617BE /* BBCode.swift */,
 				19742A5B2D069AC3008791CC /* InfoboxView.swift */,
 				19ECCDA02CFC21160092F715 /* PageView.swift */,
 				19671C392BDEB55D000B4D99 /* ImageView.swift */,
@@ -691,7 +688,6 @@
 				194E75D22D0BC6540070F5F8 /* Spotlight.swift in Sources */,
 				194E75D42D0BDF660070F5F8 /* EpisodeInfoView.swift in Sources */,
 				1915A89E2BF09E6B003DB76D /* SubjectRelationListView.swift in Sources */,
-				19B2A7502D092240001617BE /* BBCode.swift in Sources */,
 				19ECCF132CFF60430092F715 /* PersonCastListView.swift in Sources */,
 				19ECCF142CFF60430092F715 /* PersonCastsView.swift in Sources */,
 				19ECCF152CFF60430092F715 /* PersonCastItemView.swift in Sources */,
