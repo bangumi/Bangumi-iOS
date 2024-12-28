@@ -16,6 +16,9 @@
 		190C3B1D2D1AC1D4004ECCE6 /* Timeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 190C3B1C2D1AC1D2004ECCE6 /* Timeline.swift */; };
 		190C3B492D1C30CA004ECCE6 /* SubjectCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 190C3B482D1C30CA004ECCE6 /* SubjectCardView.swift */; };
 		190C3B752D1C5D82004ECCE6 /* Notice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 190C3B742D1C5D80004ECCE6 /* Notice.swift */; };
+		190C3C9F2D202963004ECCE6 /* subject_anime_episode.json in Resources */ = {isa = PBXBuildFile; fileRef = 190C3C9C2D202963004ECCE6 /* subject_anime_episode.json */; };
+		190C3CA02D202963004ECCE6 /* user_followers.json in Resources */ = {isa = PBXBuildFile; fileRef = 190C3C9D2D202963004ECCE6 /* user_followers.json */; };
+		190C3CA12D202963004ECCE6 /* user_friends.json in Resources */ = {isa = PBXBuildFile; fileRef = 190C3C9E2D202963004ECCE6 /* user_friends.json */; };
 		1915A89A2BEFB942003DB76D /* CharacterCastsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1915A8992BEFB942003DB76D /* CharacterCastsView.swift */; };
 		1915A89E2BF09E6B003DB76D /* SubjectRelationListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1915A89D2BF09E6B003DB76D /* SubjectRelationListView.swift */; };
 		1915A8A02BF09F4D003DB76D /* SubjectCharacterListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1915A89F2BF09F4D003DB76D /* SubjectCharacterListView.swift */; };
@@ -134,6 +137,9 @@
 		190C3B1C2D1AC1D2004ECCE6 /* Timeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Timeline.swift; sourceTree = "<group>"; };
 		190C3B482D1C30CA004ECCE6 /* SubjectCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubjectCardView.swift; sourceTree = "<group>"; };
 		190C3B742D1C5D80004ECCE6 /* Notice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notice.swift; sourceTree = "<group>"; };
+		190C3C9C2D202963004ECCE6 /* subject_anime_episode.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = subject_anime_episode.json; sourceTree = "<group>"; };
+		190C3C9D2D202963004ECCE6 /* user_followers.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = user_followers.json; sourceTree = "<group>"; };
+		190C3C9E2D202963004ECCE6 /* user_friends.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = user_friends.json; sourceTree = "<group>"; };
 		1915A8992BEFB942003DB76D /* CharacterCastsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterCastsView.swift; sourceTree = "<group>"; };
 		1915A89D2BF09E6B003DB76D /* SubjectRelationListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubjectRelationListView.swift; sourceTree = "<group>"; };
 		1915A89F2BF09F4D003DB76D /* SubjectCharacterListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubjectCharacterListView.swift; sourceTree = "<group>"; };
@@ -337,6 +343,9 @@
 				194E77412D0EFAF80070F5F8 /* subject_offprints.json */,
 				194E77422D0EFAF80070F5F8 /* subject_recs.json */,
 				194E77432D0EFAF80070F5F8 /* subject_relations.json */,
+				190C3C9C2D202963004ECCE6 /* subject_anime_episode.json */,
+				190C3C9D2D202963004ECCE6 /* user_followers.json */,
+				190C3C9E2D202963004ECCE6 /* user_friends.json */,
 				194E77442D0EFAF80070F5F8 /* subject_staffs.json */,
 				194E77452D0EFAF80070F5F8 /* user_character_collection.json */,
 				194E77462D0EFAF80070F5F8 /* user_character_collections.json */,
@@ -602,6 +611,9 @@
 				194E77492D0EFAF80070F5F8 /* character_casts.json in Resources */,
 				194E774A2D0EFAF80070F5F8 /* person_works.json in Resources */,
 				194E774B2D0EFAF80070F5F8 /* subject_offprints.json in Resources */,
+				190C3C9F2D202963004ECCE6 /* subject_anime_episode.json in Resources */,
+				190C3CA02D202963004ECCE6 /* user_followers.json in Resources */,
+				190C3CA12D202963004ECCE6 /* user_friends.json in Resources */,
 				194E774C2D0EFAF80070F5F8 /* person_casts.json in Resources */,
 				194E774D2D0EFAF80070F5F8 /* user_person_collection.json in Resources */,
 				194E774E2D0EFAF80070F5F8 /* user_person_collections.json in Resources */,

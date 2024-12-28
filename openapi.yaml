@@ -15,53 +15,6 @@ components:
         - large
       title: Avatar
       type: object
-    BaseEpisodeComment:
-      properties:
-        content:
-          type: string
-        createdAt:
-          type: integer
-        creatorID:
-          type: integer
-        epID:
-          type: integer
-        id:
-          type: integer
-        relatedID:
-          type: integer
-        state:
-          type: integer
-        user:
-          $ref: '#/components/schemas/SlimUser'
-      required:
-        - id
-        - epID
-        - creatorID
-        - relatedID
-        - createdAt
-        - content
-        - state
-        - user
-      type: object
-    BasicReply:
-      properties:
-        createdAt:
-          type: integer
-        creator:
-          $ref: '#/components/schemas/SlimUser'
-        id:
-          type: integer
-        state:
-          type: integer
-        text:
-          type: string
-      required:
-        - id
-        - creator
-        - createdAt
-        - text
-        - state
-      type: object
     BlogEntry:
       properties:
         content:
@@ -235,6 +188,29 @@ components:
       x-ms-enum:
         modelAsString: false
         name: CollectionType
+    CreateEpisodeComment:
+      properties:
+        cf-turnstile-response:
+          description: >-
+            需要
+            [turnstile](https://developers.cloudflare.com/turnstile/get-started/client-side-rendering/)
+
+            next.bgm.tv 域名对应的 site-key 为 `0x4AAAAAAABkMYinukE8nzYS`
+
+            dev.bgm38.com 域名使用测试用的 site-key `1x00000000000000000000AA`
+          minLength: 1
+          type: string
+        content:
+          minLength: 1
+          type: string
+        replyTo:
+          default: 0
+          description: 被回复的吐槽 ID, `0` 代表发送顶层吐槽
+          type: integer
+      required:
+        - content
+        - cf-turnstile-response
+      type: object
     CreateTopic:
       example:
         cf-turnstile-response: 10000000-aaaa-bbbb-cccc-000000000001
@@ -318,21 +294,20 @@ components:
           type: string
         id:
           type: integer
-        lock:
-          type: boolean
         name:
           type: string
         nameCN:
           type: string
         sort:
           type: number
+        subject:
+          $ref: '#/components/schemas/SlimSubject'
         subjectID:
           type: integer
         type:
           $ref: '#/components/schemas/EpisodeType'
       required:
         - id
-        - subjectID
         - sort
         - type
         - disc
@@ -341,8 +316,7 @@ components:
         - duration
         - airdate
         - comment
-        - desc
-        - lock
+        - subjectID
       title: Episode
       type: object
     EpisodeCollectionStatus:
@@ -366,6 +340,39 @@ components:
       x-ms-enum:
         modelAsString: false
         name: EpisodeCollectionStatus
+    EpisodeCommentBase:
+      properties:
+        content:
+          type: string
+        createdAt:
+          type: integer
+        creatorID:
+          type: integer
+        epID:
+          type: integer
+        id:
+          type: integer
+        reactions:
+          items:
+            $ref: '#/components/schemas/Reaction'
+          type: array
+        relatedID:
+          type: integer
+        state:
+          type: integer
+        user:
+          $ref: '#/components/schemas/SlimUser'
+      required:
+        - id
+        - epID
+        - creatorID
+        - relatedID
+        - createdAt
+        - content
+        - state
+        - user
+        - reactions
+      type: object
     EpisodeComments:
       allOf:
         - properties:
@@ -379,6 +386,10 @@ components:
               type: integer
             id:
               type: integer
+            reactions:
+              items:
+                $ref: '#/components/schemas/Reaction'
+              type: array
             relatedID:
               type: integer
             state:
@@ -394,11 +405,12 @@ components:
             - content
             - state
             - user
+            - reactions
           type: object
         - properties:
             replies:
               items:
-                $ref: '#/components/schemas/BaseEpisodeComment'
+                $ref: '#/components/schemas/EpisodeCommentBase'
               type: array
           required:
             - replies
@@ -589,31 +601,6 @@ components:
         - inGroup
         - group
         - totalTopics
-      type: object
-    GroupReply:
-      properties:
-        createdAt:
-          type: integer
-        creator:
-          $ref: '#/components/schemas/SlimUser'
-        id:
-          type: integer
-        state:
-          type: integer
-        text:
-          type: string
-        topicID:
-          type: integer
-        topicTitle:
-          type: string
-      required:
-        - id
-        - creator
-        - createdAt
-        - text
-        - state
-        - topicID
-        - topicTitle
       type: object
     HistorySummary:
       properties:
@@ -1013,7 +1000,6 @@ components:
           type: string
       required:
         - id
-        - isFriend
         - replies
         - creator
         - createdAt
@@ -1173,6 +1159,8 @@ components:
           type: string
         nsfw:
           type: boolean
+        rating:
+          $ref: '#/components/schemas/SubjectRating'
         type:
           $ref: '#/components/schemas/SubjectType'
       required:
@@ -1181,6 +1169,7 @@ components:
         - nameCN
         - type
         - info
+        - rating
         - locked
         - nsfw
       title: SlimSubject
@@ -1233,7 +1222,6 @@ components:
         - id
         - creator
         - createdAt
-        - isFriend
         - text
         - state
         - reactions
@@ -2110,6 +2098,14 @@ components:
         - subject
         - count
       type: object
+    UpdateEpisodeComment:
+      properties:
+        content:
+          minLength: 1
+          type: string
+      required:
+        - content
+      type: object
     UpdateTopic:
       properties:
         text:
@@ -2446,7 +2442,7 @@ info:
     关于订阅通知的 socket.io 相关的文档在
     <https://github.com/bangumi/GraphQL/blob/master/docs/socket.io.md>
   title: bangumi private api
-  version: 2024-12-22-382bf5a
+  version: 2024-12-28-de050e5
 openapi: 3.0.3
 paths:
   /p1/blocklist:
@@ -2913,7 +2909,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GroupReply'
+                $ref: '#/components/schemas/Reply'
           description: Default Response
         '404':
           content:
@@ -3120,7 +3116,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BasicReply'
+                $ref: '#/components/schemas/SubReply'
           description: Default Response
         '401':
           content:
@@ -3958,6 +3954,59 @@ paths:
         - subject
   /p1/subjects/-/episode/-/comments/{commentID}:
     delete:
+      parameters:
+        - in: path
+          name: commentID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Default Response
+    put:
+      parameters:
+        - in: path
+          name: commentID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Default Response
+  /p1/subjects/-/episode/{episodeID}:
+    get:
+      parameters:
+        - in: path
+          name: episodeID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Default Response
+  /p1/subjects/-/episode/{episodeID}/comments:
+    get:
+      parameters:
+        - in: path
+          name: episodeID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Default Response
+    post:
+      parameters:
+        - in: path
+          name: episodeID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Default Response
+  /p1/subjects/-/episodes/-/comments/{commentID}:
+    delete:
       operationId: deleteSubjectEpComment
       parameters:
         - example: 1034989
@@ -3967,39 +4016,6 @@ paths:
           schema:
             type: integer
       responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                properties: {}
-                type: object
-          description: Default Response
-        '401':
-          content:
-            application/json:
-              examples:
-                NOT_ALLOWED:
-                  value:
-                    code: NOT_ALLOWED
-                    error: Unauthorized
-                    message: you don't have permission to delete this comment
-                    statusCode: 401
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          description: default error response type
-        '404':
-          content:
-            application/json:
-              examples:
-                NOT_FOUND:
-                  value:
-                    code: NOT_FOUND
-                    error: Not Found
-                    message: comment not found
-                    statusCode: 404
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          description: default error response type
         '500':
           content:
             application/json:
@@ -4012,9 +4028,9 @@ paths:
           HTTPBearer: []
       summary: 删除条目的剧集吐槽
       tags:
-        - subject
+        - episode
     put:
-      operationId: editSubjectEpComment
+      operationId: updateSubjectEpComment
       parameters:
         - example: 1075440
           in: path
@@ -4025,25 +4041,9 @@ paths:
       requestBody:
         content:
           application/json:
-            example:
-              content: new comment contents
             schema:
-              properties:
-                content:
-                  minLength: 1
-                  type: string
-              required:
-                - content
-              type: object
-        required: true
+              $ref: '#/components/schemas/UpdateEpisodeComment'
       responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                properties: {}
-                type: object
-          description: Default Response
         '500':
           content:
             application/json:
@@ -4056,8 +4056,35 @@ paths:
           HTTPBearer: []
       summary: 编辑条目的剧集吐槽
       tags:
-        - subject
-  /p1/subjects/-/episode/{episodeID}/comments:
+        - episode
+  /p1/subjects/-/episodes/{episodeID}:
+    get:
+      operationId: getSubjectEpisode
+      parameters:
+        - example: 1075440
+          in: path
+          name: episodeID
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Episode'
+          description: Default Response
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                description: 意料之外的服务器错误
+          description: 意料之外的服务器错误
+      summary: 获取剧集信息
+      tags:
+        - episode
+  /p1/subjects/-/episodes/{episodeID}/comments:
     get:
       operationId: getSubjectEpisodeComments
       parameters:
@@ -4086,6 +4113,10 @@ paths:
                           type: integer
                         id:
                           type: integer
+                        reactions:
+                          items:
+                            $ref: '#/components/schemas/Reaction'
+                          type: array
                         relatedID:
                           type: integer
                         state:
@@ -4101,11 +4132,12 @@ paths:
                         - content
                         - state
                         - user
+                        - reactions
                       type: object
                     - properties:
                         replies:
                           items:
-                            $ref: '#/components/schemas/BaseEpisodeComment'
+                            $ref: '#/components/schemas/EpisodeCommentBase'
                           type: array
                       required:
                         - replies
@@ -4122,17 +4154,8 @@ paths:
           description: 意料之外的服务器错误
       summary: 获取条目的剧集吐槽箱
       tags:
-        - subject
+        - episode
     post:
-      description: >-
-        需要
-        [turnstile](https://developers.cloudflare.com/turnstile/get-started/client-side-rendering/)
-
-
-        next.bgm.tv 域名对应的 site-key 为 `0x4AAAAAAABkMYinukE8nzYS`
-
-
-        dev.bgm38.com 域名使用测试用的 site-key `1x00000000000000000000AA`
       operationId: createSubjectEpComment
       parameters:
         - example: 1075440
@@ -4144,40 +4167,20 @@ paths:
       requestBody:
         content:
           application/json:
-            examples:
-              example1:
-                value:
-                  cf-turnstile-response: 10000000-aaaa-bbbb-cccc-000000000001
-                  content: comment contents
-              example2:
-                value:
-                  cf-turnstile-response: 10000000-aaaa-bbbb-cccc-000000000001
-                  content: comment contents
-                  replyTo: 2
             schema:
-              properties:
-                cf-turnstile-response:
-                  minLength: 1
-                  type: string
-                content:
-                  minLength: 1
-                  type: string
-                replyTo:
-                  default: 0
-                  description: 被回复的吐槽 ID, `0` 代表发送顶层吐槽
-                  example: 0
-                  type: integer
-              required:
-                - content
-                - cf-turnstile-response
-              type: object
-        required: true
+              $ref: '#/components/schemas/CreateEpisodeComment'
       responses:
         '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BasicReply'
+                properties:
+                  id:
+                    description: new reply id
+                    type: integer
+                required:
+                  - id
+                type: object
           description: Default Response
         '500':
           content:
@@ -4191,7 +4194,7 @@ paths:
           HTTPBearer: []
       summary: 创建条目的剧集吐槽
       tags:
-        - subject
+        - episode
   /p1/subjects/-/posts/{postID}:
     delete:
       operationId: deleteSubjectPost
@@ -4263,7 +4266,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GroupReply'
+                $ref: '#/components/schemas/Reply'
           description: Default Response
         '404':
           content:
@@ -4475,7 +4478,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BasicReply'
+                $ref: '#/components/schemas/SubReply'
           description: Default Response
         '401':
           content:
@@ -5101,13 +5104,20 @@ paths:
           required: false
           schema:
             $ref: '#/components/schemas/FilterMode'
-        - description: min 0
+        - description: min 1, max 20
           in: query
-          name: offset
+          name: limit
           required: false
           schema:
-            default: 0
-            minimum: 0
+            default: 20
+            maximum: 20
+            minimum: 1
+            type: integer
+        - description: max timeline id to fetch from
+          in: query
+          name: until
+          required: false
+          schema:
             type: integer
       responses:
         '200':
@@ -5717,6 +5727,63 @@ paths:
       summary: 获取用户收藏概览
       tags:
         - user
+  /p1/users/{username}/followers:
+    get:
+      operationId: getUserFollowers
+      parameters:
+        - description: max 100
+          in: query
+          name: limit
+          required: false
+          schema:
+            default: 20
+            maximum: 100
+            minimum: 1
+            type: integer
+        - description: min 0
+          in: query
+          name: offset
+          required: false
+          schema:
+            default: 0
+            minimum: 0
+            type: integer
+        - in: path
+          name: username
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  data:
+                    items:
+                      $ref: '#/components/schemas/Friend'
+                    type: array
+                  total:
+                    description: limit+offset 为参数的请求表示总条数，page 为参数的请求表示总页数
+                    type: integer
+                required:
+                  - data
+                  - total
+                type: object
+          description: Default Response
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                description: 意料之外的服务器错误
+          description: 意料之外的服务器错误
+      security:
+        - CookiesSession: []
+          HTTPBearer: []
+      summary: 获取用户的关注者列表
+      tags:
+        - user
   /p1/users/{username}/friends:
     get:
       operationId: getUserFriends
@@ -5819,13 +5886,20 @@ paths:
     get:
       operationId: getUserTimeline
       parameters:
-        - description: min 0
+        - description: min 1, max 20
           in: query
-          name: offset
+          name: limit
           required: false
           schema:
-            default: 0
-            minimum: 0
+            default: 20
+            maximum: 20
+            minimum: 1
+            type: integer
+        - description: max timeline id to fetch from
+          in: query
+          name: until
+          required: false
+          schema:
             type: integer
         - in: path
           name: username
