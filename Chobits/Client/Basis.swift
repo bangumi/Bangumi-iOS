@@ -309,9 +309,9 @@ enum CollectionType: Int, Codable, Identifiable, CaseIterable {
     case .do:
       return "在" + action
     case .onHold:
-      return "搁置了"
+      return "搁置"
     case .dropped:
-      return "抛弃了"
+      return "抛弃"
     }
   }
 
