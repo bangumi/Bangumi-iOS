@@ -591,3 +591,14 @@ enum TimelineMode: String, Codable {
   case all
   case friends
 }
+
+struct Friend: Codable, Identifiable, Hashable {
+  var user: SlimUserDTO
+  var grade: Int
+  var createdAt: Int
+  var description: String
+
+  var id: Int {
+    user.id
+  }
+}

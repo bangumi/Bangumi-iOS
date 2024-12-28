@@ -34,6 +34,9 @@ struct ChiiTimelineView: View {
               NavigationLink(value: NavDestination.collections) {
                 Label("时光机", systemImage: "star")
               }
+              NavigationLink(value: NavDestination.friends) {
+                Label("好友", systemImage: "person.2")
+              }
               Divider()
               Button(role: .destructive) {
                 logoutConfirm = true

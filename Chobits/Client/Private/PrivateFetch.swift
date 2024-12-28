@@ -31,6 +31,40 @@ extension Chii {
     let resp: PagedDTO<NoticeDTO> = try self.decodeResponse(data)
     return resp
   }
+
+  func getUserFriends(username: String, limit: Int = 20, offset: Int = 0) async throws -> PagedDTO<
+    Friend
+  > {
+    if self.mock {
+      return loadFixture(fixture: "user_friends.json", target: PagedDTO<Friend>.self)
+    }
+    let url = BangumiAPI.priv.build("p1/users/\(username)/friends")
+    let queryItems: [URLQueryItem] = [
+      URLQueryItem(name: "limit", value: String(limit)),
+      URLQueryItem(name: "offset", value: String(offset)),
+    ]
+    let pageURL = url.appending(queryItems: queryItems)
+    let data = try await self.request(url: pageURL, method: "GET")
+    let resp: PagedDTO<Friend> = try self.decodeResponse(data)
+    return resp
+  }
+
+  func getUserFollowers(username: String, limit: Int = 20, offset: Int = 0) async throws
+    -> PagedDTO<Friend>
+  {
+    if self.mock {
+      return loadFixture(fixture: "user_followers.json", target: PagedDTO<Friend>.self)
+    }
+    let url = BangumiAPI.priv.build("p1/users/\(username)/followers")
+    let queryItems: [URLQueryItem] = [
+      URLQueryItem(name: "limit", value: String(limit)),
+      URLQueryItem(name: "offset", value: String(offset)),
+    ]
+    let pageURL = url.appending(queryItems: queryItems)
+    let data = try await self.request(url: pageURL, method: "GET")
+    let resp: PagedDTO<Friend> = try self.decodeResponse(data)
+    return resp
+  }
 }
 
 // MARK: - Character

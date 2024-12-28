@@ -10,6 +10,7 @@ protocol Linkable {
 enum NavDestination: Hashable, View {
   case setting
   case notice
+  case friends
   case collections
   case collectionList(_ subjectType: SubjectType)
 
@@ -43,6 +44,8 @@ enum NavDestination: Hashable, View {
       NoticeView()
     case .collections:
       CollectionsView()
+    case .friends:
+      FriendsView()
     case .collectionList(let subjectType):
       CollectionListView(subjectType: subjectType)
 
