@@ -59,7 +59,7 @@ struct ChiiProgressView: View {
     let limit: Int = 100
     var offset: Int = 0
     var count: Int = 0
-    var loaded: [Int] = []
+    var loaded: [Int: SubjectType] = [:]
     while true {
       let resp = try await Chii.shared.getUserSubjectCollections(
         username: profile.username,
@@ -70,7 +70,7 @@ struct ChiiProgressView: View {
       for item in resp.data {
         try await db.saveUserSubjectCollection(item)
         count += 1
-        loaded.append(item.subject.id)
+        loaded[item.subject.id] = item.subject.type
         refreshProgress = CGFloat(count) / CGFloat(resp.total)
       }
       try await db.commit()
@@ -87,8 +87,11 @@ struct ChiiProgressView: View {
     return count
   }
 
-  func checkLoadEpisodes(_ subjectIds: [Int]) {
+  func checkLoadEpisodes(_ subjects: [Int: SubjectType]) {
     Task.detached {
+      let subjectIds = subjects.filter {
+        $0.value == .anime || $0.value == .music || $0.value == .real
+      }.map { $0.key }
       for subjectId in subjectIds {
         do {
           try await Chii.shared.loadEpisodes(subjectId)

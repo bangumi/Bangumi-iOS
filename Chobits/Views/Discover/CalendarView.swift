@@ -120,7 +120,7 @@ struct CalendarWeekdayView: View {
       LazyVGrid(columns: columns) {
         ForEach(calendar.items, id: \.subject) { item in
           VStack {
-            ImageView(img: item.subject.images?.common) {
+            ImageView(img: item.subject.images?.resize(.r200)) {
             } caption: {
               Text(item.subject.title)
                 .multilineTextAlignment(.leading)

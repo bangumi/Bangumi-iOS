@@ -188,6 +188,7 @@ struct SlimSubjectDTO: Codable, Identifiable, Hashable, Linkable {
   var id: Int
   var images: SubjectImages?
   var info: String
+  var rating: SubjectRating?
   var locked: Bool
   var name: String
   var nameCN: String

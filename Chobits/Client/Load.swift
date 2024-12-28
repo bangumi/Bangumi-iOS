@@ -51,17 +51,9 @@ extension Chii {
 
   func loadEpisodes(_ subjectId: Int) async throws {
     let db = try self.getDB()
-    let type = try await db.getSubjectType(subjectId)
-    switch type {
-    case .anime, .music, .real:
-      break
-    default:
-      return
-    }
     var offset: Int = 0
     let limit: Int = 1000
     var total: Int = 0
-
     if self.isAuthenticated() {
       var items: [EpisodeCollectionDTO] = []
       while true {

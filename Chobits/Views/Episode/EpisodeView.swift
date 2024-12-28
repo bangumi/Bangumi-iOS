@@ -6,12 +6,6 @@ struct EpisodeView: View {
 
   @AppStorage("shareDomain") var shareDomain: String = ShareDomain.chii.label
   @AppStorage("isolationMode") var isolationMode: Bool = false
-  @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
-  @AppStorage("profile") var profile: Profile = Profile()
-
-  @Environment(\.dismiss) private var dismiss
-
-  @State private var updating: Bool = false
 
   @Query private var episodes: [Episode]
   private var episode: Episode? { episodes.first }

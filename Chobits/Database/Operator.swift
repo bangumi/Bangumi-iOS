@@ -38,18 +38,6 @@ extension DatabaseOperator {
     return subject
   }
 
-  public func getSubjectType(_ id: Int) throws -> SubjectType {
-    let subject = try self.fetchOne(
-      predicate: #Predicate<Subject> {
-        $0.subjectId == id
-      }
-    )
-    guard let subject = subject else {
-      throw ChiiError(message: "subject not found: \(id)")
-    }
-    return subject.typeEnum
-  }
-
   public func getEpisodeIDs(subjectId: Int, sort: Float) throws -> [Int] {
     let descriptor = FetchDescriptor<Episode>(
       predicate: #Predicate<Episode> {

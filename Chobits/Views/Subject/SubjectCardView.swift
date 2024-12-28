@@ -37,6 +37,26 @@ struct SubjectTinyView: View {
 struct SubjectSmallView: View {
   let subject: SlimSubjectDTO
 
+  var ratingLine: Text {
+    guard let rating = subject.rating else {
+      return Text("")
+    }
+    var text: [Text] = []
+    if rating.rank > 0, rating.rank < 1000 {
+      text.append(Text("#\(rating.rank) "))
+    }
+    if rating.score > 0 {
+      let img = Image(systemName: "star.fill")
+      text.append(Text("\(img)").font(.system(size: 10)).baselineOffset(1))
+      let score = String(format: "%.1f", rating.score)
+      text.append(Text(" \(score)"))
+    }
+    if rating.total > 10 {
+      text.append(Text(" (\(rating.total))"))
+    }
+    return text.reduce(Text(""), +)
+  }
+
   var body: some View {
     BorderView(
       color: .secondary.opacity(0.2),
@@ -53,12 +73,13 @@ struct SubjectSmallView: View {
         .imageType(.subject)
         VStack(alignment: .leading) {
           Text("\(subject.nameCN.isEmpty ? subject.name : subject.nameCN)")
-            .lineLimit(1)
           Text(subject.info)
             .font(.footnote)
             .foregroundStyle(.secondary)
-            .lineLimit(2)
-        }
+          ratingLine
+            .font(.footnote)
+            .foregroundStyle(.secondary)
+        }.lineLimit(1)
         Spacer()
       }.padding(5)
     }
@@ -83,6 +104,26 @@ struct SubjectSmallView: View {
 struct SubjectCardView: View {
   let subject: SlimSubjectDTO
 
+  var ratingLine: Text {
+    guard let rating = subject.rating else {
+      return Text("")
+    }
+    var text: [Text] = []
+    if rating.rank > 0, rating.rank < 1000 {
+      text.append(Text("#\(rating.rank) "))
+    }
+    if rating.score > 0 {
+      let img = Image(systemName: "star.fill")
+      text.append(Text("\(img)").foregroundStyle(.orange).baselineOffset(1))
+      let score = String(format: "%.1f", rating.score)
+      text.append(Text(" \(score)"))
+    }
+    if rating.total > 10 {
+      text.append(Text(" (\(rating.total)人评分)"))
+    }
+    return text.reduce(Text(""), +)
+  }
+
   var body: some View {
     VStack(alignment: .leading, spacing: 5) {
       HStack(alignment: .top) {
@@ -91,7 +132,7 @@ struct SubjectCardView: View {
             NSFWBadgeView()
           }
         }
-        .imageStyle(width: 72, height: 96)
+        .imageStyle(width: 80, height: 108)
         .imageType(.subject)
         VStack(alignment: .leading) {
           Text(subject.name)
@@ -108,6 +149,10 @@ struct SubjectCardView: View {
             .foregroundStyle(.secondary)
             .lineLimit(2)
           Spacer()
+          ratingLine
+            .font(.footnote)
+            .foregroundStyle(.secondary)
+            .lineLimit(1)
         }
         Spacer()
       }

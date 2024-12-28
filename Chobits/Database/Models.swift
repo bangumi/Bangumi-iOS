@@ -86,6 +86,7 @@ final class SubjectV1: Searchable {
       id: subjectId,
       images: images,
       info: info,
+      rating: rating,
       locked: locked,
       name: name,
       nameCN: nameCN,
@@ -131,7 +132,7 @@ final class SubjectV1: Searchable {
     self.nameCN = item.nameCN
     self.nsfw = item.nsfw
     self.platform = SubjectPlatform(name: "")
-    self.rating = SubjectRating()
+    self.rating = item.rating ?? SubjectRating()
     self.series = false
     self.summary = ""
     self.type = item.type.rawValue
@@ -163,7 +164,7 @@ final class SubjectV1: Searchable {
     if self.airtime != item.airtime { self.airtime = item.airtime }
     if self.collection != item.collection { self.collection = item.collection }
     if self.eps != item.eps { self.eps = item.eps }
-    if self.images != item.images { self.images = item.images }
+    if let images = item.images, self.images != images { self.images = images }
     if self.infobox != item.infobox.clean() { self.infobox = item.infobox.clean() }
     if self.info != item.info { self.info = item.info }
     if self.locked != item.locked { self.locked = item.locked }
@@ -181,8 +182,9 @@ final class SubjectV1: Searchable {
   }
 
   func update(_ item: SlimSubjectDTO) {
-    if self.images != item.images { self.images = item.images }
+    if let images = item.images, self.images != images { self.images = images }
     if self.info != item.info { self.info = item.info }
+    if let rating = item.rating, self.rating != rating { self.rating = rating }
     if self.locked != item.locked { self.locked = item.locked }
     if self.name != item.name { self.name = item.name }
     if self.nameCN != item.nameCN { self.nameCN = item.nameCN }
@@ -193,15 +195,13 @@ final class SubjectV1: Searchable {
   func update(_ item: SubjectDTOV0) {
     if self.collection != item.collection { self.collection = item.collection }
     if self.eps != item.eps { self.eps = item.eps }
-    if self.images != item.images { self.images = item.images }
+    if let images = item.images, self.images != images { self.images = images }
     if self.locked != item.locked { self.locked = item.locked }
     if self.metaTags != item.metaTags { self.metaTags = item.metaTags }
     if self.tags != item.tags { self.tags = item.tags }
     if self.name != item.name { self.name = item.name }
     if self.nameCN != item.nameCn { self.nameCN = item.nameCn }
     if self.nsfw != item.nsfw { self.nsfw = item.nsfw }
-    let newRating = SubjectRating(item.rating)
-    if self.rating != newRating { self.rating = newRating }
     if self.series != item.series { self.series = item.series }
     if self.summary != item.summary { self.summary = item.summary }
     if self.type != item.type.rawValue { self.type = item.type.rawValue }
@@ -605,8 +605,7 @@ final class EpisodeV1 {
     if self.duration != item.duration { self.duration = item.duration }
     if self.airdate != item.airdate { self.airdate = item.airdate }
     if self.comment != item.comment { self.comment = item.comment }
-    let desc = item.desc ?? ""
-    if self.desc != desc { self.desc = desc }
+    if let desc = item.desc, self.desc != desc { self.desc = desc }
     if self.disc != item.disc { self.disc = item.disc }
   }
 }
