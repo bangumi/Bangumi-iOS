@@ -90,7 +90,9 @@ struct SubjectCollectionBoxView: View {
           .buttonStyle(.borderedProminent)
           .frame(width: 40)
           .sensoryFeedback(.selection, trigger: priv)
-        }.padding(.vertical, 5)
+        }
+        .disabled(collectionType == .none)
+        .padding(.vertical, 5)
         if collection.updatedAt.timeIntervalSince1970 > 0 {
           Text("上次更新：\(collection.updatedAt.formatted(date: .complete, time: .complete))")
             .font(.caption)
