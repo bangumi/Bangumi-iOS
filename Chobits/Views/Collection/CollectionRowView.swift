@@ -20,7 +20,7 @@ struct CollectionRowView: View {
 
   var body: some View {
     HStack(alignment: .top) {
-      ImageView(img: subject?.images?.common)
+      ImageView(img: subject?.images?.resize(.r200))
         .imageStyle(width: 60, height: 60)
         .imageType(.subject)
         .imageLink(subject?.link)

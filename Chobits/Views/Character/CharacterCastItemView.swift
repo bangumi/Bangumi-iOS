@@ -5,7 +5,7 @@ struct CharacterCastItemView: View {
 
   var body: some View {
     HStack(alignment: .top) {
-      ImageView(img: item.subject.images?.common) {
+      ImageView(img: item.subject.images?.resize(.r200)) {
       } caption: {
         Text(item.type.description)
       }

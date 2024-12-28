@@ -43,7 +43,7 @@ struct SubjectOffprintsView: View {
       LazyHStack(alignment: .top) {
         ForEach(offprints) { offprint in
           if let ctype = collections[offprint.subject.id] {
-            ImageView(img: offprint.subject.images?.common) {
+            ImageView(img: offprint.subject.images?.resize(.r200)) {
             } caption: {
               HStack {
                 Image(systemName: ctype.icon)
@@ -57,7 +57,7 @@ struct SubjectOffprintsView: View {
             .padding(2)
             .shadow(radius: 2)
           } else {
-            ImageView(img: offprint.subject.images?.common)
+            ImageView(img: offprint.subject.images?.resize(.r200))
               .imageStyle(width: 60, height: 80)
               .imageType(.subject)
               .imageLink(offprint.subject.link)

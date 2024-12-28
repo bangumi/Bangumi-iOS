@@ -53,7 +53,7 @@ struct SubjectRecsView: View {
         ForEach(recs) { rec in
           VStack {
             if let ctype = collections[rec.subject.id] {
-              ImageView(img: rec.subject.images?.common) {
+              ImageView(img: rec.subject.images?.resize(.r200)) {
                 if rec.subject.nsfw {
                   NSFWBadgeView()
                 }
@@ -70,7 +70,7 @@ struct SubjectRecsView: View {
               .padding(2)
               .shadow(radius: 2)
             } else {
-              ImageView(img: rec.subject.images?.common) {
+              ImageView(img: rec.subject.images?.resize(.r200)) {
                 if rec.subject.nsfw {
                   NSFWBadgeView()
                 }

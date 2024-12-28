@@ -96,7 +96,7 @@ struct CollectionSubjectTypeView: View {
       if collections.count > 0 {
         LazyVGrid(columns: columns) {
           ForEach(collections) { collection in
-            ImageView(img: subjects[collection.subjectId]?.images?.common)
+            ImageView(img: subjects[collection.subjectId]?.images?.resize(.r200))
               .imageStyle(width: 80, height: 80)
               .imageType(.subject)
               .imageLink(collection.subject?.link)

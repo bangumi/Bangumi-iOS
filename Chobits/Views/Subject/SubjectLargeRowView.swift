@@ -25,7 +25,7 @@ struct SubjectLargeRowView: View {
 
   var body: some View {
     HStack {
-      ImageView(img: subject?.images?.common) {
+      ImageView(img: subject?.images?.resize(.r200)) {
         if subject?.nsfw ?? false {
           NSFWBadgeView()
         }

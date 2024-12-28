@@ -68,7 +68,7 @@ struct SubjectRelationsView: View {
             .lineLimit(1)
             .font(.caption)
             if let ctype = collections[relation.subject.id] {
-              ImageView(img: relation.subject.images?.common) {
+              ImageView(img: relation.subject.images?.resize(.r200)) {
                 if relation.subject.nsfw {
                   NSFWBadgeView()
                 }
@@ -85,7 +85,7 @@ struct SubjectRelationsView: View {
               .padding(2)
               .shadow(radius: 2)
             } else {
-              ImageView(img: relation.subject.images?.common) {
+              ImageView(img: relation.subject.images?.resize(.r200)) {
                 if relation.subject.nsfw {
                   NSFWBadgeView()
                 }

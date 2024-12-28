@@ -102,7 +102,7 @@ struct ProgressListItemView: View {
   var body: some View {
     VStack(alignment: .leading, spacing: 4) {
       HStack {
-        ImageView(img: collection.subject?.images?.common) {
+        ImageView(img: collection.subject?.images?.resize(.r200)) {
           if collection.priv {
             Image(systemName: "lock")
               .padding(2)

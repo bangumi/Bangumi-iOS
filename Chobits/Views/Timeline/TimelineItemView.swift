@@ -25,7 +25,7 @@ struct TimelineItemView: View {
             ScrollView(.horizontal, showsIndicators: false) {
               HStack {
                 ForEach(subjects.prefix(5)) { subject in
-                  ImageView(img: subject.images?.common) {
+                  ImageView(img: subject.images?.resize(.r200)) {
                     if subject.nsfw {
                       NSFWBadgeView()
                     }

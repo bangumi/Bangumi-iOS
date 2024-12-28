@@ -64,7 +64,7 @@ struct SubjectSmallView: View {
       padding: 0, cornerRadius: 8
     ) {
       HStack {
-        ImageView(img: subject.images?.common) {
+        ImageView(img: subject.images?.resize(.r200)) {
           if subject.nsfw {
             NSFWBadgeView()
           }
@@ -127,7 +127,7 @@ struct SubjectCardView: View {
   var body: some View {
     VStack(alignment: .leading, spacing: 5) {
       HStack(alignment: .top) {
-        ImageView(img: subject.images?.common) {
+        ImageView(img: subject.images?.resize(.r200)) {
           if subject.nsfw {
             NSFWBadgeView()
           }

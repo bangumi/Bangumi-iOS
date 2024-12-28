@@ -33,7 +33,7 @@ struct SubjectRelationListView: View {
       PageView<SubjectRelationDTO, _>(reloader: reloader, nextPageFunc: load) { item in
         CardView {
           HStack {
-            ImageView(img: item.subject.images?.common)
+            ImageView(img: item.subject.images?.resize(.r200))
               .imageStyle(width: 60, height: 60)
               .imageType(.subject)
               .imageLink(item.subject.link)
