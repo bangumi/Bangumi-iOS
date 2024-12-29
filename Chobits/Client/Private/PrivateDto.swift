@@ -587,9 +587,18 @@ enum TimelineSource: Int, Codable {
   }
 }
 
-enum TimelineMode: String, Codable {
+enum TimelineMode: String, Codable, CaseIterable {
   case all
   case friends
+
+  var desc: String {
+    switch self {
+    case .all:
+      return "全站"
+    case .friends:
+      return "好友"
+    }
+  }
 }
 
 struct Friend: Codable, Identifiable, Hashable {

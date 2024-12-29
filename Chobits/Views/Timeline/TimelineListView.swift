@@ -9,6 +9,8 @@ struct TimelineListView: View {
 
   @State private var showInput = false
 
+  @State private var mode: TimelineMode = .friends
+
   @State private var exhausted: Bool = false
   @State private var loading: Bool = false
   @State private var lastID: Int?
@@ -17,7 +19,7 @@ struct TimelineListView: View {
 
   func reload() async {
     do {
-      let data = try await Chii.shared.getTimeline(limit: 20, until: nil)
+      let data = try await Chii.shared.getTimeline(mode: mode, limit: 20, until: nil)
       if data.count == 0 {
         Notifier.shared.notify(message: "没有新动态")
         return
@@ -46,7 +48,7 @@ struct TimelineListView: View {
     }
     loading = true
     do {
-      let data = try await Chii.shared.getTimeline(limit: 20, until: lastID)
+      let data = try await Chii.shared.getTimeline(mode: mode, limit: 20, until: lastID)
       if data.count == 0 {
         exhausted = true
       }
@@ -67,6 +69,16 @@ struct TimelineListView: View {
             Text("Hi! \(profile.nickname.withLink(profile.link))")
               .font(.title3)
             Spacer()
+            Picker("", selection: $mode) {
+              ForEach(TimelineMode.allCases, id: \.self) { mode in
+                Text(mode.desc).tag(mode)
+              }
+            }
+            .onChange(of: mode) {
+              Task {
+                await reload()
+              }
+            }
             Button {
               showInput = true
             } label: {
@@ -82,12 +94,12 @@ struct TimelineListView: View {
         }
       }.padding(8)
       LazyVStack(alignment: .leading, spacing: 16) {
-        ForEach(items.indices, id: \.self) { idx in
+        ForEach(Array(zip(items.indices, items)), id: \.1) { idx, item in
           TimelineItemView(
-            item: items[idx], previous: idx == items.startIndex ? nil : items[idx - 1]
+            item: item, previous: idx == items.startIndex ? nil : items[idx - 1]
           ).onAppear {
             Task {
-              await loadNextPage(items[idx])
+              await loadNextPage(item)
             }
           }
         }
