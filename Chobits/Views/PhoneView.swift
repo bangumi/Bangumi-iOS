@@ -15,7 +15,8 @@ struct PhoneView: View {
   @State private var searching: Bool = false
 
   init() {
-    let defaultTab = UserDefaults.standard.string(forKey: "defaultTab") ?? "discover"
+    let defaultTab =
+      UserDefaults.standard.string(forKey: "defaultTab") ?? ChiiViewTab.timeline.label
     self.selectedTab = ChiiViewTab(defaultTab)
   }
 

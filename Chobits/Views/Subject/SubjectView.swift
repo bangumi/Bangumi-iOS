@@ -109,7 +109,7 @@ struct SubjectView: View {
 }
 
 struct SubjectDetailView: View {
-  @AppStorage("shareDomain") var shareDomain: String = ShareDomain.chii.label
+  @AppStorage("shareDomain") var shareDomain: ShareDomain = .chii
   @AppStorage("isolationMode") var isolationMode: Bool = false
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
 

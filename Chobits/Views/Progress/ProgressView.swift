@@ -6,7 +6,7 @@ struct ChiiProgressView: View {
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
   @AppStorage("profile") var profile: Profile = Profile()
   @AppStorage("collectionsUpdatedAt") var collectionsUpdatedAt: Int = 0
-  @AppStorage("progressMode") var progressMode: String = ProgressMode.tile.label
+  @AppStorage("progressMode") var progressMode: ProgressMode = .tile
 
   @Environment(\.modelContext) var modelContext
 
@@ -146,7 +146,7 @@ struct ChiiProgressView: View {
             }
           }
           if collectionsUpdatedAt > 0 {
-            switch ProgressMode(progressMode) {
+            switch progressMode {
             case .list:
               ProgressListView(subjectType: subjectType, search: search)
             case .tile:

@@ -3,7 +3,7 @@ import SwiftUI
 struct UserView: View {
   let username: String
 
-  @AppStorage("shareDomain") var shareDomain: String = ShareDomain.chii.label
+  @AppStorage("shareDomain") var shareDomain: ShareDomain = .chii
 
   @State private var user: SlimUserDTO?
 

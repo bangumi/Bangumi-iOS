@@ -4,7 +4,7 @@ import SwiftUI
 struct EpisodeView: View {
   let episodeId: Int
 
-  @AppStorage("shareDomain") var shareDomain: String = ShareDomain.chii.label
+  @AppStorage("shareDomain") var shareDomain: ShareDomain = .chii
   @AppStorage("isolationMode") var isolationMode: Bool = false
 
   @Query private var episodes: [Episode]

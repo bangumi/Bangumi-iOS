@@ -1,12 +1,12 @@
 import Foundation
 import SwiftUI
 
-enum AppearanceType: Codable, CaseIterable, Identifiable {
+enum AppearanceType: Codable, CaseIterable {
   case system
   case dark
   case light
 
-  init(_ label: String) {
+  init(_ label: String? = nil) {
     switch label {
     case "system":
       self = .system
@@ -17,10 +17,6 @@ enum AppearanceType: Codable, CaseIterable, Identifiable {
     default:
       self = .system
     }
-  }
-
-  var id: Self {
-    return self
   }
 
   var label: String {
@@ -57,12 +53,28 @@ enum AppearanceType: Codable, CaseIterable, Identifiable {
   }
 }
 
-enum ShareDomain: Codable, CaseIterable, Identifiable {
+extension AppearanceType: RawRepresentable {
+  typealias RawValue = String
+
+  public init?(rawValue: RawValue) {
+    if rawValue.isEmpty {
+      self.init()
+      return
+    }
+    self = Self(rawValue)
+  }
+
+  public var rawValue: RawValue {
+    label
+  }
+}
+
+enum ShareDomain: Codable, CaseIterable {
   case chii
   case bgm
   case bangumi
 
-  init(_ label: String) {
+  init(_ label: String? = nil) {
     switch label {
     case "chii.in":
       self = .chii
@@ -73,10 +85,6 @@ enum ShareDomain: Codable, CaseIterable, Identifiable {
     default:
       self = .chii
     }
-  }
-
-  var id: Self {
-    return self
   }
 
   var label: String {
@@ -91,23 +99,35 @@ enum ShareDomain: Codable, CaseIterable, Identifiable {
   }
 }
 
-enum AuthDomain: Codable, CaseIterable, Identifiable {
+extension ShareDomain: RawRepresentable {
+  typealias RawValue = String
+
+  public init?(rawValue: RawValue) {
+    if rawValue.isEmpty {
+      self.init()
+      return
+    }
+    self = Self(rawValue)
+  }
+
+  public var rawValue: RawValue {
+    label
+  }
+}
+
+enum AuthDomain: Codable, CaseIterable {
   case origin
   case next
 
-  init(_ label: String) {
+  init(_ label: String? = nil) {
     switch label {
     case "bgm.tv":
       self = .origin
     case "next.bgm.tv":
       self = .next
     default:
-      self = .origin
+      self = .next
     }
-  }
-
-  var id: Self {
-    return self
   }
 
   var label: String {
@@ -120,23 +140,35 @@ enum AuthDomain: Codable, CaseIterable, Identifiable {
   }
 }
 
-enum ProgressMode: Codable, CaseIterable, Identifiable {
+extension AuthDomain: RawRepresentable {
+  typealias RawValue = String
+
+  public init?(rawValue: RawValue) {
+    if rawValue.isEmpty {
+      self.init()
+      return
+    }
+    self = Self(rawValue)
+  }
+
+  public var rawValue: RawValue {
+    label
+  }
+}
+
+enum ProgressMode: Codable, CaseIterable {
   case list
   case tile
 
-  init(_ label: String) {
+  init(_ label: String? = nil) {
     switch label {
     case "list":
       self = .list
     case "tile":
       self = .tile
     default:
-      self = .list
+      self = .tile
     }
-  }
-
-  var id: Self {
-    return self
   }
 
   var label: String {
@@ -158,7 +190,23 @@ enum ProgressMode: Codable, CaseIterable, Identifiable {
   }
 }
 
-enum ChiiViewTab: Hashable, Identifiable {
+extension ProgressMode: RawRepresentable {
+  typealias RawValue = String
+
+  public init?(rawValue: RawValue) {
+    if rawValue.isEmpty {
+      self.init()
+      return
+    }
+    self = Self(rawValue)
+  }
+
+  public var rawValue: RawValue {
+    label
+  }
+}
+
+enum ChiiViewTab: Hashable {
   case timeline
   case discover
 
@@ -168,7 +216,7 @@ enum ChiiViewTab: Hashable, Identifiable {
 
   case settings
 
-  init(_ label: String) {
+  init(_ label: String? = nil) {
     switch label {
     case "timeline":
       self = .timeline
@@ -185,10 +233,6 @@ enum ChiiViewTab: Hashable, Identifiable {
     default:
       self = .timeline
     }
-  }
-
-  var id: Self {
-    return self
   }
 
   var title: String {
@@ -244,5 +288,21 @@ enum ChiiViewTab: Hashable, Identifiable {
 
   static var defaultTabs: [Self] {
     return [.timeline, .progress, .discover]
+  }
+}
+
+extension ChiiViewTab: RawRepresentable {
+  typealias RawValue = String
+
+  public init?(rawValue: RawValue) {
+    if rawValue.isEmpty {
+      self.init()
+      return
+    }
+    self = Self(rawValue)
+  }
+
+  public var rawValue: RawValue {
+    label
   }
 }

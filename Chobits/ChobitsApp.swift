@@ -5,7 +5,7 @@ import SwiftUI
 struct ChobitsApp: App {
   @State var sharedModelContainer: ModelContainer
 
-  @AppStorage("appearance") var appearance: String = "system"
+  @AppStorage("appearance") var appearance: AppearanceType = .system
 
   init() {
     let schema = Schema([
@@ -30,7 +30,7 @@ struct ChobitsApp: App {
 
   var body: some Scene {
     WindowGroup {
-      ContentView().preferredColorScheme(AppearanceType(appearance).colorScheme)
+      ContentView().preferredColorScheme(appearance.colorScheme)
     }.modelContainer(sharedModelContainer)
   }
 }

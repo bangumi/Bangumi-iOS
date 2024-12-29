@@ -6,7 +6,7 @@ import SwiftUI
 struct PersonView: View {
   var personId: Int
 
-  @AppStorage("shareDomain") var shareDomain: String = ShareDomain.chii.label
+  @AppStorage("shareDomain") var shareDomain: ShareDomain = .chii
   @AppStorage("isolationMode") var isolationMode: Bool = false
 
   @State private var refreshed: Bool = false
