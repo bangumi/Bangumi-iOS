@@ -69,14 +69,20 @@ struct TimelineListView: View {
             Text("Hi! \(profile.nickname.withLink(profile.link))")
               .font(.title3)
             Spacer()
+            if loading, items.count > 0 {
+              ProgressView()
+            }
             Picker("", selection: $mode) {
               ForEach(TimelineMode.allCases, id: \.self) { mode in
                 Text(mode.desc).tag(mode)
               }
             }
+            .disabled(loading)
             .onChange(of: mode) {
               Task {
+                loading = true
                 await reload()
+                loading = false
               }
             }
             Button {

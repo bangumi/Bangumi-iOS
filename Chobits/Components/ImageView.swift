@@ -92,7 +92,7 @@ struct ImageView<ImageBadge: View, ImageCaption: View>: View {
 
   var body: some View {
     ZStack {
-      Section {
+      ZStack {
         if let imageURL = imageURL {
           if style.width > 0, style.height > 0 {
             KFImage(imageURL)
