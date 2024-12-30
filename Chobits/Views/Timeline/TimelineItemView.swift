@@ -68,7 +68,7 @@ struct TimelineItemView: View {
         case .status:
           switch item.type {
           case 0:
-            Text("更新了签名: \(item.memo.status?.sign ?? "")")
+            Text("**更新了签名:** \(item.memo.status?.sign ?? "")")
           case 1:
             Text(item.memo.status?.tsukkomi ?? "")
           case 2:
@@ -84,7 +84,7 @@ struct TimelineItemView: View {
         Menu {
           Text("\(item.createdAt.datetimeDisplay)")
         } label: {
-          Text("\(item.createdAt.durationDisplay) · \(item.source.desc)")
+          Text("\(item.createdAt.relativeDateDisplay) · \(item.source.desc)")
             .font(.caption)
             .foregroundStyle(.secondary)
         }.buttonStyle(.plain)

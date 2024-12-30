@@ -85,7 +85,7 @@ struct SubjectCommentListView: View {
                   StarsView(score: Float(comment.rate), size: 10)
                 }
                 Text(
-                  "\(comment.type.description(subject?.typeEnum)) @ \(comment.updatedAt.durationDisplay)"
+                  "\(comment.type.description(subject?.typeEnum)) @ \(comment.updatedAt.relativeDateDisplay)"
                 )
                 .lineLimit(1)
                 .font(.caption)

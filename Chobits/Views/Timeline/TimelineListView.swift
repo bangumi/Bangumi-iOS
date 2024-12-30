@@ -68,6 +68,7 @@ struct TimelineListView: View {
           HStack {
             Text("Hi! \(profile.nickname.withLink(profile.link))")
               .font(.title3)
+              .lineLimit(1)
             Spacer()
             if loading, items.count > 0 {
               ProgressView()

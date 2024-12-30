@@ -67,11 +67,10 @@ extension Date {
   var formatRelative: String {
     let timeInterval = -self.timeIntervalSinceNow
     if timeInterval < 60 {
-      return "\(Int(timeInterval))秒前"
+      return "刚刚"
     } else if timeInterval < 3600 {
       let minutes = Int(timeInterval) / 60
-      let seconds = Int(timeInterval) % 60
-      return "\(minutes)分钟\(seconds)秒前"
+      return "\(minutes)分钟前"
     } else if timeInterval < 86400 {  // Within 24 hours
       let hours = Int(timeInterval) / 3600
       let minutes = Int(timeInterval) % 3600 / 60
@@ -97,7 +96,7 @@ extension Int {
     return date.formatted(date: .numeric, time: .shortened)
   }
 
-  var durationDisplay: String {
+  var relativeDateDisplay: String {
     let t = Date(timeIntervalSince1970: TimeInterval(self))
     return t.formatRelative
   }
