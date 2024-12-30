@@ -20,6 +20,39 @@ struct TimelineItemView: View {
       }
       VStack(alignment: .leading) {
         switch item.cat {
+        case .daily:
+          Text(item.desc)
+          switch item.type {
+          case 2:
+            if let users = item.memo.daily?.users, users.count > 0 {
+              ScrollView(.horizontal, showsIndicators: false) {
+                HStack {
+                  ForEach(users.prefix(5)) { user in
+                    ImageView(img: user.avatar?.large)
+                      .imageStyle(width: 60, height: 60)
+                      .imageType(.avatar)
+                      .imageLink(user.link)
+                  }
+                }.frame(height: 60)
+              }
+            }
+          case 3, 4:
+            if let groups = item.memo.daily?.groups, groups.count > 0 {
+              ScrollView(.horizontal, showsIndicators: false) {
+                HStack {
+                  ForEach(groups.prefix(5)) { group in
+                    ImageView(img: group.icon?.large)
+                      .imageStyle(width: 60, height: 60)
+                      .imageType(.avatar)
+                      .imageLink(group.link)
+                  }
+                }.frame(height: 60)
+              }
+            }
+          default:
+            EmptyView()
+          }
+
         case .subject:
           Text(item.desc)
           if item.batch {
@@ -85,6 +118,28 @@ struct TimelineItemView: View {
           default:
             EmptyView()
           }
+
+        case .mono:
+          Text(item.desc)
+          if let mono = item.memo.mono, mono.characters.count + mono.persons.count > 0 {
+            ScrollView(.horizontal, showsIndicators: false) {
+              HStack {
+                ForEach(mono.characters.prefix(5)) { character in
+                  ImageView(img: character.images?.grid)
+                    .imageStyle(width: 40, height: 40)
+                    .imageType(.avatar)
+                    .imageLink(character.link)
+                }
+                ForEach(mono.persons.prefix(5)) { person in
+                  ImageView(img: person.images?.grid)
+                    .imageStyle(width: 40, height: 40)
+                    .imageType(.avatar)
+                    .imageLink(person.link)
+                }
+              }.frame(height: 40)
+            }
+          }
+
         default:
           Text(item.desc)
         }

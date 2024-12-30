@@ -495,7 +495,7 @@ struct SlimGroupDTO: Codable, Identifiable, Hashable, Linkable {
   var name: String
   var nsfw: Bool
   var title: String
-  var icon: Avatar
+  var icon: Avatar?
 
   var link: String {
     "chii://group/\(id)"
