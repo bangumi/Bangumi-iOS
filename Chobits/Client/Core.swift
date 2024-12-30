@@ -153,11 +153,12 @@ extension Chii {
     } else if response.statusCode < 500 {
       let error = String(data: data, encoding: .utf8) ?? ""
       Logger.api.warning("response \(response.statusCode): \(url.absoluteString): \(error)")
-      throw ChiiError(code: response.statusCode, response: error)
+      throw ChiiError(code: response.statusCode, response: error, headers: response.allHeaderFields)
     } else {
       let error = String(data: data, encoding: .utf8) ?? ""
       Logger.api.error("response: \(response.statusCode): \(url.absoluteString): \(error)")
-      throw ChiiError(code: response.statusCode, response: error)
+
+      throw ChiiError(code: response.statusCode, response: error, headers: response.allHeaderFields)
     }
   }
 

@@ -64,6 +64,10 @@ struct ContentView: View {
       Button("OK") {
         Notifier.shared.vanishError()
       }
+      Button("Copy") {
+        UIPasteboard.general.string = notifier.currentError?.description
+        Notifier.shared.notify(message: "已复制")
+      }
     } message: {
       if let error = notifier.currentError {
         Text("\(error)")

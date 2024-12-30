@@ -48,7 +48,7 @@ enum ChiiError: Error, CustomStringConvertible {
     self = .ignore(ignore)
   }
 
-  init(code: Int, response: String) {
+  init(code: Int, response: String, headers: [AnyHashable: Any]) {
     switch code {
     case 400:
       self = .badRequest(response)
@@ -57,7 +57,12 @@ enum ChiiError: Error, CustomStringConvertible {
     case 404:
       self = .notFound(response)
     default:
-      self = .generic(response.description)
+      var text = "code: \(code)\n"
+      text += "response: \(response)\n"
+      if let reqID = headers["x-request-id"] as? String {
+        text += "requestID: \(reqID)\n"
+      }
+      self = .generic(text)
     }
   }
 
