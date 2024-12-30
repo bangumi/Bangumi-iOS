@@ -28,11 +28,13 @@ extension View {
 struct ImageViewStyle {
   let width: CGFloat
   let height: CGFloat
+  let cornerRadius: CGFloat
   let alignment: Alignment
 }
 
 struct ImageViewStyleKey: EnvironmentKey {
-  static let defaultValue = ImageViewStyle(width: 0, height: 0, alignment: .center)
+  static let defaultValue = ImageViewStyle(
+    width: 0, height: 0, cornerRadius: 5, alignment: .top)
 }
 
 extension EnvironmentValues {
@@ -43,10 +45,14 @@ extension EnvironmentValues {
 }
 
 extension View {
-  public func imageStyle(width: CGFloat = 0, height: CGFloat = 0, alignment: Alignment = .center)
+  public func imageStyle(
+    width: CGFloat = 0, height: CGFloat = 0, cornerRadius: CGFloat = 5,
+    alignment: Alignment = .top
+  )
     -> some View
   {
-    let style = ImageViewStyle(width: width, height: height, alignment: alignment)
+    let style = ImageViewStyle(
+      width: width, height: height, cornerRadius: cornerRadius, alignment: alignment)
     return self.environment(\.imageStyle, style)
   }
 }
@@ -70,8 +76,8 @@ struct ImageView<ImageBadge: View, ImageCaption: View>: View {
   @Environment(\.imageStyle) var style
   @Environment(\.imageType) var type
 
-  @State private var width: CGFloat = 0
-  @State private var height: CGFloat = 0
+  @State private var originalWidth: Int = 0
+  @State private var originalHeight: Int = 0
 
   init(
     img: String?, large: String? = nil,
@@ -90,17 +96,75 @@ struct ImageView<ImageBadge: View, ImageCaption: View>: View {
     return URL(string: icon)
   }
 
+  var imageWidth: CGFloat {
+    frameWidth
+  }
+
+  var imageHeight: CGFloat {
+    if originalHeight == 0 {
+      if style.height == 0 {
+        return .infinity
+      } else {
+        return style.height
+      }
+    } else {
+      let ratio = CGFloat(originalWidth) / CGFloat(originalHeight)
+      return min((style.width / ratio), style.height)
+    }
+  }
+
+  var frameWidth: CGFloat {
+    if originalWidth == 0 {
+      if style.width == 0 {
+        return .infinity
+      } else {
+        return style.width
+      }
+    } else {
+      if style.width == 0 {
+        return .infinity
+      } else {
+        return min(style.width, CGFloat(originalWidth))
+      }
+    }
+  }
+
+  var frameHeight: CGFloat {
+    if originalHeight == 0 {
+      if style.height == 0 {
+        return .infinity
+      } else {
+        return style.height
+      }
+    } else {
+      if style.height == 0 {
+        return imageHeight
+      } else {
+        return style.height
+      }
+    }
+  }
+
   var body: some View {
     ZStack {
       ZStack {
+        Rectangle()
+          .foregroundStyle(.secondary.opacity(0.02))
+          .frame(width: frameWidth, height: frameHeight)
         if let imageURL = imageURL {
           if style.width > 0, style.height > 0 {
             KFImage(imageURL)
+              .onSuccess { result in
+                if let img = result.image.cgImage {
+                  self.originalWidth = img.width
+                  self.originalHeight = img.height
+                }
+              }
               .fade(duration: 0.25)
               .resizable()
               .scaledToFill()
-              .alignmentGuide(.top, computeValue: { _ in 0 })
-              .frame(width: style.width, height: style.height, alignment: style.alignment)
+              .frame(width: imageWidth, height: imageHeight, alignment: style.alignment)
+              .clipShape(RoundedRectangle(cornerRadius: style.cornerRadius))
           } else {
             KFImage(imageURL)
               .fade(duration: 0.25)
@@ -109,7 +173,7 @@ struct ImageView<ImageBadge: View, ImageCaption: View>: View {
           }
         } else {
           if style.width > 0, style.height > 0 {
-            Section {
+            ZStack {
               if style.width == style.height {
                 switch type {
                 case .subject:
@@ -125,24 +189,22 @@ struct ImageView<ImageBadge: View, ImageCaption: View>: View {
                     .resizable()
                     .scaledToFit()
                 default:
-                  Image(systemName: "photo")
+                  Rectangle()
+                    .foregroundStyle(.secondary.opacity(0.2))
                 }
               } else {
                 Rectangle()
                   .foregroundStyle(.secondary.opacity(0.2))
               }
-            }.frame(width: style.width, height: style.height, alignment: style.alignment)
+            }
           } else {
-            Image(systemName: "photo")
+            Rectangle()
+              .foregroundStyle(.secondary.opacity(0.2))
           }
         }
       }
-      .onGeometryChange(for: CGSize.self) { proxy in
-        proxy.size
-      } action: { newSize in
-        self.width = newSize.width
-        self.height = newSize.height
-      }
+      .frame(width: frameWidth, height: frameHeight, alignment: .top)
+      .clipShape(RoundedRectangle(cornerRadius: style.cornerRadius))
       if ImageCaption.self != EmptyView.self {
         ZStack {
           Rectangle()
@@ -165,14 +227,15 @@ struct ImageView<ImageBadge: View, ImageCaption: View>: View {
           .font(.caption)
           .foregroundStyle(.white)
           .padding(.bottom, 2)
-        }.frame(width: width, height: height, alignment: .bottom)
+        }.frame(width: frameWidth, height: frameHeight, alignment: .bottom)
       }
       if ImageBadge.self != EmptyView.self {
         ZStack {
           badge
-        }.frame(width: width, height: height, alignment: .topLeading)
+        }.frame(width: frameWidth, height: frameHeight, alignment: .topLeading)
       }
     }
+    .clipShape(RoundedRectangle(cornerRadius: style.cornerRadius))
     .contextMenu {
       if let large = large, let imageURL = URL(string: large) {
         Button {
@@ -197,7 +260,6 @@ struct ImageView<ImageBadge: View, ImageCaption: View>: View {
           .scaledToFit()
       }
     }
-    .clipShape(RoundedRectangle(cornerRadius: 5))
   }
 }
 
@@ -234,6 +296,9 @@ extension ImageView {
       ImageView(img: "")
         .imageStyle(width: 40, height: 60)
         .imageType(.common)
+      ImageView(
+        img: "https://lain.bgm.tv/r/400/pic/cover/l/94/20/520019_xgqUl.jpg"
+      ).imageStyle(width: 60, height: 60, alignment: .top)
       ImageView(
         img: "https://lain.bgm.tv/pic/cover/m/5e/39/140534_cUj6H.jpg"
       ).imageStyle(width: 60, height: 60, alignment: .top)
