@@ -1,3 +1,4 @@
+import BBCode
 import SwiftUI
 
 struct UserView: View {
@@ -5,11 +6,7 @@ struct UserView: View {
 
   @AppStorage("shareDomain") var shareDomain: ShareDomain = .chii
 
-  @State private var user: SlimUserDTO?
-
-  var shareLink: URL {
-    URL(string: "https://\(shareDomain)/user/\(username)")!
-  }
+  @State private var user: UserDTO?
 
   func load() async {
     do {
@@ -46,7 +43,17 @@ struct UserView: View {
             }
             .padding(.leading, 2)
           }
-          Divider()
+          if user.bio.isEmpty {
+            Divider()
+          } else {
+            CardView {
+              HStack {
+                BBCodeView(user.bio)
+                Spacer()
+              }
+            }
+          }
+
           Text("时光机 🚧")
         }.padding(.horizontal, 8)
       }
@@ -55,7 +62,7 @@ struct UserView: View {
       .toolbar {
         ToolbarItem(placement: .topBarTrailing) {
           Menu {
-            ShareLink(item: shareLink) {
+            ShareLink(item: user.link) {
               Label("分享", systemImage: "square.and.arrow.up")
             }
           } label: {

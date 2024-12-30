@@ -31,6 +31,19 @@ extension Chii {
     let resp: PagedDTO<NoticeDTO> = try self.decodeResponse(data)
     return resp
   }
+}
+
+// MARK: - User
+extension Chii {
+  func getUser(_ username: String) async throws -> UserDTO {
+    if self.mock {
+      return loadFixture(fixture: "user.json", target: UserDTO.self)
+    }
+    let url = BangumiAPI.priv.build("p1/users/\(username)")
+    let data = try await self.request(url: url, method: "GET")
+    let user: UserDTO = try self.decodeResponse(data)
+    return user
+  }
 
   func getUserFriends(username: String, limit: Int = 20, offset: Int = 0) async throws -> PagedDTO<
     Friend

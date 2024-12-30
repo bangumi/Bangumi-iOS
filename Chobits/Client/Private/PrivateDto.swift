@@ -102,6 +102,46 @@ extension Profile: RawRepresentable {
   }
 }
 
+struct UserDTO: Codable, Identifiable, Hashable, Linkable {
+  var id: Int
+  var username: String
+  var nickname: String
+  var avatar: Avatar?
+  var group: UserGroup
+  var joinedAt: Int
+  var sign: String
+  var site: String
+  var location: String
+  var bio: String
+  var networkServices: [UserNetworkServiceDTO]
+  var homepage: UserHomepageDTO
+
+  var name: String {
+    nickname.isEmpty ? "用户\(username)" : nickname
+  }
+
+  var link: String {
+    "chii://user/\(username)"
+  }
+
+  var slim: SlimUserDTO {
+    SlimUserDTO(self)
+  }
+}
+
+struct UserHomepageDTO: Codable, Hashable {
+  var left: [String]
+  var right: [String]
+}
+
+struct UserNetworkServiceDTO: Codable, Hashable {
+  var name: String
+  var title: String
+  var url: String
+  var color: String
+  var account: String
+}
+
 struct SlimUserDTO: Codable, Identifiable, Hashable, Linkable {
   var id: Int
   var username: String
@@ -117,6 +157,15 @@ struct SlimUserDTO: Codable, Identifiable, Hashable, Linkable {
     self.avatar = profile.avatar
     self.sign = profile.sign
     self.joinedAt = profile.joinedAt
+  }
+
+  init(_ user: UserDTO) {
+    self.id = user.id
+    self.username = user.username
+    self.nickname = user.nickname
+    self.avatar = user.avatar
+    self.sign = user.sign
+    self.joinedAt = user.joinedAt
   }
 
   var name: String {

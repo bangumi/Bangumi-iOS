@@ -11,6 +11,7 @@
 		1909F3AB2BEC406500E3B8F0 /* SubjectCharactersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1909F3AA2BEC406500E3B8F0 /* SubjectCharactersView.swift */; };
 		1909F3B42BECF9D100E3B8F0 /* CharacterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1909F3B32BECF9D100E3B8F0 /* CharacterView.swift */; };
 		1909F3B62BECFAC400E3B8F0 /* character.json in Resources */ = {isa = PBXBuildFile; fileRef = 1909F3B52BECFAC400E3B8F0 /* character.json */; };
+		190AE56A2D22EB1700274B4C /* user.json in Resources */ = {isa = PBXBuildFile; fileRef = 190AE5692D22EB1700274B4C /* user.json */; };
 		190C3A9C2D182381004ECCE6 /* user_timeline.json in Resources */ = {isa = PBXBuildFile; fileRef = 190C3A9B2D182381004ECCE6 /* user_timeline.json */; };
 		190C3A9D2D182381004ECCE6 /* timeline.json in Resources */ = {isa = PBXBuildFile; fileRef = 190C3A9A2D182381004ECCE6 /* timeline.json */; };
 		190C3B1D2D1AC1D4004ECCE6 /* Timeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 190C3B1C2D1AC1D2004ECCE6 /* Timeline.swift */; };
@@ -132,6 +133,7 @@
 		1909F3AA2BEC406500E3B8F0 /* SubjectCharactersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubjectCharactersView.swift; sourceTree = "<group>"; };
 		1909F3B32BECF9D100E3B8F0 /* CharacterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterView.swift; sourceTree = "<group>"; };
 		1909F3B52BECFAC400E3B8F0 /* character.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = character.json; sourceTree = "<group>"; };
+		190AE5692D22EB1700274B4C /* user.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = user.json; sourceTree = "<group>"; };
 		190C3A9A2D182381004ECCE6 /* timeline.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = timeline.json; sourceTree = "<group>"; };
 		190C3A9B2D182381004ECCE6 /* user_timeline.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = user_timeline.json; sourceTree = "<group>"; };
 		190C3B1C2D1AC1D2004ECCE6 /* Timeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Timeline.swift; sourceTree = "<group>"; };
@@ -333,41 +335,42 @@
 		19671C472BDEB55D000B4D99 /* Preview Content */ = {
 			isa = PBXGroup;
 			children = (
-				19671C442BDEB55D000B4D99 /* Preview Assets.xcassets */,
+				1909F3B52BECFAC400E3B8F0 /* character.json */,
 				194E773B2D0EFAF80070F5F8 /* character_casts.json */,
 				194E773C2D0EFAF80070F5F8 /* character_collects.json */,
+				1980EE012BE419D500E013EA /* episode_collections.json */,
+				19B9002F2BED16FE00405F0F /* person.json */,
 				194E773D2D0EFAF80070F5F8 /* person_casts.json */,
 				194E773E2D0EFAF80070F5F8 /* person_collects.json */,
 				194E773F2D0EFAF80070F5F8 /* person_works.json */,
+				19671C442BDEB55D000B4D99 /* Preview Assets.xcassets */,
+				19C2CE642BE2ACE60080A056 /* profile.json */,
+				19671C452BDEB55D000B4D99 /* subject_anime.json */,
+				190C3C9C2D202963004ECCE6 /* subject_anime_episode.json */,
+				19B2A8872D0B1034001617BE /* subject_anime_episodes.json */,
+				19C2CE602BE2538A0080A056 /* subject_book.json */,
 				194E77402D0EFAF80070F5F8 /* subject_characters.json */,
+				1998DD062CB1221E00115E1F /* subject_comments.json */,
+				1980EDFF2BE418C800E013EA /* subject_episodes.json */,
+				19B2A8852D0B0EC5001617BE /* subject_music.json */,
+				19B2A8882D0B1034001617BE /* subject_music_episodes.json */,
 				194E77412D0EFAF80070F5F8 /* subject_offprints.json */,
 				194E77422D0EFAF80070F5F8 /* subject_recs.json */,
 				194E77432D0EFAF80070F5F8 /* subject_relations.json */,
-				190C3C9C2D202963004ECCE6 /* subject_anime_episode.json */,
-				190C3C9D2D202963004ECCE6 /* user_followers.json */,
-				190C3C9E2D202963004ECCE6 /* user_friends.json */,
+				194E78412D10350C0070F5F8 /* subject_reviews.json */,
 				194E77442D0EFAF80070F5F8 /* subject_staffs.json */,
+				1998DCFE2CB10B7900115E1F /* subject_topics.json */,
+				190C3A9A2D182381004ECCE6 /* timeline.json */,
+				190AE5692D22EB1700274B4C /* user.json */,
 				194E77452D0EFAF80070F5F8 /* user_character_collection.json */,
 				194E77462D0EFAF80070F5F8 /* user_character_collections.json */,
+				190C3C9D2D202963004ECCE6 /* user_followers.json */,
+				190C3C9E2D202963004ECCE6 /* user_friends.json */,
 				194E77472D0EFAF80070F5F8 /* user_person_collection.json */,
 				194E77482D0EFAF80070F5F8 /* user_person_collections.json */,
-				19C2CE602BE2538A0080A056 /* subject_book.json */,
-				19671C452BDEB55D000B4D99 /* subject_anime.json */,
-				19B2A8872D0B1034001617BE /* subject_anime_episodes.json */,
-				19B2A8882D0B1034001617BE /* subject_music_episodes.json */,
-				19B2A8852D0B0EC5001617BE /* subject_music.json */,
-				194E78412D10350C0070F5F8 /* subject_reviews.json */,
 				19B87C242CFB313700CB5B63 /* user_subject_collection_anime.json */,
 				19B87C262CFB319F00CB5B63 /* user_subject_collection_book.json */,
-				1998DCFE2CB10B7900115E1F /* subject_topics.json */,
-				1998DD062CB1221E00115E1F /* subject_comments.json */,
-				1909F3B52BECFAC400E3B8F0 /* character.json */,
 				19ECCDA22CFC74C50092F715 /* user_subject_collections.json */,
-				19B9002F2BED16FE00405F0F /* person.json */,
-				19C2CE642BE2ACE60080A056 /* profile.json */,
-				1980EDFF2BE418C800E013EA /* subject_episodes.json */,
-				1980EE012BE419D500E013EA /* episode_collections.json */,
-				190C3A9A2D182381004ECCE6 /* timeline.json */,
 				190C3A9B2D182381004ECCE6 /* user_timeline.json */,
 			);
 			path = "Preview Content";
@@ -599,6 +602,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				190AE56A2D22EB1700274B4C /* user.json in Resources */,
 				1980EE002BE418C800E013EA /* subject_episodes.json in Resources */,
 				19B2A8862D0B0EC5001617BE /* subject_music.json in Resources */,
 				19ECCDA32CFC74C50092F715 /* user_subject_collections.json in Resources */,

@@ -3,10 +3,11 @@
 UID ?= 873244
 PREVIEW_PATH ?= Chobits/Preview Content
 
-update_preview_data:
+
+update_api:
 	curl -sSfLo openapi.yaml https://next.bgm.tv/p1/openapi.yaml
 
-	# subject
+update_subject:
 	curl -sSfLo "$(PREVIEW_PATH)/subject_anime.json" https://next.bgm.tv/p1/subjects/12
 	curl -sSfLo "$(PREVIEW_PATH)/subject_anime_episode.json" https://next.bgm.tv/p1/subjects/-/episodes/1027
 	curl -sSfLo "$(PREVIEW_PATH)/subject_anime_episodes.json" https://next.bgm.tv/p1/subjects/12/episodes
@@ -22,7 +23,23 @@ update_preview_data:
 	curl -sSfLo "$(PREVIEW_PATH)/subject_topics.json" https://next.bgm.tv/p1/subjects/12/topics
 	curl -sSfLo "$(PREVIEW_PATH)/subject_comments.json" https://next.bgm.tv/p1/subjects/12/comments
 
-	# user
+update_character:
+	curl -sSfLo "$(PREVIEW_PATH)/character.json" https://next.bgm.tv/p1/characters/32
+	curl -sSfLo "$(PREVIEW_PATH)/character_casts.json" https://next.bgm.tv/p1/characters/32/casts
+	curl -sSfLo "$(PREVIEW_PATH)/character_collects.json" https://next.bgm.tv/p1/characters/32/collects
+	curl -sSfLo "$(PREVIEW_PATH)/user_character_collection.json" https://next.bgm.tv/p1/users/$(UID)/collections/characters/32
+	curl -sSfLo "$(PREVIEW_PATH)/user_character_collections.json" https://next.bgm.tv/p1/users/$(UID)/collections/characters
+
+update_person:
+	curl -sSfLo "$(PREVIEW_PATH)/person.json" https://next.bgm.tv/p1/persons/3862
+	curl -sSfLo "$(PREVIEW_PATH)/person_works.json" https://next.bgm.tv/p1/persons/3862/works
+	curl -sSfLo "$(PREVIEW_PATH)/person_casts.json" https://next.bgm.tv/p1/persons/3862/casts
+	curl -sSfLo "$(PREVIEW_PATH)/person_collects.json" https://next.bgm.tv/p1/persons/3862/collects
+	curl -sSfLo "$(PREVIEW_PATH)/user_person_collection.json" https://next.bgm.tv/p1/users/$(UID)/collections/persons/3862
+	curl -sSfLo "$(PREVIEW_PATH)/user_person_collections.json" https://next.bgm.tv/p1/users/$(UID)/collections/persons
+
+update_user:
+	curl -sSfLo "$(PREVIEW_PATH)/user.json" https://next.bgm.tv/p1/users/$(UID)
 	curl -sSfLo "$(PREVIEW_PATH)/user_friends.json" https://next.bgm.tv/p1/users/$(UID)/friends
 	curl -sSfLo "$(PREVIEW_PATH)/user_followers.json" https://next.bgm.tv/p1/users/$(UID)/followers
 	curl -sSfLo "$(PREVIEW_PATH)/user_subject_collections.json" https://next.bgm.tv/p1/users/$(UID)/collections/subjects
@@ -31,21 +48,9 @@ update_preview_data:
 
 	# curl -sSfLo "$(PREVIEW_PATH)/episode_collections.json" https://next.bgm.tv/p1/users/-/collections/subjects/12/episodes
 
-	# character
-	curl -sSfLo "$(PREVIEW_PATH)/character.json" https://next.bgm.tv/p1/characters/32
-	curl -sSfLo "$(PREVIEW_PATH)/character_casts.json" https://next.bgm.tv/p1/characters/32/casts
-	curl -sSfLo "$(PREVIEW_PATH)/character_collects.json" https://next.bgm.tv/p1/characters/32/collects
-	curl -sSfLo "$(PREVIEW_PATH)/user_character_collection.json" https://next.bgm.tv/p1/users/$(UID)/collections/characters/32
-	curl -sSfLo "$(PREVIEW_PATH)/user_character_collections.json" https://next.bgm.tv/p1/users/$(UID)/collections/characters
-
-	# person
-	curl -sSfLo "$(PREVIEW_PATH)/person.json" https://next.bgm.tv/p1/persons/3862
-	curl -sSfLo "$(PREVIEW_PATH)/person_works.json" https://next.bgm.tv/p1/persons/3862/works
-	curl -sSfLo "$(PREVIEW_PATH)/person_casts.json" https://next.bgm.tv/p1/persons/3862/casts
-	curl -sSfLo "$(PREVIEW_PATH)/person_collects.json" https://next.bgm.tv/p1/persons/3862/collects
-	curl -sSfLo "$(PREVIEW_PATH)/user_person_collection.json" https://next.bgm.tv/p1/users/$(UID)/collections/persons/3862
-	curl -sSfLo "$(PREVIEW_PATH)/user_person_collections.json" https://next.bgm.tv/p1/users/$(UID)/collections/persons
-
-	# timeline
+update_timeline:
 	curl -sSfLo "$(PREVIEW_PATH)/timeline.json" https://next.bgm.tv/p1/timeline
 	curl -sSfLo "$(PREVIEW_PATH)/user_timeline.json" https://next.bgm.tv/p1/users/$(UID)/timeline
+
+
+update_preview: update_api update_subject update_user update_character update_person
