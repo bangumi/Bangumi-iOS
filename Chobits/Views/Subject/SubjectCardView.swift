@@ -5,22 +5,24 @@ struct SubjectTinyView: View {
   let subject: SlimSubjectDTO
 
   var body: some View {
-    BorderView(
-      color: .secondary.opacity(0.2),
-      background: .secondary.opacity(0.01),
-      padding: 0, cornerRadius: 8
-    ) {
-      HStack {
-        ImageView(img: subject.images?.grid)
-          .imageStyle(width: 32, height: 32)
-          .imageType(.subject)
-        VStack(alignment: .leading) {
-          Text("\(subject.nameCN.isEmpty ? subject.name : subject.nameCN)")
-            .lineLimit(1)
-        }
-        Spacer()
-      }.padding(5)
+    HStack {
+      ImageView(img: subject.images?.grid)
+        .imageStyle(width: 32, height: 32)
+        .imageType(.subject)
+      VStack(alignment: .leading) {
+        Text("\(subject.nameCN.isEmpty ? subject.name : subject.nameCN)")
+          .lineLimit(1)
+      }
+      Spacer()
     }
+    .padding(5)
+    .overlay {
+      RoundedRectangle(cornerRadius: 8)
+        .inset(by: 1)
+        .stroke(.secondary.opacity(0.2), lineWidth: 1)
+    }
+    .background(.secondary.opacity(0.01))
+    .clipShape(RoundedRectangle(cornerRadius: 8))
     .frame(height: 40)
     .contextMenu {
       NavigationLink(value: NavDestination.subject(subject.id)) {
@@ -58,31 +60,34 @@ struct SubjectSmallView: View {
   }
 
   var body: some View {
-    BorderView(
-      color: .secondary.opacity(0.2),
-      background: .secondary.opacity(0.01),
-      padding: 0, cornerRadius: 8
-    ) {
-      HStack {
-        ImageView(img: subject.images?.resize(.r200)) {
-          if subject.nsfw {
-            NSFWBadgeView()
-          }
+
+    HStack {
+      ImageView(img: subject.images?.resize(.r200)) {
+        if subject.nsfw {
+          NSFWBadgeView()
         }
-        .imageStyle(width: 60, height: 72)
-        .imageType(.subject)
-        VStack(alignment: .leading) {
-          Text("\(subject.nameCN.isEmpty ? subject.name : subject.nameCN)")
-          Text(subject.info)
-            .font(.footnote)
-            .foregroundStyle(.secondary)
-          ratingLine
-            .font(.footnote)
-            .foregroundStyle(.secondary)
-        }.lineLimit(1)
-        Spacer()
-      }.padding(5)
+      }
+      .imageStyle(width: 60, height: 72)
+      .imageType(.subject)
+      VStack(alignment: .leading) {
+        Text("\(subject.nameCN.isEmpty ? subject.name : subject.nameCN)")
+        Text(subject.info)
+          .font(.footnote)
+          .foregroundStyle(.secondary)
+        ratingLine
+          .font(.footnote)
+          .foregroundStyle(.secondary)
+      }.lineLimit(1)
+      Spacer()
     }
+    .padding(5)
+    .overlay {
+      RoundedRectangle(cornerRadius: 8)
+        .inset(by: 1)
+        .stroke(.secondary.opacity(0.2), lineWidth: 1)
+    }
+    .background(.secondary.opacity(0.01))
+    .clipShape(RoundedRectangle(cornerRadius: 8))
     .frame(height: 80)
     .contextMenu {
       NavigationLink(value: NavDestination.subject(subject.id)) {

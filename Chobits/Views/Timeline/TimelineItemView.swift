@@ -8,18 +8,20 @@ struct TimelineItemView: View {
 
   var body: some View {
     HStack(alignment: .top) {
-      if item.user.id != previous?.user.id {
-        ImageView(img: item.user.avatar?.large)
-          .imageStyle(width: 40, height: 40)
-          .imageType(.avatar)
-          .imageLink(item.user.link)
-      } else {
-        Rectangle().fill(.clear).frame(width: 40, height: 40)
+      if let user = item.user {
+        if user.id != previous?.user?.id {
+          ImageView(img: user.avatar?.large)
+            .imageStyle(width: 40, height: 40)
+            .imageType(.avatar)
+            .imageLink(user.link)
+        } else {
+          Rectangle().fill(.clear).frame(width: 40, height: 40)
+        }
       }
       VStack(alignment: .leading) {
-        Text(item.desc)
         switch item.cat {
         case .subject:
+          Text(item.desc)
           if item.batch {
             let subjects = item.memo.subject?.map(\.subject).filter { $0.images != nil } ?? []
             ScrollView(.horizontal, showsIndicators: false) {
@@ -55,6 +57,7 @@ struct TimelineItemView: View {
           }
 
         case .progress:
+          Text(item.desc)
           switch item.type {
           case 0:
             if let subject = item.memo.progress?.batch?.subject {
@@ -65,7 +68,11 @@ struct TimelineItemView: View {
               SubjectTinyView(subject: subject)
             }
           }
+
         case .status:
+          if item.user != nil {
+            Text(item.desc)
+          }
           switch item.type {
           case 0:
             Text("**更新了签名:** \(item.memo.status?.sign ?? "")")
@@ -79,7 +86,7 @@ struct TimelineItemView: View {
             EmptyView()
           }
         default:
-          EmptyView()
+          Text(item.desc)
         }
         Menu {
           Text("\(item.createdAt.datetimeDisplay)")

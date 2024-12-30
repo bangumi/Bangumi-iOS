@@ -36,6 +36,10 @@ struct Profile: Codable, Identifiable, Hashable, Linkable {
     "chii://user/\(username)"
   }
 
+  var user: SlimUserDTO {
+    SlimUserDTO(self)
+  }
+
   init() {
     self.id = 0
     self.username = ""
@@ -105,6 +109,15 @@ struct SlimUserDTO: Codable, Identifiable, Hashable, Linkable {
   var avatar: Avatar?
   var sign: String
   var joinedAt: Int?
+
+  init(_ profile: Profile) {
+    self.id = profile.id
+    self.username = profile.username
+    self.nickname = profile.nickname
+    self.avatar = profile.avatar
+    self.sign = profile.sign
+    self.joinedAt = profile.joinedAt
+  }
 
   var name: String {
     nickname.isEmpty ? "用户\(username)" : nickname
@@ -458,7 +471,7 @@ struct TimelineDTO: Codable, Identifiable, Hashable {
   var source: TimelineSource
   var replies: Int
   var createdAt: Int
-  var user: SlimUserDTO
+  var user: SlimUserDTO?
 }
 
 struct TimelineMemoDTO: Codable, Hashable {

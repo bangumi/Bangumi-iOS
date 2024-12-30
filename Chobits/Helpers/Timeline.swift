@@ -3,25 +3,29 @@ import SwiftUI
 extension TimelineDTO {
 
   func unknown(_ op: String) -> AttributedString {
-    var text = AttributedString(" 神秘的\(op)")
+    var text = AttributedString("神秘的\(op)")
     text.foregroundColor = .secondary
     return text
   }
 
   var desc: AttributedString {
-    var text = self.user.nickname.withLink(self.user.link)
+    var text = AttributedString("")
+    if let user = self.user {
+      text += user.nickname.withLink(user.link)
+      text += AttributedString(" ")
+    }
     switch self.cat {
     case .daily:
       switch self.type {
       case 1:
-        text += AttributedString(" 注册成为了 Bangumi 成员")
+        text += AttributedString("注册成为了 Bangumi 成员")
       case 2:
         if self.batch {
-          text += AttributedString(" 将 ")
+          text += AttributedString("将 ")
           text += genBatch(self.memo.daily?.users ?? [])
           text += AttributedString(" \(self.memo.daily?.users?.count ?? 0) 位用户加为了好友")
         } else {
-          text += AttributedString(" 将 ")
+          text += AttributedString("将 ")
           if let user = self.memo.daily?.users?.first {
             text += user.nickname.withLink(user.link)
           } else {
@@ -31,11 +35,11 @@ extension TimelineDTO {
         }
       case 3:
         if self.batch {
-          text += AttributedString(" 加入了 ")
+          text += AttributedString("加入了 ")
           text += genBatch(self.memo.daily?.groups ?? [])
           text += AttributedString(" \(self.memo.daily?.groups?.count ?? 0) 个小组")
         } else {
-          text += AttributedString(" 加入了 ")
+          text += AttributedString("加入了 ")
           if let group = self.memo.daily?.groups?.first {
             text += group.title.withLink(group.link)
           } else {
@@ -45,11 +49,11 @@ extension TimelineDTO {
         }
       case 4:
         if self.batch {
-          text += AttributedString(" 创建了 ")
+          text += AttributedString("创建了 ")
           text += genBatch(self.memo.daily?.groups ?? [])
           text += AttributedString(" \(self.memo.daily?.groups?.count ?? 0) 个小组")
         } else {
-          text += AttributedString(" 创建了 ")
+          text += AttributedString("创建了 ")
           if let group = self.memo.daily?.groups?.first {
             text += group.title.withLink(group.link)
           } else {
@@ -62,7 +66,7 @@ extension TimelineDTO {
       }
 
     case .wiki:
-      text += AttributedString(" \(TimelineNewSubjectType(self.type).desc) ")
+      text += AttributedString("\(TimelineNewSubjectType(self.type).desc) ")
       if let subject = self.memo.wiki?.subject {
         text += subject.name.withLink(subject.link)
       } else {
@@ -71,7 +75,7 @@ extension TimelineDTO {
 
     case .subject:
       if self.batch {
-        text += AttributedString(" \(TimelineSubjectActionType(self.type).desc) ")
+        text += AttributedString("\(TimelineSubjectActionType(self.type).desc) ")
         text += genBatch(self.memo.subject?.map(\.subject) ?? [])
         let count = self.memo.subject?.count ?? 0
         var typeID = self.memo.subject?.first?.subject.type.rawValue ?? 0
@@ -80,7 +84,7 @@ extension TimelineDTO {
         }
         text += AttributedString(" \(count) \(TimelineSubjectBatchType(typeID).desc)")
       } else {
-        text += AttributedString(" \(TimelineSubjectActionType(self.type).desc) ")
+        text += AttributedString("\(TimelineSubjectActionType(self.type).desc) ")
         if let collect = self.memo.subject?.first {
           text += collect.subject.name.withLink(collect.subject.link)
         } else {
@@ -93,7 +97,7 @@ extension TimelineDTO {
       case 0:
         if let batch = self.memo.progress?.batch {
           if batch.subject.type == .book {
-            text += AttributedString(" 读过 ")
+            text += AttributedString("读过 ")
             text += batch.subject.name.withLink(batch.subject.link)
             if let volsUpdate = batch.volsUpdate, volsUpdate > 0 {
               text += AttributedString(" 第\(volsUpdate) 卷")
@@ -102,7 +106,7 @@ extension TimelineDTO {
               text += AttributedString(" 第\(epsUpdate) 话")
             }
           } else {
-            text += AttributedString(" 完成了 ")
+            text += AttributedString("完成了 ")
             text += batch.subject.name.withLink(batch.subject.link)
             text += AttributedString(" \(batch.epsUpdate ?? 0) of \(batch.epsTotal) 话")
           }
@@ -111,7 +115,7 @@ extension TimelineDTO {
         }
       case 1, 2, 3:
         if let episode = self.memo.progress?.single?.episode {
-          text += AttributedString(" \(EpisodeCollectionType(self.type).description) ")
+          text += AttributedString("\(EpisodeCollectionType(self.type).description) ")
           text += episode.title.withLink(episode.link)
         } else {
           text += self.unknown("剧集")
@@ -125,7 +129,7 @@ extension TimelineDTO {
 
     case .blog:
       if let blog = self.memo.blog {
-        text += AttributedString(" 发表了新日志 ")
+        text += AttributedString("发表了新日志 ")
         text += blog.title.withLink(blog.link)
       } else {
         text += self.unknown("日志")
@@ -135,9 +139,9 @@ extension TimelineDTO {
       if let index = self.memo.index {
         switch self.type {
         case 0:
-          text += AttributedString(" 创建了新目录 ")
+          text += AttributedString("创建了新目录 ")
         case 1:
-          text += AttributedString(" 收藏了目录 ")
+          text += AttributedString("收藏了目录 ")
         default:
           text += self.unknown("目录")
         }
@@ -151,28 +155,28 @@ extension TimelineDTO {
         switch self.type {
         case 0:
           if let character = mono.characters.first {
-            text += AttributedString(" 创建了新角色 ")
+            text += AttributedString("创建了新角色 ")
             text += character.name.withLink(character.link)
           }
           if let person = mono.persons.first {
-            text += AttributedString(" 创建了新人物 ")
+            text += AttributedString("创建了新人物 ")
             text += person.name.withLink(person.link)
           }
         case 1:
           if self.batch {
             if mono.characters.count > 0 {
-              text += AttributedString(" 收藏了 ")
+              text += AttributedString("收藏了 ")
               text += genBatch(mono.characters)
               text += AttributedString(" \(mono.characters.count) 个角色")
             } else if mono.persons.count > 0 {
-              text += AttributedString(" 收藏了 ")
+              text += AttributedString("收藏了 ")
               text += genBatch(mono.persons)
               text += AttributedString(" \(mono.persons.count) 个人物")
             } else {
               text += AttributedString(" 没有收藏角色或人物")
             }
           } else {
-            text += AttributedString(" 收藏了")
+            text += AttributedString("收藏了")
             if let character = mono.characters.first {
               text += AttributedString("角色 ")
               text += character.name.withLink(character.link)
