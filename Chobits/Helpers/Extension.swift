@@ -54,6 +54,30 @@ extension Color {
       opacity: opacity
     )
   }
+
+  init?(_ color: String) {
+    var color = color.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+
+    // check for hex color
+    if color.hasPrefix("#") {
+      color = String(color.dropFirst())
+    }
+
+    // handle 3-digit hex color
+    if color.count == 3, let hex = Int(color, radix: 16) {
+      let r = (hex >> 8) & 0xf
+      let g = (hex >> 4) & 0xf
+      let b = hex & 0xf
+      // convert to 6-digit by repeating each digit
+      let fullHex = (r << 20) | (r << 16) | (g << 12) | (g << 8) | (b << 4) | b
+      self.init(hex: fullHex)
+      return
+    }
+
+    // handle 6-digit hex color
+    guard color.count == 6, let hex = Int(color, radix: 16) else { return nil }
+    self.init(hex: hex)
+  }
 }
 
 extension Date {

@@ -124,7 +124,11 @@ struct ImageView<ImageBadge: View, ImageCaption: View>: View {
       if style.width == 0 {
         return .infinity
       } else {
-        return min(style.width, CGFloat(originalWidth))
+        if style.width == style.height {
+          return style.width
+        } else {
+          return min(style.width, CGFloat(originalWidth))
+        }
       }
     }
   }

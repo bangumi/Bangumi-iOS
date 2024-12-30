@@ -125,7 +125,10 @@ struct PersonView: View {
             }.frame(height: 160)
 
             /// summary
-            BBCodeView(person.summary, textSize: 14).padding(2)
+            BBCodeView(person.summary, textSize: 14)
+              .padding(2)
+              .tint(.linkText)
+              .textSelection(.enabled)
 
             /// casts
             PersonCastsView(personId: personId, casts: person.casts)

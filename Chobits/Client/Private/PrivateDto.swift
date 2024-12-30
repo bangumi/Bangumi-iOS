@@ -134,12 +134,24 @@ struct UserHomepageDTO: Codable, Hashable {
   var right: [String]
 }
 
-struct UserNetworkServiceDTO: Codable, Hashable {
+struct UserNetworkServiceDTO: Codable, Identifiable, Hashable, Linkable {
   var name: String
   var title: String
   var url: String
   var color: String
   var account: String
+
+  var id: String {
+    name
+  }
+
+  var link: String {
+    if url.isEmpty {
+      return ""
+    } else {
+      return url + account
+    }
+  }
 }
 
 struct SlimUserDTO: Codable, Identifiable, Hashable, Linkable {

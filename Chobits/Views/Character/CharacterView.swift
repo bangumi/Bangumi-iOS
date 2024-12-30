@@ -107,7 +107,10 @@ struct CharacterView: View {
             }.frame(height: 160)
 
             /// summary
-            BBCodeView(character.summary, textSize: 14).padding(2)
+            BBCodeView(character.summary, textSize: 14)
+              .padding(2)
+              .tint(.linkText)
+              .textSelection(.enabled)
 
             /// casts
             CharacterCastsView(characterId: characterId, casts: character.casts)
