@@ -5,14 +5,17 @@ import SwiftUI
 struct CardView<Content: View>: View {
   let padding: CGFloat
   let cornerRadius: CGFloat
+  let background: Color
   let content: () -> Content
 
   public init(
     padding: CGFloat = 8, cornerRadius: CGFloat = 8,
+    background: Color? = nil,
     @ViewBuilder content: @escaping () -> Content
   ) {
     self.padding = padding
     self.cornerRadius = cornerRadius
+    self.background = background ?? Color("CardBackgroundColor")
     self.content = content
   }
 
@@ -20,7 +23,7 @@ struct CardView<Content: View>: View {
     Section {
       content().padding(padding)
     }
-    .background(Color("CardBackgroundColor"))
+    .background(background)
     .cornerRadius(cornerRadius)
     .shadow(color: Color.black.opacity(0.2), radius: 4)
   }

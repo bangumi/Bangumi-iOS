@@ -67,7 +67,7 @@ struct UserView: View {
           if user.bio.isEmpty {
             Divider()
           } else {
-            CardView {
+            CardView(background: Color(hex: 0xf9f9f5)) {
               HStack {
                 BBCodeView(user.bio, textSize: 12)
                   .tint(.linkText)
