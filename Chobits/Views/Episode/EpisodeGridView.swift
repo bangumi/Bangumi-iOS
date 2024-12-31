@@ -140,14 +140,14 @@ struct EpisodeGridView: View {
       }
       if !episodeSps.isEmpty {
         Text("SP")
-          .foregroundStyle(Color(hex: 0x8EB021))
+          .foregroundStyle(.leadingBorder)
           .padding(.vertical, 3)
           .padding(.leading, 5)
           .padding(.trailing, 1)
           .overlay(
             Rectangle()
               .frame(width: 3)
-              .foregroundStyle(Color(hex: 0x8EB021))
+              .foregroundStyle(.leadingBorder)
               .offset(x: -12, y: 0)
           )
           .padding(2)
@@ -192,7 +192,7 @@ struct EpisodeGridView: View {
       HStack {
         Rectangle()
           .frame(width: 5)
-          .foregroundStyle(Color(hex: 0x8EB021))
+          .foregroundStyle(.leadingBorder)
           .offset(x: 0, y: 0)
         Spacer()
       }

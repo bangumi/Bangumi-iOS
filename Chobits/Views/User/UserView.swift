@@ -6,6 +6,7 @@ struct UserView: View {
   let username: String
 
   @AppStorage("shareDomain") var shareDomain: ShareDomain = .chii
+  @Environment(\.colorScheme) var colorScheme
 
   @State private var user: UserDTO?
 
@@ -67,7 +68,7 @@ struct UserView: View {
           if user.bio.isEmpty {
             Divider()
           } else {
-            CardView(background: Color(hex: 0xf9f9f5)) {
+            CardView(background: .bioBackground) {
               HStack {
                 BBCodeView(user.bio, textSize: 12)
                   .tint(.linkText)
