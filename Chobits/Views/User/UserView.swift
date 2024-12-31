@@ -79,6 +79,18 @@ struct UserView: View {
           }
 
           HFlow {
+            if !user.site.isEmpty {
+              HStack(spacing: 5) {
+                BadgeView(background: .accentColor) {
+                  Text("Home")
+                    .font(.caption)
+                    .fixedSize()
+                }
+                Text(user.site.withLink(user.site))
+                  .font(.footnote)
+                  .textSelection(.enabled)
+              }
+            }
             ForEach(user.networkServices) { service in
               HStack(spacing: 5) {
                 BadgeView(background: Color(service.color)) {
@@ -93,7 +105,7 @@ struct UserView: View {
             }
           }
 
-          Text("时光机 🚧")
+          // Text("时光机 🚧")
         }.padding(.horizontal, 8)
       }
       .navigationTitle("\(user.nickname)")
