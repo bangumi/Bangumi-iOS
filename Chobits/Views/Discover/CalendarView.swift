@@ -121,10 +121,18 @@ struct CalendarWeekdayView: View {
         ForEach(calendar.items, id: \.subject) { item in
           VStack {
             ImageView(img: item.subject.images?.resize(.r200)) {
+              if item.watchers > 100 {
+                Label("\(item.watchers)", systemImage: "flame")
+                  .padding(2)
+                  .background(.accent.opacity(0.9))
+                  .padding(2)
+                  .foregroundStyle(.white)
+                  .font(.caption)
+                  .clipShape(Capsule())
+              }
             } caption: {
               Text(item.subject.title)
-                .multilineTextAlignment(.leading)
-                .lineLimit(2)
+                .lineLimit(1)
                 .padding(.horizontal, 2)
             }
             .imageStyle(width: 110, height: 140)
