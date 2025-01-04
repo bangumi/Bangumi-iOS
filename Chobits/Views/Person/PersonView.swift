@@ -26,6 +26,13 @@ struct PersonView: View {
     URL(string: "https://\(shareDomain)/person/\(personId)")!
   }
 
+  var title: String {
+    guard let person = person else {
+      return "人物"
+    }
+    return person.name
+  }
+
   var nameCN: String {
     guard let person = person else {
       return ""
@@ -144,7 +151,7 @@ struct PersonView: View {
         ProgressView()
       }
     }
-    .navigationTitle(person?.name ?? "人物")
+    .navigationTitle(title)
     .navigationBarTitleDisplayMode(.inline)
     .toolbar {
       ToolbarItem(placement: .topBarTrailing) {

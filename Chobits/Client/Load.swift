@@ -4,6 +4,15 @@ import SwiftData
 import SwiftUI
 
 extension Chii {
+  func loadUser(_ username: String) async throws {
+    let db = try self.getDB()
+    let item = try await self.getUser(username)
+    try await db.saveUser(item)
+    try await db.commit()
+  }
+}
+
+extension Chii {
   func loadCalendar() async throws {
     let db = try self.getDB()
     let response = try await self.getCalendar()

@@ -121,6 +121,21 @@ extension DatabaseOperator {
 
 // MARK: - ensure
 extension DatabaseOperator {
+  public func ensureUser(_ item: UserDTO) throws -> User {
+    let uid = item.id
+    let fetched = try self.fetchOne(
+      predicate: #Predicate<User> {
+        $0.userId == uid
+      })
+    if let user = fetched {
+      user.update(item)
+      return user
+    }
+    let user = User(item)
+    modelContext.insert(user)
+    return user
+  }
+
   public func ensureSubject(_ item: SubjectDTO) throws -> Subject {
     let sid = item.id
     let fetched = try self.fetchOne(
@@ -276,6 +291,10 @@ extension DatabaseOperator {
 
 // MARK: - save
 extension DatabaseOperator {
+  public func saveUser(_ item: UserDTO) throws {
+    let _ = try self.ensureUser(item)
+  }
+
   public func saveCalendarItem(weekday: Int, items: [BangumiCalendarItemDTO]) throws {
     let cal = BangumiCalendar(weekday: weekday, items: items)
     modelContext.insert(cal)

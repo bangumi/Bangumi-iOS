@@ -130,8 +130,8 @@ struct UserDTO: Codable, Identifiable, Hashable, Linkable {
 }
 
 struct UserHomepageDTO: Codable, Hashable {
-  var left: [String]
-  var right: [String]
+  var left: [UserHomeSection]
+  var right: [UserHomeSection]
 }
 
 struct UserNetworkServiceDTO: Codable, Identifiable, Hashable, Linkable {
@@ -173,6 +173,15 @@ struct SlimUserDTO: Codable, Identifiable, Hashable, Linkable {
 
   init(_ user: UserDTO) {
     self.id = user.id
+    self.username = user.username
+    self.nickname = user.nickname
+    self.avatar = user.avatar
+    self.sign = user.sign
+    self.joinedAt = user.joinedAt
+  }
+
+  init(_ user: User) {
+    self.id = user.userId
     self.username = user.username
     self.nickname = user.nickname
     self.avatar = user.avatar
@@ -268,6 +277,18 @@ struct SlimSubjectDTO: Codable, Identifiable, Hashable, Linkable {
   var nameCN: String
   var nsfw: Bool
   var type: SubjectType
+
+  init(_ subject: Subject) {
+    self.id = subject.subjectId
+    self.images = subject.images
+    self.info = subject.info
+    self.rating = subject.rating
+    self.locked = subject.locked
+    self.name = subject.name
+    self.nameCN = subject.nameCN
+    self.nsfw = subject.nsfw
+    self.type = subject.typeEnum
+  }
 
   var link: String {
     "chii://subject/\(id)"

@@ -9,6 +9,7 @@ struct ChobitsApp: App {
 
   init() {
     let schema = Schema([
+      User.self,
       BangumiCalendar.self,
       Episode.self,
       Subject.self,

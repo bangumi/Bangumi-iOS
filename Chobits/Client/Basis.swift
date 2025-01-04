@@ -91,6 +91,29 @@ enum UserGroup: Int, Codable {
   }
 }
 
+enum UserHomeSection: String, Codable {
+  case none = ""
+  case anime = "anime"
+  case blog = "blog"
+  case book = "book"
+  case rriend = "friend"
+  case game = "game"
+  case group = "group"
+  case index = "index"
+  case mono = "mono"
+  case music = "music"
+  case real = "real"
+
+  init(_ value: String) {
+    let tmp = Self(rawValue: value)
+    if let out = tmp {
+      self = out
+      return
+    }
+    self = Self.none
+  }
+}
+
 struct Tag: Codable, Hashable {
   var name: String
   var count: Int
