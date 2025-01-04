@@ -60,7 +60,7 @@ struct EpisodeGridView: View {
       do {
         try await Chii.shared.updateEpisodeCollection(
           subjectId: episode.subjectId, episodeId: episode.episodeId, type: type)
-        try await Chii.shared.loadUserSubjectCollection(
+        try await Chii.shared.loadSubjectCollection(
           username: profile.username, subjectId: subjectId)
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
       } catch {
@@ -74,7 +74,7 @@ struct EpisodeGridView: View {
       do {
         try await Chii.shared.updateSubjectEpisodeCollection(
           subjectId: subjectId, updateTo: episode.sort, type: .collect)
-        try await Chii.shared.loadUserSubjectCollection(
+        try await Chii.shared.loadSubjectCollection(
           username: profile.username, subjectId: subjectId)
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
       } catch {

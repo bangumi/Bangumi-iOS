@@ -89,7 +89,7 @@ struct ProgressListItemView: View {
       do {
         try await Chii.shared.updateEpisodeCollection(
           subjectId: subjectId, episodeId: episodeId, type: .collect)
-        try await Chii.shared.loadUserSubjectCollection(
+        try await Chii.shared.loadSubjectCollection(
           username: profile.username, subjectId: subjectId)
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
       } catch {

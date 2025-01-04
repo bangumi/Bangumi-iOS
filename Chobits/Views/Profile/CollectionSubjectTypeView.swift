@@ -13,7 +13,7 @@ struct CollectionSubjectTypeView: View {
   @State private var subjects: [Int: Subject] = [:]
 
   var columnCount: Int {
-    let columns = Int((width - 16) / 80)
+    let columns = Int((width - 8) / 88)
     return columns > 0 ? columns : 1
   }
 
@@ -93,14 +93,12 @@ struct CollectionSubjectTypeView: View {
           await loadCounts()
         }
       }
-      if collections.count > 0 {
-        LazyVGrid(columns: columns) {
-          ForEach(collections) { collection in
-            ImageView(img: subjects[collection.subjectId]?.images?.resize(.r200))
-              .imageStyle(width: 80, height: 80)
-              .imageType(.subject)
-              .imageLink(collection.subject?.link)
-          }
+      LazyVGrid(columns: columns) {
+        ForEach(collections) { collection in
+          ImageView(img: subjects[collection.subjectId]?.images?.resize(.r200))
+            .imageStyle(width: 80, height: 80)
+            .imageType(.subject)
+            .imageLink(collection.subject?.link)
         }
       }
     }.animation(.default, value: collections)

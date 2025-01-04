@@ -26,12 +26,12 @@ struct SubjectView: View {
     if refreshing { return }
     refreshing = true
     do {
-      try await Chii.shared.loadSubject(subjectId)
+      let item = try await Chii.shared.loadSubject(subjectId)
       refreshed = true
 
       if isAuthenticated {
         Task {
-          try await Chii.shared.loadUserSubjectCollection(
+          try await Chii.shared.loadSubjectCollection(
             username: profile.username, subjectId: subjectId)
         }
       }
@@ -42,7 +42,7 @@ struct SubjectView: View {
           subject?.characters = resp.data
         }
       }
-      if subject?.typeEnum == .book, subject?.series ?? false {
+      if item.type == .book, item.series {
         Task {
           let resp = try await Chii.shared.getSubjectRelations(
             subjectId, offprint: true, limit: 100)

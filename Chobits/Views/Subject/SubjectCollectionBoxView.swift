@@ -62,7 +62,7 @@ struct SubjectCollectionBoxView: View {
           priv: priv,
           tags: tags
         )
-        try await Chii.shared.loadUserSubjectCollection(
+        try await Chii.shared.loadSubjectCollection(
           username: profile.username, subjectId: subject.subjectId)
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
         dismiss()

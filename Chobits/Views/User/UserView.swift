@@ -38,11 +38,13 @@ struct UserView: View {
   }
 
   func refresh() async {
+    if refreshed { return }
     do {
-      try await Chii.shared.loadUser(username)
+      let _ = try await Chii.shared.loadUser(username)
     } catch {
       Notifier.shared.alert(error: error)
     }
+    refreshed = true
   }
 
   var body: some View {
@@ -133,7 +135,8 @@ struct UserView: View {
               }
             }
 
-            // Text("时光机 🚧")
+            /// user homepage
+            UserHomeView().environment(user)
           }.padding(.horizontal, 8)
         }
       } else if refreshed {

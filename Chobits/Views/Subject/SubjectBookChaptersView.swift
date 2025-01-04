@@ -89,7 +89,7 @@ struct SubjectBookChaptersView: View {
       do {
         try await Chii.shared.updateBookCollection(
           subjectId: collection.subjectId, eps: eps, vols: vols)
-        try await Chii.shared.loadUserSubjectCollection(
+        try await Chii.shared.loadSubjectCollection(
           username: profile.username, subjectId: collection.subjectId)
 
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()

@@ -29,6 +29,15 @@ extension DatabaseOperator {
 
 // MARK: - fetch
 extension DatabaseOperator {
+  public func getUser(_ username: String) throws -> User? {
+    let user = try self.fetchOne(
+      predicate: #Predicate<User> {
+        $0.username == username
+      }
+    )
+    return user
+  }
+
   public func getSubject(_ id: Int) throws -> Subject? {
     let subject = try self.fetchOne(
       predicate: #Predicate<Subject> {

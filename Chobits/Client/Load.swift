@@ -4,15 +4,14 @@ import SwiftData
 import SwiftUI
 
 extension Chii {
-  func loadUser(_ username: String) async throws {
+  func loadUser(_ username: String) async throws -> UserDTO {
     let db = try self.getDB()
     let item = try await self.getUser(username)
     try await db.saveUser(item)
     try await db.commit()
+    return item
   }
-}
 
-extension Chii {
   func loadCalendar() async throws {
     let db = try self.getDB()
     let response = try await self.getCalendar()
@@ -26,7 +25,7 @@ extension Chii {
     try await db.commit()
   }
 
-  func loadSubject(_ sid: Int) async throws {
+  func loadSubject(_ sid: Int) async throws -> SubjectDTO {
     let db = try self.getDB()
     let item = try await self.getSubject(sid)
 
@@ -40,9 +39,10 @@ extension Chii {
 
     try await db.saveSubject(item)
     try await db.commit()
+    return item
   }
 
-  func loadUserSubjectCollection(username: String, subjectId: Int) async throws {
+  func loadSubjectCollection(username: String, subjectId: Int) async throws {
     if !self.isAuthenticated() {
       return
     }

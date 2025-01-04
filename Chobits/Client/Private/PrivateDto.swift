@@ -231,6 +231,24 @@ struct SubjectCommentDTO: Codable, Identifiable, Hashable {
   }
 }
 
+struct SlimUserSubjectCollectionDTO: Codable, Hashable {
+  var rate: Int
+  var type: CollectionType
+  var comment: String
+  var tags: [String]
+  var updatedAt: Int
+  var subject: SlimSubjectDTO
+
+  init(_ collection: UserSubjectCollectionDTO) {
+    self.rate = collection.rate
+    self.type = collection.type
+    self.comment = collection.comment
+    self.tags = collection.tags
+    self.updatedAt = collection.updatedAt
+    self.subject = collection.subject.slim
+  }
+}
+
 struct UserSubjectCollectionDTO: Codable {
   var rate: Int
   var type: CollectionType
@@ -241,6 +259,10 @@ struct UserSubjectCollectionDTO: Codable {
   var updatedAt: Int
   var `private`: Bool
   var subject: SubjectDTO
+
+  var slim: SlimUserSubjectCollectionDTO {
+    SlimUserSubjectCollectionDTO(self)
+  }
 }
 
 struct SubjectDTO: Codable, Identifiable, Searchable {
@@ -265,6 +287,10 @@ struct SubjectDTO: Codable, Identifiable, Searchable {
   var summary: String
   var type: SubjectType
   var volumes: Int
+
+  var slim: SlimSubjectDTO {
+    SlimSubjectDTO(self)
+  }
 }
 
 struct SlimSubjectDTO: Codable, Identifiable, Hashable, Linkable {
@@ -288,6 +314,18 @@ struct SlimSubjectDTO: Codable, Identifiable, Hashable, Linkable {
     self.nameCN = subject.nameCN
     self.nsfw = subject.nsfw
     self.type = subject.typeEnum
+  }
+
+  init(_ subject: SubjectDTO) {
+    self.id = subject.id
+    self.images = subject.images
+    self.info = subject.info
+    self.rating = subject.rating
+    self.locked = subject.locked
+    self.name = subject.name
+    self.nameCN = subject.nameCN
+    self.nsfw = subject.nsfw
+    self.type = subject.type
   }
 
   var link: String {
@@ -319,6 +357,10 @@ struct CharacterDTO: Codable, Identifiable, Searchable {
   var redirect: Int
   var role: CharacterType
   var summary: String
+
+  var slim: SlimCharacterDTO {
+    SlimCharacterDTO(self)
+  }
 }
 
 struct SlimCharacterDTO: Codable, Identifiable, Hashable, Linkable {
@@ -330,6 +372,17 @@ struct SlimCharacterDTO: Codable, Identifiable, Hashable, Linkable {
   var nsfw: Bool
   var role: CharacterType
   var comment: Int?
+
+  init(_ character: CharacterDTO) {
+    self.id = character.id
+    self.images = character.images
+    self.lock = character.lock
+    self.name = character.name
+    self.nameCN = character.nameCN
+    self.nsfw = character.nsfw
+    self.role = character.role
+    self.comment = character.comment
+  }
 
   var link: String {
     "chii://character/\(id)"
@@ -350,6 +403,10 @@ struct PersonDTO: Codable, Identifiable, Searchable {
   var redirect: Int
   var summary: String
   var type: PersonType
+
+  var slim: SlimPersonDTO {
+    SlimPersonDTO(self)
+  }
 }
 
 struct CharacterCastDTO: Codable, Identifiable, Hashable {
@@ -462,6 +519,17 @@ struct SlimPersonDTO: Codable, Identifiable, Hashable, Linkable {
   var lock: Bool
   var nsfw: Bool
   var comment: Int?
+
+  init(_ person: PersonDTO) {
+    self.id = person.id
+    self.name = person.name
+    self.nameCN = person.nameCN
+    self.type = person.type
+    self.images = person.images
+    self.lock = person.lock
+    self.nsfw = person.nsfw
+    self.comment = person.comment
+  }
 
   var link: String {
     "chii://person/\(id)"
