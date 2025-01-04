@@ -32,10 +32,7 @@
 		191881412CD0804800B4DAD7 /* PadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 191881402CD0804600B4DAD7 /* PadView.swift */; };
 		191CF1A62CC09F25000EF819 /* BorderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 191CF1A52CC09F1E000EF819 /* BorderView.swift */; };
 		192E30392D15AA8700A6A486 /* ProgressTileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 192E30382D15AA8700A6A486 /* ProgressTileView.swift */; };
-		1930110E2C00F08A008DCEBF /* CollectionSubjectTypeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1930110D2C00F08A008DCEBF /* CollectionSubjectTypeView.swift */; };
 		1943C5082C08CD2E0067ACDB /* StarsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1943C5072C08CD2E0067ACDB /* StarsView.swift */; };
-		194484232BF4C68B002EC925 /* CollectionListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 194484222BF4C68B002EC925 /* CollectionListView.swift */; };
-		194484252BF4DD5E002EC925 /* CollectionRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 194484242BF4DD5E002EC925 /* CollectionRowView.swift */; };
 		194E75D22D0BC6540070F5F8 /* Spotlight.swift in Sources */ = {isa = PBXBuildFile; fileRef = 194E75D12D0BC64E0070F5F8 /* Spotlight.swift */; };
 		194E75D42D0BDF660070F5F8 /* EpisodeInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 194E75D32D0BDF600070F5F8 /* EpisodeInfoView.swift */; };
 		194E75D62D0BE7BE0070F5F8 /* EpisodeRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 194E75D52D0BE7B70070F5F8 /* EpisodeRowView.swift */; };
@@ -116,7 +113,6 @@
 		19C2CE632BE2A4F10080A056 /* SubjectBookChaptersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19C2CE622BE2A4F10080A056 /* SubjectBookChaptersView.swift */; };
 		19C2CE652BE2ACE60080A056 /* profile.json in Resources */ = {isa = PBXBuildFile; fileRef = 19C2CE642BE2ACE60080A056 /* profile.json */; };
 		19C2CE692BE330F60080A056 /* SubjectCollectionBoxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19C2CE682BE330F60080A056 /* SubjectCollectionBoxView.swift */; };
-		19E0E5072BF34F0E00066EB7 /* CollectionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19E0E5062BF34F0E00066EB7 /* CollectionsView.swift */; };
 		19ECCDA12CFC21160092F715 /* PageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19ECCDA02CFC21160092F715 /* PageView.swift */; };
 		19ECCDA32CFC74C50092F715 /* user_subject_collections.json in Resources */ = {isa = PBXBuildFile; fileRef = 19ECCDA22CFC74C50092F715 /* user_subject_collections.json */; };
 		19ECCDEF2CFD43CD0092F715 /* Wrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19ECCDEE2CFD43CA0092F715 /* Wrapper.swift */; };
@@ -159,10 +155,7 @@
 		191881402CD0804600B4DAD7 /* PadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PadView.swift; sourceTree = "<group>"; };
 		191CF1A52CC09F1E000EF819 /* BorderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BorderView.swift; sourceTree = "<group>"; };
 		192E30382D15AA8700A6A486 /* ProgressTileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressTileView.swift; sourceTree = "<group>"; };
-		1930110D2C00F08A008DCEBF /* CollectionSubjectTypeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionSubjectTypeView.swift; sourceTree = "<group>"; };
 		1943C5072C08CD2E0067ACDB /* StarsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StarsView.swift; sourceTree = "<group>"; };
-		194484222BF4C68B002EC925 /* CollectionListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionListView.swift; sourceTree = "<group>"; };
-		194484242BF4DD5E002EC925 /* CollectionRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionRowView.swift; sourceTree = "<group>"; };
 		194E75D12D0BC64E0070F5F8 /* Spotlight.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Spotlight.swift; sourceTree = "<group>"; };
 		194E75D32D0BDF600070F5F8 /* EpisodeInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EpisodeInfoView.swift; sourceTree = "<group>"; };
 		194E75D52D0BE7B70070F5F8 /* EpisodeRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EpisodeRowView.swift; sourceTree = "<group>"; };
@@ -242,7 +235,6 @@
 		19C2CE622BE2A4F10080A056 /* SubjectBookChaptersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubjectBookChaptersView.swift; sourceTree = "<group>"; };
 		19C2CE642BE2ACE60080A056 /* profile.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = profile.json; sourceTree = "<group>"; };
 		19C2CE682BE330F60080A056 /* SubjectCollectionBoxView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubjectCollectionBoxView.swift; sourceTree = "<group>"; };
-		19E0E5062BF34F0E00066EB7 /* CollectionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionsView.swift; sourceTree = "<group>"; };
 		19ECCDA02CFC21160092F715 /* PageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageView.swift; sourceTree = "<group>"; };
 		19ECCDA22CFC74C50092F715 /* user_subject_collections.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = user_subject_collections.json; sourceTree = "<group>"; };
 		19ECCDEE2CFD43CA0092F715 /* Wrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Wrapper.swift; sourceTree = "<group>"; };
@@ -260,6 +252,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		190AE6452D293E8500274B4C /* Profile */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Profile; sourceTree = "<group>"; };
 		190C3AE62D197913004ECCE6 /* Group */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Group; sourceTree = "<group>"; };
 		190C3AEA2D19830F004ECCE6 /* Index */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Index; sourceTree = "<group>"; };
 		194E783D2D1033DE0070F5F8 /* Blog */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Blog; sourceTree = "<group>"; };
@@ -394,12 +387,12 @@
 		19671C4D2BDEB55D000B4D99 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				190AE6452D293E8500274B4C /* Profile */,
 				190C3AEA2D19830F004ECCE6 /* Index */,
 				190C3AE62D197913004ECCE6 /* Group */,
 				1998DD002CB10E7E00115E1F /* Topic */,
 				1998DCF62CB023B000115E1F /* User */,
 				1998DCF22CAFDA5400115E1F /* Timeline */,
-				19E0E5052BF34EE700066EB7 /* Collection */,
 				19B9003E2BEEE20500405F0F /* Discover */,
 				19B9003D2BEEE1C400405F0F /* Progress */,
 				197A19E52BE69B0600804B13 /* Episode */,
@@ -525,17 +518,6 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		19E0E5052BF34EE700066EB7 /* Collection */ = {
-			isa = PBXGroup;
-			children = (
-				19E0E5062BF34F0E00066EB7 /* CollectionsView.swift */,
-				1930110D2C00F08A008DCEBF /* CollectionSubjectTypeView.swift */,
-				194484222BF4C68B002EC925 /* CollectionListView.swift */,
-				194484242BF4DD5E002EC925 /* CollectionRowView.swift */,
-			);
-			path = Collection;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -552,6 +534,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
+				190AE6452D293E8500274B4C /* Profile */,
 				190C3AE62D197913004ECCE6 /* Group */,
 				190C3AEA2D19830F004ECCE6 /* Index */,
 				194E783D2D1033DE0070F5F8 /* Blog */,
@@ -683,7 +666,6 @@
 				19671C6F2BDEB55D000B4D99 /* ChobitsApp.swift in Sources */,
 				19671C552BDEB55D000B4D99 /* SubjectCollectionView.swift in Sources */,
 				19671C5F2BDEB55D000B4D99 /* ProgressListView.swift in Sources */,
-				19E0E5072BF34F0E00066EB7 /* CollectionsView.swift in Sources */,
 				19671C692BDEB55D000B4D99 /* AuthView.swift in Sources */,
 				19ECCF0E2CFF58490092F715 /* PersonWorksView.swift in Sources */,
 				19ECCF0F2CFF58490092F715 /* PersonWorkListView.swift in Sources */,
@@ -697,14 +679,12 @@
 				19ECCE132CFD5B6B0092F715 /* CardView.swift in Sources */,
 				19671C5D2BDEB55D000B4D99 /* ImageView.swift in Sources */,
 				19671C622BDEB55D000B4D99 /* Core.swift in Sources */,
-				194484252BF4DD5E002EC925 /* CollectionRowView.swift in Sources */,
 				19BD24282BE9F22B00595973 /* Load.swift in Sources */,
 				19C2CE632BE2A4F10080A056 /* SubjectBookChaptersView.swift in Sources */,
 				197A19DA2BE6733A00804B13 /* Error.swift in Sources */,
 				19BD24302BEB3C3B00595973 /* SettingsView.swift in Sources */,
 				19B9002E2BED15B600405F0F /* PersonView.swift in Sources */,
 				19742A5C2D069AC3008791CC /* InfoboxView.swift in Sources */,
-				1930110E2C00F08A008DCEBF /* CollectionSubjectTypeView.swift in Sources */,
 				1909F3B42BECF9D100E3B8F0 /* CharacterView.swift in Sources */,
 				19671C5E2BDEB55D000B4D99 /* LoadingView.swift in Sources */,
 				1998DCFD2CB10A5C00115E1F /* SubjectTopicListView.swift in Sources */,
@@ -739,7 +719,6 @@
 				194E76982D0D3A360070F5F8 /* Style.swift in Sources */,
 				19671C602BDEB55D000B4D99 /* Basis.swift in Sources */,
 				192E30392D15AA8700A6A486 /* ProgressTileView.swift in Sources */,
-				194484232BF4C68B002EC925 /* CollectionListView.swift in Sources */,
 				197A19D12BE6304D00804B13 /* EpisodeView.swift in Sources */,
 				19671C6C2BDEB55D000B4D99 /* ProgressView.swift in Sources */,
 				1998DD052CB11F9C00115E1F /* SubjectCommentsView.swift in Sources */,
