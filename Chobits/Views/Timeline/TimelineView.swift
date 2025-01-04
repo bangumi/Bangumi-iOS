@@ -50,7 +50,7 @@ struct ChiiTimelineView: View {
                 Label("时间胶囊", systemImage: "clock")
               }
               NavigationLink(value: NavDestination.userGroup(profile.user)) {
-                Label("小组", systemImage: "person.3")
+                Label("小组", systemImage: "rectangle.3.group.bubble")
               }
               NavigationLink(value: NavDestination.friends) {
                 Label("好友", systemImage: "person.2")

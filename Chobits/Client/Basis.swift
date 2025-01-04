@@ -652,19 +652,6 @@ enum CastType: Int, Codable, Identifiable, CaseIterable {
       return "客串"
     }
   }
-
-  var icon: String {
-    switch self {
-    case .none:
-      return "questionmark"
-    case .main:
-      return "star"
-    case .secondary:
-      return "person.2"
-    case .cameo:
-      return "person.3"
-    }
-  }
 }
 
 /// 章节类型
