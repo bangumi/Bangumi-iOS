@@ -15,7 +15,13 @@ enum NavDestination: Hashable, View {
   case collectionList(_ subjectType: SubjectType)
 
   case user(_ username: String)
+  case userCollection(_ user: SlimUserDTO)
+  case userMono(_ user: SlimUserDTO)
+  case userBlog(_ user: SlimUserDTO)
+  case userIndex(_ user: SlimUserDTO)
   case userTimeline(_ user: SlimUserDTO)
+  case userGroup(_ user: SlimUserDTO)
+  case userFriend(_ user: SlimUserDTO)
 
   case infobox(_ title: String, _ infobox: Infobox)
   case subject(_ subjectId: Int)
@@ -53,6 +59,18 @@ enum NavDestination: Hashable, View {
 
     case .user(let username):
       UserView(username: username)
+    case .userCollection(let user):
+      UserCollectionListView(user: user)
+    case .userMono(let user):
+      UserMonoListView(user: user)
+    case .userBlog(let user):
+      UserBlogListView(user: user)
+    case .userIndex(let user):
+      UserIndexListView(user: user)
+    case .userGroup(let user):
+      UserGroupListView(user: user)
+    case .userFriend(let user):
+      UserFriendListView(user: user)
     case .userTimeline(let user):
       UserTimelineView(user: user)
 

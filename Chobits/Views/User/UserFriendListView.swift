@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct UserFriendsView: View {
+struct UserFriendListView: View {
   let user: SlimUserDTO
 
   @AppStorage("profile") var profile: Profile = Profile()

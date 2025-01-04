@@ -495,17 +495,18 @@ struct CharacterSubjectRelationDTO: Codable, Identifiable, Hashable {
   }
 }
 
-struct UserCharacterCollectionDTO: Codable, Identifiable {
+struct UserCharacterCollectionDTO: Codable {
   var character: CharacterDTO
   var createdAt: Int
-
-  var id: Int {
-    character.id
-  }
 }
 
 struct UserPersonCollectionDTO: Codable {
   var person: PersonDTO
+  var createdAt: Int
+}
+
+struct UserIndexCollectionDTO: Codable {
+  var index: IndexDTO
   var createdAt: Int
 }
 
@@ -586,7 +587,7 @@ struct SlimGroupDTO: Codable, Identifiable, Hashable, Linkable {
   var createdAt: Int = 0
 
   var link: String {
-    "chii://group/\(id)"
+    "chii://group/\(name)"
   }
 }
 
@@ -634,12 +635,48 @@ struct TimelineWikiDTO: Codable, Hashable {
   var subject: SlimSubjectDTO?
 }
 
+typealias IndexStats = [Int: Int]
+
+struct IndexDTO: Codable, Identifiable, Hashable, Linkable {
+  var id: Int
+  var type: Int
+  var title: String
+  var desc: String
+  var replies: Int
+  var total: Int
+  var collects: Int
+  var stats: IndexStats
+  var createdAt: Int
+  var updatedAt: Int
+  var creator: SlimUserDTO
+
+  var name: String {
+    title
+  }
+
+  var slim: SlimIndexDTO {
+    SlimIndexDTO(self)
+  }
+
+  var link: String {
+    "chii://index/\(id)"
+  }
+}
+
 struct SlimIndexDTO: Codable, Identifiable, Hashable, Linkable {
   var id: Int
   var type: Int
   var title: String
   var total: Int
   var createdAt: Int
+
+  init(_ index: IndexDTO) {
+    self.id = index.id
+    self.type = index.type
+    self.title = index.title
+    self.total = index.total
+    self.createdAt = index.createdAt
+  }
 
   var name: String {
     title

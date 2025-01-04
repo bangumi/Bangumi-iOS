@@ -7,6 +7,7 @@ public enum ImageType: String, Sendable {
   case person
   case avatar
   case photo
+  case icon
 }
 
 struct ImageTypeKey: EnvironmentKey {
@@ -195,6 +196,10 @@ struct ImageView<ImageBadge: View, ImageCaption: View>: View {
                     .scaledToFit()
                 case .photo:
                   Image("noPhoto")
+                    .resizable()
+                    .scaledToFit()
+                case .icon:
+                  Image("noIcon")
                     .resizable()
                     .scaledToFit()
                 default:

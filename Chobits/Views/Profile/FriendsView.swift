@@ -16,6 +16,7 @@ enum FriendType {
 
 struct FriendsView: View {
   @AppStorage("profile") var profile: Profile = Profile()
+
   @State private var reloader = false
   @State private var type: FriendType = .friends
 

@@ -96,7 +96,7 @@ enum UserHomeSection: String, Codable {
   case anime = "anime"
   case blog = "blog"
   case book = "book"
-  case rriend = "friend"
+  case friend = "friend"
   case game = "game"
   case group = "group"
   case index = "index"

@@ -147,6 +147,30 @@ struct UserView: View {
     .toolbar {
       ToolbarItem(placement: .topBarTrailing) {
         Menu {
+          if let user = user?.slim {
+            NavigationLink(value: NavDestination.userCollection(user)) {
+              Label("收藏", systemImage: "star")
+            }
+            NavigationLink(value: NavDestination.userMono(user)) {
+              Label("人物", systemImage: "person")
+            }
+            NavigationLink(value: NavDestination.userBlog(user)) {
+              Label("日志", systemImage: "book")
+            }
+            NavigationLink(value: NavDestination.userIndex(user)) {
+              Label("目录", systemImage: "list.bullet")
+            }
+            NavigationLink(value: NavDestination.userTimeline(user)) {
+              Label("时间胶囊", systemImage: "clock")
+            }
+            NavigationLink(value: NavDestination.userGroup(user)) {
+              Label("小组", systemImage: "person.3")
+            }
+            NavigationLink(value: NavDestination.userFriend(user)) {
+              Label("好友", systemImage: "person.2")
+            }
+            Divider()
+          }
           ShareLink(item: shareLink) {
             Label("分享", systemImage: "square.and.arrow.up")
           }
