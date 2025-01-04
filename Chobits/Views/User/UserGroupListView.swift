@@ -37,7 +37,7 @@ struct UserGroupListView: View {
               Text(item.title.withLink(item.link))
                 .lineLimit(1)
               Divider()
-              Text("\(item.totalMembers) 位成员")
+              Text("\(item.totalMembers ?? 0) 位成员")
                 .font(.footnote)
                 .foregroundStyle(.secondary)
             }.padding(.leading, 4)
