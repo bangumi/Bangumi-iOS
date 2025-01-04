@@ -10,7 +10,7 @@ struct SubjectTinyView: View {
         .imageStyle(width: 32, height: 32)
         .imageType(.subject)
       VStack(alignment: .leading) {
-        Text("\(subject.nameCN.isEmpty ? subject.name : subject.nameCN)")
+        Text(subject.title)
           .lineLimit(1)
       }
       Spacer()
@@ -70,7 +70,7 @@ struct SubjectSmallView: View {
       .imageStyle(width: 60, height: 72)
       .imageType(.subject)
       VStack(alignment: .leading) {
-        Text("\(subject.nameCN.isEmpty ? subject.name : subject.nameCN)")
+        Text(subject.title)
         Text(subject.info)
           .font(.footnote)
           .foregroundStyle(.secondary)

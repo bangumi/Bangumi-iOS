@@ -53,7 +53,7 @@ struct BlogView: View {
                       ImageView(img: subject.images?.grid)
                         .imageStyle(width: 32, height: 32)
                         .imageType(.subject)
-                      Text("\(subject.nameCN.isEmpty ? subject.name : subject.nameCN)")
+                      Text(subject.title)
                     }
                   }
                 }

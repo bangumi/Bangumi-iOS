@@ -122,6 +122,10 @@ final class SubjectV1: Searchable, Linkable {
     return SubjectType(type)
   }
 
+  var title: String {
+    nameCN.isEmpty ? name : nameCN
+  }
+
   var category: String {
     if platform.typeCN.isEmpty {
       return typeEnum.description
@@ -376,6 +380,10 @@ final class CharacterV1: Searchable, Linkable {
     return CharacterType(role)
   }
 
+  var title: String {
+    nameCN.isEmpty ? name : nameCN
+  }
+
   var link: String {
     return "chii://character/\(characterId)"
   }
@@ -455,6 +463,10 @@ final class PersonV1: Searchable, Linkable {
 
   var typeEnum: PersonType {
     return PersonType(type)
+  }
+
+  var title: String {
+    nameCN.isEmpty ? name : nameCN
   }
 
   var link: String {

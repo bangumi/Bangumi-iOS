@@ -26,16 +26,6 @@ struct CharacterView: View {
     URL(string: "https://\(shareDomain)/character/\(characterId)")!
   }
 
-  var nameCN: String {
-    guard let character = character else {
-      return ""
-    }
-    if character.nameCN.isEmpty {
-      return character.name
-    }
-    return character.nameCN
-  }
-
   func refresh() async {
     if refreshed { return }
     do {
@@ -92,7 +82,7 @@ struct CharacterView: View {
                 .foregroundStyle(.secondary)
 
                 Spacer()
-                Text(nameCN)
+                Text(character.title)
                   .multilineTextAlignment(.leading)
                   .truncationMode(.middle)
                   .lineLimit(2)

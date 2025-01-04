@@ -33,16 +33,6 @@ struct PersonView: View {
     return person.name
   }
 
-  var nameCN: String {
-    guard let person = person else {
-      return ""
-    }
-    if person.nameCN.isEmpty {
-      return person.name
-    }
-    return person.nameCN
-  }
-
   var careers: String {
     guard let person = person else { return "" }
     let vals = Set(person.career).sorted().map { PersonCareer($0).description }
@@ -110,7 +100,7 @@ struct PersonView: View {
                 .foregroundStyle(.secondary)
 
                 Spacer()
-                Text(nameCN)
+                Text(person.title)
                   .multilineTextAlignment(.leading)
                   .truncationMode(.middle)
                   .lineLimit(2)

@@ -4,13 +4,6 @@ import SwiftUI
 struct SubjectHeaderView: View {
   @Environment(Subject.self) var subject
 
-  var nameCN: String {
-    if subject.nameCN.isEmpty {
-      return subject.name
-    }
-    return subject.nameCN
-  }
-
   var type: SubjectType {
     subject.typeEnum
   }
@@ -65,7 +58,7 @@ struct SubjectHeaderView: View {
         .foregroundStyle(.secondary)
 
         Spacer()
-        Text(nameCN)
+        Text(subject.title)
           .multilineTextAlignment(.leading)
           .truncationMode(.middle)
           .lineLimit(2)
