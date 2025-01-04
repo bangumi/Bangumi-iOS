@@ -40,9 +40,16 @@ update_person:
 
 update_user:
 	curl -sSfLo "$(PREVIEW_PATH)/user.json" https://next.bgm.tv/p1/users/$(UID)
+	curl -sSfLo "$(PREVIEW_PATH)/user_timeline.json" https://next.bgm.tv/p1/users/$(UID)/timeline
+	curl -sSfLo "$(PREVIEW_PATH)/user_groups.json" https://next.bgm.tv/p1/users/$(UID)/groups
+	curl -sSfLo "$(PREVIEW_PATH)/user_blogs.json" https://next.bgm.tv/p1/users/$(UID)/blogs
+	curl -sSfLo "$(PREVIEW_PATH)/user_indexes.json" https://next.bgm.tv/p1/users/$(UID)/indexes
 	curl -sSfLo "$(PREVIEW_PATH)/user_friends.json" https://next.bgm.tv/p1/users/$(UID)/friends
 	curl -sSfLo "$(PREVIEW_PATH)/user_followers.json" https://next.bgm.tv/p1/users/$(UID)/followers
 	curl -sSfLo "$(PREVIEW_PATH)/user_subject_collections.json" https://next.bgm.tv/p1/users/$(UID)/collections/subjects
+	curl -sSfLo "$(PREVIEW_PATH)/user_person_collections.json" https://next.bgm.tv/p1/users/$(UID)/collections/persons
+	curl -sSfLo "$(PREVIEW_PATH)/user_character_collections.json" https://next.bgm.tv/p1/users/$(UID)/collections/characters
+	curl -sSfLo "$(PREVIEW_PATH)/user_index_collections.json" https://next.bgm.tv/p1/users/$(UID)/collections/indexes
 	curl -sSfLo "$(PREVIEW_PATH)/user_subject_collection_anime.json" https://next.bgm.tv/p1/users/$(UID)/collections/subjects/12
 	curl -sSfLo "$(PREVIEW_PATH)/user_subject_collection_book.json" https://next.bgm.tv/p1/users/$(UID)/collections/subjects/497
 
@@ -50,7 +57,6 @@ update_user:
 
 update_timeline:
 	curl -sSfLo "$(PREVIEW_PATH)/timeline.json" https://next.bgm.tv/p1/timeline
-	curl -sSfLo "$(PREVIEW_PATH)/user_timeline.json" https://next.bgm.tv/p1/users/$(UID)/timeline
 
 
 update_preview: update_api update_subject update_user update_character update_person

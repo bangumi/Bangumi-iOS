@@ -64,6 +64,26 @@ components:
         - public
       title: BlogEntry
       type: object
+    BlogPhoto:
+      properties:
+        createdAt:
+          type: integer
+        icon:
+          type: string
+        id:
+          type: integer
+        target:
+          type: string
+        vote:
+          type: integer
+      required:
+        - id
+        - target
+        - icon
+        - vote
+        - createdAt
+      title: BlogPhoto
+      type: object
     Calendar:
       additionalProperties:
         items:
@@ -531,12 +551,20 @@ components:
       type: object
     Group:
       properties:
+        accessible:
+          type: boolean
+        cat:
+          type: integer
         createdAt:
+          type: integer
+        creator:
+          $ref: '#/components/schemas/SlimUser'
+        creatorID:
           type: integer
         description:
           type: string
         icon:
-          type: string
+          $ref: '#/components/schemas/Avatar'
         id:
           type: integer
         name:
@@ -547,14 +575,24 @@ components:
           type: string
         totalMembers:
           type: integer
+        totalPosts:
+          type: integer
+        totalTopics:
+          type: integer
       required:
         - id
+        - cat
         - name
         - nsfw
         - title
         - icon
+        - creatorID
+        - creator
         - description
+        - totalTopics
+        - totalPosts
         - totalMembers
+        - accessible
         - createdAt
       title: Group
       type: object
@@ -581,7 +619,33 @@ components:
     GroupProfile:
       properties:
         group:
-          $ref: '#/components/schemas/Group'
+          properties:
+            createdAt:
+              type: number
+            description:
+              type: string
+            icon:
+              type: string
+            id:
+              type: integer
+            name:
+              type: string
+            nsfw:
+              type: boolean
+            title:
+              type: string
+            totalMembers:
+              type: integer
+          required:
+            - id
+            - name
+            - nsfw
+            - description
+            - title
+            - createdAt
+            - totalMembers
+            - icon
+          type: object
         inGroup:
           description: 是否已经加入小组
           type: boolean
@@ -1012,8 +1076,12 @@ components:
       properties:
         createdAt:
           type: integer
+        icon:
+          type: string
         id:
           type: integer
+        public:
+          type: boolean
         replies:
           type: integer
         summary:
@@ -1022,14 +1090,19 @@ components:
           type: string
         type:
           type: integer
+        uid:
+          type: integer
         updatedAt:
           type: integer
       required:
         - id
+        - uid
         - type
         - title
+        - icon
         - summary
         - replies
+        - public
         - createdAt
         - updatedAt
       title: SlimBlogEntry
@@ -1064,6 +1137,10 @@ components:
       type: object
     SlimGroup:
       properties:
+        createdAt:
+          type: integer
+        creatorID:
+          type: integer
         icon:
           $ref: '#/components/schemas/Avatar'
         id:
@@ -1074,12 +1151,17 @@ components:
           type: boolean
         title:
           type: string
+        totalMembers:
+          type: integer
       required:
         - id
         - name
         - nsfw
         - title
         - icon
+        - creatorID
+        - totalMembers
+        - createdAt
       title: SlimGroup
       type: object
     SlimIndex:
@@ -2060,7 +2142,7 @@ components:
           type: integer
         parent:
           anyOf:
-            - $ref: '#/components/schemas/Group'
+            - $ref: '#/components/schemas/SlimGroup'
             - $ref: '#/components/schemas/SlimSubject'
         reactions:
           items:
@@ -2442,7 +2524,7 @@ info:
     关于订阅通知的 socket.io 相关的文档在
     <https://github.com/bangumi/GraphQL/blob/master/docs/socket.io.md>
   title: bangumi private api
-  version: 2024-12-28-de050e5
+  version: 2025-01-04-d3ae650
 openapi: 3.0.3
 paths:
   /p1/blocklist:
@@ -2474,7 +2556,7 @@ paths:
           HTTPBearer: []
       summary: 获取绝交用户列表
       tags:
-        - user
+        - misc
     post:
       operationId: addToBlocklist
       requestBody:
@@ -2514,7 +2596,7 @@ paths:
           HTTPBearer: []
       summary: 将用户添加到绝交列表
       tags:
-        - user
+        - misc
   /p1/blocklist/{id}:
     delete:
       operationId: removeFromBlocklist
@@ -2550,7 +2632,7 @@ paths:
           HTTPBearer: []
       summary: 将用户从绝交列表移出
       tags:
-        - user
+        - misc
   /p1/calendar:
     get:
       operationId: getCalendar
@@ -2821,7 +2903,7 @@ paths:
           HTTPBearer: []
       summary: 标记通知为已读
       tags:
-        - user
+        - misc
   /p1/debug:
     get:
       description: debug 路由
@@ -3457,7 +3539,7 @@ paths:
                 description: 意料之外的服务器错误
           description: 意料之外的服务器错误
       tags:
-        - user
+        - auth
   /p1/logout:
     post:
       description: 登出
@@ -3496,7 +3578,7 @@ paths:
                 description: 意料之外的服务器错误
           description: 意料之外的服务器错误
       tags:
-        - user
+        - auth
   /p1/me:
     get:
       operationId: getCurrentUser
@@ -3527,8 +3609,9 @@ paths:
           description: 意料之外的服务器错误
       security:
         - CookiesSession: []
+      summary: 获取当前用户信息
       tags:
-        - user
+        - misc
   /p1/notify:
     get:
       operationId: listNotice
@@ -3590,7 +3673,7 @@ paths:
           HTTPBearer: []
       summary: 获取未读通知
       tags:
-        - user
+        - misc
   /p1/persons/{personID}:
     get:
       operationId: getPerson
@@ -5232,7 +5315,7 @@ paths:
           description: 意料之外的服务器错误
       summary: 获取 Turnstile 令牌
       tags:
-        - user
+        - auth
   /p1/users/-/collections/subjects/-/episodes/{episodeID}:
     get:
       operationId: getUserSubjectCollectionEpisodeByEpisodeID
@@ -5353,6 +5436,47 @@ paths:
         - CookiesSession: []
           HTTPBearer: []
       summary: 获取用户信息
+      tags:
+        - user
+  /p1/users/{username}/blogs:
+    get:
+      operationId: getUserBlogs
+      parameters:
+        - description: max 100
+          in: query
+          name: limit
+          required: false
+          schema:
+            default: 20
+            maximum: 100
+            minimum: 1
+            type: integer
+        - description: min 0
+          in: query
+          name: offset
+          required: false
+          schema:
+            default: 0
+            minimum: 0
+            type: integer
+        - in: path
+          name: username
+          required: true
+          schema:
+            minLength: 1
+            type: string
+      responses:
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                description: 意料之外的服务器错误
+          description: 意料之外的服务器错误
+      security:
+        - CookiesSession: []
+          HTTPBearer: []
+      summary: 获取用户创建的日志
       tags:
         - user
   /p1/users/{username}/collections/characters:
@@ -5841,6 +5965,47 @@ paths:
       summary: 获取用户的好友列表
       tags:
         - user
+  /p1/users/{username}/groups:
+    get:
+      operationId: getUserGroups
+      parameters:
+        - description: max 100
+          in: query
+          name: limit
+          required: false
+          schema:
+            default: 20
+            maximum: 100
+            minimum: 1
+            type: integer
+        - description: min 0
+          in: query
+          name: offset
+          required: false
+          schema:
+            default: 0
+            minimum: 0
+            type: integer
+        - in: path
+          name: username
+          required: true
+          schema:
+            minLength: 1
+            type: string
+      responses:
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                description: 意料之外的服务器错误
+          description: 意料之外的服务器错误
+      security:
+        - CookiesSession: []
+          HTTPBearer: []
+      summary: 获取用户加入的小组
+      tags:
+        - user
   /p1/users/{username}/indexes:
     get:
       operationId: getUserIndexes
@@ -5997,6 +6162,9 @@ paths:
                 nameCN: 中文名
                 summary: a short description
                 type: 0
+              expectedRevision:
+                name: old name
+                nameCN: old cn name
             schema:
               properties:
                 commitMessage:
@@ -6023,6 +6191,24 @@ paths:
                       type: string
                     type:
                       $ref: '#/components/schemas/EpisodeType'
+                  type: object
+                expectedRevision:
+                  description: >-
+                    a optional object to check if input is changed by others
+
+                    if some key is given, and current data in database doesn't
+                    match input, subject will not be changed
+                  properties:
+                    date:
+                      type: string
+                    duration:
+                      type: string
+                    name:
+                      type: string
+                    nameCN:
+                      type: string
+                    summary:
+                      type: string
                   type: object
               required:
                 - commitMessage
