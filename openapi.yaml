@@ -2279,114 +2279,6 @@ components:
         - character
         - createdAt
       type: object
-    UserCollectionsCharacterSummary:
-      properties:
-        count:
-          type: integer
-        detail:
-          items:
-            $ref: '#/components/schemas/SlimCharacter'
-          type: array
-      required:
-        - count
-        - detail
-      type: object
-    UserCollectionsPersonSummary:
-      properties:
-        count:
-          type: integer
-        detail:
-          items:
-            $ref: '#/components/schemas/SlimPerson'
-          type: array
-      required:
-        - count
-        - detail
-      type: object
-    UserCollectionsSubjectSummary:
-      properties:
-        counts:
-          additionalProperties:
-            type: integer
-          example:
-            '1': 0
-            '2': 0
-            '3': 0
-            '4': 0
-            '5': 0
-          type: object
-        details:
-          additionalProperties:
-            items:
-              $ref: '#/components/schemas/SlimSubject'
-            type: array
-          example:
-            '1': []
-            '2':
-              - id: 8
-                images:
-                  common: https://lain.bgm.tv/pic/cover/c/c9/f0/8_wK0z3.jpg
-                  grid: https://lain.bgm.tv/pic/cover/g/c9/f0/8_wK0z3.jpg
-                  large: https://lain.bgm.tv/pic/cover/l/c9/f0/8_wK0z3.jpg
-                  medium: https://lain.bgm.tv/pic/cover/m/c9/f0/8_wK0z3.jpg
-                  small: https://lain.bgm.tv/pic/cover/s/c9/f0/8_wK0z3.jpg
-                locked: false
-                name: コードギアス 反逆のルルーシュR2
-                nameCN: Code Geass 反叛的鲁路修R2
-                nsfw: false
-                type: 2
-            '3': []
-            '4': []
-            '5': []
-          type: object
-      required:
-        - counts
-        - details
-      type: object
-    UserCollectionsSummary:
-      properties:
-        character:
-          $ref: '#/components/schemas/UserCollectionsCharacterSummary'
-        index:
-          $ref: '#/components/schemas/UserIndexesSummary'
-        person:
-          $ref: '#/components/schemas/UserCollectionsPersonSummary'
-        subject:
-          additionalProperties:
-            $ref: '#/components/schemas/UserCollectionsSubjectSummary'
-          example:
-            '1':
-              counts:
-                '1': 0
-                '2': 1
-                '3': 0
-                '4': 0
-                '5': 0
-              details:
-                '1': []
-                '2':
-                  - id: 8
-                    images:
-                      common: https://lain.bgm.tv/pic/cover/c/c9/f0/8_wK0z3.jpg
-                      grid: https://lain.bgm.tv/pic/cover/g/c9/f0/8_wK0z3.jpg
-                      large: https://lain.bgm.tv/pic/cover/l/c9/f0/8_wK0z3.jpg
-                      medium: https://lain.bgm.tv/pic/cover/m/c9/f0/8_wK0z3.jpg
-                      small: https://lain.bgm.tv/pic/cover/s/c9/f0/8_wK0z3.jpg
-                    locked: false
-                    name: コードギアス 反逆のルルーシュR2
-                    nameCN: Code Geass 反叛的鲁路修R2
-                    nsfw: false
-                    type: 2
-                '3': []
-                '4': []
-                '5': []
-          type: object
-      required:
-        - subject
-        - character
-        - person
-        - index
-      type: object
     UserHomepage:
       properties:
         left:
@@ -2411,18 +2303,6 @@ components:
       required:
         - index
         - createdAt
-      type: object
-    UserIndexesSummary:
-      properties:
-        count:
-          type: integer
-        detail:
-          items:
-            $ref: '#/components/schemas/SlimIndex'
-          type: array
-      required:
-        - count
-        - detail
       type: object
     UserNetworkService:
       properties:
@@ -2524,7 +2404,7 @@ info:
     关于订阅通知的 socket.io 相关的文档在
     <https://github.com/bangumi/GraphQL/blob/master/docs/socket.io.md>
   title: bangumi private api
-  version: 2025-01-04-d3ae650
+  version: 2025-01-04-3baab16
 openapi: 3.0.3
 paths:
   /p1/blocklist:
@@ -2633,6 +2513,120 @@ paths:
       summary: 将用户从绝交列表移出
       tags:
         - misc
+  /p1/blogs/{entryID}:
+    get:
+      operationId: getBlogEntry
+      parameters:
+        - in: path
+          name: entryID
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlogEntry'
+          description: Default Response
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                description: 意料之外的服务器错误
+          description: 意料之外的服务器错误
+      security:
+        - HTTPBearer: []
+      summary: 获取日志详情
+      tags:
+        - blog
+  /p1/blogs/{entryID}/photos:
+    get:
+      operationId: getBlogPhotos
+      parameters:
+        - description: max 100
+          in: query
+          name: limit
+          required: false
+          schema:
+            default: 20
+            maximum: 100
+            minimum: 1
+            type: integer
+        - description: min 0
+          in: query
+          name: offset
+          required: false
+          schema:
+            default: 0
+            minimum: 0
+            type: integer
+        - in: path
+          name: entryID
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  data:
+                    items:
+                      $ref: '#/components/schemas/BlogPhoto'
+                    type: array
+                  total:
+                    description: limit+offset 为参数的请求表示总条数，page 为参数的请求表示总页数
+                    type: integer
+                required:
+                  - data
+                  - total
+                type: object
+          description: Default Response
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                description: 意料之外的服务器错误
+          description: 意料之外的服务器错误
+      security:
+        - HTTPBearer: []
+      summary: 获取日志的图片
+      tags:
+        - blog
+  /p1/blogs/{entryID}/subjects:
+    get:
+      operationId: getBlogRelatedSubjects
+      parameters:
+        - in: path
+          name: entryID
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/SlimSubject'
+                type: array
+          description: Default Response
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                description: 意料之外的服务器错误
+          description: 意料之外的服务器错误
+      security:
+        - HTTPBearer: []
+      summary: 获取日志的关联条目
+      tags:
+        - blog
   /p1/calendar:
     get:
       operationId: getCalendar
@@ -5466,6 +5460,23 @@ paths:
             minLength: 1
             type: string
       responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  data:
+                    items:
+                      $ref: '#/components/schemas/SlimBlogEntry'
+                    type: array
+                  total:
+                    description: limit+offset 为参数的请求表示总条数，page 为参数的请求表示总页数
+                    type: integer
+                required:
+                  - data
+                  - total
+                type: object
+          description: Default Response
         '500':
           content:
             application/json:
@@ -5507,6 +5518,23 @@ paths:
             minLength: 1
             type: string
       responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  data:
+                    items:
+                      $ref: '#/components/schemas/UserCharacterCollection'
+                    type: array
+                  total:
+                    description: limit+offset 为参数的请求表示总条数，page 为参数的请求表示总页数
+                    type: integer
+                required:
+                  - data
+                  - total
+                type: object
+          description: Default Response
         '500':
           content:
             application/json:
@@ -5584,6 +5612,23 @@ paths:
             minLength: 1
             type: string
       responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  data:
+                    items:
+                      $ref: '#/components/schemas/UserIndexCollection'
+                    type: array
+                  total:
+                    description: limit+offset 为参数的请求表示总条数，page 为参数的请求表示总页数
+                    type: integer
+                required:
+                  - data
+                  - total
+                type: object
+          description: Default Response
         '500':
           content:
             application/json:
@@ -5661,6 +5706,23 @@ paths:
             minLength: 1
             type: string
       responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  data:
+                    items:
+                      $ref: '#/components/schemas/UserPersonCollection'
+                    type: array
+                  total:
+                    description: limit+offset 为参数的请求表示总条数，page 为参数的请求表示总页数
+                    type: integer
+                required:
+                  - data
+                  - total
+                type: object
+          description: Default Response
         '500':
           content:
             application/json:
@@ -5821,36 +5883,6 @@ paths:
       summary: 获取用户单个条目收藏
       tags:
         - user
-  /p1/users/{username}/collections/summary:
-    get:
-      operationId: getUserCollectionsSummary
-      parameters:
-        - in: path
-          name: username
-          required: true
-          schema:
-            minLength: 1
-            type: string
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserCollectionsSummary'
-          description: Default Response
-        '500':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-                description: 意料之外的服务器错误
-          description: 意料之外的服务器错误
-      security:
-        - CookiesSession: []
-          HTTPBearer: []
-      summary: 获取用户收藏概览
-      tags:
-        - user
   /p1/users/{username}/followers:
     get:
       operationId: getUserFollowers
@@ -5993,6 +6025,23 @@ paths:
             minLength: 1
             type: string
       responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  data:
+                    items:
+                      $ref: '#/components/schemas/SlimGroup'
+                    type: array
+                  total:
+                    description: limit+offset 为参数的请求表示总条数，page 为参数的请求表示总页数
+                    type: integer
+                required:
+                  - data
+                  - total
+                type: object
+          description: Default Response
         '500':
           content:
             application/json:
@@ -6034,6 +6083,23 @@ paths:
             minLength: 1
             type: string
       responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  data:
+                    items:
+                      $ref: '#/components/schemas/SlimIndex'
+                    type: array
+                  total:
+                    description: limit+offset 为参数的请求表示总条数，page 为参数的请求表示总页数
+                    type: integer
+                required:
+                  - data
+                  - total
+                type: object
+          description: Default Response
         '500':
           content:
             application/json:
@@ -6073,6 +6139,14 @@ paths:
             minLength: 1
             type: string
       responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Timeline'
+                type: array
+          description: Default Response
         '500':
           content:
             application/json:

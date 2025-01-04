@@ -547,6 +547,31 @@ struct SlimBlogEntryDTO: Codable, Hashable, Identifiable, Linkable {
   }
 }
 
+struct BlogEntryDTO: Codable, Hashable, Identifiable, Linkable {
+  var id: Int
+  var type: Int
+  var user: SlimUserDTO
+  var title: String
+  var icon: String
+  var content: String
+  var tags: [String]
+  var views: Int
+  var replies: Int
+  var createdAt: Int
+  var updatedAt: Int
+  var noreply: Int
+  var related: Int
+  var `public`: Bool
+
+  var name: String {
+    title
+  }
+
+  var link: String {
+    "chii://blog/\(id)"
+  }
+}
+
 struct TimelineDTO: Codable, Identifiable, Hashable {
   var id: Int
   var uid: Int

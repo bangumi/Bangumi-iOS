@@ -690,3 +690,26 @@ extension Chii {
   }
 
 }
+
+// MARK: - Blog
+extension Chii {
+  func getBlogEntry(_ blogId: Int) async throws -> BlogEntryDTO {
+    if self.mock {
+      return loadFixture(fixture: "blog.json", target: BlogEntryDTO.self)
+    }
+    let url = BangumiAPI.priv.build("p1/blogs/\(blogId)")
+    let data = try await self.request(url: url, method: "GET")
+    let blog: BlogEntryDTO = try self.decodeResponse(data)
+    return blog
+  }
+
+  func getBlogSubjects(_ blogId: Int) async throws -> [SlimSubjectDTO] {
+    if self.mock {
+      return loadFixture(fixture: "blog_subjects.json", target: [SlimSubjectDTO].self)
+    }
+    let url = BangumiAPI.priv.build("p1/blogs/\(blogId)/subjects")
+    let data = try await self.request(url: url, method: "GET")
+    let subjects: [SlimSubjectDTO] = try self.decodeResponse(data)
+    return subjects
+  }
+}

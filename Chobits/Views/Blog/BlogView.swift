@@ -1,10 +1,97 @@
+import BBCode
 import SwiftData
 import SwiftUI
 
 struct BlogView: View {
   let blogId: Int
 
+  @AppStorage("shareDomain") var shareDomain: ShareDomain = .chii
+
+  @State private var refreshed: Bool = false
+  @State private var blog: BlogEntryDTO?
+  @State private var subjects: [SlimSubjectDTO] = []
+
+  var title: String {
+    guard let blog = blog else {
+      return "日志"
+    }
+    return blog.title
+  }
+
+  var shareLink: URL {
+    URL(string: "https://\(shareDomain)/blog/\(blogId)")!
+  }
+
+  func load() async {
+    do {
+      blog = try await Chii.shared.getBlogEntry(blogId)
+      subjects = try await Chii.shared.getBlogSubjects(blogId)
+    } catch {
+      Notifier.shared.alert(error: error)
+    }
+  }
+
   var body: some View {
-    Text("🚧")
+    Section {
+      if let blog = blog {
+        ScrollView {
+          VStack(alignment: .leading, spacing: 5) {
+            UserSmallView(user: blog.user)
+              .padding(.top, 8)
+            Text(blog.title)
+              .font(.title3)
+              .bold()
+            HStack {
+              Text(blog.createdAt.datetimeDisplay)
+                .font(.caption)
+                .foregroundColor(.secondary)
+              Spacer()
+              Menu {
+                ForEach(subjects) { subject in
+                  NavigationLink(value: NavDestination.subject(subject.id)) {
+                    HStack {
+                      ImageView(img: subject.images?.grid)
+                        .imageStyle(width: 32, height: 32)
+                        .imageType(.subject)
+                      Text("\(subject.nameCN.isEmpty ? subject.name : subject.nameCN)")
+                    }
+                  }
+                }
+              } label: {
+                Text(subjects.isEmpty ? "" : "关联条目+")
+                  .font(.caption)
+                  .foregroundStyle(.accent)
+              }.disabled(subjects.isEmpty)
+            }
+            Divider()
+            BBCodeView(blog.content)
+              .padding(.top, 8)
+          }.padding(.horizontal, 8)
+
+        }
+      } else if refreshed {
+        NotFoundView()
+      } else {
+        ProgressView()
+      }
+    }
+    .navigationTitle(title)
+    .navigationBarTitleDisplayMode(.inline)
+    .toolbar {
+      ToolbarItem(placement: .topBarTrailing) {
+        Menu {
+          ShareLink(item: shareLink) {
+            Label("分享", systemImage: "square.and.arrow.up")
+          }
+        } label: {
+          Image(systemName: "ellipsis.circle")
+        }
+      }
+    }
+    .onAppear {
+      Task {
+        await load()
+      }
+    }
   }
 }

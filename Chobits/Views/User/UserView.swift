@@ -155,7 +155,7 @@ struct UserView: View {
               Label("人物", systemImage: "person")
             }
             NavigationLink(value: NavDestination.userBlog(user)) {
-              Label("日志", systemImage: "book")
+              Label("日志", systemImage: "richtext.page")
             }
             NavigationLink(value: NavDestination.userIndex(user)) {
               Label("目录", systemImage: "list.bullet")

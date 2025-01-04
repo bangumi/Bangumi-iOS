@@ -37,8 +37,20 @@ struct ChiiTimelineView: View {
               NavigationLink(value: NavDestination.collections) {
                 Label("收藏", systemImage: "star")
               }
+              NavigationLink(value: NavDestination.userMono(profile.user)) {
+                Label("人物", systemImage: "person")
+              }
+              NavigationLink(value: NavDestination.userBlog(profile.user)) {
+                Label("日志", systemImage: "richtext.page")
+              }
+              NavigationLink(value: NavDestination.userIndex(profile.user)) {
+                Label("目录", systemImage: "list.bullet")
+              }
               NavigationLink(value: NavDestination.userTimeline(profile.user)) {
                 Label("时间胶囊", systemImage: "clock")
+              }
+              NavigationLink(value: NavDestination.userGroup(profile.user)) {
+                Label("小组", systemImage: "person.3")
               }
               NavigationLink(value: NavDestination.friends) {
                 Label("好友", systemImage: "person.2")

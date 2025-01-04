@@ -58,5 +58,6 @@ update_user:
 update_timeline:
 	curl -sSfLo "$(PREVIEW_PATH)/timeline.json" https://next.bgm.tv/p1/timeline
 
-
-update_preview: update_api update_subject update_user update_character update_person
+update_blog:
+	curl -sSfLo "$(PREVIEW_PATH)/blog.json" https://next.bgm.tv/p1/blogs/347290
+	curl -sSfLo "$(PREVIEW_PATH)/blog_subjects.json" https://next.bgm.tv/p1/blogs/347290/subjects

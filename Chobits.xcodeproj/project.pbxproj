@@ -17,6 +17,8 @@
 		190AE6322D292BF800274B4C /* user_index_collections.json in Resources */ = {isa = PBXBuildFile; fileRef = 190AE62F2D292BF800274B4C /* user_index_collections.json */; };
 		190AE6332D292BF800274B4C /* user_indexes.json in Resources */ = {isa = PBXBuildFile; fileRef = 190AE6302D292BF800274B4C /* user_indexes.json */; };
 		190AE6342D292BF800274B4C /* user_groups.json in Resources */ = {isa = PBXBuildFile; fileRef = 190AE62E2D292BF800274B4C /* user_groups.json */; };
+		190AE6EC2D2982A200274B4C /* blog.json in Resources */ = {isa = PBXBuildFile; fileRef = 190AE6EA2D2982A200274B4C /* blog.json */; };
+		190AE6ED2D2982A200274B4C /* blog_subjects.json in Resources */ = {isa = PBXBuildFile; fileRef = 190AE6EB2D2982A200274B4C /* blog_subjects.json */; };
 		190C3A9C2D182381004ECCE6 /* user_timeline.json in Resources */ = {isa = PBXBuildFile; fileRef = 190C3A9B2D182381004ECCE6 /* user_timeline.json */; };
 		190C3A9D2D182381004ECCE6 /* timeline.json in Resources */ = {isa = PBXBuildFile; fileRef = 190C3A9A2D182381004ECCE6 /* timeline.json */; };
 		190C3B1D2D1AC1D4004ECCE6 /* Timeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 190C3B1C2D1AC1D2004ECCE6 /* Timeline.swift */; };
@@ -140,6 +142,8 @@
 		190AE62E2D292BF800274B4C /* user_groups.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = user_groups.json; sourceTree = "<group>"; };
 		190AE62F2D292BF800274B4C /* user_index_collections.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = user_index_collections.json; sourceTree = "<group>"; };
 		190AE6302D292BF800274B4C /* user_indexes.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = user_indexes.json; sourceTree = "<group>"; };
+		190AE6EA2D2982A200274B4C /* blog.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = blog.json; sourceTree = "<group>"; };
+		190AE6EB2D2982A200274B4C /* blog_subjects.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = blog_subjects.json; sourceTree = "<group>"; };
 		190C3A9A2D182381004ECCE6 /* timeline.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = timeline.json; sourceTree = "<group>"; };
 		190C3A9B2D182381004ECCE6 /* user_timeline.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = user_timeline.json; sourceTree = "<group>"; };
 		190C3B1C2D1AC1D2004ECCE6 /* Timeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Timeline.swift; sourceTree = "<group>"; };
@@ -339,6 +343,8 @@
 		19671C472BDEB55D000B4D99 /* Preview Content */ = {
 			isa = PBXGroup;
 			children = (
+				190AE6EA2D2982A200274B4C /* blog.json */,
+				190AE6EB2D2982A200274B4C /* blog_subjects.json */,
 				1909F3B52BECFAC400E3B8F0 /* character.json */,
 				194E773B2D0EFAF80070F5F8 /* character_casts.json */,
 				194E773C2D0EFAF80070F5F8 /* character_collects.json */,
@@ -611,6 +617,8 @@
 				190AE6342D292BF800274B4C /* user_groups.json in Resources */,
 				1998DD072CB1222400115E1F /* subject_comments.json in Resources */,
 				19B2A8892D0B1034001617BE /* subject_music_episodes.json in Resources */,
+				190AE6EC2D2982A200274B4C /* blog.json in Resources */,
+				190AE6ED2D2982A200274B4C /* blog_subjects.json in Resources */,
 				190C3A9C2D182381004ECCE6 /* user_timeline.json in Resources */,
 				190C3A9D2D182381004ECCE6 /* timeline.json in Resources */,
 				19B2A88A2D0B1034001617BE /* subject_anime_episodes.json in Resources */,
