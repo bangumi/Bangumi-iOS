@@ -165,7 +165,7 @@ struct SubjectDetailView: View {
       ToolbarItem(placement: .topBarTrailing) {
         Menu {
           NavigationLink(value: NavDestination.subjectStaffList(subject.subjectId)) {
-            Label("制作人员", systemImage: "person.2")
+            Label("制作人员", systemImage: "person.3")
           }
           NavigationLink(value: NavDestination.subjectRating(subject)) {
             Label("评分分布", systemImage: "chart.bar.xaxis")

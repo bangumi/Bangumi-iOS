@@ -24,7 +24,7 @@ struct CollectionsView: View {
         }
       }.padding(.horizontal, 8)
     }
-    .navigationTitle("时光机")
+    .navigationTitle("我的收藏")
     .navigationBarTitleDisplayMode(.inline)
     .onGeometryChange(for: CGSize.self) { proxy in
       proxy.size

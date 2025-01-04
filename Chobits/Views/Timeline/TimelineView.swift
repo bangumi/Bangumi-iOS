@@ -31,8 +31,11 @@ struct ChiiTimelineView: View {
         if isAuthenticated {
           ToolbarItem(placement: .topBarLeading) {
             Menu {
+              NavigationLink(value: NavDestination.user(profile.user.username)) {
+                Label("时光机", systemImage: "house")
+              }
               NavigationLink(value: NavDestination.collections) {
-                Label("时光机", systemImage: "star")
+                Label("收藏", systemImage: "star")
               }
               NavigationLink(value: NavDestination.userTimeline(profile.user)) {
                 Label("时间胶囊", systemImage: "clock")

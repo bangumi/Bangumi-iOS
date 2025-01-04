@@ -6,9 +6,22 @@ struct UserView: View {
   let username: String
 
   @AppStorage("shareDomain") var shareDomain: ShareDomain = .chii
+  @AppStorage("profile") var profile: Profile = Profile()
+
   @Environment(\.colorScheme) var colorScheme
 
   @State private var user: UserDTO?
+
+  var title: String {
+    guard let user = user else {
+      return "用户"
+    }
+    if profile.username == user.username {
+      return "我的时光机"
+    } else {
+      return "\(user.nickname)的时光机"
+    }
+  }
 
   func load() async {
     do {
@@ -108,7 +121,7 @@ struct UserView: View {
           // Text("时光机 🚧")
         }.padding(.horizontal, 8)
       }
-      .navigationTitle("\(user.nickname)")
+      .navigationTitle(title)
       .toolbarTitleDisplayMode(.inline)
       .toolbar {
         ToolbarItem(placement: .topBarTrailing) {
