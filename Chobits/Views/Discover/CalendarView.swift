@@ -106,7 +106,7 @@ struct CalendarWeekdayView: View {
   }
 
   var columnCount: Int {
-    let columns = Int((width - 16) / 110)
+    let columns = Int((width - 8) / 118)
     return columns > 0 ? columns : 1
   }
 

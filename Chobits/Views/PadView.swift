@@ -61,10 +61,7 @@ struct PadView: View {
         }
       }
 
-      Tab(
-        ChiiViewTab.discover.title, systemImage: ChiiViewTab.discover.icon,
-        value: .discover, role: .search
-      ) {
+      Tab(ChiiViewTab.discover.title, systemImage: ChiiViewTab.discover.icon, value: .discover) {
         NavigationStack(path: $discoverNav) {
           Section {
             if searching {

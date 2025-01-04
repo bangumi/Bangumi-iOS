@@ -34,13 +34,13 @@ struct ProgressTileView: View {
   }
 
   var columns: Int {
-    let columns = Int((width - 16) / 160)
+    let columns = Int((width - 8) / (160 + 24))
     return columns > 0 ? columns : 1
   }
 
   var cardWidth: CGFloat {
     let columns = CGFloat(self.columns)
-    let cw = ((width - 16 - columns * 8 + 8) / columns) - 16
+    let cw = (width - 8) / columns - 24
     if cw < 160 {
       return 160
     }
