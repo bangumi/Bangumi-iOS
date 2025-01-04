@@ -527,10 +527,13 @@ struct SubjectReviewDTO: Codable, Identifiable, Hashable {
 
 struct SlimBlogEntryDTO: Codable, Hashable, Identifiable, Linkable {
   var id: Int
+  var uid: Int = 0
   var title: String
+  var icon: String = ""
   var summary: String
   var replies: Int
   var type: Int
+  var `public`: Bool = true
   var createdAt: Int
   var updatedAt: Int
 
@@ -578,6 +581,9 @@ struct SlimGroupDTO: Codable, Identifiable, Hashable, Linkable {
   var nsfw: Bool
   var title: String
   var icon: Avatar?
+  var creatorID: Int = 0
+  var totalMembers: Int = 0
+  var createdAt: Int = 0
 
   var link: String {
     "chii://group/\(id)"

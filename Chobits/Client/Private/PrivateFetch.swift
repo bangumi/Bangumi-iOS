@@ -258,6 +258,85 @@ extension Chii {
     let resp: PagedDTO<EpisodeCollectionDTO> = try self.decodeResponse(data)
     return resp
   }
+
+  func getUserBlogs(username: String, limit: Int = 20, offset: Int = 0) async throws -> PagedDTO<
+    SlimBlogEntryDTO
+  > {
+    if self.mock {
+      return loadFixture(fixture: "user_blogs.json", target: PagedDTO<SlimBlogEntryDTO>.self)
+    }
+    let url = BangumiAPI.priv.build("p1/users/\(username)/blogs")
+    let queryItems: [URLQueryItem] = [
+      URLQueryItem(name: "limit", value: String(limit)),
+      URLQueryItem(name: "offset", value: String(offset)),
+    ]
+    let pageURL = url.appending(queryItems: queryItems)
+    let data = try await self.request(url: pageURL, method: "GET")
+    let resp: PagedDTO<SlimBlogEntryDTO> = try self.decodeResponse(data)
+    return resp
+  }
+
+  func getUserIndexes(username: String, limit: Int = 20, offset: Int = 0) async throws -> PagedDTO<
+    SlimIndexDTO
+  > {
+    if self.mock {
+      return loadFixture(fixture: "user_indexes.json", target: PagedDTO<SlimIndexDTO>.self)
+    }
+    let url = BangumiAPI.priv.build("p1/users/\(username)/indexes")
+    let queryItems: [URLQueryItem] = [
+      URLQueryItem(name: "limit", value: String(limit)),
+      URLQueryItem(name: "offset", value: String(offset)),
+    ]
+    let pageURL = url.appending(queryItems: queryItems)
+    let data = try await self.request(url: pageURL, method: "GET")
+    let resp: PagedDTO<SlimIndexDTO> = try self.decodeResponse(data)
+    return resp
+  }
+
+  func getUserIndexCollections(username: String, limit: Int = 20, offset: Int = 0) async throws
+    -> PagedDTO<SlimIndexDTO>
+  {
+    if self.mock {
+      return loadFixture(
+        fixture: "user_index_collections.json", target: PagedDTO<SlimIndexDTO>.self)
+    }
+    let url = BangumiAPI.priv.build("p1/users/\(username)/collections/indexes")
+    let queryItems: [URLQueryItem] = [
+      URLQueryItem(name: "limit", value: String(limit)),
+      URLQueryItem(name: "offset", value: String(offset)),
+    ]
+    let pageURL = url.appending(queryItems: queryItems)
+    let data = try await self.request(url: pageURL, method: "GET")
+    let resp: PagedDTO<SlimIndexDTO> = try self.decodeResponse(data)
+    return resp
+  }
+
+  func getUserIndexCollection(username: String, indexID: Int) async throws -> SlimIndexDTO {
+    if self.mock {
+      return loadFixture(fixture: "user_index_collection.json", target: SlimIndexDTO.self)
+    }
+    let url = BangumiAPI.priv.build("p1/users/\(username)/collections/indexes/\(indexID)")
+    let data = try await self.request(url: url, method: "GET")
+    let collection: SlimIndexDTO = try self.decodeResponse(data)
+    return collection
+  }
+
+  func getUserGroups(username: String, limit: Int = 20, offset: Int = 0) async throws -> PagedDTO<
+    SlimGroupDTO
+  > {
+    if self.mock {
+      return loadFixture(fixture: "user_groups.json", target: PagedDTO<SlimGroupDTO>.self)
+    }
+    let url = BangumiAPI.priv.build("p1/users/\(username)/groups")
+    let queryItems: [URLQueryItem] = [
+      URLQueryItem(name: "limit", value: String(limit)),
+      URLQueryItem(name: "offset", value: String(offset)),
+    ]
+    let pageURL = url.appending(queryItems: queryItems)
+    let data = try await self.request(url: pageURL, method: "GET")
+    let resp: PagedDTO<SlimGroupDTO> = try self.decodeResponse(data)
+    return resp
+  }
 }
 
 // MARK: - Character
