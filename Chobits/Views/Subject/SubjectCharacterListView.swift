@@ -84,8 +84,7 @@ struct SubjectCharacterListView: View {
             }.padding(.leading, 4)
           }
         }
-      }
-      .padding(8)
+      }.padding(8)
     }
     .buttonStyle(.plain)
     .navigationTitle("角色列表")

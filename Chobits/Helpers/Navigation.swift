@@ -15,7 +15,7 @@ enum NavDestination: Hashable, View {
   case collectionList(_ subjectType: SubjectType)
 
   case user(_ username: String)
-  case userCollection(_ user: SlimUserDTO)
+  case userCollection(_ user: SlimUserDTO, _ stype: SubjectType)
   case userMono(_ user: SlimUserDTO)
   case userBlog(_ user: SlimUserDTO)
   case userIndex(_ user: SlimUserDTO)
@@ -59,8 +59,8 @@ enum NavDestination: Hashable, View {
 
     case .user(let username):
       UserView(username: username)
-    case .userCollection(let user):
-      UserCollectionListView(user: user)
+    case .userCollection(let user, let stype):
+      UserCollectionListView(user: user, stype: stype)
     case .userMono(let user):
       UserMonoListView(user: user)
     case .userBlog(let user):

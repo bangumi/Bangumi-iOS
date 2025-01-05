@@ -2,52 +2,40 @@ import SwiftData
 import SwiftUI
 
 struct CollectionRowView: View {
-  let subjectId: Int
+  let collection: SlimUserSubjectCollectionDTO
 
   @Environment(\.modelContext) var modelContext
 
-  @Query private var subjects: [Subject]
-  var subject: Subject? { subjects.first }
-
-  @Query private var collections: [UserSubjectCollection]
-  var collection: UserSubjectCollection? { collections.first }
-
-  init(subjectId: Int) {
-    self.subjectId = subjectId
-    _subjects = Query(filter: #Predicate<Subject> { $0.subjectId == subjectId })
-    _collections = Query(filter: #Predicate<UserSubjectCollection> { $0.subjectId == subjectId })
-  }
-
   var body: some View {
     HStack(alignment: .top) {
-      ImageView(img: subject?.images?.resize(.r200))
+      ImageView(img: collection.subject.images?.resize(.r200))
         .imageStyle(width: 60, height: 60)
         .imageType(.subject)
-        .imageLink(subject?.link)
+        .imageLink(collection.subject.link)
       VStack(alignment: .leading) {
-        Text(subject?.name.withLink(subject?.link) ?? "")
+        Text(collection.subject.name.withLink(collection.subject.link))
           .lineLimit(1)
-        Text(subject?.nameCN ?? "")
+        Text(collection.subject.nameCN)
           .lineLimit(1)
           .font(.footnote)
           .foregroundStyle(.secondary)
         Spacer()
         HStack {
-          if collection?.priv ?? false {
+          if collection.private {
             Image(systemName: "lock.fill").foregroundStyle(.accent)
           }
-          Text(collection?.updatedAt.formatCollectionDate ?? "")
+          Text(collection.updatedAt.datetimeDisplay)
             .foregroundStyle(.secondary)
             .lineLimit(1)
           Spacer()
-          if let rate = collection?.rate, rate > 0 {
-            StarsView(score: Float(rate), size: 12)
+          if collection.rate > 0 {
+            StarsView(score: Float(collection.rate), size: 12)
           }
         }.font(.footnote)
-        if let comment = collection?.comment, !comment.isEmpty {
+        if !collection.comment.isEmpty {
           VStack(alignment: .leading, spacing: 2) {
             Divider()
-            Text(comment)
+            Text(collection.comment)
               .padding(2)
               .font(.footnote)
               .multilineTextAlignment(.leading)
@@ -74,7 +62,7 @@ struct CollectionRowView: View {
 
   return ScrollView {
     LazyVStack(alignment: .leading) {
-      CollectionRowView(subjectId: subject.subjectId)
+      CollectionRowView(collection: collection.slim)
     }.padding().modelContainer(container)
   }
 }

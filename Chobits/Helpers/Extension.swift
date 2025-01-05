@@ -81,13 +81,6 @@ extension Color {
 }
 
 extension Date {
-  var formatCollectionDate: String {
-    if self.timeIntervalSince1970 <= 0 {
-      return ""
-    }
-    return self.formatted(date: .numeric, time: .shortened)
-  }
-
   var formatRelative: String {
     let timeInterval = -self.timeIntervalSinceNow
     if timeInterval < 60 {

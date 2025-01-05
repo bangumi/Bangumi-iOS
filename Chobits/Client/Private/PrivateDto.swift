@@ -231,13 +231,18 @@ struct SubjectCommentDTO: Codable, Identifiable, Hashable {
   }
 }
 
-struct SlimUserSubjectCollectionDTO: Codable, Hashable {
+struct SlimUserSubjectCollectionDTO: Codable, Hashable, Identifiable {
   var rate: Int
   var type: CollectionType
   var comment: String
   var tags: [String]
   var updatedAt: Int
+  var `private`: Bool
   var subject: SlimSubjectDTO
+
+  var id: Int {
+    subject.id
+  }
 
   init(_ collection: UserSubjectCollectionDTO) {
     self.rate = collection.rate
@@ -245,7 +250,18 @@ struct SlimUserSubjectCollectionDTO: Codable, Hashable {
     self.comment = collection.comment
     self.tags = collection.tags
     self.updatedAt = collection.updatedAt
+    self.private = collection.private
     self.subject = collection.subject.slim
+  }
+
+  init(_ collection: UserSubjectCollection) {
+    self.rate = collection.rate
+    self.type = collection.typeEnum
+    self.comment = collection.comment
+    self.tags = collection.tags
+    self.updatedAt = Int(collection.updatedAt.timeIntervalSince1970)
+    self.private = collection.priv
+    self.subject = collection.subject?.slim ?? SlimSubjectDTO()
   }
 }
 
@@ -304,6 +320,18 @@ struct SlimSubjectDTO: Codable, Identifiable, Hashable, Linkable {
   var nsfw: Bool
   var type: SubjectType
 
+  init() {
+    self.id = 0
+    self.images = nil
+    self.info = ""
+    self.rating = nil
+    self.locked = false
+    self.name = ""
+    self.nameCN = ""
+    self.nsfw = false
+    self.type = .none
+  }
+
   init(_ subject: Subject) {
     self.id = subject.subjectId
     self.images = subject.images
@@ -344,7 +372,7 @@ struct BangumiCalendarItemDTO: Codable {
 
 typealias BangumiCalendarDTO = [String: [BangumiCalendarItemDTO]]
 
-struct CharacterDTO: Codable, Identifiable, Searchable {
+struct CharacterDTO: Codable, Identifiable, Searchable, Linkable {
   var collects: Int
   var comment: Int
   var id: Int
@@ -360,6 +388,10 @@ struct CharacterDTO: Codable, Identifiable, Searchable {
 
   var slim: SlimCharacterDTO {
     SlimCharacterDTO(self)
+  }
+
+  var link: String {
+    "chii://character/\(id)"
   }
 }
 
@@ -389,7 +421,7 @@ struct SlimCharacterDTO: Codable, Identifiable, Hashable, Linkable {
   }
 }
 
-struct PersonDTO: Codable, Identifiable, Searchable {
+struct PersonDTO: Codable, Identifiable, Searchable, Linkable {
   var career: [PersonCareer]
   var collects: Int
   var comment: Int
@@ -406,6 +438,10 @@ struct PersonDTO: Codable, Identifiable, Searchable {
 
   var slim: SlimPersonDTO {
     SlimPersonDTO(self)
+  }
+
+  var link: String {
+    "chii://person/\(id)"
   }
 }
 

@@ -304,6 +304,10 @@ final class UserSubjectCollectionV1: Searchable {
     typeEnum.message(type: subjectTypeEnum)
   }
 
+  var slim: SlimUserSubjectCollectionDTO {
+    SlimUserSubjectCollectionDTO(self)
+  }
+
   init(_ subjectId: Int) {
     self.subjectId = subjectId
     self.rate = 0
