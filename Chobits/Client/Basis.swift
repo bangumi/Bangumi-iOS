@@ -394,7 +394,7 @@ enum SubjectType: Int, Codable, Identifiable, CaseIterable {
   }
 
   static var allTypes: [Self] {
-    return [.book, .anime, .music, .game, .real]
+    return [.anime, .game, .book, .music, .real]
   }
 
   var description: String {
