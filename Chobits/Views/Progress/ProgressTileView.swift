@@ -34,15 +34,15 @@ struct ProgressTileView: View {
   }
 
   var columns: Int {
-    let columns = Int((width - 8) / (160 + 24))
+    let columns = Int((width - 8) / (150 + 24))
     return columns > 0 ? columns : 1
   }
 
   var cardWidth: CGFloat {
     let columns = CGFloat(self.columns)
     let cw = (width - 8) / columns - 24
-    if cw < 160 {
-      return 160
+    if cw < 150 {
+      return 150
     }
     return cw
   }
@@ -239,7 +239,7 @@ struct ProgressTileItemView: View {
 
   return ScrollView {
     LazyVStack(alignment: .leading) {
-      ProgressTileItemView(subjectId: subject.subjectId, width: 160)
+      ProgressTileItemView(subjectId: subject.subjectId, width: 200)
         .environment(collection)
         .environment(subject)
         .modelContainer(container)
