@@ -146,9 +146,11 @@ struct TimelineItemView: View {
         Menu {
           Text("\(item.createdAt.datetimeDisplay)")
         } label: {
-          Text("\(item.createdAt.relativeDateDisplay) · \(item.source.desc)")
-            .font(.caption)
-            .foregroundStyle(.secondary)
+          Section {
+            item.createdAt.relativeText + Text(" · \(item.source.desc)")
+          }
+          .font(.caption)
+          .foregroundStyle(.secondary)
         }.buttonStyle(.plain)
         Divider()
       }

@@ -44,9 +44,9 @@ struct SubjectCommentsView: View {
               if comment.rate > 0 {
                 StarsView(score: Float(comment.rate), size: 10)
               }
-              Text(
-                "\(comment.type.description(subjectType)) @ \(comment.updatedAt.relativeDateDisplay)"
-              )
+              Section {
+                Text("\(comment.type.description(subjectType)) @ ") + comment.updatedAt.relativeText
+              }
               .lineLimit(1)
               .font(.caption)
               .foregroundStyle(.secondary)

@@ -80,28 +80,6 @@ extension Color {
   }
 }
 
-extension Date {
-  var formatRelative: String {
-    let timeInterval = -self.timeIntervalSinceNow
-    if timeInterval < 60 {
-      return "刚刚"
-    } else if timeInterval < 3600 {
-      let minutes = Int(timeInterval) / 60
-      return "\(minutes)分钟前"
-    } else if timeInterval < 86400 {  // Within 24 hours
-      let hours = Int(timeInterval) / 3600
-      let minutes = Int(timeInterval) % 3600 / 60
-      return "\(hours)小时\(minutes)分钟前"
-    } else if timeInterval < 604800 {  // Within 7 days
-      let days = Int(timeInterval) / 86400
-      let hours = Int(timeInterval) % 86400 / 3600
-      return "\(days)天\(hours)小时前"
-    } else {
-      return self.formatted(date: .numeric, time: .shortened)
-    }
-  }
-}
-
 extension Int {
   var dateDisplay: String {
     let date = Date(timeIntervalSince1970: TimeInterval(self))
@@ -113,9 +91,15 @@ extension Int {
     return date.formatted(date: .numeric, time: .shortened)
   }
 
-  var relativeDateDisplay: String {
-    let t = Date(timeIntervalSince1970: TimeInterval(self))
-    return t.formatRelative
+  var relativeText: Text {
+    let date = Date(timeIntervalSince1970: TimeInterval(self))
+    // < 7 days
+    let relative = -date.timeIntervalSinceNow
+    if relative < 604800 {
+      return Text("\(date, style: .relative)").monospacedDigit()
+    } else {
+      return Text(date.formatted(date: .numeric, time: .shortened))
+    }
   }
 }
 
