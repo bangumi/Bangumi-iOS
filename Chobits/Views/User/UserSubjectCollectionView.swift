@@ -46,34 +46,36 @@ struct UserSubjectCollectionView: View {
 
   var body: some View {
     VStack {
-      HStack {
-        Text("\(user.nickname)的\(stype.description)").font(.title3)
-        Spacer()
-        NavigationLink(value: NavDestination.userCollection(user.slim, stype)) {
-          Text("更多 »")
-            .font(.caption)
-        }.buttonStyle(.navLink)
-      }
-      .padding(.top, 8)
-      .task(refresh)
-      .onChange(of: width) {
-        if !subjects.isEmpty {
-          return
+      VStack(spacing: 2) {
+        HStack(alignment: .bottom) {
+          Text("\(user.nickname)的\(stype.description)").font(.title3)
+          Spacer()
+          NavigationLink(value: NavDestination.userCollection(user.slim, stype)) {
+            Text("更多 »")
+              .font(.caption)
+          }.buttonStyle(.navLink)
         }
-        Task {
-          await refresh()
+        .padding(.top, 8)
+        .task(refresh)
+        .onChange(of: width) {
+          if !subjects.isEmpty {
+            return
+          }
+          Task {
+            await refresh()
+          }
         }
-      }
 
-      Picker("Collection Type", selection: $ctype) {
-        ForEach(CollectionType.allTypes()) { ct in
-          Text(ct.description(stype)).tag(ct)
+        Picker("Collection Type", selection: $ctype) {
+          ForEach(CollectionType.allTypes()) { ct in
+            Text(ct.description(stype)).tag(ct)
+          }
         }
-      }
-      .pickerStyle(.segmented)
-      .onChange(of: ctype) { _, _ in
-        Task {
-          await refresh()
+        .pickerStyle(.segmented)
+        .onChange(of: ctype) { _, _ in
+          Task {
+            await refresh()
+          }
         }
       }
 

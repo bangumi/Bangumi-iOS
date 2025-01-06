@@ -60,7 +60,7 @@ enum NavDestination: Hashable, View {
     case .user(let username):
       UserView(username: username)
     case .userCollection(let user, let stype):
-      UserCollectionListView(user: user, stype: stype)
+      UserSubjectCollectionListView(user: user, stype: stype)
     case .userMono(let user):
       UserMonoListView(user: user)
     case .userBlog(let user):

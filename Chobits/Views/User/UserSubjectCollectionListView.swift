@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct UserCollectionListView: View {
+struct UserSubjectCollectionListView: View {
   let user: SlimUserDTO
   let stype: SubjectType
 
