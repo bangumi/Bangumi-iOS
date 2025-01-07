@@ -1,10 +1,10 @@
 import Foundation
 import SwiftUI
 
-enum AppearanceType: Codable, CaseIterable {
-  case system
-  case dark
-  case light
+enum AppearanceType: String, CaseIterable {
+  case system = "system"
+  case dark = "dark"
+  case light = "light"
 
   init(_ label: String? = nil) {
     switch label {
@@ -16,17 +16,6 @@ enum AppearanceType: Codable, CaseIterable {
       self = .light
     default:
       self = .system
-    }
-  }
-
-  var label: String {
-    switch self {
-    case .system:
-      "system"
-    case .dark:
-      "dark"
-    case .light:
-      "light"
     }
   }
 
@@ -53,26 +42,10 @@ enum AppearanceType: Codable, CaseIterable {
   }
 }
 
-extension AppearanceType: RawRepresentable {
-  typealias RawValue = String
-
-  public init?(rawValue: RawValue) {
-    if rawValue.isEmpty {
-      self.init()
-      return
-    }
-    self = Self(rawValue)
-  }
-
-  public var rawValue: RawValue {
-    label
-  }
-}
-
-enum ShareDomain: Codable, CaseIterable {
-  case chii
-  case bgm
-  case bangumi
+enum ShareDomain: String, CaseIterable {
+  case chii = "chii.in"
+  case bgm = "bgm.tv"
+  case bangumi = "bangumi.tv"
 
   init(_ label: String? = nil) {
     switch label {
@@ -86,38 +59,11 @@ enum ShareDomain: Codable, CaseIterable {
       self = .chii
     }
   }
-
-  var label: String {
-    switch self {
-    case .chii:
-      "chii.in"
-    case .bgm:
-      "bgm.tv"
-    case .bangumi:
-      "bangumi.tv"
-    }
-  }
 }
 
-extension ShareDomain: RawRepresentable {
-  typealias RawValue = String
-
-  public init?(rawValue: RawValue) {
-    if rawValue.isEmpty {
-      self.init()
-      return
-    }
-    self = Self(rawValue)
-  }
-
-  public var rawValue: RawValue {
-    label
-  }
-}
-
-enum AuthDomain: Codable, CaseIterable {
-  case origin
-  case next
+enum AuthDomain: String, CaseIterable {
+  case origin = "bgm.tv"
+  case next = "next.bgm.tv"
 
   init(_ label: String? = nil) {
     switch label {
@@ -129,36 +75,11 @@ enum AuthDomain: Codable, CaseIterable {
       self = .next
     }
   }
-
-  var label: String {
-    switch self {
-    case .origin:
-      "bgm.tv"
-    case .next:
-      "next.bgm.tv"
-    }
-  }
 }
 
-extension AuthDomain: RawRepresentable {
-  typealias RawValue = String
-
-  public init?(rawValue: RawValue) {
-    if rawValue.isEmpty {
-      self.init()
-      return
-    }
-    self = Self(rawValue)
-  }
-
-  public var rawValue: RawValue {
-    label
-  }
-}
-
-enum ProgressMode: Codable, CaseIterable {
-  case list
-  case tile
+enum ProgressMode: String, CaseIterable {
+  case list = "list"
+  case tile = "tile"
 
   init(_ label: String? = nil) {
     switch label {
@@ -168,15 +89,6 @@ enum ProgressMode: Codable, CaseIterable {
       self = .tile
     default:
       self = .tile
-    }
-  }
-
-  var label: String {
-    switch self {
-    case .list:
-      "list"
-    case .tile:
-      "tile"
     }
   }
 
@@ -190,31 +102,15 @@ enum ProgressMode: Codable, CaseIterable {
   }
 }
 
-extension ProgressMode: RawRepresentable {
-  typealias RawValue = String
+enum ChiiViewTab: String {
+  case timeline = "timeline"
+  case discover = "discover"
 
-  public init?(rawValue: RawValue) {
-    if rawValue.isEmpty {
-      self.init()
-      return
-    }
-    self = Self(rawValue)
-  }
+  case progress = "progress"
+  case collection = "collection"
+  case notice = "notice"
 
-  public var rawValue: RawValue {
-    label
-  }
-}
-
-enum ChiiViewTab: Hashable {
-  case timeline
-  case discover
-
-  case progress
-  case collection
-  case notice
-
-  case settings
+  case settings = "settings"
 
   init(_ label: String? = nil) {
     switch label {
@@ -252,23 +148,6 @@ enum ChiiViewTab: Hashable {
     }
   }
 
-  var label: String {
-    switch self {
-    case .timeline:
-      "timeline"
-    case .discover:
-      "discover"
-    case .progress:
-      "progress"
-    case .collection:
-      "collection"
-    case .notice:
-      "notice"
-    case .settings:
-      "settings"
-    }
-  }
-
   var icon: String {
     switch self {
     case .timeline:
@@ -288,21 +167,5 @@ enum ChiiViewTab: Hashable {
 
   static var defaultTabs: [Self] {
     return [.timeline, .progress, .discover]
-  }
-}
-
-extension ChiiViewTab: RawRepresentable {
-  typealias RawValue = String
-
-  public init?(rawValue: RawValue) {
-    if rawValue.isEmpty {
-      self.init()
-      return
-    }
-    self = Self(rawValue)
-  }
-
-  public var rawValue: RawValue {
-    label
   }
 }

@@ -73,7 +73,7 @@ struct SettingsView: View {
       Section(header: Text("域名设置")) {
         Picker(selection: $selectedShareDomain, label: Text("分享域名")) {
           ForEach(ShareDomain.allCases, id: \.self) { domain in
-            Text(domain.label).tag(domain)
+            Text(domain.rawValue).tag(domain)
           }
         }
         .onChange(of: selectedShareDomain) {
@@ -81,7 +81,7 @@ struct SettingsView: View {
         }
         Picker(selection: $selectedAuthDomain, label: Text("认证域名")) {
           ForEach(AuthDomain.allCases, id: \.self) { domain in
-            Text(domain.label).tag(domain)
+            Text(domain.rawValue).tag(domain)
           }
         }
         .onChange(of: selectedAuthDomain) {

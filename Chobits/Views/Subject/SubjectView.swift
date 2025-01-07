@@ -116,7 +116,7 @@ struct SubjectDetailView: View {
   @Environment(Subject.self) var subject
 
   var shareLink: URL {
-    URL(string: "https://\(shareDomain)/subject/\(subject.subjectId)")!
+    URL(string: "https://\(shareDomain.rawValue)/subject/\(subject.subjectId)")!
   }
 
   var body: some View {

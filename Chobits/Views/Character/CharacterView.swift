@@ -23,7 +23,7 @@ struct CharacterView: View {
   }
 
   var shareLink: URL {
-    URL(string: "https://\(shareDomain)/character/\(characterId)")!
+    URL(string: "https://\(shareDomain.rawValue)/character/\(characterId)")!
   }
 
   func refresh() async {

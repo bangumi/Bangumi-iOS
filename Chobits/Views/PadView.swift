@@ -20,8 +20,7 @@ struct PadView: View {
   @State private var profile: SlimUserDTO?
 
   init() {
-    let defaultTab =
-      UserDefaults.standard.string(forKey: "defaultTab") ?? ChiiViewTab.timeline.label
+    let defaultTab = UserDefaults.standard.string(forKey: "defaultTab") ?? ""
     self.selectedTab = ChiiViewTab(defaultTab)
   }
 

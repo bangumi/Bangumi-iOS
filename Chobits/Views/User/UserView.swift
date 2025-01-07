@@ -23,7 +23,7 @@ struct UserView: View {
   }
 
   var shareLink: URL {
-    URL(string: "https://\(shareDomain)/user/\(username)")!
+    URL(string: "https://\(shareDomain.rawValue)/user/\(username)")!
   }
 
   var title: String {

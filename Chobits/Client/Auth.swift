@@ -3,7 +3,7 @@ import OSLog
 
 extension Chii {
   func getOAuthBase() -> String {
-    let domain = UserDefaults.standard.string(forKey: "authDomain") ?? AuthDomain.next.label
+    let domain = UserDefaults.standard.string(forKey: "authDomain") ?? AuthDomain.next.rawValue
     return "https://\(domain)/oauth"
   }
 
