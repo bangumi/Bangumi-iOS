@@ -34,7 +34,7 @@ struct NSFWBadgeView: View {
 
   var body: some View {
     if showNSFWBadge {
-      Text("18+")
+      Text("R18")
         .padding(2)
         .background(.red.opacity(0.8))
         .padding(2)
