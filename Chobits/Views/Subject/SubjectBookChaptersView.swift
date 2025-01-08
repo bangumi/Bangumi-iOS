@@ -241,7 +241,7 @@ struct SubjectBookChaptersView: View {
             HStack(alignment: .firstTextBaseline, spacing: 0) {
               TextField("\(epStatus)", text: $inputEps)
                 .keyboardType(.numberPad)
-                .frame(minWidth: 20, maxWidth: 42)
+                .frame(minWidth: 30, maxWidth: 42)
                 .multilineTextAlignment(.trailing)
                 .fixedSize(horizontal: true, vertical: false)
                 .padding(.trailing, 2)
@@ -262,7 +262,7 @@ struct SubjectBookChaptersView: View {
             HStack(alignment: .firstTextBaseline, spacing: 0) {
               TextField("\(volStatus)", text: $inputVols)
                 .keyboardType(.numberPad)
-                .frame(minWidth: 20, maxWidth: 42)
+                .frame(minWidth: 30, maxWidth: 42)
                 .multilineTextAlignment(.trailing)
                 .fixedSize(horizontal: true, vertical: false)
                 .padding(.trailing, 2)
