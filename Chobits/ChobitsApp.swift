@@ -11,6 +11,7 @@ struct ChobitsApp: App {
     let schema = Schema([
       User.self,
       BangumiCalendar.self,
+      TrendingSubject.self,
       Episode.self,
       Subject.self,
       UserSubjectCollection.self,

@@ -46,38 +46,36 @@ struct CalendarSlimView: View {
         await refreshCalendar()
       }
     } else {
-      ScrollView {
-        VStack {
-          HStack {
-            Text("每日放送: \(Date().formatted(date: .long, time: .omitted))")
-              .font(.title3)
+      VStack {
+        HStack {
+          Text("每日放送: \(Date().formatted(date: .long, time: .omitted))")
+            .font(.title3)
+          Spacer()
+          NavigationLink(value: NavDestination.calendar) {
+            Text("更多 »").font(.caption)
+          }.buttonStyle(.navLink)
+        }
+        HStack(spacing: 0) {
+          VStack {
+            Text("今天")
+            Text(todayDesc)
             Spacer()
-            NavigationLink(value: NavDestination.calendar) {
-              Text("更多 »").font(.caption)
-            }.buttonStyle(.navLink)
           }
-          HStack(spacing: 0) {
-            VStack {
-              Text("今天")
-              Text(todayDesc)
-              Spacer()
-            }
-            .padding(5)
-            .background(Color(hex: 0x339900))
-            CalendarWeekdaySlimView()
-              .environment(today)
+          .padding(5)
+          .background(Color(hex: 0x339900))
+          CalendarWeekdaySlimView()
+            .environment(today)
+        }
+        HStack(spacing: 0) {
+          VStack {
+            Text("明天")
+            Text(tomorrowDesc)
+            Spacer()
           }
-          HStack(spacing: 0) {
-            VStack {
-              Text("明天")
-              Text(tomorrowDesc)
-              Spacer()
-            }
-            .padding(5)
-            .background(Color(hex: 0x0085C8))
-            CalendarWeekdaySlimView()
-              .environment(tomorrow)
-          }
+          .padding(5)
+          .background(Color(hex: 0x0085C8))
+          CalendarWeekdaySlimView()
+            .environment(tomorrow)
         }
       }
     }

@@ -713,3 +713,25 @@ extension Chii {
     return subjects
   }
 }
+
+// MARK: - Trending
+extension Chii {
+  func getTrendingSubjects(
+    type: SubjectType, limit: Int = 20, offset: Int = 0
+  ) async throws -> PagedDTO<TrendingSubjectDTO> {
+    if self.mock {
+      return loadFixture(
+        fixture: "trending_subjects_anime.json", target: PagedDTO<TrendingSubjectDTO>.self)
+    }
+    let url = BangumiAPI.priv.build("p1/trending/subjects")
+    let queryItems: [URLQueryItem] = [
+      URLQueryItem(name: "type", value: String(type.rawValue)),
+      URLQueryItem(name: "limit", value: String(limit)),
+      URLQueryItem(name: "offset", value: String(offset)),
+    ]
+    let pageURL = url.appending(queryItems: queryItems)
+    let data = try await self.request(url: pageURL, method: "GET")
+    let resp: PagedDTO<TrendingSubjectDTO> = try self.decodeResponse(data)
+    return resp
+  }
+}

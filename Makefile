@@ -61,3 +61,6 @@ update_timeline:
 update_blog:
 	curl -sSfLo "$(PREVIEW_PATH)/blog.json" https://next.bgm.tv/p1/blogs/347290
 	curl -sSfLo "$(PREVIEW_PATH)/blog_subjects.json" https://next.bgm.tv/p1/blogs/347290/subjects
+
+update_trending:
+	curl -sSfLo "$(PREVIEW_PATH)/trending_subjects_anime.json" https://next.bgm.tv/p1/trending/subjects?type=2

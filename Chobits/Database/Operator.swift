@@ -309,6 +309,11 @@ extension DatabaseOperator {
     modelContext.insert(cal)
   }
 
+  public func saveTrendingSubjects(type: Int, items: [TrendingSubjectDTO]) throws {
+    let trending = TrendingSubject(type: type, items: items)
+    modelContext.insert(trending)
+  }
+
   public func saveSubject(_ item: SubjectDTO) throws {
     let _ = try self.ensureSubject(item)
   }

@@ -878,3 +878,12 @@ struct Friend: Codable, Identifiable, Hashable {
     user.id
   }
 }
+
+struct TrendingSubjectDTO: Codable, Identifiable, Hashable {
+  var subject: SlimSubjectDTO
+  var count: Int
+
+  var id: Int {
+    subject.id
+  }
+}
