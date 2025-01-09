@@ -68,9 +68,38 @@ extension View {
   }
 }
 
+extension View {
+  @ViewBuilder
+  public func enableSave(_ large: String?) -> some View {
+    if let large = large, let imageURL = URL(string: large) {
+      self.contextMenu {
+        Button {
+          Task {
+            guard let data = try? await URLSession.shared.data(from: imageURL).0 else { return }
+            guard let img = UIImage(data: data) else { return }
+            UIImageWriteToSavedPhotosAlbum(img, nil, nil, nil)
+          }
+        } label: {
+          Label("保存", systemImage: "square.and.arrow.down")
+        }
+        ShareLink(item: imageURL)
+      } preview: {
+        KFImage(URL(string: large))
+          .fade(duration: 0.25)
+          .placeholder {
+            ProgressView()
+          }
+          .resizable()
+          .scaledToFit()
+      }
+    } else {
+      self
+    }
+  }
+}
+
 struct ImageView<ImageBadge: View, ImageCaption: View>: View {
   let img: String?
-  let large: String?
 
   let badge: ImageBadge
   let caption: ImageCaption
@@ -82,12 +111,11 @@ struct ImageView<ImageBadge: View, ImageCaption: View>: View {
   @State private var originalHeight: Int = 0
 
   init(
-    img: String?, large: String? = nil,
+    img: String?,
     @ViewBuilder badge: () -> ImageBadge,
     @ViewBuilder caption: () -> ImageCaption
   ) {
     self.img = img
-    self.large = large
     self.badge = badge()
     self.caption = caption()
   }
@@ -248,47 +276,16 @@ struct ImageView<ImageBadge: View, ImageCaption: View>: View {
           badge
         }.frame(width: frameWidth, height: frameHeight, alignment: .topLeading)
       }
-    }
-    .clipShape(RoundedRectangle(cornerRadius: style.cornerRadius))
-    .contextMenu {
-      if let large = large, let imageURL = URL(string: large) {
-        Button {
-          Task {
-            guard let data = try? await URLSession.shared.data(from: imageURL).0 else { return }
-            guard let img = UIImage(data: data) else { return }
-            UIImageWriteToSavedPhotosAlbum(img, nil, nil, nil)
-          }
-        } label: {
-          Label("保存", systemImage: "square.and.arrow.down")
-        }
-        ShareLink(item: imageURL)
-      }
-    } preview: {
-      if let large = large, !large.isEmpty {
-        KFImage(URL(string: large))
-          .fade(duration: 0.25)
-          .placeholder {
-            ProgressView()
-          }
-          .resizable()
-          .scaledToFit()
-      }
-    }
+    }.clipShape(RoundedRectangle(cornerRadius: style.cornerRadius))
   }
 }
 
 extension ImageView {
-  init(
-    img: String?, large: String? = nil,
-    @ViewBuilder badge: () -> ImageBadge
-  ) where ImageCaption == EmptyView {
-    self.init(
-      img: img, large: large, badge: badge, caption: {})
+  init(img: String?, @ViewBuilder badge: () -> ImageBadge) where ImageCaption == EmptyView {
+    self.init(img: img, badge: badge, caption: {})
   }
-  init(
-    img: String?, large: String? = nil
-  ) where ImageCaption == EmptyView, ImageBadge == EmptyView {
-    self.init(img: img, large: large, badge: {}, caption: {})
+  init(img: String?) where ImageCaption == EmptyView, ImageBadge == EmptyView {
+    self.init(img: img, badge: {}, caption: {})
   }
 }
 
@@ -317,11 +314,12 @@ extension ImageView {
         img: "https://lain.bgm.tv/pic/cover/m/5e/39/140534_cUj6H.jpg"
       ).imageStyle(width: 60, height: 60, alignment: .top)
       ImageView(
-        img: "https://lain.bgm.tv/pic/cover/m/5e/39/140534_cUj6H.jpg",
-        large: "https://lain.bgm.tv/pic/cover/l/5e/39/140534_cUj6H.jpg"
+        img: "https://lain.bgm.tv/pic/cover/m/5e/39/140534_cUj6H.jpg"
       ) {
         NSFWBadgeView()
-      }.imageStyle(width: 60, height: 90)
+      }
+      .imageStyle(width: 60, height: 90)
+      .enableSave("https://lain.bgm.tv/pic/cover/l/5e/39/140534_cUj6H.jpg")
       ImageView(img: "https://lain.bgm.tv/pic/cover/c/5e/39/140534_cUj6H.jpg") {
         NSFWBadgeView()
       } caption: {

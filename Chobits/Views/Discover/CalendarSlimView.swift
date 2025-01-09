@@ -94,6 +94,15 @@ struct CalendarWeekdaySlimView: View {
           .imageStyle(width: 40, height: 40, cornerRadius: 0)
           .imageType(.subject)
           .imageLink(item.subject.link)
+          .contextMenu {
+            NavigationLink(value: NavDestination.subject(item.subject.id)) {
+              Label("查看详情", systemImage: "maginifyingglass")
+            }
+          } preview: {
+            SubjectCardView(subject: item.subject)
+              .padding()
+              .frame(idealWidth: 360)
+          }
       }
     }
   }

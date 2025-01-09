@@ -74,9 +74,10 @@ struct PersonView: View {
 
             /// header
             HStack(alignment: .top) {
-              ImageView(img: person.images?.large, large: person.images?.resize(.r400))
+              ImageView(img: person.images?.resize(.r400))
                 .imageStyle(width: 120, height: 160, alignment: .top)
                 .imageType(.person)
+                .enableSave(person.images?.large)
                 .padding(4)
                 .shadow(radius: 4)
               VStack(alignment: .leading) {
