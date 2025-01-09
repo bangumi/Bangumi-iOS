@@ -12,6 +12,7 @@ enum NavDestination: Hashable, View {
   case notice
   case friends
   case collections
+  case calendar
   case collectionList(_ subjectType: SubjectType)
 
   case user(_ username: String)
@@ -54,6 +55,8 @@ enum NavDestination: Hashable, View {
       CollectionsView()
     case .friends:
       FriendsView()
+    case .calendar:
+      CalendarView()
     case .collectionList(let subjectType):
       CollectionListView(subjectType: subjectType)
 

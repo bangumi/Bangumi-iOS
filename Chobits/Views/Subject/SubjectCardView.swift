@@ -6,7 +6,7 @@ struct SubjectTinyView: View {
 
   var body: some View {
     HStack {
-      ImageView(img: subject.images?.grid)
+      ImageView(img: subject.images?.small)
         .imageStyle(width: 32, height: 32)
         .imageType(.subject)
       VStack(alignment: .leading) {

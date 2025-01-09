@@ -66,7 +66,7 @@ struct PadView: View {
             if searching {
               SearchView(text: $searchQuery, remote: $searchRemote)
             } else {
-              CalendarView()
+              ChiiDiscoverView()
             }
           }.navigationDestination(for: NavDestination.self) { $0 }
         }

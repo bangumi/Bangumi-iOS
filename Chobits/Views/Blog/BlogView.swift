@@ -50,7 +50,7 @@ struct BlogView: View {
                 ForEach(subjects) { subject in
                   NavigationLink(value: NavDestination.subject(subject.id)) {
                     HStack {
-                      ImageView(img: subject.images?.grid)
+                      ImageView(img: subject.images?.small)
                         .imageStyle(width: 32, height: 32)
                         .imageType(.subject)
                       Text(subject.title)

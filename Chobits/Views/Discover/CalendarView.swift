@@ -80,6 +80,8 @@ struct CalendarView: View {
           }
         }.padding(.horizontal, 8)
       }
+      .navigationTitle("每日放送")
+      .navigationBarTitleDisplayMode(.inline)
       .onGeometryChange(for: CGSize.self) { proxy in
         proxy.size
       } action: { newSize in
