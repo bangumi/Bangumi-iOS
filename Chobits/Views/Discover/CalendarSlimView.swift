@@ -62,6 +62,7 @@ struct CalendarSlimView: View {
           }
           .padding(5)
           .background(Color(hex: 0x339900))
+          .foregroundStyle(.white)
           CalendarWeekdaySlimView()
             .environment(today)
         }
@@ -73,6 +74,7 @@ struct CalendarSlimView: View {
           }
           .padding(5)
           .background(Color(hex: 0x0085C8))
+          .foregroundStyle(.white)
           CalendarWeekdaySlimView()
             .environment(tomorrow)
         }
@@ -88,7 +90,7 @@ struct CalendarWeekdaySlimView: View {
     HFlow(spacing: 0) {
       ForEach(calendar.items, id: \.subject) { item in
         ImageView(img: item.subject.images?.resize(.r100))
-          .imageStyle(width: 48, height: 48, cornerRadius: 0)
+          .imageStyle(width: 60, height: 60, cornerRadius: 0)
           .imageType(.subject)
           .imageLink(item.subject.link)
           .contextMenu {

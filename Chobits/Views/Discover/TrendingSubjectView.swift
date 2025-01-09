@@ -120,7 +120,7 @@ struct TrendingSubjectTypeView: View {
       } else {
         LazyVGrid(columns: largeColumns, spacing: 8) {
           ForEach(largeItems) { item in
-            ImageView(img: item.subject.images?.resize(.r400)) {
+            ImageView(img: item.subject.images?.resize(.r800)) {
               Text("\(item.count) 人关注")
                 .padding(4)
                 .background(.accent.opacity(0.9))
@@ -145,7 +145,7 @@ struct TrendingSubjectTypeView: View {
         }
         LazyVGrid(columns: smallColumns, spacing: 8) {
           ForEach(smallItems) { item in
-            ImageView(img: item.subject.images?.resize(.r200)) {
+            ImageView(img: item.subject.images?.resize(.r400)) {
               Text("\(item.count) 人关注")
                 .padding(4)
                 .background(.accent.opacity(0.9))
