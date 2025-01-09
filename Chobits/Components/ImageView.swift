@@ -126,33 +126,36 @@ struct ImageView<ImageBadge: View, ImageCaption: View>: View {
     return URL(string: icon)
   }
 
-  var imageWidth: CGFloat {
+  var imageWidth: CGFloat? {
     frameWidth
   }
 
-  var imageHeight: CGFloat {
+  var imageHeight: CGFloat? {
     if originalHeight == 0 {
       if style.height == 0 {
-        return .infinity
+        return nil
       } else {
         return style.height
       }
     } else {
       let ratio = CGFloat(originalWidth) / CGFloat(originalHeight)
+      if ratio == 0 {
+        return nil
+      }
       return min((style.width / ratio), style.height)
     }
   }
 
-  var frameWidth: CGFloat {
+  var frameWidth: CGFloat? {
     if originalWidth == 0 {
       if style.width == 0 {
-        return .infinity
+        return nil
       } else {
         return style.width
       }
     } else {
       if style.width == 0 {
-        return .infinity
+        return nil
       } else {
         if style.width == style.height {
           return style.width
@@ -163,10 +166,10 @@ struct ImageView<ImageBadge: View, ImageCaption: View>: View {
     }
   }
 
-  var frameHeight: CGFloat {
+  var frameHeight: CGFloat? {
     if originalHeight == 0 {
       if style.height == 0 {
-        return .infinity
+        return nil
       } else {
         return style.height
       }
@@ -204,6 +207,7 @@ struct ImageView<ImageBadge: View, ImageCaption: View>: View {
               .fade(duration: 0.25)
               .resizable()
               .scaledToFit()
+              .clipShape(RoundedRectangle(cornerRadius: style.cornerRadius))
           }
         } else {
           if style.width > 0, style.height > 0 {
@@ -272,8 +276,9 @@ struct ImageView<ImageBadge: View, ImageCaption: View>: View {
         }.frame(width: frameWidth, height: frameHeight, alignment: .bottom)
       }
       if ImageBadge.self != EmptyView.self {
-        ZStack {
+        VStack {
           badge
+          Spacer()
         }.frame(width: frameWidth, height: frameHeight, alignment: .topLeading)
       }
     }.clipShape(RoundedRectangle(cornerRadius: style.cornerRadius))

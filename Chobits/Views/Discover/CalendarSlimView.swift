@@ -46,10 +46,9 @@ struct CalendarSlimView: View {
         await refreshCalendar()
       }
     } else {
-      VStack {
+      VStack(alignment: .leading, spacing: 5) {
         HStack {
           Text("每日放送: \(Date().formatted(date: .long, time: .omitted))")
-            .font(.title3)
           Spacer()
           NavigationLink(value: NavDestination.calendar) {
             Text("更多 »").font(.caption)
@@ -88,13 +87,13 @@ struct CalendarWeekdaySlimView: View {
   var body: some View {
     HFlow(spacing: 0) {
       ForEach(calendar.items, id: \.subject) { item in
-        ImageView(img: item.subject.images?.small)
-          .imageStyle(width: 40, height: 40, cornerRadius: 0)
+        ImageView(img: item.subject.images?.resize(.r100))
+          .imageStyle(width: 48, height: 48, cornerRadius: 0)
           .imageType(.subject)
           .imageLink(item.subject.link)
           .contextMenu {
             NavigationLink(value: NavDestination.subject(item.subject.id)) {
-              Label("查看详情", systemImage: "maginifyingglass")
+              Label("查看详情", systemImage: "magnifyingglass")
             }
           } preview: {
             SubjectCardView(subject: item.subject)

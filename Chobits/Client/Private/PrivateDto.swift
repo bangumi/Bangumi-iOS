@@ -365,7 +365,7 @@ struct SlimSubjectDTO: Codable, Identifiable, Hashable, Linkable {
   }
 }
 
-struct BangumiCalendarItemDTO: Codable {
+struct BangumiCalendarItemDTO: Codable, Hashable {
   var watchers: Int
   var subject: SlimSubjectDTO
 }

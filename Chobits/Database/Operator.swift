@@ -145,6 +145,42 @@ extension DatabaseOperator {
     return user
   }
 
+  public func ensureCalendarItem(_ weekday: Int, items: [BangumiCalendarItemDTO]) throws
+    -> BangumiCalendar
+  {
+    let fetched = try self.fetchOne(
+      predicate: #Predicate<BangumiCalendar> {
+        $0.weekday == weekday
+      })
+    if let calendar = fetched {
+      if calendar.items != items {
+        calendar.items = items
+      }
+      return calendar
+    }
+    let calendar = BangumiCalendar(weekday: weekday, items: items)
+    modelContext.insert(calendar)
+    return calendar
+  }
+
+  public func ensureTrendingSubject(_ type: Int, items: [TrendingSubjectDTO]) throws
+    -> TrendingSubject
+  {
+    let fetched = try self.fetchOne(
+      predicate: #Predicate<TrendingSubject> {
+        $0.type == type
+      })
+    if let trending = fetched {
+      if trending.items != items {
+        trending.items = items
+      }
+      return trending
+    }
+    let trending = TrendingSubject(type: type, items: items)
+    modelContext.insert(trending)
+    return trending
+  }
+
   public func ensureSubject(_ item: SubjectDTO) throws -> Subject {
     let sid = item.id
     let fetched = try self.fetchOne(
@@ -305,13 +341,11 @@ extension DatabaseOperator {
   }
 
   public func saveCalendarItem(weekday: Int, items: [BangumiCalendarItemDTO]) throws {
-    let cal = BangumiCalendar(weekday: weekday, items: items)
-    modelContext.insert(cal)
+    let _ = try self.ensureCalendarItem(weekday, items: items)
   }
 
   public func saveTrendingSubjects(type: Int, items: [TrendingSubjectDTO]) throws {
-    let trending = TrendingSubject(type: type, items: items)
-    modelContext.insert(trending)
+    let _ = try self.ensureTrendingSubject(type, items: items)
   }
 
   public func saveSubject(_ item: SubjectDTO) throws {
