@@ -110,9 +110,6 @@ func safeParseDate(str: String?) -> Date {
   if str.isEmpty {
     return Date(timeIntervalSince1970: 0)
   }
-  if str == "2099" {
-    return Date(timeIntervalSince1970: 0)
-  }
 
   let dateFormatter = DateFormatter()
   dateFormatter.locale = Locale(identifier: "en_US_POSIX")
@@ -122,7 +119,7 @@ func safeParseDate(str: String?) -> Date {
   if let date = dateFormatter.date(from: str) {
     return date
   } else {
-    Logger.app.warning("failed to parse date: \(str)")
+    // fallback to 1970-01-01
     return Date(timeIntervalSince1970: 0)
   }
 }
@@ -143,7 +140,7 @@ func safeParseRFC3339Date(str: String?) -> Date {
   if let date = RFC3339DateFormatter.date(from: str) {
     return date
   } else {
-    Logger.app.warning("failed to parse RFC3339 date: \(str)")
+    // fallback to 1970-01-01
     return Date(timeIntervalSince1970: 0)
   }
 }
