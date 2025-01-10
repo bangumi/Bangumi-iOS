@@ -28,15 +28,15 @@ extension View {
 }
 
 struct ImageViewStyle {
-  let width: CGFloat
-  let height: CGFloat
+  let width: CGFloat?
+  let height: CGFloat?
   let cornerRadius: CGFloat
   let alignment: Alignment
 }
 
 struct ImageViewStyleKey: EnvironmentKey {
   static let defaultValue = ImageViewStyle(
-    width: 0, height: 0, cornerRadius: 5, alignment: .top)
+    width: nil, height: nil, cornerRadius: 5, alignment: .top)
 }
 
 extension EnvironmentValues {
@@ -48,7 +48,7 @@ extension EnvironmentValues {
 
 extension View {
   public func imageStyle(
-    width: CGFloat = 0, height: CGFloat = 0, cornerRadius: CGFloat = 5,
+    width: CGFloat? = nil, height: CGFloat? = nil, cornerRadius: CGFloat = 5,
     alignment: Alignment = .top
   )
     -> some View
@@ -107,8 +107,7 @@ struct ImageView<ImageBadge: View, ImageCaption: View>: View {
   @Environment(\.imageStyle) var style
   @Environment(\.imageType) var type
 
-  @State private var originalWidth: Int = 0
-  @State private var originalHeight: Int = 0
+  @State private var imageRatio: CGFloat = 1
 
   init(
     img: String?,
@@ -122,62 +121,21 @@ struct ImageView<ImageBadge: View, ImageCaption: View>: View {
 
   var imageURL: URL? {
     guard let img = img else { return nil }
-    let icon = img.replacing("http://", with: "https://")
-    return URL(string: icon)
-  }
-
-  var imageWidth: CGFloat? {
-    frameWidth
-  }
-
-  var imageHeight: CGFloat? {
-    if originalHeight == 0 {
-      if style.height == 0 {
-        return nil
-      } else {
-        return style.height
-      }
-    } else {
-      let ratio = CGFloat(originalWidth) / CGFloat(originalHeight)
-      if ratio == 0 {
-        return nil
-      }
-      return min((style.width / ratio), style.height)
+    if img.isEmpty {
+      return nil
     }
+    let url = img.replacing("http://", with: "https://")
+    return URL(string: url)
   }
 
-  var frameWidth: CGFloat? {
-    if originalWidth == 0 {
-      if style.width == 0 {
-        return nil
-      } else {
-        return style.width
-      }
+  var height: CGFloat? {
+    if style.height != nil {
+      return style.height
     } else {
-      if style.width == 0 {
+      if let width = style.width {
+        return width * imageRatio
+      } else {
         return nil
-      } else {
-        if style.width == style.height {
-          return style.width
-        } else {
-          return min(style.width, CGFloat(originalWidth))
-        }
-      }
-    }
-  }
-
-  var frameHeight: CGFloat? {
-    if originalHeight == 0 {
-      if style.height == 0 {
-        return nil
-      } else {
-        return style.height
-      }
-    } else {
-      if style.height == 0 {
-        return imageHeight
-      } else {
-        return style.height
       }
     }
   }
@@ -185,32 +143,37 @@ struct ImageView<ImageBadge: View, ImageCaption: View>: View {
   var body: some View {
     ZStack {
       ZStack {
-        Rectangle()
-          .foregroundStyle(.secondary.opacity(0.02))
-          .frame(width: frameWidth, height: frameHeight)
         if let imageURL = imageURL {
-          if style.width > 0, style.height > 0 {
+          if style.width != nil, height != nil {
             KFImage(imageURL)
               .onSuccess { result in
                 if let img = result.image.cgImage {
-                  self.originalWidth = img.width
-                  self.originalHeight = img.height
+                  if img.width > 0, img.height > 0 {
+                    self.imageRatio = CGFloat(img.width) / CGFloat(img.height)
+                  }
                 }
               }
               .fade(duration: 0.25)
               .resizable()
               .scaledToFill()
-              .frame(width: imageWidth, height: imageHeight, alignment: style.alignment)
+              .frame(width: style.width, height: height, alignment: style.alignment)
               .clipShape(RoundedRectangle(cornerRadius: style.cornerRadius))
           } else {
             KFImage(imageURL)
+              .onSuccess { result in
+                if let img = result.image.cgImage {
+                  if img.width > 0, img.height > 0 {
+                    self.imageRatio = CGFloat(img.width) / CGFloat(img.height)
+                  }
+                }
+              }
               .fade(duration: 0.25)
               .resizable()
               .scaledToFit()
               .clipShape(RoundedRectangle(cornerRadius: style.cornerRadius))
           }
         } else {
-          if style.width > 0, style.height > 0 {
+          if style.width != nil, height != nil {
             ZStack {
               if style.width == style.height {
                 switch type {
@@ -249,7 +212,7 @@ struct ImageView<ImageBadge: View, ImageCaption: View>: View {
           }
         }
       }
-      .frame(width: frameWidth, height: frameHeight, alignment: .top)
+      .frame(width: style.width, height: height, alignment: style.alignment)
       .clipShape(RoundedRectangle(cornerRadius: style.cornerRadius))
       if ImageCaption.self != EmptyView.self {
         ZStack {
@@ -273,13 +236,13 @@ struct ImageView<ImageBadge: View, ImageCaption: View>: View {
           .font(.caption)
           .foregroundStyle(.white)
           .padding(.bottom, 2)
-        }.frame(width: frameWidth, height: frameHeight, alignment: .bottom)
+        }.frame(width: style.width, height: height, alignment: .bottom)
       }
       if ImageBadge.self != EmptyView.self {
         VStack {
           badge
           Spacer()
-        }.frame(width: frameWidth, height: frameHeight, alignment: .topLeading)
+        }.frame(width: style.width, height: height, alignment: .topLeading)
       }
     }.clipShape(RoundedRectangle(cornerRadius: style.cornerRadius))
   }
@@ -309,6 +272,9 @@ extension ImageView {
       ImageView(img: "")
         .imageStyle(width: 60, height: 60)
         .imageType(.avatar)
+      ImageView(img: "")
+        .imageStyle(width: 60, height: 60)
+        .imageType(.icon)
       ImageView(img: "")
         .imageStyle(width: 40, height: 60)
         .imageType(.common)

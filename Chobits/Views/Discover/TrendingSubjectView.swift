@@ -136,7 +136,7 @@ struct TrendingSubjectTypeView: View {
                 .font(.body)
                 .padding(8)
             }
-            .imageStyle(width: largeCardWidth, height: largeCardWidth * 1.3)
+            .imageStyle(width: largeCardWidth, height: largeCardWidth * 1.2)
             .imageType(.subject)
             .imageLink(item.subject.link)
             .padding(8)
