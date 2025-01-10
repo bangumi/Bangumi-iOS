@@ -96,7 +96,7 @@ extension Int {
     // < 7 days
     let relative = -date.timeIntervalSinceNow
     if relative < 604800 {
-      return Text("\(date, style: .relative)").monospacedDigit()
+      return Text("\(date, style: .relative)前").monospacedDigit()
     } else {
       return Text(date.formatted(date: .numeric, time: .shortened))
     }
