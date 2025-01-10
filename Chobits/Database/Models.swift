@@ -694,7 +694,7 @@ final class EpisodeV1: Linkable {
     if self.duration != item.duration { self.duration = item.duration }
     if self.airdate != item.airdate { self.airdate = item.airdate }
     if self.comment != item.comment { self.comment = item.comment }
-    if let desc = item.desc, self.desc != desc { self.desc = desc }
+    if let desc = item.desc, !desc.isEmpty && self.desc != desc { self.desc = desc }
     if self.disc != item.disc { self.disc = item.disc }
   }
 }

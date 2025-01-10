@@ -234,6 +234,12 @@ extension DatabaseOperator {
       })
     if let episode = fetched {
       episode.update(item)
+      if episode.subject == nil, let subject = item.subject {
+        let subject = try self.ensureSubject(subject)
+        if episode.subject == nil {
+          episode.subject = subject
+        }
+      }
       return episode
     }
     let episode = Episode(item)
