@@ -115,6 +115,7 @@ struct UserDTO: Codable, Identifiable, Hashable, Linkable {
   var bio: String
   var networkServices: [UserNetworkServiceDTO]
   var homepage: UserHomepageDTO
+  var stats: UserStatsDTO
 
   var name: String {
     nickname.isEmpty ? "用户\(username)" : nickname
@@ -886,4 +887,40 @@ struct TrendingSubjectDTO: Codable, Identifiable, Hashable {
   var id: Int {
     subject.id
   }
+}
+
+struct UserStatsDTO: Codable, Hashable {
+  var subject: UserSubjectCollectionStatsDTO
+  var mono: UserMonoCollectionStatsDTO
+  var blog: Int
+  var friend: Int
+  var group: Int
+  var index: UserIndexStatsDTO
+}
+
+typealias UserSubjectCollectionStatsDTO = [String: [String: Int]]
+
+extension UserSubjectCollectionStatsDTO {
+  var stats: [SubjectType: [CollectionType: Int]] {
+    var result: [SubjectType: [CollectionType: Int]] = [:]
+    for (stype, ctypes) in self {
+      let subjectType = SubjectType(Int(stype) ?? 0)
+      var collections: [CollectionType: Int] = [:]
+      for (ctype, count) in ctypes {
+        collections[CollectionType(Int(ctype) ?? 0)] = count
+      }
+      result[subjectType] = collections
+    }
+    return result
+  }
+}
+
+struct UserMonoCollectionStatsDTO: Codable, Hashable {
+  var character: Int
+  var person: Int
+}
+
+struct UserIndexStatsDTO: Codable, Hashable {
+  var create: Int
+  var collect: Int
 }

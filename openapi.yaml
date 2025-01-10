@@ -1968,7 +1968,7 @@ components:
         - Mono
         - Doujin
       x-ms-enum:
-        modelAsString: true
+        modelAsString: false
         name: TimelineCat
     TimelineMemo:
       properties:
@@ -2095,7 +2095,7 @@ components:
         - WP
         - API
       x-ms-enum:
-        modelAsString: true
+        modelAsString: false
         name: TimelineSource
     Topic:
       properties:
@@ -2247,6 +2247,8 @@ components:
           type: string
         site:
           type: string
+        stats:
+          $ref: '#/components/schemas/UserStats'
         user_group:
           description: deprecated, use group instead
           type: integer
@@ -2267,6 +2269,7 @@ components:
         - bio
         - networkServices
         - homepage
+        - stats
       title: User
       type: object
     UserCharacterCollection:
@@ -2283,17 +2286,45 @@ components:
       properties:
         left:
           items:
-            type: string
+            $ref: '#/components/schemas/UserHomepageSection'
           type: array
         right:
           items:
-            type: string
+            $ref: '#/components/schemas/UserHomepageSection'
           type: array
       required:
         - left
         - right
       title: UserHomepage
       type: object
+    UserHomepageSection:
+      description: 用户时光机板块
+      enum:
+        - anime
+        - game
+        - book
+        - music
+        - real
+        - mono
+        - blog
+        - friend
+        - group
+        - index
+      type: string
+      x-enum-varnames:
+        - Anime
+        - Game
+        - Book
+        - Music
+        - Real
+        - Mono
+        - Blog
+        - Friend
+        - Group
+        - Index
+      x-ms-enum:
+        modelAsString: true
+        name: UserHomepageSection
     UserIndexCollection:
       properties:
         createdAt:
@@ -2303,6 +2334,28 @@ components:
       required:
         - index
         - createdAt
+      type: object
+    UserIndexStats:
+      properties:
+        collect:
+          type: integer
+        create:
+          type: integer
+      required:
+        - create
+        - collect
+      title: UserIndexStats
+      type: object
+    UserMonoCollectionStats:
+      properties:
+        character:
+          type: integer
+        person:
+          type: integer
+      required:
+        - character
+        - person
+      title: UserMonoCollectionStats
       type: object
     UserNetworkService:
       properties:
@@ -2333,6 +2386,29 @@ components:
       required:
         - person
         - createdAt
+      type: object
+    UserStats:
+      properties:
+        blog:
+          type: integer
+        friend:
+          type: integer
+        group:
+          type: integer
+        index:
+          $ref: '#/components/schemas/UserIndexStats'
+        mono:
+          $ref: '#/components/schemas/UserMonoCollectionStats'
+        subject:
+          $ref: '#/components/schemas/UserSubjectCollectionStats'
+      required:
+        - subject
+        - mono
+        - blog
+        - friend
+        - group
+        - index
+      title: UserStats
       type: object
     UserSubjectCollection:
       properties:
@@ -2366,6 +2442,13 @@ components:
         - volStatus
         - private
         - updatedAt
+      type: object
+    UserSubjectCollectionStats:
+      additionalProperties:
+        additionalProperties:
+          type: integer
+        type: object
+      title: UserSubjectCollectionStats
       type: object
     UserSubjectEpisodeCollection:
       properties:
@@ -2404,7 +2487,7 @@ info:
     关于订阅通知的 socket.io 相关的文档在
     <https://github.com/bangumi/GraphQL/blob/master/docs/socket.io.md>
   title: bangumi private api
-  version: 2025-01-04-3baab16
+  version: 2025-01-10-e268ab4
 openapi: 3.0.3
 paths:
   /p1/blocklist:

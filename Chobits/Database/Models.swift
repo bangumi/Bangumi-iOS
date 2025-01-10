@@ -21,6 +21,7 @@ final class UserV1 {
   var bio: String
   var networkServices: [UserNetworkServiceDTO]
   var homepage: UserHomepageDTO
+  var stats: UserStatsDTO?
 
   var name: String {
     nickname.isEmpty ? "用户\(username)" : nickname
@@ -51,6 +52,7 @@ final class UserV1 {
     self.bio = item.bio
     self.networkServices = item.networkServices
     self.homepage = item.homepage
+    self.stats = item.stats
   }
 
   func update(_ item: UserDTO) {
@@ -65,6 +67,7 @@ final class UserV1 {
     if self.bio != item.bio { self.bio = item.bio }
     if self.networkServices != item.networkServices { self.networkServices = item.networkServices }
     if self.homepage != item.homepage { self.homepage = item.homepage }
+    if self.stats != item.stats { self.stats = item.stats }
   }
 }
 

@@ -5,6 +5,17 @@ struct UserHomeView: View {
 
   @State private var width: CGFloat = 0
 
+  func ctypes(_ stype: SubjectType) -> [CollectionType: Int] {
+    var result: [CollectionType: Int] = [:]
+    for ct in CollectionType.allTypes() {
+      guard let count = user.stats?.subject.stats[stype]?[ct] else { continue }
+      if count > 0 {
+        result[ct] = count
+      }
+    }
+    return result
+  }
+
   var body: some View {
     VStack {
       ForEach(user.homepage.left, id: \.self) { section in
@@ -14,35 +25,47 @@ struct UserHomeView: View {
             EmptyView()
 
           case .anime:
-            UserSubjectCollectionView(.anime, width)
+            UserSubjectCollectionView(width, .anime, ctypes(.anime))
 
           case .blog:
-            UserBlogsView()
+            if let count = user.stats?.blog, count > 0 {
+              UserBlogsView()
+            }
 
           case .book:
-            UserSubjectCollectionView(.book, width)
+            UserSubjectCollectionView(width, .book, ctypes(.book))
 
           case .friend:
-            UserFriendsView(width)
+            if let count = user.stats?.friend, count > 0 {
+              UserFriendsView(width)
+            }
 
           case .game:
-            UserSubjectCollectionView(.game, width)
+            UserSubjectCollectionView(width, .game, ctypes(.game))
 
           case .group:
-            UserGroupsView(width)
+            if let count = user.stats?.group, count > 0 {
+              UserGroupsView(width)
+            }
 
           case .index:
-            UserIndexesView()
+            if let count = user.stats?.index.create, count > 0 {
+              UserIndexesView()
+            }
 
           case .mono:
-            UserCharacterCollectionView(width)
-            UserPersonCollectionView(width)
+            if let count = user.stats?.mono.character, count > 0 {
+              UserCharacterCollectionView(width)
+            }
+            if let count = user.stats?.mono.person, count > 0 {
+              UserPersonCollectionView(width)
+            }
 
           case .music:
-            UserSubjectCollectionView(.music, width)
+            UserSubjectCollectionView(width, .music, ctypes(.music))
 
           case .real:
-            UserSubjectCollectionView(.real, width)
+            UserSubjectCollectionView(width, .real, ctypes(.real))
           }
         }
       }

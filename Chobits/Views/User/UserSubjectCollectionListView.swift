@@ -3,6 +3,7 @@ import SwiftUI
 struct UserSubjectCollectionListView: View {
   let user: SlimUserDTO
   let stype: SubjectType
+  let ctypes: [CollectionType: Int]
 
   @AppStorage("profile") var profile: Profile = Profile()
 
@@ -34,8 +35,14 @@ struct UserSubjectCollectionListView: View {
   var body: some View {
     VStack {
       Picker("Type", selection: $ctype) {
-        ForEach(CollectionType.allTypes(), id: \.self) { type in
-          Text(type.description(stype)).tag(type)
+        ForEach(CollectionType.allTypes(), id: \.self) { ct in
+          if let count = ctypes[ct], count > 0 {
+            Text("\(ct.description(stype))(\(count))")
+              .tag(ct)
+          } else {
+            Text("\(ct.description(stype))")
+              .tag(ct)
+          }
         }
       }
       .pickerStyle(.segmented)

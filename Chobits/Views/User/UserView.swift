@@ -151,7 +151,7 @@ struct UserView: View {
       ToolbarItem(placement: .topBarTrailing) {
         Menu {
           if let user = user?.slim {
-            NavigationLink(value: NavDestination.userCollection(user, .anime)) {
+            NavigationLink(value: NavDestination.userCollection(user, .anime, [:])) {
               Label("收藏", systemImage: "star")
             }
             NavigationLink(value: NavDestination.userMono(user)) {
