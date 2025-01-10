@@ -24,15 +24,7 @@ struct SubjectTinyView: View {
     .background(.secondary.opacity(0.01))
     .clipShape(RoundedRectangle(cornerRadius: 8))
     .frame(height: 40)
-    .contextMenu {
-      NavigationLink(value: NavDestination.subject(subject.id)) {
-        Label("查看详情", systemImage: "magnifyingglass")
-      }
-    } preview: {
-      SubjectCardView(subject: subject)
-        .padding()
-        .frame(idealWidth: 360)
-    }
+    .subjectPreview(subject)
   }
 }
 
@@ -89,20 +81,7 @@ struct SubjectSmallView: View {
     .background(.secondary.opacity(0.01))
     .clipShape(RoundedRectangle(cornerRadius: 8))
     .frame(height: 80)
-    .contextMenu {
-      NavigationLink(value: NavDestination.subject(subject.id)) {
-        Label("查看详情", systemImage: "magnifyingglass")
-      }
-      if subject.type == .anime || subject.type == .real {
-        NavigationLink(value: NavDestination.episodeList(subject.id)) {
-          Label("章节列表", systemImage: "list.bullet")
-        }
-      }
-    } preview: {
-      SubjectCardView(subject: subject)
-        .padding()
-        .frame(idealWidth: 360)
-    }
+    .subjectPreview(subject, eps: true)
   }
 }
 
@@ -161,6 +140,25 @@ struct SubjectCardView: View {
         }
         Spacer()
       }
+    }
+  }
+}
+
+extension View {
+  func subjectPreview(_ subject: SlimSubjectDTO, eps: Bool = false) -> some View {
+    self.contextMenu {
+      NavigationLink(value: NavDestination.subject(subject.id)) {
+        Label("查看详情", systemImage: "magnifyingglass")
+      }
+      if eps, subject.type == .anime || subject.type == .real {
+        NavigationLink(value: NavDestination.episodeList(subject.id)) {
+          Label("章节列表", systemImage: "list.bullet")
+        }
+      }
+    } preview: {
+      SubjectCardView(subject: subject)
+        .padding()
+        .frame(idealWidth: 360)
     }
   }
 }

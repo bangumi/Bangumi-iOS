@@ -141,6 +141,7 @@ struct TrendingSubjectTypeView: View {
             .imageLink(item.subject.link)
             .padding(8)
             .shadow(color: Color.black.opacity(0.2), radius: 4)
+            .subjectPreview(item.subject)
           }
         }
         LazyVGrid(columns: smallColumns, spacing: 8) {
@@ -166,6 +167,7 @@ struct TrendingSubjectTypeView: View {
             .imageLink(item.subject.link)
             .padding(8)
             .shadow(color: Color.black.opacity(0.2), radius: 4)
+            .subjectPreview(item.subject)
           }
         }
       }

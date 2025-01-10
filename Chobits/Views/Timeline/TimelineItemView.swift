@@ -33,7 +33,7 @@ struct TimelineItemView: View {
                       .imageType(.avatar)
                       .imageLink(user.link)
                   }
-                }.frame(height: 60)
+                }
               }
             }
           case 3, 4:
@@ -46,7 +46,7 @@ struct TimelineItemView: View {
                       .imageType(.avatar)
                       .imageLink(group.link)
                   }
-                }.frame(height: 60)
+                }
               }
             }
           default:
@@ -68,8 +68,9 @@ struct TimelineItemView: View {
                   .imageStyle(width: 60, height: 72)
                   .imageType(.subject)
                   .imageLink(subject.link)
+                  .subjectPreview(subject)
                 }
-              }.frame(height: 75)
+              }
             }
           } else {
             if let collect = item.memo.subject?.first {
@@ -136,7 +137,7 @@ struct TimelineItemView: View {
                     .imageType(.avatar)
                     .imageLink(person.link)
                 }
-              }.frame(height: 40)
+              }
             }
           }
 
