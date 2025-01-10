@@ -124,7 +124,7 @@ struct CalendarWeekdayView: View {
           VStack {
             ImageView(img: item.subject.images?.resize(.r200)) {
               if item.watchers > 100 {
-                Label("\(item.watchers)", systemImage: "flame")
+                Text("\(item.watchers)人追番")
                   .padding(2)
                   .background(.accent.opacity(0.9))
                   .padding(2)
@@ -140,6 +140,7 @@ struct CalendarWeekdayView: View {
             .imageStyle(width: 110, height: 140)
             .imageType(.subject)
             .imageLink(item.subject.link)
+            .subjectPreview(item.subject)
           }
         }
       }
