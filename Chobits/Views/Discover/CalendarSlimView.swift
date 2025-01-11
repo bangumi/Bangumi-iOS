@@ -17,7 +17,7 @@ struct CalendarSlimView: View {
 
   var todayDesc: String {
     let weekday = getWeekday(Date())
-    return Calendar(identifier: .iso8601).weekdaySymbols[weekday]
+    return Calendar(identifier: .iso8601).weekdaySymbols[weekday % 7]
   }
 
   var tomorrow: BangumiCalendar? {
@@ -27,7 +27,7 @@ struct CalendarSlimView: View {
 
   var tomorrowDesc: String {
     let weekday = getWeekday(Date().addingTimeInterval(86400))
-    return Calendar(identifier: .iso8601).weekdaySymbols[weekday]
+    return Calendar(identifier: .iso8601).weekdaySymbols[weekday % 7]
   }
 
   func refreshCalendar() async {
