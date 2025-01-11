@@ -188,7 +188,7 @@ struct ChiiProgressView: View {
           await loadCounts()
         }
         .navigationTitle("进度管理")
-        .toolbarTitleDisplayMode(.inlineLarge)
+        .navigationBarTitleDisplayMode(.inline)
         .toolbar {
           ToolbarItem(placement: .topBarTrailing) {
             Menu {
