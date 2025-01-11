@@ -92,6 +92,6 @@ struct PadView: View {
           selectedTab = .discover
         }
       }
-    }.tabViewStyle(.sidebarAdaptable)
+    }
   }
 }
