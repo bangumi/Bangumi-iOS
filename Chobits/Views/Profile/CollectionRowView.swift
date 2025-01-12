@@ -40,7 +40,6 @@ struct CollectionRowView: View {
               .font(.footnote)
               .multilineTextAlignment(.leading)
               .textSelection(.enabled)
-              .foregroundStyle(.secondary)
           }
         }
       }

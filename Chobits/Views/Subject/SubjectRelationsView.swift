@@ -79,7 +79,7 @@ struct SubjectRelationsView: View {
                   Text(ctype.description(relation.subject.type))
                 }.padding(.horizontal, 4)
               }
-              .imageStyle(width: 90, height: 120)
+              .imageStyle(width: 90, height: 90)
               .imageType(.subject)
               .imageLink(relation.subject.link)
               .padding(2)
@@ -90,7 +90,7 @@ struct SubjectRelationsView: View {
                   NSFWBadgeView()
                 }
               }
-              .imageStyle(width: 90, height: 120)
+              .imageStyle(width: 90, height: 90)
               .imageType(.subject)
               .imageLink(relation.subject.link)
               .padding(2)
@@ -102,7 +102,7 @@ struct SubjectRelationsView: View {
               .truncationMode(.middle)
               .lineLimit(2)
             Spacer()
-          }.frame(width: 90, height: 190)
+          }.frame(width: 90, height: 160)
         }
       }.padding(.horizontal, 2)
     }.animation(.default, value: relations)

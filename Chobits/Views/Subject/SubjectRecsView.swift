@@ -64,7 +64,7 @@ struct SubjectRecsView: View {
                   Text(ctype.description(rec.subject.type))
                 }.padding(.horizontal, 4)
               }
-              .imageStyle(width: 72, height: 96)
+              .imageStyle(width: 72, height: 72)
               .imageType(.subject)
               .imageLink(rec.subject.link)
               .padding(2)
@@ -75,7 +75,7 @@ struct SubjectRecsView: View {
                   NSFWBadgeView()
                 }
               }
-              .imageStyle(width: 72, height: 96)
+              .imageStyle(width: 72, height: 72)
               .imageType(.subject)
               .imageLink(rec.subject.link)
               .padding(2)
@@ -88,7 +88,7 @@ struct SubjectRecsView: View {
             Spacer()
           }
           .font(.caption)
-          .frame(width: 72, height: 144)
+          .frame(width: 72, height: 120)
         }
       }.padding(.horizontal, 2)
     }.animation(.default, value: recs)

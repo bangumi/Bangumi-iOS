@@ -147,15 +147,13 @@ struct ProgressTileItemView: View {
       .imageLink(collection.subject?.link)
 
       VStack(alignment: .leading, spacing: 4) {
-        NavigationLink(value: NavDestination.subject(subjectId)) {
-          VStack(alignment: .leading) {
-            Text(collection.subject?.name ?? "")
-              .font(.headline)
-            if let nameCN = collection.subject?.nameCN, !nameCN.isEmpty {
-              Text(nameCN)
-                .foregroundStyle(.secondary)
-                .font(.subheadline)
-            }
+        VStack(alignment: .leading) {
+          Text(collection.subject?.name.withLink(collection.subject?.link) ?? "")
+            .font(.headline)
+          if let nameCN = collection.subject?.nameCN, !nameCN.isEmpty {
+            Text(nameCN)
+              .foregroundStyle(.secondary)
+              .font(.subheadline)
           }
         }.buttonStyle(.plain)
 
