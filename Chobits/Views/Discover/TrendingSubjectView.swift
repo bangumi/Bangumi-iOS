@@ -134,6 +134,7 @@ struct TrendingSubjectTypeView: View {
               }
               .imageBadge(show: item.count > 100, padding: 4) {
                 Text("\(item.count) 人关注")
+                  .font(.callout)
               }
               .padding(8)
               .shadow(color: Color.black.opacity(0.2), radius: 4)
@@ -152,7 +153,7 @@ struct TrendingSubjectTypeView: View {
                   .truncationMode(.middle)
                   .lineLimit(2)
                   .font(.footnote)
-                  .padding(8)
+                  .padding(4)
               }
               .imageBadge(show: item.count > 100, padding: 2) {
                 Text("\(item.count) 人关注")

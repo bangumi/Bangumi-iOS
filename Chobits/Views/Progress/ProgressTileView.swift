@@ -141,14 +141,15 @@ struct ProgressTileItemView: View {
 
       VStack(alignment: .leading, spacing: 4) {
         VStack(alignment: .leading) {
-          Text(collection.subject?.name.withLink(collection.subject?.link) ?? "")
-            .font(.headline)
+          NavigationLink(value: NavDestination.subject(subjectId)) {
+            Text(collection.subject?.name ?? "").font(.headline)
+          }.buttonStyle(.plain)
           if let nameCN = collection.subject?.nameCN, !nameCN.isEmpty {
             Text(nameCN)
               .foregroundStyle(.secondary)
               .font(.subheadline)
           }
-        }.buttonStyle(.plain)
+        }
 
         switch collection.subjectTypeEnum {
         case .anime, .real:

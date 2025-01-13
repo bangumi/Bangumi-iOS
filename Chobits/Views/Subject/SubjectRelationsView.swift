@@ -8,24 +8,21 @@ struct SubjectRelationsView: View {
 
   @Environment(\.modelContext) var modelContext
 
-  @State private var collections: [Int: CollectionType] = [:]
+  @Query private var collects: [UserSubjectCollection]
 
-  func load() {
-    Task {
-      do {
-        let relationIDs = relations.map { $0.subject.id }
-        let collectionDescriptor = FetchDescriptor<UserSubjectCollection>(
-          predicate: #Predicate<UserSubjectCollection> {
-            relationIDs.contains($0.subjectId)
-          })
-        let collects = try modelContext.fetch(collectionDescriptor)
-        for collection in collects {
-          self.collections[collection.subjectId] = collection.typeEnum
-        }
-      } catch {
-        Notifier.shared.alert(error: error)
-      }
-    }
+  init(subjectId: Int, relations: [SubjectRelationDTO]) {
+    self.subjectId = subjectId
+    self.relations = relations
+    let relationIDs = relations.map { $0.subject.id }
+    let descriptor = FetchDescriptor<UserSubjectCollection>(
+      predicate: #Predicate<UserSubjectCollection> {
+        relationIDs.contains($0.subjectId)
+      })
+    _collects = Query(descriptor)
+  }
+
+  var collections: [Int: CollectionType] {
+    collects.reduce(into: [:]) { $0[$1.subjectId] = $1.typeEnum }
   }
 
   var body: some View {
@@ -34,7 +31,6 @@ struct SubjectRelationsView: View {
         Text("关联条目")
           .foregroundStyle(relations.count > 0 ? .primary : .secondary)
           .font(.title3)
-          .onAppear(perform: load)
         Spacer()
         if relations.count > 0 {
           NavigationLink(value: NavDestination.subjectRelationList(subjectId)) {
