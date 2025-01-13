@@ -5,13 +5,13 @@ struct CharacterCastItemView: View {
 
   var body: some View {
     HStack(alignment: .top) {
-      ImageView(img: item.subject.images?.resize(.r200)) {
-      } caption: {
-        Text(item.type.description)
-      }
-      .imageStyle(width: 60, height: 60, alignment: .top)
-      .imageType(.subject)
-      .imageLink(item.subject.link)
+      ImageView(img: item.subject.images?.resize(.r200))
+        .imageStyle(width: 60, height: 60, alignment: .top)
+        .imageType(.subject)
+        .imageLink(item.subject.link)
+        .imageCaption {
+          Text(item.type.description)
+        }
 
       VStack(alignment: .leading) {
         Text(item.subject.name.withLink(item.subject.link))

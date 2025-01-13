@@ -8,24 +8,21 @@ struct SubjectRecsView: View {
 
   @Environment(\.modelContext) var modelContext
 
-  @State private var collections: [Int: CollectionType] = [:]
+  @Query private var collects: [UserSubjectCollection]
 
-  func load() {
-    Task {
-      do {
-        let recIDs = recs.map { $0.subject.id }
-        let collectionDescriptor = FetchDescriptor<UserSubjectCollection>(
-          predicate: #Predicate<UserSubjectCollection> {
-            recIDs.contains($0.subjectId)
-          })
-        let collects = try modelContext.fetch(collectionDescriptor)
-        for collection in collects {
-          self.collections[collection.subjectId] = collection.typeEnum
-        }
-      } catch {
-        Notifier.shared.alert(error: error)
-      }
-    }
+  init(subjectId: Int, recs: [SubjectRecDTO]) {
+    self.subjectId = subjectId
+    self.recs = recs
+    let recIDs = recs.map { $0.subject.id }
+    let descriptor = FetchDescriptor<UserSubjectCollection>(
+      predicate: #Predicate<UserSubjectCollection> {
+        recIDs.contains($0.subjectId)
+      })
+    _collects = Query(descriptor)
+  }
+
+  var collections: [Int: CollectionType] {
+    collects.reduce(into: [:]) { $0[$1.subjectId] = $1.typeEnum }
   }
 
   var body: some View {
@@ -34,7 +31,6 @@ struct SubjectRecsView: View {
         Text("猜你喜欢")
           .foregroundStyle(recs.count > 0 ? .primary : .secondary)
           .font(.title3)
-          .onAppear(perform: load)
         Spacer()
       }
       Divider()
@@ -52,35 +48,21 @@ struct SubjectRecsView: View {
       LazyHStack(alignment: .top) {
         ForEach(recs) { rec in
           VStack {
-            if let ctype = collections[rec.subject.id] {
-              ImageView(img: rec.subject.images?.resize(.r200)) {
-                if rec.subject.nsfw {
-                  NSFWBadgeView()
-                }
-              } caption: {
+            let ctype = collections[rec.subject.id]
+            ImageView(img: rec.subject.images?.resize(.r200))
+              .imageStyle(width: 72, height: 72)
+              .imageType(.subject)
+              .imageNSFW(rec.subject.nsfw)
+              .imageCaption(show: ctype != nil) {
                 HStack {
-                  Image(systemName: ctype.icon)
+                  Image(systemName: ctype?.icon ?? "")
                   Spacer()
-                  Text(ctype.description(rec.subject.type))
+                  Text(ctype?.description(rec.subject.type) ?? "")
                 }.padding(.horizontal, 4)
               }
-              .imageStyle(width: 72, height: 72)
-              .imageType(.subject)
               .imageLink(rec.subject.link)
               .padding(2)
               .shadow(radius: 2)
-            } else {
-              ImageView(img: rec.subject.images?.resize(.r200)) {
-                if rec.subject.nsfw {
-                  NSFWBadgeView()
-                }
-              }
-              .imageStyle(width: 72, height: 72)
-              .imageType(.subject)
-              .imageLink(rec.subject.link)
-              .padding(2)
-              .shadow(radius: 2)
-            }
             Text(rec.subject.name)
               .multilineTextAlignment(.leading)
               .truncationMode(.middle)

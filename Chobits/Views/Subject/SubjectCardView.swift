@@ -54,13 +54,10 @@ struct SubjectSmallView: View {
   var body: some View {
 
     HStack {
-      ImageView(img: subject.images?.resize(.r200)) {
-        if subject.nsfw {
-          NSFWBadgeView()
-        }
-      }
-      .imageStyle(width: 60, height: 72)
-      .imageType(.subject)
+      ImageView(img: subject.images?.resize(.r200))
+        .imageStyle(width: 60, height: 72)
+        .imageType(.subject)
+        .imageNSFW(subject.nsfw)
       VStack(alignment: .leading) {
         Text(subject.title)
         Text(subject.info)
@@ -111,13 +108,10 @@ struct SubjectCardView: View {
   var body: some View {
     VStack(alignment: .leading, spacing: 5) {
       HStack(alignment: .top) {
-        ImageView(img: subject.images?.resize(.r200)) {
-          if subject.nsfw {
-            NSFWBadgeView()
-          }
-        }
-        .imageStyle(width: 80, height: 108)
-        .imageType(.subject)
+        ImageView(img: subject.images?.resize(.r200))
+          .imageStyle(width: 80, height: 108)
+          .imageType(.subject)
+          .imageNSFW(subject.nsfw)
         VStack(alignment: .leading) {
           Text(subject.name)
             .font(.headline)

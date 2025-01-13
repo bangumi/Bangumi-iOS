@@ -56,16 +56,13 @@ struct CharacterView: View {
 
             /// header
             HStack(alignment: .top) {
-              ImageView(img: character.images?.resize(.r400)) {
-                if character.nsfw {
-                  NSFWBadgeView()
-                }
-              }
-              .imageStyle(width: 120, height: 160, alignment: .top)
-              .imageType(.person)
-              .enableSave(character.images?.large)
-              .padding(4)
-              .shadow(radius: 4)
+              ImageView(img: character.images?.resize(.r400))
+                .imageStyle(width: 120, height: 160, alignment: .top)
+                .imageType(.person)
+                .imageNSFW(character.nsfw)
+                .enableSave(character.images?.large)
+                .padding(4)
+                .shadow(radius: 4)
               VStack(alignment: .leading) {
                 HStack {
                   Image(systemName: character.roleEnum.icon)

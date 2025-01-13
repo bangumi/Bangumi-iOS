@@ -25,14 +25,11 @@ struct SubjectLargeRowView: View {
 
   var body: some View {
     HStack {
-      ImageView(img: subject?.images?.resize(.r200)) {
-        if subject?.nsfw ?? false {
-          NSFWBadgeView()
-        }
-      }
-      .imageStyle(width: 90, height: 120)
-      .imageType(.subject)
-      .imageLink(subject?.link)
+      ImageView(img: subject?.images?.resize(.r200))
+        .imageStyle(width: 90, height: 120)
+        .imageType(.subject)
+        .imageNSFW(subject?.nsfw ?? false)
+        .imageLink(subject?.link)
       VStack(alignment: .leading) {
         // title
         HStack {

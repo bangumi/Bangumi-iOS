@@ -47,7 +47,7 @@ extension EnvironmentValues {
 }
 
 extension View {
-  public func imageStyle(
+  func imageStyle(
     width: CGFloat? = nil, height: CGFloat? = nil, cornerRadius: CGFloat = 5,
     alignment: Alignment = .top
   )
@@ -60,7 +60,7 @@ extension View {
 }
 
 extension View {
-  public func imageLink(_ link: String?) -> some View {
+  func imageLink(_ link: String?) -> some View {
     let url = URL(string: link ?? "") ?? URL(string: "")!
     return Link(destination: url) {
       self
@@ -70,7 +70,7 @@ extension View {
 
 extension View {
   @ViewBuilder
-  public func enableSave(_ large: String?) -> some View {
+  func enableSave(_ large: String?) -> some View {
     if let large = large, let imageURL = URL(string: large) {
       self.contextMenu {
         Button {
@@ -98,25 +98,110 @@ extension View {
   }
 }
 
-struct ImageView<ImageBadge: View, ImageCaption: View>: View {
-  let img: String?
+extension View {
+  @ViewBuilder
+  func imageCaption<Overlay: View>(show: Bool = true, @ViewBuilder caption: () -> Overlay)
+    -> some View
+  {
+    if show {
+      self
+        .overlay {
+          ZStack {
+            Rectangle()
+              .fill(
+                LinearGradient(
+                  gradient: Gradient(colors: [
+                    Color.black.opacity(0),
+                    Color.black.opacity(0),
+                    Color.black.opacity(0),
+                    Color.black.opacity(0),
+                    Color.black.opacity(0.1),
+                    Color.black.opacity(0.2),
+                    Color.black.opacity(0.4),
+                    Color.black.opacity(0.8),
+                  ]), startPoint: .top, endPoint: .bottom))
 
-  let badge: ImageBadge
-  let caption: ImageCaption
+            VStack {
+              Spacer()
+              caption()
+            }
+            .font(.caption)
+            .foregroundStyle(.white)
+            .padding(.bottom, 2)
+          }.clipShape(RoundedRectangle(cornerRadius: 5))
+        }
+    } else {
+      self
+    }
+  }
+}
+
+struct NSFWBadgeView: View {
+  @AppStorage("showNSFWBadge") var showNSFWBadge: Bool = true
+
+  var body: some View {
+    if showNSFWBadge {
+      Text("R18")
+        .padding(2)
+        .background(.red.opacity(0.8))
+        .clipShape(RoundedRectangle(cornerRadius: 5))
+        .padding(4)
+        .foregroundStyle(.white)
+        .font(.caption)
+    } else {
+      EmptyView()
+    }
+  }
+}
+
+extension View {
+  @ViewBuilder
+  func imageNSFW(_ nsfw: Bool) -> some View {
+    if nsfw {
+      self.overlay(alignment: .topLeading) {
+        NSFWBadgeView()
+      }
+    } else {
+      self
+    }
+  }
+}
+
+extension View {
+  @ViewBuilder
+  func imageBadge<Overlay: View>(
+    show: Bool = true, background: Color = .accent, padding: CGFloat = 2,
+    @ViewBuilder badge: () -> Overlay
+  )
+    -> some View
+  {
+    if show {
+      self
+        .overlay(alignment: .topLeading) {
+          badge()
+            .padding(padding)
+            .background(background.opacity(0.9))
+            .clipShape(RoundedRectangle(cornerRadius: 5))
+            .padding(padding)
+            .foregroundStyle(.white)
+            .font(.caption)
+        }
+    } else {
+      self
+    }
+  }
+}
+
+struct ImageView: View {
+  let img: String?
 
   @Environment(\.imageStyle) var style
   @Environment(\.imageType) var type
 
   @State private var imageRatio: CGFloat = 1
 
-  init(
-    img: String?,
-    @ViewBuilder badge: () -> ImageBadge,
-    @ViewBuilder caption: () -> ImageCaption
-  ) {
+  init(img: String?) {
     self.img = img
-    self.badge = badge()
-    self.caption = caption()
   }
 
   var imageURL: URL? {
@@ -142,118 +227,77 @@ struct ImageView<ImageBadge: View, ImageCaption: View>: View {
 
   var body: some View {
     ZStack {
-      ZStack {
-        if let imageURL = imageURL {
-          if style.width != nil, height != nil {
-            KFImage(imageURL)
-              .onSuccess { result in
-                if let img = result.image.cgImage {
-                  if img.width > 0, img.height > 0 {
-                    self.imageRatio = CGFloat(img.width) / CGFloat(img.height)
-                  }
+      if let imageURL = imageURL {
+        if style.width != nil, height != nil {
+          KFImage(imageURL)
+            .onSuccess { result in
+              if let img = result.image.cgImage {
+                if img.width > 0, img.height > 0 {
+                  self.imageRatio = CGFloat(img.width) / CGFloat(img.height)
                 }
               }
-              .fade(duration: 0.25)
-              .resizable()
-              .scaledToFill()
-              .frame(width: style.width, height: height, alignment: style.alignment)
-              .clipShape(RoundedRectangle(cornerRadius: style.cornerRadius))
-          } else {
-            KFImage(imageURL)
-              .onSuccess { result in
-                if let img = result.image.cgImage {
-                  if img.width > 0, img.height > 0 {
-                    self.imageRatio = CGFloat(img.width) / CGFloat(img.height)
-                  }
-                }
-              }
-              .fade(duration: 0.25)
-              .resizable()
-              .scaledToFit()
-              .clipShape(RoundedRectangle(cornerRadius: style.cornerRadius))
-          }
+            }
+            .fade(duration: 0.25)
+            .resizable()
+            .scaledToFill()
+            .frame(width: style.width, height: height, alignment: style.alignment)
+            .clipShape(RoundedRectangle(cornerRadius: style.cornerRadius))
         } else {
-          if style.width != nil, height != nil {
-            ZStack {
-              if style.width == style.height {
-                switch type {
-                case .subject:
-                  Image("noIconSubject")
-                    .resizable()
-                    .scaledToFit()
-                case .person:
-                  Image("noIconPerson")
-                    .resizable()
-                    .scaledToFit()
-                case .avatar:
-                  Image("noIconAvatar")
-                    .resizable()
-                    .scaledToFit()
-                case .photo:
-                  Image("noPhoto")
-                    .resizable()
-                    .scaledToFit()
-                case .icon:
-                  Image("noIcon")
-                    .resizable()
-                    .scaledToFit()
-                default:
-                  Rectangle()
-                    .foregroundStyle(.secondary.opacity(0.2))
+          KFImage(imageURL)
+            .onSuccess { result in
+              if let img = result.image.cgImage {
+                if img.width > 0, img.height > 0 {
+                  self.imageRatio = CGFloat(img.width) / CGFloat(img.height)
                 }
-              } else {
+              }
+            }
+            .fade(duration: 0.25)
+            .resizable()
+            .scaledToFit()
+            .clipShape(RoundedRectangle(cornerRadius: style.cornerRadius))
+        }
+      } else {
+        if style.width != nil, height != nil {
+          ZStack {
+            if style.width == style.height {
+              switch type {
+              case .subject:
+                Image("noIconSubject")
+                  .resizable()
+                  .scaledToFit()
+              case .person:
+                Image("noIconPerson")
+                  .resizable()
+                  .scaledToFit()
+              case .avatar:
+                Image("noIconAvatar")
+                  .resizable()
+                  .scaledToFit()
+              case .photo:
+                Image("noPhoto")
+                  .resizable()
+                  .scaledToFit()
+              case .icon:
+                Image("noIcon")
+                  .resizable()
+                  .scaledToFit()
+              default:
                 Rectangle()
                   .foregroundStyle(.secondary.opacity(0.2))
               }
+            } else {
+              Rectangle()
+                .foregroundStyle(.secondary.opacity(0.2))
             }
-          } else {
-            Rectangle()
-              .foregroundStyle(.secondary.opacity(0.2))
           }
+        } else {
+          Rectangle()
+            .foregroundStyle(.secondary.opacity(0.2))
         }
       }
-      .frame(width: style.width, height: height, alignment: style.alignment)
-      .clipShape(RoundedRectangle(cornerRadius: style.cornerRadius))
-      if ImageCaption.self != EmptyView.self {
-        ZStack {
-          Rectangle()
-            .fill(
-              LinearGradient(
-                gradient: Gradient(colors: [
-                  Color.black.opacity(0),
-                  Color.black.opacity(0),
-                  Color.black.opacity(0),
-                  Color.black.opacity(0),
-                  Color.black.opacity(0.1),
-                  Color.black.opacity(0.2),
-                  Color.black.opacity(0.4),
-                  Color.black.opacity(0.8),
-                ]), startPoint: .top, endPoint: .bottom))
-          VStack {
-            Spacer()
-            caption
-          }
-          .font(.caption)
-          .foregroundStyle(.white)
-          .padding(.bottom, 2)
-        }.frame(width: style.width, height: height, alignment: .bottom)
-      }
-      if ImageBadge.self != EmptyView.self {
-        VStack {
-          badge
-          Spacer()
-        }.frame(width: style.width, height: height, alignment: .topLeading)
-      }
-    }.clipShape(RoundedRectangle(cornerRadius: style.cornerRadius))
-  }
-}
-
-extension ImageView {
-  init(img: String?, @ViewBuilder badge: () -> ImageBadge) where ImageCaption == EmptyView {
-    self.init(img: img, badge: badge, caption: {})
-  }
-  init(img: String?) where ImageCaption == EmptyView, ImageBadge == EmptyView {
-    self.init(img: img, badge: {}, caption: {})
+    }
+    .frame(width: style.width, height: height, alignment: style.alignment)
+    .clipShape(RoundedRectangle(cornerRadius: style.cornerRadius))
   }
 }
 
@@ -278,37 +322,38 @@ extension ImageView {
       ImageView(img: "")
         .imageStyle(width: 40, height: 60)
         .imageType(.common)
+        .imageNSFW(true)
       ImageView(
         img: "https://lain.bgm.tv/r/400/pic/cover/l/94/20/520019_xgqUl.jpg"
       ).imageStyle(width: 60, height: 60, alignment: .top)
       ImageView(
         img: "https://lain.bgm.tv/pic/cover/m/5e/39/140534_cUj6H.jpg"
       ).imageStyle(width: 60, height: 60, alignment: .top)
-      ImageView(
-        img: "https://lain.bgm.tv/pic/cover/m/5e/39/140534_cUj6H.jpg"
-      ) {
-        NSFWBadgeView()
-      }
-      .imageStyle(width: 60, height: 90)
-      .enableSave("https://lain.bgm.tv/pic/cover/l/5e/39/140534_cUj6H.jpg")
-      ImageView(img: "https://lain.bgm.tv/pic/cover/c/5e/39/140534_cUj6H.jpg") {
-        NSFWBadgeView()
-      } caption: {
-        HStack {
+      ImageView(img: "https://lain.bgm.tv/pic/cover/m/5e/39/140534_cUj6H.jpg")
+        .imageStyle(width: 60, height: 90)
+        .enableSave("https://lain.bgm.tv/pic/cover/l/5e/39/140534_cUj6H.jpg")
+        .imageNSFW(true)
+      ImageView(img: "https://lain.bgm.tv/pic/cover/c/5e/39/140534_cUj6H.jpg")
+        .imageStyle(width: 90, height: 120)
+        .imageCaption {
+          HStack {
+            Text("abc")
+            Spacer()
+            Text("bcd")
+          }.padding(.horizontal, 4)
+        }
+        .imageNSFW(true)
+      ImageView(img: "")
+        .imageStyle(width: 60, height: 80)
+        .imageCaption {
           Text("abc")
-          Spacer()
-          Text("bcd")
-        }.padding(.horizontal, 4)
-      }.imageStyle(width: 90, height: 120)
-      ImageView(img: "") {
-      } caption: {
-        Text("abc")
-      }.imageStyle(width: 60, height: 80)
-      ImageView(img: "https://lain.bgm.tv/pic/cover/l/5e/39/140534_cUj6H.jpg") {
-        NSFWBadgeView()
-      } caption: {
-        Text("天道花怜")
-      }
+        }
+      ImageView(img: "https://lain.bgm.tv/pic/cover/l/5e/39/140534_cUj6H.jpg")
+        .imageStyle(width: 60, height: 80)
+        .imageCaption {
+          Text("天道花怜")
+        }
+        .imageNSFW(true)
     }.padding()
   }
 }

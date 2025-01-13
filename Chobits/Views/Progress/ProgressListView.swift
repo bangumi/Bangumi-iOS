@@ -102,20 +102,13 @@ struct ProgressListItemView: View {
   var body: some View {
     VStack(alignment: .leading, spacing: 4) {
       HStack {
-        ImageView(img: collection.subject?.images?.resize(.r200)) {
-          if collection.priv {
+        ImageView(img: collection.subject?.images?.resize(.r200))
+          .imageStyle(width: 72, height: 72)
+          .imageType(.subject)
+          .imageBadge(show: collection.priv, background: .red) {
             Image(systemName: "lock")
-              .padding(2)
-              .background(.red.opacity(0.8))
-              .padding(2)
-              .foregroundStyle(.white)
-              .font(.caption)
-              .clipShape(Capsule())
           }
-        }
-        .imageStyle(width: 72, height: 72)
-        .imageType(.subject)
-        .imageLink(collection.subject?.link)
+          .imageLink(collection.subject?.link)
         VStack(alignment: .leading) {
           NavigationLink(value: NavDestination.subject(subjectId)) {
             VStack(alignment: .leading) {

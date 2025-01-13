@@ -67,35 +67,21 @@ struct SubjectRelationsView: View {
             }
             .lineLimit(1)
             .font(.caption)
-            if let ctype = collections[relation.subject.id] {
-              ImageView(img: relation.subject.images?.resize(.r200)) {
-                if relation.subject.nsfw {
-                  NSFWBadgeView()
-                }
-              } caption: {
+            let ctype = collections[relation.subject.id]
+            ImageView(img: relation.subject.images?.resize(.r200))
+              .imageStyle(width: 90, height: 90)
+              .imageType(.subject)
+              .imageNSFW(relation.subject.nsfw)
+              .imageCaption(show: ctype != nil) {
                 HStack {
-                  Image(systemName: ctype.icon)
+                  Image(systemName: ctype?.icon ?? "")
                   Spacer()
-                  Text(ctype.description(relation.subject.type))
+                  Text(ctype?.description(relation.subject.type) ?? "")
                 }.padding(.horizontal, 4)
               }
-              .imageStyle(width: 90, height: 90)
-              .imageType(.subject)
               .imageLink(relation.subject.link)
               .padding(2)
               .shadow(radius: 2)
-            } else {
-              ImageView(img: relation.subject.images?.resize(.r200)) {
-                if relation.subject.nsfw {
-                  NSFWBadgeView()
-                }
-              }
-              .imageStyle(width: 90, height: 90)
-              .imageType(.subject)
-              .imageLink(relation.subject.link)
-              .padding(2)
-              .shadow(radius: 2)
-            }
             Text(relation.subject.name)
               .font(.caption)
               .multilineTextAlignment(.leading)

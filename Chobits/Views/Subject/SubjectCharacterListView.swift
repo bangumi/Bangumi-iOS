@@ -36,13 +36,13 @@ struct SubjectCharacterListView: View {
       PageView<SubjectCharacterDTO, _>(limit: 10, reloader: reloader, nextPageFunc: load) { item in
         CardView {
           HStack {
-            ImageView(img: item.character.images?.medium) {
-            } caption: {
-              Text(item.type.description)
-            }
-            .imageStyle(width: 60, height: 90, alignment: .top)
-            .imageType(.person)
-            .imageLink(item.character.link)
+            ImageView(img: item.character.images?.medium)
+              .imageStyle(width: 60, height: 90, alignment: .top)
+              .imageType(.person)
+              .imageCaption {
+                Text(item.type.description)
+              }
+              .imageLink(item.character.link)
             VStack(alignment: .leading) {
               VStack(alignment: .leading) {
                 HStack {

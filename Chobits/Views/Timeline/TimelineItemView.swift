@@ -60,15 +60,12 @@ struct TimelineItemView: View {
             ScrollView(.horizontal, showsIndicators: false) {
               HStack {
                 ForEach(subjects.prefix(5)) { subject in
-                  ImageView(img: subject.images?.resize(.r200)) {
-                    if subject.nsfw {
-                      NSFWBadgeView()
-                    }
-                  }
-                  .imageStyle(width: 60, height: 72)
-                  .imageType(.subject)
-                  .imageLink(subject.link)
-                  .subjectPreview(subject)
+                  ImageView(img: subject.images?.resize(.r200))
+                    .imageStyle(width: 60, height: 72)
+                    .imageType(.subject)
+                    .imageNSFW(subject.nsfw)
+                    .imageLink(subject.link)
+                    .subjectPreview(subject)
                 }
               }
             }

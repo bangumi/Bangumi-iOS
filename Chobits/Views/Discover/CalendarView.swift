@@ -122,25 +122,19 @@ struct CalendarWeekdayView: View {
       LazyVGrid(columns: columns) {
         ForEach(calendar.items, id: \.subject) { item in
           VStack {
-            ImageView(img: item.subject.images?.resize(.r200)) {
-              if item.watchers > 100 {
-                Text("\(item.watchers)人追番")
-                  .padding(2)
-                  .background(.accent.opacity(0.9))
-                  .padding(2)
-                  .foregroundStyle(.white)
-                  .font(.caption)
-                  .clipShape(Capsule())
+            ImageView(img: item.subject.images?.resize(.r200))
+              .imageStyle(width: 110, height: 140)
+              .imageType(.subject)
+              .imageLink(item.subject.link)
+              .imageCaption {
+                Text(item.subject.title)
+                  .lineLimit(1)
+                  .padding(.horizontal, 2)
               }
-            } caption: {
-              Text(item.subject.title)
-                .lineLimit(1)
-                .padding(.horizontal, 2)
-            }
-            .imageStyle(width: 110, height: 140)
-            .imageType(.subject)
-            .imageLink(item.subject.link)
-            .subjectPreview(item.subject)
+              .imageBadge(show: item.watchers > 100) {
+                Text("\(item.watchers)人追番")
+              }
+              .subjectPreview(item.subject)
           }
         }
       }

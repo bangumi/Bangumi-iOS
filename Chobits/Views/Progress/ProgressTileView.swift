@@ -131,20 +131,13 @@ struct ProgressTileItemView: View {
 
   var body: some View {
     VStack(alignment: .leading, spacing: 8) {
-      ImageView(img: collection.subject?.images?.resize(.r400)) {
-        if collection.priv {
+      ImageView(img: collection.subject?.images?.resize(.r400))
+        .imageStyle(width: width, height: imageHeight)
+        .imageType(.subject)
+        .imageBadge(show: collection.priv, background: .red) {
           Image(systemName: "lock")
-            .padding(2)
-            .background(.red.opacity(0.8))
-            .padding(2)
-            .foregroundStyle(.white)
-            .font(.caption)
-            .clipShape(Capsule())
         }
-      }
-      .imageStyle(width: width, height: imageHeight)
-      .imageType(.subject)
-      .imageLink(collection.subject?.link)
+        .imageLink(collection.subject?.link)
 
       VStack(alignment: .leading, spacing: 4) {
         VStack(alignment: .leading) {

@@ -32,16 +32,13 @@ struct SubjectHeaderView: View {
       .multilineTextAlignment(.leading)
       .textSelection(.enabled)
     HStack {
-      ImageView(img: subject.images?.resize(.r400)) {
-        if subject.nsfw {
-          NSFWBadgeView()
-        }
-      }
-      .imageStyle(width: 120, height: 160)
-      .imageType(.subject)
-      .enableSave(subject.images?.large)
-      .padding(4)
-      .shadow(radius: 4)
+      ImageView(img: subject.images?.resize(.r400))
+        .imageStyle(width: 120, height: 160)
+        .imageType(.subject)
+        .imageNSFW(subject.nsfw)
+        .enableSave(subject.images?.large)
+        .padding(4)
+        .shadow(radius: 4)
       VStack(alignment: .leading) {
         HStack {
           if type != .none {

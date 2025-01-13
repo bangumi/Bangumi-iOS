@@ -120,54 +120,47 @@ struct TrendingSubjectTypeView: View {
       } else {
         LazyVGrid(columns: largeColumns, spacing: 8) {
           ForEach(largeItems) { item in
-            ImageView(img: item.subject.images?.resize(.r800)) {
-              Text("\(item.count) 人关注")
-                .padding(4)
-                .background(.accent.opacity(0.9))
-                .padding(4)
-                .foregroundStyle(.white)
-                .font(.body)
-                .clipShape(Capsule())
-            } caption: {
-              Text(item.subject.name)
-                .multilineTextAlignment(.leading)
-                .truncationMode(.middle)
-                .lineLimit(2)
-                .font(.body)
-                .padding(8)
-            }
-            .imageStyle(width: largeCardWidth, height: largeCardWidth * 1.2)
-            .imageType(.subject)
-            .imageLink(item.subject.link)
-            .padding(8)
-            .shadow(color: Color.black.opacity(0.2), radius: 4)
-            .subjectPreview(item.subject)
+            ImageView(img: item.subject.images?.resize(.r800))
+              .imageStyle(width: largeCardWidth, height: largeCardWidth * 1.2)
+              .imageType(.subject)
+              .imageLink(item.subject.link)
+              .imageCaption {
+                Text(item.subject.name)
+                  .multilineTextAlignment(.leading)
+                  .truncationMode(.middle)
+                  .lineLimit(2)
+                  .font(.body)
+                  .padding(8)
+              }
+              .imageBadge(show: item.count > 100, padding: 4) {
+                Text("\(item.count) 人关注")
+              }
+              .padding(8)
+              .shadow(color: Color.black.opacity(0.2), radius: 4)
+              .subjectPreview(item.subject)
           }
         }
         LazyVGrid(columns: smallColumns, spacing: 8) {
           ForEach(smallItems) { item in
-            ImageView(img: item.subject.images?.resize(.r400)) {
-              Text("\(item.count) 人关注")
-                .padding(4)
-                .background(.accent.opacity(0.9))
-                .padding(4)
-                .foregroundStyle(.white)
-                .font(.footnote)
-                .clipShape(Capsule())
-            } caption: {
-              Text(item.subject.name)
-                .multilineTextAlignment(.leading)
-                .truncationMode(.middle)
-                .lineLimit(2)
-                .font(.footnote)
-                .padding(8)
-            }
-            .imageStyle(width: smallCardWidth, height: smallCardWidth * 1.3)
-            .imageType(.subject)
-            .imageLink(item.subject.link)
-            .padding(8)
-            .shadow(color: Color.black.opacity(0.2), radius: 4)
-            .subjectPreview(item.subject)
+            ImageView(img: item.subject.images?.resize(.r400))
+              .imageStyle(width: smallCardWidth, height: smallCardWidth * 1.3)
+              .imageType(.subject)
+              .imageLink(item.subject.link)
+              .imageCaption {
+                Text(item.subject.name)
+                  .multilineTextAlignment(.leading)
+                  .truncationMode(.middle)
+                  .lineLimit(2)
+                  .font(.footnote)
+                  .padding(8)
+              }
+              .imageBadge(show: item.count > 100, padding: 2) {
+                Text("\(item.count) 人关注")
+                  .font(.footnote)
+              }
+              .padding(8)
+              .shadow(color: Color.black.opacity(0.2), radius: 4)
+              .subjectPreview(item.subject)
           }
         }
       }
