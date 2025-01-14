@@ -19,7 +19,6 @@ struct ContentView: View {
       }
       tries += 1
       do {
-        Notifier.shared.notify(message: "正在更新当前用户信息")
         profile = try await Chii.shared.getProfile()
         await Chii.shared.setAuthStatus(true)
         Logger.api.info("refresh profile success: \(profile.rawValue)")
@@ -32,7 +31,7 @@ struct ContentView: View {
         Notifier.shared.notify(message: "获取当前用户信息失败，重试 \(tries)/3")
         Logger.api.warning("refresh profile failed: \(error)")
       }
-      sleep(1)
+      sleep(2)
     }
     Notifier.shared.alert(message: "无法获取当前用户信息，请重新登录")
     await Chii.shared.setAuthStatus(false)
