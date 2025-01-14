@@ -123,7 +123,6 @@ struct TrendingSubjectTypeView: View {
             ImageView(img: item.subject.images?.resize(.r800))
               .imageStyle(width: largeCardWidth, height: largeCardWidth * 1.2)
               .imageType(.subject)
-              .imageLink(item.subject.link)
               .imageCaption {
                 Text(item.subject.name)
                   .multilineTextAlignment(.leading)
@@ -136,6 +135,7 @@ struct TrendingSubjectTypeView: View {
                 Text("\(item.count) 人关注")
                   .font(.callout)
               }
+              .imageLink(item.subject.link)
               .padding(8)
               .shadow(color: Color.black.opacity(0.2), radius: 4)
               .subjectPreview(item.subject)
@@ -146,7 +146,6 @@ struct TrendingSubjectTypeView: View {
             ImageView(img: item.subject.images?.resize(.r400))
               .imageStyle(width: smallCardWidth, height: smallCardWidth * 1.3)
               .imageType(.subject)
-              .imageLink(item.subject.link)
               .imageCaption {
                 Text(item.subject.name)
                   .multilineTextAlignment(.leading)
@@ -159,6 +158,7 @@ struct TrendingSubjectTypeView: View {
                 Text("\(item.count) 人关注")
                   .font(.footnote)
               }
+              .imageLink(item.subject.link)
               .padding(8)
               .shadow(color: Color.black.opacity(0.2), radius: 4)
               .subjectPreview(item.subject)

@@ -32,7 +32,7 @@ struct UserFriendListView: View {
             ImageView(img: item.user.avatar?.large)
               .imageStyle(width: 60, height: 60)
               .imageType(.avatar)
-              .imageLink("chii://user/\(item.user.username)")
+              .imageLink(item.user.link)
             VStack(alignment: .leading) {
               HStack {
                 VStack(alignment: .leading) {

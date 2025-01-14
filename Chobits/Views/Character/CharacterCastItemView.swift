@@ -8,10 +8,10 @@ struct CharacterCastItemView: View {
       ImageView(img: item.subject.images?.resize(.r200))
         .imageStyle(width: 60, height: 60, alignment: .top)
         .imageType(.subject)
-        .imageLink(item.subject.link)
         .imageCaption {
           Text(item.type.description)
         }
+        .imageLink(item.subject.link)
 
       VStack(alignment: .leading) {
         Text(item.subject.name.withLink(item.subject.link))

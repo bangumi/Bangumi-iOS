@@ -125,7 +125,6 @@ struct CalendarWeekdayView: View {
             ImageView(img: item.subject.images?.resize(.r200))
               .imageStyle(width: 110, height: 140)
               .imageType(.subject)
-              .imageLink(item.subject.link)
               .imageCaption {
                 Text(item.subject.title)
                   .lineLimit(1)
@@ -134,6 +133,7 @@ struct CalendarWeekdayView: View {
               .imageBadge(show: item.watchers > 100) {
                 Text("\(item.watchers)人追番")
               }
+              .imageLink(item.subject.link)
               .subjectPreview(item.subject)
           }
         }
