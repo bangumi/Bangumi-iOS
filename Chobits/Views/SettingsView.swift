@@ -150,7 +150,9 @@ struct SettingsView: View {
             Text(Chii.shared.version).foregroundStyle(.secondary)
           }
           Link(
-            "隐私声明", destination: URL(string: "https://www.everpcpc.com/privacy-policy/chobits/")!)
+            "隐私声明", destination: URL(string: "https://www.everpcpc.com/privacy-policy/chobits/")!
+          )
+          Link("问题反馈(Discord)", destination: URL(string: "https://discord.gg/nZPTwzXxAX")!)
         }
       }
       Section {
