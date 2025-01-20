@@ -66,11 +66,12 @@ struct ProgressTileView: View {
                 .frame(width: cardWidth)
             }
           }
-        }
+        }.frame(width: cardWidth + 16, alignment: .topLeading)
       }
     }
     .animation(.default, value: collections)
     .padding(.horizontal, 8)
+    .frame(width: width, alignment: .topLeading)
   }
 }
 
