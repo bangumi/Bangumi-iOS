@@ -66,30 +66,25 @@ struct SettingsView: View {
       }
 
       Section(header: Text("外观设置")) {
-        VStack {
-          Picker(selection: $appearance, label: Text("主题")) {
-            ForEach(AppearanceType.allCases, id: \.self) { appearance in
-              Text(appearance.desc).tag(appearance)
-            }
+        Picker(selection: $appearance, label: Text("主题")) {
+          ForEach(AppearanceType.allCases, id: \.self) { appearance in
+            Text(appearance.desc).tag(appearance)
           }
-
-          Picker(selection: $defaultTab, label: Text("默认页面")) {
-            ForEach(ChiiViewTab.defaultTabs, id: \.self) { tab in
-              Text(tab.title).tag(tab)
-            }
+        }
+        Picker(selection: $defaultTab, label: Text("默认页面")) {
+          ForEach(ChiiViewTab.defaultTabs, id: \.self) { tab in
+            Text(tab.title).tag(tab)
           }
-
-          Picker(selection: $progressMode, label: Text("进度管理模式")) {
-            ForEach(ProgressMode.allCases, id: \.self) { mode in
-              Text(mode.desc).tag(mode)
-            }
+        }
+        Picker(selection: $progressMode, label: Text("进度管理模式")) {
+          ForEach(ProgressMode.allCases, id: \.self) { mode in
+            Text(mode.desc).tag(mode)
           }
-
-          Picker(selection: $progressLimit, label: Text("进度管理数量")) {
-            Text("50").tag(50)
-            Text("100").tag(100)
-            Text("无限制").tag(0)
-          }
+        }
+        Picker(selection: $progressLimit, label: Text("进度管理数量")) {
+          Text("50").tag(50)
+          Text("100").tag(100)
+          Text("无限制").tag(0)
         }
       }
 
@@ -108,7 +103,6 @@ struct SettingsView: View {
           Spacer()
           Text(Chii.shared.version).foregroundStyle(.secondary)
         }
-
         Link(destination: URL(string: "https://www.everpcpc.com/privacy-policy/chobits/")!) {
           HStack {
             Text("隐私声明")
@@ -117,7 +111,6 @@ struct SettingsView: View {
             Image(systemName: "chevron.right")
           }
         }
-
         Link(destination: URL(string: "https://discord.gg/nZPTwzXxAX")!) {
           HStack {
             Text("问题反馈(Discord)")
