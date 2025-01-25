@@ -41,7 +41,7 @@ struct ChiiTimelineView: View {
                 Label("人物", systemImage: "person")
               }
               NavigationLink(value: NavDestination.userBlog(profile.user)) {
-                Label("日志", systemImage: "richtext.page")
+                Label("日志", systemImage: "text.below.photo")
               }
               NavigationLink(value: NavDestination.userIndex(profile.user)) {
                 Label("目录", systemImage: "list.bullet")
