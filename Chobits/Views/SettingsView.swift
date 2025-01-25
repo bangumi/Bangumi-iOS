@@ -52,7 +52,7 @@ struct SettingsView: View {
 
   var body: some View {
     Form {
-      Section(header: Text("域名设置")) {
+      Section(header: Text("域名")) {
         Picker(selection: $shareDomain, label: Text("分享域名")) {
           ForEach(ShareDomain.allCases, id: \.self) { domain in
             Text(domain.rawValue).tag(domain)
@@ -65,7 +65,7 @@ struct SettingsView: View {
         }
       }
 
-      Section(header: Text("外观设置")) {
+      Section(header: Text("外观")) {
         Picker(selection: $appearance, label: Text("主题")) {
           ForEach(AppearanceType.allCases, id: \.self) { appearance in
             Text(appearance.desc).tag(appearance)
@@ -88,7 +88,7 @@ struct SettingsView: View {
         }
       }
 
-      Section(header: Text("其他设置")) {
+      Section(header: Text("特殊")) {
         Toggle(isOn: $showNSFWBadge) {
           Text("显示 NSFW 标记")
         }
