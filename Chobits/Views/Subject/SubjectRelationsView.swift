@@ -67,8 +67,12 @@ struct SubjectRelationsView: View {
             ImageView(img: relation.subject.images?.resize(.r200))
               .imageStyle(width: 90, height: 90)
               .imageType(.subject)
-              .imageNSFW(relation.subject.nsfw)
-              .subjectCollectionStatus(ctype: ctype, stype: relation.subject.type)
+              .imageBadge {
+                if let ctype = ctype {
+                  Label(ctype.description(relation.subject.type), systemImage: ctype.icon)
+                    .labelStyle(.compact)
+                }
+              }
               .imageLink(relation.subject.link)
               .padding(2)
               .shadow(radius: 2)

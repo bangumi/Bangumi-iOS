@@ -135,8 +135,10 @@ struct ProgressTileItemView: View {
       ImageView(img: collection.subject?.images?.resize(.r400))
         .imageStyle(width: width, height: imageHeight)
         .imageType(.subject)
-        .imageBadge(show: collection.priv, background: .red) {
-          Image(systemName: "lock")
+        .imageBadge {
+          if collection.priv {
+            Image(systemName: "lock")
+          }
         }
         .imageLink(collection.subject?.link)
 

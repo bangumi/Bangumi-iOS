@@ -52,8 +52,12 @@ struct SubjectRecsView: View {
             ImageView(img: rec.subject.images?.resize(.r200))
               .imageStyle(width: 72, height: 72)
               .imageType(.subject)
-              .imageNSFW(rec.subject.nsfw)
-              .subjectCollectionStatus(ctype: ctype, stype: rec.subject.type)
+              .imageBadge {
+                if let ctype = ctype {
+                  Label(ctype.description(rec.subject.type), systemImage: ctype.icon)
+                    .labelStyle(.compact)
+                }
+              }
               .imageLink(rec.subject.link)
               .padding(2)
               .shadow(radius: 2)

@@ -42,7 +42,12 @@ struct SubjectOffprintsView: View {
           ImageView(img: offprint.subject.images?.resize(.r200))
             .imageStyle(width: 60, height: 80)
             .imageType(.subject)
-            .subjectCollectionStatus(ctype: ctype, stype: offprint.subject.type)
+            .imageBadge {
+              if let ctype = ctype {
+                Label(ctype.description(offprint.subject.type), systemImage: ctype.icon)
+                  .labelStyle(.compact)
+              }
+            }
             .imageLink(offprint.subject.link)
             .padding(2)
             .shadow(radius: 2)

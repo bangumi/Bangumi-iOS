@@ -23,7 +23,7 @@ extension View {
   @ViewBuilder
   func imageNSFW(_ nsfw: Bool) -> some View {
     if nsfw {
-      self.overlay(alignment: .topTrailing) {
+      self.overlay(alignment: .topLeading) {
         NSFWBadgeView()
       }
     } else {
@@ -34,51 +34,22 @@ extension View {
 
 extension View {
   @ViewBuilder
-  func subjectCollectionStatus(
-    ctype: CollectionType?, stype: SubjectType, padding: CGFloat = 2
-  )
-    -> some View
-  {
-    if let ctype = ctype {
-      self.overlay(alignment: .topLeading) {
-        Label(ctype.description(stype), systemImage: ctype.icon)
-          .labelStyle(.compact)
-          .padding(2)
-          .background(.accent)
-          .clipShape(RoundedRectangle(cornerRadius: 5))
-          .padding(padding)
-          .foregroundStyle(.white)
-          .font(.caption)
-          .shadow(radius: 2)
-      }
-    } else {
-      self
-    }
-  }
-}
-
-extension View {
-  @ViewBuilder
   func imageBadge<Overlay: View>(
-    show: Bool = true, background: Color = .accent, padding: CGFloat = 2,
+    background: Color = .accent, padding: CGFloat = 2,
     @ViewBuilder badge: () -> Overlay
   )
     -> some View
   {
-    if show {
-      self
-        .overlay(alignment: .topLeading) {
-          badge()
-            .padding(padding)
-            .background(background)
-            .clipShape(RoundedRectangle(cornerRadius: 5))
-            .padding(padding)
-            .foregroundStyle(.white)
-            .font(.caption)
-            .shadow(radius: 2)
-        }
-    } else {
-      self
-    }
+    self
+      .overlay(alignment: .topLeading) {
+        badge()
+          .padding(padding)
+          .background(background)
+          .clipShape(RoundedRectangle(cornerRadius: 5))
+          .padding(padding * 2)
+          .foregroundStyle(.white)
+          .font(.caption)
+          .shadow(radius: 2)
+      }
   }
 }
