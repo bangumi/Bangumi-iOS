@@ -44,7 +44,7 @@ extension View {
         .overlay(alignment: .topLeading) {
           badge()
             .padding(padding)
-            .background(background.opacity(0.9))
+            .background(background)
             .clipShape(RoundedRectangle(cornerRadius: 5))
             .padding(padding)
             .foregroundStyle(.white)
