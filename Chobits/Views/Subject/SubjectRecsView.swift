@@ -53,13 +53,7 @@ struct SubjectRecsView: View {
               .imageStyle(width: 72, height: 72)
               .imageType(.subject)
               .imageNSFW(rec.subject.nsfw)
-              .imageCaption(show: ctype != nil) {
-                HStack {
-                  Image(systemName: ctype?.icon ?? "")
-                  Spacer()
-                  Text(ctype?.description(rec.subject.type) ?? "")
-                }.padding(.horizontal, 4)
-              }
+              .subjectCollectionStatus(ctype: ctype, stype: rec.subject.type)
               .imageLink(rec.subject.link)
               .padding(2)
               .shadow(radius: 2)

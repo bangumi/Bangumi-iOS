@@ -68,13 +68,7 @@ struct SubjectRelationsView: View {
               .imageStyle(width: 90, height: 90)
               .imageType(.subject)
               .imageNSFW(relation.subject.nsfw)
-              .imageCaption(show: ctype != nil) {
-                HStack {
-                  Image(systemName: ctype?.icon ?? "")
-                  Spacer()
-                  Text(ctype?.description(relation.subject.type) ?? "")
-                }.padding(.horizontal, 4)
-              }
+              .subjectCollectionStatus(ctype: ctype, stype: relation.subject.type)
               .imageLink(relation.subject.link)
               .padding(2)
               .shadow(radius: 2)

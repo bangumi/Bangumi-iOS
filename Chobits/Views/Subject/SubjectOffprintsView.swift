@@ -42,13 +42,7 @@ struct SubjectOffprintsView: View {
           ImageView(img: offprint.subject.images?.resize(.r200))
             .imageStyle(width: 60, height: 80)
             .imageType(.subject)
-            .imageCaption(show: ctype != nil) {
-              HStack {
-                Image(systemName: ctype?.icon ?? "")
-                Spacer()
-                Text(ctype?.description(offprint.subject.type) ?? "")
-              }.padding(.horizontal, 4)
-            }
+            .subjectCollectionStatus(ctype: ctype, stype: offprint.subject.type)
             .imageLink(offprint.subject.link)
             .padding(2)
             .shadow(radius: 2)
