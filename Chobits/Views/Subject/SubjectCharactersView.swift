@@ -8,11 +8,11 @@ struct SubjectCharactersView: View {
   @AppStorage("isolationMode") var isolationMode: Bool = false
 
   var rowCount: Int {
-    let count = characters.count / 3
-    if count > 3 {
-      return 3
+    if characters.count == 0 {
+      return 0
     }
-    return count
+    let count = characters.count / 3
+    return max(1, min(count, 3))
   }
 
   var rows: [GridItem] {
