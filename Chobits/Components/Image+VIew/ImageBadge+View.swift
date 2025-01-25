@@ -75,6 +75,7 @@ extension View {
             .padding(padding)
             .foregroundStyle(.white)
             .font(.caption)
+            .shadow(radius: 2)
         }
     } else {
       self
