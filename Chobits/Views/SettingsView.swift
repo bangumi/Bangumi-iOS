@@ -126,14 +126,13 @@ struct SettingsView: View {
           .onChange(of: selectedProgressLimit) {
             progressLimit = selectedProgressLimit
           }
-
-          Toggle(isOn: $showNSFWBadge) {
-            Text("显示 NSFW 标记")
-          }
         }
       }
 
       Section(header: Text("其他设置")) {
+        Toggle(isOn: $showNSFWBadge) {
+          Text("显示 NSFW 标记")
+        }
         Toggle(isOn: $isolationModeEnabled) {
           Text("社恐模式")
         }
@@ -143,16 +142,28 @@ struct SettingsView: View {
       }
 
       Section(header: Text("关于")) {
-        VStack {
+        HStack {
+          Text("版本")
+          Spacer()
+          Text(Chii.shared.version).foregroundStyle(.secondary)
+        }
+
+        Link(destination: URL(string: "https://www.everpcpc.com/privacy-policy/chobits/")!) {
           HStack {
-            Text("版本")
+            Text("隐私声明")
             Spacer()
-            Text(Chii.shared.version).foregroundStyle(.secondary)
+            Image(systemName: "lock.shield")
+            Image(systemName: "chevron.right")
           }
-          Link(
-            "隐私声明", destination: URL(string: "https://www.everpcpc.com/privacy-policy/chobits/")!
-          )
-          Link("问题反馈(Discord)", destination: URL(string: "https://discord.gg/nZPTwzXxAX")!)
+        }
+
+        Link(destination: URL(string: "https://discord.gg/nZPTwzXxAX")!) {
+          HStack {
+            Text("问题反馈(Discord)")
+            Spacer()
+            Image(systemName: "questionmark.bubble")
+            Image(systemName: "chevron.right")
+          }
         }
       }
       Section {
