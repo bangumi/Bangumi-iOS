@@ -15,25 +15,9 @@ struct SettingsView: View {
 
   @Environment(\.modelContext) var modelContext
 
-  @State private var selectedShareDomain: ShareDomain = .chii
-  @State private var selectedAuthDomain: AuthDomain = .next
-  @State private var selectedAppearance: AppearanceType = .system
-  @State private var selectedDefaultTab: ChiiViewTab = .timeline
-  @State private var selectedProgressMode: ProgressMode = .tile
-  @State private var selectedProgressLimit: Int = 50
-
   @State private var refreshing: Bool = false
   @State private var refreshProgress: CGFloat = 0
   @State private var logoutConfirm: Bool = false
-
-  func load() {
-    selectedAppearance = appearance
-    selectedShareDomain = shareDomain
-    selectedAuthDomain = authDomain
-    selectedDefaultTab = defaultTab
-    selectedProgressMode = progressMode
-    selectedProgressLimit = progressLimit
-  }
 
   func reindex() {
     refreshing = true
@@ -69,60 +53,42 @@ struct SettingsView: View {
   var body: some View {
     Form {
       Section(header: Text("域名设置")) {
-        Picker(selection: $selectedShareDomain, label: Text("分享域名")) {
+        Picker(selection: $shareDomain, label: Text("分享域名")) {
           ForEach(ShareDomain.allCases, id: \.self) { domain in
             Text(domain.rawValue).tag(domain)
           }
         }
-        .onChange(of: selectedShareDomain) {
-          shareDomain = selectedShareDomain
-        }
-        Picker(selection: $selectedAuthDomain, label: Text("认证域名")) {
+        Picker(selection: $authDomain, label: Text("认证域名")) {
           ForEach(AuthDomain.allCases, id: \.self) { domain in
             Text(domain.rawValue).tag(domain)
           }
-        }
-        .onChange(of: selectedAuthDomain) {
-          authDomain = selectedAuthDomain
         }
       }
 
       Section(header: Text("外观设置")) {
         VStack {
-          Picker(selection: $selectedAppearance, label: Text("主题")) {
+          Picker(selection: $appearance, label: Text("主题")) {
             ForEach(AppearanceType.allCases, id: \.self) { appearance in
               Text(appearance.desc).tag(appearance)
             }
           }
-          .onChange(of: selectedAppearance) {
-            appearance = selectedAppearance
-          }
 
-          Picker(selection: $selectedDefaultTab, label: Text("默认页面")) {
+          Picker(selection: $defaultTab, label: Text("默认页面")) {
             ForEach(ChiiViewTab.defaultTabs, id: \.self) { tab in
               Text(tab.title).tag(tab)
             }
           }
-          .onChange(of: selectedDefaultTab) {
-            defaultTab = selectedDefaultTab
-          }
 
-          Picker(selection: $selectedProgressMode, label: Text("进度管理模式")) {
+          Picker(selection: $progressMode, label: Text("进度管理模式")) {
             ForEach(ProgressMode.allCases, id: \.self) { mode in
               Text(mode.desc).tag(mode)
             }
           }
-          .onChange(of: selectedProgressMode) {
-            progressMode = selectedProgressMode
-          }
 
-          Picker(selection: $selectedProgressLimit, label: Text("进度管理数量")) {
+          Picker(selection: $progressLimit, label: Text("进度管理数量")) {
             Text("50").tag(50)
             Text("100").tag(100)
             Text("无限制").tag(0)
-          }
-          .onChange(of: selectedProgressLimit) {
-            progressLimit = selectedProgressLimit
           }
         }
       }
@@ -194,7 +160,6 @@ struct SettingsView: View {
     }
     .navigationTitle("设置")
     .navigationBarTitleDisplayMode(.inline)
-    .onAppear(perform: load)
   }
 }
 
