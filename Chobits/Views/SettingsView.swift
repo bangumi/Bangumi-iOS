@@ -9,8 +9,8 @@ struct SettingsView: View {
   @AppStorage("defaultTab") var defaultTab: ChiiViewTab = .timeline
   @AppStorage("progressMode") var progressMode: ProgressMode = .tile
   @AppStorage("progressLimit") var progressLimit: Int = 50
-  @AppStorage("isolationMode") var isolationMode: Bool = false
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
+  @AppStorage("isolationMode") var isolationMode: Bool = false
   @AppStorage("showNSFWBadge") var showNSFWBadge: Bool = true
 
   @Environment(\.modelContext) var modelContext
@@ -21,7 +21,6 @@ struct SettingsView: View {
   @State private var selectedDefaultTab: ChiiViewTab = .timeline
   @State private var selectedProgressMode: ProgressMode = .tile
   @State private var selectedProgressLimit: Int = 50
-  @State private var isolationModeEnabled: Bool = false
 
   @State private var refreshing: Bool = false
   @State private var refreshProgress: CGFloat = 0
@@ -34,7 +33,6 @@ struct SettingsView: View {
     selectedDefaultTab = defaultTab
     selectedProgressMode = progressMode
     selectedProgressLimit = progressLimit
-    isolationModeEnabled = isolationMode
   }
 
   func reindex() {
@@ -133,11 +131,8 @@ struct SettingsView: View {
         Toggle(isOn: $showNSFWBadge) {
           Text("显示 NSFW 标记")
         }
-        Toggle(isOn: $isolationModeEnabled) {
+        Toggle(isOn: $isolationMode) {
           Text("社恐模式")
-        }
-        .onChange(of: isolationModeEnabled) {
-          isolationMode = isolationModeEnabled
         }
       }
 
