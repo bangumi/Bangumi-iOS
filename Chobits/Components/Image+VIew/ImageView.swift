@@ -7,8 +7,6 @@ struct ImageView: View {
   @Environment(\.imageStyle) var style
   @Environment(\.imageType) var type
 
-  @State private var imageRatio: CGFloat = 1
-
   init(img: String?) {
     self.img = img
   }
@@ -22,51 +20,26 @@ struct ImageView: View {
     return URL(string: url)
   }
 
-  var height: CGFloat? {
-    if style.height != nil {
-      return style.height
-    } else {
-      if let width = style.width {
-        return width * imageRatio
-      } else {
-        return nil
-      }
-    }
-  }
-
   var body: some View {
     ZStack {
       if let imageURL = imageURL {
-        if style.width != nil, height != nil {
+        if style.width != nil, style.height != nil {
           KFImage(imageURL)
-            .onSuccess { result in
-              if let img = result.image.cgImage {
-                if img.width > 0, img.height > 0 {
-                  self.imageRatio = CGFloat(img.width) / CGFloat(img.height)
-                }
-              }
-            }
             .fade(duration: 0.25)
             .resizable()
             .scaledToFill()
-            .frame(width: style.width, height: height, alignment: style.alignment)
+            .frame(width: style.width, height: style.height, alignment: style.alignment)
             .clipShape(RoundedRectangle(cornerRadius: style.cornerRadius))
         } else {
           KFImage(imageURL)
-            .onSuccess { result in
-              if let img = result.image.cgImage {
-                if img.width > 0, img.height > 0 {
-                  self.imageRatio = CGFloat(img.width) / CGFloat(img.height)
-                }
-              }
-            }
             .fade(duration: 0.25)
             .resizable()
             .scaledToFit()
+            .frame(width: style.width, height: style.height, alignment: style.alignment)
             .clipShape(RoundedRectangle(cornerRadius: style.cornerRadius))
         }
       } else {
-        if style.width != nil, height != nil {
+        if style.width != nil, style.height != nil {
           ZStack {
             if style.width == style.height {
               switch type {
@@ -91,22 +64,21 @@ struct ImageView: View {
                   .resizable()
                   .scaledToFit()
               default:
-                Rectangle()
-                  .foregroundStyle(.secondary.opacity(0.2))
+                Color.secondary.opacity(0.2)
               }
             } else {
-              Rectangle()
-                .foregroundStyle(.secondary.opacity(0.2))
+              Color.secondary.opacity(0.2)
             }
           }
+          .frame(width: style.width, height: style.height, alignment: style.alignment)
+          .clipShape(RoundedRectangle(cornerRadius: style.cornerRadius))
         } else {
-          Rectangle()
-            .foregroundStyle(.secondary.opacity(0.2))
+          Color.secondary.opacity(0.2)
+            .frame(alignment: style.alignment)
+            .clipShape(RoundedRectangle(cornerRadius: style.cornerRadius))
         }
       }
     }
-    .frame(width: style.width, height: height, alignment: style.alignment)
-    .clipShape(RoundedRectangle(cornerRadius: style.cornerRadius))
   }
 }
 
@@ -136,6 +108,9 @@ struct ImageView: View {
         img: "https://lain.bgm.tv/r/400/pic/cover/l/94/20/520019_xgqUl.jpg"
       ).imageStyle(width: 60, height: 60, alignment: .top)
       ImageView(
+        img: "https://lain.bgm.tv/r/400/pic/cover/l/94/20/520019_xgqUl.jpg"
+      ).imageStyle(width: 60, alignment: .top)
+      ImageView(
         img: "https://lain.bgm.tv/pic/cover/m/5e/39/140534_cUj6H.jpg"
       ).imageStyle(width: 60, height: 60, alignment: .top)
       ImageView(img: "https://lain.bgm.tv/pic/cover/m/5e/39/140534_cUj6H.jpg")
@@ -158,7 +133,6 @@ struct ImageView: View {
           Text("abc")
         }
       ImageView(img: "https://lain.bgm.tv/pic/cover/l/5e/39/140534_cUj6H.jpg")
-        .imageStyle(width: 60, height: 80)
         .imageCaption {
           Text("天道花怜")
         }
