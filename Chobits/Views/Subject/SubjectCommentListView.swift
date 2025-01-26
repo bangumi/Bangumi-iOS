@@ -84,12 +84,10 @@ struct SubjectCommentListView: View {
                 if comment.rate > 0 {
                   StarsView(score: Float(comment.rate), size: 10)
                 }
-                Text(
-                  "\(comment.type.description(subject?.typeEnum)) @ \(comment.updatedAt.datetimeDisplay)"
-                )
-                .lineLimit(1)
-                .font(.caption)
-                .foregroundStyle(.secondary)
+                comment.header(subject?.typeEnum ?? .none)
+                  .lineLimit(1)
+                  .font(.caption)
+                  .foregroundStyle(.secondary)
                 Spacer()
               }
               Text(comment.comment).font(.footnote)

@@ -489,16 +489,6 @@ extension Chii {
     return subject
   }
 
-  func getSubjectEpisode(_ episodeId: Int) async throws -> EpisodeDTO {
-    if self.mock {
-      return loadFixture(fixture: "subject_anime_episode.json", target: EpisodeDTO.self)
-    }
-    let url = BangumiAPI.priv.build("p1/subjects/-/episodes/\(episodeId)")
-    let data = try await self.request(url: url, method: "GET")
-    let episode: EpisodeDTO = try self.decodeResponse(data)
-    return episode
-  }
-
   func getSubjectEpisodes(
     _ subjectId: Int, type: EpisodeType? = nil, limit: Int = 100, offset: Int = 0
   ) async throws -> PagedDTO<EpisodeDTO> {
@@ -663,6 +653,29 @@ extension Chii {
     let pageURL = url.appending(queryItems: queryItems)
     let data = try await self.request(url: pageURL, method: "GET")
     let resp: PagedDTO<SubjectReviewDTO> = try self.decodeResponse(data)
+    return resp
+  }
+}
+
+// MARK: - Episode
+extension Chii {
+  func getSubjectEpisode(_ episodeId: Int) async throws -> EpisodeDTO {
+    if self.mock {
+      return loadFixture(fixture: "subject_anime_episode.json", target: EpisodeDTO.self)
+    }
+    let url = BangumiAPI.priv.build("p1/subjects/-/episodes/\(episodeId)")
+    let data = try await self.request(url: url, method: "GET")
+    let episode: EpisodeDTO = try self.decodeResponse(data)
+    return episode
+  }
+
+  func getSubjectEpisodeComments(_ episodeId: Int) async throws -> [EpisodeCommentDTO] {
+    if self.mock {
+      return loadFixture(fixture: "episode_comments.json", target: [EpisodeCommentDTO].self)
+    }
+    let url = BangumiAPI.priv.build("p1/subjects/-/episodes/\(episodeId)/comments")
+    let data = try await self.request(url: url, method: "GET")
+    let resp: [EpisodeCommentDTO] = try self.decodeResponse(data)
     return resp
   }
 }

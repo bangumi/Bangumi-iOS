@@ -1,5 +1,6 @@
 import Foundation
 import OSLog
+import SwiftUI
 
 struct PagedDTO<T: Sendable & Codable>: Codable, Sendable {
   var data: [T]
@@ -197,6 +198,17 @@ struct SlimUserDTO: Codable, Identifiable, Hashable, Linkable {
   var link: String {
     "chii://user/\(username)"
   }
+
+  var header: AttributedString {
+    var result = nickname.withLink(link)
+    if !sign.isEmpty {
+      var signText = AttributedString(" (\(sign))")
+      signText.font = .footnote
+      signText.foregroundColor = .secondary
+      result.append(signText)
+    }
+    return result
+  }
 }
 
 struct NoticeDTO: Codable, Identifiable, Hashable {
@@ -229,6 +241,10 @@ struct SubjectCommentDTO: Codable, Identifiable, Hashable {
 
   var id: Int {
     user.id
+  }
+
+  func header(_ stype: SubjectType) -> Text {
+    Text("\(type.description(stype)) @ ") + updatedAt.relativeText
   }
 }
 
@@ -515,6 +531,29 @@ struct EpisodeDTO: Codable, Identifiable, Hashable, Linkable {
 struct EpisodeCollectionDTO: Codable {
   var episode: EpisodeDTO
   var type: EpisodeCollectionType
+}
+
+struct EpisodeCommentBaseDTO: Codable, Identifiable, Hashable {
+  var id: Int
+  var content: String
+  var createdAt: Int
+  var creatorID: Int
+  var epID: Int
+  var relatedID: Int
+  var state: Int
+  var user: SlimUserDTO
+}
+
+struct EpisodeCommentDTO: Codable, Identifiable, Hashable {
+  var id: Int
+  var content: String
+  var createdAt: Int
+  var creatorID: Int
+  var epID: Int
+  var relatedID: Int
+  var state: Int
+  var user: SlimUserDTO
+  var replies: [EpisodeCommentBaseDTO]
 }
 
 struct SubjectRelationDTO: Codable, Identifiable, Hashable {

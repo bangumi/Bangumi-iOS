@@ -10,6 +10,8 @@ struct EpisodeView: View {
   @Query private var episodes: [Episode]
   private var episode: Episode? { episodes.first }
 
+  @State private var comments: [EpisodeCommentDTO] = []
+
   init(episodeId: Int) {
     self.episodeId = episodeId
 
@@ -19,6 +21,9 @@ struct EpisodeView: View {
   func load() async {
     do {
       try await Chii.shared.loadEpisode(episodeId)
+      if !isolationMode {
+        comments = try await Chii.shared.getSubjectEpisodeComments(episodeId)
+      }
     } catch {
       Notifier.shared.alert(error: error)
     }
@@ -41,11 +46,18 @@ struct EpisodeView: View {
         Divider()
         if let desc = episode?.desc, !desc.isEmpty {
           Text(desc).foregroundStyle(.secondary)
+          Divider()
+        }
+        if !comments.isEmpty {
+          ForEach(comments) { comment in
+            EpisodeCommentItemView(comment: comment)
+          }
         }
         Spacer()
       }.padding(.horizontal, 8)
     }
     .task(load)
+    .animation(.default, value: comments)
     .navigationTitle("章节详情")
     .navigationBarTitleDisplayMode(.inline)
     .toolbar {
