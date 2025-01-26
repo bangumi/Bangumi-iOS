@@ -105,10 +105,8 @@ struct ProgressListItemView: View {
         ImageView(img: collection.subject?.images?.resize(.r200))
           .imageStyle(width: 72, height: 72)
           .imageType(.subject)
-          .imageBadge {
-            if collection.priv {
-              Image(systemName: "lock")
-            }
+          .imageBadge(show: collection.priv) {
+            Image(systemName: "lock")
           }
           .imageLink(collection.subject?.link)
         VStack(alignment: .leading) {

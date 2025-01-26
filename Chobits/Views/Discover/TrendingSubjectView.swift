@@ -131,11 +131,9 @@ struct TrendingSubjectTypeView: View {
                   .font(.body)
                   .padding(8)
               }
-              .imageBadge {
-                if item.count > 100 {
-                  Text("\(item.count) 人关注")
-                    .font(.callout)
-                }
+              .imageBadge(show: item.count > 10) {
+                Text("\(item.count) 人关注")
+                  .font(.callout)
               }
               .imageLink(item.subject.link)
               .padding(8)
@@ -156,11 +154,9 @@ struct TrendingSubjectTypeView: View {
                   .font(.footnote)
                   .padding(4)
               }
-              .imageBadge {
-                if item.count > 100 {
-                  Text("\(item.count) 人关注")
-                    .font(.footnote)
-                }
+              .imageBadge(show: item.count > 10) {
+                Text("\(item.count) 人关注")
+                  .font(.footnote)
               }
               .imageLink(item.subject.link)
               .padding(8)

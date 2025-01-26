@@ -196,10 +196,8 @@ struct CalendarWeekdayView: View {
                   .lineLimit(1)
                   .padding(.horizontal, 2)
               }
-              .imageBadge {
-                if item.watchers > 100 {
-                  Text("\(item.watchers)人追番")
-                }
+              .imageBadge(show: item.watchers > 10) {
+                Text("\(item.watchers)人追番")
               }
               .imageLink(item.subject.link)
               .subjectPreview(item.subject)

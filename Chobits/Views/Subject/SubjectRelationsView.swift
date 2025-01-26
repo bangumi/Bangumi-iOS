@@ -67,7 +67,7 @@ struct SubjectRelationsView: View {
             ImageView(img: relation.subject.images?.resize(.r200))
               .imageStyle(width: 90, height: 90)
               .imageType(.subject)
-              .imageBadge {
+              .imageBadge(show: ctype != nil) {
                 if let ctype = ctype {
                   Label(ctype.description(relation.subject.type), systemImage: ctype.icon)
                     .labelStyle(.compact)

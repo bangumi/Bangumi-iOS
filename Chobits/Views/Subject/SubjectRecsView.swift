@@ -52,7 +52,7 @@ struct SubjectRecsView: View {
             ImageView(img: rec.subject.images?.resize(.r200))
               .imageStyle(width: 72, height: 72)
               .imageType(.subject)
-              .imageBadge {
+              .imageBadge(show: ctype != nil) {
                 if let ctype = ctype {
                   Label(ctype.description(rec.subject.type), systemImage: ctype.icon)
                     .labelStyle(.compact)

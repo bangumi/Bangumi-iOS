@@ -35,21 +35,26 @@ extension View {
 extension View {
   @ViewBuilder
   func imageBadge<Overlay: View>(
+    show: Bool = true,
     background: Color = .accent, padding: CGFloat = 2,
     @ViewBuilder badge: () -> Overlay
   )
     -> some View
   {
-    self
-      .overlay(alignment: .topLeading) {
-        badge()
-          .padding(padding)
-          .background(background)
-          .clipShape(RoundedRectangle(cornerRadius: 5))
-          .padding(padding * 2)
-          .foregroundStyle(.white)
-          .font(.caption)
-          .shadow(radius: 2)
-      }
+    if show {
+      self
+        .overlay(alignment: .topLeading) {
+          badge()
+            .padding(padding)
+            .background(background)
+            .clipShape(RoundedRectangle(cornerRadius: 5))
+            .padding(padding * 2)
+            .foregroundStyle(.white)
+            .font(.caption)
+            .shadow(radius: 2)
+        }
+    } else {
+      self
+    }
   }
 }
