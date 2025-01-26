@@ -12,10 +12,14 @@ struct EpisodeCommentItemView: View {
           .imageType(.avatar)
           .imageLink(comment.user.link)
         VStack(alignment: .leading) {
-          Text(comment.user.header)
-          Text(comment.createdAt.datetimeDisplay)
-            .font(.caption)
-            .foregroundStyle(.secondary)
+          HStack {
+            Text(comment.user.header).lineLimit(1)
+            Spacer()
+            Text(comment.createdAt.datetimeDisplay)
+              .lineLimit(1)
+              .font(.caption)
+              .foregroundStyle(.secondary)
+          }
           BBCodeView(comment.content)
           ForEach(comment.replies) { reply in
             VStack(alignment: .leading) {
@@ -26,10 +30,15 @@ struct EpisodeCommentItemView: View {
                   .imageType(.avatar)
                   .imageLink(reply.user.link)
                 VStack(alignment: .leading) {
-                  Text(reply.user.nickname.withLink(reply.user.link))
-                  Text(reply.createdAt.datetimeDisplay)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                  HStack {
+                    Text(reply.user.nickname.withLink(reply.user.link))
+                      .lineLimit(1)
+                    Spacer()
+                    Text(reply.createdAt.datetimeDisplay)
+                      .lineLimit(1)
+                      .font(.caption)
+                      .foregroundStyle(.secondary)
+                  }
                   BBCodeView(reply.content)
                 }
               }

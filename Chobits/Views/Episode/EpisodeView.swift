@@ -48,7 +48,7 @@ struct EpisodeView: View {
           Text(desc).foregroundStyle(.secondary)
           Divider()
         }
-        if !comments.isEmpty {
+        if !isolationMode {
           ForEach(comments) { comment in
             EpisodeCommentItemView(comment: comment)
           }
