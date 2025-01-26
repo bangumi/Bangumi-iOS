@@ -11,23 +11,26 @@ struct CalendarSlimView: View {
   private var calendars: [BangumiCalendar]
 
   var today: BangumiCalendar? {
-    let weekday = getWeekday(Date())
-    return calendars.first { $0.weekday == weekday }
+    let weekday = WeekDay(date: Date())
+    return calendars.first { $0.weekday == weekday.rawValue }
   }
 
-  var todayDesc: String {
-    let weekday = getWeekday(Date())
-    return Calendar(identifier: .iso8601).weekdaySymbols[weekday % 7]
+  var todayTotal: Int {
+    today?.items.count ?? 0
   }
 
-  var tomorrow: BangumiCalendar? {
-    let weekday = getWeekday(Date().addingTimeInterval(86400))
-    return calendars.first { $0.weekday == weekday }
+  var todayWatchers: Int {
+    today?.items.reduce(0) { $0 + $1.watchers } ?? 0
   }
 
-  var tomorrowDesc: String {
-    let weekday = getWeekday(Date().addingTimeInterval(86400))
-    return Calendar(identifier: .iso8601).weekdaySymbols[weekday % 7]
+  var dates: [(weekday: WeekDay, desc: String, date: Date)] {
+    let today = Date()
+    let tomorrow = today.addingTimeInterval(86400)
+    let result = [
+      (weekday: WeekDay(date: today), desc: "今天", date: today),
+      (weekday: WeekDay(date: tomorrow), desc: "明天", date: tomorrow),
+    ]
+    return result
   }
 
   func refreshCalendar() async {
@@ -47,37 +50,31 @@ struct CalendarSlimView: View {
       }
     } else {
       VStack(alignment: .leading, spacing: 5) {
-        HStack {
+        HStack(alignment: .bottom) {
           Text("每日放送: \(Date().formatted(date: .long, time: .omitted))")
           Spacer()
           NavigationLink(value: NavDestination.calendar) {
             Text("更多 »").font(.caption)
           }.buttonStyle(.navLink)
         }
-        HStack(spacing: 0) {
-          VStack {
-            Text("今天")
-            Text(todayDesc)
-            Spacer()
+        ForEach(dates, id: \.weekday) { item in
+          HStack(spacing: 0) {
+            VStack {
+              Text(item.desc)
+              Text(item.weekday.desc)
+              Spacer()
+            }
+            .padding(5)
+            .background(item.weekday.color)
+            .foregroundStyle(.white)
+            CalendarWeekdaySlimView()
+              .environment(calendars.first { $0.weekday == item.weekday.rawValue })
           }
-          .padding(5)
-          .background(Color(hex: 0x339900))
-          .foregroundStyle(.white)
-          CalendarWeekdaySlimView()
-            .environment(today)
         }
-        HStack(spacing: 0) {
-          VStack {
-            Text("明天")
-            Text(tomorrowDesc)
-            Spacer()
-          }
-          .padding(5)
-          .background(Color(hex: 0x0085C8))
-          .foregroundStyle(.white)
-          CalendarWeekdaySlimView()
-            .environment(tomorrow)
-        }
+        Text("今日上映 \(todayTotal) 部。共 \(todayWatchers) 人收看今日番组。")
+          .font(.footnote)
+          .foregroundStyle(.secondary)
+        Divider()
       }
     }
   }

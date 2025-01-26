@@ -2,8 +2,61 @@ import OSLog
 import SwiftData
 import SwiftUI
 
-func getWeekday(_ date: Date) -> Int {
-  return [0, 7, 1, 2, 3, 4, 5, 6][Calendar.current.component(.weekday, from: date)]
+enum WeekDay: Int, CaseIterable {
+  case mon = 1
+  case tue = 2
+  case wed = 3
+  case thu = 4
+  case fri = 5
+  case sat = 6
+  case sun = 7
+
+  init(_ weekday: Int) {
+    let value = [0, 7, 1, 2, 3, 4, 5, 6][weekday]
+    let tmp = Self(rawValue: value)
+    if let out = tmp {
+      self = out
+    } else {
+      self = Self.mon
+    }
+  }
+
+  init(date: Date) {
+    let value = [0, 7, 1, 2, 3, 4, 5, 6][Calendar.current.component(.weekday, from: date)]
+    let tmp = Self(rawValue: value)
+    if let out = tmp {
+      self = out
+    } else {
+      self = Self.mon
+    }
+  }
+
+  var color: Color {
+    switch self {
+    case .sun:
+      Color(hex: 0xFB1F19)
+    case .mon:
+      Color(hex: 0xFB5E21)
+    case .tue:
+      Color(hex: 0xFCC12C)
+    case .wed:
+      Color(hex: 0xA9D939)
+    case .thu:
+      Color(hex: 0x51B235)
+    case .fri:
+      Color(hex: 0x1579BE)
+    case .sat:
+      Color(hex: 0x0F4B97)
+    }
+  }
+
+  var desc: String {
+    Calendar(identifier: .iso8601).weekdaySymbols[rawValue % 7]
+  }
+
+  var cn: String {
+    Calendar.current.weekdaySymbols[rawValue % 7]
+  }
 }
 
 struct CalendarView: View {
@@ -19,11 +72,11 @@ struct CalendarView: View {
   }
 
   var sortedCalendars: [BangumiCalendar] {
-    let weekday = getWeekday(today)
+    let weekday = WeekDay(date: today)
     return calendars.sorted { (cal1: BangumiCalendar, cal2: BangumiCalendar) -> Bool in
-      if cal1.weekday >= weekday && cal2.weekday < weekday {
+      if cal1.weekday >= weekday.rawValue && cal2.weekday < weekday.rawValue {
         return true
-      } else if cal1.weekday < weekday && cal2.weekday >= weekday {
+      } else if cal1.weekday < weekday.rawValue && cal2.weekday >= weekday.rawValue {
         return false
       } else {
         return cal1.weekday < cal2.weekday
@@ -103,8 +156,8 @@ struct CalendarWeekdayView: View {
 
   @Environment(BangumiCalendar.self) var calendar
 
-  var weekday: String {
-    return Calendar.current.weekdaySymbols[calendar.weekday % 7]
+  var weekday: WeekDay {
+    WeekDay(calendar.weekday)
   }
 
   var columnCount: Int {
@@ -118,7 +171,20 @@ struct CalendarWeekdayView: View {
 
   var body: some View {
     VStack {
-      Text(weekday).font(.title3)
+      HStack {
+        Spacer()
+        Text(weekday.cn)
+        Text(weekday.desc)
+        Spacer()
+      }
+      .padding(.vertical, 5)
+      .padding(.horizontal, 10)
+      .font(.title3)
+      .foregroundStyle(.white)
+      .background(weekday.color)
+      .cornerRadius(10)
+      .shadow(radius: 5)
+
       LazyVGrid(columns: columns) {
         ForEach(calendar.items, id: \.subject) { item in
           VStack {
