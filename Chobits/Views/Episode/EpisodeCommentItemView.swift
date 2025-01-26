@@ -26,7 +26,7 @@ struct EpisodeCommentItemView: View {
                   .imageType(.avatar)
                   .imageLink(reply.user.link)
                 VStack(alignment: .leading) {
-                  Text(reply.user.header)
+                  Text(reply.user.nickname.withLink(reply.user.link))
                   Text(reply.createdAt.datetimeDisplay)
                     .font(.caption)
                     .foregroundStyle(.secondary)
