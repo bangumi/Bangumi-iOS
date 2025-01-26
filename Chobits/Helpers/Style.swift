@@ -25,8 +25,8 @@ extension PrimitiveButtonStyle where Self == NavlinkButtonStyle {
 struct CompactLabel: LabelStyle {
   func makeBody(configuration: Configuration) -> some View {
     HStack(spacing: 2) {
-      configuration.icon
       configuration.title
+      configuration.icon
     }
   }
 }

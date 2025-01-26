@@ -14,7 +14,7 @@ struct SubjectCollectionBoxView: View {
   @State private var rate: Int = 0
   @State private var comment: String = ""
   @State private var priv: Bool = false
-  @State private var tags: [String] = []
+  @State private var tags: Set<String> = Set()
   @State private var tagsInput: String = ""
 
   @State private var updating: Bool = false
@@ -46,8 +46,13 @@ struct SubjectCollectionBoxView: View {
     self.rate = collection.rate
     self.comment = collection.comment
     self.priv = collection.priv
-    self.tags = collection.tags
-    self.tagsInput = collection.tags.joined(separator: " ")
+    self.tags = Set(collection.tags)
+  }
+
+  func updateTags() {
+    let inputTags = tagsInput.split(separator: " ").map { String($0) }
+    tags.formUnion(inputTags)
+    tagsInput = ""
   }
 
   func update() {
@@ -60,7 +65,7 @@ struct SubjectCollectionBoxView: View {
           rate: rate,
           comment: comment,
           priv: priv,
-          tags: tags
+          tags: Array(tags.sorted().prefix(10))
         )
         try await Chii.shared.loadSubjectCollection(
           username: profile.username, subjectId: subject.subjectId)
@@ -133,37 +138,65 @@ struct SubjectCollectionBoxView: View {
           }
 
           Text("标签 (使用半角空格或逗号隔开，至多10个)")
+            .font(.footnote)
             .padding(.top, 10)
-          BorderView(color: .secondary.opacity(0.2), padding: 4) {
-            TextField("标签", text: $tagsInput)
-              .onChange(of: tagsInput) { _, new in
-                var tagSet: Set<String> = Set()
-                for tag in new.components(separatedBy: " ") {
-                  if !tag.isEmpty {
-                    tagSet.insert(tag.trimmingCharacters(in: .whitespacesAndNewlines))
-                  }
-                }
-                tags = Array(tagSet.sorted())
-                if tags.count > 10 {
-                  tags = Array(tags[0..<10])
+
+          HFlow(alignment: .center, spacing: 4) {
+            ForEach(Array(tags.sorted().prefix(10)), id: \.self) { tag in
+              BorderView(padding: 2) {
+                Button {
+                  tags.remove(tag)
+                } label: {
+                  Label(tag, systemImage: "xmark.circle")
+                    .labelStyle(.compact)
                 }
               }
+              .font(.caption)
+              .foregroundStyle(.secondary)
+            }
+          }.padding(.top, 2)
+
+          BorderView(color: .secondary.opacity(0.2), padding: 4) {
+            HStack {
+              TextField("标签", text: $tagsInput)
+                .autocorrectionDisabled()
+                .textInputAutocapitalization(.never)
+                .onSubmit {
+                  updateTags()
+                }
+              Button {
+                updateTags()
+              } label: {
+                Image(systemName: "plus.circle")
+              }.disabled(tagsInput.isEmpty)
+            }
           }
-          HStack(alignment: .top) {
-            Text("常用标签").font(.footnote).foregroundStyle(.secondary)
+
+          VStack(alignment: .leading, spacing: 2) {
+            Text("常用标签:").font(.footnote).foregroundStyle(.secondary)
             HFlow(alignment: .center, spacing: 2) {
               ForEach(recommendedTags, id: \.self) { tag in
-                BorderView {
+
                   Button {
-                    self.tagsInput += " " + tag
+                    tags.insert(tag)
                   } label: {
-                    Text(tag)
+                    if tags.contains(tag) {
+                      Label(tag, systemImage: "checkmark.circle")
+                        .labelStyle(.compact)
+                    } else {
+                      Label(tag, systemImage: "plus.circle")
+                        .labelStyle(.compact)
+                    }
                   }
+                  .disabled(tags.contains(tag))
                   .font(.caption)
-                  .foregroundStyle(.secondary)
                   .lineLimit(1)
-                }
-                .padding(2)
+                  .padding(.vertical, 2)
+                  .padding(.horizontal, 4)
+                  .foregroundStyle(.secondary.opacity(tags.contains(tag) ? 0.6 : 1))
+                  .background(.secondary.opacity(tags.contains(tag) ? 0.3 : 0.1))
+                  .cornerRadius(5)
+                  .padding(1)
               }
             }
           }
