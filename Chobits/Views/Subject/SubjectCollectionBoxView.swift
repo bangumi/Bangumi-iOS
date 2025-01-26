@@ -176,27 +176,26 @@ struct SubjectCollectionBoxView: View {
             Text("常用标签:").font(.footnote).foregroundStyle(.secondary)
             HFlow(alignment: .center, spacing: 2) {
               ForEach(recommendedTags, id: \.self) { tag in
-
-                  Button {
-                    tags.insert(tag)
-                  } label: {
-                    if tags.contains(tag) {
-                      Label(tag, systemImage: "checkmark.circle")
-                        .labelStyle(.compact)
-                    } else {
-                      Label(tag, systemImage: "plus.circle")
-                        .labelStyle(.compact)
-                    }
+                Button {
+                  tags.insert(tag)
+                } label: {
+                  if tags.contains(tag) {
+                    Label(tag, systemImage: "checkmark.circle")
+                      .labelStyle(.compact)
+                  } else {
+                    Label(tag, systemImage: "plus.circle")
+                      .labelStyle(.compact)
                   }
-                  .disabled(tags.contains(tag))
-                  .font(.caption)
-                  .lineLimit(1)
-                  .padding(.vertical, 2)
-                  .padding(.horizontal, 4)
-                  .foregroundStyle(.secondary.opacity(tags.contains(tag) ? 0.6 : 1))
-                  .background(.secondary.opacity(tags.contains(tag) ? 0.3 : 0.1))
-                  .cornerRadius(5)
-                  .padding(1)
+                }
+                .disabled(tags.contains(tag))
+                .font(.caption)
+                .lineLimit(1)
+                .padding(.vertical, 2)
+                .padding(.horizontal, 4)
+                .foregroundStyle(.secondary.opacity(tags.contains(tag) ? 0.6 : 1))
+                .background(.secondary.opacity(tags.contains(tag) ? 0.3 : 0.1))
+                .cornerRadius(5)
+                .padding(1)
               }
             }
           }
