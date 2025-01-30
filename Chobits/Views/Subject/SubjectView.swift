@@ -133,9 +133,9 @@ struct SubjectDetailView: View {
         }
 
         BBCodeView(subject.summary, textSize: 14)
+          .textSelection(.enabled)
           .padding(2)
           .tint(.linkText)
-          .textSelection(.enabled)
 
         if subject.typeEnum == .music {
           EpisodeDiscView(subjectId: subject.subjectId)

@@ -101,8 +101,8 @@ struct UserView: View {
               CardView(background: .bioBackground) {
                 HStack {
                   BBCodeView(user.bio, textSize: 12)
-                    .tint(.linkText)
                     .textSelection(.enabled)
+                    .tint(.linkText)
                   Spacer()
                 }
               }

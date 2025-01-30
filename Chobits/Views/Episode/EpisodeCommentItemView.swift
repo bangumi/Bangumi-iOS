@@ -21,6 +21,7 @@ struct EpisodeCommentItemView: View {
               .foregroundStyle(.secondary)
           }
           BBCodeView(comment.content)
+            .textSelection(.enabled)
           ForEach(comment.replies) { reply in
             VStack(alignment: .leading) {
               Divider()
@@ -40,6 +41,7 @@ struct EpisodeCommentItemView: View {
                       .foregroundStyle(.secondary)
                   }
                   BBCodeView(reply.content)
+                    .textSelection(.enabled)
                 }
               }
             }

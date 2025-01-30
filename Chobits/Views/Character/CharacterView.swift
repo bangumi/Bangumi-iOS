@@ -96,9 +96,9 @@ struct CharacterView: View {
 
             /// summary
             BBCodeView(character.summary, textSize: 14)
+              .textSelection(.enabled)
               .padding(2)
               .tint(.linkText)
-              .textSelection(.enabled)
 
             /// casts
             CharacterCastsView(characterId: characterId, casts: character.casts)

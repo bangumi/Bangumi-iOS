@@ -124,9 +124,9 @@ struct PersonView: View {
 
             /// summary
             BBCodeView(person.summary, textSize: 14)
+              .textSelection(.enabled)
               .padding(2)
               .tint(.linkText)
-              .textSelection(.enabled)
 
             /// casts
             PersonCastsView(personId: personId, casts: person.casts)

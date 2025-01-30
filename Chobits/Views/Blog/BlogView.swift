@@ -65,6 +65,7 @@ struct BlogView: View {
             }
             Divider()
             BBCodeView(blog.content)
+              .textSelection(.enabled)
               .padding(.top, 8)
           }.padding(.horizontal, 8)
 
