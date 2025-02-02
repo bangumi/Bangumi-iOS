@@ -96,23 +96,6 @@ extension Subject {
   }
 }
 
-extension UserSubjectCollection {
-  func searchable() -> SearchableItem {
-    guard let subject = self.subject else {
-      return SearchableItem(
-        catorgory: "",
-        identifier: 0,
-        title: "",
-        displayName: "",
-        alternateNames: [],
-        contentDescription: "",
-        thumbnailURL: nil
-      )
-    }
-    return subject.searchable()
-  }
-}
-
 extension PersonDTO {
   func searchable() -> SearchableItem {
     var displayName = self.name

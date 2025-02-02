@@ -105,7 +105,6 @@ struct SubjectReviewListView: View {
   return ScrollView {
     LazyVStack(alignment: .leading) {
       SubjectReviewListView(subjectId: subject.subjectId)
-        .modelContainer(container)
-    }
-  }.padding()
+    }.padding()
+  }.modelContainer(container)
 }

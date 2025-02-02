@@ -20,7 +20,12 @@ struct CalendarSlimView: View {
   }
 
   var todayWatchers: Int {
-    today?.items.reduce(0) { $0 + $1.watchers } ?? 0
+    var total = 0
+    guard let today = today else { return total }
+    for item in today.items {
+      total += today.watchers[item.subjectId] ?? 0
+    }
+    return total
   }
 
   var dates: [(weekday: WeekDay, desc: String, date: Date)] {
@@ -85,12 +90,12 @@ struct CalendarWeekdaySlimView: View {
 
   var body: some View {
     HFlow(spacing: 0) {
-      ForEach(calendar.items, id: \.subject) { item in
-        ImageView(img: item.subject.images?.resize(.r100))
+      ForEach(calendar.items) { item in
+        ImageView(img: item.images?.resize(.r100))
           .imageStyle(width: 60, height: 60, cornerRadius: 0)
           .imageType(.subject)
-          .imageLink(item.subject.link)
-          .subjectPreview(item.subject)
+          .imageLink(item.link)
+          .subjectPreview(item.slim)
       }
     }
   }

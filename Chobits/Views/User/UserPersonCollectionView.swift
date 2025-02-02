@@ -35,7 +35,7 @@ struct UserPersonCollectionView: View {
     do {
       let resp = try await Chii.shared.getUserPersonCollections(
         username: user.username, limit: 20)
-      persons = resp.data.map { $0.person.slim }
+      persons = resp.data
     } catch {
       Notifier.shared.alert(error: error)
     }

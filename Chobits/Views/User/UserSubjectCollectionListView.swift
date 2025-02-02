@@ -18,14 +18,11 @@ struct UserSubjectCollectionListView: View {
     }
   }
 
-  func load(limit: Int, offset: Int) async -> PagedDTO<SlimUserSubjectCollectionDTO>? {
+  func load(limit: Int, offset: Int) async -> PagedDTO<SlimSubjectDTO>? {
     do {
       let resp = try await Chii.shared.getUserSubjectCollections(
         username: user.username, type: ctype, subjectType: stype, limit: limit, offset: offset)
-      return PagedDTO<SlimUserSubjectCollectionDTO>(
-        data: resp.data.map { $0.slim },
-        total: resp.total
-      )
+      return resp
     } catch {
       Notifier.shared.alert(error: error)
     }
@@ -52,10 +49,9 @@ struct UserSubjectCollectionListView: View {
       }
 
       ScrollView {
-        PageView<SlimUserSubjectCollectionDTO, _>(limit: 20, reloader: reloader, nextPageFunc: load)
-        {
+        PageView<SlimSubjectDTO, _>(limit: 20, reloader: reloader, nextPageFunc: load) {
           item in
-          CollectionRowView(collection: item)
+          UserSubjectCollectionRowView(subject: item)
           Divider()
         }.padding(8)
       }

@@ -8,14 +8,13 @@ struct EpisodeGridView: View {
 
   @AppStorage("isolationMode") var isolationMode: Bool = false
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
-  @AppStorage("profile") var profile: Profile = Profile()
 
   @Environment(\.modelContext) var modelContext
 
   @State private var refreshed: Bool = false
 
-  @Query private var collections: [UserSubjectCollection]
-  private var collection: UserSubjectCollection? { collections.first }
+  @Query private var subjects: [Subject] = []
+  private var subject: Subject? { subjects.first }
 
   @Query private var episodeMains: [Episode] = []
   @Query private var episodeSps: [Episode] = []
@@ -39,7 +38,7 @@ struct EpisodeGridView: View {
 
     _episodeMains = Query(mainDescriptor)
     _episodeSps = Query(spDescriptor)
-    _collections = Query(filter: #Predicate<UserSubjectCollection> { $0.subjectId == subjectId })
+    _subjects = Query(filter: #Predicate<Subject> { $0.subjectId == subjectId })
   }
 
   func refresh() {
@@ -60,8 +59,7 @@ struct EpisodeGridView: View {
       do {
         try await Chii.shared.updateEpisodeCollection(
           subjectId: episode.subjectId, episodeId: episode.episodeId, type: type)
-        try await Chii.shared.loadSubjectCollection(
-          username: profile.username, subjectId: subjectId)
+        _ = try await Chii.shared.loadSubject(subjectId)
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
       } catch {
         Notifier.shared.alert(error: error)
@@ -74,8 +72,7 @@ struct EpisodeGridView: View {
       do {
         try await Chii.shared.updateSubjectEpisodeCollection(
           subjectId: subjectId, updateTo: episode.sort, type: .collect)
-        try await Chii.shared.loadSubjectCollection(
-          username: profile.username, subjectId: subjectId)
+        _ = try await Chii.shared.loadSubject(subjectId)
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
       } catch {
         Notifier.shared.alert(error: error)
@@ -108,7 +105,7 @@ struct EpisodeGridView: View {
           .padding(2)
           .strikethrough(episode.collection == EpisodeCollectionType.dropped.rawValue)
           .contextMenu {
-            if isAuthenticated, collection != nil {
+            if isAuthenticated, subject?.interest.type ?? 0 != 0 {
               ForEach(episode.collectionTypeEnum.otherTypes()) { type in
                 Button {
                   updateSingle(episode: episode, type: type)
@@ -161,7 +158,7 @@ struct EpisodeGridView: View {
             .padding(2)
             .strikethrough(episode.collection == EpisodeCollectionType.dropped.rawValue)
             .contextMenu {
-              if isAuthenticated, collection != nil {
+              if isAuthenticated, subject?.interest.type ?? 0 != 0 {
                 ForEach(episode.collectionTypeEnum.otherTypes()) { type in
                   Button {
                     updateSingle(episode: episode, type: type)
@@ -204,8 +201,6 @@ struct EpisodeGridView: View {
 
 #Preview {
   let container = mockContainer()
-
-  container.mainContext.insert(UserSubjectCollection.previewAnime)
 
   let subject = Subject.previewAnime
   container.mainContext.insert(subject)

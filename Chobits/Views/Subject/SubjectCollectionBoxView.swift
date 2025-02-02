@@ -3,14 +3,11 @@ import SwiftData
 import SwiftUI
 
 struct SubjectCollectionBoxView: View {
-  @AppStorage("profile") var profile: Profile = Profile()
-
   @Environment(\.modelContext) var modelContext
   @Environment(\.dismiss) private var dismiss
   @Environment(Subject.self) var subject
-  @Environment(UserSubjectCollection.self) var collection
 
-  @State private var collectionType: CollectionType = .do
+  @State private var ctype: CollectionType = .do
   @State private var rate: Int = 0
   @State private var comment: String = ""
   @State private var priv: Bool = false
@@ -24,10 +21,10 @@ struct SubjectCollectionBoxView: View {
   }
 
   var buttonText: String {
-    if collection.typeEnum == .none {
-      return priv ? "悄悄地添加" : "添加"
-    } else {
+    if subject.interest.type != 0 {
       return priv ? "悄悄地更新" : "更新"
+    } else {
+      return priv ? "悄悄地添加" : "添加"
     }
   }
 
@@ -42,11 +39,13 @@ struct SubjectCollectionBoxView: View {
   }
 
   func load() {
-    self.collectionType = collection.typeEnum
-    self.rate = collection.rate
-    self.comment = collection.comment
-    self.priv = collection.priv
-    self.tags = Set(collection.tags)
+    if subject.interest.type != 0 {
+      self.ctype = CollectionType(subject.interest.type)
+      self.rate = subject.interest.rate
+      self.comment = subject.interest.comment
+      self.priv = subject.interest.private
+      self.tags = Set(subject.interest.tags)
+    }
   }
 
   func updateTags() {
@@ -61,14 +60,13 @@ struct SubjectCollectionBoxView: View {
       do {
         try await Chii.shared.updateSubjectCollection(
           subjectId: subject.subjectId,
-          type: collectionType,
+          type: ctype,
           rate: rate,
           comment: comment,
           priv: priv,
           tags: Array(tags.sorted().prefix(10))
         )
-        try await Chii.shared.loadSubjectCollection(
-          username: profile.username, subjectId: subject.subjectId)
+        _ = try await Chii.shared.loadSubject(subject.subjectId)
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
         dismiss()
       } catch {
@@ -96,15 +94,18 @@ struct SubjectCollectionBoxView: View {
           .frame(width: 40)
           .sensoryFeedback(.selection, trigger: priv)
         }
-        .disabled(collectionType == .none)
+        .disabled(ctype == .none)
         .padding(.vertical, 5)
-        if collection.updatedAt.timeIntervalSince1970 > 0 {
-          Text("上次更新：\(collection.updatedAt.formatted(date: .complete, time: .complete))")
-            .font(.caption)
-            .foregroundStyle(.secondary)
+        if subject.interest.updatedAt > 0 {
+          Section {
+            Text("上次更新：\(subject.interest.updatedAt.datetimeDisplay)/")
+              + subject.interest.updatedAt.relativeText
+          }
+          .font(.caption)
+          .foregroundStyle(.secondary)
         }
 
-        Picker("Collection Type", selection: $collectionType) {
+        Picker("CollectionType", selection: $ctype) {
           ForEach(CollectionType.allTypes()) { ct in
             Text("\(ct.description(subject.typeEnum))").tag(ct)
           }
@@ -222,15 +223,10 @@ struct SubjectCollectionBoxView: View {
 #Preview {
   let container = mockContainer()
 
-  let collection = UserSubjectCollection.previewBook
   let subject = Subject.previewBook
-
-  container.mainContext.insert(collection)
   container.mainContext.insert(subject)
-  collection.subject = subject
 
   return SubjectCollectionBoxView()
     .environment(subject)
-    .environment(collection)
     .modelContainer(container)
 }

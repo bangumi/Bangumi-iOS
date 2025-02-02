@@ -35,7 +35,7 @@ struct UserFriendsView: View {
     do {
       let resp = try await Chii.shared.getUserFriends(
         username: user.username, limit: 20)
-      users = resp.data.map { $0.user }
+      users = resp.data
     } catch {
       Notifier.shared.alert(error: error)
     }

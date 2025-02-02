@@ -8,21 +8,21 @@ struct SubjectRecsView: View {
 
   @Environment(\.modelContext) var modelContext
 
-  @Query private var collects: [UserSubjectCollection]
+  @Query private var collects: [Subject]
 
   init(subjectId: Int, recs: [SubjectRecDTO]) {
     self.subjectId = subjectId
     self.recs = recs
     let recIDs = recs.map { $0.subject.id }
-    let descriptor = FetchDescriptor<UserSubjectCollection>(
-      predicate: #Predicate<UserSubjectCollection> {
+    let descriptor = FetchDescriptor<Subject>(
+      predicate: #Predicate<Subject> {
         recIDs.contains($0.subjectId)
       })
     _collects = Query(descriptor)
   }
 
   var collections: [Int: CollectionType] {
-    collects.reduce(into: [:]) { $0[$1.subjectId] = $1.typeEnum }
+    collects.reduce(into: [:]) { $0[$1.subjectId] = $1.interest.typeEnum }
   }
 
   var body: some View {
@@ -80,7 +80,7 @@ struct SubjectRecsView: View {
     LazyVStack(alignment: .leading) {
       SubjectRecsView(
         subjectId: Subject.previewAnime.subjectId, recs: Subject.previewRecs
-      ).modelContainer(mockContainer())
+      )
     }.padding()
-  }
+  }.modelContainer(mockContainer())
 }

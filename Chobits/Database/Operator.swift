@@ -25,6 +25,34 @@ extension DatabaseOperator {
   public func truncate<T: PersistentModel>(_ model: T.Type) throws {
     try modelContext.delete(model: model)
   }
+
+  public func clearSubjectInterest() throws {
+    let subjects = try modelContext.fetch(FetchDescriptor<Subject>())
+    for subject in subjects {
+      subject.interest = SubjectInterest()
+    }
+  }
+
+  public func clearEpisodeCollection() throws {
+    let episodes = try modelContext.fetch(FetchDescriptor<Episode>())
+    for episode in episodes {
+      episode.collection = nil
+    }
+  }
+
+  public func clearPersonCollection() throws {
+    let persons = try modelContext.fetch(FetchDescriptor<Person>())
+    for person in persons {
+      person.collectedAt = nil
+    }
+  }
+
+  public func clearCharacterCollection() throws {
+    let characters = try modelContext.fetch(FetchDescriptor<Character>())
+    for character in characters {
+      character.collectedAt = nil
+    }
+  }
 }
 
 // MARK: - fetch
@@ -58,14 +86,15 @@ extension DatabaseOperator {
 
   public func getSearchable<T: PersistentModel & Searchable>(
     _ type: T.Type,
-    limit: Int = 20,
+    descriptor: FetchDescriptor<T>,
+    limit: Int = 50,
     offset: Int = 0
   ) throws -> PagedDTO<SearchableItem> {
-    let total = try modelContext.fetchCount(FetchDescriptor<T>())
-    var descriptor = FetchDescriptor<T>()
-    descriptor.fetchLimit = limit
-    descriptor.fetchOffset = offset
-    let items = try modelContext.fetch(descriptor)
+    let total = try modelContext.fetchCount(descriptor)
+    var desc = descriptor
+    desc.fetchLimit = limit
+    desc.fetchOffset = offset
+    let items = try modelContext.fetch(desc)
     return PagedDTO(
       data: items.map { $0.searchable() },
       total: total
@@ -75,22 +104,6 @@ extension DatabaseOperator {
 
 // MARK: - delete,update user collection
 extension DatabaseOperator {
-  public func deleteUserCollection(subjectId: Int) throws {
-    try modelContext.delete(
-      model: UserSubjectCollection.self,
-      where: #Predicate<UserSubjectCollection> {
-        $0.subjectId == subjectId
-      })
-    let episodes = try modelContext.fetch(
-      FetchDescriptor<Episode>(
-        predicate: #Predicate<Episode> {
-          $0.subjectId == subjectId
-        }))
-    for episode in episodes {
-      episode.collection = EpisodeCollectionType.none.rawValue
-    }
-  }
-
   public func updateEpisodeCollections(subjectId: Int, sort: Float, type: EpisodeCollectionType)
     throws
   {
@@ -102,12 +115,12 @@ extension DatabaseOperator {
     for episode in episodes {
       episode.collection = type.rawValue
     }
-    let collection = try self.fetchOne(
-      predicate: #Predicate<UserSubjectCollection> {
+    let subject = try self.fetchOne(
+      predicate: #Predicate<Subject> {
         $0.subjectId == subjectId
       }
     )
-    collection?.updatedAt = Date() - 1
+    subject?.interest.updatedAt = Int(Date().timeIntervalSince1970) - 1
   }
 
   public func updateEpisodeCollection(subjectId: Int, episodeId: Int, type: EpisodeCollectionType)
@@ -119,12 +132,12 @@ extension DatabaseOperator {
       }
     )
     episode?.collection = type.rawValue
-    let collection = try self.fetchOne(
-      predicate: #Predicate<UserSubjectCollection> {
+    let subject = try self.fetchOne(
+      predicate: #Predicate<Subject> {
         $0.subjectId == subjectId
       }
     )
-    collection?.updatedAt = Date() - 1
+    subject?.interest.updatedAt = Int(Date().timeIntervalSince1970) - 1
   }
 }
 
@@ -145,38 +158,28 @@ extension DatabaseOperator {
     return user
   }
 
-  public func ensureCalendarItem(_ weekday: Int, items: [BangumiCalendarItemDTO]) throws
-    -> BangumiCalendar
-  {
+  public func ensureCalendarItem(_ weekday: Int) throws -> BangumiCalendar {
     let fetched = try self.fetchOne(
       predicate: #Predicate<BangumiCalendar> {
         $0.weekday == weekday
       })
     if let calendar = fetched {
-      if calendar.items != items {
-        calendar.items = items
-      }
       return calendar
     }
-    let calendar = BangumiCalendar(weekday: weekday, items: items)
+    let calendar = BangumiCalendar(weekday: weekday)
     modelContext.insert(calendar)
     return calendar
   }
 
-  public func ensureTrendingSubject(_ type: Int, items: [TrendingSubjectDTO]) throws
-    -> TrendingSubject
-  {
+  public func ensureTrendingSubject(_ type: Int) throws -> TrendingSubject {
     let fetched = try self.fetchOne(
       predicate: #Predicate<TrendingSubject> {
         $0.type == type
       })
     if let trending = fetched {
-      if trending.items != items {
-        trending.items = items
-      }
       return trending
     }
-    let trending = TrendingSubject(type: type, items: items)
+    let trending = TrendingSubject(type: type)
     modelContext.insert(trending)
     return trending
   }
@@ -287,57 +290,6 @@ extension DatabaseOperator {
     modelContext.insert(person)
     return person
   }
-
-  public func ensureUserSubjectCollection(_ item: UserSubjectCollectionDTO) throws
-    -> UserSubjectCollection
-  {
-    let sid = item.subject.id
-    let fetched = try self.fetchOne(
-      predicate: #Predicate<UserSubjectCollection> {
-        $0.subjectId == sid
-      })
-    if let collection = fetched {
-      collection.update(item)
-      return collection
-    }
-    let collection = UserSubjectCollection(item)
-    modelContext.insert(collection)
-    return collection
-  }
-
-  public func ensureUserCharacterCollection(_ item: UserCharacterCollectionDTO) throws
-    -> UserCharacterCollection
-  {
-    let cid = item.character.id
-    let fetched = try self.fetchOne(
-      predicate: #Predicate<UserCharacterCollection> {
-        $0.characterId == cid
-      })
-    if let collection = fetched {
-      collection.update(item)
-      return collection
-    }
-    let collection = UserCharacterCollection(item)
-    modelContext.insert(collection)
-    return collection
-  }
-
-  public func ensureUserPersonCollection(_ item: UserPersonCollectionDTO) throws
-    -> UserPersonCollection
-  {
-    let pid = item.person.id
-    let fetched = try self.fetchOne(
-      predicate: #Predicate<UserPersonCollection> {
-        $0.personId == pid
-      })
-    if let collection = fetched {
-      collection.update(item)
-      return collection
-    }
-    let collection = UserPersonCollection(item)
-    modelContext.insert(collection)
-    return collection
-  }
 }
 
 // MARK: - save
@@ -347,11 +299,37 @@ extension DatabaseOperator {
   }
 
   public func saveCalendarItem(weekday: Int, items: [BangumiCalendarItemDTO]) throws {
-    let _ = try self.ensureCalendarItem(weekday, items: items)
+    let cal = try self.ensureCalendarItem(weekday)
+    var subjects: [Subject] = []
+    var watchers: [Int: Int] = [:]
+    for item in items {
+      let subject = try self.ensureSubject(item.subject)
+      subjects.append(subject)
+      watchers[subject.subjectId] = item.watchers
+    }
+    if cal.items != subjects {
+      cal.items = subjects
+    }
+    if cal.watchers != watchers {
+      cal.watchers = watchers
+    }
   }
 
   public func saveTrendingSubjects(type: Int, items: [TrendingSubjectDTO]) throws {
-    let _ = try self.ensureTrendingSubject(type, items: items)
+    let trend = try self.ensureTrendingSubject(type)
+    var subjects: [Subject] = []
+    var watchers: [Int: Int] = [:]
+    for item in items {
+      let subject = try self.ensureSubject(item.subject)
+      subjects.append(subject)
+      watchers[subject.subjectId] = item.count
+    }
+    if trend.items != subjects {
+      trend.items = subjects
+    }
+    if trend.watchers != watchers {
+      trend.watchers = watchers
+    }
   }
 
   public func saveSubject(_ item: SubjectDTO) throws {
@@ -362,23 +340,8 @@ extension DatabaseOperator {
     let _ = try self.ensureSubject(item)
   }
 
-  public func saveUserSubjectCollection(_ item: UserSubjectCollectionDTO) throws {
-    let subject = try self.ensureSubject(item.subject)
-    let collection = try self.ensureUserSubjectCollection(item)
-    if collection.subject == nil {
-      collection.subject = subject
-    }
-  }
-
   public func saveEpisode(_ item: EpisodeDTO) throws {
     let _ = try self.ensureEpisode(item)
-  }
-
-  public func saveEpisode(_ item: EpisodeCollectionDTO) throws {
-    let episode = try self.ensureEpisode(item.episode)
-    if episode.collection != item.type.rawValue {
-      episode.collection = item.type.rawValue
-    }
   }
 
   public func saveCharacter(_ item: CharacterDTO) throws {
@@ -387,21 +350,5 @@ extension DatabaseOperator {
 
   public func savePerson(_ item: PersonDTO) throws {
     let _ = try self.ensurePerson(item)
-  }
-
-  public func saveUserCharacterCollection(_ item: UserCharacterCollectionDTO) throws {
-    let character = try self.ensureCharacter(item.character)
-    let collection = try self.ensureUserCharacterCollection(item)
-    if collection.character == nil {
-      collection.character = character
-    }
-  }
-
-  public func saveUserPersonCollection(_ item: UserPersonCollectionDTO) throws {
-    let person = try self.ensurePerson(item.person)
-    let collection = try self.ensureUserPersonCollection(item)
-    if collection.person == nil {
-      collection.person = person
-    }
   }
 }

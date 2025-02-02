@@ -4,7 +4,6 @@ import SwiftUI
 
 struct ChiiProgressView: View {
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
-  @AppStorage("profile") var profile: Profile = Profile()
   @AppStorage("collectionsUpdatedAt") var collectionsUpdatedAt: Int = 0
   @AppStorage("progressMode") var progressMode: ProgressMode = .tile
 
@@ -25,9 +24,9 @@ struct ChiiProgressView: View {
     do {
       for type in SubjectType.progressTypes {
         let tvalue = type.rawValue
-        let desc = FetchDescriptor<UserSubjectCollection>(
-          predicate: #Predicate<UserSubjectCollection> {
-            (tvalue == 0 || $0.subjectType == tvalue) && $0.type == doingType
+        let desc = FetchDescriptor<Subject>(
+          predicate: #Predicate<Subject> {
+            (tvalue == 0 || $0.type == tvalue) && $0.interest.type == doingType
           })
         let count = try modelContext.fetchCount(desc)
         counts[type] = count
@@ -61,20 +60,19 @@ struct ChiiProgressView: View {
     var count: Int = 0
     var loaded: [Int: SubjectType] = [:]
     while true {
-      let resp = try await Chii.shared.getUserSubjectCollections(
-        username: profile.username,
+      let resp = try await Chii.shared.getSubjectCollections(
         since: since, limit: limit, offset: offset)
       if resp.data.isEmpty {
         break
       }
       for item in resp.data {
-        try await db.saveUserSubjectCollection(item)
+        try await db.saveSubject(item)
         count += 1
-        loaded[item.subject.id] = item.subject.type
+        loaded[item.id] = item.type
         refreshProgress = CGFloat(count) / CGFloat(resp.total)
       }
       try await db.commit()
-      await Chii.shared.index(resp.data.map { $0.subject.searchable() })
+      await Chii.shared.index(resp.data.map { $0.searchable() })
       offset += limit
       if offset >= resp.total {
         break

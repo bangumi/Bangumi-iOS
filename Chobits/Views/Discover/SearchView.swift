@@ -143,7 +143,8 @@ struct SearchView: View {
           LazyVStack(alignment: .leading) {
             ForEach(subjects, id: \.inner.self) { item in
               CardView {
-                SubjectLargeRowView(subjectId: item.inner.subjectId)
+                SubjectLargeRowView()
+                  .environment(item.inner)
               }
               .onAppear {
                 Task {

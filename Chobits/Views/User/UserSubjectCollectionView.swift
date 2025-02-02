@@ -40,7 +40,7 @@ struct UserSubjectCollectionView: View {
     do {
       let resp = try await Chii.shared.getUserSubjectCollections(
         username: user.username, type: ctype, subjectType: stype, limit: 20)
-      subjects = resp.data.map { $0.subject.slim }
+      subjects = resp.data
     } catch {
       Notifier.shared.alert(error: error)
     }

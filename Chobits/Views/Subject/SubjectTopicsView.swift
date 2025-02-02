@@ -39,8 +39,8 @@ struct SubjectTopicsView: View {
                 .lineLimit(1)
             }.buttonStyle(.navLink)
             Spacer()
-            if topic.repliesCount > 0 {
-              Text("(+\(topic.repliesCount))")
+            if topic.replies > 0 {
+              Text("(+\(topic.replies))")
                 .font(.footnote)
                 .foregroundStyle(.orange)
             }
@@ -50,8 +50,10 @@ struct SubjectTopicsView: View {
               .lineLimit(1)
               .foregroundStyle(.secondary)
             Spacer()
-            Text(topic.creator.nickname.withLink(topic.creator.link))
-              .lineLimit(1)
+            if let creator = topic.creator {
+              Text(creator.nickname.withLink(creator.link))
+                .lineLimit(1)
+            }
           }.font(.footnote)
         }.padding(.top, 2)
       }
@@ -67,8 +69,7 @@ struct SubjectTopicsView: View {
         SubjectTopicsView(
           subjectId: Subject.previewAnime.subjectId, topics: Subject.previewTopics
         )
-        .modelContainer(mockContainer())
       }.padding()
-    }
+    }.modelContainer(mockContainer())
   }
 }

@@ -5,7 +5,7 @@ func mockContainer() -> ModelContainer {
   let config = ModelConfiguration(isStoredInMemoryOnly: true)
   let container = try! ModelContainer(
     for: BangumiCalendar.self,
-    UserSubjectCollection.self,
+    TrendingSubject.self,
     Episode.self,
     Subject.self,
     Character.self,
@@ -98,31 +98,7 @@ extension Subject {
 
 }
 
-extension UserSubjectCollection {
-  static var previewAnime: UserSubjectCollection {
-    let item = loadFixture(
-      fixture: "user_subject_collection_anime.json", target: UserSubjectCollectionDTO.self)
-    let collection = UserSubjectCollection(item)
-    return collection
-  }
-
-  static var previewBook: UserSubjectCollection {
-    let item = loadFixture(
-      fixture: "user_subject_collection_book.json", target: UserSubjectCollectionDTO.self)
-    let collection = UserSubjectCollection(item)
-    return collection
-  }
-}
-
 extension Episode {
-  static var previewCollections: [Episode] {
-    let collections =
-      loadFixture(
-        fixture: "episode_collections.json", target: PagedDTO<EpisodeCollectionDTO>.self
-      )
-    return collections.data.map { Episode($0) }
-  }
-
   static var previewAnime: [Episode] {
     let items = loadFixture(
       fixture: "subject_anime_episodes.json", target: PagedDTO<EpisodeDTO>.self)
@@ -133,10 +109,6 @@ extension Episode {
     let items = loadFixture(
       fixture: "subject_music_episodes.json", target: PagedDTO<EpisodeDTO>.self)
     return items.data.map { Episode($0) }
-  }
-
-  static var preview: Episode {
-    return self.previewCollections.first!
   }
 }
 

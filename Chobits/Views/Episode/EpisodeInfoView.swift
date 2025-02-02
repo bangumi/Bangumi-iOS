@@ -59,11 +59,10 @@ struct EpisodeInfoView: View {
 #Preview {
   let container = mockContainer()
 
-  container.mainContext.insert(UserSubjectCollection.previewAnime)
   let subject = Subject.previewAnime
   container.mainContext.insert(subject)
 
-  let episodes = Episode.previewCollections
+  let episodes = Episode.previewAnime
   for episode in episodes {
     container.mainContext.insert(episode)
   }

@@ -153,6 +153,32 @@ extension SubjectCollection {
   }
 }
 
+struct SubjectInterest: Codable, Hashable {
+  var comment: String
+  var epStatus: Int
+  var volStatus: Int
+  var `private`: Bool
+  var rate: Int
+  var tags: [String]
+  var type: Int
+  var updatedAt: Int
+
+  var typeEnum: CollectionType {
+    return CollectionType(type)
+  }
+
+  init() {
+    self.comment = ""
+    self.epStatus = 0
+    self.volStatus = 0
+    self.private = false
+    self.rate = 0
+    self.tags = []
+    self.type = 0
+    self.updatedAt = 0
+  }
+}
+
 struct SubjectPlatform: Codable, Hashable {
   var alias: String
   var enableHeader: Bool?

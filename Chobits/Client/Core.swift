@@ -233,7 +233,7 @@ extension Chii {
       try await CSSearchableIndex.default().indexSearchableItems(
         items.filter { $0.identifier > 0 }.map { $0.index() })
     } catch {
-      Logger.spotlight.error("Failed to index: \(error)")
+      Logger.app.error("Failed to index: \(error)")
     }
   }
 }

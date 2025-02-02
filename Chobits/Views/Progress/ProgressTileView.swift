@@ -10,7 +10,7 @@ struct ProgressTileView: View {
 
   @Environment(\.modelContext) var modelContext
 
-  @Query var collections: [UserSubjectCollection]
+  @Query var subjects: [Subject]
 
   init(subjectType: SubjectType, search: String, width: CGFloat) {
     self.subjectType = subjectType
@@ -19,18 +19,19 @@ struct ProgressTileView: View {
 
     let stype = subjectType.rawValue
     let doingType = CollectionType.do.rawValue
-    var descriptor = FetchDescriptor<UserSubjectCollection>(
-      predicate: #Predicate<UserSubjectCollection> {
-        (stype == 0 || $0.subjectType == stype) && $0.type == doingType
-          && (search == "" || $0.alias.localizedStandardContains(search))
+    var descriptor = FetchDescriptor<Subject>(
+      predicate: #Predicate<Subject> {
+        (stype == 0 || $0.type == stype) && $0.interest.type == doingType
+          && (search == "" || $0.name.localizedStandardContains(search)
+            || $0.alias.localizedStandardContains(search))
       },
       sortBy: [
-        SortDescriptor(\.updatedAt, order: .reverse)
+        SortDescriptor(\.interest.updatedAt, order: .reverse)
       ])
     if progressLimit > 0 {
       descriptor.fetchLimit = progressLimit
     }
-    self._collections = Query(descriptor)
+    self._subjects = Query(descriptor)
   }
 
   var columns: Int {
@@ -47,10 +48,10 @@ struct ProgressTileView: View {
     return cw
   }
 
-  var items: [Int: [UserSubjectCollection]] {
-    var result: [Int: [UserSubjectCollection]] = [:]
-    for (index, collection) in collections.enumerated() {
-      result[index % columns, default: []].append(collection)
+  var items: [Int: [Subject]] {
+    var result: [Int: [Subject]] = [:]
+    for (index, subject) in subjects.enumerated() {
+      result[index % columns, default: []].append(subject)
     }
     return result
   }
@@ -59,17 +60,17 @@ struct ProgressTileView: View {
     HStack(alignment: .top, spacing: 8) {
       ForEach(Array(items.keys.sorted()), id: \.self) { idx in
         LazyVStack(alignment: .leading, spacing: 8) {
-          ForEach(items[idx] ?? []) { collection in
+          ForEach(items[idx] ?? []) { subject in
             CardView(padding: 8) {
-              ProgressTileItemView(subjectId: collection.subjectId, width: cardWidth)
-                .environment(collection)
+              ProgressTileItemView(subjectId: subject.subjectId, width: cardWidth)
+                .environment(subject)
                 .frame(width: cardWidth)
             }
           }
         }.frame(width: cardWidth + 16, alignment: .topLeading)
       }
     }
-    .animation(.default, value: collections)
+    .animation(.default, value: subjects)
     .padding(.horizontal, 8)
     .frame(width: width, alignment: .topLeading)
   }
@@ -79,9 +80,7 @@ struct ProgressTileItemView: View {
   let subjectId: Int
   let width: CGFloat
 
-  @AppStorage("profile") var profile: Profile = Profile()
-
-  @Environment(UserSubjectCollection.self) var collection
+  @Environment(Subject.self) var subject
   @Environment(\.modelContext) var modelContext
 
   @State private var updating: Bool = false
@@ -100,14 +99,6 @@ struct ProgressTileItemView: View {
     _pendingEpisodes = Query(descriptor)
   }
 
-  var totalEps: Int {
-    collection.subject?.eps ?? 0
-  }
-
-  var totalVols: Int {
-    collection.subject?.volumes ?? 0
-  }
-
   var imageHeight: CGFloat {
     width * 1.4
   }
@@ -120,8 +111,7 @@ struct ProgressTileItemView: View {
       do {
         try await Chii.shared.updateEpisodeCollection(
           subjectId: subjectId, episodeId: episodeId, type: .collect)
-        try await Chii.shared.loadSubjectCollection(
-          username: profile.username, subjectId: subjectId)
+        _ = try await Chii.shared.loadSubject(subjectId)
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
       } catch {
         Notifier.shared.alert(error: error)
@@ -132,30 +122,30 @@ struct ProgressTileItemView: View {
 
   var body: some View {
     VStack(alignment: .leading, spacing: 8) {
-      ImageView(img: collection.subject?.images?.resize(.r400))
+      ImageView(img: subject.images?.resize(.r400))
         .imageStyle(width: width, height: imageHeight)
         .imageType(.subject)
-        .imageBadge(show: collection.priv) {
+        .imageBadge(show: subject.interest.private) {
           Image(systemName: "lock")
         }
-        .imageLink(collection.subject?.link)
+        .imageLink(subject.link)
 
       VStack(alignment: .leading, spacing: 4) {
         VStack(alignment: .leading) {
           NavigationLink(value: NavDestination.subject(subjectId)) {
-            Text(collection.subject?.name ?? "").font(.headline)
+            Text(subject.name).font(.headline)
           }.buttonStyle(.plain)
-          if let nameCN = collection.subject?.nameCN, !nameCN.isEmpty {
-            Text(nameCN)
+          if !subject.nameCN.isEmpty {
+            Text(subject.nameCN)
               .foregroundStyle(.secondary)
               .font(.subheadline)
           }
         }
 
-        switch collection.subjectTypeEnum {
+        switch subject.typeEnum {
         case .anime, .real:
           HStack {
-            Text("\(collection.epStatus) / \(totalEps)")
+            Text("\(subject.interest.epStatus) / \(subject.eps)")
               .foregroundStyle(.secondary)
             Spacer()
             if let episode = nextEpisode {
@@ -183,29 +173,33 @@ struct ProgressTileItemView: View {
           }.font(.callout)
         case .book:
           SubjectBookChaptersView(mode: .tile)
+            .environment(subject)
 
         default:
           Label(
-            collection.subjectTypeEnum.description,
-            systemImage: collection.subjectTypeEnum.icon
+            subject.typeEnum.description,
+            systemImage: subject.typeEnum.icon
           )
           .foregroundStyle(.accent)
           .font(.callout)
         }
 
         Section {
-          switch collection.subjectTypeEnum {
+          switch subject.typeEnum {
           case .book:
             VStack(spacing: 1) {
               ProgressView(
-                value: Float(min(totalEps, collection.epStatus)), total: Float(totalEps))
+                value: Float(min(subject.eps, subject.interest.epStatus)),
+                total: Float(subject.eps))
               ProgressView(
-                value: Float(min(totalVols, collection.volStatus)), total: Float(totalVols))
+                value: Float(min(subject.volumes, subject.interest.volStatus)),
+                total: Float(subject.volumes))
             }.progressViewStyle(.linear)
 
           case .anime, .real:
             ProgressView(
-              value: Float(min(totalEps, collection.epStatus)), total: Float(totalEps)
+              value: Float(min(subject.eps, subject.interest.epStatus)),
+              total: Float(subject.eps)
             ).progressViewStyle(.linear)
 
           default:
@@ -220,12 +214,9 @@ struct ProgressTileItemView: View {
 #Preview {
   let container = mockContainer()
 
-  let collection = UserSubjectCollection.previewAnime
   let subject = Subject.previewAnime
-  collection.subject = subject
-  let episodes = Episode.previewCollections
+  let episodes = Episode.previewAnime
   container.mainContext.insert(subject)
-  container.mainContext.insert(collection)
   for episode in episodes {
     container.mainContext.insert(episode)
   }
@@ -233,7 +224,6 @@ struct ProgressTileItemView: View {
   return ScrollView {
     LazyVStack(alignment: .leading) {
       ProgressTileItemView(subjectId: subject.subjectId, width: 200)
-        .environment(collection)
         .environment(subject)
         .modelContainer(container)
     }.padding()

@@ -15,21 +15,17 @@ enum FriendType {
 }
 
 struct FriendsView: View {
-  @AppStorage("profile") var profile: Profile = Profile()
-
   @State private var reloader = false
   @State private var type: FriendType = .friends
 
-  func load(limit: Int, offset: Int) async -> PagedDTO<Friend>? {
+  func load(limit: Int, offset: Int) async -> PagedDTO<FriendDTO>? {
     do {
       let resp = try await {
         switch type {
         case .friends:
-          return try await Chii.shared.getUserFriends(
-            username: profile.username, limit: limit, offset: offset)
+          return try await Chii.shared.getFriends(limit: limit, offset: offset)
         case .followers:
-          return try await Chii.shared.getUserFollowers(
-            username: profile.username, limit: limit, offset: offset)
+          return try await Chii.shared.getFollowers(limit: limit, offset: offset)
         }
       }()
       return resp
@@ -52,7 +48,7 @@ struct FriendsView: View {
       }
 
       ScrollView {
-        PageView<Friend, _>(reloader: reloader, nextPageFunc: load) { item in
+        PageView<FriendDTO, _>(reloader: reloader, nextPageFunc: load) { item in
           CardView {
             HStack(alignment: .top) {
               ImageView(img: item.user.avatar?.large)

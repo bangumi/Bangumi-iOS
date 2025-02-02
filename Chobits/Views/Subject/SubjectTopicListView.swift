@@ -68,8 +68,8 @@ struct SubjectTopicListView: View {
                   .lineLimit(1)
               }
               Spacer()
-              if topic.repliesCount > 0 {
-                Text("(+\(topic.repliesCount))")
+              if topic.replies > 0 {
+                Text("(+\(topic.replies))")
                   .font(.footnote)
                   .foregroundStyle(.orange)
               }
@@ -79,8 +79,10 @@ struct SubjectTopicListView: View {
                 .lineLimit(1)
                 .foregroundStyle(.secondary)
               Spacer()
-              Text(topic.creator.nickname.withLink(topic.creator.link))
-                .lineLimit(1)
+              if let creator = topic.creator {
+                Text(creator.nickname.withLink(creator.link))
+                  .lineLimit(1)
+              }
             }.font(.footnote)
             Divider()
           }
@@ -138,7 +140,6 @@ struct SubjectTopicListView: View {
   return ScrollView {
     LazyVStack(alignment: .leading) {
       SubjectTopicListView(subjectId: subject.subjectId)
-        .modelContainer(container)
-    }
-  }.padding()
+    }.padding()
+  }.modelContainer(container)
 }

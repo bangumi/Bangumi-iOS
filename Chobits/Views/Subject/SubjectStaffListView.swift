@@ -7,7 +7,7 @@ struct SubjectStaffListView: View {
 
   func load(limit: Int, offset: Int) async -> PagedDTO<SubjectStaffDTO>? {
     do {
-      let resp = try await Chii.shared.getSubjectStaffs(
+      let resp = try await Chii.shared.getSubjectStaffPersons(
         subjectId, limit: limit, offset: offset)
       return resp
     } catch {
@@ -21,15 +21,15 @@ struct SubjectStaffListView: View {
       PageView<SubjectStaffDTO, _>(limit: 20, nextPageFunc: load) { item in
         CardView {
           HStack {
-            ImageView(img: item.person.images?.medium)
+            ImageView(img: item.staff.images?.medium)
               .imageStyle(width: 60, height: 60, alignment: .top)
               .imageType(.person)
-              .imageLink(item.person.link)
+              .imageLink(item.staff.link)
             VStack(alignment: .leading) {
-              Text(item.person.name.withLink(item.person.link))
+              Text(item.staff.name.withLink(item.staff.link))
                 .font(.callout)
                 .lineLimit(1)
-              Text(item.person.nameCN)
+              Text(item.staff.nameCN)
                 .font(.footnote)
                 .foregroundStyle(.secondary)
                 .lineLimit(1)

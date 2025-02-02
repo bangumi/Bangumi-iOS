@@ -93,7 +93,12 @@ struct CalendarView: View {
   }
 
   var todayWatchers: Int {
-    sortedCalendars.first?.items.reduce(0) { $0 + $1.watchers } ?? 0
+    var total = 0
+    guard let calendar = sortedCalendars.first else { return 0 }
+    for item in calendar.items {
+      total += calendar.watchers[item.subjectId] ?? 0
+    }
+    return total
   }
 
   func refreshCalendar() async {
@@ -186,21 +191,21 @@ struct CalendarWeekdayView: View {
       .shadow(radius: 5)
 
       LazyVGrid(columns: columns) {
-        ForEach(calendar.items, id: \.subject) { item in
+        ForEach(calendar.items) { item in
           VStack {
-            ImageView(img: item.subject.images?.resize(.r200))
+            ImageView(img: item.images?.resize(.r200))
               .imageStyle(width: 110, height: 140)
               .imageType(.subject)
               .imageCaption {
-                Text(item.subject.title)
+                Text(item.title)
                   .lineLimit(1)
                   .padding(.horizontal, 2)
               }
-              .imageBadge(show: item.watchers > 10) {
-                Text("\(item.watchers)人追番")
+              .imageBadge(show: calendar.watchers[item.subjectId] ?? 0 > 10) {
+                Text("\(calendar.watchers[item.subjectId] ?? 0)人追番")
               }
-              .imageLink(item.subject.link)
-              .subjectPreview(item.subject)
+              .imageLink(item.link)
+              .subjectPreview(item.slim)
           }
         }
       }

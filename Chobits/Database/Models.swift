@@ -71,40 +71,44 @@ final class UserV1 {
   }
 }
 
-typealias BangumiCalendar = BangumiCalendarV1
+typealias BangumiCalendar = BangumiCalendarV2
 
 @Model
-final class BangumiCalendarV1 {
+final class BangumiCalendarV2 {
   @Attribute(.unique)
   var weekday: Int
 
-  var items: [BangumiCalendarItemDTO]
+  var items: [Subject]
+  var watchers: [Int: Int]
 
-  init(weekday: Int, items: [BangumiCalendarItemDTO]) {
+  init(weekday: Int) {
     self.weekday = weekday
-    self.items = items
+    self.items = []
+    self.watchers = [:]
   }
 }
 
-typealias TrendingSubject = TrendingSubjectV1
+typealias TrendingSubject = TrendingSubjectV2
 
 @Model
-final class TrendingSubjectV1 {
+final class TrendingSubjectV2 {
   @Attribute(.unique)
   var type: Int
 
-  var items: [TrendingSubjectDTO]
+  var items: [Subject]
+  var watchers: [Int: Int]
 
-  init(type: Int, items: [TrendingSubjectDTO]) {
+  init(type: Int) {
     self.type = type
-    self.items = items
+    self.items = []
+    self.watchers = [:]
   }
 }
 
-typealias Subject = SubjectV1
+typealias Subject = SubjectV2
 
 @Model
-final class SubjectV1: Searchable, Linkable {
+final class SubjectV2: Searchable, Linkable {
   @Attribute(.unique)
   var subjectId: Int
 
@@ -113,7 +117,7 @@ final class SubjectV1: Searchable, Linkable {
   var eps: Int
   var images: SubjectImages?
   var infobox: Infobox
-  var info: String = ""
+  var info: String
   var locked: Bool
   var metaTags: [String]
   var tags: [Tag]
@@ -126,6 +130,8 @@ final class SubjectV1: Searchable, Linkable {
   var summary: String
   var type: Int
   var volumes: Int
+  var interest: SubjectInterest
+  var alias: String
 
   var characters: [SubjectCharacterDTO] = []
   var offprints: [SubjectRelationDTO] = []
@@ -192,6 +198,8 @@ final class SubjectV1: Searchable, Linkable {
     self.summary = item.summary
     self.type = item.type.rawValue
     self.volumes = item.volumes
+    self.interest = item.interest ?? SubjectInterest()
+    self.alias = item.infobox.aliases.joined(separator: " ")
   }
 
   init(_ item: SlimSubjectDTO) {
@@ -214,6 +222,8 @@ final class SubjectV1: Searchable, Linkable {
     self.summary = ""
     self.type = item.type.rawValue
     self.volumes = 0
+    self.interest = SubjectInterest()
+    self.alias = ""
   }
 
   init(_ item: SubjectDTOV0) {
@@ -223,6 +233,7 @@ final class SubjectV1: Searchable, Linkable {
     self.eps = item.eps
     self.images = item.images
     self.infobox = []
+    self.info = ""
     self.locked = item.locked
     self.metaTags = item.metaTags
     self.tags = item.tags
@@ -235,6 +246,8 @@ final class SubjectV1: Searchable, Linkable {
     self.summary = item.summary
     self.type = item.type.rawValue
     self.volumes = item.volumes
+    self.interest = SubjectInterest()
+    self.alias = ""
   }
 
   func update(_ item: SubjectDTO) {
@@ -256,6 +269,11 @@ final class SubjectV1: Searchable, Linkable {
     if self.summary != item.summary { self.summary = item.summary }
     if self.type != item.type.rawValue { self.type = item.type.rawValue }
     if self.volumes != item.volumes { self.volumes = item.volumes }
+    if let interest = item.interest {
+      if self.interest != interest { self.interest = interest }
+    }
+    let aliases = item.infobox.aliases.joined(separator: " ")
+    if self.alias != aliases { self.alias = aliases }
   }
 
   func update(_ item: SlimSubjectDTO) {
@@ -286,99 +304,10 @@ final class SubjectV1: Searchable, Linkable {
   }
 }
 
-typealias UserSubjectCollection = UserSubjectCollectionV1
+typealias Character = CharacterV2
 
 @Model
-final class UserSubjectCollectionV1: Searchable {
-  @Attribute(.unique)
-  var subjectId: Int
-
-  var rate: Int
-  var type: Int
-  var subjectType: Int
-  var comment: String
-  var tags: [String]
-  var epStatus: Int
-  var volStatus: Int
-  var priv: Bool
-  var updatedAt: Date
-  var alias: String = ""
-
-  var subject: Subject?
-
-  var typeEnum: CollectionType {
-    CollectionType(type)
-  }
-
-  var subjectTypeEnum: SubjectType {
-    SubjectType(subjectType)
-  }
-
-  var typeDesc: String {
-    return typeEnum.description(subjectTypeEnum)
-  }
-
-  var message: String {
-    typeEnum.message(type: subjectTypeEnum)
-  }
-
-  var slim: SlimUserSubjectCollectionDTO {
-    SlimUserSubjectCollectionDTO(self)
-  }
-
-  init(_ subjectId: Int) {
-    self.subjectId = subjectId
-    self.rate = 0
-    self.type = 0
-    self.subjectType = 0
-    self.comment = ""
-    self.tags = []
-    self.epStatus = 0
-    self.volStatus = 0
-    self.priv = false
-    self.updatedAt = Date(timeIntervalSince1970: 0)
-  }
-
-  init(_ item: UserSubjectCollectionDTO) {
-    self.subjectId = item.subject.id
-    self.rate = item.rate
-    self.type = item.type.rawValue
-    self.comment = item.comment
-    self.tags = item.tags
-    self.epStatus = item.epStatus
-    self.volStatus = item.volStatus
-    self.priv = item.`private`
-    self.updatedAt = Date(timeIntervalSince1970: TimeInterval(item.updatedAt))
-    self.subjectType = item.subject.type.rawValue
-    var aliases = [item.subject.name]
-    aliases.append(contentsOf: item.subject.infobox.aliases)
-    self.alias = aliases.joined(separator: ", ")
-  }
-
-  func update(_ item: UserSubjectCollectionDTO) {
-    if self.rate != item.rate { self.rate = item.rate }
-    if self.type != item.type.rawValue { self.type = item.type.rawValue }
-    if self.comment != item.comment { self.comment = item.comment }
-    if self.tags != item.tags { self.tags = item.tags }
-    if self.epStatus != item.epStatus { self.epStatus = item.epStatus }
-    if self.volStatus != item.volStatus { self.volStatus = item.volStatus }
-    if self.priv != item.`private` { self.priv = item.`private` }
-    let newDate = Date(timeIntervalSince1970: TimeInterval(item.updatedAt))
-    if self.updatedAt != newDate { self.updatedAt = newDate }
-    if self.subjectType != item.subject.type.rawValue {
-      self.subjectType = item.subject.type.rawValue
-    }
-    var aliases = [item.subject.name]
-    aliases.append(contentsOf: item.subject.infobox.aliases)
-    let newAlias = aliases.joined(separator: ", ")
-    if self.alias != newAlias { self.alias = newAlias }
-  }
-}
-
-typealias Character = CharacterV1
-
-@Model
-final class CharacterV1: Searchable, Linkable {
+final class CharacterV2: Searchable, Linkable {
   @Attribute(.unique)
   var characterId: Int
 
@@ -392,11 +321,9 @@ final class CharacterV1: Searchable, Linkable {
   var nsfw: Bool
   var role: Int
   var summary: String
+  var collectedAt: Int?
 
   var casts: [CharacterCastDTO] = []
-
-  @Relationship(deleteRule: .cascade, inverse: \UserCharacterCollection.character)
-  var userCollection: UserCharacterCollection?
 
   var roleEnum: CharacterType {
     return CharacterType(role)
@@ -422,6 +349,7 @@ final class CharacterV1: Searchable, Linkable {
     self.nsfw = item.nsfw
     self.role = item.role.rawValue
     self.summary = item.summary
+    self.collectedAt = item.collectedAt
   }
 
   func update(_ item: CharacterDTO) {
@@ -435,33 +363,14 @@ final class CharacterV1: Searchable, Linkable {
     if self.nsfw != item.nsfw { self.nsfw = item.nsfw }
     if self.role != item.role.rawValue { self.role = item.role.rawValue }
     if self.summary != item.summary { self.summary = item.summary }
+    if self.collectedAt != item.collectedAt { self.collectedAt = item.collectedAt }
   }
 }
 
-typealias UserCharacterCollection = UserCharacterCollectionV1
+typealias Person = PersonV2
 
 @Model
-final class UserCharacterCollectionV1 {
-  @Attribute(.unique)
-  var characterId: Int
-  var createdAt: Date
-  var character: Character?
-
-  init(_ item: UserCharacterCollectionDTO) {
-    self.characterId = item.character.id
-    self.createdAt = Date(timeIntervalSince1970: TimeInterval(item.createdAt))
-  }
-
-  func update(_ item: UserCharacterCollectionDTO) {
-    let newDate = Date(timeIntervalSince1970: TimeInterval(item.createdAt))
-    if self.createdAt != newDate { self.createdAt = newDate }
-  }
-}
-
-typealias Person = PersonV1
-
-@Model
-final class PersonV1: Searchable, Linkable {
+final class PersonV2: Searchable, Linkable {
   @Attribute(.unique)
   var personId: Int
 
@@ -476,12 +385,10 @@ final class PersonV1: Searchable, Linkable {
   var nsfw: Bool
   var summary: String
   var type: Int
+  var collectedAt: Int?
 
   var casts: [PersonCastDTO] = []
   var works: [PersonWorkDTO] = []
-
-  @Relationship(deleteRule: .cascade, inverse: \UserPersonCollection.person)
-  var userCollection: UserPersonCollection?
 
   var typeEnum: PersonType {
     return PersonType(type)
@@ -508,6 +415,7 @@ final class PersonV1: Searchable, Linkable {
     self.nsfw = item.nsfw
     self.summary = item.summary
     self.type = item.type.rawValue
+    self.collectedAt = item.collectedAt
   }
 
   func update(_ item: PersonDTO) {
@@ -523,28 +431,9 @@ final class PersonV1: Searchable, Linkable {
     if self.nsfw != item.nsfw { self.nsfw = item.nsfw }
     if self.summary != item.summary { self.summary = item.summary }
     if self.type != item.type.rawValue { self.type = item.type.rawValue }
+    if self.collectedAt != item.collectedAt { self.collectedAt = item.collectedAt }
   }
 
-}
-
-typealias UserPersonCollection = UserPersonCollectionV1
-
-@Model
-final class UserPersonCollectionV1 {
-  @Attribute(.unique)
-  var personId: Int
-  var createdAt: Date
-  var person: Person?
-
-  init(_ item: UserPersonCollectionDTO) {
-    self.personId = item.person.id
-    self.createdAt = Date(timeIntervalSince1970: TimeInterval(item.createdAt))
-  }
-
-  func update(_ item: UserPersonCollectionDTO) {
-    let newDate = Date(timeIntervalSince1970: TimeInterval(item.createdAt))
-    if self.createdAt != newDate { self.createdAt = newDate }
-  }
 }
 
 typealias Episode = EpisodeV1
@@ -590,10 +479,6 @@ final class EpisodeV1: Linkable {
     self.desc = item.desc ?? ""
     self.disc = item.disc
     self.collection = collection
-  }
-
-  convenience init(_ collection: EpisodeCollectionDTO) {
-    self.init(collection.episode, collection: collection.type.rawValue)
   }
 
   var title: AttributedString {

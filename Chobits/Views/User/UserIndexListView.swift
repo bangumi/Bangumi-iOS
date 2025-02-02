@@ -35,12 +35,9 @@ struct UserIndexListView: View {
       let resp = try await {
         switch type {
         case .collect:
-          let collects = try await Chii.shared.getUserIndexCollections(
+          let data = try await Chii.shared.getUserIndexCollections(
             username: user.username, limit: limit, offset: offset)
-          return PagedDTO<SlimIndexDTO>(
-            data: collects.data.map { $0.index.slim },
-            total: collects.total
-          )
+          return data
         case .created:
           return try await Chii.shared.getUserIndexes(
             username: user.username, limit: limit, offset: offset)

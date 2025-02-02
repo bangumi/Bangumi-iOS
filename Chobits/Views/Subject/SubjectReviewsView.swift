@@ -45,8 +45,7 @@ struct SubjectReviewsView: View {
           subjectId: Subject.previewAnime.subjectId,
           reviews: Subject.previewReviews
         )
-        .modelContainer(mockContainer())
       }.padding()
-    }
+    }.modelContainer(mockContainer())
   }
 }

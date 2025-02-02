@@ -11,9 +11,7 @@ enum BookChapterMode {
 struct SubjectBookChaptersView: View {
   let mode: BookChapterMode
 
-  @AppStorage("profile") var profile: Profile = Profile()
-
-  @Environment(UserSubjectCollection.self) var collection
+  @Environment(Subject.self) var subject
 
   @State private var inputEps: String = ""
   @State private var eps: Int? = nil
@@ -26,22 +24,6 @@ struct SubjectBookChaptersView: View {
       return true
     }
     return eps == nil && vols == nil
-  }
-
-  var epsDesc: String {
-    collection.subject?.epsDesc ?? ""
-  }
-
-  var epStatus: Int {
-    collection.epStatus
-  }
-
-  var volsDesc: String {
-    collection.subject?.volumesDesc ?? ""
-  }
-
-  var volStatus: Int {
-    collection.volStatus
   }
 
   func parseInputEps() {
@@ -64,7 +46,7 @@ struct SubjectBookChaptersView: View {
     if let value = eps {
       self.inputEps = "\(value+1)"
     } else {
-      self.inputEps = "\(collection.epStatus+1)"
+      self.inputEps = "\(subject.interest.epStatus+1)"
     }
   }
 
@@ -72,7 +54,7 @@ struct SubjectBookChaptersView: View {
     if let value = vols {
       self.inputVols = "\(value+1)"
     } else {
-      self.inputVols = "\(collection.volStatus+1)"
+      self.inputVols = "\(subject.interest.volStatus+1)"
     }
   }
 
@@ -88,9 +70,8 @@ struct SubjectBookChaptersView: View {
     Task {
       do {
         try await Chii.shared.updateBookCollection(
-          subjectId: collection.subjectId, eps: eps, vols: vols)
-        try await Chii.shared.loadSubjectCollection(
-          username: profile.username, subjectId: collection.subjectId)
+          subjectId: subject.subjectId, eps: eps, vols: vols)
+        _ = try await Chii.shared.loadSubject(subject.subjectId)
 
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
       } catch {
@@ -108,7 +89,7 @@ struct SubjectBookChaptersView: View {
         VStack {
           HStack(alignment: .firstTextBaseline, spacing: 0) {
             Text("Chap.").foregroundStyle(.secondary)
-            TextField("\(epStatus)", text: $inputEps)
+            TextField("\(subject.interest.epStatus)", text: $inputEps)
               .keyboardType(.numberPad)
               .frame(minWidth: 50, maxWidth: 75)
               .multilineTextAlignment(.trailing)
@@ -119,7 +100,7 @@ struct SubjectBookChaptersView: View {
                 parseInputEps()
               }
             Text("/").foregroundStyle(.secondary)
-            Text(epsDesc).foregroundStyle(.secondary)
+            Text(subject.epsDesc).foregroundStyle(.secondary)
               .padding(.trailing, 5)
             Button {
               incrEps()
@@ -131,7 +112,7 @@ struct SubjectBookChaptersView: View {
           }.monospaced()
           HStack(alignment: .firstTextBaseline, spacing: 0) {
             Text("Vol. ").foregroundStyle(.secondary)
-            TextField("\(volStatus)", text: $inputVols)
+            TextField("\(subject.interest.volStatus)", text: $inputVols)
               .keyboardType(.numberPad)
               .frame(minWidth: 50, maxWidth: 75)
               .multilineTextAlignment(.trailing)
@@ -142,7 +123,7 @@ struct SubjectBookChaptersView: View {
                 parseInputVols()
               }
             Text("/").foregroundStyle(.secondary)
-            Text(volsDesc).foregroundStyle(.secondary)
+            Text(subject.volumesDesc).foregroundStyle(.secondary)
               .padding(.trailing, 5)
             Button {
               incrVols()
@@ -170,7 +151,7 @@ struct SubjectBookChaptersView: View {
       case .row:
         Section {
           HStack(alignment: .firstTextBaseline, spacing: 0) {
-            TextField("\(epStatus)", text: $inputEps)
+            TextField("\(subject.interest.epStatus)", text: $inputEps)
               .keyboardType(.numberPad)
               .frame(minWidth: 15, maxWidth: 30)
               .multilineTextAlignment(.trailing)
@@ -180,7 +161,7 @@ struct SubjectBookChaptersView: View {
               .onChange(of: inputEps) {
                 parseInputEps()
               }
-            Text("/\(epsDesc)话")
+            Text("/\(subject.epsDesc)话")
               .foregroundStyle(.secondary)
               .padding(.trailing, 2)
             Button {
@@ -192,7 +173,7 @@ struct SubjectBookChaptersView: View {
           }
           .monospaced()
           HStack(alignment: .firstTextBaseline, spacing: 0) {
-            TextField("\(volStatus)", text: $inputVols)
+            TextField("\(subject.interest.volStatus)", text: $inputVols)
               .keyboardType(.numberPad)
               .frame(minWidth: 15, maxWidth: 30)
               .multilineTextAlignment(.trailing)
@@ -202,7 +183,7 @@ struct SubjectBookChaptersView: View {
               .onChange(of: inputVols) {
                 parseInputVols()
               }
-            Text("/\(volsDesc)卷")
+            Text("/\(subject.volumesDesc)卷")
               .foregroundStyle(.secondary)
               .padding(.trailing, 2)
             Button {
@@ -239,7 +220,7 @@ struct SubjectBookChaptersView: View {
         HStack {
           VStack(alignment: .leading) {
             HStack(alignment: .firstTextBaseline, spacing: 0) {
-              TextField("\(epStatus)", text: $inputEps)
+              TextField("\(subject.interest.epStatus)", text: $inputEps)
                 .keyboardType(.numberPad)
                 .frame(minWidth: 32, maxWidth: 48)
                 .multilineTextAlignment(.trailing)
@@ -249,7 +230,7 @@ struct SubjectBookChaptersView: View {
                 .onChange(of: inputEps) {
                   parseInputEps()
                 }
-              Text("/\(epsDesc)话")
+              Text("/\(subject.epsDesc)话")
                 .foregroundStyle(.secondary)
                 .padding(.trailing, 2)
               Button {
@@ -260,7 +241,7 @@ struct SubjectBookChaptersView: View {
               }.buttonStyle(.plain)
             }.monospaced()
             HStack(alignment: .firstTextBaseline, spacing: 0) {
-              TextField("\(volStatus)", text: $inputVols)
+              TextField("\(subject.interest.volStatus)", text: $inputVols)
                 .keyboardType(.numberPad)
                 .frame(minWidth: 32, maxWidth: 48)
                 .multilineTextAlignment(.trailing)
@@ -270,7 +251,7 @@ struct SubjectBookChaptersView: View {
                 .onChange(of: inputVols) {
                   parseInputVols()
                 }
-              Text("/\(volsDesc)卷")
+              Text("/\(subject.volumesDesc)卷")
                 .foregroundStyle(.secondary)
                 .padding(.trailing, 2)
               Button {
@@ -313,25 +294,21 @@ struct SubjectBookChaptersView: View {
 #Preview {
   let container = mockContainer()
 
-  let collection = UserSubjectCollection.previewBook
   let subject = Subject.previewBook
-
-  container.mainContext.insert(collection)
   container.mainContext.insert(subject)
-  collection.subject = subject
 
   return ScrollView {
     LazyVStack(alignment: .leading) {
       SubjectBookChaptersView(mode: .large)
-        .environment(collection)
+        .environment(subject)
       SubjectBookChaptersView(mode: .row)
-        .environment(collection)
+        .environment(subject)
       HStack(spacing: 8) {
         SubjectBookChaptersView(mode: .tile)
-          .environment(collection)
+          .environment(subject)
         Spacer()
         SubjectBookChaptersView(mode: .tile)
-          .environment(collection)
+          .environment(subject)
       }
     }.padding()
   }.modelContainer(container)

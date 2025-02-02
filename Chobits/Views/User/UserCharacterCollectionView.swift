@@ -35,7 +35,7 @@ struct UserCharacterCollectionView: View {
     do {
       let resp = try await Chii.shared.getUserCharacterCollections(
         username: user.username, limit: 20)
-      characters = resp.data.map { $0.character.slim }
+      characters = resp.data
     } catch {
       Notifier.shared.alert(error: error)
     }

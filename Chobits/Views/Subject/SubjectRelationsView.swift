@@ -8,21 +8,21 @@ struct SubjectRelationsView: View {
 
   @Environment(\.modelContext) var modelContext
 
-  @Query private var collects: [UserSubjectCollection]
+  @Query private var collects: [Subject]
 
   init(subjectId: Int, relations: [SubjectRelationDTO]) {
     self.subjectId = subjectId
     self.relations = relations
     let relationIDs = relations.map { $0.subject.id }
-    let descriptor = FetchDescriptor<UserSubjectCollection>(
-      predicate: #Predicate<UserSubjectCollection> {
+    let descriptor = FetchDescriptor<Subject>(
+      predicate: #Predicate<Subject> {
         relationIDs.contains($0.subjectId)
       })
     _collects = Query(descriptor)
   }
 
   var collections: [Int: CollectionType] {
-    collects.reduce(into: [:]) { $0[$1.subjectId] = $1.typeEnum }
+    collects.reduce(into: [:]) { $0[$1.subjectId] = $1.interest.typeEnum }
   }
 
   var body: some View {
@@ -95,7 +95,6 @@ struct SubjectRelationsView: View {
       SubjectRelationsView(
         subjectId: Subject.previewBook.subjectId, relations: Subject.previewRelations
       )
-      .modelContainer(mockContainer())
     }.padding()
-  }
+  }.modelContainer(mockContainer())
 }

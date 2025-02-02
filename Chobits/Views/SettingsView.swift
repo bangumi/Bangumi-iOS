@@ -22,7 +22,7 @@ struct SettingsView: View {
   func reindex() {
     refreshing = true
     refreshProgress = 0
-    let limit: Int = 20
+    let limit: Int = 50
     var offset: Int = 0
     Task {
       let db = try await Chii.shared.getDB()
@@ -31,7 +31,13 @@ struct SettingsView: View {
         Notifier.shared.notify(message: "Spotlight 索引清除成功")
         while true {
           let resp = try await db.getSearchable(
-            UserSubjectCollection.self, limit: limit, offset: offset)
+            Subject.self,
+            descriptor: FetchDescriptor<Subject>(
+              predicate: #Predicate<Subject> {
+                $0.interest.type != 0
+              }
+            ),
+            limit: limit, offset: offset)
           if resp.data.isEmpty {
             break
           }

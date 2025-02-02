@@ -12,16 +12,16 @@ struct CollectionListView: View {
   @State private var exhausted: Bool = false
   @State private var loadedIdx: [Int: Bool] = [:]
   @State private var counts: [CollectionType: Int] = [:]
-  @State private var collections: [EnumerateItem<(UserSubjectCollection)>] = []
+  @State private var subjects: [EnumerateItem<(Subject)>] = []
 
   func loadCounts() async {
     let stype = subjectType.rawValue
     do {
       for type in CollectionType.allTypes() {
         let ctype = type.rawValue
-        let desc = FetchDescriptor<UserSubjectCollection>(
-          predicate: #Predicate<UserSubjectCollection> {
-            $0.type == ctype && $0.subjectType == stype
+        let desc = FetchDescriptor<Subject>(
+          predicate: #Predicate<Subject> {
+            $0.interest.type == ctype && $0.type == stype
           })
         let count = try modelContext.fetchCount(desc)
         counts[type] = count
@@ -31,25 +31,25 @@ struct CollectionListView: View {
     }
   }
 
-  func fetch(limit: Int = 20) async -> [EnumerateItem<UserSubjectCollection>] {
+  func fetch(limit: Int = 20) async -> [EnumerateItem<Subject>] {
     let stype = subjectType.rawValue
     let ctype = collectionType.rawValue
-    var descriptor = FetchDescriptor<UserSubjectCollection>(
-      predicate: #Predicate<UserSubjectCollection> {
-        $0.subjectType == stype && $0.type == ctype
+    var descriptor = FetchDescriptor<Subject>(
+      predicate: #Predicate<Subject> {
+        $0.interest.type == ctype && $0.type == stype
       },
       sortBy: [
-        SortDescriptor(\.updatedAt, order: .reverse)
+        SortDescriptor(\.interest.updatedAt, order: .reverse)
       ])
     descriptor.fetchLimit = limit
     descriptor.fetchOffset = offset
     do {
-      let collections = try modelContext.fetch(descriptor)
-      if collections.count < limit {
+      let subjects = try modelContext.fetch(descriptor)
+      if subjects.count < limit {
         exhausted = true
       }
-      let result = collections.enumerated().map { (idx, collection) in
-        EnumerateItem(idx: idx + offset, inner: collection)
+      let result = subjects.enumerated().map { (idx, subject) in
+        EnumerateItem(idx: idx + offset, inner: subject)
       }
       offset += limit
       return result
@@ -63,9 +63,9 @@ struct CollectionListView: View {
     offset = 0
     exhausted = false
     loadedIdx.removeAll()
-    collections.removeAll()
-    let collections = await fetch()
-    self.collections.append(contentsOf: collections)
+    subjects.removeAll()
+    let subjects = await fetch()
+    self.subjects.append(contentsOf: subjects)
   }
 
   func loadNextPage(idx: Int) async {
@@ -79,8 +79,8 @@ struct CollectionListView: View {
       return
     }
     loadedIdx[idx] = true
-    let collections = await fetch()
-    self.collections.append(contentsOf: collections)
+    let subjects = await fetch()
+    self.subjects.append(contentsOf: subjects)
   }
 
   var body: some View {
@@ -98,7 +98,7 @@ struct CollectionListView: View {
         }
       } else {
         VStack {
-          Picker("Collection Type", selection: $collectionType) {
+          Picker("CollectionType", selection: $collectionType) {
             ForEach(CollectionType.allTypes()) { ctype in
               Text("\(ctype.description(subjectType))(\(counts[ctype, default: 0]))").tag(
                 ctype)
@@ -112,8 +112,9 @@ struct CollectionListView: View {
           }
           ScrollView {
             LazyVStack(alignment: .leading, spacing: 10) {
-              ForEach(collections, id: \.inner) { item in
-                CollectionRowView(collection: item.inner.slim)
+              ForEach(subjects, id: \.inner) { item in
+                CollectionRowView()
+                  .environment(item.inner)
                   .onAppear {
                     Task {
                       await loadNextPage(idx: item.idx)
@@ -136,7 +137,7 @@ struct CollectionListView: View {
           .animation(.easeInOut, value: collectionType)
         }
         .animation(.default, value: counts)
-        .animation(.default, value: collections)
+        .animation(.default, value: subjects)
       }
     }
     .navigationTitle("我的\(subjectType.description)")
@@ -147,10 +148,8 @@ struct CollectionListView: View {
 #Preview {
   let container = mockContainer()
 
-  let collection = UserSubjectCollection.previewAnime
   let subject = Subject.previewAnime
   container.mainContext.insert(subject)
-  container.mainContext.insert(collection)
 
   return CollectionListView(subjectType: SubjectType.anime)
     .modelContainer(container)

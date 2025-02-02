@@ -77,7 +77,7 @@ struct UserGroupsView: View {
                 .lineLimit(1)
                 .font(.footnote)
               Divider()
-              Text("\(group.totalMembers ?? 0) 位成员")
+              Text("\(group.members ?? 0) 位成员")
                 .foregroundStyle(.secondary)
                 .font(.caption)
                 .lineLimit(1)

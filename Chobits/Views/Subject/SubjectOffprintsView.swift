@@ -8,21 +8,21 @@ struct SubjectOffprintsView: View {
 
   @Environment(\.modelContext) var modelContext
 
-  @Query private var collects: [UserSubjectCollection]
+  @Query private var collects: [Subject]
 
   init(subjectId: Int, offprints: [SubjectRelationDTO]) {
     self.subjectId = subjectId
     self.offprints = offprints
     let offprintIDs = offprints.map { $0.subject.id }
-    let descriptor = FetchDescriptor<UserSubjectCollection>(
-      predicate: #Predicate<UserSubjectCollection> {
+    let descriptor = FetchDescriptor<Subject>(
+      predicate: #Predicate<Subject> {
         offprintIDs.contains($0.subjectId)
       })
     _collects = Query(descriptor)
   }
 
   var collections: [Int: CollectionType] {
-    collects.reduce(into: [:]) { $0[$1.subjectId] = $1.typeEnum }
+    collects.reduce(into: [:]) { $0[$1.subjectId] = $1.interest.typeEnum }
   }
 
   var body: some View {
@@ -62,7 +62,7 @@ struct SubjectOffprintsView: View {
     LazyVStack(alignment: .leading) {
       SubjectOffprintsView(
         subjectId: Subject.previewBook.subjectId, offprints: Subject.previewOffprints
-      ).modelContainer(mockContainer())
+      )
     }.padding()
-  }
+  }.modelContainer(mockContainer())
 }

@@ -14,7 +14,6 @@ struct ChobitsApp: App {
       TrendingSubject.self,
       Episode.self,
       Subject.self,
-      UserSubjectCollection.self,
       Character.self,
       Person.self,
     ])

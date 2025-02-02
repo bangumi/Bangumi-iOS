@@ -7,7 +7,7 @@ struct ScoreInfo {
 }
 
 struct SubjectRatingView: View {
-  @ObservableModel var subject: Subject
+  var subject: Subject
 
   var scoreInfo: ScoreInfo {
     let score = Int(subject.rating.score.rounded())

@@ -9,8 +9,7 @@ struct CollectionSubjectTypeView: View {
 
   @State private var collectionType: CollectionType = .collect
   @State private var counts: [CollectionType: Int] = [:]
-  @State private var collections: [UserSubjectCollection] = []
-  @State private var subjects: [Int: Subject] = [:]
+  @State private var subjects: [Subject] = []
 
   var columnCount: Int {
     let columns = Int((width - 8) / 88)
@@ -25,30 +24,14 @@ struct CollectionSubjectTypeView: View {
     if width == 0 { return }
     let stypeVal = stype.rawValue
     let ctypeVal = collectionType.rawValue
-    var descriptor = FetchDescriptor<UserSubjectCollection>(
-      predicate: #Predicate<UserSubjectCollection> {
-        $0.subjectType == stypeVal && $0.type == ctypeVal
+    var descriptor = FetchDescriptor<Subject>(
+      predicate: #Predicate<Subject> {
+        $0.type == stypeVal && $0.interest.type == ctypeVal
       },
       sortBy: [
-        SortDescriptor<UserSubjectCollection>(\.updatedAt, order: .reverse)
+        SortDescriptor<Subject>(\.interest.updatedAt, order: .reverse)
       ])
     descriptor.fetchLimit = columnCount * 2
-    do {
-      collections = try modelContext.fetch(descriptor)
-      for collection in collections {
-        let sid = collection.subjectId
-        var desc = FetchDescriptor<Subject>(
-          predicate: #Predicate<Subject> {
-            $0.subjectId == sid
-          })
-        desc.fetchLimit = 1
-        let res = try modelContext.fetch(desc)
-        let subject = res.first
-        subjects[sid] = subject
-      }
-    } catch {
-      Notifier.shared.alert(error: error)
-    }
   }
 
   func loadCounts() async {
@@ -56,9 +39,9 @@ struct CollectionSubjectTypeView: View {
     do {
       for type in CollectionType.allTypes() {
         let ctypeVal = type.rawValue
-        let desc = FetchDescriptor<UserSubjectCollection>(
-          predicate: #Predicate<UserSubjectCollection> {
-            $0.type == ctypeVal && $0.subjectType == stypeVal
+        let desc = FetchDescriptor<Subject>(
+          predicate: #Predicate<Subject> {
+            $0.type == stypeVal && $0.interest.type == ctypeVal
           })
         let count = try modelContext.fetchCount(desc)
         counts[type] = count
@@ -70,7 +53,7 @@ struct CollectionSubjectTypeView: View {
 
   var body: some View {
     VStack {
-      Picker("Collection Type", selection: $collectionType) {
+      Picker("CollectionType", selection: $collectionType) {
         ForEach(CollectionType.allTypes()) { ctype in
           Text("\(ctype.description(stype))(\(counts[ctype, default: 0]))").tag(
             ctype)
@@ -94,13 +77,13 @@ struct CollectionSubjectTypeView: View {
         }
       }
       LazyVGrid(columns: columns) {
-        ForEach(collections) { collection in
-          ImageView(img: subjects[collection.subjectId]?.images?.resize(.r200))
+        ForEach(subjects) { subject in
+          ImageView(img: subject.images?.resize(.r200))
             .imageStyle(width: 80, height: 80)
             .imageType(.subject)
-            .imageLink(collection.subject?.link)
+            .imageLink(subject.link)
         }
       }
-    }.animation(.default, value: collections)
+    }.animation(.default, value: subjects)
   }
 }

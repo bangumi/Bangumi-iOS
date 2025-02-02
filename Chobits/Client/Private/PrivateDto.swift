@@ -12,12 +12,22 @@ struct PagedDTO<T: Sendable & Codable>: Codable, Sendable {
   }
 }
 
+struct Permissions: Codable, Hashable {
+  var subjectWikiEdit: Bool
+}
+
 struct Profile: Codable, Identifiable, Hashable, Linkable {
   var id: Int
-  var username: String
-  var nickname: String
   var avatar: Avatar?
+  var bio: String
+  var friendIDs: [Int]
+  var group: Int
+  var location: String
+  var nickname: String
+  var permissions: Permissions
   var sign: String
+  var site: String
+  var username: String
   var joinedAt: Int?
 
   enum CodingKeys: String, CodingKey {
@@ -25,7 +35,13 @@ struct Profile: Codable, Identifiable, Hashable, Linkable {
     case username
     case nickname
     case avatar
+    case bio
+    case friendIDs
+    case group
+    case location
+    case permissions
     case sign
+    case site
     case joinedAt
   }
 
@@ -48,6 +64,12 @@ struct Profile: Codable, Identifiable, Hashable, Linkable {
     self.avatar = nil
     self.sign = ""
     self.joinedAt = 0
+    self.bio = ""
+    self.friendIDs = []
+    self.group = 0
+    self.location = ""
+    self.permissions = Permissions(subjectWikiEdit: false)
+    self.site = ""
   }
 
   init(from: String) throws {
@@ -66,6 +88,12 @@ struct Profile: Codable, Identifiable, Hashable, Linkable {
     try container.encode(avatar, forKey: .avatar)
     try container.encode(sign, forKey: .sign)
     try container.encode(joinedAt, forKey: .joinedAt)
+    try container.encode(bio, forKey: .bio)
+    try container.encode(friendIDs, forKey: .friendIDs)
+    try container.encode(group, forKey: .group)
+    try container.encode(location, forKey: .location)
+    try container.encode(permissions, forKey: .permissions)
+    try container.encode(site, forKey: .site)
   }
 
   init(from decoder: Decoder) throws {
@@ -76,6 +104,12 @@ struct Profile: Codable, Identifiable, Hashable, Linkable {
     self.avatar = try container.decodeIfPresent(Avatar.self, forKey: .avatar)
     self.sign = try container.decode(String.self, forKey: .sign)
     self.joinedAt = try container.decodeIfPresent(Int.self, forKey: .joinedAt)
+    self.bio = try container.decode(String.self, forKey: .bio)
+    self.friendIDs = try container.decode([Int].self, forKey: .friendIDs)
+    self.group = try container.decode(Int.self, forKey: .group)
+    self.location = try container.decode(String.self, forKey: .location)
+    self.permissions = try container.decode(Permissions.self, forKey: .permissions)
+    self.site = try container.decode(String.self, forKey: .site)
   }
 }
 
@@ -211,6 +245,20 @@ struct SlimUserDTO: Codable, Identifiable, Hashable, Linkable {
   }
 }
 
+struct SimpleUserDTO: Codable, Identifiable, Hashable, Linkable {
+  var id: Int
+  var nickname: String
+  var username: String
+
+  var name: String {
+    nickname.isEmpty ? "用户\(username)" : nickname
+  }
+
+  var link: String {
+    "chii://user/\(username)"
+  }
+}
+
 struct NoticeDTO: Codable, Identifiable, Hashable {
   var id: Int
   var postID: Int
@@ -225,11 +273,44 @@ struct NoticeDTO: Codable, Identifiable, Hashable {
 struct TopicDTO: Codable, Identifiable, Hashable {
   var id: Int
   var parentID: Int
-  var creator: SlimUserDTO
+  var creatorID: Int
+  var creator: SlimUserDTO?
   var title: String
-  var repliesCount: Int
+  var replies: Int
+  var state: Int
+  var display: Int
   var createdAt: Int
   var updatedAt: Int
+}
+
+struct SubjectTopicDTO: Codable, Identifiable, Hashable {
+  var id: Int
+  var parentID: Int
+  var creatorID: Int
+  var creator: SlimUserDTO
+  var subject: SlimSubjectDTO
+  var title: String
+  var content: String
+  var state: Int
+  var display: Int
+  var createdAt: Int
+  var updatedAt: Int
+  var replies: [ReplyDTO]
+}
+
+struct GroupTopicDTO: Codable, Identifiable, Hashable {
+  var id: Int
+  var parentID: Int
+  var creatorID: Int
+  var creator: SlimUserDTO
+  var group: SlimGroupDTO
+  var title: String
+  var content: String
+  var state: Int
+  var display: Int
+  var createdAt: Int
+  var updatedAt: Int
+  var replies: [ReplyDTO]
 }
 
 struct SubjectCommentDTO: Codable, Identifiable, Hashable {
@@ -248,54 +329,12 @@ struct SubjectCommentDTO: Codable, Identifiable, Hashable {
   }
 }
 
-struct SlimUserSubjectCollectionDTO: Codable, Hashable, Identifiable {
+struct SlimSubjectInterestDTO: Codable, Hashable {
   var rate: Int
   var type: CollectionType
   var comment: String
   var tags: [String]
   var updatedAt: Int
-  var `private`: Bool
-  var subject: SlimSubjectDTO
-
-  var id: Int {
-    subject.id
-  }
-
-  init(_ collection: UserSubjectCollectionDTO) {
-    self.rate = collection.rate
-    self.type = collection.type
-    self.comment = collection.comment
-    self.tags = collection.tags
-    self.updatedAt = collection.updatedAt
-    self.private = collection.private
-    self.subject = collection.subject.slim
-  }
-
-  init(_ collection: UserSubjectCollection) {
-    self.rate = collection.rate
-    self.type = collection.typeEnum
-    self.comment = collection.comment
-    self.tags = collection.tags
-    self.updatedAt = Int(collection.updatedAt.timeIntervalSince1970)
-    self.private = collection.priv
-    self.subject = collection.subject?.slim ?? SlimSubjectDTO()
-  }
-}
-
-struct UserSubjectCollectionDTO: Codable {
-  var rate: Int
-  var type: CollectionType
-  var comment: String
-  var tags: [String]
-  var epStatus: Int
-  var volStatus: Int
-  var updatedAt: Int
-  var `private`: Bool
-  var subject: SubjectDTO
-
-  var slim: SlimUserSubjectCollectionDTO {
-    SlimUserSubjectCollectionDTO(self)
-  }
 }
 
 struct SubjectDTO: Codable, Identifiable, Searchable {
@@ -320,6 +359,7 @@ struct SubjectDTO: Codable, Identifiable, Searchable {
   var summary: String
   var type: SubjectType
   var volumes: Int
+  var interest: SubjectInterest?
 
   var slim: SlimSubjectDTO {
     SlimSubjectDTO(self)
@@ -336,6 +376,7 @@ struct SlimSubjectDTO: Codable, Identifiable, Hashable, Linkable {
   var nameCN: String
   var nsfw: Bool
   var type: SubjectType
+  var interest: SlimSubjectInterestDTO?
 
   init() {
     self.id = 0
@@ -347,6 +388,7 @@ struct SlimSubjectDTO: Codable, Identifiable, Hashable, Linkable {
     self.nameCN = ""
     self.nsfw = false
     self.type = .none
+    self.interest = nil
   }
 
   init(_ subject: Subject) {
@@ -402,6 +444,7 @@ struct CharacterDTO: Codable, Identifiable, Searchable, Linkable {
   var redirect: Int
   var role: CharacterType
   var summary: String
+  var collectedAt: Int?
 
   var slim: SlimCharacterDTO {
     SlimCharacterDTO(self)
@@ -452,6 +495,7 @@ struct PersonDTO: Codable, Identifiable, Searchable, Linkable {
   var redirect: Int
   var summary: String
   var type: PersonType
+  var collectedAt: Int?
 
   var slim: SlimPersonDTO {
     SlimPersonDTO(self)
@@ -474,19 +518,30 @@ struct CharacterCastDTO: Codable, Identifiable, Hashable {
 
 struct PersonWorkDTO: Codable, Identifiable, Hashable {
   var subject: SlimSubjectDTO
-  var positions: [SubjectStaffPosition]
+  var positions: [SubjectStaffPositionDTO]
 
   var id: Int {
     subject.id
   }
 }
 
-struct SubjectStaffPosition: Codable, Identifiable, Hashable {
+struct SubjectStaffPositionDTO: Codable, Identifiable, Hashable {
   var type: SubjectStaffPositionType
   var summary: String
+  var appearEps: String
 
   var id: Int {
     type.id
+  }
+}
+
+struct SubjectPositionStaffDTO: Codable, Identifiable, Hashable {
+  var person: SlimPersonDTO
+  var summary: String
+  var appearEps: String
+
+  var id: Int {
+    person.id
   }
 }
 
@@ -526,11 +581,6 @@ struct EpisodeDTO: Codable, Identifiable, Hashable, Linkable {
   var link: String {
     "chii://episode/\(id)"
   }
-}
-
-struct EpisodeCollectionDTO: Codable {
-  var episode: EpisodeDTO
-  var type: EpisodeCollectionType
 }
 
 struct EpisodeCommentBaseDTO: Codable, Identifiable, Hashable {
@@ -578,11 +628,20 @@ struct SubjectCharacterDTO: Codable, Identifiable, Hashable {
 }
 
 struct SubjectStaffDTO: Codable, Identifiable, Hashable {
-  var person: SlimPersonDTO
-  var positions: [SubjectStaffPosition]
+  var staff: SlimPersonDTO
+  var positions: [SubjectStaffPositionDTO]
 
   var id: Int {
-    person.id
+    staff.id
+  }
+}
+
+struct SubjectPositionDTO: Codable, Identifiable, Hashable {
+  var position: SubjectStaffPositionType
+  var staffs: [SubjectPositionStaffDTO]
+
+  var id: Int {
+    position.id
   }
 }
 
@@ -752,11 +811,43 @@ struct SlimGroupDTO: Codable, Identifiable, Hashable, Linkable {
   var title: String
   var icon: Avatar?
   var creatorID: Int? = 0
-  var totalMembers: Int? = 0
+  var members: Int? = 0
   var createdAt: Int? = 0
+  var accessible: Bool? = true
 
   var link: String {
     "chii://group/\(name)"
+  }
+}
+
+struct GroupDTO: Codable, Identifiable, Hashable, Linkable {
+  var id: Int
+  var name: String
+  var nsfw: Bool
+  var title: String
+  var icon: Avatar?
+  var creator: SlimUserDTO?
+  var creatorID: Int
+  var description: String
+  var cat: Int
+  var accessible: Bool
+  var members: Int
+  var posts: Int
+  var topics: Int
+  var createdAt: Int
+  var link: String {
+    "chii://group/\(name)"
+  }
+}
+
+struct GroupMemberDTO: Codable, Identifiable, Hashable {
+  var user: SlimUserDTO?
+  var uid: Int
+  var joinedAt: Int
+  var moderator: Bool
+
+  var id: Int {
+    uid
   }
 }
 
@@ -818,6 +909,7 @@ struct IndexDTO: Codable, Identifiable, Hashable, Linkable {
   var createdAt: Int
   var updatedAt: Int
   var creator: SlimUserDTO
+  var collectedAt: Int?
 
   var name: String {
     title
@@ -908,7 +1000,7 @@ enum TimelineMode: String, Codable, CaseIterable {
   }
 }
 
-struct Friend: Codable, Identifiable, Hashable {
+struct FriendDTO: Codable, Identifiable, Hashable {
   var user: SlimUserDTO
   var grade: Int
   var createdAt: Int
@@ -962,4 +1054,30 @@ struct UserMonoCollectionStatsDTO: Codable, Hashable {
 struct UserIndexStatsDTO: Codable, Hashable {
   var create: Int
   var collect: Int
+}
+
+struct ReactionDTO: Codable, Hashable {
+  var users: [SimpleUserDTO]
+  var value: Int
+}
+
+struct ReplyBaseDTO: Codable, Identifiable, Hashable {
+  var id: Int
+  var content: String
+  var createdAt: Int
+  var creator: SlimUserDTO?
+  var creatorID: Int
+  var reactions: [ReactionDTO]? = []
+  var state: Int
+}
+
+struct ReplyDTO: Codable, Identifiable, Hashable {
+  var id: Int
+  var content: String
+  var createdAt: Int
+  var creator: SlimUserDTO?
+  var creatorID: Int
+  var reactions: [ReactionDTO]? = []
+  var state: Int
+  var replies: [ReplyBaseDTO]
 }

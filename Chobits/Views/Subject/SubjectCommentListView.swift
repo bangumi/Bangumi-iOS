@@ -149,7 +149,6 @@ struct SubjectCommentListView: View {
   return ScrollView {
     LazyVStack(alignment: .leading) {
       SubjectCommentListView(subjectId: subject.subjectId)
-        .modelContainer(container)
-    }
-  }.padding()
+    }.padding()
+  }.modelContainer(container)
 }

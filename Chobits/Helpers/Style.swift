@@ -6,7 +6,7 @@ struct NavlinkButtonStyle: PrimitiveButtonStyle {
   func makeBody(configuration: Configuration) -> some View {
     configuration.label
       .foregroundColor(.linkText)
-      // .compositingGroup()
+      .compositingGroup()
       .scaleEffect(isPressing ? 0.95 : 1)
       .animation(.spring(), value: isPressing)
       .simultaneousGesture(

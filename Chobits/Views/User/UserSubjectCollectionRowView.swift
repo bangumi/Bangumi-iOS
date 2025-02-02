@@ -1,10 +1,8 @@
 import SwiftData
 import SwiftUI
 
-struct CollectionRowView: View {
-  @Environment(Subject.self) var subject
-
-  @Environment(\.modelContext) var modelContext
+struct UserSubjectCollectionRowView: View {
+  let subject: SlimSubjectDTO
 
   var body: some View {
     HStack(alignment: .top) {
@@ -20,23 +18,20 @@ struct CollectionRowView: View {
           .font(.footnote)
           .foregroundStyle(.secondary)
         Spacer()
-        if subject.interest.type != 0 {
+        if let interest = subject.interest {
           HStack {
-            if subject.interest.private {
-              Image(systemName: "lock.fill").foregroundStyle(.accent)
-            }
-            Text(subject.interest.updatedAt.datetimeDisplay)
+            Text(interest.updatedAt.datetimeDisplay)
               .foregroundStyle(.secondary)
               .lineLimit(1)
             Spacer()
-            if subject.interest.rate > 0 {
-              StarsView(score: Float(subject.interest.rate), size: 12)
+            if interest.rate > 0 {
+              StarsView(score: Float(interest.rate), size: 12)
             }
           }.font(.footnote)
-          if !subject.interest.comment.isEmpty {
+          if !interest.comment.isEmpty {
             VStack(alignment: .leading, spacing: 2) {
               Divider()
-              Text(subject.interest.comment)
+              Text(interest.comment)
                 .padding(2)
                 .font(.footnote)
                 .multilineTextAlignment(.leading)
@@ -50,19 +45,5 @@ struct CollectionRowView: View {
     .frame(minHeight: 60)
     .padding(2)
     .clipShape(RoundedRectangle(cornerRadius: 10))
-  }
-}
-
-#Preview {
-  let container = mockContainer()
-
-  let subject = Subject.previewAnime
-  container.mainContext.insert(subject)
-
-  return ScrollView {
-    LazyVStack(alignment: .leading) {
-      CollectionRowView()
-        .environment(subject)
-    }.padding().modelContainer(container)
   }
 }

@@ -33,10 +33,7 @@ struct UserMonoListView: View {
     do {
       let resp = try await Chii.shared.getUserCharacterCollections(
         username: user.username, limit: limit, offset: offset)
-      return PagedDTO<SlimCharacterDTO>(
-        data: resp.data.map { $0.character.slim },
-        total: resp.total
-      )
+      return resp
     } catch {
       Notifier.shared.alert(error: error)
     }
@@ -47,10 +44,7 @@ struct UserMonoListView: View {
     do {
       let resp = try await Chii.shared.getUserPersonCollections(
         username: user.username, limit: limit, offset: offset)
-      return PagedDTO<SlimPersonDTO>(
-        data: resp.data.map { $0.person.slim },
-        total: resp.total
-      )
+      return resp
     } catch {
       Notifier.shared.alert(error: error)
     }

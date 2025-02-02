@@ -27,8 +27,10 @@ extension Chii {
     UserDefaults.standard.set("", forKey: "profile")
     do {
       let db = try self.getDB()
-      try await db.truncate(UserSubjectCollection.self)
-      try await db.truncate(Episode.self)
+      try await db.clearSubjectInterest()
+      try await db.clearEpisodeCollection()
+      try await db.clearPersonCollection()
+      try await db.clearCharacterCollection()
       await Notifier.shared.notify(message: "退出登录成功")
     } catch {
       await Notifier.shared.alert(error: error)

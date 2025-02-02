@@ -13,7 +13,7 @@ struct UserFriendListView: View {
     }
   }
 
-  func load(limit: Int, offset: Int) async -> PagedDTO<Friend>? {
+  func load(limit: Int, offset: Int) async -> PagedDTO<SlimUserDTO>? {
     do {
       let resp = try await Chii.shared.getUserFriends(
         username: user.username, limit: limit, offset: offset)
@@ -26,20 +26,20 @@ struct UserFriendListView: View {
 
   var body: some View {
     ScrollView {
-      PageView<Friend, _>(nextPageFunc: load) { item in
+      PageView<SlimUserDTO, _>(nextPageFunc: load) { item in
         CardView {
           HStack(alignment: .top) {
-            ImageView(img: item.user.avatar?.large)
+            ImageView(img: item.avatar?.large)
               .imageStyle(width: 60, height: 60)
               .imageType(.avatar)
-              .imageLink(item.user.link)
+              .imageLink(item.link)
             VStack(alignment: .leading) {
               HStack {
                 VStack(alignment: .leading) {
-                  Text(item.user.nickname.withLink(item.user.link))
+                  Text(item.nickname.withLink(item.link))
                     .lineLimit(1)
                   Divider()
-                  Text("@\(item.user.username)")
+                  Text("@\(item.username)")
                     .font(.footnote)
                     .foregroundStyle(.secondary)
                     .lineLimit(1)

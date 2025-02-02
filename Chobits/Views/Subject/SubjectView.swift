@@ -8,7 +8,6 @@ struct SubjectView: View {
 
   @AppStorage("isolationMode") var isolationMode: Bool = false
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
-  @AppStorage("profile") var profile: Profile = Profile()
 
   @State private var refreshed: Bool = false
   @State private var refreshing: Bool = false
@@ -28,13 +27,6 @@ struct SubjectView: View {
     do {
       let item = try await Chii.shared.loadSubject(subjectId)
       refreshed = true
-
-      if isAuthenticated {
-        Task {
-          try await Chii.shared.loadSubjectCollection(
-            username: profile.username, subjectId: subjectId)
-        }
-      }
 
       Task {
         let resp = try await Chii.shared.getSubjectCharacters(subjectId, limit: 12)
@@ -125,7 +117,8 @@ struct SubjectDetailView: View {
         SubjectHeaderView()
 
         if isAuthenticated {
-          SubjectCollectionView(subjectId: subject.subjectId)
+          SubjectCollectionView()
+            .environment(subject)
         }
 
         if subject.typeEnum == .anime || subject.typeEnum == .real {
@@ -187,14 +180,10 @@ struct SubjectDetailView: View {
 #Preview {
   let container = mockContainer()
 
-  let collection = UserSubjectCollection.previewAnime
   let subject = Subject.previewAnime
-
-  container.mainContext.insert(collection)
   container.mainContext.insert(subject)
 
   return NavigationStack {
     SubjectView(subjectId: subject.subjectId)
-      .modelContainer(container)
-  }
+  }.modelContainer(container)
 }
