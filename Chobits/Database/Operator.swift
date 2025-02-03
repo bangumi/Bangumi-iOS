@@ -76,6 +76,24 @@ extension DatabaseOperator {
     return subject
   }
 
+  public func getCharacter(_ id: Int) throws -> Character? {
+    let character = try self.fetchOne(
+      predicate: #Predicate<Character> {
+        $0.characterId == id
+      }
+    )
+    return character
+  }
+
+  public func getPerson(_ id: Int) throws -> Person? {
+    let person = try self.fetchOne(
+      predicate: #Predicate<Person> {
+        $0.personId == id
+      }
+    )
+    return person
+  }
+
   public func getEpisodeIDs(subjectId: Int, sort: Float) throws -> [Int] {
     let descriptor = FetchDescriptor<Episode>(
       predicate: #Predicate<Episode> {
@@ -317,6 +335,13 @@ extension DatabaseOperator {
     _ = try self.ensureTrendingSubject(type, items: items)
   }
 
+  public func saveEpisode(_ item: EpisodeDTO) throws {
+    let _ = try self.ensureEpisode(item)
+  }
+}
+
+// MARK: - save subject
+extension DatabaseOperator {
   public func saveSubject(_ item: SubjectDTO) throws {
     let _ = try self.ensureSubject(item)
   }
@@ -325,21 +350,6 @@ extension DatabaseOperator {
     let _ = try self.ensureSubject(item)
   }
 
-  public func saveEpisode(_ item: EpisodeDTO) throws {
-    let _ = try self.ensureEpisode(item)
-  }
-
-  public func saveCharacter(_ item: CharacterDTO) throws {
-    let _ = try self.ensureCharacter(item)
-  }
-
-  public func savePerson(_ item: PersonDTO) throws {
-    let _ = try self.ensurePerson(item)
-  }
-}
-
-// MARK: - save subject details
-extension DatabaseOperator {
   public func saveSubjectCharacters(subjectId: Int, items: [SubjectCharacterDTO]) throws {
     let subject = try self.getSubject(subjectId)
     if subject?.characters != items {
@@ -386,6 +396,41 @@ extension DatabaseOperator {
     let subject = try self.getSubject(subjectId)
     if subject?.comments != items {
       subject?.comments = items
+    }
+  }
+}
+
+// MARK: - save character
+extension DatabaseOperator {
+  public func saveCharacter(_ item: CharacterDTO) throws {
+    let _ = try self.ensureCharacter(item)
+  }
+
+  public func saveCharacterCasts(characterId: Int, items: [CharacterCastDTO]) throws {
+    let character = try self.getCharacter(characterId)
+    if character?.casts != items {
+      character?.casts = items
+    }
+  }
+}
+
+// MARK: - save person
+extension DatabaseOperator {
+  public func savePerson(_ item: PersonDTO) throws {
+    let _ = try self.ensurePerson(item)
+  }
+
+  public func savePersonCasts(personId: Int, items: [PersonCastDTO]) throws {
+    let person = try self.getPerson(personId)
+    if person?.casts != items {
+      person?.casts = items
+    }
+  }
+
+  public func savePersonWorks(personId: Int, items: [PersonWorkDTO]) throws {
+    let person = try self.getPerson(personId)
+    if person?.works != items {
+      person?.works = items
     }
   }
 }

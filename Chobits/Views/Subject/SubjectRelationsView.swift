@@ -63,15 +63,13 @@ struct SubjectRelationsView: View {
             }
             .lineLimit(1)
             .font(.caption)
-            let ctype = collections[relation.subject.id]
+            let ctype = collections[relation.subject.id] ?? .none
             ImageView(img: relation.subject.images?.resize(.r200))
               .imageStyle(width: 90, height: 90)
               .imageType(.subject)
-              .imageBadge(show: ctype != nil) {
-                if let ctype = ctype {
-                  Label(ctype.description(relation.subject.type), systemImage: ctype.icon)
-                    .labelStyle(.compact)
-                }
+              .imageBadge(show: ctype != .none) {
+                Label(ctype.description(relation.subject.type), systemImage: ctype.icon)
+                  .labelStyle(.compact)
               }
               .imageLink(relation.subject.link)
               .padding(2)

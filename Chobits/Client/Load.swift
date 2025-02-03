@@ -142,6 +142,17 @@ extension Chii {
     try await db.commit()
   }
 
+  func loadCharacterDetails(_ characterId: Int) async throws {
+    let db = try self.getDB()
+    await withThrowingTaskGroup(of: Void.self) { group in
+      group.addTask {
+        let response = try await self.getCharacterCasts(characterId, limit: 5)
+        try await db.saveCharacterCasts(characterId: characterId, items: response.data)
+      }
+    }
+    try await db.commit()
+  }
+
   func loadPerson(_ pid: Int) async throws {
     let db = try self.getDB()
     let item = try await self.getPerson(pid)
@@ -152,6 +163,21 @@ extension Chii {
     try await db.savePerson(item)
     if item.collectedAt != nil {
       await self.index([item.searchable()])
+    }
+    try await db.commit()
+  }
+
+  func loadPersonDetails(_ personId: Int) async throws {
+    let db = try self.getDB()
+    await withThrowingTaskGroup(of: Void.self) { group in
+      group.addTask {
+        let response = try await self.getPersonCasts(personId, limit: 5)
+        try await db.savePersonCasts(personId: personId, items: response.data)
+      }
+      group.addTask {
+        let response = try await self.getPersonWorks(personId, limit: 5)
+        try await db.savePersonWorks(personId: personId, items: response.data)
+      }
     }
     try await db.commit()
   }

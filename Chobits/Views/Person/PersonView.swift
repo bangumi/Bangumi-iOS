@@ -43,22 +43,13 @@ struct PersonView: View {
     if refreshed { return }
     do {
       try await Chii.shared.loadPerson(personId)
+      refreshed = true
 
-      Task {
-        let respCasts = try await Chii.shared.getPersonCasts(personId, limit: 5)
-        person?.casts = respCasts.data
-      }
-
-      Task {
-        let respWorks = try await Chii.shared.getPersonWorks(personId, limit: 5)
-        person?.works = respWorks.data
-      }
-
+      try await Chii.shared.loadPersonDetails(personId)
     } catch {
       Notifier.shared.alert(error: error)
       return
     }
-    refreshed = true
   }
 
   var body: some View {

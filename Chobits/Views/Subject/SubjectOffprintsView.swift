@@ -38,15 +38,13 @@ struct SubjectOffprintsView: View {
     ScrollView(.horizontal, showsIndicators: false) {
       LazyHStack(alignment: .top) {
         ForEach(offprints) { offprint in
-          let ctype = collections[offprint.subject.id]
+          let ctype = collections[offprint.subject.id] ?? .none
           ImageView(img: offprint.subject.images?.resize(.r200))
             .imageStyle(width: 60, height: 80)
             .imageType(.subject)
-            .imageBadge(show: ctype != nil) {
-              if let ctype = ctype {
-                Label(ctype.description(offprint.subject.type), systemImage: ctype.icon)
-                  .labelStyle(.compact)
-              }
+            .imageBadge(show: ctype != .none) {
+              Label(ctype.description(offprint.subject.type), systemImage: ctype.icon)
+                .labelStyle(.compact)
             }
             .imageLink(offprint.subject.link)
             .padding(2)

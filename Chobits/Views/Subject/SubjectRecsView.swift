@@ -48,15 +48,13 @@ struct SubjectRecsView: View {
       LazyHStack(alignment: .top) {
         ForEach(recs) { rec in
           VStack {
-            let ctype = collections[rec.subject.id]
+            let ctype = collections[rec.subject.id] ?? .none
             ImageView(img: rec.subject.images?.resize(.r200))
               .imageStyle(width: 72, height: 72)
               .imageType(.subject)
-              .imageBadge(show: ctype != nil) {
-                if let ctype = ctype {
-                  Label(ctype.description(rec.subject.type), systemImage: ctype.icon)
-                    .labelStyle(.compact)
-                }
+              .imageBadge(show: ctype != .none) {
+                Label(ctype.description(rec.subject.type), systemImage: ctype.icon)
+                  .labelStyle(.compact)
               }
               .imageLink(rec.subject.link)
               .padding(2)

@@ -30,17 +30,13 @@ struct CharacterView: View {
     if refreshed { return }
     do {
       try await Chii.shared.loadCharacter(characterId)
+      refreshed = true
 
-      Task {
-        let respCasts = try await Chii.shared.getCharacterCasts(characterId, limit: 5)
-        character?.casts = respCasts.data
-      }
-
+      try await Chii.shared.loadCharacterDetails(characterId)
     } catch {
       Notifier.shared.alert(error: error)
       return
     }
-    refreshed = true
   }
 
   var body: some View {
