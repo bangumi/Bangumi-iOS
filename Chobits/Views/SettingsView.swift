@@ -34,7 +34,7 @@ struct SettingsView: View {
             Subject.self,
             descriptor: FetchDescriptor<Subject>(
               predicate: #Predicate<Subject> {
-                $0.interest.type != 0
+                $0.ctype != 0
               }
             ),
             limit: limit, offset: offset)

@@ -21,12 +21,12 @@ struct ProgressTileView: View {
     let doingType = CollectionType.do.rawValue
     var descriptor = FetchDescriptor<Subject>(
       predicate: #Predicate<Subject> {
-        (stype == 0 || $0.type == stype) && $0.interest.type == doingType
+        (stype == 0 || $0.type == stype) && $0.ctype == doingType
           && (search == "" || $0.name.localizedStandardContains(search)
             || $0.alias.localizedStandardContains(search))
       },
       sortBy: [
-        SortDescriptor(\.interest.updatedAt, order: .reverse)
+        SortDescriptor(\.interest?.updatedAt, order: .reverse)
       ])
     if progressLimit > 0 {
       descriptor.fetchLimit = progressLimit
@@ -56,7 +56,7 @@ struct ProgressTileView: View {
           ProgressTileItemView(subjectId: subject.subjectId, width: cardWidth)
             .environment(subject)
             .frame(width: cardWidth)
-        }.frame(width: cardWidth+16)
+        }.frame(width: cardWidth + 16)
       }
     }
     .animation(.default, value: subjects)
@@ -114,7 +114,7 @@ struct ProgressTileItemView: View {
       ImageView(img: subject.images?.resize(.r400))
         .imageStyle(width: width, height: imageHeight)
         .imageType(.subject)
-        .imageBadge(show: subject.interest.private) {
+        .imageBadge(show: subject.interest?.private ?? false) {
           Image(systemName: "lock")
         }
         .imageLink(subject.link)
@@ -136,7 +136,7 @@ struct ProgressTileItemView: View {
         switch subject.typeEnum {
         case .anime, .real:
           HStack {
-            Text("\(subject.interest.epStatus) / \(subject.eps)")
+            Text("\(subject.interest?.epStatus ?? 0) / \(subject.eps)")
               .foregroundStyle(.secondary)
             Spacer()
             if let episode = nextEpisode {
@@ -179,16 +179,16 @@ struct ProgressTileItemView: View {
         case .book:
           VStack(spacing: 1) {
             ProgressView(
-              value: Float(min(subject.eps, subject.interest.epStatus)),
+              value: Float(min(subject.eps, subject.interest?.epStatus ?? 0)),
               total: Float(subject.eps))
             ProgressView(
-              value: Float(min(subject.volumes, subject.interest.volStatus)),
+              value: Float(min(subject.volumes, subject.interest?.volStatus ?? 0)),
               total: Float(subject.volumes))
           }.progressViewStyle(.linear)
 
         case .anime, .real:
           ProgressView(
-            value: Float(min(subject.eps, subject.interest.epStatus)),
+            value: Float(min(subject.eps, subject.interest?.epStatus ?? 0)),
             total: Float(subject.eps)
           ).progressViewStyle(.linear)
 

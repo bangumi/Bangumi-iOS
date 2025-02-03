@@ -97,10 +97,10 @@ struct SubjectLargeRowView: View {
               .foregroundStyle(.secondary)
           }
           Spacer()
-          if subject.interest.type != 0 {
+          if let interest = subject.interest {
             Label(
-              subject.interest.typeEnum.description(subject.typeEnum),
-              systemImage: subject.interest.typeEnum.icon
+              interest.type.description(subject.typeEnum),
+              systemImage: interest.type.icon
             )
             .foregroundStyle(.accent)
           }

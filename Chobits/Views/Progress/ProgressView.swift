@@ -26,7 +26,7 @@ struct ChiiProgressView: View {
         let tvalue = type.rawValue
         let desc = FetchDescriptor<Subject>(
           predicate: #Predicate<Subject> {
-            (tvalue == 0 || $0.type == tvalue) && $0.interest.type == doingType
+            (tvalue == 0 || $0.type == tvalue) && $0.ctype == doingType
           })
         let count = try modelContext.fetchCount(desc)
         counts[type] = count

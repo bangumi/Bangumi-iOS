@@ -10,24 +10,24 @@ struct SubjectCollectionView: View {
   @State private var edit: Bool = false
 
   var tags: String {
-    subject.interest.tags.joined(separator: " / ")
+    subject.interest?.tags.joined(separator: " / ") ?? ""
   }
 
   var body: some View {
     Section {
-      if subject.interest.type != 0 {
+      if let interest = subject.interest {
         VStack(alignment: .leading) {
           BorderView(color: .linkText, padding: 5) {
             HStack {
               Spacer()
-              if subject.interest.private {
+              if interest.private {
                 Image(systemName: "lock")
               }
               Label(
-                subject.interest.typeEnum.message(type: subject.typeEnum),
-                systemImage: subject.interest.typeEnum.icon
+                interest.type.message(type: subject.typeEnum),
+                systemImage: interest.type.icon
               )
-              StarsView(score: Float(subject.interest.rate), size: 16)
+              StarsView(score: Float(interest.rate), size: 16)
               Spacer()
             }.foregroundStyle(.linkText)
           }
@@ -43,9 +43,9 @@ struct SubjectCollectionView: View {
               .foregroundStyle(.secondary)
           }
           Divider()
-          if !subject.interest.comment.isEmpty {
+          if !interest.comment.isEmpty {
             CardView {
-              Text(subject.interest.comment)
+              Text(interest.comment)
                 .padding(2)
                 .font(.footnote)
                 .multilineTextAlignment(.leading)

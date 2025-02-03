@@ -20,23 +20,23 @@ struct CollectionRowView: View {
           .font(.footnote)
           .foregroundStyle(.secondary)
         Spacer()
-        if subject.interest.type != 0 {
+        if let interest = subject.interest {
           HStack {
-            if subject.interest.private {
+            if interest.private {
               Image(systemName: "lock.fill").foregroundStyle(.accent)
             }
-            Text(subject.interest.updatedAt.datetimeDisplay)
+            Text(interest.updatedAt.datetimeDisplay)
               .foregroundStyle(.secondary)
               .lineLimit(1)
             Spacer()
-            if subject.interest.rate > 0 {
-              StarsView(score: Float(subject.interest.rate), size: 12)
+            if interest.rate > 0 {
+              StarsView(score: Float(interest.rate), size: 12)
             }
           }.font(.footnote)
-          if !subject.interest.comment.isEmpty {
+          if !interest.comment.isEmpty {
             VStack(alignment: .leading, spacing: 2) {
               Divider()
-              Text(subject.interest.comment)
+              Text(interest.comment)
                 .padding(2)
                 .font(.footnote)
                 .multilineTextAlignment(.leading)

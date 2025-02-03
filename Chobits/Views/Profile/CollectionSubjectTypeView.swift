@@ -26,10 +26,10 @@ struct CollectionSubjectTypeView: View {
     let ctypeVal = collectionType.rawValue
     var descriptor = FetchDescriptor<Subject>(
       predicate: #Predicate<Subject> {
-        $0.type == stypeVal && $0.interest.type == ctypeVal
+        $0.type == stypeVal && $0.ctype == ctypeVal
       },
       sortBy: [
-        SortDescriptor<Subject>(\.interest.updatedAt, order: .reverse)
+        SortDescriptor<Subject>(\.interest?.updatedAt, order: .reverse)
       ])
     descriptor.fetchLimit = columnCount * 2
   }
@@ -41,7 +41,7 @@ struct CollectionSubjectTypeView: View {
         let ctypeVal = type.rawValue
         let desc = FetchDescriptor<Subject>(
           predicate: #Predicate<Subject> {
-            $0.type == stypeVal && $0.interest.type == ctypeVal
+            $0.type == stypeVal && $0.ctype == ctypeVal
           })
         let count = try modelContext.fetchCount(desc)
         counts[type] = count

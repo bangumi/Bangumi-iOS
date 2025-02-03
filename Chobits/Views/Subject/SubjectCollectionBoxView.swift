@@ -21,7 +21,7 @@ struct SubjectCollectionBoxView: View {
   }
 
   var buttonText: String {
-    if subject.interest.type != 0 {
+    if subject.ctype != 0 {
       return priv ? "悄悄地更新" : "更新"
     } else {
       return priv ? "悄悄地添加" : "添加"
@@ -39,12 +39,12 @@ struct SubjectCollectionBoxView: View {
   }
 
   func load() {
-    if subject.interest.type != 0 {
-      self.ctype = CollectionType(subject.interest.type)
-      self.rate = subject.interest.rate
-      self.comment = subject.interest.comment
-      self.priv = subject.interest.private
-      self.tags = Set(subject.interest.tags)
+    if let interest = subject.interest {
+      self.ctype = interest.type
+      self.rate = interest.rate
+      self.comment = interest.comment
+      self.priv = interest.private
+      self.tags = Set(interest.tags)
     }
   }
 
@@ -96,10 +96,10 @@ struct SubjectCollectionBoxView: View {
         }
         .disabled(ctype == .none)
         .padding(.vertical, 5)
-        if subject.interest.updatedAt > 0 {
+        if let interest = subject.interest, interest.updatedAt > 0 {
           Section {
-            Text("上次更新：\(subject.interest.updatedAt.datetimeDisplay)/")
-              + subject.interest.updatedAt.relativeText
+            Text("上次更新：\(interest.updatedAt.datetimeDisplay)/")
+              + interest.updatedAt.relativeText
           }
           .font(.caption)
           .foregroundStyle(.secondary)

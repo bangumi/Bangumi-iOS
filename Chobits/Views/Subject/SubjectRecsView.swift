@@ -22,7 +22,7 @@ struct SubjectRecsView: View {
   }
 
   var collections: [Int: CollectionType] {
-    collects.reduce(into: [:]) { $0[$1.subjectId] = $1.interest.typeEnum }
+    collects.reduce(into: [:]) { $0[$1.subjectId] = $1.ctypeEnum }
   }
 
   var body: some View {

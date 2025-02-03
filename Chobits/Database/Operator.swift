@@ -29,7 +29,8 @@ extension DatabaseOperator {
   public func clearSubjectInterest() throws {
     let subjects = try modelContext.fetch(FetchDescriptor<Subject>())
     for subject in subjects {
-      subject.interest = SubjectInterest()
+      subject.ctype = 0
+      subject.interest = nil
     }
   }
 
@@ -120,7 +121,7 @@ extension DatabaseOperator {
         $0.subjectId == subjectId
       }
     )
-    subject?.interest.updatedAt = Int(Date().timeIntervalSince1970) - 1
+    subject?.interest?.updatedAt = Int(Date().timeIntervalSince1970) - 1
   }
 
   public func updateEpisodeCollection(subjectId: Int, episodeId: Int, type: EpisodeCollectionType)
@@ -137,7 +138,7 @@ extension DatabaseOperator {
         $0.subjectId == subjectId
       }
     )
-    subject?.interest.updatedAt = Int(Date().timeIntervalSince1970) - 1
+    subject?.interest?.updatedAt = Int(Date().timeIntervalSince1970) - 1
   }
 }
 

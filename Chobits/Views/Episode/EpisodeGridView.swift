@@ -105,7 +105,7 @@ struct EpisodeGridView: View {
           .padding(2)
           .strikethrough(episode.collection == EpisodeCollectionType.dropped.rawValue)
           .contextMenu {
-            if isAuthenticated, subject?.interest.type ?? 0 != 0 {
+            if isAuthenticated, subject?.ctype ?? 0 != 0 {
               ForEach(episode.collectionTypeEnum.otherTypes()) { type in
                 Button {
                   updateSingle(episode: episode, type: type)
@@ -158,7 +158,7 @@ struct EpisodeGridView: View {
             .padding(2)
             .strikethrough(episode.collection == EpisodeCollectionType.dropped.rawValue)
             .contextMenu {
-              if isAuthenticated, subject?.interest.type ?? 0 != 0 {
+              if isAuthenticated, subject?.ctype ?? 0 != 0 {
                 ForEach(episode.collectionTypeEnum.otherTypes()) { type in
                   Button {
                     updateSingle(episode: episode, type: type)
