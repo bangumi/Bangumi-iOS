@@ -161,7 +161,7 @@ struct ProgressTileItemView: View {
                   .foregroundStyle(.secondary)
               }.buttonStyle(.plain)
             }
-          }.font(.callout)
+          }
         case .book:
           SubjectBookChaptersView(mode: .tile)
             .environment(subject)
@@ -172,7 +172,6 @@ struct ProgressTileItemView: View {
             systemImage: subject.typeEnum.icon
           )
           .foregroundStyle(.accent)
-          .font(.callout)
         }
 
         switch subject.typeEnum {

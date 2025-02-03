@@ -218,6 +218,28 @@ struct SubjectBookChaptersView: View {
         }.font(.callout)
       case .tile:
         HStack {
+          VStack {
+            if updating {
+              ZStack {
+                Button {
+                } label: {
+                  Image(systemName: "checkmark.circle")
+                }
+                .disabled(true)
+                .hidden()
+                .buttonStyle(.borderless)
+                ProgressView()
+              }
+            } else {
+              Button {
+                update()
+              } label: {
+                Image(systemName: "checkmark.circle")
+              }
+              .disabled(updateButtonDisable)
+              .buttonStyle(.borderless)
+            }
+          }.font(.title3)
           Spacer()
           VStack(alignment: .trailing) {
             HStack(alignment: .firstTextBaseline, spacing: 0) {
@@ -262,30 +284,6 @@ struct SubjectBookChaptersView: View {
                   .foregroundStyle(.secondary)
               }.buttonStyle(.plain)
             }.monospaced()
-          }
-          VStack {
-            if updating {
-              ZStack {
-                Button {
-                } label: {
-                  Image(systemName: "checkmark.circle")
-                }
-                .font(.title3)
-                .disabled(true)
-                .hidden()
-                .buttonStyle(.plain)
-                ProgressView()
-              }
-            } else {
-              Button {
-                update()
-              } label: {
-                Image(systemName: "checkmark.circle")
-              }
-              .font(.title3)
-              .disabled(updateButtonDisable)
-              .buttonStyle(.borderless)
-            }
           }
         }
       }
