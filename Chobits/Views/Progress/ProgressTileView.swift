@@ -34,45 +34,34 @@ struct ProgressTileView: View {
     self._subjects = Query(descriptor)
   }
 
-  var columns: Int {
-    let columns = Int((width - 8) / (150 + 24))
-    return columns > 0 ? columns : 1
+  var cols: Int {
+    let cols = Int((width - 8) / (150 + 24))
+    return max(cols, 1)
   }
 
   var cardWidth: CGFloat {
-    let columns = CGFloat(self.columns)
-    let cw = (width - 8) / columns - 24
-    if cw < 150 {
-      return 150
-    }
-    return cw
+    let cols = CGFloat(self.cols)
+    let cw = (width - 8) / cols - 24
+    return max(cw, 150)
   }
 
-  var items: [Int: [Subject]] {
-    var result: [Int: [Subject]] = [:]
-    for (index, subject) in subjects.enumerated() {
-      result[index % columns, default: []].append(subject)
-    }
-    return result
+  var columns: [GridItem] {
+    Array(repeating: .init(.flexible()), count: cols)
   }
 
   var body: some View {
-    HStack(alignment: .top, spacing: 8) {
-      ForEach(Array(items.keys.sorted()), id: \.self) { idx in
-        LazyVStack(alignment: .leading, spacing: 8) {
-          ForEach(items[idx] ?? []) { subject in
-            CardView(padding: 8) {
-              ProgressTileItemView(subjectId: subject.subjectId, width: cardWidth)
-                .environment(subject)
-                .frame(width: cardWidth)
-            }
-          }
-        }.frame(width: cardWidth + 16, alignment: .topLeading)
+    LazyVGrid(columns: columns) {
+      ForEach(subjects) { subject in
+        CardView(padding: 8) {
+          ProgressTileItemView(subjectId: subject.subjectId, width: cardWidth)
+            .environment(subject)
+            .frame(width: cardWidth)
+        }.frame(width: cardWidth+16)
       }
     }
     .animation(.default, value: subjects)
     .padding(.horizontal, 8)
-    .frame(width: width, alignment: .topLeading)
+    .frame(width: width)
   }
 }
 
@@ -142,6 +131,8 @@ struct ProgressTileItemView: View {
           }
         }
 
+        Spacer()
+
         switch subject.typeEnum {
         case .anime, .real:
           HStack {
@@ -184,29 +175,27 @@ struct ProgressTileItemView: View {
           .font(.callout)
         }
 
-        Section {
-          switch subject.typeEnum {
-          case .book:
-            VStack(spacing: 1) {
-              ProgressView(
-                value: Float(min(subject.eps, subject.interest.epStatus)),
-                total: Float(subject.eps))
-              ProgressView(
-                value: Float(min(subject.volumes, subject.interest.volStatus)),
-                total: Float(subject.volumes))
-            }.progressViewStyle(.linear)
-
-          case .anime, .real:
+        switch subject.typeEnum {
+        case .book:
+          VStack(spacing: 1) {
             ProgressView(
               value: Float(min(subject.eps, subject.interest.epStatus)),
-              total: Float(subject.eps)
-            ).progressViewStyle(.linear)
+              total: Float(subject.eps))
+            ProgressView(
+              value: Float(min(subject.volumes, subject.interest.volStatus)),
+              total: Float(subject.volumes))
+          }.progressViewStyle(.linear)
 
-          default:
-            ProgressView(value: 0, total: 0).progressViewStyle(.linear)
-          }
+        case .anime, .real:
+          ProgressView(
+            value: Float(min(subject.eps, subject.interest.epStatus)),
+            total: Float(subject.eps)
+          ).progressViewStyle(.linear)
+
+        default:
+          ProgressView(value: 0, total: 0).progressViewStyle(.linear)
         }
-      }
+      }.frame(height: 120)
     }
   }
 }
@@ -223,9 +212,11 @@ struct ProgressTileItemView: View {
 
   return ScrollView {
     LazyVStack(alignment: .leading) {
-      ProgressTileItemView(subjectId: subject.subjectId, width: 200)
-        .environment(subject)
-        .modelContainer(container)
+      CardView(padding: 8) {
+        ProgressTileItemView(subjectId: subject.subjectId, width: 320)
+          .environment(subject)
+          .modelContainer(container)
+      }
     }.padding()
   }
 }

@@ -149,7 +149,7 @@ struct SubjectBookChaptersView: View {
             .buttonStyle(.borderedProminent)
         }
       case .row:
-        Section {
+        VStack {
           HStack(alignment: .firstTextBaseline, spacing: 0) {
             TextField("\(subject.interest.epStatus)", text: $inputEps)
               .keyboardType(.numberPad)
@@ -218,7 +218,8 @@ struct SubjectBookChaptersView: View {
         }.font(.callout)
       case .tile:
         HStack {
-          VStack(alignment: .leading) {
+          Spacer()
+          VStack(alignment: .trailing) {
             HStack(alignment: .firstTextBaseline, spacing: 0) {
               TextField("\(subject.interest.epStatus)", text: $inputEps)
                 .keyboardType(.numberPad)
@@ -262,28 +263,29 @@ struct SubjectBookChaptersView: View {
               }.buttonStyle(.plain)
             }.monospaced()
           }
-          Spacer()
-          if updating {
-            ZStack {
+          VStack {
+            if updating {
+              ZStack {
+                Button {
+                } label: {
+                  Image(systemName: "checkmark.circle")
+                }
+                .font(.title3)
+                .disabled(true)
+                .hidden()
+                .buttonStyle(.plain)
+                ProgressView()
+              }
+            } else {
               Button {
+                update()
               } label: {
                 Image(systemName: "checkmark.circle")
               }
               .font(.title3)
-              .disabled(true)
-              .hidden()
-              .buttonStyle(.plain)
-              ProgressView()
+              .disabled(updateButtonDisable)
+              .buttonStyle(.borderless)
             }
-          } else {
-            Button {
-              update()
-            } label: {
-              Image(systemName: "checkmark.circle")
-            }
-            .font(.title3)
-            .disabled(updateButtonDisable)
-            .buttonStyle(.borderless)
           }
         }
       }

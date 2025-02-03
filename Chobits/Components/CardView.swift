@@ -20,7 +20,7 @@ struct CardView<Content: View>: View {
   }
 
   public var body: some View {
-    Section {
+    VStack {
       content().padding(padding)
     }
     .background(background ?? .cardBackground)

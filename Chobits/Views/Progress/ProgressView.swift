@@ -119,7 +119,7 @@ struct ChiiProgressView: View {
               }.frame(height: 40)
             }
           }
-          Picker("Subject Type", selection: $subjectType) {
+          Picker("SubjectType", selection: $subjectType) {
             ForEach(SubjectType.progressTypes) { type in
               Text("\(type.description)(\(counts[type, default: 0]))").tag(type)
             }
