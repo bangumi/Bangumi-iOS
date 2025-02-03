@@ -78,7 +78,7 @@ struct SubjectRatingView: View {
             Text("/").foregroundStyle(.secondary).padding(.horizontal, 2)
             Section {
               Text("\(subject.collection.doing)人")
-              Text(CollectionType.do.description(subject.typeEnum))
+              Text(CollectionType.doing.description(subject.typeEnum))
             }
             Text("/").foregroundStyle(.secondary).padding(.horizontal, 2)
             Section {

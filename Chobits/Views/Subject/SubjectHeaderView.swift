@@ -15,7 +15,7 @@ struct SubjectHeaderView: View {
   var collectStats: String {
     var text = ""
     if subject.collection.doing > 0 {
-      text += "\(subject.collection.doing) 人\(CollectionType.do.description(type))"
+      text += "\(subject.collection.doing) 人\(CollectionType.doing.description(type))"
     }
     if subject.collection.collect > 0 {
       text += " / \(subject.collection.collect) 人\(CollectionType.collect.description(type))"

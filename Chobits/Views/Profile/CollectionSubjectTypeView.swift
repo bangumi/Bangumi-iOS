@@ -7,7 +7,7 @@ struct CollectionSubjectTypeView: View {
 
   @Environment(\.modelContext) var modelContext
 
-  @State private var collectionType: CollectionType = .collect
+  @State private var ctype: CollectionType = .collect
   @State private var counts: [CollectionType: Int] = [:]
   @State private var subjects: [Subject] = []
 
@@ -23,7 +23,7 @@ struct CollectionSubjectTypeView: View {
   func load() async {
     if width == 0 { return }
     let stypeVal = stype.rawValue
-    let ctypeVal = collectionType.rawValue
+    let ctypeVal = ctype.rawValue
     var descriptor = FetchDescriptor<Subject>(
       predicate: #Predicate<Subject> {
         $0.type == stypeVal && $0.ctype == ctypeVal
@@ -32,6 +32,11 @@ struct CollectionSubjectTypeView: View {
         SortDescriptor<Subject>(\.interest?.updatedAt, order: .reverse)
       ])
     descriptor.fetchLimit = columnCount * 2
+    do {
+      subjects = try modelContext.fetch(descriptor)
+    } catch {
+      Notifier.shared.alert(error: error)
+    }
   }
 
   func loadCounts() async {
@@ -53,14 +58,13 @@ struct CollectionSubjectTypeView: View {
 
   var body: some View {
     VStack {
-      Picker("CollectionType", selection: $collectionType) {
-        ForEach(CollectionType.allTypes()) { ctype in
-          Text("\(ctype.description(stype))(\(counts[ctype, default: 0]))").tag(
-            ctype)
+      Picker("CollectionType", selection: $ctype) {
+        ForEach(CollectionType.allTypes()) { ct in
+          Text("\(ct.description(stype))(\(counts[ct, default: 0]))").tag(ct)
         }
       }
       .pickerStyle(.segmented)
-      .onChange(of: collectionType) { _, _ in
+      .onChange(of: ctype) { _, _ in
         Task {
           await load()
         }

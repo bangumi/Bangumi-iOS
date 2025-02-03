@@ -7,7 +7,7 @@ struct SubjectCollectionBoxView: View {
   @Environment(\.dismiss) private var dismiss
   @Environment(Subject.self) var subject
 
-  @State private var ctype: CollectionType = .do
+  @State private var ctype: CollectionType = .doing
   @State private var rate: Int = 0
   @State private var comment: String = ""
   @State private var priv: Bool = false

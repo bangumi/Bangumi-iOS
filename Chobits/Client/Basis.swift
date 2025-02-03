@@ -143,7 +143,7 @@ extension SubjectCollection {
     self[String(CollectionType.collect.rawValue)] ?? 0
   }
   var doing: Int {
-    self[String(CollectionType.do.rawValue)] ?? 0
+    self[String(CollectionType.doing.rawValue)] ?? 0
   }
   var onHold: Int {
     self[String(CollectionType.onHold.rawValue)] ?? 0
@@ -278,7 +278,7 @@ enum CollectionType: Int, Codable, Identifiable, CaseIterable {
   case none = 0
   case wish = 1
   case collect = 2
-  case `do` = 3
+  case doing = 3
   case onHold = 4
   case dropped = 5
 
@@ -296,11 +296,11 @@ enum CollectionType: Int, Codable, Identifiable, CaseIterable {
   }
 
   static func allTypes() -> [Self] {
-    return [.wish, .collect, .do, .onHold, .dropped]
+    return [.wish, .collect, .doing, .onHold, .dropped]
   }
 
   static func timelineTypes() -> [Self] {
-    return [.do, .collect]
+    return [.doing, .collect]
   }
 
   var icon: String {
@@ -311,7 +311,7 @@ enum CollectionType: Int, Codable, Identifiable, CaseIterable {
       return "heart"
     case .collect:
       return "checkmark"
-    case .do:
+    case .doing:
       return "eyes"
     case .onHold:
       return "hourglass"
@@ -340,7 +340,7 @@ enum CollectionType: Int, Codable, Identifiable, CaseIterable {
       return "想" + action
     case .collect:
       return action + "过"
-    case .do:
+    case .doing:
       return "在" + action
     case .onHold:
       return "搁置"

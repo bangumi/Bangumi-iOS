@@ -18,7 +18,7 @@ struct ProgressTileView: View {
     self.width = width
 
     let stype = subjectType.rawValue
-    let doingType = CollectionType.do.rawValue
+    let doingType = CollectionType.doing.rawValue
     var descriptor = FetchDescriptor<Subject>(
       predicate: #Predicate<Subject> {
         (stype == 0 || $0.type == stype) && $0.ctype == doingType

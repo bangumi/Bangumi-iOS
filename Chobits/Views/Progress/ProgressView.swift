@@ -20,7 +20,7 @@ struct ChiiProgressView: View {
   @State private var counts: [SubjectType: Int] = [:]
 
   func loadCounts() async {
-    let doingType = CollectionType.do.rawValue
+    let doingType = CollectionType.doing.rawValue
     do {
       for type in SubjectType.progressTypes {
         let tvalue = type.rawValue
