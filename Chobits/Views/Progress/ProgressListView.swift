@@ -118,7 +118,7 @@ struct ProgressListItemView: View {
           switch subject.typeEnum {
           case .anime, .real:
             HStack {
-              Text("\(subject.eps) / \(subject.volumes)")
+              Text("\(subject.interest?.epStatus ?? 0) / \(subject.eps)")
                 .foregroundStyle(.secondary)
               Spacer()
               if let episode = nextEpisode {

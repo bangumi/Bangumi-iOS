@@ -98,11 +98,12 @@ struct SubjectCollectionBoxView: View {
         .padding(.vertical, 5)
         if let interest = subject.interest, interest.updatedAt > 0 {
           Section {
-            Text("上次更新：\(interest.updatedAt.datetimeDisplay)/")
+            Text("上次更新：") + Text(interest.updatedAt.datetimeDisplay)
+              + Text(" / ").foregroundStyle(.secondary)
               + interest.updatedAt.relativeText
+              .foregroundStyle(.secondary)
           }
           .font(.caption)
-          .foregroundStyle(.secondary)
         }
 
         Picker("CollectionType", selection: $ctype) {
