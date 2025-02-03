@@ -337,3 +337,55 @@ extension DatabaseOperator {
     let _ = try self.ensurePerson(item)
   }
 }
+
+// MARK: - save subject details
+extension DatabaseOperator {
+  public func saveSubjectCharacters(subjectId: Int, items: [SubjectCharacterDTO]) throws {
+    let subject = try self.getSubject(subjectId)
+    if subject?.characters != items {
+      subject?.characters = items
+    }
+  }
+
+  public func saveSubjectOffprints(subjectId: Int, items: [SubjectRelationDTO]) throws {
+    let subject = try self.getSubject(subjectId)
+    if subject?.offprints != items {
+      subject?.offprints = items
+    }
+  }
+
+  public func saveSubjectRelations(subjectId: Int, items: [SubjectRelationDTO]) throws {
+    let subject = try self.getSubject(subjectId)
+    if subject?.relations != items {
+      subject?.relations = items
+    }
+  }
+
+  public func saveSubjectRecs(subjectId: Int, items: [SubjectRecDTO]) throws {
+    let subject = try self.getSubject(subjectId)
+    if subject?.recs != items {
+      subject?.recs = items
+    }
+  }
+
+  public func saveSubjectReviews(subjectId: Int, items: [SubjectReviewDTO]) throws {
+    let subject = try self.getSubject(subjectId)
+    if subject?.reviews != items {
+      subject?.reviews = items
+    }
+  }
+
+  public func saveSubjectTopics(subjectId: Int, items: [TopicDTO]) throws {
+    let subject = try self.getSubject(subjectId)
+    if subject?.topics != items {
+      subject?.topics = items
+    }
+  }
+
+  public func saveSubjectComments(subjectId: Int, items: [SubjectCommentDTO]) throws {
+    let subject = try self.getSubject(subjectId)
+    if subject?.comments != items {
+      subject?.comments = items
+    }
+  }
+}

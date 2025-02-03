@@ -52,6 +52,46 @@ extension Chii {
     return item
   }
 
+  func loadSubjectDetails(_ subjectId: Int, offprints: Bool, social: Bool) async throws {
+    let db = try self.getDB()
+    await withThrowingTaskGroup(of: Void.self) { group in
+      group.addTask {
+        let response = try await self.getSubjectCharacters(subjectId, limit: 12)
+        try await db.saveSubjectCharacters(subjectId: subjectId, items: response.data)
+      }
+      if offprints {
+        group.addTask {
+          let response = try await self.getSubjectRelations(
+            subjectId, offprint: true, limit: 100)
+          try await db.saveSubjectOffprints(subjectId: subjectId, items: response.data)
+        }
+      }
+      group.addTask {
+        let response = try await self.getSubjectRelations(subjectId, limit: 10)
+        try await db.saveSubjectRelations(subjectId: subjectId, items: response.data)
+      }
+      group.addTask {
+        let response = try await self.getSubjectRecs(subjectId, limit: 10)
+        try await db.saveSubjectRecs(subjectId: subjectId, items: response.data)
+      }
+      if social {
+        group.addTask {
+          let response = try await self.getSubjectReviews(subjectId, limit: 5)
+          try await db.saveSubjectReviews(subjectId: subjectId, items: response.data)
+        }
+        group.addTask {
+          let response = try await self.getSubjectTopics(subjectId, limit: 5)
+          try await db.saveSubjectTopics(subjectId: subjectId, items: response.data)
+        }
+        group.addTask {
+          let response = try await self.getSubjectComments(subjectId, limit: 10)
+          try await db.saveSubjectComments(subjectId: subjectId, items: response.data)
+        }
+      }
+    }
+    try await db.commit()
+  }
+
   func loadEpisodes(_ subjectId: Int) async throws {
     let db = try self.getDB()
     var offset: Int = 0
