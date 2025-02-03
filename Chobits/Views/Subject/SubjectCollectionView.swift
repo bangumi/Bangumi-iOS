@@ -76,15 +76,12 @@ struct SubjectCollectionView: View {
         }
       }
     }
-    .sheet(
-      isPresented: $edit,
-      content: {
-        SubjectCollectionBoxView()
-          .environment(subject)
-          .presentationDragIndicator(.visible)
-          .presentationDetents(.init([.medium, .large]))
-      }
-    )
+    .sheet(isPresented: $edit) {
+      SubjectCollectionBoxView()
+        .environment(subject)
+        .presentationDragIndicator(.visible)
+        .presentationDetents(.init([.medium, .large]))
+    }
   }
 }
 

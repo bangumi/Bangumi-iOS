@@ -3,7 +3,6 @@ import SwiftData
 import SwiftUI
 
 struct TimelineListView: View {
-
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
   @AppStorage("profile") var profile: Profile = Profile()
 
@@ -93,7 +92,12 @@ struct TimelineListView: View {
                 .font(.footnote)
             }
             .buttonStyle(.borderedProminent)
-            .disabled(true)
+            .disabled(showInput)
+            .sheet(isPresented: $showInput) {
+              TimelineSayView()
+                .presentationDragIndicator(.visible)
+                .presentationDetents(.init([.medium, .large]))
+            }
           }
         } else {
           AuthView(slogan: "Bangumi 让你的 ACG 生活更美好")

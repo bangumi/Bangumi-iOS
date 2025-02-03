@@ -12,6 +12,10 @@ struct PagedDTO<T: Sendable & Codable>: Codable, Sendable {
   }
 }
 
+struct IDResponseDTO: Codable, Hashable {
+  var id: Int
+}
+
 struct Permissions: Codable, Hashable {
   var subjectWikiEdit: Bool
 }

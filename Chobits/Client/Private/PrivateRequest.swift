@@ -599,6 +599,13 @@ extension Chii {
     let resp: [TimelineDTO] = try self.decodeResponse(data)
     return resp
   }
+
+  func postTimeline(content: String, token: String) async throws {
+    let url = BangumiAPI.priv.build("p1/timeline")
+    let data = try await self.request(
+      url: url, method: "POST", body: ["content": content, "token": token])
+    let _: IDResponseDTO = try self.decodeResponse(data)
+  }
 }
 
 // MARK: - Trending
