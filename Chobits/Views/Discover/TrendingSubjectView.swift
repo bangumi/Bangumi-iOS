@@ -19,7 +19,7 @@ struct TrendingSubjectView: View {
     VStack(spacing: 5) {
       HStack(alignment: .bottom) {
         Text("热门")
-        Picker("Subject Type", selection: $type) {
+        Picker("SubjectType", selection: $type) {
           ForEach(SubjectType.allTypes) { st in
             Text(st.description).tag(st)
           }
@@ -36,6 +36,7 @@ struct TrendingSubjectView: View {
 
       TrendingSubjectTypeView(type: type, width: width)
     }
+    .animation(.default, value: type)
     .onGeometryChange(for: CGSize.self) { proxy in
       proxy.size
     } action: { newSize in
@@ -53,8 +54,7 @@ struct TrendingSubjectTypeView: View {
   @Environment(\.modelContext) private var modelContext
 
   @Query private var trending: [TrendingSubject]
-  var items: [Subject] { trending.first?.items ?? [] }
-  var watchers: [Int: Int] { trending.first?.watchers ?? [:] }
+  var items: [TrendingSubjectDTO] { trending.first?.items ?? [] }
 
   init(type: SubjectType, width: CGFloat) {
     self.type = type
@@ -96,7 +96,7 @@ struct TrendingSubjectTypeView: View {
     Array(repeating: GridItem(.flexible()), count: columnCount * 2)
   }
 
-  var largeItems: [Subject] {
+  var largeItems: [TrendingSubjectDTO] {
     var itemLimit = 6
     if columnCount == 2 {
       itemLimit = 10
@@ -108,10 +108,14 @@ struct TrendingSubjectTypeView: View {
     return Array(items.prefix(itemLimit))
   }
 
-  var smallItems: [Subject] {
+  var smallItems: [TrendingSubjectDTO] {
     let itemLimit = columnCount * 2
     let largeCount = largeItems.count
     return Array(items.dropFirst(largeCount).prefix(itemLimit))
+  }
+
+  var firstItem: TrendingSubject? {
+    trending.first
   }
 
   var body: some View {
@@ -121,48 +125,48 @@ struct TrendingSubjectTypeView: View {
       } else {
         LazyVGrid(columns: largeColumns, spacing: 8) {
           ForEach(largeItems) { item in
-            ImageView(img: item.images?.resize(.r800))
+            ImageView(img: item.subject.images?.resize(.r800))
               .imageStyle(width: largeCardWidth, height: largeCardWidth * 1.2)
               .imageType(.subject)
               .imageCaption {
-                Text(item.name)
+                Text(item.subject.name)
                   .multilineTextAlignment(.leading)
                   .truncationMode(.middle)
                   .lineLimit(2)
                   .font(.body)
                   .padding(8)
               }
-              .imageBadge(show: watchers[item.subjectId] ?? 0 > 10) {
-                Text("\(watchers[item.subjectId] ?? 0) 人关注")
+              .imageBadge(show: item.count > 10) {
+                Text("\(item.count) 人关注")
                   .font(.callout)
               }
-              .imageLink(item.link)
+              .imageLink(item.subject.link)
               .padding(8)
               .shadow(color: Color.black.opacity(0.2), radius: 4)
-              .subjectPreview(item.slim)
+              .subjectPreview(item.subject)
           }
         }
         LazyVGrid(columns: smallColumns, spacing: 8) {
           ForEach(smallItems) { item in
-            ImageView(img: item.images?.resize(.r400))
+            ImageView(img: item.subject.images?.resize(.r400))
               .imageStyle(width: smallCardWidth, height: smallCardWidth * 1.3)
               .imageType(.subject)
               .imageCaption {
-                Text(item.name)
+                Text(item.subject.name)
                   .multilineTextAlignment(.leading)
                   .truncationMode(.middle)
                   .lineLimit(2)
                   .font(.footnote)
                   .padding(4)
               }
-              .imageBadge(show: watchers[item.subjectId] ?? 0 > 10) {
-                Text("\(watchers[item.subjectId] ?? 0) 人关注")
+              .imageBadge(show: item.count > 10) {
+                Text("\(item.count) 人关注")
                   .font(.footnote)
               }
-              .imageLink(item.link)
+              .imageLink(item.subject.link)
               .padding(8)
               .shadow(color: Color.black.opacity(0.2), radius: 4)
-              .subjectPreview(item.slim)
+              .subjectPreview(item.subject)
           }
         }
       }

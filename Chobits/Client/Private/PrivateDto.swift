@@ -424,9 +424,13 @@ struct SlimSubjectDTO: Codable, Identifiable, Hashable, Linkable {
   }
 }
 
-struct BangumiCalendarItemDTO: Codable, Hashable {
+struct BangumiCalendarItemDTO: Codable, Hashable, Identifiable {
   var watchers: Int
   var subject: SlimSubjectDTO
+
+  var id: Int {
+    subject.id
+  }
 }
 
 typealias BangumiCalendarDTO = [String: [BangumiCalendarItemDTO]]

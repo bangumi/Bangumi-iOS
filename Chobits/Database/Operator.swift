@@ -158,28 +158,38 @@ extension DatabaseOperator {
     return user
   }
 
-  public func ensureCalendarItem(_ weekday: Int) throws -> BangumiCalendar {
+  public func ensureCalendarItem(_ weekday: Int, items: [BangumiCalendarItemDTO])
+    throws -> BangumiCalendar
+  {
     let fetched = try self.fetchOne(
       predicate: #Predicate<BangumiCalendar> {
         $0.weekday == weekday
       })
     if let calendar = fetched {
+      if calendar.items != items {
+        calendar.items = items
+      }
       return calendar
     }
-    let calendar = BangumiCalendar(weekday: weekday)
+    let calendar = BangumiCalendar(weekday: weekday, items: items)
     modelContext.insert(calendar)
     return calendar
   }
 
-  public func ensureTrendingSubject(_ type: Int) throws -> TrendingSubject {
+  public func ensureTrendingSubject(_ type: Int, items: [TrendingSubjectDTO])
+    throws -> TrendingSubject
+  {
     let fetched = try self.fetchOne(
       predicate: #Predicate<TrendingSubject> {
         $0.type == type
       })
     if let trending = fetched {
+      if trending.items != items {
+        trending.items = items
+      }
       return trending
     }
-    let trending = TrendingSubject(type: type)
+    let trending = TrendingSubject(type: type, items: items)
     modelContext.insert(trending)
     return trending
   }
@@ -299,37 +309,11 @@ extension DatabaseOperator {
   }
 
   public func saveCalendarItem(weekday: Int, items: [BangumiCalendarItemDTO]) throws {
-    let cal = try self.ensureCalendarItem(weekday)
-    var subjects: [Subject] = []
-    var watchers: [Int: Int] = [:]
-    for item in items {
-      let subject = try self.ensureSubject(item.subject)
-      subjects.append(subject)
-      watchers[subject.subjectId] = item.watchers
-    }
-    if cal.items != subjects {
-      cal.items = subjects
-    }
-    if cal.watchers != watchers {
-      cal.watchers = watchers
-    }
+    _ = try self.ensureCalendarItem(weekday, items: items)
   }
 
   public func saveTrendingSubjects(type: Int, items: [TrendingSubjectDTO]) throws {
-    let trend = try self.ensureTrendingSubject(type)
-    var subjects: [Subject] = []
-    var watchers: [Int: Int] = [:]
-    for item in items {
-      let subject = try self.ensureSubject(item.subject)
-      subjects.append(subject)
-      watchers[subject.subjectId] = item.count
-    }
-    if trend.items != subjects {
-      trend.items = subjects
-    }
-    if trend.watchers != watchers {
-      trend.watchers = watchers
-    }
+    _ = try self.ensureTrendingSubject(type, items: items)
   }
 
   public func saveSubject(_ item: SubjectDTO) throws {

@@ -71,37 +71,33 @@ final class UserV1 {
   }
 }
 
-typealias BangumiCalendar = BangumiCalendarV2
+typealias BangumiCalendar = BangumiCalendarV1
 
 @Model
-final class BangumiCalendarV2 {
+final class BangumiCalendarV1 {
   @Attribute(.unique)
   var weekday: Int
 
-  var items: [Subject]
-  var watchers: [Int: Int]
+  var items: [BangumiCalendarItemDTO]
 
-  init(weekday: Int) {
+  init(weekday: Int, items: [BangumiCalendarItemDTO]) {
     self.weekday = weekday
-    self.items = []
-    self.watchers = [:]
+    self.items = items
   }
 }
 
-typealias TrendingSubject = TrendingSubjectV2
+typealias TrendingSubject = TrendingSubjectV1
 
 @Model
-final class TrendingSubjectV2 {
+final class TrendingSubjectV1 {
   @Attribute(.unique)
   var type: Int
 
-  var items: [Subject]
-  var watchers: [Int: Int]
+  var items: [TrendingSubjectDTO]
 
-  init(type: Int) {
+  init(type: Int, items: [TrendingSubjectDTO]) {
     self.type = type
-    self.items = []
-    self.watchers = [:]
+    self.items = items
   }
 }
 
