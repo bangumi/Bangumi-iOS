@@ -454,10 +454,10 @@ final class PersonV2: Searchable, Linkable {
 
 }
 
-typealias Episode = EpisodeV1
+typealias Episode = EpisodeV2
 
 @Model
-final class EpisodeV1: Linkable {
+final class EpisodeV2: Linkable {
   @Attribute(.unique)
   var episodeId: Int
 
