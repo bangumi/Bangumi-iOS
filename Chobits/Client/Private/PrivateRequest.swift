@@ -603,7 +603,7 @@ extension Chii {
   func postTimeline(content: String, token: String) async throws {
     let url = BangumiAPI.priv.build("p1/timeline")
     let data = try await self.request(
-      url: url, method: "POST", body: ["content": content, "token": token])
+      url: url, method: "POST", body: ["content": content, "turnstileToken": token])
     let _: IDResponseDTO = try self.decodeResponse(data)
   }
 }

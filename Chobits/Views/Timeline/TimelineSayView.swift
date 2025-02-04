@@ -41,11 +41,13 @@ struct TimelineSayView: View {
           } label: {
             Label("发送", systemImage: "paperplane")
           }
-          .disabled(content.isEmpty || updating || content.count > 380)
+          .disabled(content.isEmpty || token.isEmpty || updating || content.count > 380)
           .buttonStyle(.borderedProminent)
         }
         BorderView(color: .secondary.opacity(0.2), padding: 4) {
           TextField("吐槽", text: $content, axis: .vertical)
+            .autocorrectionDisabled()
+            .textInputAutocapitalization(.never)
             .multilineTextAlignment(.leading)
             .scrollDisabled(true)
             .lineLimit(5...)
@@ -56,28 +58,11 @@ struct TimelineSayView: View {
             .monospacedDigit()
             .foregroundStyle(content.count > 380 ? .red : .secondary)
         }
-        TrunstileView().frame(width: 120, height: 60)
+
+        if token.isEmpty {
+          TrunstileView(token: $token).frame(height: 80)
+        }
       }.padding()
     }
-  }
-}
-
-struct TrunstileView: UIViewRepresentable {
-
-  func makeUIView(context: Context) -> WKWebView {
-    let config = WKWebViewConfiguration()
-    config.defaultWebpagePreferences.preferredContentMode = .mobile
-
-    let webView = WKWebView(
-      frame: CGRect(x: 0, y: 0, width: 120, height: 60), configuration: config)
-    webView.scrollView.isScrollEnabled = false
-    webView.contentScaleFactor = 1
-    let url = URL(string: "https://next.bgm.tv/p1/turnstile?redirect_uri=bangumi://turnstile")
-    let request = URLRequest(url: url!)
-    webView.load(request)
-    return webView
-  }
-
-  func updateUIView(_ uiView: WKWebView, context: Context) {
   }
 }
