@@ -135,10 +135,9 @@ struct ProgressTileItemView: View {
 
         switch subject.typeEnum {
         case .anime, .real:
-          HStack {
+          VStack(alignment: .trailing) {
             Text("\(subject.interest?.epStatus ?? 0) / \(subject.eps)")
               .foregroundStyle(.secondary)
-            Spacer()
             if let episode = nextEpisode {
               if episode.air > Date() {
                 Text("EP.\(episode.sort.episodeDisplay) ~ \(episode.waitDesc)")

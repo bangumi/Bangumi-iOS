@@ -266,28 +266,34 @@ extension DatabaseOperator {
       })
     if let episode = fetched {
       episode.update(item)
-      if episode.subject == nil, let subject = item.subject {
-        let subject = try self.ensureSubject(subject)
-        if episode.subject == nil {
-          episode.subject = subject
+      if let slim = item.subject {
+        if let old = episode.subject, old.subjectId == slim.id {
+          return episode
+        }
+        let subject = try self.ensureSubject(slim)
+        episode.subject = subject
+      } else {
+        let subject = try self.getSubject(item.subjectID)
+        if let new = subject {
+          if let old = episode.subject, old.subjectId == new.subjectId {
+            return episode
+          }
+          episode.subject = new
         }
       }
       return episode
-    }
-    let episode = Episode(item)
-    modelContext.insert(episode)
-    if let slim = item.subject {
-      let subject = try self.ensureSubject(slim)
-      if episode.subject == nil {
-        episode.subject = subject
-      }
     } else {
-      let subject = try self.getSubject(item.subjectID)
-      if episode.subject == nil, let subject = subject {
+      let episode = Episode(item)
+      modelContext.insert(episode)
+      if let slim = item.subject {
+        let subject = try self.ensureSubject(slim)
+        episode.subject = subject
+      } else {
+        let subject = try self.getSubject(item.subjectID)
         episode.subject = subject
       }
+      return episode
     }
-    return episode
   }
 
   public func ensureCharacter(_ item: CharacterDTO) throws -> Character {
