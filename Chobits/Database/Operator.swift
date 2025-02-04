@@ -37,21 +37,21 @@ extension DatabaseOperator {
   public func clearEpisodeCollection() throws {
     let episodes = try modelContext.fetch(FetchDescriptor<Episode>())
     for episode in episodes {
-      episode.collection = nil
+      episode.status = 0
     }
   }
 
   public func clearPersonCollection() throws {
     let persons = try modelContext.fetch(FetchDescriptor<Person>())
     for person in persons {
-      person.collectedAt = nil
+      person.collectedAt = 0
     }
   }
 
   public func clearCharacterCollection() throws {
     let characters = try modelContext.fetch(FetchDescriptor<Character>())
     for character in characters {
-      character.collectedAt = nil
+      character.collectedAt = 0
     }
   }
 }
@@ -132,7 +132,7 @@ extension DatabaseOperator {
       })
     let episodes = try modelContext.fetch(descriptor)
     for episode in episodes {
-      episode.collection = type.rawValue
+      episode.status = type.rawValue
     }
     let subject = try self.fetchOne(
       predicate: #Predicate<Subject> {
@@ -150,7 +150,7 @@ extension DatabaseOperator {
         $0.episodeId == episodeId
       }
     )
-    episode?.collection = type.rawValue
+    episode?.status = type.rawValue
     let subject = try self.fetchOne(
       predicate: #Predicate<Subject> {
         $0.subjectId == subjectId

@@ -580,6 +580,7 @@ struct EpisodeDTO: Codable, Identifiable, Hashable, Linkable {
   var comment: Int
   var disc: Int
   var desc: String?
+  var status: Int?
   var subject: SlimSubjectDTO?
 
   var title: String {

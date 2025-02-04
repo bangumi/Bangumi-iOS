@@ -22,7 +22,7 @@ struct EpisodeRowView: View {
               .font(.footnote)
           }
           .padding(2)
-          .strikethrough(episode.collection == EpisodeCollectionType.dropped.rawValue)
+          .strikethrough(episode.status == EpisodeCollectionType.dropped.rawValue)
           .background {
             RoundedRectangle(cornerRadius: 5)
               .fill(Color(hex: episode.backgroundColor))

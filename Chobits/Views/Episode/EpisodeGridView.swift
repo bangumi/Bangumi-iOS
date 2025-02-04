@@ -103,7 +103,7 @@ struct EpisodeGridView: View {
           .background(Color(hex: episode.backgroundColor))
           .border(Color(hex: episode.borderColor), width: 1)
           .padding(2)
-          .strikethrough(episode.collection == EpisodeCollectionType.dropped.rawValue)
+          .strikethrough(episode.status == EpisodeCollectionType.dropped.rawValue)
           .contextMenu {
             if isAuthenticated, subject?.ctype ?? 0 != 0 {
               ForEach(episode.collectionTypeEnum.otherTypes()) { type in
@@ -156,7 +156,7 @@ struct EpisodeGridView: View {
             .background(Color(hex: episode.backgroundColor))
             .border(Color(hex: episode.borderColor), width: 1)
             .padding(2)
-            .strikethrough(episode.collection == EpisodeCollectionType.dropped.rawValue)
+            .strikethrough(episode.status == EpisodeCollectionType.dropped.rawValue)
             .contextMenu {
               if isAuthenticated, subject?.ctype ?? 0 != 0 {
                 ForEach(episode.collectionTypeEnum.otherTypes()) { type in

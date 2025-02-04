@@ -48,13 +48,13 @@ struct EpisodeListView: View {
       predicate: #Predicate<Episode> {
         if main {
           if filterCollection {
-            $0.subjectId == subjectId && $0.type == mainType && $0.collection == 0
+            $0.subjectId == subjectId && $0.type == mainType && $0.status == 0
           } else {
             $0.subjectId == subjectId && $0.type == mainType
           }
         } else {
           if filterCollection {
-            $0.subjectId == subjectId && $0.type != mainType && $0.collection == 0
+            $0.subjectId == subjectId && $0.type != mainType && $0.status == 0
           } else {
             $0.subjectId == subjectId && $0.type != mainType
           }

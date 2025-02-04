@@ -334,7 +334,8 @@ final class CharacterV2: Searchable, Linkable {
   var nsfw: Bool
   var role: Int
   var summary: String
-  var collectedAt: Int?
+
+  var collectedAt: Int = 0
 
   var casts: [CharacterCastDTO] = []
 
@@ -362,7 +363,7 @@ final class CharacterV2: Searchable, Linkable {
     self.nsfw = item.nsfw
     self.role = item.role.rawValue
     self.summary = item.summary
-    self.collectedAt = item.collectedAt
+    self.collectedAt = item.collectedAt ?? 0
   }
 
   func update(_ item: CharacterDTO) {
@@ -376,7 +377,9 @@ final class CharacterV2: Searchable, Linkable {
     if self.nsfw != item.nsfw { self.nsfw = item.nsfw }
     if self.role != item.role.rawValue { self.role = item.role.rawValue }
     if self.summary != item.summary { self.summary = item.summary }
-    if self.collectedAt != item.collectedAt { self.collectedAt = item.collectedAt }
+    if let collectedAt = item.collectedAt, self.collectedAt != collectedAt {
+      self.collectedAt = collectedAt
+    }
   }
 }
 
@@ -398,7 +401,7 @@ final class PersonV2: Searchable, Linkable {
   var nsfw: Bool
   var summary: String
   var type: Int
-  var collectedAt: Int?
+  var collectedAt: Int = 0
 
   var casts: [PersonCastDTO] = []
   var works: [PersonWorkDTO] = []
@@ -428,7 +431,7 @@ final class PersonV2: Searchable, Linkable {
     self.nsfw = item.nsfw
     self.summary = item.summary
     self.type = item.type.rawValue
-    self.collectedAt = item.collectedAt
+    self.collectedAt = item.collectedAt ?? 0
   }
 
   func update(_ item: PersonDTO) {
@@ -444,7 +447,9 @@ final class PersonV2: Searchable, Linkable {
     if self.nsfw != item.nsfw { self.nsfw = item.nsfw }
     if self.summary != item.summary { self.summary = item.summary }
     if self.type != item.type.rawValue { self.type = item.type.rawValue }
-    if self.collectedAt != item.collectedAt { self.collectedAt = item.collectedAt }
+    if let collectedAt = item.collectedAt, self.collectedAt != collectedAt {
+      self.collectedAt = collectedAt
+    }
   }
 
 }
@@ -467,7 +472,7 @@ final class EpisodeV1: Linkable {
   var desc: String
   var disc: Int
 
-  var collection: Int?
+  var status: Int = 0
 
   var subject: Subject?
 
@@ -476,10 +481,10 @@ final class EpisodeV1: Linkable {
   }
 
   var collectionTypeEnum: EpisodeCollectionType {
-    return EpisodeCollectionType(collection ?? 0)
+    return EpisodeCollectionType(status)
   }
 
-  init(_ item: EpisodeDTO, collection: Int? = 0) {
+  init(_ item: EpisodeDTO) {
     self.episodeId = item.id
     self.subjectId = item.subjectID
     self.type = item.type.rawValue
@@ -491,7 +496,7 @@ final class EpisodeV1: Linkable {
     self.comment = item.comment
     self.desc = item.desc ?? ""
     self.disc = item.disc
-    self.collection = collection
+    self.status = item.status ?? 0
   }
 
   var title: AttributedString {
@@ -594,5 +599,6 @@ final class EpisodeV1: Linkable {
     if self.comment != item.comment { self.comment = item.comment }
     if let desc = item.desc, !desc.isEmpty && self.desc != desc { self.desc = desc }
     if self.disc != item.disc { self.disc = item.disc }
+    if let status = item.status, self.status != status { self.status = status }
   }
 }

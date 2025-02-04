@@ -63,7 +63,7 @@ struct ProgressListItemView: View {
     self.subjectId = subjectId
     var descriptor = FetchDescriptor<Episode>(
       predicate: #Predicate<Episode> {
-        $0.subjectId == subjectId && $0.type == 0 && $0.collection == 0
+        $0.subjectId == subjectId && $0.type == 0 && $0.status == 0
       }, sortBy: [SortDescriptor<Episode>(\.sort, order: .forward)])
     descriptor.fetchLimit = 1
     _pendingEpisodes = Query(descriptor)
