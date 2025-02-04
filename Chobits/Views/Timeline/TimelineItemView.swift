@@ -1,5 +1,4 @@
 import OSLog
-import SwiftData
 import SwiftUI
 
 struct TimelineItemView: View {
@@ -141,15 +140,24 @@ struct TimelineItemView: View {
         default:
           Text(item.desc)
         }
-        Menu {
-          Text("\(item.createdAt.datetimeDisplay)")
-        } label: {
-          Section {
-            item.createdAt.relativeText + Text(" · \(item.source.desc)")
+        HStack {
+          if item.cat == .status, item.type == 1 {
+            NavigationLink(value: NavDestination.timelineReply(item)) {
+              Text(item.replies > 0 ? "\(item.replies) 回复 " : "回复")
+            }.buttonStyle(.navLink)
+          } else if item.cat == .subject, !item.batch {
+            // reactions
           }
-          .font(.caption)
-          .foregroundStyle(.secondary)
-        }.buttonStyle(.plain)
+          Menu {
+            Text("\(item.createdAt.datetimeDisplay)")
+          } label: {
+            item.createdAt.relativeText
+              .foregroundStyle(.secondary)
+          }.buttonStyle(.plain)
+          Text("·")
+          Text("\(item.source.desc)")
+            .foregroundStyle(.secondary)
+        }.font(.footnote)
         Divider()
       }
       Spacer()
