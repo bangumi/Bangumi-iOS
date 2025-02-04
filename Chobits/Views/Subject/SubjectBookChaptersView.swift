@@ -26,6 +26,14 @@ struct SubjectBookChaptersView: View {
     return eps == nil && vols == nil
   }
 
+  var epStatus: Int {
+    return subject.interest?.epStatus ?? 0
+  }
+
+  var volStatus: Int {
+    return subject.interest?.volStatus ?? 0
+  }
+
   func parseInputEps() {
     if let newEps = Int(inputEps) {
       self.eps = newEps
@@ -46,7 +54,7 @@ struct SubjectBookChaptersView: View {
     if let value = eps {
       self.inputEps = "\(value+1)"
     } else {
-      self.inputEps = "\(subject.interest?.epStatus ?? 0+1)"
+      self.inputEps = "\(epStatus+1)"
     }
   }
 
@@ -54,7 +62,7 @@ struct SubjectBookChaptersView: View {
     if let value = vols {
       self.inputVols = "\(value+1)"
     } else {
-      self.inputVols = "\(subject.interest?.volStatus ?? 0+1)"
+      self.inputVols = "\(volStatus+1)"
     }
   }
 
@@ -89,7 +97,7 @@ struct SubjectBookChaptersView: View {
         VStack {
           HStack(alignment: .firstTextBaseline, spacing: 0) {
             Text("Chap.").foregroundStyle(.secondary)
-            TextField("\(subject.interest?.epStatus ?? 0)", text: $inputEps)
+            TextField("\(epStatus)", text: $inputEps)
               .keyboardType(.numberPad)
               .frame(minWidth: 50, maxWidth: 75)
               .multilineTextAlignment(.trailing)
@@ -112,7 +120,7 @@ struct SubjectBookChaptersView: View {
           }.monospaced()
           HStack(alignment: .firstTextBaseline, spacing: 0) {
             Text("Vol. ").foregroundStyle(.secondary)
-            TextField("\(subject.interest?.volStatus ?? 0)", text: $inputVols)
+            TextField("\(volStatus)", text: $inputVols)
               .keyboardType(.numberPad)
               .frame(minWidth: 50, maxWidth: 75)
               .multilineTextAlignment(.trailing)
@@ -151,7 +159,7 @@ struct SubjectBookChaptersView: View {
       case .row:
         HStack {
           HStack(alignment: .firstTextBaseline, spacing: 0) {
-            TextField("\(subject.interest?.epStatus ?? 0)", text: $inputEps)
+            TextField("\(epStatus)", text: $inputEps)
               .keyboardType(.numberPad)
               .frame(minWidth: 15, maxWidth: 30)
               .multilineTextAlignment(.trailing)
@@ -173,7 +181,7 @@ struct SubjectBookChaptersView: View {
           }
           .monospaced()
           HStack(alignment: .firstTextBaseline, spacing: 0) {
-            TextField("\(subject.interest?.volStatus ?? 0)", text: $inputVols)
+            TextField("\(volStatus)", text: $inputVols)
               .keyboardType(.numberPad)
               .frame(minWidth: 15, maxWidth: 30)
               .multilineTextAlignment(.trailing)
@@ -243,7 +251,7 @@ struct SubjectBookChaptersView: View {
           Spacer()
           VStack(alignment: .trailing) {
             HStack(alignment: .firstTextBaseline, spacing: 0) {
-              TextField("\(subject.interest?.epStatus ?? 0)", text: $inputEps)
+              TextField("\(epStatus)", text: $inputEps)
                 .keyboardType(.numberPad)
                 .frame(minWidth: 32, maxWidth: 48)
                 .multilineTextAlignment(.trailing)
@@ -264,7 +272,7 @@ struct SubjectBookChaptersView: View {
               }.buttonStyle(.plain)
             }.monospaced()
             HStack(alignment: .firstTextBaseline, spacing: 0) {
-              TextField("\(subject.interest?.volStatus ?? 0)", text: $inputVols)
+              TextField("\(volStatus)", text: $inputVols)
                 .keyboardType(.numberPad)
                 .frame(minWidth: 32, maxWidth: 48)
                 .multilineTextAlignment(.trailing)
