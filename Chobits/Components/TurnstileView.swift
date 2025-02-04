@@ -8,21 +8,29 @@ let turnstileHTML = """
           <meta charset="utf-8">
           <meta name='viewport' content='width=device-width, shrink-to-fit=YES' initial-scale='1.0' maximum-scale='1.0' minimum-scale='1.0' user-scalable='no'>
           <script src='https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onloadTurnstileCallback' async defer></script>
+          <style type="text/css">
+            :root {
+              color-scheme: light dark;
+            }
+            body {
+              margin: 0;
+              padding: 0;
+            }
+          </style>
         </head>
         <body>
           <div id='turnstile-container'></div>
           <script>
-            window.onload = function () {
+            function onloadTurnstileCallback() {
               turnstile.render('#turnstile-container', {
                 sitekey: '0x4AAAAAAABkMYinukE8nzYS',
                 theme: 'auto',
-                callback: turnstileCallback,
+                callback: function(token) {
+                  let message = {token: token};
+                  window.webkit.messageHandlers.observer.postMessage(message);
+                },
               });
             };
-            function turnstileCallback(token) {
-              var message = {token: token};
-              window.webkit.messageHandlers.observer.postMessage(message);
-            }
           </script>
         </body>
       </html>
@@ -40,12 +48,12 @@ struct TrunstileView: UIViewRepresentable {
     userController.add(context.coordinator, name: "observer")
     config.userContentController = userController
     let webView = WKWebView(frame: .zero, configuration: config)
+    webView.scrollView.isScrollEnabled = false
+    webView.loadHTMLString(turnstileHTML, baseURL: URL(string: "https://next.bgm.tv/turnstile")!)
     return webView
   }
 
   public func updateUIView(_ uiView: WKWebView, context: Context) {
-    uiView.scrollView.isScrollEnabled = false
-    uiView.loadHTMLString(turnstileHTML, baseURL: URL(string: "https://next.bgm.tv/turnstile")!)
   }
 
   func makeCoordinator() -> Coordinator {

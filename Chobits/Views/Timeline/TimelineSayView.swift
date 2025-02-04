@@ -59,9 +59,7 @@ struct TimelineSayView: View {
             .foregroundStyle(content.count > 380 ? .red : .secondary)
         }
 
-        if token.isEmpty {
-          TrunstileView(token: $token).frame(height: 80)
-        }
+        TrunstileView(token: $token).frame(height: 65)
       }.padding()
     }
   }
