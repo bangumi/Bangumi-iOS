@@ -145,6 +145,7 @@ struct TimelineItemView: View {
             NavigationLink(value: NavDestination.timelineReply(item)) {
               Text(item.replies > 0 ? "\(item.replies) 回复 " : "回复")
             }.buttonStyle(.navLink)
+            Text("·")
           } else if item.cat == .subject, !item.batch {
             // reactions
           }
