@@ -81,24 +81,25 @@ extension Color {
 }
 
 extension Int {
+  var date: Date {
+    return Date(timeIntervalSince1970: TimeInterval(self))
+  }
+
   var dateDisplay: String {
-    let date = Date(timeIntervalSince1970: TimeInterval(self))
-    return date.formatted(date: .numeric, time: .omitted)
+    return self.date.formatted(date: .numeric, time: .omitted)
   }
 
   var datetimeDisplay: String {
-    let date = Date(timeIntervalSince1970: TimeInterval(self))
-    return date.formatted(date: .numeric, time: .shortened)
+    return self.date.formatted(date: .numeric, time: .shortened)
   }
 
   var relativeText: Text {
-    let date = Date(timeIntervalSince1970: TimeInterval(self))
     // < 7 days
-    let relative = -date.timeIntervalSinceNow
+    let relative = -self.date.timeIntervalSinceNow
     if relative < 604800 {
-      return Text("\(date, style: .relative)前").monospacedDigit()
+      return Text("\(self.date, style: .relative)前").monospacedDigit()
     } else {
-      return Text(date.formatted(date: .numeric, time: .shortened))
+      return Text(self.date.formatted(date: .numeric, time: .shortened))
     }
   }
 }
