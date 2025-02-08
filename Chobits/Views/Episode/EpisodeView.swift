@@ -10,7 +10,7 @@ struct EpisodeView: View {
   @Query private var episodes: [Episode]
   private var episode: Episode? { episodes.first }
 
-  @State private var comments: [EpisodeCommentDTO] = []
+  @State private var comments: [CommentDTO] = []
 
   init(episodeId: Int) {
     self.episodeId = episodeId
@@ -50,7 +50,7 @@ struct EpisodeView: View {
         }
         if !isolationMode {
           ForEach(comments) { comment in
-            EpisodeCommentItemView(comment: comment)
+            CommentItemView(comment: comment)
           }
         }
         Spacer()

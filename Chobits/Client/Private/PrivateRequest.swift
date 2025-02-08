@@ -208,13 +208,13 @@ extension Chii {
     return episode
   }
 
-  func getSubjectEpisodeComments(_ episodeID: Int) async throws -> [EpisodeCommentDTO] {
+  func getSubjectEpisodeComments(_ episodeID: Int) async throws -> [CommentDTO] {
     if self.mock {
-      return loadFixture(fixture: "episode_comments.json", target: [EpisodeCommentDTO].self)
+      return loadFixture(fixture: "episode_comments.json", target: [CommentDTO].self)
     }
     let url = BangumiAPI.priv.build("p1/episodes/\(episodeID)/comments")
     let data = try await self.request(url: url, method: "GET")
-    let resp: [EpisodeCommentDTO] = try self.decodeResponse(data)
+    let resp: [CommentDTO] = try self.decodeResponse(data)
     return resp
   }
 }

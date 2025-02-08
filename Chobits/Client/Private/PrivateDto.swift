@@ -592,27 +592,38 @@ struct EpisodeDTO: Codable, Identifiable, Hashable, Linkable {
   }
 }
 
-struct EpisodeCommentBaseDTO: Codable, Identifiable, Hashable {
-  var id: Int
-  var content: String
-  var createdAt: Int
-  var creatorID: Int
-  var epID: Int
-  var relatedID: Int
-  var state: Int
-  var user: SlimUserDTO
+struct ReactionDTO: Codable, Identifiable, Hashable {
+  var users: [SimpleUserDTO]
+  var value: Int
+
+  var id: Int {
+    value
+  }
 }
 
-struct EpisodeCommentDTO: Codable, Identifiable, Hashable {
+struct CommentBaseDTO: Codable, Identifiable, Hashable {
   var id: Int
   var content: String
   var createdAt: Int
   var creatorID: Int
-  var epID: Int
+  var mainID: Int
+  var relatedID: Int
+  var state: Int
+  var user: SlimUserDTO?
+  var reactions: [ReactionDTO]?
+}
+
+struct CommentDTO: Codable, Identifiable, Hashable {
+  var id: Int
+  var content: String
+  var createdAt: Int
+  var creatorID: Int
+  var mainID: Int
   var relatedID: Int
   var state: Int
   var user: SlimUserDTO
-  var replies: [EpisodeCommentBaseDTO]
+  var replies: [CommentBaseDTO]
+  var reactions: [ReactionDTO]?
 }
 
 struct SubjectRelationDTO: Codable, Identifiable, Hashable {
@@ -1065,19 +1076,14 @@ struct UserIndexStatsDTO: Codable, Hashable {
   var collect: Int
 }
 
-struct ReactionDTO: Codable, Hashable {
-  var users: [SimpleUserDTO]
-  var value: Int
-}
-
 struct ReplyBaseDTO: Codable, Identifiable, Hashable {
   var id: Int
   var content: String
   var createdAt: Int
   var creator: SlimUserDTO?
   var creatorID: Int
-  var reactions: [ReactionDTO]? = []
   var state: Int
+  var reactions: [ReactionDTO]?
 }
 
 struct ReplyDTO: Codable, Identifiable, Hashable {
@@ -1086,7 +1092,7 @@ struct ReplyDTO: Codable, Identifiable, Hashable {
   var createdAt: Int
   var creator: SlimUserDTO?
   var creatorID: Int
-  var reactions: [ReactionDTO]? = []
   var state: Int
   var replies: [ReplyBaseDTO]
+  var reactions: [ReactionDTO]?
 }

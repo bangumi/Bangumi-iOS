@@ -1,8 +1,8 @@
 import BBCode
 import SwiftUI
 
-struct EpisodeCommentItemView: View {
-  let comment: EpisodeCommentDTO
+struct CommentItemView: View {
+  let comment: CommentDTO
 
   var body: some View {
     VStack(alignment: .leading) {
@@ -26,14 +26,23 @@ struct EpisodeCommentItemView: View {
             VStack(alignment: .leading) {
               Divider()
               HStack(alignment: .top) {
-                ImageView(img: reply.user.avatar?.large)
-                  .imageStyle(width: 40, height: 40)
-                  .imageType(.avatar)
-                  .imageLink(reply.user.link)
+                if let user = reply.user {
+                  ImageView(img: user.avatar?.large)
+                    .imageStyle(width: 40, height: 40)
+                    .imageType(.avatar)
+                    .imageLink(user.link)
+                } else {
+                  Rectangle().fill(.clear).frame(width: 40, height: 40)
+                }
                 VStack(alignment: .leading) {
                   HStack {
-                    Text(reply.user.nickname.withLink(reply.user.link))
-                      .lineLimit(1)
+                    if let user = reply.user {
+                      Text(user.nickname.withLink(user.link))
+                        .lineLimit(1)
+                    } else {
+                      Text("用户 \(reply.creatorID)")
+                        .lineLimit(1)
+                    }
                     Spacer()
                     Text(reply.createdAt.datetimeDisplay)
                       .lineLimit(1)
