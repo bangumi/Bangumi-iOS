@@ -60,6 +60,16 @@ extension Chii {
     let subjects: [SlimSubjectDTO] = try self.decodeResponse(data)
     return subjects
   }
+
+  func getBlogComments(_ entryID: Int) async throws -> [CommentDTO] {
+    if self.mock {
+      return loadFixture(fixture: "blog_comments.json", target: [CommentDTO].self)
+    }
+    let url = BangumiAPI.priv.build("p1/blogs/\(entryID)/comments")
+    let data = try await self.request(url: url, method: "GET")
+    let resp: [CommentDTO] = try self.decodeResponse(data)
+    return resp
+  }
 }
 
 // MARK: - Calendar
@@ -124,6 +134,16 @@ extension Chii {
     let pageURL = url.appending(queryItems: queryItems)
     let data = try await self.request(url: pageURL, method: "GET")
     let resp: PagedDTO<PersonCollectDTO> = try self.decodeResponse(data)
+    return resp
+  }
+
+  func getCharacterComments(_ characterID: Int) async throws -> [CommentDTO] {
+    if self.mock {
+      return loadFixture(fixture: "character_comments.json", target: [CommentDTO].self)
+    }
+    let url = BangumiAPI.priv.build("p1/characters/\(characterID)/comments")
+    let data = try await self.request(url: url, method: "GET")
+    let resp: [CommentDTO] = try self.decodeResponse(data)
     return resp
   }
 }
@@ -378,6 +398,16 @@ extension Chii {
     let pageURL = url.appending(queryItems: queryItems)
     let data = try await self.request(url: pageURL, method: "GET")
     let resp: PagedDTO<PersonCollectDTO> = try self.decodeResponse(data)
+    return resp
+  }
+
+  func getPersonComments(_ personID: Int) async throws -> [CommentDTO] {
+    if self.mock {
+      return loadFixture(fixture: "person_comments.json", target: [CommentDTO].self)
+    }
+    let url = BangumiAPI.priv.build("p1/persons/\(personID)/comments")
+    let data = try await self.request(url: url, method: "GET")
+    let resp: [CommentDTO] = try self.decodeResponse(data)
     return resp
   }
 }
