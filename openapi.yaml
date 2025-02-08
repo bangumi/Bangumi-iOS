@@ -210,76 +210,99 @@ components:
       x-ms-enum:
         modelAsString: false
         name: CollectionType
-    CreateEpisodeComment:
+    Comment:
+      allOf:
+        - properties:
+            content:
+              type: string
+            createdAt:
+              type: integer
+            creatorID:
+              type: integer
+            id:
+              type: integer
+            mainID:
+              type: integer
+            reactions:
+              items:
+                $ref: '#/components/schemas/Reaction'
+              type: array
+            relatedID:
+              type: integer
+            state:
+              type: integer
+            user:
+              $ref: '#/components/schemas/SlimUser'
+          required:
+            - id
+            - mainID
+            - creatorID
+            - relatedID
+            - createdAt
+            - content
+            - state
+          type: object
+        - properties:
+            replies:
+              items:
+                $ref: '#/components/schemas/CommentBase'
+              type: array
+          required:
+            - replies
+          type: object
+      type: object
+    CommentBase:
+      properties:
+        content:
+          type: string
+        createdAt:
+          type: integer
+        creatorID:
+          type: integer
+        id:
+          type: integer
+        mainID:
+          type: integer
+        reactions:
+          items:
+            $ref: '#/components/schemas/Reaction'
+          type: array
+        relatedID:
+          type: integer
+        state:
+          type: integer
+        user:
+          $ref: '#/components/schemas/SlimUser'
+      required:
+        - id
+        - mainID
+        - creatorID
+        - relatedID
+        - createdAt
+        - content
+        - state
+      type: object
+    CreateContent:
+      properties:
+        content:
+          minLength: 1
+          type: string
+      required:
+        - content
+      type: object
+    CreateReply:
       properties:
         content:
           minLength: 1
           type: string
         replyTo:
           default: 0
-          description: 被回复的吐槽 ID, `0` 代表发送顶层吐槽
+          description: 被回复的回复 ID, `0` 代表发送顶层回复
           type: integer
-        turnstileToken:
-          description: >-
-            需要
-            [turnstile](https://developers.cloudflare.com/turnstile/get-started/client-side-rendering/)
-
-            next.bgm.tv 域名对应的 site-key 为 `0x4AAAAAAABkMYinukE8nzYS`
-
-            dev.bgm38.tv 域名使用测试用的 site-key `1x00000000000000000000AA`
-          minLength: 1
-          type: string
       required:
         - content
-        - turnstileToken
-      type: object
-    CreatePost:
-      properties:
-        content:
-          minLength: 1
-          type: string
-        replyTo:
-          default: 0
-          description: 被回复的帖子 ID, `0` 代表回复楼主
-          type: integer
-        turnstileToken:
-          description: >-
-            需要
-            [turnstile](https://developers.cloudflare.com/turnstile/get-started/client-side-rendering/)
-
-            next.bgm.tv 域名对应的 site-key 为 `0x4AAAAAAABkMYinukE8nzYS`
-
-            dev.bgm38.tv 域名使用测试用的 site-key `1x00000000000000000000AA`
-          minLength: 1
-          type: string
-      required:
-        - content
-        - turnstileToken
-      type: object
-    CreateTimelineSay:
-      properties:
-        content:
-          minLength: 1
-          type: string
-        turnstileToken:
-          description: >-
-            需要
-            [turnstile](https://developers.cloudflare.com/turnstile/get-started/client-side-rendering/)
-
-            next.bgm.tv 域名对应的 site-key 为 `0x4AAAAAAABkMYinukE8nzYS`
-
-            dev.bgm38.tv 域名使用测试用的 site-key `1x00000000000000000000AA`
-          minLength: 1
-          type: string
-      required:
-        - content
-        - turnstileToken
       type: object
     CreateTopic:
-      example:
-        content: topic content
-        title: topic title
-        turnstileToken: 10000000-aaaa-bbbb-cccc-000000000001
       properties:
         content:
           description: bbcode
@@ -288,19 +311,9 @@ components:
         title:
           minLength: 1
           type: string
-        turnstileToken:
-          description: >-
-            需要
-            [turnstile](https://developers.cloudflare.com/turnstile/get-started/client-side-rendering/)
-
-            next.bgm.tv 域名对应的 site-key 为 `0x4AAAAAAABkMYinukE8nzYS`
-
-            dev.bgm38.tv 域名使用测试用的 site-key `1x00000000000000000000AA`
-          type: string
       required:
         - title
         - content
-        - turnstileToken
       type: object
     Episode:
       properties:
@@ -364,78 +377,6 @@ components:
       x-ms-enum:
         modelAsString: false
         name: EpisodeCollectionStatus
-    EpisodeCommentBase:
-      properties:
-        content:
-          type: string
-        createdAt:
-          type: integer
-        creatorID:
-          type: integer
-        epID:
-          type: integer
-        id:
-          type: integer
-        reactions:
-          items:
-            $ref: '#/components/schemas/Reaction'
-          type: array
-        relatedID:
-          type: integer
-        state:
-          type: integer
-        user:
-          $ref: '#/components/schemas/SlimUser'
-      required:
-        - id
-        - epID
-        - creatorID
-        - relatedID
-        - createdAt
-        - content
-        - state
-      type: object
-    EpisodeComments:
-      allOf:
-        - properties:
-            content:
-              type: string
-            createdAt:
-              type: integer
-            creatorID:
-              type: integer
-            epID:
-              type: integer
-            id:
-              type: integer
-            reactions:
-              items:
-                $ref: '#/components/schemas/Reaction'
-              type: array
-            relatedID:
-              type: integer
-            state:
-              type: integer
-            user:
-              $ref: '#/components/schemas/SlimUser'
-          required:
-            - id
-            - epID
-            - creatorID
-            - relatedID
-            - createdAt
-            - content
-            - state
-          type: object
-        - properties:
-            replies:
-              items:
-                $ref: '#/components/schemas/EpisodeCommentBase'
-              type: array
-          required:
-            - replies
-          type: object
-      type: object
     EpisodeType:
       description: |-
         话数类型
@@ -1674,33 +1615,6 @@ components:
         type: integer
       title: SubjectCollection
       type: object
-    SubjectComment:
-      properties:
-        comment:
-          type: string
-        id:
-          type: integer
-        rate:
-          type: integer
-        reactions:
-          items:
-            $ref: '#/components/schemas/Reaction'
-          type: array
-        type:
-          $ref: '#/components/schemas/CollectionType'
-        updatedAt:
-          type: integer
-        user:
-          $ref: '#/components/schemas/SlimUser'
-      required:
-        - id
-        - user
-        - type
-        - rate
-        - comment
-        - updatedAt
-      title: SubjectComment
-      type: object
     SubjectEdit:
       example:
         infobox: |-
@@ -1814,6 +1728,33 @@ components:
         - private
         - updatedAt
       title: SubjectInterest
+      type: object
+    SubjectInterestComment:
+      properties:
+        comment:
+          type: string
+        id:
+          type: integer
+        rate:
+          type: integer
+        reactions:
+          items:
+            $ref: '#/components/schemas/Reaction'
+          type: array
+        type:
+          $ref: '#/components/schemas/CollectionType'
+        updatedAt:
+          type: integer
+        user:
+          $ref: '#/components/schemas/SlimUser'
+      required:
+        - id
+        - user
+        - type
+        - rate
+        - comment
+        - updatedAt
+      title: SubjectInterestComment
       type: object
     SubjectNew:
       properties:
@@ -2393,18 +2334,23 @@ components:
         - subject
         - count
       type: object
-    UpdateEpisodeComment:
+    TurnstileToken:
       properties:
-        content:
-          minLength: 1
+        turnstileToken:
+          description: >-
+            需要
+            [turnstile](https://developers.cloudflare.com/turnstile/get-started/client-side-rendering/)
+
+            next.bgm.tv 域名对应的 site-key 为 `0x4AAAAAAABkMYinukE8nzYS`
+
+            dev.bgm38.tv 域名使用测试用的 site-key `1x00000000000000000000AA`
           type: string
       required:
-        - content
+        - turnstileToken
       type: object
-    UpdatePost:
+    UpdateContent:
       properties:
         content:
-          description: bbcode
           minLength: 1
           type: string
       required:
@@ -2632,7 +2578,7 @@ info:
     关于订阅通知的 socket.io 相关的文档在
     <https://github.com/bangumi/GraphQL/blob/master/docs/socket.io.md>
   title: bangumi private api
-  version: v0.12.9
+  version: v0.13.2
 openapi: 3.0.3
 paths:
   /p1/blocklist:
@@ -2741,6 +2687,70 @@ paths:
       summary: 将用户从绝交列表移出
       tags:
         - misc
+  /p1/blogs/-/comments/{commentID}:
+    delete:
+      operationId: deleteBlogComment
+      parameters:
+        - in: path
+          name: commentID
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties: {}
+                type: object
+          description: Default Response
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                description: 意料之外的服务器错误
+          description: 意料之外的服务器错误
+      security:
+        - CookiesSession: []
+          HTTPBearer: []
+      summary: 删除日志的吐槽
+      tags:
+        - blog
+    put:
+      operationId: updateBlogComment
+      parameters:
+        - in: path
+          name: commentID
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateContent'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties: {}
+                type: object
+          description: Default Response
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                description: 意料之外的服务器错误
+          description: 意料之外的服务器错误
+      security:
+        - CookiesSession: []
+          HTTPBearer: []
+      summary: 编辑日志的吐槽
+      tags:
+        - blog
   /p1/blogs/{entryID}:
     get:
       operationId: getBlogEntry
@@ -2767,6 +2777,130 @@ paths:
       security:
         - HTTPBearer: []
       summary: 获取日志详情
+      tags:
+        - blog
+  /p1/blogs/{entryID}/comments:
+    get:
+      operationId: getBlogComments
+      parameters:
+        - in: path
+          name: entryID
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  allOf:
+                    - properties:
+                        content:
+                          type: string
+                        createdAt:
+                          type: integer
+                        creatorID:
+                          type: integer
+                        id:
+                          type: integer
+                        mainID:
+                          type: integer
+                        reactions:
+                          items:
+                            $ref: '#/components/schemas/Reaction'
+                          type: array
+                        relatedID:
+                          type: integer
+                        state:
+                          type: integer
+                        user:
+                          $ref: '#/components/schemas/SlimUser'
+                      required:
+                        - id
+                        - mainID
+                        - creatorID
+                        - relatedID
+                        - createdAt
+                        - content
+                        - state
+                      type: object
+                    - properties:
+                        replies:
+                          items:
+                            $ref: '#/components/schemas/CommentBase'
+                          type: array
+                      required:
+                        - replies
+                      type: object
+                  type: object
+                type: array
+          description: Default Response
+        '404':
+          content:
+            application/json:
+              examples:
+                NOT_FOUND:
+                  value:
+                    code: NOT_FOUND
+                    error: Not Found
+                    message: blog entry not found
+                    statusCode: 404
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: default error response type
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                description: 意料之外的服务器错误
+          description: 意料之外的服务器错误
+      security:
+        - CookiesSession: []
+          HTTPBearer: []
+      summary: 获取日志的吐槽箱
+      tags:
+        - blog
+    post:
+      operationId: createBlogComment
+      parameters:
+        - in: path
+          name: entryID
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/CreateReply'
+                - $ref: '#/components/schemas/TurnstileToken'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    description: new comment id
+                    type: integer
+                required:
+                  - id
+                type: object
+          description: Default Response
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                description: 意料之外的服务器错误
+          description: 意料之外的服务器错误
+      security:
+        - CookiesSession: []
+          HTTPBearer: []
+      summary: 创建日志的吐槽
       tags:
         - blog
   /p1/blogs/{entryID}/photos:
@@ -2878,6 +3012,70 @@ paths:
       summary: 获取每日放送
       tags:
         - calendar
+  /p1/characters/-/comments/{commentID}:
+    delete:
+      operationId: deleteCharacterComment
+      parameters:
+        - in: path
+          name: commentID
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties: {}
+                type: object
+          description: Default Response
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                description: 意料之外的服务器错误
+          description: 意料之外的服务器错误
+      security:
+        - CookiesSession: []
+          HTTPBearer: []
+      summary: 删除角色的吐槽
+      tags:
+        - character
+    put:
+      operationId: updateCharacterComment
+      parameters:
+        - in: path
+          name: commentID
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateContent'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties: {}
+                type: object
+          description: Default Response
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                description: 意料之外的服务器错误
+          description: 意料之外的服务器错误
+      security:
+        - CookiesSession: []
+          HTTPBearer: []
+      summary: 编辑角色的吐槽
+      tags:
+        - character
   /p1/characters/{characterID}:
     get:
       operationId: getCharacter
@@ -3069,6 +3267,130 @@ paths:
         - CookiesSession: []
           HTTPBearer: []
       summary: 获取角色的收藏用户
+      tags:
+        - character
+  /p1/characters/{characterID}/comments:
+    get:
+      operationId: getCharacterComments
+      parameters:
+        - in: path
+          name: characterID
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  allOf:
+                    - properties:
+                        content:
+                          type: string
+                        createdAt:
+                          type: integer
+                        creatorID:
+                          type: integer
+                        id:
+                          type: integer
+                        mainID:
+                          type: integer
+                        reactions:
+                          items:
+                            $ref: '#/components/schemas/Reaction'
+                          type: array
+                        relatedID:
+                          type: integer
+                        state:
+                          type: integer
+                        user:
+                          $ref: '#/components/schemas/SlimUser'
+                      required:
+                        - id
+                        - mainID
+                        - creatorID
+                        - relatedID
+                        - createdAt
+                        - content
+                        - state
+                      type: object
+                    - properties:
+                        replies:
+                          items:
+                            $ref: '#/components/schemas/CommentBase'
+                          type: array
+                      required:
+                        - replies
+                      type: object
+                  type: object
+                type: array
+          description: Default Response
+        '404':
+          content:
+            application/json:
+              examples:
+                NOT_FOUND:
+                  value:
+                    code: NOT_FOUND
+                    error: Not Found
+                    message: character not found
+                    statusCode: 404
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: default error response type
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                description: 意料之外的服务器错误
+          description: 意料之外的服务器错误
+      security:
+        - CookiesSession: []
+          HTTPBearer: []
+      summary: 获取角色的吐槽箱
+      tags:
+        - character
+    post:
+      operationId: createCharacterComment
+      parameters:
+        - in: path
+          name: characterID
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/CreateReply'
+                - $ref: '#/components/schemas/TurnstileToken'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    description: new comment id
+                    type: integer
+                required:
+                  - id
+                type: object
+          description: Default Response
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                description: 意料之外的服务器错误
+          description: 意料之外的服务器错误
+      security:
+        - CookiesSession: []
+          HTTPBearer: []
+      summary: 创建角色的吐槽
       tags:
         - character
   /p1/clear-notify:
@@ -3371,13 +3693,13 @@ paths:
       summary: debug
   /p1/episodes/-/comments/{commentID}:
     delete:
-      operationId: deleteSubjectEpComment
+      operationId: deleteEpisodeComment
       parameters:
-        - example: 1034989
-          in: path
+        - in: path
           name: commentID
           required: true
           schema:
+            minimum: 1
             type: integer
       responses:
         '200':
@@ -3401,19 +3723,19 @@ paths:
       tags:
         - episode
     put:
-      operationId: updateSubjectEpComment
+      operationId: updateEpisodeComment
       parameters:
-        - example: 1075440
-          in: path
+        - in: path
           name: commentID
           required: true
           schema:
+            minimum: 1
             type: integer
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateEpisodeComment'
+              $ref: '#/components/schemas/UpdateContent'
       responses:
         '200':
           content:
@@ -3437,13 +3759,13 @@ paths:
         - episode
   /p1/episodes/{episodeID}:
     get:
-      operationId: getSubjectEpisode
+      operationId: getEpisode
       parameters:
-        - example: 1075440
-          in: path
+        - in: path
           name: episodeID
           required: true
           schema:
+            minimum: 1
             type: integer
       responses:
         '200':
@@ -3467,7 +3789,7 @@ paths:
         - episode
   /p1/episodes/{episodeID}/comments:
     get:
-      operationId: getSubjectEpisodeComments
+      operationId: getEpisodeComments
       parameters:
         - in: path
           name: episodeID
@@ -3489,9 +3811,9 @@ paths:
                           type: integer
                         creatorID:
                           type: integer
-                        epID:
-                          type: integer
                         id:
+                          type: integer
+                        mainID:
                           type: integer
                         reactions:
                           items:
@@ -3505,7 +3827,7 @@ paths:
                           $ref: '#/components/schemas/SlimUser'
                       required:
                         - id
-                        - epID
+                        - mainID
                         - creatorID
                         - relatedID
                         - createdAt
@@ -3515,7 +3837,7 @@ paths:
                     - properties:
                         replies:
                           items:
-                            $ref: '#/components/schemas/EpisodeCommentBase'
+                            $ref: '#/components/schemas/CommentBase'
                           type: array
                       required:
                         - replies
@@ -3534,19 +3856,21 @@ paths:
       tags:
         - episode
     post:
-      operationId: createSubjectEpComment
+      operationId: createEpisodeComment
       parameters:
-        - example: 1075440
-          in: path
+        - in: path
           name: episodeID
           required: true
           schema:
+            minimum: 1
             type: integer
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateEpisodeComment'
+              allOf:
+                - $ref: '#/components/schemas/CreateReply'
+                - $ref: '#/components/schemas/TurnstileToken'
       responses:
         '200':
           content:
@@ -3554,7 +3878,7 @@ paths:
               schema:
                 properties:
                   id:
-                    description: new reply id
+                    description: new comment id
                     type: integer
                 required:
                   - id
@@ -3744,7 +4068,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdatePost'
+              $ref: '#/components/schemas/UpdateContent'
       responses:
         '200':
           content:
@@ -3842,7 +4166,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreatePost'
+              allOf:
+                - $ref: '#/components/schemas/CreateReply'
+                - $ref: '#/components/schemas/TurnstileToken'
       responses:
         '200':
           content:
@@ -4025,7 +4351,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateTopic'
+              allOf:
+                - $ref: '#/components/schemas/CreateTopic'
+                - $ref: '#/components/schemas/TurnstileToken'
       responses:
         '200':
           content:
@@ -4289,6 +4617,70 @@ paths:
       summary: 获取未读通知
       tags:
         - misc
+  /p1/persons/-/comments/{commentID}:
+    delete:
+      operationId: deletePersonComment
+      parameters:
+        - in: path
+          name: commentID
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties: {}
+                type: object
+          description: Default Response
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                description: 意料之外的服务器错误
+          description: 意料之外的服务器错误
+      security:
+        - CookiesSession: []
+          HTTPBearer: []
+      summary: 删除人物的吐槽
+      tags:
+        - person
+    put:
+      operationId: updatePersonComment
+      parameters:
+        - in: path
+          name: commentID
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateContent'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties: {}
+                type: object
+          description: Default Response
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                description: 意料之外的服务器错误
+          description: 意料之外的服务器错误
+      security:
+        - CookiesSession: []
+          HTTPBearer: []
+      summary: 编辑人物的吐槽
+      tags:
+        - person
   /p1/persons/{personID}:
     get:
       operationId: getPerson
@@ -4482,6 +4874,130 @@ paths:
       summary: 获取人物的收藏用户
       tags:
         - person
+  /p1/persons/{personID}/comments:
+    get:
+      operationId: getPersonComments
+      parameters:
+        - in: path
+          name: personID
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  allOf:
+                    - properties:
+                        content:
+                          type: string
+                        createdAt:
+                          type: integer
+                        creatorID:
+                          type: integer
+                        id:
+                          type: integer
+                        mainID:
+                          type: integer
+                        reactions:
+                          items:
+                            $ref: '#/components/schemas/Reaction'
+                          type: array
+                        relatedID:
+                          type: integer
+                        state:
+                          type: integer
+                        user:
+                          $ref: '#/components/schemas/SlimUser'
+                      required:
+                        - id
+                        - mainID
+                        - creatorID
+                        - relatedID
+                        - createdAt
+                        - content
+                        - state
+                      type: object
+                    - properties:
+                        replies:
+                          items:
+                            $ref: '#/components/schemas/CommentBase'
+                          type: array
+                      required:
+                        - replies
+                      type: object
+                  type: object
+                type: array
+          description: Default Response
+        '404':
+          content:
+            application/json:
+              examples:
+                NOT_FOUND:
+                  value:
+                    code: NOT_FOUND
+                    error: Not Found
+                    message: person not found
+                    statusCode: 404
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: default error response type
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                description: 意料之外的服务器错误
+          description: 意料之外的服务器错误
+      security:
+        - CookiesSession: []
+          HTTPBearer: []
+      summary: 获取人物的吐槽箱
+      tags:
+        - person
+    post:
+      operationId: createPersonComment
+      parameters:
+        - in: path
+          name: personID
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/CreateReply'
+                - $ref: '#/components/schemas/TurnstileToken'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    description: new comment id
+                    type: integer
+                required:
+                  - id
+                type: object
+          description: Default Response
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                description: 意料之外的服务器错误
+          description: 意料之外的服务器错误
+      security:
+        - CookiesSession: []
+          HTTPBearer: []
+      summary: 创建人物的吐槽
+      tags:
+        - person
   /p1/persons/{personID}/works:
     get:
       operationId: getPersonWorks
@@ -4650,50 +5166,6 @@ paths:
       summary: 获取条目列表
       tags:
         - subject
-  /p1/subjects/-/episode/{episodeID}:
-    get:
-      parameters:
-        - in: path
-          name: episodeID
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Default Response
-  /p1/subjects/-/episode/{episodeID}/comments:
-    get:
-      parameters:
-        - in: path
-          name: episodeID
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Default Response
-  /p1/subjects/-/episodes/{episodeID}:
-    get:
-      parameters:
-        - in: path
-          name: episodeID
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Default Response
-  /p1/subjects/-/episodes/{episodeID}/comments:
-    get:
-      parameters:
-        - in: path
-          name: episodeID
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Default Response
   /p1/subjects/-/posts/{postID}:
     delete:
       operationId: deleteSubjectPost
@@ -4761,7 +5233,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdatePost'
+              $ref: '#/components/schemas/UpdateContent'
       responses:
         '200':
           content:
@@ -4872,7 +5344,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreatePost'
+              allOf:
+                - $ref: '#/components/schemas/CreateReply'
+                - $ref: '#/components/schemas/TurnstileToken'
       responses:
         '200':
           content:
@@ -5029,7 +5503,7 @@ paths:
                 properties:
                   data:
                     items:
-                      $ref: '#/components/schemas/SubjectComment'
+                      $ref: '#/components/schemas/SubjectInterestComment'
                     type: array
                   total:
                     description: limit+offset 为参数的请求表示总条数，page 为参数的请求表示总页数
@@ -5487,7 +5961,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateTopic'
+              allOf:
+                - $ref: '#/components/schemas/CreateTopic'
+                - $ref: '#/components/schemas/TurnstileToken'
       responses:
         '200':
           content:
@@ -5567,7 +6043,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateTimelineSay'
+              allOf:
+                - $ref: '#/components/schemas/CreateContent'
+                - $ref: '#/components/schemas/TurnstileToken'
       responses:
         '200':
           content:
