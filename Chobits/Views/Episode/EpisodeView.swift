@@ -22,7 +22,7 @@ struct EpisodeView: View {
     do {
       try await Chii.shared.loadEpisode(episodeId)
       if !isolationMode {
-        comments = try await Chii.shared.getSubjectEpisodeComments(episodeId)
+        comments = try await Chii.shared.getEpisodeComments(episodeId)
       }
     } catch {
       Notifier.shared.alert(error: error)

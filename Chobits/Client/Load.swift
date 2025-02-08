@@ -121,7 +121,7 @@ extension Chii {
 
   func loadEpisode(_ episodeId: Int) async throws {
     let db = try self.getDB()
-    let item = try await self.getSubjectEpisode(episodeId)
+    let item = try await self.getEpisode(episodeId)
     try await db.saveEpisode(item)
     try await db.commit()
   }

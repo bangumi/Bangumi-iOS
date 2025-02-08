@@ -198,7 +198,7 @@ extension Chii {
 
 // MARK: - Episode
 extension Chii {
-  func getSubjectEpisode(_ episodeID: Int) async throws -> EpisodeDTO {
+  func getEpisode(_ episodeID: Int) async throws -> EpisodeDTO {
     if self.mock {
       return loadFixture(fixture: "subject_anime_episode.json", target: EpisodeDTO.self)
     }
@@ -208,7 +208,7 @@ extension Chii {
     return episode
   }
 
-  func getSubjectEpisodeComments(_ episodeID: Int) async throws -> [CommentDTO] {
+  func getEpisodeComments(_ episodeID: Int) async throws -> [CommentDTO] {
     if self.mock {
       return loadFixture(fixture: "episode_comments.json", target: [CommentDTO].self)
     }
@@ -597,6 +597,16 @@ extension Chii {
     let pageURL = url.appending(queryItems: queryItems)
     let data = try await self.request(url: pageURL, method: "GET")
     let resp: [TimelineDTO] = try self.decodeResponse(data)
+    return resp
+  }
+
+  func getTimelineReplies(_ id: Int) async throws -> [CommentDTO] {
+    if self.mock {
+      return loadFixture(fixture: "timeline_replies.json", target: [CommentDTO].self)
+    }
+    let url = BangumiAPI.priv.build("p1/timeline/\(id)/replies")
+    let data = try await self.request(url: url, method: "GET")
+    let resp: [CommentDTO] = try self.decodeResponse(data)
     return resp
   }
 
