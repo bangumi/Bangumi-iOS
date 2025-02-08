@@ -9,6 +9,7 @@ struct TimelineReplyView: View {
 
   func load() async {
     if isolationMode { return }
+    if !comments.isEmpty { return }
     do {
       comments = try await Chii.shared.getTimelineReplies(item.id)
     } catch {
@@ -36,8 +37,8 @@ struct TimelineReplyView: View {
           Divider()
         }
         Text(item.memo.status?.tsukkomi ?? "").textSelection(.enabled)
-        Divider()
         if !isolationMode {
+          Divider()
           ForEach(comments) { comment in
             CommentItemView(comment: comment)
           }
@@ -46,5 +47,10 @@ struct TimelineReplyView: View {
     }
     .navigationTitle("回复吐槽")
     .navigationBarTitleDisplayMode(.inline)
+    .onAppear {
+      Task {
+        await load()
+      }
+    }
   }
 }

@@ -14,6 +14,8 @@ struct PersonView: View {
   @Query private var persons: [Person]
   var person: Person? { persons.first }
 
+  @State private var comments: [CommentDTO] = []
+
   init(personId: Int) {
     self.personId = personId
     let predicate = #Predicate<Person> {
@@ -45,6 +47,10 @@ struct PersonView: View {
       try await Chii.shared.loadPerson(personId)
       refreshed = true
 
+      if !isolationMode {
+        comments = try await Chii.shared.getPersonComments(personId)
+      }
+
       try await Chii.shared.loadPersonDetails(personId)
     } catch {
       Notifier.shared.alert(error: error)
@@ -55,7 +61,7 @@ struct PersonView: View {
   var body: some View {
     Section {
       if let person = person {
-        ScrollView(showsIndicators: false) {
+        ScrollView {
           LazyVStack(alignment: .leading) {
 
             /// title
@@ -125,6 +131,13 @@ struct PersonView: View {
             /// works
             PersonWorksView(personId: personId, works: person.works)
 
+            /// comments
+            if !isolationMode {
+              Divider()
+              ForEach(comments) { comment in
+                CommentItemView(comment: comment)
+              }
+            }
           }.padding(.horizontal, 8)
         }
       } else if refreshed {

@@ -14,6 +14,8 @@ struct CharacterView: View {
   @Query private var characters: [Character]
   private var character: Character? { characters.first }
 
+  @State private var comments: [CommentDTO] = []
+
   init(characterId: Int) {
     self.characterId = characterId
     let predicate = #Predicate<Character> {
@@ -32,6 +34,10 @@ struct CharacterView: View {
       try await Chii.shared.loadCharacter(characterId)
       refreshed = true
 
+      if !isolationMode {
+        comments = try await Chii.shared.getCharacterComments(characterId)
+      }
+
       try await Chii.shared.loadCharacterDetails(characterId)
     } catch {
       Notifier.shared.alert(error: error)
@@ -42,7 +48,7 @@ struct CharacterView: View {
   var body: some View {
     Section {
       if let character = character {
-        ScrollView(showsIndicators: false) {
+        ScrollView {
           LazyVStack(alignment: .leading) {
 
             /// title
@@ -98,6 +104,13 @@ struct CharacterView: View {
 
             /// casts
             CharacterCastsView(characterId: characterId, casts: character.casts)
+
+            /// comments
+            if !isolationMode {
+              ForEach(comments) { comment in
+                CommentItemView(comment: comment)
+              }
+            }
           }.padding(.horizontal, 8)
         }
       } else {

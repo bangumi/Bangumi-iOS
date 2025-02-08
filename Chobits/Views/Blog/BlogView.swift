@@ -6,10 +6,12 @@ struct BlogView: View {
   let blogId: Int
 
   @AppStorage("shareDomain") var shareDomain: ShareDomain = .chii
+  @AppStorage("isolationMode") var isolationMode: Bool = false
 
   @State private var refreshed: Bool = false
   @State private var blog: BlogEntryDTO?
   @State private var subjects: [SlimSubjectDTO] = []
+  @State private var comments: [CommentDTO] = []
 
   var title: String {
     guard let blog = blog else {
@@ -26,6 +28,9 @@ struct BlogView: View {
     do {
       blog = try await Chii.shared.getBlogEntry(blogId)
       subjects = try await Chii.shared.getBlogSubjects(blogId)
+      if !isolationMode {
+        comments = try await Chii.shared.getBlogComments(blogId)
+      }
     } catch {
       Notifier.shared.alert(error: error)
     }
@@ -69,6 +74,13 @@ struct BlogView: View {
               .padding(.top, 8)
           }.padding(.horizontal, 8)
 
+          /// comments
+          if !isolationMode {
+            Divider()
+            ForEach(comments) { comment in
+              CommentItemView(comment: comment)
+            }
+          }
         }
       } else if refreshed {
         NotFoundView()
