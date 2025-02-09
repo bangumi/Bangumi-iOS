@@ -153,12 +153,12 @@ struct TimelineItemView: View {
             Text("\(item.createdAt.datetimeDisplay)")
           } label: {
             item.createdAt.relativeText
-              .foregroundStyle(.secondary)
           }.buttonStyle(.plain)
           Text("·")
           Text("\(item.source.desc)")
-            .foregroundStyle(.secondary)
-        }.font(.footnote)
+        }
+        .foregroundStyle(.secondary)
+        .font(.footnote)
         Divider()
       }
       Spacer()
