@@ -29,7 +29,7 @@ struct CollectionSubjectTypeView: View {
         $0.type == stypeVal && $0.ctype == ctypeVal
       },
       sortBy: [
-        SortDescriptor<Subject>(\.interest?.updatedAt, order: .reverse)
+        SortDescriptor<Subject>(\.collectedAt, order: .reverse)
       ])
     descriptor.fetchLimit = columnCount * 2
     do {

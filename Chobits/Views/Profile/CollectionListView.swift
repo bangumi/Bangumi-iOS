@@ -39,7 +39,7 @@ struct CollectionListView: View {
         $0.ctype == ctype && $0.type == stype
       },
       sortBy: [
-        SortDescriptor(\.interest?.updatedAt, order: .reverse)
+        SortDescriptor(\.collectedAt, order: .reverse)
       ])
     descriptor.fetchLimit = limit
     descriptor.fetchOffset = offset

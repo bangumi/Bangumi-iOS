@@ -128,7 +128,8 @@ final class SubjectV2: Searchable, Linkable {
   var volumes: Int
   var alias: String
 
-  var ctype: Int
+  var ctype: Int = 0
+  var collectedAt: Int = 0
   var interest: SubjectInterest?
 
   var characters: [SubjectCharacterDTO] = []
@@ -203,8 +204,7 @@ final class SubjectV2: Searchable, Linkable {
     self.interest = item.interest
     if let interest = item.interest {
       self.ctype = interest.type.rawValue
-    } else {
-      self.ctype = 0
+      self.collectedAt = interest.updatedAt
     }
     self.alias = item.infobox.aliases.joined(separator: " ")
   }
@@ -230,7 +230,6 @@ final class SubjectV2: Searchable, Linkable {
     self.type = item.type.rawValue
     self.volumes = 0
     self.alias = ""
-    self.ctype = 0
     self.interest = nil
   }
 
@@ -255,7 +254,6 @@ final class SubjectV2: Searchable, Linkable {
     self.type = item.type.rawValue
     self.volumes = item.volumes
     self.alias = ""
-    self.ctype = 0
     self.interest = nil
   }
 
@@ -282,9 +280,11 @@ final class SubjectV2: Searchable, Linkable {
     if self.alias != aliases { self.alias = aliases }
     if let interest = item.interest {
       if self.ctype != interest.type.rawValue { self.ctype = interest.type.rawValue }
+      if self.collectedAt != interest.updatedAt { self.collectedAt = interest.updatedAt }
       if self.interest != interest { self.interest = interest }
     } else {
       if self.ctype != 0 { self.ctype = 0 }
+      if self.collectedAt != 0 { self.collectedAt = 0 }
       if self.interest != nil { self.interest = nil }
     }
   }

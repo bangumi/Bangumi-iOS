@@ -25,7 +25,7 @@ struct ProgressListView: View {
             || $0.alias.localizedStandardContains(search))
       },
       sortBy: [
-        SortDescriptor(\.interest?.updatedAt, order: .reverse)
+        SortDescriptor(\.collectedAt, order: .reverse)
       ])
     if progressLimit > 0 {
       descriptor.fetchLimit = progressLimit
