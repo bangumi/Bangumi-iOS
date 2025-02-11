@@ -107,7 +107,9 @@ struct TimelineItemView: View {
           case 0:
             Text("**更新了签名:** \(item.memo.status?.sign ?? "")").textSelection(.enabled)
           case 1:
-            Text(item.memo.status?.tsukkomi ?? "").textSelection(.enabled)
+            Text(.init(item.memo.status?.tsukkomi ?? ""))
+              .tint(.linkText)
+              .textSelection(.enabled)
           case 2:
             Text(
               "从 **\(item.memo.status?.nickname?.before ?? "")** 改名为 **\(item.memo.status?.nickname?.after ?? "")**"
