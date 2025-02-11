@@ -33,10 +33,12 @@ struct TimelineReplyView: View {
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
             }
-          }
+          }.frame(height: 60)
           Divider()
         }
-        Text(item.memo.status?.tsukkomi ?? "").textSelection(.enabled)
+        Text(.init(item.memo.status?.tsukkomi ?? ""))
+          .tint(.linkText)
+          .textSelection(.enabled)
         if !isolationMode {
           Divider()
           ForEach(comments) { comment in
