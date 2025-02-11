@@ -987,6 +987,7 @@ enum TimelineSource: Int, Codable {
   case inTouch = 3
   case wp = 4
   case api = 5
+  case next = 6
 
   var desc: String {
     switch self {
@@ -1002,6 +1003,8 @@ enum TimelineSource: Int, Codable {
       return "WP"
     case .api:
       return "API"
+    case .next:
+      return "next"
     }
   }
 }
