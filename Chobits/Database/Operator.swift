@@ -30,6 +30,7 @@ extension DatabaseOperator {
     let subjects = try modelContext.fetch(FetchDescriptor<Subject>())
     for subject in subjects {
       subject.ctype = 0
+      subject.collectedAt = 0
       subject.interest = nil
     }
   }
