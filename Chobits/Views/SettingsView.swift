@@ -126,20 +126,21 @@ struct SettingsView: View {
           }
         }
       }
-      Section {
-        if refreshing {
-          HStack {
-            ProgressView(value: refreshProgress)
+
+      if isAuthenticated {
+        Section {
+          if refreshing {
+            HStack {
+              ProgressView(value: refreshProgress)
+            }
+            .padding()
+            .frame(height: 20)
           }
-          .padding()
-          .frame(height: 20)
-        }
-        Button(role: .destructive) {
-          reindex()
-        } label: {
-          Text("重建 Spotlight 索引")
-        }
-        if isAuthenticated {
+          Button(role: .destructive) {
+            reindex()
+          } label: {
+            Text("重建 Spotlight 索引")
+          }
           Button(role: .destructive) {
             logoutConfirm = true
           } label: {
@@ -154,8 +155,8 @@ struct SettingsView: View {
           } message: {
             Text("确定要退出登录吗？")
           }
-        }
-      }.disabled(refreshing)
+        }.disabled(refreshing)
+      }
     }
     .navigationTitle("设置")
     .navigationBarTitleDisplayMode(.inline)
