@@ -28,6 +28,13 @@ struct CharacterView: View {
     URL(string: "https://\(shareDomain.rawValue)/character/\(characterId)")!
   }
 
+  var title: String {
+    guard let character = character else {
+      return "角色"
+    }
+    return character.name
+  }
+
   func refresh() async {
     if refreshed { return }
     do {
@@ -50,60 +57,8 @@ struct CharacterView: View {
       if let character = character {
         ScrollView {
           LazyVStack(alignment: .leading) {
-
-            /// title
-            Text(character.name)
-              .font(.title2.bold())
-              .multilineTextAlignment(.leading)
-
-            /// header
-            HStack(alignment: .top) {
-              ImageView(img: character.images?.resize(.r400))
-                .imageStyle(width: 120, height: 160, alignment: .top)
-                .imageType(.person)
-                .imageNSFW(character.nsfw)
-                .enableSave(character.images?.large)
-                .padding(4)
-                .shadow(radius: 4)
-              VStack(alignment: .leading) {
-                HStack {
-                  Image(systemName: character.roleEnum.icon)
-                  if character.collects > 0 {
-                    Text("(\(character.collects)人收藏)").lineLimit(1)
-                  }
-                  Spacer()
-                  if !isolationMode {
-                    Label("评论: \(character.comment)", systemImage: "bubble")
-                      .lineLimit(1)
-                      .font(.footnote)
-                  }
-                }
-                .font(.footnote)
-                .foregroundStyle(.secondary)
-
-                Spacer()
-                Text(character.title)
-                  .multilineTextAlignment(.leading)
-                  .truncationMode(.middle)
-                  .lineLimit(2)
-                  .textSelection(.enabled)
-                Spacer()
-
-                NavigationLink(value: NavDestination.infobox("角色信息", character.infobox)) {
-                  InfoboxHeaderView(infobox: character.infobox)
-                }.buttonStyle(.plain)
-
-              }.padding(.leading, 2)
-            }.frame(height: 160)
-
-            /// summary
-            BBCodeView(character.summary, textSize: 14)
-              .textSelection(.enabled)
-              .padding(2)
-              .tint(.linkText)
-
-            /// casts
-            CharacterCastsView(characterId: characterId, casts: character.casts)
+            CharacterDetailView()
+              .environment(character)
 
             /// comments
             if !isolationMode {
@@ -115,14 +70,14 @@ struct CharacterView: View {
             }
           }.padding(.horizontal, 8)
         }
+      } else if refreshed {
+        NotFoundView()
       } else {
-        if refreshed {
-          NotFoundView()
-        } else {
-          ProgressView()
-        }
+        ProgressView()
       }
     }
+    .navigationTitle(title)
+    .navigationBarTitleDisplayMode(.inline)
     .toolbar {
       ToolbarItem(placement: .topBarTrailing) {
         Menu {
@@ -134,13 +89,73 @@ struct CharacterView: View {
         }
       }
     }
-    .navigationTitle(character?.name ?? "角色")
-    .navigationBarTitleDisplayMode(.inline)
     .onAppear {
       Task {
         await refresh()
       }
     }
+  }
+}
+
+struct CharacterDetailView: View {
+  @Environment(Character.self) var character
+
+  @AppStorage("isolationMode") var isolationMode: Bool = false
+
+  var body: some View {
+    /// title
+    Text(character.name)
+      .font(.title2.bold())
+      .multilineTextAlignment(.leading)
+
+    /// header
+    HStack(alignment: .top) {
+      ImageView(img: character.images?.resize(.r400))
+        .imageStyle(width: 120, height: 160, alignment: .top)
+        .imageType(.person)
+        .imageNSFW(character.nsfw)
+        .enableSave(character.images?.large)
+        .padding(4)
+        .shadow(radius: 4)
+      VStack(alignment: .leading) {
+        HStack {
+          Image(systemName: character.roleEnum.icon)
+          if character.collects > 0 {
+            Text("(\(character.collects)人收藏)").lineLimit(1)
+          }
+          Spacer()
+          if !isolationMode {
+            Label("评论: \(character.comment)", systemImage: "bubble")
+              .lineLimit(1)
+              .font(.footnote)
+          }
+        }
+        .font(.footnote)
+        .foregroundStyle(.secondary)
+
+        Spacer()
+        Text(character.title)
+          .multilineTextAlignment(.leading)
+          .truncationMode(.middle)
+          .lineLimit(2)
+          .textSelection(.enabled)
+        Spacer()
+
+        NavigationLink(value: NavDestination.infobox("角色信息", character.infobox)) {
+          InfoboxHeaderView(infobox: character.infobox)
+        }.buttonStyle(.plain)
+
+      }.padding(.leading, 2)
+    }.frame(height: 160)
+
+    /// summary
+    BBCodeView(character.summary, textSize: 14)
+      .textSelection(.enabled)
+      .padding(2)
+      .tint(.linkText)
+
+    /// casts
+    CharacterCastsView(characterId: character.characterId, casts: character.casts)
   }
 }
 
