@@ -187,7 +187,7 @@ extension DatabaseOperator {
       return
     }
     if let type = type {
-      subject.type = type.rawValue
+      subject.interest?.type = type
     }
     if let rate = rate {
       subject.interest?.rate = rate
