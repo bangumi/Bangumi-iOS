@@ -202,14 +202,8 @@ struct SubjectCollectionBoxView: View {
           }
 
           Text("吐槽")
-          BorderView(color: .secondary.opacity(0.2), padding: 4) {
-            TextField("吐槽", text: $comment, axis: .vertical)
-              .autocorrectionDisabled()
-              .textInputAutocapitalization(.never)
-              .multilineTextAlignment(.leading)
-              .scrollDisabled(true)
-              .lineLimit(5...)
-          }
+          TextInputView(text: $comment)
+            .textInputStyle(placeholder: "吐槽", wordLimit: 380)
         }
         Spacer()
       }

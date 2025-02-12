@@ -44,21 +44,8 @@ struct TimelineSayView: View {
           .disabled(content.isEmpty || token.isEmpty || updating || content.count > 380)
           .buttonStyle(.borderedProminent)
         }
-        BorderView(color: .secondary.opacity(0.2), padding: 4) {
-          TextField("吐槽", text: $content, axis: .vertical)
-            .autocorrectionDisabled()
-            .textInputAutocapitalization(.never)
-            .multilineTextAlignment(.leading)
-            .scrollDisabled(true)
-            .lineLimit(5...)
-        }
-        HStack {
-          Spacer()
-          Text("\(content.count) / 380")
-            .monospacedDigit()
-            .foregroundStyle(content.count > 380 ? .red : .secondary)
-        }
-
+        TextInputView(text: $content)
+          .textInputStyle(placeholder: "吐槽", wordLimit: 380)
         TrunstileView(token: $token).frame(height: 65)
       }.padding()
     }
