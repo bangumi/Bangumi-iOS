@@ -186,22 +186,35 @@ extension DatabaseOperator {
     guard let subject = subject else {
       return
     }
-    if let type = type {
-      subject.interest?.type = type
-    }
-    if let rate = rate {
-      subject.interest?.rate = rate
-    }
-    if let comment = comment {
-      subject.interest?.comment = comment
-    }
-    if let priv = priv {
-      subject.interest?.private = priv
-    }
-    if let tags = tags {
-      subject.interest?.tags = tags
-    }
     let now = Int(Date().timeIntervalSince1970)
+    if subject.interest == nil {
+      subject.interest = SubjectInterest(
+        comment: comment ?? "",
+        epStatus: 0,
+        volStatus: 0,
+        private: priv ?? false,
+        rate: rate ?? 0,
+        tags: tags ?? [],
+        type: type ?? CollectionType.doing,
+        updatedAt: now - 1
+      )
+    } else {
+      if let type = type {
+        subject.interest?.type = type
+      }
+      if let rate = rate {
+        subject.interest?.rate = rate
+      }
+      if let comment = comment {
+        subject.interest?.comment = comment
+      }
+      if let priv = priv {
+        subject.interest?.private = priv
+      }
+      if let tags = tags {
+        subject.interest?.tags = tags
+      }
+    }
     subject.interest?.updatedAt = now - 1
     subject.collectedAt = now - 1
     try self.commit()
