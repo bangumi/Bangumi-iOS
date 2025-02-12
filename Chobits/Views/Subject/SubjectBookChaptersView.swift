@@ -77,10 +77,8 @@ struct SubjectBookChaptersView: View {
     self.updating = true
     Task {
       do {
-        try await Chii.shared.updateBookCollection(
+        try await Chii.shared.updateSubjectProgress(
           subjectId: subject.subjectId, eps: eps, vols: vols)
-        _ = try await Chii.shared.loadSubject(subject.subjectId)
-
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
       } catch {
         Notifier.shared.alert(error: error)

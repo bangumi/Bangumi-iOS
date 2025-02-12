@@ -58,8 +58,7 @@ struct EpisodeGridView: View {
     Task {
       do {
         try await Chii.shared.updateEpisodeCollection(
-          subjectId: episode.subjectId, episodeId: episode.episodeId, type: type)
-        _ = try await Chii.shared.loadSubject(subjectId)
+          episodeId: episode.episodeId, type: type)
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
       } catch {
         Notifier.shared.alert(error: error)
@@ -70,9 +69,8 @@ struct EpisodeGridView: View {
   func updateBatch(episode: Episode) {
     Task {
       do {
-        try await Chii.shared.updateSubjectEpisodeCollection(
-          subjectId: subjectId, updateTo: episode.sort, type: .collect)
-        _ = try await Chii.shared.loadSubject(subjectId)
+        try await Chii.shared.updateEpisodeCollection(
+          episodeId: episode.episodeId, type: .collect, batch: true)
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
       } catch {
         Notifier.shared.alert(error: error)

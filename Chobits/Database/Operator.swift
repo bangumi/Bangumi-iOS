@@ -122,42 +122,123 @@ extension DatabaseOperator {
   }
 }
 
-// MARK: - delete,update user collection
+// MARK: - update user collection
 extension DatabaseOperator {
-  public func updateEpisodeCollections(subjectId: Int, sort: Float, type: EpisodeCollectionType)
-    throws
-  {
-    let descriptor = FetchDescriptor<Episode>(
-      predicate: #Predicate<Episode> {
-        $0.subjectId == subjectId && $0.sort <= sort
-      })
-    let episodes = try modelContext.fetch(descriptor)
-    for episode in episodes {
-      episode.status = type.rawValue
-    }
+  public func updateSubjectProgress(subjectId: Int, eps: Int?, vols: Int?) throws {
     let subject = try self.fetchOne(
       predicate: #Predicate<Subject> {
         $0.subjectId == subjectId
       }
     )
-    subject?.interest?.updatedAt = Int(Date().timeIntervalSince1970) - 1
+    guard let subject = subject else {
+      return
+    }
+    if let eps = eps {
+      subject.interest?.epStatus = eps
+    }
+    if let vols = vols {
+      subject.interest?.volStatus = vols
+    }
+    let now = Int(Date().timeIntervalSince1970)
+    subject.interest?.updatedAt = now - 1
+    subject.collectedAt = now - 1
+
+    switch subject.typeEnum {
+    case .anime, .real:
+      guard let eps = eps else {
+        break
+      }
+      let episodes = try modelContext.fetch(
+        FetchDescriptor<Episode>(
+          predicate: #Predicate<Episode> {
+            $0.subjectId == subjectId && $0.type == 0
+          },
+          sortBy: [
+            SortDescriptor<Episode>(\.sort)
+          ]
+        )
+      )
+      for (idx, episode) in episodes.enumerated() {
+        if idx < eps {
+          episode.status = EpisodeCollectionType.collect.rawValue
+        } else {
+          if episode.status == EpisodeCollectionType.collect.rawValue {
+            episode.status = EpisodeCollectionType.none.rawValue
+          }
+        }
+      }
+    default:
+      break
+    }
+
+    try self.commit()
   }
 
-  public func updateEpisodeCollection(subjectId: Int, episodeId: Int, type: EpisodeCollectionType)
-    throws
-  {
+  public func updateSubjectCollection(
+    subjectId: Int, type: CollectionType?, rate: Int?, comment: String?, priv: Bool?,
+    tags: [String]?
+  ) throws {
+    let subject = try self.fetchOne(
+      predicate: #Predicate<Subject> {
+        $0.subjectId == subjectId
+      }
+    )
+    guard let subject = subject else {
+      return
+    }
+    if let type = type {
+      subject.type = type.rawValue
+    }
+    if let rate = rate {
+      subject.interest?.rate = rate
+    }
+    if let comment = comment {
+      subject.interest?.comment = comment
+    }
+    if let priv = priv {
+      subject.interest?.private = priv
+    }
+    if let tags = tags {
+      subject.interest?.tags = tags
+    }
+    let now = Int(Date().timeIntervalSince1970)
+    subject.interest?.updatedAt = now - 1
+    subject.collectedAt = now - 1
+    try self.commit()
+  }
+
+  public func updateEpisodeCollection(
+    episodeId: Int, type: EpisodeCollectionType, batch: Bool = false
+  ) throws {
     let episode = try self.fetchOne(
       predicate: #Predicate<Episode> {
         $0.episodeId == episodeId
       }
     )
-    episode?.status = type.rawValue
-    let subject = try self.fetchOne(
-      predicate: #Predicate<Subject> {
-        $0.subjectId == subjectId
+    guard let episode = episode else {
+      return
+    }
+    if batch {
+      let subjectId = episode.subjectId
+      let sort = episode.sort
+      let descriptor = FetchDescriptor<Episode>(
+        predicate: #Predicate<Episode> {
+          $0.subjectId == subjectId && $0.sort <= sort && $0.type == 0
+        }
+      )
+      let episodes = try modelContext.fetch(descriptor)
+      for episode in episodes {
+        episode.status = EpisodeCollectionType.collect.rawValue
       }
-    )
-    subject?.interest?.updatedAt = Int(Date().timeIntervalSince1970) - 1
+      episode.subject?.interest?.epStatus = episodes.count
+    } else {
+      episode.status = type.rawValue
+      episode.subject?.interest?.epStatus = (episode.subject?.interest?.epStatus ?? 0) + 1
+    }
+    let now = Int(Date().timeIntervalSince1970)
+    episode.subject?.interest?.updatedAt = now - 1
+    episode.subject?.collectedAt = now - 1
+    try self.commit()
   }
 }
 

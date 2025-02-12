@@ -79,9 +79,7 @@ struct ProgressListItemView: View {
     updating = true
     Task {
       do {
-        try await Chii.shared.updateEpisodeCollection(
-          subjectId: subjectId, episodeId: episodeId, type: .collect)
-        _ = try await Chii.shared.loadSubject(subjectId)
+        try await Chii.shared.updateEpisodeCollection(episodeId: episodeId, type: .collect)
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
       } catch {
         Notifier.shared.alert(error: error)

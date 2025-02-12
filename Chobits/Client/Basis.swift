@@ -4,6 +4,35 @@ import OSLog
 let HTTPS = "https"
 let CDN_DOMAIN = "lain.bgm.tv"
 
+struct AppInfo: Codable {
+  var clientId: String
+  var clientSecret: String
+  var callbackURL: String
+}
+
+struct TokenResponse: Codable {
+  var accessToken: String
+  var expiresIn: UInt
+  var tokenType: String
+  var refreshToken: String
+}
+
+struct Auth: Codable {
+  var accessToken: String
+  var expiresAt: Date
+  var refreshToken: String
+
+  init(response: TokenResponse) {
+    self.accessToken = response.accessToken
+    self.expiresAt = Date().addingTimeInterval(TimeInterval(response.expiresIn))
+    self.refreshToken = response.refreshToken
+  }
+
+  func isExpired() -> Bool {
+    return Date() > expiresAt
+  }
+}
+
 enum ImageSize: Int {
   case r100 = 100
   case r200 = 200

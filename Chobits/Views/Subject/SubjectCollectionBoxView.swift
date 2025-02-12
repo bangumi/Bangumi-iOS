@@ -66,7 +66,6 @@ struct SubjectCollectionBoxView: View {
           priv: priv,
           tags: Array(tags.sorted().prefix(10))
         )
-        _ = try await Chii.shared.loadSubject(subject.subjectId)
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
         dismiss()
       } catch {

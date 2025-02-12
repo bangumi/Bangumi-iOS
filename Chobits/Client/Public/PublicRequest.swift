@@ -1,5 +1,40 @@
 import Foundation
 
+struct SubjectsResponse: Codable {
+  var total: Int
+  var limit: Int
+  var offset: Int
+  var data: [SubjectDTOV0]
+}
+
+struct SubjectDTOV0: Codable {
+  var id: Int
+  var type: SubjectType
+  var name: String
+  var nameCn: String
+  var summary: String
+  var series: Bool
+  var nsfw: Bool
+  var locked: Bool
+  var date: String?
+  var platform: String?
+  var images: SubjectImages?
+  var volumes: Int
+  // var infobox: [String: String]
+  var eps: Int
+  var rating: SubjectRatingV0
+  var collection: SubjectCollection
+  var metaTags: [String]
+  var tags: [Tag]
+}
+
+struct SubjectRatingV0: Codable {
+  var count: [String: Int]
+  var total: Int
+  var score: Float
+  var rank: Int
+}
+
 struct SubjectsBrowseFilterDTO {
   var cat: SubjectCategory? = nil
   var series: Bool? = nil

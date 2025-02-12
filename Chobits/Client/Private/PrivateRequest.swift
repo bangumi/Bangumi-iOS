@@ -214,6 +214,82 @@ extension Chii {
     let resp: PagedDTO<SubjectDTO> = try self.decodeResponse(data)
     return resp
   }
+
+  func updateSubjectProgress(subjectId: Int, eps: Int?, vols: Int?) async throws {
+    if self.mock {
+      return
+    }
+    let url = BangumiAPI.priv.build("p1/collections/subjects/\(subjectId)")
+    var body: [String: Any] = [:]
+    if let epStatus = eps {
+      body["epStatus"] = epStatus
+    }
+    if let volStatus = vols {
+      body["volStatus"] = volStatus
+    }
+    if body.count == 0 {
+      return
+    }
+
+    _ = try await self.request(url: url, method: "PATCH", body: body, auth: .required)
+    let db = try self.getDB()
+    try await db.updateSubjectProgress(subjectId: subjectId, eps: eps, vols: vols)
+  }
+
+  func updateSubjectCollection(
+    subjectId: Int, type: CollectionType?, rate: Int?, comment: String?, priv: Bool?,
+    tags: [String]?
+  ) async throws {
+    if self.mock {
+      return
+    }
+    let url = BangumiAPI.priv.build("p1/collections/subjects/\(subjectId)")
+    var body: [String: Any] = [:]
+    if let type = type {
+      body["type"] = type.rawValue
+    }
+    if let rate = rate {
+      body["rate"] = rate
+    }
+    if let comment = comment {
+      body["comment"] = comment
+    }
+    if let priv = priv {
+      body["private"] = priv
+    }
+    if let tags = tags {
+      body["tags"] = tags
+    }
+    if body.count == 0 {
+      return
+    }
+
+    _ = try await self.request(url: url, method: "PUT", body: body, auth: .required)
+    let db = try self.getDB()
+    try await db.updateSubjectCollection(
+      subjectId: subjectId, type: type, rate: rate,
+      comment: comment, priv: priv, tags: tags
+    )
+  }
+
+  func updateEpisodeCollection(
+    episodeId: Int, type: EpisodeCollectionType, batch: Bool = false
+  ) async throws {
+    if self.mock {
+      return
+    }
+    let url = BangumiAPI.priv.build("p1/collections/episodes/\(episodeId)")
+    var body: [String: Any] = [:]
+    if batch {
+      body["batch"] = true
+    } else {
+      body["type"] = type.rawValue
+    }
+
+    _ = try await self.request(url: url, method: "PATCH", body: body, auth: .required)
+    let db = try self.getDB()
+    try await db.updateEpisodeCollection(episodeId: episodeId, type: type, batch: batch)
+  }
 }
 
 // MARK: - Episode
