@@ -159,7 +159,6 @@ extension Chii {
     } else {
       let error = String(data: data, encoding: .utf8) ?? ""
       Logger.api.error("response: \(response.statusCode): \(url.absoluteString): \(error)")
-
       throw ChiiError(code: response.statusCode, response: error, headers: response.allHeaderFields)
     }
   }
