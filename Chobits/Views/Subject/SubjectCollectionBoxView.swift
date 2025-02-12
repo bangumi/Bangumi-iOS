@@ -38,6 +38,10 @@ struct SubjectCollectionBoxView: View {
     return ""
   }
 
+  var submitDisabled: Bool {
+    return ctype == .none || comment.count > 380
+  }
+
   func load() {
     if let interest = subject.interest {
       self.ctype = interest.type
@@ -93,7 +97,7 @@ struct SubjectCollectionBoxView: View {
           .frame(width: 40)
           .sensoryFeedback(.selection, trigger: priv)
         }
-        .disabled(ctype == .none)
+        .disabled(submitDisabled)
         .padding(.vertical, 5)
         if let interest = subject.interest, interest.updatedAt > 0 {
           Section {
