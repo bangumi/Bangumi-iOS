@@ -42,7 +42,7 @@ struct TimelineReplyView: View {
         if !isolationMode {
           Divider()
           ForEach(comments) { comment in
-            CommentItemView(comment: comment)
+            CommentItemView(comment: comment, bbcode: false)
           }
         }
       }.padding(.horizontal, 8)

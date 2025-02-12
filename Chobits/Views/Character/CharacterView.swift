@@ -110,7 +110,7 @@ struct CharacterView: View {
               Text("吐槽箱").font(.title3)
               Divider()
               ForEach(comments) { comment in
-                CommentItemView(comment: comment)
+                CommentItemView(comment: comment, bbcode: true)
               }
             }
           }.padding(.horizontal, 8)

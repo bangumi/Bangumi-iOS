@@ -3,6 +3,7 @@ import SwiftUI
 
 struct CommentItemView: View {
   let comment: CommentDTO
+  let bbcode: Bool
 
   var body: some View {
     VStack(alignment: .leading) {
@@ -20,8 +21,13 @@ struct CommentItemView: View {
               .font(.caption)
               .foregroundStyle(.secondary)
           }
-          BBCodeView(comment.content)
-            .textSelection(.enabled)
+          if bbcode {
+            BBCodeView(comment.content)
+              .textSelection(.enabled)
+          } else {
+            Text(.init(comment.content))
+              .textSelection(.enabled)
+          }
           ForEach(comment.replies) { reply in
             VStack(alignment: .leading) {
               Divider()
@@ -49,8 +55,13 @@ struct CommentItemView: View {
                       .font(.caption)
                       .foregroundStyle(.secondary)
                   }
-                  BBCodeView(reply.content)
-                    .textSelection(.enabled)
+                  if bbcode {
+                    BBCodeView(reply.content)
+                      .textSelection(.enabled)
+                  } else {
+                    Text(.init(reply.content))
+                      .textSelection(.enabled)
+                  }
                 }
               }
             }
