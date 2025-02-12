@@ -95,6 +95,15 @@ extension DatabaseOperator {
     return person
   }
 
+  public func getGroup(_ name: String) throws -> Group? {
+    let group = try self.fetchOne(
+      predicate: #Predicate<Group> {
+        $0.name == name
+      }
+    )
+    return group
+  }
+
   public func getEpisodeIDs(subjectId: Int, sort: Float) throws -> [Int] {
     let descriptor = FetchDescriptor<Episode>(
       predicate: #Predicate<Episode> {
@@ -420,6 +429,21 @@ extension DatabaseOperator {
     modelContext.insert(person)
     return person
   }
+
+  public func ensureGroup(_ item: GroupDTO) throws -> Group {
+    let gid = item.id
+    let fetched = try self.fetchOne(
+      predicate: #Predicate<Group> {
+        $0.groupId == gid
+      })
+    if let group = fetched {
+      group.update(item)
+      return group
+    }
+    let group = Group(item)
+    modelContext.insert(group)
+    return group
+  }
 }
 
 // MARK: - save
@@ -532,6 +556,34 @@ extension DatabaseOperator {
     let person = try self.getPerson(personId)
     if person?.works != items {
       person?.works = items
+    }
+  }
+}
+
+// MARK: - save group
+extension DatabaseOperator {
+  public func saveGroup(_ item: GroupDTO) throws {
+    let _ = try self.ensureGroup(item)
+  }
+
+  public func saveGroupRecentMembers(groupName: String, items: [GroupMemberDTO]) throws {
+    let group = try self.getGroup(groupName)
+    if group?.recentMembers != items {
+      group?.recentMembers = items
+    }
+  }
+
+  public func saveGroupModerators(groupName: String, items: [GroupMemberDTO]) throws {
+    let group = try self.getGroup(groupName)
+    if group?.moderators != items {
+      group?.moderators = items
+    }
+  }
+
+  public func saveGroupRecentTopics(groupName: String, items: [TopicDTO]) throws {
+    let group = try self.getGroup(groupName)
+    if group?.recentTopics != items {
+      group?.recentTopics = items
     }
   }
 }

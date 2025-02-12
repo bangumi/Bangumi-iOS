@@ -35,12 +35,6 @@ struct PersonView: View {
     return person.name
   }
 
-  var careers: String {
-    guard let person = person else { return "" }
-    let vals = Set(person.career).sorted().map { PersonCareer($0).description }
-    return vals.joined(separator: " / ")
-  }
-
   func refresh() async {
     if refreshed { return }
     do {
@@ -63,73 +57,8 @@ struct PersonView: View {
       if let person = person {
         ScrollView {
           LazyVStack(alignment: .leading) {
-
-            /// title
-            Text(person.name)
-              .font(.title2.bold())
-              .multilineTextAlignment(.leading)
-
-            /// header
-            HStack(alignment: .top) {
-              ImageView(img: person.images?.resize(.r400))
-                .imageStyle(width: 120, height: 160, alignment: .top)
-                .imageType(.person)
-                .enableSave(person.images?.large)
-                .padding(4)
-                .shadow(radius: 4)
-              VStack(alignment: .leading) {
-                HStack {
-                  Image(systemName: person.typeEnum.icon)
-                  if person.collects > 0 {
-                    Text("(\(person.collects)人收藏)").lineLimit(1)
-                  }
-                  Spacer()
-                  // if person.lock {
-                  //   Label("", systemImage: "lock")
-                  //     .foregroundStyle(.red)
-                  // }
-                  if !isolationMode {
-                    Label("评论: \(person.comment)", systemImage: "bubble")
-                      .lineLimit(1)
-                      .font(.footnote)
-                  }
-                }
-                .font(.footnote)
-                .foregroundStyle(.secondary)
-
-                Spacer()
-                Text(person.title)
-                  .multilineTextAlignment(.leading)
-                  .truncationMode(.middle)
-                  .lineLimit(2)
-                  .textSelection(.enabled)
-                Spacer()
-
-                if !careers.isEmpty {
-                  Text(careers)
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
-                }
-
-                NavigationLink(value: NavDestination.infobox("人物信息", person.infobox)) {
-                  InfoboxHeaderView(infobox: person.infobox)
-                }.buttonStyle(.plain)
-
-              }.padding(.leading, 2)
-            }.frame(height: 160)
-
-            /// summary
-            BBCodeView(person.summary, textSize: 14)
-              .textSelection(.enabled)
-              .padding(2)
-              .tint(.linkText)
-
-            /// casts
-            PersonCastsView(personId: personId, casts: person.casts)
-
-            /// works
-            PersonWorksView(personId: personId, works: person.works)
+            PersonDetailView()
+              .environment(person)
 
             /// comments
             if !isolationMode {
@@ -165,6 +94,86 @@ struct PersonView: View {
         await refresh()
       }
     }
+  }
+}
+
+struct PersonDetailView: View {
+  @Environment(Person.self) var person
+
+  @AppStorage("isolationMode") var isolationMode: Bool = false
+
+  var careers: String {
+    let vals = Set(person.career).sorted().map { PersonCareer($0).description }
+    return vals.joined(separator: " / ")
+  }
+
+  var body: some View {
+    /// title
+    Text(person.name)
+      .font(.title2.bold())
+      .multilineTextAlignment(.leading)
+
+    /// header
+    HStack(alignment: .top) {
+      ImageView(img: person.images?.resize(.r400))
+        .imageStyle(width: 120, height: 160, alignment: .top)
+        .imageType(.person)
+        .enableSave(person.images?.large)
+        .padding(4)
+        .shadow(radius: 4)
+      VStack(alignment: .leading) {
+        HStack {
+          Image(systemName: person.typeEnum.icon)
+          if person.collects > 0 {
+            Text("(\(person.collects)人收藏)").lineLimit(1)
+          }
+          Spacer()
+          // if person.lock {
+          //   Label("", systemImage: "lock")
+          //     .foregroundStyle(.red)
+          // }
+          if !isolationMode {
+            Label("评论: \(person.comment)", systemImage: "bubble")
+              .lineLimit(1)
+              .font(.footnote)
+          }
+        }
+        .font(.footnote)
+        .foregroundStyle(.secondary)
+
+        Spacer()
+        Text(person.title)
+          .multilineTextAlignment(.leading)
+          .truncationMode(.middle)
+          .lineLimit(2)
+          .textSelection(.enabled)
+        Spacer()
+
+        if !careers.isEmpty {
+          Text(careers)
+            .font(.footnote)
+            .foregroundStyle(.secondary)
+            .lineLimit(1)
+        }
+
+        NavigationLink(value: NavDestination.infobox("人物信息", person.infobox)) {
+          InfoboxHeaderView(infobox: person.infobox)
+        }.buttonStyle(.plain)
+
+      }.padding(.leading, 2)
+    }.frame(height: 160)
+
+    /// summary
+    BBCodeView(person.summary, textSize: 14)
+      .textSelection(.enabled)
+      .padding(2)
+      .tint(.linkText)
+
+    /// casts
+    PersonCastsView(personId: person.personId, casts: person.casts)
+
+    /// works
+    PersonWorksView(personId: person.personId, works: person.works)
   }
 }
 

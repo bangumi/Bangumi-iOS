@@ -43,7 +43,7 @@ enum NavDestination: Hashable, View {
   case personCastList(_ personId: Int)
   case personWorkList(_ personId: Int)
   case index(_ indexId: Int)
-  case group(_ groupId: Int)
+  case group(_ name: String)
   case topic(_ topic: TopicDTO)
   case blog(_ blogId: Int)
 
@@ -116,8 +116,8 @@ enum NavDestination: Hashable, View {
       PersonWorkListView(personId: personId)
     case .index(let indexId):
       IndexView(indexId: indexId)
-    case .group(let groupId):
-      GroupView(groupId: groupId)
+    case .group(let name):
+      GroupView(name: name)
     case .topic(let topic):
       TopicView(topic: topic)
     case .blog(let blogId):
@@ -155,8 +155,8 @@ func handleChiiURL(_ url: URL, nav: Binding<NavigationPath>) -> Bool {
       nav.wrappedValue.append(NavDestination.person(personId))
     }
   case "group":
-    if let groupId = components.first.flatMap({ Int($0) }) {
-      nav.wrappedValue.append(NavDestination.group(groupId))
+    if let groupName = components.first {
+      nav.wrappedValue.append(NavDestination.group(groupName))
     }
   case "index":
     if let indexId = components.first.flatMap({ Int($0) }) {

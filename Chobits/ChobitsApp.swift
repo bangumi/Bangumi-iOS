@@ -16,6 +16,7 @@ struct ChobitsApp: App {
       Subject.self,
       Character.self,
       Person.self,
+      Group.self,
     ])
     let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
     do {

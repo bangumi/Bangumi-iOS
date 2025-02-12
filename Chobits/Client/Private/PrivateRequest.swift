@@ -367,17 +367,21 @@ extension Chii {
     return resp
   }
 
-  func getGroupMembers(_ groupName: String, limit: Int = 20, offset: Int = 0) async throws
-    -> PagedDTO<GroupMemberDTO>
-  {
+  func getGroupMembers(
+    _ groupName: String, moderator: Bool? = nil,
+    limit: Int = 20, offset: Int = 0
+  ) async throws -> PagedDTO<GroupMemberDTO> {
     if self.mock {
       return loadFixture(fixture: "group_members.json", target: PagedDTO<GroupMemberDTO>.self)
     }
     let url = BangumiAPI.priv.build("p1/groups/\(groupName)/members")
-    let queryItems: [URLQueryItem] = [
+    var queryItems: [URLQueryItem] = [
       URLQueryItem(name: "limit", value: String(limit)),
       URLQueryItem(name: "offset", value: String(offset)),
     ]
+    if let moderator = moderator {
+      queryItems.append(URLQueryItem(name: "moderator", value: String(moderator)))
+    }
     let pageURL = url.appending(queryItems: queryItems)
     let data = try await self.request(url: pageURL, method: "GET")
     let resp: PagedDTO<GroupMemberDTO> = try self.decodeResponse(data)
@@ -387,6 +391,9 @@ extension Chii {
   func getGroupTopics(_ groupName: String, limit: Int = 20, offset: Int = 0) async throws
     -> PagedDTO<TopicDTO>
   {
+    if self.mock {
+      return loadFixture(fixture: "group_topics.json", target: PagedDTO<TopicDTO>.self)
+    }
     let url = BangumiAPI.priv.build("p1/groups/\(groupName)/topics")
     let queryItems: [URLQueryItem] = [
       URLQueryItem(name: "limit", value: String(limit)),

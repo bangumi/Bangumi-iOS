@@ -855,6 +855,8 @@ struct GroupDTO: Codable, Identifiable, Hashable, Linkable {
   var posts: Int
   var topics: Int
   var createdAt: Int
+  var joinedAt: Int?
+
   var link: String {
     "chii://group/\(name)"
   }

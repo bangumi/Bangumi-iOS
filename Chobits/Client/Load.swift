@@ -182,3 +182,31 @@ extension Chii {
     try await db.commit()
   }
 }
+
+extension Chii {
+  func loadGroup(_ name: String) async throws {
+    let db = try self.getDB()
+    let item = try await self.getGroup(name)
+    try await db.saveGroup(item)
+    try await db.commit()
+  }
+
+  func loadGroupDetails(_ name: String) async throws {
+    let db = try self.getDB()
+    await withThrowingTaskGroup(of: Void.self) { group in
+      group.addTask {
+        let response = try await self.getGroupMembers(name, moderator: false, limit: 10)
+        try await db.saveGroupRecentMembers(groupName: name, items: response.data)
+      }
+      group.addTask {
+        let response = try await self.getGroupMembers(name, moderator: true, limit: 10)
+        try await db.saveGroupModerators(groupName: name, items: response.data)
+      }
+      group.addTask {
+        let response = try await self.getGroupTopics(name, limit: 10)
+        try await db.saveGroupRecentTopics(groupName: name, items: response.data)
+      }
+    }
+    try await db.commit()
+  }
+}
