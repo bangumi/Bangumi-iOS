@@ -1,3 +1,4 @@
+import BBCode
 import SwiftUI
 
 struct TimelineReplyView: View {
@@ -36,13 +37,14 @@ struct TimelineReplyView: View {
           }.frame(height: 60)
           Divider()
         }
-        Text(.init(item.memo.status?.tsukkomi ?? ""))
+
+        BBCodeView(item.memo.status?.tsukkomi ?? "")
           .tint(.linkText)
           .textSelection(.enabled)
         if !isolationMode {
           Divider()
           ForEach(comments) { comment in
-            CommentItemView(comment: comment, bbcode: false)
+            CommentItemView(comment: comment)
           }
         }
       }.padding(.horizontal, 8)

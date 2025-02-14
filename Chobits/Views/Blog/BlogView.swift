@@ -78,7 +78,7 @@ struct BlogView: View {
           if !isolationMode {
             Divider()
             ForEach(comments) { comment in
-              CommentItemView(comment: comment, bbcode: true)
+              CommentItemView(comment: comment)
             }
           }
         }
