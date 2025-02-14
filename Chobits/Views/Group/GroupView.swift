@@ -1,3 +1,4 @@
+import BBCode
 import SwiftData
 import SwiftUI
 
@@ -45,8 +46,12 @@ struct GroupView: View {
   var body: some View {
     Section {
       if let group = group {
-        GroupDetailView()
-          .environment(group)
+        ScrollView {
+          LazyVStack(alignment: .leading) {
+            GroupDetailView()
+              .environment(group)
+          }.padding(.horizontal, 8)
+        }
       } else if refreshed {
         NotFoundView()
       } else {
@@ -78,6 +83,36 @@ struct GroupDetailView: View {
   @Environment(Group.self) var group
 
   var body: some View {
-    Text(group.title)
+    CardView(background: .introBackground) {
+      VStack(alignment: .leading, spacing: 8) {
+        HStack(alignment: .top, spacing: 8) {
+          ImageView(img: group.icon?.large)
+            .imageStyle(width: 96, height: 96, alignment: .top)
+            .imageType(.icon)
+            .padding(4)
+            .shadow(radius: 4)
+          VStack(alignment: .leading) {
+            Spacer()
+            Text(group.title)
+              .font(.title2.bold())
+              .multilineTextAlignment(.leading)
+            Divider()
+            Section {
+              Label("创建于 \(group.createdAt.datetimeDisplay)", systemImage: "calendar")
+              Label("\(group.members) 位成员", systemImage: "person")
+            }
+            .font(.subheadline)
+            .foregroundStyle(.secondary)
+            Spacer()
+          }
+        }
+        Divider()
+        HStack {
+          BBCodeView(group.desc)
+            .tint(.linkText)
+          Spacer()
+        }
+      }
+    }
   }
 }
