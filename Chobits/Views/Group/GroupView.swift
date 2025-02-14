@@ -106,8 +106,7 @@ struct GroupDetailView: View {
             .imageType(.icon)
             .padding(4)
             .shadow(radius: 4)
-          VStack(alignment: .leading) {
-            Spacer()
+          VStack(alignment: .leading, spacing: 4) {
             Text(group.title)
               .font(.title2.bold())
               .multilineTextAlignment(.leading)
@@ -115,17 +114,19 @@ struct GroupDetailView: View {
             Section {
               Label("创建于 \(group.createdAt.datetimeDisplay)", systemImage: "calendar")
               Label("\(group.members) 位成员", systemImage: "person")
+              Label("\(group.topics) 个讨论", systemImage: "bubble")
             }
             .font(.subheadline)
             .foregroundStyle(.secondary)
-            Spacer()
           }
         }
-        Divider()
-        HStack {
-          BBCodeView(group.desc)
-            .tint(.linkText)
-          Spacer()
+        if !group.desc.isEmpty {
+          Divider()
+          HStack {
+            BBCodeView(group.desc)
+              .tint(.linkText)
+            Spacer()
+          }
         }
       }
     }
