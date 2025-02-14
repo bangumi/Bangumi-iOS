@@ -839,6 +839,50 @@ enum EpisodeCollectionType: Int, Codable, Identifiable, CaseIterable {
   }
 }
 
+enum PostState: Int, Codable, CaseIterable {
+  case normal = 0
+  case adminCloseTopic = 1
+  case adminReopen = 2
+  case adminPin = 3
+  case adminMerge = 4
+  case adminSilentTopic = 5
+  case userDelete = 6
+  case adminDelete = 7
+  case adminOffTopic = 8
+
+  var description: String {
+    switch self {
+    case .normal:
+      return "正常"
+    case .adminCloseTopic:
+      return "管理员关闭主题"
+    case .adminReopen:
+      return "管理员重开主题"
+    case .adminPin:
+      return "管理员置顶主题"
+    case .adminMerge:
+      return "管理员合并主题"
+    case .adminSilentTopic:
+      return "管理员下沉主题"
+    case .userDelete:
+      return "用户自行删除"
+    case .adminDelete:
+      return "管理员删除"
+    case .adminOffTopic:
+      return "管理员折叠主题"
+    }
+  }
+
+  init(_ value: Int = 0) {
+    let tmp = Self(rawValue: value)
+    if let out = tmp {
+      self = out
+      return
+    }
+    self = Self.normal
+  }
+}
+
 /// TODO: use bangumi/common
 
 struct SubjectCategory: Identifiable {

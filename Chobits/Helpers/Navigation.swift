@@ -34,6 +34,7 @@ enum NavDestination: Hashable, View {
   case subjectStaffList(_ subjectId: Int)
   case subjectReviewList(_ subjectId: Int)
   case subjectTopicList(_ subjectId: Int)
+  case subjectTopicDetail(_ topicId: Int)
   case subjectCommentList(_ subjectId: Int)
   case episode(_ episodeId: Int)
   case episodeList(_ subjectId: Int)
@@ -47,8 +48,8 @@ enum NavDestination: Hashable, View {
   case group(_ name: String)
   case groupMemberList(_ name: String)
   case groupTopicList(_ name: String)
+  case groupTopicDetail(_ topicId: Int)
 
-  case topic(_ topic: TopicDTO)
   case blog(_ blogId: Int)
 
   var body: some View {
@@ -127,11 +128,13 @@ enum NavDestination: Hashable, View {
       GroupMemberListView(name: name)
     case .groupTopicList(let name):
       GroupTopicListView(name: name)
+    case .groupTopicDetail(let topicId):
+      GroupTopicDetailView(topicId: topicId)
 
-    case .topic(let topic):
-      TopicView(topic: topic)
     case .blog(let blogId):
       BlogView(blogId: blogId)
+    case .subjectTopicDetail(let topicId):
+      SubjectTopicDetailView(topicId: topicId)
     }
   }
 }

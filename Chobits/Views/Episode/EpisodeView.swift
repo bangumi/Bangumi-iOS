@@ -49,10 +49,17 @@ struct EpisodeView: View {
           Divider()
         }
         if !isolationMode {
-          Text("吐槽箱").font(.title3)
-          Divider()
-          ForEach(comments) { comment in
-            CommentItemView(comment: comment)
+          CardView {
+            LazyVStack(alignment: .leading, spacing: 8) {
+              Text("吐槽箱").font(.title3)
+              Divider()
+              ForEach(comments) { comment in
+                CommentItemView(comment: comment)
+                if comment.id != comments.last?.id {
+                  Divider()
+                }
+              }
+            }
           }
         }
         Spacer()

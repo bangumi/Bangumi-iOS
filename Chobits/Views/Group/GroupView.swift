@@ -217,7 +217,7 @@ struct GroupRecentTopicView: View {
         ForEach(group.recentTopics) { topic in
           VStack {
             HStack {
-              NavigationLink(value: NavDestination.topic(topic)) {
+              NavigationLink(value: NavDestination.groupTopicDetail(topic.id)) {
                 Text(topic.title)
                   .font(.callout)
                   .lineLimit(1)
@@ -230,7 +230,7 @@ struct GroupRecentTopicView: View {
               }
             }
             HStack {
-              Text(topic.createdAt.dateDisplay)
+              Text(topic.createdAt.datetimeDisplay)
                 .lineLimit(1)
                 .foregroundStyle(.secondary)
               Spacer()

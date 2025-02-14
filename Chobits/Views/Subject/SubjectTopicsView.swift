@@ -33,7 +33,7 @@ struct SubjectTopicsView: View {
       ForEach(topics) { topic in
         VStack {
           HStack {
-            NavigationLink(value: NavDestination.topic(topic)) {
+            NavigationLink(value: NavDestination.subjectTopicDetail(topic.id)) {
               Text(topic.title)
                 .font(.callout)
                 .lineLimit(1)

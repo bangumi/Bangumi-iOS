@@ -608,7 +608,7 @@ struct CommentBaseDTO: Codable, Identifiable, Hashable {
   var creatorID: Int
   var mainID: Int
   var relatedID: Int
-  var state: Int
+  var state: PostState
   var user: SlimUserDTO?
   var reactions: [ReactionDTO]?
 }
@@ -620,7 +620,7 @@ struct CommentDTO: Codable, Identifiable, Hashable {
   var creatorID: Int
   var mainID: Int
   var relatedID: Int
-  var state: Int
+  var state: PostState
   var user: SlimUserDTO
   var replies: [CommentBaseDTO]
   var reactions: [ReactionDTO]?
@@ -1087,7 +1087,7 @@ struct ReplyBaseDTO: Codable, Identifiable, Hashable {
   var createdAt: Int
   var creator: SlimUserDTO?
   var creatorID: Int
-  var state: Int
+  var state: PostState
   var reactions: [ReactionDTO]?
 }
 
@@ -1097,7 +1097,7 @@ struct ReplyDTO: Codable, Identifiable, Hashable {
   var createdAt: Int
   var creator: SlimUserDTO?
   var creatorID: Int
-  var state: Int
+  var state: PostState
   var replies: [ReplyBaseDTO]
   var reactions: [ReactionDTO]?
 }

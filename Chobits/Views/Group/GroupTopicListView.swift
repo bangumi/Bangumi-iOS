@@ -23,7 +23,7 @@ struct GroupTopicListView: View {
         CardView {
           VStack(alignment: .leading, spacing: 4) {
             HStack {
-              NavigationLink(value: NavDestination.topic(topic)) {
+              NavigationLink(value: NavDestination.groupTopicDetail(topic.id)) {
                 Text(topic.title)
                   .font(.headline)
                   .lineLimit(2)
@@ -38,7 +38,6 @@ struct GroupTopicListView: View {
             }
             Divider()
             HStack {
-              Text("[\(topic.createdAt.dateDisplay)]")
               ImageView(img: topic.creator?.avatar?.large)
                 .imageStyle(width: 24, height: 24)
                 .imageType(.avatar)

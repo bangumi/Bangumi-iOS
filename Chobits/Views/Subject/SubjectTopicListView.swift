@@ -62,7 +62,7 @@ struct SubjectTopicListView: View {
           let topic = item.inner
           VStack {
             HStack {
-              NavigationLink(value: NavDestination.topic(topic)) {
+              NavigationLink(value: NavDestination.subjectTopicDetail(topic.id)) {
                 Text(topic.title)
                   .font(.callout)
                   .lineLimit(1)

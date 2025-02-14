@@ -40,47 +40,55 @@ struct BlogView: View {
     Section {
       if let blog = blog {
         ScrollView {
-          VStack(alignment: .leading, spacing: 5) {
-            UserSmallView(user: blog.user)
-              .padding(.top, 8)
-            Text(blog.title)
-              .font(.title3)
-              .bold()
-            HStack {
-              Text(blog.createdAt.datetimeDisplay)
-                .font(.caption)
-                .foregroundColor(.secondary)
-              Spacer()
-              Menu {
-                ForEach(subjects) { subject in
-                  NavigationLink(value: NavDestination.subject(subject.id)) {
-                    HStack {
-                      ImageView(img: subject.images?.small)
-                        .imageStyle(width: 32, height: 32)
-                        .imageType(.subject)
-                      Text(subject.title)
+          LazyVStack(alignment: .leading) {
+            VStack(alignment: .leading, spacing: 5) {
+              UserSmallView(user: blog.user)
+                .padding(.top, 8)
+              Text(blog.title)
+                .font(.title3)
+                .bold()
+              HStack {
+                Text(blog.createdAt.datetimeDisplay)
+                  .font(.caption)
+                  .foregroundColor(.secondary)
+                Spacer()
+                Menu {
+                  ForEach(subjects) { subject in
+                    NavigationLink(value: NavDestination.subject(subject.id)) {
+                      HStack {
+                        ImageView(img: subject.images?.small)
+                          .imageStyle(width: 32, height: 32)
+                          .imageType(.subject)
+                        Text(subject.title)
+                      }
+                    }
+                  }
+                } label: {
+                  Text(subjects.isEmpty ? "" : "关联条目+")
+                    .font(.caption)
+                    .foregroundStyle(.accent)
+                }.disabled(subjects.isEmpty)
+              }
+              Divider()
+              BBCodeView(blog.content)
+                .textSelection(.enabled)
+                .padding(.top, 8)
+            }
+
+            /// comments
+            if !isolationMode {
+              CardView {
+                LazyVStack(alignment: .leading, spacing: 8) {
+                  ForEach(comments) { comment in
+                    CommentItemView(comment: comment)
+                    if comment.id != comments.last?.id {
+                      Divider()
                     }
                   }
                 }
-              } label: {
-                Text(subjects.isEmpty ? "" : "关联条目+")
-                  .font(.caption)
-                  .foregroundStyle(.accent)
-              }.disabled(subjects.isEmpty)
+              }
             }
-            Divider()
-            BBCodeView(blog.content)
-              .textSelection(.enabled)
-              .padding(.top, 8)
           }.padding(.horizontal, 8)
-
-          /// comments
-          if !isolationMode {
-            Divider()
-            ForEach(comments) { comment in
-              CommentItemView(comment: comment)
-            }
-          }
         }
       } else if refreshed {
         NotFoundView()

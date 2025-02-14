@@ -1,32 +1,41 @@
 import BBCode
 import SwiftUI
 
-struct CommentItemNormalView: View {
-  let comment: CommentDTO
+struct ReplyItemNormalView: View {
+  let reply: ReplyDTO
 
   var body: some View {
     VStack(alignment: .leading) {
       HStack(alignment: .top) {
-        ImageView(img: comment.user.avatar?.large)
-          .imageStyle(width: 40, height: 40)
-          .imageType(.avatar)
-          .imageLink(comment.user.link)
+        if let creator = reply.creator {
+          ImageView(img: creator.avatar?.large)
+            .imageStyle(width: 40, height: 40)
+            .imageType(.avatar)
+            .imageLink(creator.link)
+        } else {
+          Rectangle().fill(.clear).frame(width: 40, height: 40)
+        }
         VStack(alignment: .leading) {
           HStack {
-            Text(comment.user.header).lineLimit(1)
+            if let creator = reply.creator {
+              Text(creator.header).lineLimit(1)
+            } else {
+              Text("用户 \(reply.creatorID)")
+                .lineLimit(1)
+            }
             Spacer()
-            Text(comment.createdAt.datetimeDisplay)
+            Text(reply.createdAt.datetimeDisplay)
               .lineLimit(1)
               .font(.caption)
               .foregroundStyle(.secondary)
           }
-          BBCodeView(comment.content)
+          BBCodeView(reply.content)
             .textSelection(.enabled)
-          ForEach(comment.replies) { reply in
+          ForEach(reply.replies) { subreply in
             VStack(alignment: .leading) {
               Divider()
               HStack(alignment: .top) {
-                if let user = reply.user {
+                if let user = subreply.creator {
                   ImageView(img: user.avatar?.large)
                     .imageStyle(width: 40, height: 40)
                     .imageType(.avatar)
@@ -36,20 +45,20 @@ struct CommentItemNormalView: View {
                 }
                 VStack(alignment: .leading) {
                   HStack {
-                    if let user = reply.user {
+                    if let user = subreply.creator {
                       Text(user.nickname.withLink(user.link))
                         .lineLimit(1)
                     } else {
-                      Text("用户 \(reply.creatorID)")
+                      Text("用户 \(subreply.creatorID)")
                         .lineLimit(1)
                     }
                     Spacer()
-                    Text(reply.createdAt.datetimeDisplay)
+                    Text(subreply.createdAt.datetimeDisplay)
                       .lineLimit(1)
                       .font(.caption)
                       .foregroundStyle(.secondary)
                   }
-                  BBCodeView(reply.content)
+                  BBCodeView(subreply.content)
                     .textSelection(.enabled)
                 }
               }
@@ -61,25 +70,30 @@ struct CommentItemNormalView: View {
   }
 }
 
-struct CommentItemView: View {
-  let comment: CommentDTO
+struct ReplyItemView: View {
+  let reply: ReplyDTO
 
   var body: some View {
-    switch comment.state {
+    switch reply.state {
     case .userDelete:
       HStack {
-        Text(comment.user.header).lineLimit(1)
-        Text("删除了评论")
+        if let creator = reply.creator {
+          Text(creator.header).lineLimit(1)
+        } else {
+          Text("用户 \(reply.creatorID)")
+            .lineLimit(1)
+        }
+        Text("删除了回复")
           .font(.footnote)
           .foregroundStyle(.secondary)
         Spacer()
-        Text(comment.createdAt.datetimeDisplay)
+        Text(reply.createdAt.datetimeDisplay)
           .lineLimit(1)
           .font(.caption)
           .foregroundStyle(.secondary)
       }
     default:
-      CommentItemNormalView(comment: comment)
+      ReplyItemNormalView(reply: reply)
     }
   }
 }
