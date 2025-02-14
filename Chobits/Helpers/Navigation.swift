@@ -43,7 +43,11 @@ enum NavDestination: Hashable, View {
   case personCastList(_ personId: Int)
   case personWorkList(_ personId: Int)
   case index(_ indexId: Int)
+
   case group(_ name: String)
+  case groupMemberList(_ name: String)
+  case groupTopicList(_ name: String)
+
   case topic(_ topic: TopicDTO)
   case blog(_ blogId: Int)
 
@@ -116,8 +120,14 @@ enum NavDestination: Hashable, View {
       PersonWorkListView(personId: personId)
     case .index(let indexId):
       IndexView(indexId: indexId)
+
     case .group(let name):
       GroupView(name: name)
+    case .groupMemberList(let name):
+      GroupMemberListView(name: name)
+    case .groupTopicList(let name):
+      GroupTopicListView(name: name)
+
     case .topic(let topic):
       TopicView(topic: topic)
     case .blog(let blogId):
