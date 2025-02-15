@@ -73,8 +73,10 @@ struct SubjectTopicDetailView: View {
               Divider()
 
               // Content
-              BBCodeView(topic.content)
-                .tint(.linkText)
+              if !topic.content.isEmpty {
+                BBCodeView(topic.content)
+                  .tint(.linkText)
+              }
             }
           }
 

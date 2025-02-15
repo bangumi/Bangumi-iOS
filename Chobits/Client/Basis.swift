@@ -872,15 +872,6 @@ enum PostState: Int, Codable, CaseIterable {
       return "管理员折叠主题"
     }
   }
-
-  init(_ value: Int = 0) {
-    let tmp = Self(rawValue: value)
-    if let out = tmp {
-      self = out
-      return
-    }
-    self = Self.normal
-  }
 }
 
 /// TODO: use bangumi/common

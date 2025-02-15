@@ -77,6 +77,7 @@ struct BlogView: View {
 
             /// comments
             if !isolationMode {
+              Divider()
               LazyVStack(alignment: .leading, spacing: 8) {
                 ForEach(comments) { comment in
                   CommentItemView(comment: comment)
