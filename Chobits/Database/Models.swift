@@ -126,7 +126,7 @@ final class SubjectV2: Searchable, Linkable {
   var summary: String
   var type: Int
   var volumes: Int
-  var alias: String
+  var alias: String = ""
 
   var ctype: Int = 0
   var collectedAt: Int = 0
@@ -294,7 +294,7 @@ final class CharacterV2: Searchable, Linkable {
   var nsfw: Bool
   var role: Int
   var summary: String
-  var alias: String
+  var alias: String = ""
 
   var collectedAt: Int = 0
 
@@ -390,7 +390,8 @@ final class PersonV2: Searchable, Linkable {
   var nsfw: Bool
   var summary: String
   var type: Int
-  var alias: String
+  var alias: String = ""
+
   var collectedAt: Int = 0
 
   var casts: [PersonCastDTO] = []
