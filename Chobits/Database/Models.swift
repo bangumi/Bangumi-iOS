@@ -294,6 +294,7 @@ final class CharacterV2: Searchable, Linkable {
   var nsfw: Bool
   var role: Int
   var summary: String
+  var alias: String
 
   var collectedAt: Int = 0
 
@@ -323,6 +324,7 @@ final class CharacterV2: Searchable, Linkable {
     self.nsfw = item.nsfw
     self.role = item.role.rawValue
     self.summary = item.summary
+    self.alias = item.infobox.aliases.joined(separator: " ")
     self.collectedAt = item.collectedAt ?? 0
   }
 
@@ -338,6 +340,7 @@ final class CharacterV2: Searchable, Linkable {
     self.nsfw = item.nsfw
     self.role = item.role.rawValue
     self.summary = ""
+    self.alias = ""
     self.collectedAt = 0
   }
 
@@ -352,6 +355,8 @@ final class CharacterV2: Searchable, Linkable {
     if self.nsfw != item.nsfw { self.nsfw = item.nsfw }
     if self.role != item.role.rawValue { self.role = item.role.rawValue }
     if self.summary != item.summary { self.summary = item.summary }
+    let aliases = item.infobox.aliases.joined(separator: " ")
+    if self.alias != aliases { self.alias = aliases }
     if let collectedAt = item.collectedAt, self.collectedAt != collectedAt {
       self.collectedAt = collectedAt
     }
@@ -385,6 +390,7 @@ final class PersonV2: Searchable, Linkable {
   var nsfw: Bool
   var summary: String
   var type: Int
+  var alias: String
   var collectedAt: Int = 0
 
   var casts: [PersonCastDTO] = []
@@ -415,6 +421,7 @@ final class PersonV2: Searchable, Linkable {
     self.nsfw = item.nsfw
     self.summary = item.summary
     self.type = item.type.rawValue
+    self.alias = item.infobox.aliases.joined(separator: " ")
     self.collectedAt = item.collectedAt ?? 0
   }
 
@@ -431,6 +438,7 @@ final class PersonV2: Searchable, Linkable {
     self.nsfw = item.nsfw
     self.summary = ""
     self.type = item.type.rawValue
+    self.alias = ""
     self.collectedAt = 0
   }
 
@@ -447,6 +455,8 @@ final class PersonV2: Searchable, Linkable {
     if self.nsfw != item.nsfw { self.nsfw = item.nsfw }
     if self.summary != item.summary { self.summary = item.summary }
     if self.type != item.type.rawValue { self.type = item.type.rawValue }
+    let aliases = item.infobox.aliases.joined(separator: " ")
+    if self.alias != aliases { self.alias = aliases }
     if let collectedAt = item.collectedAt, self.collectedAt != collectedAt {
       self.collectedAt = collectedAt
     }

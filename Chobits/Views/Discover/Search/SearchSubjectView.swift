@@ -71,7 +71,7 @@ struct SearchSubjectLocalView: View {
       predicate: #Predicate<Subject> {
         return (stype == 0 || stype == $0.type)
           && ($0.name.localizedStandardContains(text)
-            || $0.nameCN.localizedStandardContains(text))
+            || $0.alias.localizedStandardContains(text))
       })
     desc.fetchLimit = 20
     _subjects = Query(desc)
