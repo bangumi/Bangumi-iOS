@@ -119,7 +119,7 @@ struct TrendingSubjectTypeView: View {
   }
 
   var body: some View {
-    LazyVStack(spacing: 5) {
+    VStack(spacing: 5) {
       if items.isEmpty {
         ProgressView()
       } else {

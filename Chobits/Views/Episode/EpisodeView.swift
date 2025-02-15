@@ -35,7 +35,7 @@ struct EpisodeView: View {
 
   var body: some View {
     ScrollView {
-      LazyVStack(alignment: .leading) {
+      VStack(alignment: .leading) {
         if let episode = episode {
           if let subject = episode.subject {
             SubjectTinyView(subject: subject.slim)
@@ -49,9 +49,11 @@ struct EpisodeView: View {
           Divider()
         }
         if !isolationMode {
-          LazyVStack(alignment: .leading, spacing: 8) {
+          VStack(alignment: .leading, spacing: 2) {
             Text("吐槽箱").font(.title3)
             Divider()
+          }
+          LazyVStack(alignment: .leading, spacing: 8) {
             ForEach(comments) { comment in
               CommentItemView(comment: comment)
               if comment.id != comments.last?.id {

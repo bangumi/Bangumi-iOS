@@ -56,15 +56,17 @@ struct PersonView: View {
     Section {
       if let person = person {
         ScrollView {
-          LazyVStack(alignment: .leading) {
+          VStack(alignment: .leading) {
             PersonDetailView()
               .environment(person)
 
             /// comments
             if !isolationMode {
-              LazyVStack(alignment: .leading, spacing: 8) {
+              VStack(alignment: .leading, spacing: 2) {
                 Text("吐槽箱").font(.title3)
                 Divider()
+              }
+              LazyVStack(alignment: .leading, spacing: 8) {
                 ForEach(comments) { comment in
                   CommentItemView(comment: comment)
                   if comment.id != comments.last?.id {

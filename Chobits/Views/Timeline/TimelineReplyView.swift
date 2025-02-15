@@ -20,7 +20,7 @@ struct TimelineReplyView: View {
 
   var body: some View {
     ScrollView {
-      LazyVStack(alignment: .leading) {
+      VStack(alignment: .leading) {
         if let user = item.user {
           HStack {
             ImageView(img: user.avatar?.large)

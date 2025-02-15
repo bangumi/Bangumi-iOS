@@ -34,7 +34,7 @@ struct GroupMemberListView: View {
 
   var body: some View {
     ScrollView {
-      LazyVStack(spacing: 8) {
+      VStack(spacing: 8) {
         if !moderators.isEmpty {
           Section {
             VStack(alignment: .leading, spacing: 4) {

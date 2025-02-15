@@ -56,15 +56,17 @@ struct CharacterView: View {
     Section {
       if let character = character {
         ScrollView {
-          LazyVStack(alignment: .leading) {
+          VStack(alignment: .leading) {
             CharacterDetailView()
               .environment(character)
 
             /// comments
             if !isolationMode {
-              LazyVStack(alignment: .leading, spacing: 8) {
+              VStack(alignment: .leading, spacing: 2) {
                 Text("吐槽箱").font(.title3)
                 Divider()
+              }
+              LazyVStack(alignment: .leading, spacing: 8) {
                 ForEach(comments) { comment in
                   CommentItemView(comment: comment)
                   if comment.id != comments.last?.id {

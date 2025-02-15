@@ -3,7 +3,7 @@ import SwiftUI
 struct ChiiDiscoverView: View {
   var body: some View {
     ScrollView {
-      LazyVStack {
+      VStack {
         CalendarSlimView()
         TrendingSubjectView()
       }.padding(.horizontal, 8)

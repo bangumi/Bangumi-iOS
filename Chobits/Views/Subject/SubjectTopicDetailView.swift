@@ -30,7 +30,7 @@ struct SubjectTopicDetailView: View {
   var body: some View {
     ScrollView {
       if let topic = topic {
-        LazyVStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 8) {
           // Topic Header
           CardView {
             VStack(alignment: .leading, spacing: 8) {

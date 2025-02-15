@@ -51,7 +51,7 @@ struct UserView: View {
     Section {
       if let user = user {
         ScrollView {
-          LazyVStack(alignment: .leading) {
+          VStack(alignment: .leading) {
             Text(user.nickname)
               .font(.title3)
               .fontWeight(.bold)

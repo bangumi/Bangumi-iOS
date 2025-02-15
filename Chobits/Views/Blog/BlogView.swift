@@ -40,7 +40,7 @@ struct BlogView: View {
     Section {
       if let blog = blog {
         ScrollView {
-          LazyVStack(alignment: .leading) {
+          VStack(alignment: .leading) {
             VStack(alignment: .leading, spacing: 5) {
               UserSmallView(user: blog.user)
                 .padding(.top, 8)

@@ -26,13 +26,10 @@ struct SubjectOffprintsView: View {
   }
 
   var body: some View {
-    VStack(spacing: 2) {
-      HStack(alignment: .bottom) {
-        Text("单行本")
-          .foregroundStyle(offprints.count > 0 ? .primary : .secondary)
-          .font(.title3)
-        Spacer()
-      }
+    VStack(alignment: .leading, spacing: 2) {
+      Text("单行本")
+        .foregroundStyle(offprints.count > 0 ? .primary : .secondary)
+        .font(.title3)
       Divider()
     }.padding(.top, 5)
     ScrollView(.horizontal, showsIndicators: false) {

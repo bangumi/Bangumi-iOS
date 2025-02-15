@@ -48,7 +48,7 @@ struct GroupView: View {
     Section {
       if let group = group {
         ScrollView {
-          LazyVStack(alignment: .leading) {
+          VStack(alignment: .leading) {
             GroupDetailView(width: width)
               .environment(group)
           }.padding(.horizontal, 8)
