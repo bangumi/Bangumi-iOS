@@ -42,13 +42,11 @@ struct TimelineReplyView: View {
           .tint(.linkText)
           .textSelection(.enabled)
         if !isolationMode {
-          CardView {
-            LazyVStack(alignment: .leading, spacing: 8) {
-              ForEach(comments) { comment in
-                CommentItemView(comment: comment)
-                if comment.id != comments.last?.id {
-                  Divider()
-                }
+          LazyVStack(alignment: .leading, spacing: 8) {
+            ForEach(comments) { comment in
+              CommentItemView(comment: comment)
+              if comment.id != comments.last?.id {
+                Divider()
               }
             }
           }

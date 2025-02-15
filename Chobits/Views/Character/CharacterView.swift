@@ -62,15 +62,13 @@ struct CharacterView: View {
 
             /// comments
             if !isolationMode {
-              CardView {
-                LazyVStack(alignment: .leading, spacing: 8) {
-                  Text("吐槽箱").font(.title3)
-                  Divider()
-                  ForEach(comments) { comment in
-                    CommentItemView(comment: comment)
-                    if comment.id != comments.last?.id {
-                      Divider()
-                    }
+              LazyVStack(alignment: .leading, spacing: 8) {
+                Text("吐槽箱").font(.title3)
+                Divider()
+                ForEach(comments) { comment in
+                  CommentItemView(comment: comment)
+                  if comment.id != comments.last?.id {
+                    Divider()
                   }
                 }
               }
