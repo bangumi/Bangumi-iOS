@@ -1,0 +1,90 @@
+import OSLog
+import SwiftData
+import SwiftUI
+
+struct SearchSubjectView: View {
+  let text: String
+  let subjectType: SubjectType
+
+  func fetch(limit: Int, offset: Int) async -> PagedDTO<SlimSubjectDTO>? {
+    do {
+      guard let db = await Chii.shared.db else {
+        throw ChiiError.uninitialized
+      }
+      let resp = try await Chii.shared.searchSubjects(
+        keyword: text, type: subjectType, limit: limit, offset: offset)
+      for item in resp.data {
+        try await db.saveSubject(item)
+      }
+      try await db.commit()
+      return resp
+    } catch {
+      Notifier.shared.alert(error: error)
+    }
+    return nil
+  }
+
+  var body: some View {
+    PageView<SlimSubjectDTO, _>(nextPageFunc: fetch) { item in
+      SearchSubjectItemView(subjectId: item.id)
+    }
+  }
+}
+
+struct SearchSubjectItemView: View {
+  let subjectId: Int
+
+  @Query private var subjects: [Subject]
+  private var subject: Subject? { subjects.first }
+
+  init(subjectId: Int) {
+    self.subjectId = subjectId
+
+    let desc = FetchDescriptor<Subject>(
+      predicate: #Predicate<Subject> {
+        return $0.subjectId == subjectId
+      }
+    )
+    _subjects = Query(desc)
+  }
+
+  var body: some View {
+    CardView {
+      SubjectLargeRowView()
+        .environment(subject)
+    }
+  }
+}
+
+struct SearchSubjectLocalView: View {
+  let text: String
+  let subjectType: SubjectType
+
+  @Query private var subjects: [Subject]
+
+  init(text: String, subjectType: SubjectType) {
+    self.text = text
+    self.subjectType = subjectType
+
+    let stype = subjectType.rawValue
+    var desc = FetchDescriptor<Subject>(
+      predicate: #Predicate<Subject> {
+        return (stype == 0 || stype == $0.type)
+          && ($0.name.localizedStandardContains(text)
+            || $0.nameCN.localizedStandardContains(text))
+      })
+    desc.fetchLimit = 20
+    _subjects = Query(desc)
+  }
+
+  var body: some View {
+    LazyVStack {
+      ForEach(subjects) { subject in
+        CardView {
+          SubjectLargeRowView()
+            .environment(subject)
+        }
+      }
+    }
+  }
+}

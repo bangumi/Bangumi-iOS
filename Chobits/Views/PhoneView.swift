@@ -11,7 +11,6 @@ struct PhoneView: View {
   @State private var discoverNav: NavigationPath = NavigationPath()
 
   @State private var searchQuery: String = ""
-  @State private var searchRemote: Bool = false
   @State private var searching: Bool = false
 
   init() {
@@ -66,19 +65,13 @@ struct PhoneView: View {
         NavigationStack(path: $discoverNav) {
           Section {
             if searching {
-              SearchView(text: $searchQuery, remote: $searchRemote)
+              SearchView(text: $searchQuery, searching: $searching)
             } else {
               ChiiDiscoverView()
             }
           }.navigationDestination(for: NavDestination.self) { $0 }
         }
         .searchable(text: $searchQuery, isPresented: $searching)
-        .onSubmit(of: .search) {
-          searchRemote = true
-        }
-        .onChange(of: searchQuery) {
-          searchRemote = false
-        }
         .environment(
           \.openURL,
           OpenURLAction { url in

@@ -233,30 +233,6 @@ final class SubjectV2: Searchable, Linkable {
     self.interest = nil
   }
 
-  init(_ item: SubjectDTOV0) {
-    self.subjectId = item.id
-    self.airtime = SubjectAirtime(date: item.date)
-    self.collection = item.collection
-    self.eps = item.eps
-    self.images = item.images
-    self.infobox = []
-    self.info = ""
-    self.locked = item.locked
-    self.metaTags = item.metaTags
-    self.tags = item.tags
-    self.name = item.name
-    self.nameCN = item.nameCn
-    self.nsfw = item.nsfw
-    self.platform = SubjectPlatform(name: item.platform ?? "")
-    self.rating = SubjectRating(item.rating)
-    self.series = item.series
-    self.summary = item.summary
-    self.type = item.type.rawValue
-    self.volumes = item.volumes
-    self.alias = ""
-    self.interest = nil
-  }
-
   func update(_ item: SubjectDTO) {
     if self.airtime != item.airtime { self.airtime = item.airtime }
     if self.collection != item.collection { self.collection = item.collection }
@@ -298,22 +274,6 @@ final class SubjectV2: Searchable, Linkable {
     if self.nameCN != item.nameCN { self.nameCN = item.nameCN }
     if self.nsfw != item.nsfw { self.nsfw = item.nsfw }
     if self.type != item.type.rawValue { self.type = item.type.rawValue }
-  }
-
-  func update(_ item: SubjectDTOV0) {
-    if self.collection != item.collection { self.collection = item.collection }
-    if self.eps != item.eps { self.eps = item.eps }
-    if let images = item.images, self.images != images { self.images = images }
-    if self.locked != item.locked { self.locked = item.locked }
-    if self.metaTags != item.metaTags { self.metaTags = item.metaTags }
-    if self.tags != item.tags { self.tags = item.tags }
-    if self.name != item.name { self.name = item.name }
-    if self.nameCN != item.nameCn { self.nameCN = item.nameCn }
-    if self.nsfw != item.nsfw { self.nsfw = item.nsfw }
-    if self.series != item.series { self.series = item.series }
-    if self.summary != item.summary { self.summary = item.summary }
-    if self.type != item.type.rawValue { self.type = item.type.rawValue }
-    if self.volumes != item.volumes { self.volumes = item.volumes }
   }
 }
 
@@ -366,6 +326,21 @@ final class CharacterV2: Searchable, Linkable {
     self.collectedAt = item.collectedAt ?? 0
   }
 
+  init(_ item: SlimCharacterDTO) {
+    self.characterId = item.id
+    self.collects = 0
+    self.comment = item.comment ?? 0
+    self.images = item.images
+    self.infobox = []
+    self.lock = item.lock
+    self.name = item.name
+    self.nameCN = item.nameCN
+    self.nsfw = item.nsfw
+    self.role = item.role.rawValue
+    self.summary = ""
+    self.collectedAt = 0
+  }
+
   func update(_ item: CharacterDTO) {
     if self.collects != item.collects { self.collects = item.collects }
     if self.comment != item.comment { self.comment = item.comment }
@@ -380,6 +355,15 @@ final class CharacterV2: Searchable, Linkable {
     if let collectedAt = item.collectedAt, self.collectedAt != collectedAt {
       self.collectedAt = collectedAt
     }
+  }
+
+  func update(_ item: SlimCharacterDTO) {
+    if let images = item.images, self.images != images { self.images = images }
+    if self.name != item.name { self.name = item.name }
+    if self.nameCN != item.nameCN { self.nameCN = item.nameCN }
+    if self.nsfw != item.nsfw { self.nsfw = item.nsfw }
+    if self.role != item.role.rawValue { self.role = item.role.rawValue }
+    if let comment = item.comment, self.comment != comment { self.comment = comment }
   }
 }
 
@@ -434,6 +418,22 @@ final class PersonV2: Searchable, Linkable {
     self.collectedAt = item.collectedAt ?? 0
   }
 
+  init(_ item: SlimPersonDTO) {
+    self.personId = item.id
+    self.career = []
+    self.collects = 0
+    self.comment = item.comment ?? 0
+    self.images = item.images
+    self.infobox = []
+    self.lock = item.lock
+    self.name = item.name
+    self.nameCN = item.nameCN
+    self.nsfw = item.nsfw
+    self.summary = ""
+    self.type = item.type.rawValue
+    self.collectedAt = 0
+  }
+
   func update(_ item: PersonDTO) {
     let newCareer = item.career.map(\.rawValue)
     if self.career != newCareer { self.career = newCareer }
@@ -450,6 +450,16 @@ final class PersonV2: Searchable, Linkable {
     if let collectedAt = item.collectedAt, self.collectedAt != collectedAt {
       self.collectedAt = collectedAt
     }
+  }
+
+  func update(_ item: SlimPersonDTO) {
+    if let images = item.images, self.images != images { self.images = images }
+    if self.name != item.name { self.name = item.name }
+    if self.nameCN != item.nameCN { self.nameCN = item.nameCN }
+    if let comment = item.comment, self.comment != comment { self.comment = comment }
+    if self.type != item.type.rawValue { self.type = item.type.rawValue }
+    if self.nsfw != item.nsfw { self.nsfw = item.nsfw }
+    if self.lock != item.lock { self.lock = item.lock }
   }
 }
 

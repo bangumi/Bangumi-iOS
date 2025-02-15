@@ -229,13 +229,6 @@ struct SubjectRating: Codable, Hashable {
     self.score = 0
     self.rank = 0
   }
-
-  init(_ v0: SubjectRatingV0) {
-    self.count = v0.count.map { $0.value }
-    self.total = v0.total
-    self.score = v0.score
-    self.rank = 0
-  }
 }
 
 typealias Infobox = [InfoboxItem]

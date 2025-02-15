@@ -347,21 +347,6 @@ extension DatabaseOperator {
     return subject
   }
 
-  public func ensureSubject(_ item: SubjectDTOV0) throws -> Subject {
-    let sid = item.id
-    let fetched = try self.fetchOne(
-      predicate: #Predicate<Subject> {
-        $0.subjectId == sid
-      })
-    if let subject = fetched {
-      subject.update(item)
-      return subject
-    }
-    let subject = Subject(item)
-    modelContext.insert(subject)
-    return subject
-  }
-
   public func ensureEpisode(_ item: EpisodeDTO) throws -> Episode {
     let eid = item.id
     let fetched = try self.fetchOne(
@@ -415,7 +400,37 @@ extension DatabaseOperator {
     return character
   }
 
+  public func ensureCharacter(_ item: SlimCharacterDTO) throws -> Character {
+    let cid = item.id
+    let fetched = try self.fetchOne(
+      predicate: #Predicate<Character> {
+        $0.characterId == cid
+      })
+    if let character = fetched {
+      character.update(item)
+      return character
+    }
+    let character = Character(item)
+    modelContext.insert(character)
+    return character
+  }
+
   public func ensurePerson(_ item: PersonDTO) throws -> Person {
+    let pid = item.id
+    let fetched = try self.fetchOne(
+      predicate: #Predicate<Person> {
+        $0.personId == pid
+      })
+    if let person = fetched {
+      person.update(item)
+      return person
+    }
+    let person = Person(item)
+    modelContext.insert(person)
+    return person
+  }
+
+  public func ensurePerson(_ item: SlimPersonDTO) throws -> Person {
     let pid = item.id
     let fetched = try self.fetchOne(
       predicate: #Predicate<Person> {
@@ -471,7 +486,7 @@ extension DatabaseOperator {
     let _ = try self.ensureSubject(item)
   }
 
-  public func saveSubject(_ item: SubjectDTOV0) throws {
+  public func saveSubject(_ item: SlimSubjectDTO) throws {
     let _ = try self.ensureSubject(item)
   }
 
@@ -531,6 +546,10 @@ extension DatabaseOperator {
     let _ = try self.ensureCharacter(item)
   }
 
+  public func saveCharacter(_ item: SlimCharacterDTO) throws {
+    let _ = try self.ensureCharacter(item)
+  }
+
   public func saveCharacterCasts(characterId: Int, items: [CharacterCastDTO]) throws {
     let character = try self.getCharacter(characterId)
     if character?.casts != items {
@@ -542,6 +561,10 @@ extension DatabaseOperator {
 // MARK: - save person
 extension DatabaseOperator {
   public func savePerson(_ item: PersonDTO) throws {
+    let _ = try self.ensurePerson(item)
+  }
+
+  public func savePerson(_ item: SlimPersonDTO) throws {
     let _ = try self.ensurePerson(item)
   }
 
