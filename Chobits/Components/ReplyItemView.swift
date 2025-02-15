@@ -78,7 +78,7 @@ struct ReplyItemView: View {
     case .userDelete:
       HStack {
         if let creator = reply.creator {
-          Text(creator.header).lineLimit(1)
+          Text(creator.nickname.withLink(creator.link)).lineLimit(1)
         } else {
           Text("用户 \(reply.creatorID)")
             .lineLimit(1)

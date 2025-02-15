@@ -80,13 +80,11 @@ struct GroupTopicDetailView: View {
 
           // Replies
           if !topic.replies.isEmpty {
-            CardView {
-              LazyVStack(alignment: .leading, spacing: 8) {
-                ForEach(topic.replies) { reply in
-                  ReplyItemView(reply: reply)
-                  if reply.id != topic.replies.last?.id {
-                    Divider()
-                  }
+            LazyVStack(alignment: .leading, spacing: 8) {
+              ForEach(topic.replies) { reply in
+                ReplyItemView(reply: reply)
+                if reply.id != topic.replies.last?.id {
+                  Divider()
                 }
               }
             }
