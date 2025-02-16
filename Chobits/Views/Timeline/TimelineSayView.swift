@@ -45,7 +45,7 @@ struct TimelineSayView: View {
           .buttonStyle(.borderedProminent)
         }
         TextInputView(type: "吐槽", text: $content)
-          .textInputStyle(wordLimit: 380)
+          .textInputStyle(bbcode: true, wordLimit: 380)
         TrunstileView(token: $token).frame(height: 65)
       }.padding()
     }

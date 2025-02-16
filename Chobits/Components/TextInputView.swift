@@ -3,12 +3,10 @@ import SwiftUI
 
 struct TextInputStyle {
   let bbcode: Bool
-  let lineLimit: Int
   let wordLimit: Int?
 
-  init(bbcode: Bool = false, lineLimit: Int = 5, wordLimit: Int? = nil) {
+  init(bbcode: Bool = false, wordLimit: Int? = nil) {
     self.bbcode = bbcode
-    self.lineLimit = lineLimit
     self.wordLimit = wordLimit
   }
 }
@@ -25,11 +23,8 @@ extension EnvironmentValues {
 }
 
 extension View {
-  func textInputStyle(
-    bbcode: Bool = false,
-    lineLimit: Int = 5, wordLimit: Int? = nil
-  ) -> some View {
-    let style = TextInputStyle(bbcode: bbcode, lineLimit: lineLimit, wordLimit: wordLimit)
+  func textInputStyle(bbcode: Bool = false, wordLimit: Int? = nil) -> some View {
+    let style = TextInputStyle(bbcode: bbcode, wordLimit: wordLimit)
     return self.environment(\.textInputStyle, style)
   }
 }
@@ -42,9 +37,13 @@ struct TextInputView: View {
   @Environment(\.modelContext) var modelContext
 
   @Query private var drafts: [Draft]
-  @State private var showingDrafts = false
 
+  @FocusState private var isEditing: Bool
+  @State private var showingBBCodeMenu = false
+  @State private var showingDrafts = false
   @State private var currentDraft: Draft?
+  @State private var editorHeight: CGFloat = 120
+  private let minHeight: CGFloat = 80
 
   init(type: String, text: Binding<String>) {
     self.type = type
@@ -53,6 +52,14 @@ struct TextInputView: View {
       predicate: #Predicate<Draft> { $0.type == type },
       sortBy: [SortDescriptor(\Draft.updatedAt, order: .reverse)])
     self._drafts = Query(desc)
+  }
+
+  var draftDesc: String {
+    if drafts.count == 0 {
+      return "暂无草稿"
+    } else {
+      return "\(drafts.count)条草稿"
+    }
   }
 
   private func saveDraft() {
@@ -71,36 +78,66 @@ struct TextInputView: View {
     showingDrafts = false
   }
 
+  private func insertBBCode(_ tag: String) {
+    // 获取选中的文本范围
+    // 由于 SwiftUI 的 TextField 目前不支持获取选择范围
+    // 我们先实现简单的在光标位置插入标签
+    text += "[\(tag)][/\(tag)]"
+  }
+
   var body: some View {
     VStack {
+      if style.bbcode && isEditing {
+        ScrollView(.horizontal, showsIndicators: false) {
+          HStack(spacing: 8) {
+            ForEach(BBCodeButton.allCases) { button in
+              Button(action: { insertBBCode(button.tag) }) {
+                Image(systemName: button.icon)
+                  .frame(width: 16, height: 16)
+              }.buttonStyle(.bordered)
+            }
+          }.padding(.horizontal, 2)
+        }
+      }
+
       BorderView(color: .secondary.opacity(0.2), padding: 4) {
-        TextField("", text: $text, axis: .vertical)
+        TextEditor(text: $text)
+          .focused($isEditing)
+          .frame(height: editorHeight)
           .autocorrectionDisabled()
           .textInputAutocapitalization(.never)
-          .multilineTextAlignment(.leading)
-          .scrollDisabled(true)
-          .lineLimit(style.lineLimit, reservesSpace: true)
           .onChange(of: text) { _, newValue in
             if !newValue.isEmpty {
               saveDraft()
             }
           }
       }
+      Rectangle()
+        .fill(.secondary.opacity(0.2))
+        .frame(height: 4)
+        .cornerRadius(2)
+        .frame(width: 40)
+        .gesture(
+          DragGesture()
+            .onChanged { value in
+              let newHeight = editorHeight + value.translation.height
+              editorHeight = max(minHeight, newHeight)
+            }
+        ).padding(.vertical, 2)
+
       HStack {
-        if !drafts.isEmpty {
-          Button(action: { showingDrafts = true }) {
-            Label("\(drafts.count)条草稿", systemImage: "doc.text.fill")
-              .font(.footnote)
-              .foregroundStyle(.secondary)
-          }
-          .sheet(isPresented: $showingDrafts) {
-            DraftBoxView(
-              current: currentDraft,
-              drafts: drafts,
-              onLoad: loadDraft,
-              isPresented: $showingDrafts
-            )
-          }
+        Button(action: { showingDrafts = true }) {
+          Label(draftDesc, systemImage: "doc.text.fill")
+            .font(.footnote)
+            .foregroundStyle(.secondary)
+        }
+        .sheet(isPresented: $showingDrafts) {
+          DraftBoxView(
+            current: currentDraft,
+            drafts: drafts,
+            onLoad: loadDraft,
+            isPresented: $showingDrafts
+          )
         }
         Spacer()
         if let wordLimit = style.wordLimit {
@@ -109,6 +146,42 @@ struct TextInputView: View {
             .foregroundStyle(text.count > wordLimit ? .red : .secondary)
         }
       }
+    }.animation(.default, value: isEditing)
+  }
+}
+
+private enum BBCodeButton: String, CaseIterable, Identifiable {
+  case bold
+  case italic
+  case underline
+  case strike
+  case mask
+  case quote
+  case code
+
+  var id: String { rawValue }
+
+  var tag: String {
+    switch self {
+    case .bold: return "b"
+    case .italic: return "i"
+    case .underline: return "u"
+    case .strike: return "s"
+    case .mask: return "mask"
+    case .quote: return "quote"
+    case .code: return "code"
+    }
+  }
+
+  var icon: String {
+    switch self {
+    case .bold: return "bold"
+    case .italic: return "italic"
+    case .underline: return "underline"
+    case .strike: return "strikethrough"
+    case .mask: return "character.square.fill"
+    case .quote: return "text.quote"
+    case .code: return "chevron.left.forwardslash.chevron.right"
     }
   }
 }
@@ -143,7 +216,7 @@ private struct DraftBoxView: View {
                 Text(draft.content)
                   .lineLimit(3)
                   .multilineTextAlignment(.leading)
-                draft.updatedAt.relativeText
+                Text("\(draft.content.count)字 · \(draft.updatedAt.date, style: .relative)前")
                   .font(.caption)
                   .foregroundStyle(.secondary)
               }
@@ -168,7 +241,6 @@ private struct DraftBoxView: View {
           }
         }
       }
-    }
-    .presentationDetents([.medium])
+    }.presentationDetents([.medium])
   }
 }
