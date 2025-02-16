@@ -38,6 +38,19 @@ struct GroupMemberListView: View {
   var body: some View {
     ScrollView {
       VStack(spacing: 8) {
+        if !creators.isEmpty {
+          Section {
+            VStack(alignment: .leading, spacing: 4) {
+              Text("小组长")
+                .font(.title3)
+              Divider()
+              ForEach(creators) { member in
+                GroupMemberItemView(member: member)
+              }
+            }
+          }
+        }
+
         if !moderators.isEmpty {
           Section {
             VStack(alignment: .leading, spacing: 4) {
@@ -45,33 +58,10 @@ struct GroupMemberListView: View {
                 .font(.title3)
               Divider()
               ForEach(moderators) { member in
-                CardView {
-                  HStack(alignment: .top) {
-                    ImageView(img: member.user?.avatar?.large)
-                      .imageStyle(width: 60, height: 60)
-                      .imageType(.avatar)
-                      .imageLink(member.user?.link ?? "")
-                    VStack(alignment: .leading) {
-                      HStack {
-                        VStack(alignment: .leading) {
-                          Text(member.user?.nickname.withLink(member.user?.link) ?? "")
-                            .lineLimit(1)
-                          Divider()
-                          Text("@\(member.user?.username ?? "")")
-                            .font(.footnote)
-                            .foregroundStyle(.secondary)
-                            .lineLimit(1)
-                        }
-                        Spacer()
-                      }
-                    }.padding(.leading, 4)
-                  }
-                }
+                GroupMemberItemView(member: member)
               }
             }
           }
-          Divider()
-            .padding(.vertical, 4)
         }
 
         Section {
@@ -80,28 +70,7 @@ struct GroupMemberListView: View {
               .font(.title3)
             Divider()
             PageView<GroupMemberDTO, _>(nextPageFunc: loadMembers) { member in
-              CardView {
-                HStack(alignment: .top) {
-                  ImageView(img: member.user?.avatar?.large)
-                    .imageStyle(width: 60, height: 60)
-                    .imageType(.avatar)
-                    .imageLink(member.user?.link ?? "")
-                  VStack(alignment: .leading) {
-                    HStack {
-                      VStack(alignment: .leading) {
-                        Text(member.user?.nickname.withLink(member.user?.link) ?? "")
-                          .lineLimit(1)
-                        Divider()
-                        Text("@\(member.user?.username ?? "")")
-                          .font(.footnote)
-                          .foregroundStyle(.secondary)
-                          .lineLimit(1)
-                      }
-                      Spacer()
-                    }
-                  }.padding(.leading, 4)
-                }
-              }
+              GroupMemberItemView(member: member)
             }
           }
         }
@@ -112,6 +81,35 @@ struct GroupMemberListView: View {
     .onAppear {
       Task {
         await loadModerators()
+      }
+    }
+  }
+}
+
+struct GroupMemberItemView: View {
+  let member: GroupMemberDTO
+
+  var body: some View {
+    CardView {
+      HStack(alignment: .top) {
+        ImageView(img: member.user?.avatar?.large)
+          .imageStyle(width: 60, height: 60)
+          .imageType(.avatar)
+          .imageLink(member.user?.link ?? "")
+        VStack(alignment: .leading) {
+          HStack {
+            VStack(alignment: .leading) {
+              Text(member.user?.header ?? "")
+                .lineLimit(1)
+              Divider()
+              Text("@\(member.user?.username ?? "")")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+                .lineLimit(1)
+            }
+            Spacer()
+          }
+        }.padding(.leading, 4)
       }
     }
   }

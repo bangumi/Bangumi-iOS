@@ -33,37 +33,36 @@ struct GroupTopicDetailView: View {
         VStack(alignment: .leading, spacing: 8) {
           CardView {
             VStack(alignment: .leading, spacing: 8) {
-              VStack(alignment: .leading, spacing: 4) {
-                Text(topic.title)
-                  .font(.title3.bold())
-                  .multilineTextAlignment(.leading)
-                NavigationLink(value: NavDestination.group(topic.group.name)) {
-                  HStack {
-                    ImageView(img: topic.group.icon?.small)
-                      .imageStyle(width: 20, height: 20)
-                      .imageType(.icon)
-                    Text(topic.group.title)
-                      .font(.subheadline)
-                  }
-                }.buttonStyle(.navLink)
-              }
+              NavigationLink(value: NavDestination.group(topic.group.name)) {
+                HStack {
+                  ImageView(img: topic.group.icon?.small)
+                    .imageStyle(width: 20, height: 20)
+                    .imageType(.icon)
+                  Text(topic.group.title)
+                    .font(.subheadline)
+                }
+              }.buttonStyle(.navLink)
 
               Divider()
 
               HStack {
                 ImageView(img: topic.creator.avatar?.large)
-                  .imageStyle(width: 32, height: 32)
+                  .imageStyle(width: 20, height: 20)
                   .imageType(.avatar)
                   .imageLink(topic.creator.link)
-                VStack(alignment: .leading, spacing: 2) {
-                  Text(topic.creator.nickname.withLink(topic.creator.link))
-                    .font(.subheadline)
-                  Text(topic.createdAt.datetimeDisplay)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                }
+                Text(topic.creator.nickname.withLink(topic.creator.link))
+                  .font(.subheadline)
                 Spacer()
+                Text(topic.createdAt.datetimeDisplay)
+                  .font(.caption)
+                  .foregroundStyle(.secondary)
               }
+
+              Divider()
+
+              Text(topic.title)
+                .font(.title3.bold())
+                .multilineTextAlignment(.leading)
             }
           }
 
