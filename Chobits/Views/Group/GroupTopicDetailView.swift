@@ -78,7 +78,9 @@ struct GroupTopicDetailView: View {
           if !topic.replies.isEmpty {
             LazyVStack(alignment: .leading, spacing: 8) {
               ForEach(Array(zip(topic.replies.indices, topic.replies)), id: \.1) { idx, reply in
-                ReplyItemView(idx: idx, reply: reply, author: topic.creator)
+                ReplyItemView(
+                  type: .group, topicId: topicId, idx: idx,
+                  reply: reply, author: topic.creator)
                 if idx <= topic.replies.count - 1 {
                   Divider()
                 }

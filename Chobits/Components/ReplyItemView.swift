@@ -1,10 +1,25 @@
 import BBCode
 import SwiftUI
 
+enum TopicParentType {
+  case subject
+  case group
+}
+
 struct ReplyItemNormalView: View {
+  let type: TopicParentType
+  let topicId: Int
   let idx: Int
   let reply: ReplyDTO
   let author: SlimUserDTO
+
+  @AppStorage("shareDomain") var shareDomain: ShareDomain = .chii
+
+  @State private var showReplyBox: Bool = false
+
+  var shareLink: URL {
+    URL(string: "https://\(shareDomain.rawValue)/subject/topic/\(topicId)#post_\(reply.id)")!
+  }
 
   var body: some View {
     VStack(alignment: .leading) {
@@ -37,6 +52,20 @@ struct ReplyItemNormalView: View {
               .lineLimit(1)
               .font(.caption)
               .foregroundStyle(.secondary)
+            Menu {
+              Button {
+                showReplyBox = true
+              } label: {
+                Text("回复")
+              }
+              Divider()
+              ShareLink(item: shareLink) {
+                Label("分享", systemImage: "square.and.arrow.up")
+              }
+            } label: {
+              Image(systemName: "ellipsis")
+                .foregroundStyle(.secondary)
+            }.buttonStyle(.plain)
           }
           BBCodeView(reply.content).textSelection(.enabled)
           ForEach(Array(zip(reply.replies.indices, reply.replies)), id: \.1) { subidx, subreply in
@@ -46,7 +75,9 @@ struct ReplyItemNormalView: View {
               case .userDelete:
                 ReplyUserDeleteView(idx: subidx, reply: subreply, author: author)
               default:
-                ReplyBaseNormalView(idx: idx, subidx: subidx, subreply: subreply, author: author)
+                ReplyBaseNormalView(
+                  type: type, topicId: topicId, idx: idx, subidx: subidx,
+                  subreply: subreply, author: author)
               }
             }
           }
@@ -89,6 +120,8 @@ struct ReplyUserDeleteView: View {
 }
 
 struct ReplyItemView: View {
+  let type: TopicParentType
+  let topicId: Int
   let idx: Int
   let reply: ReplyDTO
   let author: SlimUserDTO
@@ -98,16 +131,26 @@ struct ReplyItemView: View {
     case .userDelete:
       ReplyUserDeleteView(idx: idx, reply: reply.base, author: author)
     default:
-      ReplyItemNormalView(idx: idx, reply: reply, author: author)
+      ReplyItemNormalView(type: type, topicId: topicId, idx: idx, reply: reply, author: author)
     }
   }
 }
 
 struct ReplyBaseNormalView: View {
+  let type: TopicParentType
+  let topicId: Int
   let idx: Int
   let subidx: Int
   let subreply: ReplyBaseDTO
   let author: SlimUserDTO
+
+  @State private var showReplyBox: Bool = false
+
+  @AppStorage("shareDomain") var shareDomain: ShareDomain = .chii
+
+  var shareLink: URL {
+    URL(string: "https://\(shareDomain.rawValue)/subject/topic/\(topicId)#post_\(subreply.id)")!
+  }
 
   var body: some View {
     HStack(alignment: .top) {
@@ -140,6 +183,20 @@ struct ReplyBaseNormalView: View {
             .lineLimit(1)
             .font(.caption)
             .foregroundStyle(.secondary)
+          Menu {
+            Button {
+              showReplyBox = true
+            } label: {
+              Text("回复")
+            }
+            Divider()
+            ShareLink(item: shareLink) {
+              Label("分享", systemImage: "square.and.arrow.up")
+            }
+          } label: {
+            Image(systemName: "ellipsis")
+              .foregroundStyle(.secondary)
+          }.buttonStyle(.plain)
         }
         BBCodeView(subreply.content).textSelection(.enabled)
       }
