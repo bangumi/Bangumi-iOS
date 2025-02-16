@@ -206,8 +206,8 @@ struct SubjectCollectionBoxView: View {
           }
 
           Text("吐槽")
-          TextInputView(text: $comment)
-            .textInputStyle(placeholder: "吐槽", wordLimit: 380)
+          TextInputView(type: "吐槽", text: $comment)
+            .textInputStyle(wordLimit: 380)
         }
         Spacer()
       }

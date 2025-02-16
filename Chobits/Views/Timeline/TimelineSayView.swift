@@ -44,8 +44,8 @@ struct TimelineSayView: View {
           .disabled(content.isEmpty || token.isEmpty || updating || content.count > 380)
           .buttonStyle(.borderedProminent)
         }
-        TextInputView(text: $content)
-          .textInputStyle(placeholder: "吐槽", wordLimit: 380)
+        TextInputView(type: "吐槽", text: $content)
+          .textInputStyle(wordLimit: 380)
         TrunstileView(token: $token).frame(height: 65)
       }.padding()
     }
