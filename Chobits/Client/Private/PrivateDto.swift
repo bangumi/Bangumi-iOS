@@ -863,7 +863,7 @@ struct GroupDTO: Codable, Identifiable, Hashable, Linkable {
 struct GroupMemberDTO: Codable, Identifiable, Hashable {
   var user: SlimUserDTO?
   var uid: Int
-  var role: GroupMemberRole
+  var role: GroupMemberRole? = .member
   var joinedAt: Int
 
   var id: Int {
