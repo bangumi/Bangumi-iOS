@@ -598,13 +598,23 @@ enum PersonType: Int, Codable, Identifiable, CaseIterable {
 /// 1 为 角色
 /// 2 为 机体
 /// 3 为 舰船
-/// 4 为 组织
+/// 4 为 组织机构
+/// 5 为 兵器
+/// 6 为 装备
+/// 7 为 道具&物品
+/// 8 为 技能&法术
+/// 9 为 虚拟偶像
 enum CharacterType: Int, Codable, Identifiable, CaseIterable {
   case none = 0
-  case character = 1
-  case vehicle = 2
-  case ship = 3
-  case organization = 4
+  case crt = 1
+  case mecha = 2
+  case vessel = 3
+  case org = 4
+  case weapon = 5
+  case armor = 6
+  case item = 7
+  case spell = 8
+  case vidol = 9
 
   var id: Self {
     self
@@ -623,14 +633,24 @@ enum CharacterType: Int, Codable, Identifiable, CaseIterable {
     switch self {
     case .none:
       return "未知"
-    case .character:
+    case .crt:
       return "角色"
-    case .vehicle:
+    case .mecha:
       return "机体"
-    case .ship:
+    case .vessel:
       return "舰船"
-    case .organization:
-      return "组织"
+    case .org:
+      return "组织机构"
+    case .weapon:
+      return "兵器"
+    case .armor:
+      return "装备"
+    case .item:
+      return "道具&物品"
+    case .spell:
+      return "技能&法术"
+    case .vidol:
+      return "虚拟偶像"
     }
   }
 
@@ -638,14 +658,24 @@ enum CharacterType: Int, Codable, Identifiable, CaseIterable {
     switch self {
     case .none:
       return "questionmark"
-    case .character:
+    case .crt:
       return "person"
-    case .vehicle:
+    case .mecha:
       return "car"
-    case .ship:
+    case .vessel:
       return "ferry"
-    case .organization:
+    case .org:
       return "building.2"
+    case .weapon:
+      return "gun"
+    case .armor:
+      return "shield"
+    case .item:
+      return "gift"
+    case .spell:
+      return "wand.sparkles"
+    case .vidol:
+      return "person.3"
     }
   }
 }
