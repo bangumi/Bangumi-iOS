@@ -37,10 +37,9 @@ struct GroupTopicDetailView: View {
                 Text(topic.title)
                   .font(.title3.bold())
                   .multilineTextAlignment(.leading)
-
                 NavigationLink(value: NavDestination.group(topic.group.name)) {
                   HStack {
-                    ImageView(img: topic.group.icon?.large)
+                    ImageView(img: topic.group.icon?.small)
                       .imageStyle(width: 20, height: 20)
                       .imageType(.icon)
                     Text(topic.group.title)
@@ -56,7 +55,6 @@ struct GroupTopicDetailView: View {
                   .imageStyle(width: 32, height: 32)
                   .imageType(.avatar)
                   .imageLink(topic.creator.link)
-
                 VStack(alignment: .leading, spacing: 2) {
                   Text(topic.creator.nickname.withLink(topic.creator.link))
                     .font(.subheadline)
@@ -66,8 +64,6 @@ struct GroupTopicDetailView: View {
                 }
                 Spacer()
               }
-
-              Divider()
             }
           }
 

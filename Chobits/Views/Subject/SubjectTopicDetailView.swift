@@ -37,7 +37,6 @@ struct SubjectTopicDetailView: View {
                 Text(topic.title)
                   .font(.title3.bold())
                   .multilineTextAlignment(.leading)
-
                 NavigationLink(value: NavDestination.subject(topic.subject.id)) {
                   HStack {
                     ImageView(img: topic.subject.images?.small)
@@ -65,7 +64,6 @@ struct SubjectTopicDetailView: View {
                 }
                 Spacer()
               }
-              Divider()
             }
           }
 
