@@ -2,7 +2,9 @@ import BBCode
 import SwiftUI
 
 struct ReplyItemNormalView: View {
+  let idx: Int
   let reply: ReplyDTO
+  let author: SlimUserDTO
 
   var body: some View {
     VStack(alignment: .leading) {
@@ -18,27 +20,33 @@ struct ReplyItemNormalView: View {
         VStack(alignment: .leading) {
           HStack {
             if let creator = reply.creator {
+              if creator.id == author.id {
+                BorderView {
+                  Text("楼主")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                }
+              }
               Text(creator.header).lineLimit(1)
             } else {
               Text("用户 \(reply.creatorID)")
                 .lineLimit(1)
             }
             Spacer()
-            Text(reply.createdAt.datetimeDisplay)
+            Text("#\(idx+1) - \(reply.createdAt.datetimeDisplay)")
               .lineLimit(1)
               .font(.caption)
               .foregroundStyle(.secondary)
           }
-          BBCodeView(reply.content)
-            .textSelection(.enabled)
-          ForEach(reply.replies) { subreply in
+          BBCodeView(reply.content).textSelection(.enabled)
+          ForEach(Array(zip(reply.replies.indices, reply.replies)), id: \.1) { subidx, subreply in
             VStack(alignment: .leading) {
               Divider()
               switch subreply.state {
               case .userDelete:
-                ReplyUserDeleteView(subreply.creatorID, subreply.creator, subreply.createdAt)
+                ReplyUserDeleteView(idx: subidx, reply: subreply, author: author)
               default:
-                ReplySubReplyNormalView(subreply: subreply)
+                ReplyBaseNormalView(idx: idx, subidx: subidx, subreply: subreply, author: author)
               }
             }
           }
@@ -49,29 +57,30 @@ struct ReplyItemNormalView: View {
 }
 
 struct ReplyUserDeleteView: View {
-  let creatorID: Int
-  let creator: SlimUserDTO?
-  let createdAt: Int
-
-  init(_ creatorID: Int, _ creator: SlimUserDTO?, _ createdAt: Int) {
-    self.creatorID = creatorID
-    self.creator = creator
-    self.createdAt = createdAt
-  }
+  let idx: Int
+  let reply: ReplyBaseDTO
+  let author: SlimUserDTO
 
   var body: some View {
     HStack {
-      if let creator = creator {
+      if let creator = reply.creator {
+        if creator.id == author.id {
+          BorderView {
+            Text("楼主")
+              .font(.caption)
+              .foregroundStyle(.secondary)
+          }
+        }
         Text(creator.nickname.withLink(creator.link)).lineLimit(1)
       } else {
-        Text("用户 \(creatorID)")
+        Text("用户 \(reply.creatorID)")
           .lineLimit(1)
       }
       Text("删除了回复")
         .font(.footnote)
         .foregroundStyle(.secondary)
       Spacer()
-      Text(createdAt.datetimeDisplay)
+      Text(reply.createdAt.datetimeDisplay)
         .lineLimit(1)
         .font(.caption)
         .foregroundStyle(.secondary)
@@ -80,24 +89,25 @@ struct ReplyUserDeleteView: View {
 }
 
 struct ReplyItemView: View {
+  let idx: Int
   let reply: ReplyDTO
+  let author: SlimUserDTO
 
   var body: some View {
     switch reply.state {
     case .userDelete:
-      ReplyUserDeleteView(
-        reply.creatorID,
-        reply.creator,
-        reply.createdAt
-      )
+      ReplyUserDeleteView(idx: idx, reply: reply.base, author: author)
     default:
-      ReplyItemNormalView(reply: reply)
+      ReplyItemNormalView(idx: idx, reply: reply, author: author)
     }
   }
 }
 
-struct ReplySubReplyNormalView: View {
+struct ReplyBaseNormalView: View {
+  let idx: Int
+  let subidx: Int
   let subreply: ReplyBaseDTO
+  let author: SlimUserDTO
 
   var body: some View {
     HStack(alignment: .top) {
@@ -112,6 +122,13 @@ struct ReplySubReplyNormalView: View {
       VStack(alignment: .leading) {
         HStack {
           if let user = subreply.creator {
+            if user.id == author.id {
+              BorderView {
+                Text("楼主")
+                  .font(.caption)
+                  .foregroundStyle(.secondary)
+              }
+            }
             Text(user.nickname.withLink(user.link))
               .lineLimit(1)
           } else {
@@ -119,13 +136,12 @@ struct ReplySubReplyNormalView: View {
               .lineLimit(1)
           }
           Spacer()
-          Text(subreply.createdAt.datetimeDisplay)
+          Text("#\(idx + 1)-\(subidx + 1) - \(subreply.createdAt.datetimeDisplay)")
             .lineLimit(1)
             .font(.caption)
             .foregroundStyle(.secondary)
         }
-        BBCodeView(subreply.content)
-          .textSelection(.enabled)
+        BBCodeView(subreply.content).textSelection(.enabled)
       }
     }
   }

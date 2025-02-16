@@ -1087,6 +1087,16 @@ struct ReplyBaseDTO: Codable, Identifiable, Hashable {
   var creatorID: Int
   var state: PostState
   var reactions: [ReactionDTO]?
+
+  init(_ reply: ReplyDTO) {
+    self.id = reply.id
+    self.content = reply.content
+    self.createdAt = reply.createdAt
+    self.creator = reply.creator
+    self.creatorID = reply.creatorID
+    self.state = reply.state
+    self.reactions = reply.reactions
+  }
 }
 
 struct ReplyDTO: Codable, Identifiable, Hashable {
@@ -1098,4 +1108,8 @@ struct ReplyDTO: Codable, Identifiable, Hashable {
   var state: PostState
   var replies: [ReplyBaseDTO]
   var reactions: [ReactionDTO]?
+
+  var base: ReplyBaseDTO {
+    ReplyBaseDTO(self)
+  }
 }

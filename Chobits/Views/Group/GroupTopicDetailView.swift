@@ -33,44 +33,53 @@ struct GroupTopicDetailView: View {
         VStack(alignment: .leading, spacing: 8) {
           CardView {
             VStack(alignment: .leading, spacing: 8) {
-              NavigationLink(value: NavDestination.group(topic.group.name)) {
-                HStack {
-                  ImageView(img: topic.group.icon?.small)
-                    .imageStyle(width: 20, height: 20)
-                    .imageType(.icon)
-                  Text(topic.group.title)
-                    .font(.subheadline)
-                }
-              }.buttonStyle(.navLink)
-
-              Divider()
-
               HStack {
-                ImageView(img: topic.creator.avatar?.large)
+                ImageView(img: topic.group.icon?.small)
                   .imageStyle(width: 20, height: 20)
-                  .imageType(.avatar)
-                  .imageLink(topic.creator.link)
-                Text(topic.creator.nickname.withLink(topic.creator.link))
+                  .imageType(.icon)
+                  .imageLink(topic.group.link)
+                Text(topic.group.title.withLink(topic.group.link))
                   .font(.subheadline)
                 Spacer()
-                Text(topic.createdAt.datetimeDisplay)
-                  .font(.caption)
-                  .foregroundStyle(.secondary)
+                BorderView {
+                  Text("小组")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                }
               }
 
               Divider()
 
-              Text(topic.title)
-                .font(.title3.bold())
-                .multilineTextAlignment(.leading)
+              HStack(alignment: .top) {
+                ImageView(img: topic.creator.avatar?.large)
+                  .imageStyle(width: 48, height: 48)
+                  .imageType(.avatar)
+                  .imageLink(topic.creator.link)
+                VStack(alignment: .leading, spacing: 2) {
+                  HStack {
+                    Text(topic.creator.nickname.withLink(topic.creator.link))
+                      .lineLimit(1)
+                      .font(.subheadline)
+                    Spacer()
+                    Text(topic.createdAt.datetimeDisplay)
+                      .font(.caption)
+                      .foregroundStyle(.secondary)
+                  }
+                  Divider()
+                  Text(topic.title)
+                    .font(.title3.bold())
+                    .multilineTextAlignment(.leading)
+                }
+                Spacer()
+              }
             }
           }
 
           if !topic.replies.isEmpty {
             LazyVStack(alignment: .leading, spacing: 8) {
-              ForEach(topic.replies) { reply in
-                ReplyItemView(reply: reply)
-                if reply.id != topic.replies.last?.id {
+              ForEach(Array(zip(topic.replies.indices, topic.replies)), id: \.1) { idx, reply in
+                ReplyItemView(idx: idx, reply: reply, author: topic.creator)
+                if idx <= topic.replies.count - 1 {
                   Divider()
                 }
               }
