@@ -57,7 +57,7 @@ struct ReplyItemNormalView: View {
                 showReplyBox = true
               } label: {
                 Text("回复")
-              }
+              }.disabled(true)
               Divider()
               ShareLink(item: shareLink) {
                 Label("分享", systemImage: "square.and.arrow.up")
@@ -188,7 +188,7 @@ struct ReplyBaseNormalView: View {
               showReplyBox = true
             } label: {
               Text("回复")
-            }
+            }.disabled(true)
             Divider()
             ShareLink(item: shareLink) {
               Label("分享", systemImage: "square.and.arrow.up")
