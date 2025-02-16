@@ -294,7 +294,6 @@ struct SubjectTopicDTO: Codable, Identifiable, Hashable {
   var creator: SlimUserDTO
   var subject: SlimSubjectDTO
   var title: String
-  var content: String
   var state: Int
   var display: Int
   var createdAt: Int
@@ -309,7 +308,6 @@ struct GroupTopicDTO: Codable, Identifiable, Hashable {
   var creator: SlimUserDTO
   var group: SlimGroupDTO
   var title: String
-  var content: String
   var state: Int
   var display: Int
   var createdAt: Int
@@ -865,8 +863,8 @@ struct GroupDTO: Codable, Identifiable, Hashable, Linkable {
 struct GroupMemberDTO: Codable, Identifiable, Hashable {
   var user: SlimUserDTO?
   var uid: Int
+  var role: GroupMemberRole
   var joinedAt: Int
-  var moderator: Bool
 
   var id: Int {
     uid

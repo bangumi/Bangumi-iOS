@@ -31,10 +31,8 @@ struct GroupTopicDetailView: View {
     ScrollView {
       if let topic = topic {
         VStack(alignment: .leading, spacing: 8) {
-          // Topic Header
           CardView {
             VStack(alignment: .leading, spacing: 8) {
-              // Title and Group
               VStack(alignment: .leading, spacing: 4) {
                 Text(topic.title)
                   .font(.title3.bold())
@@ -53,7 +51,6 @@ struct GroupTopicDetailView: View {
 
               Divider()
 
-              // Author Info
               HStack {
                 ImageView(img: topic.creator.avatar?.large)
                   .imageStyle(width: 32, height: 32)
@@ -71,16 +68,9 @@ struct GroupTopicDetailView: View {
               }
 
               Divider()
-
-              // Content
-              if !topic.content.isEmpty {
-                BBCodeView(topic.content)
-                  .tint(.linkText)
-              }
             }
           }
 
-          // Replies
           if !topic.replies.isEmpty {
             LazyVStack(alignment: .leading, spacing: 8) {
               ForEach(topic.replies) { reply in

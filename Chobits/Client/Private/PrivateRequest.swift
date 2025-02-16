@@ -368,7 +368,7 @@ extension Chii {
   }
 
   func getGroupMembers(
-    _ groupName: String, moderator: Bool? = nil,
+    _ groupName: String, role: GroupMemberRole? = nil,
     limit: Int = 20, offset: Int = 0
   ) async throws -> PagedDTO<GroupMemberDTO> {
     if self.mock {
@@ -379,8 +379,8 @@ extension Chii {
       URLQueryItem(name: "limit", value: String(limit)),
       URLQueryItem(name: "offset", value: String(offset)),
     ]
-    if let moderator = moderator {
-      queryItems.append(URLQueryItem(name: "moderator", value: String(moderator)))
+    if let role = role {
+      queryItems.append(URLQueryItem(name: "role", value: String(role.rawValue)))
     }
     let pageURL = url.appending(queryItems: queryItems)
     let data = try await self.request(url: pageURL, method: "GET")

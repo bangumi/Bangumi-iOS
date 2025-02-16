@@ -195,11 +195,11 @@ extension Chii {
     let db = try self.getDB()
     await withThrowingTaskGroup(of: Void.self) { group in
       group.addTask {
-        let response = try await self.getGroupMembers(name, moderator: false, limit: 10)
+        let response = try await self.getGroupMembers(name, role: .member, limit: 10)
         try await db.saveGroupRecentMembers(groupName: name, items: response.data)
       }
       group.addTask {
-        let response = try await self.getGroupMembers(name, moderator: true, limit: 10)
+        let response = try await self.getGroupMembers(name, role: .moderator, limit: 10)
         try await db.saveGroupModerators(groupName: name, items: response.data)
       }
       group.addTask {

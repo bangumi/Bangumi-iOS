@@ -31,10 +31,8 @@ struct SubjectTopicDetailView: View {
     ScrollView {
       if let topic = topic {
         VStack(alignment: .leading, spacing: 8) {
-          // Topic Header
           CardView {
             VStack(alignment: .leading, spacing: 8) {
-              // Title and Subject
               VStack(alignment: .leading, spacing: 4) {
                 Text(topic.title)
                   .font(.title3.bold())
@@ -53,13 +51,11 @@ struct SubjectTopicDetailView: View {
 
               Divider()
 
-              // Author Info
               HStack {
                 ImageView(img: topic.creator.avatar?.large)
                   .imageStyle(width: 32, height: 32)
                   .imageType(.avatar)
                   .imageLink(topic.creator.link)
-
                 VStack(alignment: .leading, spacing: 2) {
                   Text(topic.creator.nickname.withLink(topic.creator.link))
                     .font(.subheadline)
@@ -69,18 +65,10 @@ struct SubjectTopicDetailView: View {
                 }
                 Spacer()
               }
-
               Divider()
-
-              // Content
-              if !topic.content.isEmpty {
-                BBCodeView(topic.content)
-                  .tint(.linkText)
-              }
             }
           }
 
-          // Replies
           if !topic.replies.isEmpty {
             LazyVStack(alignment: .leading, spacing: 8) {
               ForEach(topic.replies) { reply in

@@ -897,6 +897,32 @@ enum PostState: Int, Codable, CaseIterable {
   }
 }
 
+enum GroupMemberRole: Int, Codable, CaseIterable {
+  case visitor = -2
+  case guest = -1
+  case member = 0
+  case creator = 1
+  case moderator = 2
+  case blocked = 3
+
+  var description: String {
+    switch self {
+    case .visitor:
+      return "访客"
+    case .guest:
+      return "游客"
+    case .member:
+      return "小组成员"
+    case .creator:
+      return "小组长"
+    case .moderator:
+      return "小组管理员"
+    case .blocked:
+      return "禁言成员"
+    }
+  }
+}
+
 /// TODO: use bangumi/common
 
 struct SubjectCategory: Identifiable {

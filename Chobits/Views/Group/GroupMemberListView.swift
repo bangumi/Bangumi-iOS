@@ -3,6 +3,7 @@ import SwiftUI
 struct GroupMemberListView: View {
   let name: String
 
+  @State private var creators: [GroupMemberDTO] = []
   @State private var moderators: [GroupMemberDTO] = []
   @State private var loadedModerators = false
 
@@ -13,8 +14,10 @@ struct GroupMemberListView: View {
   func loadModerators() async {
     if loadedModerators { return }
     do {
-      let resp = try await Chii.shared.getGroupMembers(name, moderator: true, limit: 100)
-      moderators = resp.data
+      let creatorResp = try await Chii.shared.getGroupMembers(name, role: .creator, limit: 100)
+      creators = creatorResp.data
+      let moderatorResp = try await Chii.shared.getGroupMembers(name, role: .moderator, limit: 100)
+      moderators = moderatorResp.data
       loadedModerators = true
     } catch {
       Notifier.shared.alert(error: error)
@@ -24,7 +27,7 @@ struct GroupMemberListView: View {
   func loadMembers(limit: Int, offset: Int) async -> PagedDTO<GroupMemberDTO>? {
     do {
       let resp = try await Chii.shared.getGroupMembers(
-        name, moderator: false, limit: limit, offset: offset)
+        name, role: .member, limit: limit, offset: offset)
       return resp
     } catch {
       Notifier.shared.alert(error: error)
