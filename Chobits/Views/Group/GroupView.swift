@@ -192,7 +192,7 @@ struct GroupRecentMemberView: View {
           }
         }
       }
-    }
+    }.animation(.default, value: group.recentMembers)
   }
 }
 
@@ -243,6 +243,6 @@ struct GroupRecentTopicView: View {
           }.padding(.top, 2)
         }
       }
-    }
+    }.animation(.default, value: group.recentTopics)
   }
 }
