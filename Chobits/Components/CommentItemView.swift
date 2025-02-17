@@ -1,8 +1,34 @@
 import BBCode
 import SwiftUI
 
+enum CommentParentType {
+  case blog(Int)
+  case character(Int)
+  case person(Int)
+  case episode(Int)
+  case timeline(Int)
+
+  func shareLink(commentId: Int) -> URL {
+    @AppStorage("shareDomain") var shareDomain: ShareDomain = .chii
+    switch self {
+    case .blog(let id):
+      return URL(string: "https://\(shareDomain.rawValue)/blog/\(id)#post_\(commentId)")!
+    case .character(let id):
+      return URL(string: "https://\(shareDomain.rawValue)/character/\(id)#post_\(commentId)")!
+    case .person(let id):
+      return URL(string: "https://\(shareDomain.rawValue)/person/\(id)#post_\(commentId)")!
+    case .episode(let id):
+      return URL(string: "https://\(shareDomain.rawValue)/ep/\(id)#post_\(commentId)")!
+    case .timeline(let id):
+      return URL(string: "https://\(shareDomain.rawValue)/timeline/\(id)#post_\(commentId)")!
+    }
+  }
+}
+
 struct CommentItemNormalView: View {
+  let type: CommentParentType
   let comment: CommentDTO
+  let idx: Int
 
   var body: some View {
     VStack(alignment: .leading) {
@@ -14,22 +40,31 @@ struct CommentItemNormalView: View {
         VStack(alignment: .leading) {
           HStack {
             Text(comment.user.header).lineLimit(1)
-            Spacer()
-            Text(comment.createdAt.datetimeDisplay)
-              .lineLimit(1)
-              .font(.caption)
-              .foregroundStyle(.secondary)
+            Menu {
+              ShareLink(item: type.shareLink(commentId: comment.id)) {
+                Label("分享", systemImage: "square.and.arrow.up")
+              }
+            } label: {
+              Spacer()
+              Text("#\(idx+1) - \(comment.createdAt.datetimeDisplay)")
+                .lineLimit(1)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+              Image(systemName: "ellipsis")
+                .foregroundStyle(.secondary)
+            }.buttonStyle(.plain)
           }
           BBCodeView(comment.content)
             .textSelection(.enabled)
-          ForEach(comment.replies) { reply in
+          ForEach(Array(zip(comment.replies.indices, comment.replies)), id: \.1) { subidx, reply in
             VStack(alignment: .leading) {
               Divider()
               switch reply.state {
               case .userDelete:
                 CommentUserDeleteView(reply.creatorID, reply.user, reply.createdAt)
               default:
-                CommentSubReplyNormalView(reply: reply)
+                CommentSubReplyNormalView(
+                  type: type, reply: reply, idx: idx, subidx: subidx)
               }
             }
           }
@@ -71,20 +106,25 @@ struct CommentUserDeleteView: View {
 }
 
 struct CommentItemView: View {
+  let type: CommentParentType
   let comment: CommentDTO
+  let idx: Int
 
   var body: some View {
     switch comment.state {
     case .userDelete:
       CommentUserDeleteView(comment.creatorID, comment.user, comment.createdAt)
     default:
-      CommentItemNormalView(comment: comment)
+      CommentItemNormalView(type: type, comment: comment, idx: idx)
     }
   }
 }
 
 struct CommentSubReplyNormalView: View {
+  let type: CommentParentType
   let reply: CommentBaseDTO
+  let idx: Int
+  let subidx: Int
 
   var body: some View {
     HStack(alignment: .top) {
@@ -106,10 +146,18 @@ struct CommentSubReplyNormalView: View {
               .lineLimit(1)
           }
           Spacer()
-          Text(reply.createdAt.datetimeDisplay)
-            .lineLimit(1)
-            .font(.caption)
-            .foregroundStyle(.secondary)
+          Menu {
+            ShareLink(item: type.shareLink(commentId: reply.id)) {
+              Label("分享", systemImage: "square.and.arrow.up")
+            }
+          } label: {
+            Text("#\(idx+1)-\(subidx+1) - \(reply.createdAt.datetimeDisplay)")
+              .lineLimit(1)
+              .font(.caption)
+              .foregroundStyle(.secondary)
+            Image(systemName: "ellipsis")
+              .foregroundStyle(.secondary)
+          }.buttonStyle(.plain)
         }
         BBCodeView(reply.content)
           .textSelection(.enabled)

@@ -50,10 +50,6 @@ struct ReplyItemNormalView: View {
                 .lineLimit(1)
             }
             Spacer()
-            Text("#\(idx+1) - \(reply.createdAt.datetimeDisplay)")
-              .lineLimit(1)
-              .font(.caption)
-              .foregroundStyle(.secondary)
             Menu {
               Button {
                 showReplyBox = true
@@ -65,6 +61,10 @@ struct ReplyItemNormalView: View {
                 Label("分享", systemImage: "square.and.arrow.up")
               }
             } label: {
+              Text("#\(idx+1) - \(reply.createdAt.datetimeDisplay)")
+                .lineLimit(1)
+                .font(.caption)
+                .foregroundStyle(.secondary)
               Image(systemName: "ellipsis")
                 .foregroundStyle(.secondary)
             }.buttonStyle(.plain)
@@ -181,10 +181,6 @@ struct ReplyBaseNormalView: View {
               .lineLimit(1)
           }
           Spacer()
-          Text("#\(idx + 1)-\(subidx + 1) - \(subreply.createdAt.datetimeDisplay)")
-            .lineLimit(1)
-            .font(.caption)
-            .foregroundStyle(.secondary)
           Menu {
             Button {
               showReplyBox = true
@@ -196,6 +192,10 @@ struct ReplyBaseNormalView: View {
               Label("分享", systemImage: "square.and.arrow.up")
             }
           } label: {
+            Text("#\(idx + 1)-\(subidx + 1) - \(subreply.createdAt.datetimeDisplay)")
+              .lineLimit(1)
+              .font(.caption)
+              .foregroundStyle(.secondary)
             Image(systemName: "ellipsis")
               .foregroundStyle(.secondary)
           }.buttonStyle(.plain)

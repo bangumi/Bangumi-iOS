@@ -67,8 +67,8 @@ struct PersonView: View {
                 Divider()
               }
               LazyVStack(alignment: .leading, spacing: 8) {
-                ForEach(comments) { comment in
-                  CommentItemView(comment: comment)
+                ForEach(Array(zip(comments.indices, comments)), id: \.1) { idx, comment in
+                  CommentItemView(type: .person(personId), comment: comment, idx: idx)
                   if comment.id != comments.last?.id {
                     Divider()
                   }
