@@ -18,7 +18,9 @@ struct ReplyItemNormalView: View {
   @State private var showReplyBox: Bool = false
 
   var shareLink: URL {
-    URL(string: "https://\(shareDomain.rawValue)/subject/topic/\(topicId)#post_\(reply.id)")!
+    URL(
+      string:
+        "https://\(shareDomain.rawValue)/\(type)/topic/\(topicId)#post_\(reply.id)")!
   }
 
   var body: some View {
@@ -149,7 +151,7 @@ struct ReplyBaseNormalView: View {
   @AppStorage("shareDomain") var shareDomain: ShareDomain = .chii
 
   var shareLink: URL {
-    URL(string: "https://\(shareDomain.rawValue)/subject/topic/\(topicId)#post_\(subreply.id)")!
+    URL(string: "https://\(shareDomain.rawValue)/\(type)/topic/\(topicId)#post_\(subreply.id)")!
   }
 
   var body: some View {
