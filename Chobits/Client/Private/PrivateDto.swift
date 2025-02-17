@@ -371,7 +371,7 @@ struct SubjectDTO: Codable, Identifiable, Searchable {
 struct SlimSubjectDTO: Codable, Identifiable, Hashable, Linkable {
   var id: Int
   var images: SubjectImages?
-  var info: String
+  var info: String?
   var rating: SubjectRating?
   var locked: Bool
   var name: String
@@ -383,7 +383,7 @@ struct SlimSubjectDTO: Codable, Identifiable, Hashable, Linkable {
   init() {
     self.id = 0
     self.images = nil
-    self.info = ""
+    self.info = nil
     self.rating = nil
     self.locked = false
     self.name = ""
@@ -443,6 +443,7 @@ struct CharacterDTO: Codable, Identifiable, Searchable, Linkable {
   var id: Int
   var images: Images?
   var infobox: Infobox
+  var info: String
   var lock: Bool
   var name: String
   var nameCN: String
@@ -469,6 +470,7 @@ struct SlimCharacterDTO: Codable, Identifiable, Hashable, Linkable {
   var nameCN: String
   var nsfw: Bool
   var role: CharacterType
+  var info: String?
   var comment: Int?
 
   init(_ character: CharacterDTO) {
@@ -480,6 +482,7 @@ struct SlimCharacterDTO: Codable, Identifiable, Hashable, Linkable {
     self.nsfw = character.nsfw
     self.role = character.role
     self.comment = character.comment
+    self.info = character.info
   }
 
   var link: String {
@@ -494,6 +497,7 @@ struct PersonDTO: Codable, Identifiable, Searchable, Linkable {
   var id: Int
   var images: Images?
   var infobox: Infobox
+  var info: String
   var lock: Bool
   var name: String
   var nameCN: String
@@ -672,6 +676,7 @@ struct SlimPersonDTO: Codable, Identifiable, Hashable, Linkable {
   var lock: Bool
   var nsfw: Bool
   var comment: Int?
+  var info: String?
 
   init(_ person: PersonDTO) {
     self.id = person.id
@@ -682,6 +687,7 @@ struct SlimPersonDTO: Codable, Identifiable, Hashable, Linkable {
     self.lock = person.lock
     self.nsfw = person.nsfw
     self.comment = person.comment
+    self.info = person.info
   }
 
   var link: String {

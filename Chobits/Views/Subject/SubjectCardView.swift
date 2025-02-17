@@ -60,7 +60,7 @@ struct SubjectSmallView: View {
         .imageNSFW(subject.nsfw)
       VStack(alignment: .leading) {
         Text(subject.title)
-        Text(subject.info)
+        Text(subject.info ?? "")
           .font(.footnote)
           .foregroundStyle(.secondary)
         ratingLine
@@ -122,7 +122,7 @@ struct SubjectCardView: View {
               .lineLimit(1)
           }
           Spacer()
-          Text(subject.info)
+          Text(subject.info ?? "")
             .font(.footnote)
             .foregroundStyle(.secondary)
             .lineLimit(2)

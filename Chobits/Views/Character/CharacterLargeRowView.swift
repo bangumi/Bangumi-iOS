@@ -1,3 +1,4 @@
+import SwiftData
 import SwiftUI
 
 struct CharacterLargeRowView: View {
@@ -20,9 +21,10 @@ struct CharacterLargeRowView: View {
             .foregroundStyle(.secondary)
             .lineLimit(1)
         }
-        Label(character.roleEnum.description, systemImage: character.roleEnum.icon)
-          .foregroundStyle(.secondary)
+        Text(character.info)
           .font(.footnote)
+          .foregroundStyle(.secondary)
+          .lineLimit(2)
         if character.comment > 0 {
           Label("评论: \(character.comment)", systemImage: "bubble")
             .font(.footnote)

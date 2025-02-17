@@ -54,7 +54,7 @@ struct PersonWorkListView: View {
                     .font(.footnote)
                     .foregroundStyle(.secondary)
                 }
-                Text(item.subject.info)
+                Text(item.subject.info ?? "")
                   .font(.caption)
                   .lineLimit(1)
                   .foregroundStyle(.secondary)

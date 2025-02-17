@@ -113,7 +113,6 @@ final class SubjectV2: Searchable, Linkable {
   var eps: Int
   var images: SubjectImages?
   var infobox: Infobox
-  var info: String
   var locked: Bool
   var metaTags: [String]
   var tags: [Tag]
@@ -126,6 +125,7 @@ final class SubjectV2: Searchable, Linkable {
   var summary: String
   var type: Int
   var volumes: Int
+  var info: String = ""
   var alias: String = ""
 
   var ctype: Int = 0
@@ -216,7 +216,7 @@ final class SubjectV2: Searchable, Linkable {
     self.eps = 0
     self.images = item.images
     self.infobox = []
-    self.info = item.info
+    self.info = item.info ?? ""
     self.locked = item.locked
     self.metaTags = []
     self.tags = []
@@ -267,7 +267,7 @@ final class SubjectV2: Searchable, Linkable {
 
   func update(_ item: SlimSubjectDTO) {
     if let images = item.images, self.images != images { self.images = images }
-    if self.info != item.info { self.info = item.info }
+    if let info = item.info, self.info != info { self.info = info }
     if let rating = item.rating, self.rating != rating { self.rating = rating }
     if self.locked != item.locked { self.locked = item.locked }
     if self.name != item.name { self.name = item.name }
@@ -294,6 +294,7 @@ final class CharacterV2: Searchable, Linkable {
   var nsfw: Bool
   var role: Int
   var summary: String
+  var info: String = ""
   var alias: String = ""
 
   var collectedAt: Int = 0
@@ -324,6 +325,7 @@ final class CharacterV2: Searchable, Linkable {
     self.nsfw = item.nsfw
     self.role = item.role.rawValue
     self.summary = item.summary
+    self.info = item.info
     self.alias = item.infobox.aliases.joined(separator: " ")
     self.collectedAt = item.collectedAt ?? 0
   }
@@ -339,6 +341,7 @@ final class CharacterV2: Searchable, Linkable {
     self.nameCN = item.nameCN
     self.nsfw = item.nsfw
     self.role = item.role.rawValue
+    self.info = item.info ?? ""
     self.summary = ""
     self.alias = ""
     self.collectedAt = 0
@@ -355,6 +358,7 @@ final class CharacterV2: Searchable, Linkable {
     if self.nsfw != item.nsfw { self.nsfw = item.nsfw }
     if self.role != item.role.rawValue { self.role = item.role.rawValue }
     if self.summary != item.summary { self.summary = item.summary }
+    if self.info != item.info { self.info = item.info }
     let aliases = item.infobox.aliases.joined(separator: " ")
     if self.alias != aliases { self.alias = aliases }
     if let collectedAt = item.collectedAt, self.collectedAt != collectedAt {
@@ -368,6 +372,7 @@ final class CharacterV2: Searchable, Linkable {
     if self.nameCN != item.nameCN { self.nameCN = item.nameCN }
     if self.nsfw != item.nsfw { self.nsfw = item.nsfw }
     if self.role != item.role.rawValue { self.role = item.role.rawValue }
+    if let info = item.info, self.info != info { self.info = info }
     if let comment = item.comment, self.comment != comment { self.comment = comment }
   }
 }
@@ -390,6 +395,7 @@ final class PersonV2: Searchable, Linkable {
   var nsfw: Bool
   var summary: String
   var type: Int
+  var info: String = ""
   var alias: String = ""
 
   var collectedAt: Int = 0
@@ -422,6 +428,7 @@ final class PersonV2: Searchable, Linkable {
     self.nsfw = item.nsfw
     self.summary = item.summary
     self.type = item.type.rawValue
+    self.info = item.info
     self.alias = item.infobox.aliases.joined(separator: " ")
     self.collectedAt = item.collectedAt ?? 0
   }
@@ -438,6 +445,7 @@ final class PersonV2: Searchable, Linkable {
     self.nameCN = item.nameCN
     self.nsfw = item.nsfw
     self.summary = ""
+    self.info = item.info ?? ""
     self.type = item.type.rawValue
     self.alias = ""
     self.collectedAt = 0
@@ -456,6 +464,7 @@ final class PersonV2: Searchable, Linkable {
     if self.nsfw != item.nsfw { self.nsfw = item.nsfw }
     if self.summary != item.summary { self.summary = item.summary }
     if self.type != item.type.rawValue { self.type = item.type.rawValue }
+    if self.info != item.info { self.info = item.info }
     let aliases = item.infobox.aliases.joined(separator: " ")
     if self.alias != aliases { self.alias = aliases }
     if let collectedAt = item.collectedAt, self.collectedAt != collectedAt {
@@ -471,6 +480,7 @@ final class PersonV2: Searchable, Linkable {
     if self.type != item.type.rawValue { self.type = item.type.rawValue }
     if self.nsfw != item.nsfw { self.nsfw = item.nsfw }
     if self.lock != item.lock { self.lock = item.lock }
+    if let info = item.info, self.info != info { self.info = info }
   }
 }
 

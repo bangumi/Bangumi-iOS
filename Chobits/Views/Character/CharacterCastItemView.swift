@@ -22,7 +22,7 @@ struct CharacterCastItemView: View {
           Label(item.subject.nameCN, systemImage: item.subject.type.icon)
             .foregroundStyle(.secondary)
         }
-        Text(item.subject.info)
+        Text(item.subject.info ?? "")
           .font(.caption)
           .foregroundStyle(.secondary)
       }
