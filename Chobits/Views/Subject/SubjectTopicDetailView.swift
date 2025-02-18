@@ -47,31 +47,10 @@ struct SubjectTopicDetailView: View {
                     .foregroundStyle(.secondary)
                 }
               }
-
               Divider()
-
-              HStack(alignment: .top) {
-                ImageView(img: topic.creator.avatar?.large)
-                  .imageStyle(width: 48, height: 48)
-                  .imageType(.avatar)
-                  .imageLink(topic.creator.link)
-                VStack(alignment: .leading, spacing: 2) {
-                  HStack {
-                    Text(topic.creator.nickname.withLink(topic.creator.link))
-                      .lineLimit(1)
-                      .font(.subheadline)
-                    Spacer()
-                    Text(topic.createdAt.datetimeDisplay)
-                      .font(.caption)
-                      .foregroundStyle(.secondary)
-                  }
-                  Divider()
-                  Text(topic.title)
-                    .font(.title3.bold())
-                    .multilineTextAlignment(.leading)
-                }
-                Spacer()
-              }
+              Text(topic.title)
+                .font(.title3.bold())
+                .multilineTextAlignment(.leading)
             }
           }
 
