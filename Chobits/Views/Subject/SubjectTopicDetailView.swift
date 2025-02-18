@@ -42,8 +42,7 @@ struct SubjectTopicDetailView: View {
                   .font(.subheadline)
                 Spacer()
                 BorderView {
-                  Label(topic.subject.type.description, systemImage: topic.subject.type.icon)
-                    .labelStyle(.compact)
+                  Text(topic.subject.type.description)
                     .font(.caption)
                     .foregroundStyle(.secondary)
                 }
