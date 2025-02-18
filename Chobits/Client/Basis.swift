@@ -250,10 +250,6 @@ extension Infobox {
     return result
   }
 
-  func header() -> Infobox {
-    return self.filter { !["简体中文名", "中文名", "别名"].contains($0.key) }
-  }
-
   var aliases: [String] {
     var result: [String] = []
     for item in self {

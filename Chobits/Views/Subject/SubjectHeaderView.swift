@@ -78,7 +78,9 @@ struct SubjectHeaderView: View {
             Spacer()
             Image(systemName: "chevron.right")
           }
-        }.buttonStyle(.navLink)
+        }
+        .buttonStyle(.navLink)
+        .padding(.vertical, 4)
 
         if !collectStats.isEmpty {
           Text(collectStats)

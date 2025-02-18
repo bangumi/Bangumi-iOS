@@ -113,8 +113,6 @@ struct PersonView: View {
 struct PersonDetailView: View {
   @Environment(Person.self) var person
 
-  @AppStorage("isolationMode") var isolationMode: Bool = false
-
   var careers: String {
     let vals = Set(person.career).sorted().map { PersonCareer($0).description }
     return vals.joined(separator: " / ")
@@ -129,27 +127,16 @@ struct PersonDetailView: View {
     /// header
     HStack(alignment: .top) {
       ImageView(img: person.images?.resize(.r400))
-        .imageStyle(width: 120, height: 160, alignment: .top)
+        .imageStyle(width: 120, height: 120, alignment: .top)
         .imageType(.person)
+        .imageNSFW(person.nsfw)
         .enableSave(person.images?.large)
         .padding(4)
         .shadow(radius: 4)
       VStack(alignment: .leading) {
         HStack {
-          Image(systemName: person.typeEnum.icon)
-          if person.collects > 0 {
-            Text("(\(person.collects)人收藏)").lineLimit(1)
-          }
+          Label(person.typeEnum.description, systemImage: person.typeEnum.icon)
           Spacer()
-          // if person.lock {
-          //   Label("", systemImage: "lock")
-          //     .foregroundStyle(.red)
-          // }
-          if !isolationMode {
-            Label("评论: \(person.comment)", systemImage: "bubble")
-              .lineLimit(1)
-              .font(.footnote)
-          }
         }
         .font(.footnote)
         .foregroundStyle(.secondary)
@@ -170,11 +157,28 @@ struct PersonDetailView: View {
         }
 
         NavigationLink(value: NavDestination.infobox("人物信息", person.infobox)) {
-          InfoboxHeaderView(infobox: person.infobox)
-        }.buttonStyle(.plain)
+          HStack {
+            Text(person.info)
+              .font(.caption)
+              .lineLimit(2)
+            Spacer()
+            Image(systemName: "chevron.right")
+          }
+        }
+        .buttonStyle(.navLink)
+        .padding(.vertical, 4)
 
+        Label("\(person.collects)人收藏", systemImage: "heart")
+          .font(.footnote)
+          .foregroundStyle(.secondary)
+          .lineLimit(1)
+
+        Label("\(person.comment)条评论", systemImage: "bubble")
+          .font(.footnote)
+          .foregroundStyle(.secondary)
+          .lineLimit(1)
       }.padding(.leading, 2)
-    }.frame(height: 160)
+    }.frame(height: 120)
 
     /// summary
     BBCodeView(person.summary, textSize: 14)

@@ -113,8 +113,6 @@ struct CharacterView: View {
 struct CharacterDetailView: View {
   @Environment(Character.self) var character
 
-  @AppStorage("isolationMode") var isolationMode: Bool = false
-
   var body: some View {
     /// title
     Text(character.name)
@@ -124,7 +122,7 @@ struct CharacterDetailView: View {
     /// header
     HStack(alignment: .top) {
       ImageView(img: character.images?.resize(.r400))
-        .imageStyle(width: 120, height: 160, alignment: .top)
+        .imageStyle(width: 120, height: 120, alignment: .top)
         .imageType(.person)
         .imageNSFW(character.nsfw)
         .enableSave(character.images?.large)
@@ -132,16 +130,8 @@ struct CharacterDetailView: View {
         .shadow(radius: 4)
       VStack(alignment: .leading) {
         HStack {
-          Image(systemName: character.roleEnum.icon)
-          if character.collects > 0 {
-            Text("(\(character.collects)人收藏)").lineLimit(1)
-          }
+          Label(character.roleEnum.description, systemImage: character.roleEnum.icon)
           Spacer()
-          if !isolationMode {
-            Label("评论: \(character.comment)", systemImage: "bubble")
-              .lineLimit(1)
-              .font(.footnote)
-          }
         }
         .font(.footnote)
         .foregroundStyle(.secondary)
@@ -155,11 +145,28 @@ struct CharacterDetailView: View {
         Spacer()
 
         NavigationLink(value: NavDestination.infobox("角色信息", character.infobox)) {
-          InfoboxHeaderView(infobox: character.infobox)
-        }.buttonStyle(.plain)
+          HStack {
+            Text(character.info)
+              .font(.caption)
+              .lineLimit(2)
+            Spacer()
+            Image(systemName: "chevron.right")
+          }
+        }
+        .buttonStyle(.navLink)
+        .padding(.vertical, 4)
 
+        Label("\(character.collects)人收藏", systemImage: "heart")
+          .font(.footnote)
+          .foregroundStyle(.secondary)
+          .lineLimit(1)
+
+        Label("\(character.comment)条评论", systemImage: "bubble")
+          .font(.footnote)
+          .foregroundStyle(.secondary)
+          .lineLimit(1)
       }.padding(.leading, 2)
-    }.frame(height: 160)
+    }.frame(height: 120)
 
     /// summary
     BBCodeView(character.summary, textSize: 14)
