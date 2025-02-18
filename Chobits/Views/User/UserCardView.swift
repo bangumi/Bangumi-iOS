@@ -2,13 +2,15 @@ import SwiftUI
 
 struct UserSmallView: View {
   let user: SlimUserDTO
+
   var body: some View {
     HStack {
       ImageView(img: user.avatar?.large)
         .imageStyle(width: 40, height: 40)
         .imageType(.avatar)
+        .imageLink(user.link)
       VStack(alignment: .leading) {
-        Text(user.nickname)
+        Text(user.nickname.withLink(user.link))
           .lineLimit(1)
         Text("@\(user.username)")
           .foregroundStyle(.secondary)

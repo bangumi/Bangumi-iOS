@@ -11,6 +11,7 @@ struct BlogView: View {
   @State private var refreshed: Bool = false
   @State private var blog: BlogEntryDTO?
   @State private var subjects: [SlimSubjectDTO] = []
+  @State private var showSubjects: Bool = false
   @State private var comments: [CommentDTO] = []
   @State private var loadingComments: Bool = false
 
@@ -50,22 +51,14 @@ struct BlogView: View {
               Text(blog.title)
                 .font(.title3)
                 .bold()
+
               HStack {
                 Text(blog.createdAt.datetimeDisplay)
                   .font(.caption)
                   .foregroundColor(.secondary)
                 Spacer()
-                Menu {
-                  ForEach(subjects) { subject in
-                    NavigationLink(value: NavDestination.subject(subject.id)) {
-                      HStack {
-                        ImageView(img: subject.images?.small)
-                          .imageStyle(width: 32, height: 32)
-                          .imageType(.subject)
-                        Text(subject.title)
-                      }
-                    }
-                  }
+                Button {
+                  showSubjects = true
                 } label: {
                   Text(subjects.isEmpty ? "" : "关联条目+")
                     .font(.caption)
@@ -73,9 +66,30 @@ struct BlogView: View {
                 }.disabled(subjects.isEmpty)
               }
               Divider()
+
               BBCodeView(blog.content)
                 .textSelection(.enabled)
                 .padding(.top, 8)
+            }
+            .sheet(isPresented: $showSubjects) {
+              NavigationStack {
+                ScrollView {
+                  LazyVStack(alignment: .leading, spacing: 8) {
+                    ForEach(subjects) { subject in
+                      SubjectSmallView(subject: subject)
+                    }
+                  }.padding(.horizontal, 8)
+                }
+                .navigationTitle("关联条目")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                  ToolbarItem(placement: .topBarTrailing) {
+                    Button("关闭", role: .cancel) {
+                      showSubjects = false
+                    }
+                  }
+                }
+              }.presentationDetents([.medium])
             }
 
             /// comments
