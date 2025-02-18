@@ -26,15 +26,18 @@ struct TimelineReplyView: View {
       VStack(alignment: .leading, spacing: 8) {
         CardView {
           VStack(alignment: .leading, spacing: 8) {
-            if let user = item.user {
-              HStack {
+            HStack {
+              if let user = item.user {
                 ImageView(img: user.avatar?.large)
                   .imageStyle(width: 20, height: 20)
                   .imageType(.avatar)
                   .imageLink(user.link)
                 Text(user.nickname.withLink(user.link)).font(.headline)
-                Spacer()
               }
+              Spacer()
+              Text(item.createdAt.datetimeDisplay)
+                .font(.footnote)
+                .foregroundStyle(.secondary)
             }
             Divider()
             BBCodeView(item.memo.status?.tsukkomi ?? "")
