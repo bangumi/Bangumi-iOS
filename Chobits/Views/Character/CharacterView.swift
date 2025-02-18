@@ -15,6 +15,7 @@ struct CharacterView: View {
   private var character: Character? { characters.first }
 
   @State private var comments: [CommentDTO] = []
+  @State private var loadingComments: Bool = false
 
   init(characterId: Int) {
     self.characterId = characterId
@@ -42,7 +43,9 @@ struct CharacterView: View {
       refreshed = true
 
       if !isolationMode {
+        loadingComments = true
         comments = try await Chii.shared.getCharacterComments(characterId)
+        loadingComments = false
       }
 
       try await Chii.shared.loadCharacterDetails(characterId)
@@ -67,6 +70,9 @@ struct CharacterView: View {
                 Divider()
               }
               LazyVStack(alignment: .leading, spacing: 8) {
+                if loadingComments {
+                  ProgressView()
+                }
                 ForEach(Array(zip(comments.indices, comments)), id: \.1) { idx, comment in
                   CommentItemView(type: .character(characterId), comment: comment, idx: idx)
                   if comment.id != comments.last?.id {

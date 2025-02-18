@@ -15,6 +15,7 @@ struct PersonView: View {
   var person: Person? { persons.first }
 
   @State private var comments: [CommentDTO] = []
+  @State private var loadingComments: Bool = false
 
   init(personId: Int) {
     self.personId = personId
@@ -42,7 +43,9 @@ struct PersonView: View {
       refreshed = true
 
       if !isolationMode {
+        loadingComments = true
         comments = try await Chii.shared.getPersonComments(personId)
+        loadingComments = false
       }
 
       try await Chii.shared.loadPersonDetails(personId)
@@ -67,6 +70,9 @@ struct PersonView: View {
                 Divider()
               }
               LazyVStack(alignment: .leading, spacing: 8) {
+                if loadingComments {
+                  ProgressView()
+                }
                 ForEach(Array(zip(comments.indices, comments)), id: \.1) { idx, comment in
                   CommentItemView(type: .person(personId), comment: comment, idx: idx)
                   if comment.id != comments.last?.id {

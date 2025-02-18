@@ -12,6 +12,7 @@ struct BlogView: View {
   @State private var blog: BlogEntryDTO?
   @State private var subjects: [SlimSubjectDTO] = []
   @State private var comments: [CommentDTO] = []
+  @State private var loadingComments: Bool = false
 
   var title: String {
     guard let blog = blog else {
@@ -29,7 +30,9 @@ struct BlogView: View {
       blog = try await Chii.shared.getBlogEntry(blogId)
       subjects = try await Chii.shared.getBlogSubjects(blogId)
       if !isolationMode {
+        loadingComments = true
         comments = try await Chii.shared.getBlogComments(blogId)
+        loadingComments = false
       }
     } catch {
       Notifier.shared.alert(error: error)
@@ -79,6 +82,9 @@ struct BlogView: View {
             if !isolationMode {
               Divider()
               LazyVStack(alignment: .leading, spacing: 8) {
+                if loadingComments {
+                  ProgressView()
+                }
                 ForEach(Array(zip(comments.indices, comments)), id: \.1) { idx, comment in
                   CommentItemView(type: .blog(blogId), comment: comment, idx: idx)
                   if comment.id != comments.last?.id {

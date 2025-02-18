@@ -30,6 +30,8 @@ struct CommentItemNormalView: View {
   let comment: CommentDTO
   let idx: Int
 
+  @State private var showReplyBox: Bool = false
+
   var body: some View {
     VStack(alignment: .leading) {
       HStack(alignment: .top) {
@@ -41,6 +43,12 @@ struct CommentItemNormalView: View {
           HStack {
             Text(comment.user.header).lineLimit(1)
             Menu {
+              Button {
+                showReplyBox = true
+              } label: {
+                Text("回复")
+              }.disabled(true)
+              Divider()
               ShareLink(item: type.shareLink(commentId: comment.id)) {
                 Label("分享", systemImage: "square.and.arrow.up")
               }
@@ -55,6 +63,7 @@ struct CommentItemNormalView: View {
             }.buttonStyle(.plain)
           }
           BBCodeView(comment.content)
+            .tint(.linkText)
             .textSelection(.enabled)
           ForEach(Array(zip(comment.replies.indices, comment.replies)), id: \.1) { subidx, reply in
             VStack(alignment: .leading) {
@@ -126,6 +135,8 @@ struct CommentSubReplyNormalView: View {
   let idx: Int
   let subidx: Int
 
+  @State private var showReplyBox: Bool = false
+
   var body: some View {
     HStack(alignment: .top) {
       if let user = reply.user {
@@ -147,6 +158,12 @@ struct CommentSubReplyNormalView: View {
           }
           Spacer()
           Menu {
+            Button {
+              showReplyBox = true
+            } label: {
+              Text("回复")
+            }.disabled(true)
+            Divider()
             ShareLink(item: type.shareLink(commentId: reply.id)) {
               Label("分享", systemImage: "square.and.arrow.up")
             }
@@ -160,6 +177,7 @@ struct CommentSubReplyNormalView: View {
           }.buttonStyle(.plain)
         }
         BBCodeView(reply.content)
+          .tint(.linkText)
           .textSelection(.enabled)
       }
     }

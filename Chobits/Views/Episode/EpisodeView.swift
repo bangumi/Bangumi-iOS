@@ -11,6 +11,7 @@ struct EpisodeView: View {
   private var episode: Episode? { episodes.first }
 
   @State private var comments: [CommentDTO] = []
+  @State private var loadingComments: Bool = false
 
   init(episodeId: Int) {
     self.episodeId = episodeId
@@ -22,7 +23,9 @@ struct EpisodeView: View {
     do {
       try await Chii.shared.loadEpisode(episodeId)
       if !isolationMode {
+        loadingComments = true
         comments = try await Chii.shared.getEpisodeComments(episodeId)
+        loadingComments = false
       }
     } catch {
       Notifier.shared.alert(error: error)
@@ -54,6 +57,9 @@ struct EpisodeView: View {
             Divider()
           }
           LazyVStack(alignment: .leading, spacing: 8) {
+            if loadingComments {
+              ProgressView()
+            }
             ForEach(Array(zip(comments.indices, comments)), id: \.1) { idx, comment in
               CommentItemView(type: .episode(episodeId), comment: comment, idx: idx)
               if comment.id != comments.last?.id {

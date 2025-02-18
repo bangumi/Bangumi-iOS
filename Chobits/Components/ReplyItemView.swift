@@ -69,7 +69,9 @@ struct ReplyItemNormalView: View {
                 .foregroundStyle(.secondary)
             }.buttonStyle(.plain)
           }
-          BBCodeView(reply.content).textSelection(.enabled)
+          BBCodeView(reply.content)
+            .tint(.linkText)
+            .textSelection(.enabled)
           ForEach(Array(zip(reply.replies.indices, reply.replies)), id: \.1) { subidx, subreply in
             VStack(alignment: .leading) {
               Divider()
@@ -200,7 +202,9 @@ struct ReplyBaseNormalView: View {
               .foregroundStyle(.secondary)
           }.buttonStyle(.plain)
         }
-        BBCodeView(subreply.content).textSelection(.enabled)
+        BBCodeView(subreply.content)
+          .tint(.linkText)
+          .textSelection(.enabled)
       }
     }
   }
