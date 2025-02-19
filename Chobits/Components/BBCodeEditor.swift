@@ -11,15 +11,15 @@ struct BBCodeEditor: View {
   @State private var preview: Bool = false
 
   @State private var inputURL = ""
-  @State private var inputSize: Int = 14
   @State private var showingImageInput = false
   @State private var showingURLInput = false
-  @State private var showingSizeInput = false
 
+  @State private var inputSize: Int = 14
+  @State private var showingSizeInput = false
   private let minFontSize: Int = 8
   private let maxFontSize: Int = 50
 
-  func insertBasicBBCode(_ tag: BBCodeType) {
+  func handleBasicInput(_ tag: BBCodeType) {
     let tagBefore = "[\(tag.code)]"
     let tagAfter = "[/\(tag.code)]"
     if let selection = textSelection {
@@ -58,6 +58,107 @@ struct BBCodeEditor: View {
     }
   }
 
+  private func handleImageInput() {
+    let tagBefore = "[\(BBCodeType.image.code)]"
+    let tagAfter = "[/\(BBCodeType.image.code)]"
+    if let selection = textSelection {
+      switch selection.indices {
+      case .selection(let range):
+        text.replaceSubrange(range, with: "\(tagBefore)\(inputURL)\(tagAfter)")
+        let cursorPosition =
+          range.lowerBound.utf16Offset(in: text) + tagBefore.count + inputURL.count + tagAfter.count
+        let cursorIndex = text.index(text.startIndex, offsetBy: cursorPosition)
+        textSelection = TextSelection(range: cursorIndex..<cursorIndex)
+      case .multiSelection:
+        break
+      @unknown default:
+        break
+      }
+    } else {
+      text += "\(tagBefore)\(inputURL)\(tagAfter)"
+      let cursorPosition = text.count
+      let cursorIndex = text.index(text.startIndex, offsetBy: cursorPosition)
+      textSelection = TextSelection(range: cursorIndex..<cursorIndex)
+    }
+    inputURL = ""
+  }
+
+  private func handleURLInput() {
+    if let selection = textSelection {
+      switch selection.indices {
+      case .selection(let range):
+        let tagBefore = "[\(BBCodeType.url.code)=\(inputURL)]"
+        let tagAfter = "[/\(BBCodeType.url.code)]"
+        if range.lowerBound == range.upperBound {
+          let placeholder = "链接描述"
+          text.replaceSubrange(range, with: tagBefore + placeholder + tagAfter)
+          let cursorPosition = range.lowerBound.utf16Offset(in: text)
+          let startIndex = text.index(text.startIndex, offsetBy: cursorPosition + tagBefore.count)
+          let endIndex = text.index(
+            text.startIndex, offsetBy: cursorPosition + tagBefore.count + placeholder.count)
+          textSelection = TextSelection(range: startIndex..<endIndex)
+        } else {
+          let selectedText = text[range]
+          text.replaceSubrange(range, with: "\(tagBefore)\(selectedText)\(tagAfter)")
+          let cursorPosition =
+            range.lowerBound.utf16Offset(in: text) + tagBefore.count + selectedText.count
+            + tagAfter.count
+          let cursorIndex = text.index(text.startIndex, offsetBy: cursorPosition)
+          textSelection = TextSelection(range: cursorIndex..<cursorIndex)
+        }
+      case .multiSelection:
+        break
+      @unknown default:
+        break
+      }
+    } else {
+      let insertPosition = text.count
+      let tagBefore = "[\(BBCodeType.url.code)=\(inputURL)]"
+      let tagAfter = "[/\(BBCodeType.url.code)]"
+      let placeholder = "链接描述"
+      text += tagBefore + placeholder + tagAfter
+      let startIndex = text.index(text.startIndex, offsetBy: insertPosition + tagBefore.count)
+      let endIndex = text.index(
+        text.startIndex, offsetBy: insertPosition + tagBefore.count + placeholder.count)
+      textSelection = TextSelection(range: startIndex..<endIndex)
+    }
+    inputURL = ""
+  }
+
+  private func handleSizeInput() {
+    let tagBefore = "[\(BBCodeType.size.code)=\(inputSize)]"
+    let tagAfter = "[/\(BBCodeType.size.code)]"
+    if let selection = textSelection {
+      switch selection.indices {
+      case .selection(let range):
+        if range.lowerBound == range.upperBound {
+          text.replaceSubrange(range, with: tagBefore + tagAfter)
+          let cursorPosition = range.lowerBound.utf16Offset(in: text) + tagBefore.count
+          let cursorIndex = text.index(text.startIndex, offsetBy: cursorPosition)
+          textSelection = TextSelection(range: cursorIndex..<cursorIndex)
+        } else {
+          let selectedText = text[range]
+          text.replaceSubrange(range, with: "\(tagBefore)\(selectedText)\(tagAfter)")
+          let cursorPosition =
+            range.lowerBound.utf16Offset(in: text) + tagBefore.count + selectedText.count
+            + tagAfter.count
+          let cursorIndex = text.index(text.startIndex, offsetBy: cursorPosition)
+          textSelection = TextSelection(range: cursorIndex..<cursorIndex)
+        }
+      case .multiSelection:
+        break
+      @unknown default:
+        break
+      }
+    } else {
+      text += tagBefore + tagAfter
+      let cursorPosition = text.count - tagAfter.count
+      let cursorIndex = text.index(text.startIndex, offsetBy: cursorPosition)
+      textSelection = TextSelection(range: cursorIndex..<cursorIndex)
+    }
+    inputSize = 14  // 重置为默认值
+  }
+
   var body: some View {
     VStack {
       Button {
@@ -79,9 +180,9 @@ struct BBCodeEditor: View {
       } else {
         ScrollView(.horizontal, showsIndicators: false) {
           HStack(spacing: 8) {
-            ForEach(BBCodeType.basic) { button in
-              Button(action: { insertBasicBBCode(button) }) {
-                Image(systemName: button.icon)
+            ForEach(BBCodeType.basic) { code in
+              Button(action: { handleBasicInput(code) }) {
+                Image(systemName: code.icon)
                   .frame(width: 16, height: 16)
               }
             }
@@ -100,9 +201,9 @@ struct BBCodeEditor: View {
                 .frame(width: 16, height: 16)
             }
             Divider()
-            ForEach(BBCodeType.block) { button in
-              Button(action: { insertBasicBBCode(button) }) {
-                Image(systemName: button.icon)
+            ForEach(BBCodeType.block) { code in
+              Button(action: { handleBasicInput(code) }) {
+                Image(systemName: code.icon)
                   .frame(width: 16, height: 16)
               }
             }
@@ -134,29 +235,7 @@ struct BBCodeEditor: View {
         .textInputAutocapitalization(.never)
         .autocorrectionDisabled()
       Button("确定") {
-        let tagBefore = "[\(BBCodeType.image.code)]"
-        let tagAfter = "[/\(BBCodeType.image.code)]"
-        if let selection = textSelection {
-          switch selection.indices {
-          case .selection(let range):
-            text.replaceSubrange(range, with: "\(tagBefore)\(inputURL)\(tagAfter)")
-            let cursorPosition =
-              range.lowerBound.utf16Offset(in: text) + tagBefore.count + inputURL.count
-              + tagAfter.count
-            let cursorIndex = text.index(text.startIndex, offsetBy: cursorPosition)
-            textSelection = TextSelection(range: cursorIndex..<cursorIndex)
-          case .multiSelection:
-            break
-          @unknown default:
-            break
-          }
-        } else {
-          text += "\(tagBefore)\(inputURL)\(tagAfter)"
-          let cursorPosition = text.count
-          let cursorIndex = text.index(text.startIndex, offsetBy: cursorPosition)
-          textSelection = TextSelection(range: cursorIndex..<cursorIndex)
-        }
-        inputURL = ""
+        handleImageInput()
       }
       Button("取消", role: .cancel) {
         inputURL = ""
@@ -169,46 +248,7 @@ struct BBCodeEditor: View {
         .textInputAutocapitalization(.never)
         .autocorrectionDisabled()
       Button("确定") {
-        if let selection = textSelection {
-          switch selection.indices {
-          case .selection(let range):
-            let tagBefore = "[\(BBCodeType.url.code)=\(inputURL)]"
-            let tagAfter = "[/\(BBCodeType.url.code)]"
-            if range.lowerBound == range.upperBound {
-              let placeholder = "链接描述"
-              text.replaceSubrange(range, with: tagBefore + placeholder + tagAfter)
-              let cursorPosition = range.lowerBound.utf16Offset(in: text)
-              let startIndex = text.index(
-                text.startIndex, offsetBy: cursorPosition + tagBefore.count)
-              let endIndex = text.index(
-                text.startIndex, offsetBy: cursorPosition + tagBefore.count + placeholder.count)
-              textSelection = TextSelection(range: startIndex..<endIndex)
-            } else {
-              let selectedText = text[range]
-              text.replaceSubrange(range, with: "\(tagBefore)\(selectedText)\(tagAfter)")
-              let cursorPosition =
-                range.lowerBound.utf16Offset(in: text) + tagBefore.count + selectedText.count
-                + tagAfter.count
-              let cursorIndex = text.index(text.startIndex, offsetBy: cursorPosition)
-              textSelection = TextSelection(range: cursorIndex..<cursorIndex)
-            }
-          case .multiSelection:
-            break
-          @unknown default:
-            break
-          }
-        } else {
-          let insertPosition = text.count
-          let tagBefore = "[\(BBCodeType.url.code)=\(inputURL)]"
-          let tagAfter = "[/\(BBCodeType.url.code)]"
-          let placeholder = "链接描述"
-          text += tagBefore + placeholder + tagAfter
-          let startIndex = text.index(text.startIndex, offsetBy: insertPosition + tagBefore.count)
-          let endIndex = text.index(
-            text.startIndex, offsetBy: insertPosition + tagBefore.count + placeholder.count)
-          textSelection = TextSelection(range: startIndex..<endIndex)
-        }
-        inputURL = ""
+        handleURLInput()
       }
       Button("取消", role: .cancel) {
         inputURL = ""
@@ -226,37 +266,7 @@ struct BBCodeEditor: View {
       )
       .keyboardType(.numberPad)
       Button("确定") {
-        let tagBefore = "[\(BBCodeType.size.code)=\(inputSize)]"
-        let tagAfter = "[/\(BBCodeType.size.code)]"
-        if let selection = textSelection {
-          switch selection.indices {
-          case .selection(let range):
-            if range.lowerBound == range.upperBound {
-              text.replaceSubrange(range, with: tagBefore + tagAfter)
-              let cursorPosition = range.lowerBound.utf16Offset(in: text) + tagBefore.count
-              let cursorIndex = text.index(text.startIndex, offsetBy: cursorPosition)
-              textSelection = TextSelection(range: cursorIndex..<cursorIndex)
-            } else {
-              let selectedText = text[range]
-              text.replaceSubrange(range, with: "\(tagBefore)\(selectedText)\(tagAfter)")
-              let cursorPosition =
-                range.lowerBound.utf16Offset(in: text) + tagBefore.count + selectedText.count
-                + tagAfter.count
-              let cursorIndex = text.index(text.startIndex, offsetBy: cursorPosition)
-              textSelection = TextSelection(range: cursorIndex..<cursorIndex)
-            }
-          case .multiSelection:
-            break
-          @unknown default:
-            break
-          }
-        } else {
-          text += tagBefore + tagAfter
-          let cursorPosition = text.count - tagAfter.count
-          let cursorIndex = text.index(text.startIndex, offsetBy: cursorPosition)
-          textSelection = TextSelection(range: cursorIndex..<cursorIndex)
-        }
-        inputSize = 14  // 重置为默认值
+        handleSizeInput()
       }
       Button("取消", role: .cancel) {
         inputSize = 14  // 重置为默认值
