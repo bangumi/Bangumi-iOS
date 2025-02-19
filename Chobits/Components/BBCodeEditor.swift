@@ -11,8 +11,13 @@ struct BBCodeEditor: View {
   @State private var preview: Bool = false
 
   @State private var inputURL = ""
+  @State private var inputSize: Int = 14
   @State private var showingImageInput = false
   @State private var showingURLInput = false
+  @State private var showingSizeInput = false
+
+  private let minFontSize: Int = 8
+  private let maxFontSize: Int = 50
 
   func insertBasicBBCode(_ tag: BBCodeType) {
     let tagBefore = "[\(tag.code)]"
@@ -87,6 +92,11 @@ struct BBCodeEditor: View {
             }.buttonStyle(.bordered)
             Button(action: { showingURLInput = true }) {
               Image(systemName: BBCodeType.url.icon)
+                .frame(width: 16, height: 16)
+            }.buttonStyle(.bordered)
+            Divider()
+            Button(action: { showingSizeInput = true }) {
+              Image(systemName: BBCodeType.size.icon)
                 .frame(width: 16, height: 16)
             }.buttonStyle(.bordered)
           }.padding(.horizontal, 2)
@@ -199,6 +209,54 @@ struct BBCodeEditor: View {
     } message: {
       Text("请输入链接地址")
     }
+    .alert("设置字号", isPresented: $showingSizeInput) {
+      TextField(
+        "字号",
+        value: Binding(
+          get: { inputSize },
+          set: { inputSize = max(minFontSize, min(maxFontSize, $0)) }
+        ), format: .number
+      )
+      .keyboardType(.numberPad)
+      Button("确定") {
+        let tagBefore = "[\(BBCodeType.size.code)=\(inputSize)]"
+        let tagAfter = "[/\(BBCodeType.size.code)]"
+        if let selection = textSelection {
+          switch selection.indices {
+          case .selection(let range):
+            if range.lowerBound == range.upperBound {
+              text.replaceSubrange(range, with: tagBefore + tagAfter)
+              let cursorPosition = range.lowerBound.utf16Offset(in: text) + tagBefore.count
+              let cursorIndex = text.index(text.startIndex, offsetBy: cursorPosition)
+              textSelection = TextSelection(range: cursorIndex..<cursorIndex)
+            } else {
+              let selectedText = text[range]
+              text.replaceSubrange(range, with: "\(tagBefore)\(selectedText)\(tagAfter)")
+              let cursorPosition =
+                range.lowerBound.utf16Offset(in: text) + tagBefore.count + selectedText.count
+                + tagAfter.count
+              let cursorIndex = text.index(text.startIndex, offsetBy: cursorPosition)
+              textSelection = TextSelection(range: cursorIndex..<cursorIndex)
+            }
+          case .multiSelection:
+            break
+          @unknown default:
+            break
+          }
+        } else {
+          text += tagBefore + tagAfter
+          let cursorPosition = text.count - tagAfter.count
+          let cursorIndex = text.index(text.startIndex, offsetBy: cursorPosition)
+          textSelection = TextSelection(range: cursorIndex..<cursorIndex)
+        }
+        inputSize = 14  // 重置为默认值
+      }
+      Button("取消", role: .cancel) {
+        inputSize = 14  // 重置为默认值
+      }
+    } message: {
+      Text("请输入字号大小（\(minFontSize)-\(maxFontSize)）")
+    }
   }
 }
 
@@ -210,6 +268,8 @@ enum BBCodeType: String, CaseIterable, Identifiable {
 
   case image
   case url
+
+  case size
 
   case mask
   case quote
@@ -229,6 +289,7 @@ enum BBCodeType: String, CaseIterable, Identifiable {
     case .strike: return "s"
     case .image: return "img"
     case .url: return "url"
+    case .size: return "size"
     case .mask: return "mask"
     case .quote: return "quote"
     case .code: return "code"
@@ -243,6 +304,7 @@ enum BBCodeType: String, CaseIterable, Identifiable {
     case .strike: return "strikethrough"
     case .image: return "photo"
     case .url: return "link"
+    case .size: return "textformat.size"
     case .mask: return "character.square.fill"
     case .quote: return "text.quote"
     case .code: return "chevron.left.forwardslash.chevron.right"
