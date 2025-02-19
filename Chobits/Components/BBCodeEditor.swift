@@ -83,24 +83,31 @@ struct BBCodeEditor: View {
               Button(action: { insertBasicBBCode(button) }) {
                 Image(systemName: button.icon)
                   .frame(width: 16, height: 16)
-              }.buttonStyle(.bordered)
+              }
             }
             Divider()
             Button(action: { showingImageInput = true }) {
               Image(systemName: BBCodeType.image.icon)
                 .frame(width: 16, height: 16)
-            }.buttonStyle(.bordered)
+            }
             Button(action: { showingURLInput = true }) {
               Image(systemName: BBCodeType.url.icon)
                 .frame(width: 16, height: 16)
-            }.buttonStyle(.bordered)
+            }
             Divider()
             Button(action: { showingSizeInput = true }) {
               Image(systemName: BBCodeType.size.icon)
                 .frame(width: 16, height: 16)
-            }.buttonStyle(.bordered)
+            }
+            Divider()
+            ForEach(BBCodeType.block) { button in
+              Button(action: { insertBasicBBCode(button) }) {
+                Image(systemName: button.icon)
+                  .frame(width: 16, height: 16)
+              }
+            }
           }.padding(.horizontal, 2)
-        }
+        }.buttonStyle(.bordered)
         BorderView(color: .secondary.opacity(0.2), padding: 4) {
           TextEditor(text: $text, selection: $textSelection)
             .frame(height: height)
@@ -271,14 +278,18 @@ enum BBCodeType: String, CaseIterable, Identifiable {
 
   case size
 
-  case mask
   case quote
+  case mask
   case code
 
   var id: String { rawValue }
 
   static var basic: [Self] {
     [.bold, .italic, .underline, .strike]
+  }
+
+  static var block: [Self] {
+    [.quote, .mask, .code]
   }
 
   var code: String {
@@ -290,8 +301,8 @@ enum BBCodeType: String, CaseIterable, Identifiable {
     case .image: return "img"
     case .url: return "url"
     case .size: return "size"
-    case .mask: return "mask"
     case .quote: return "quote"
+    case .mask: return "mask"
     case .code: return "code"
     }
   }
@@ -305,8 +316,8 @@ enum BBCodeType: String, CaseIterable, Identifiable {
     case .image: return "photo"
     case .url: return "link"
     case .size: return "textformat.size"
-    case .mask: return "character.square.fill"
     case .quote: return "text.quote"
+    case .mask: return "character.square.fill"
     case .code: return "chevron.left.forwardslash.chevron.right"
     }
   }
