@@ -124,11 +124,29 @@ private struct BBCodeEditor: View {
   @State private var textSelection: TextSelection?
   @State private var preview: Bool = false
 
-  private func insertBBCode(_ tag: String) {
-    // 获取选中的文本范围
-    // 由于 SwiftUI 的 TextField 目前不支持获取选择范围
-    // 我们先实现简单的在光标位置插入标签
-    text += "[\(tag)][/\(tag)]"
+  private func insertBBCode(_ tag: BBCodeType) {
+    if let textSelection {
+      switch textSelection.indices {
+      case .selection(let range):
+        if tag.isBlock {
+          text.replaceSubrange(range, with: "\n[\(tag)]\(text[range])[/\(tag)]\n")
+        } else {
+          text.replaceSubrange(range, with: "[\(tag)][/\(tag)]")
+        }
+      case .multiSelection(let rangeSet):
+        rangeSet.ranges.forEach { range in
+          if tag.isBlock {
+            text.replaceSubrange(range, with: "\n[\(tag)]\(text[range])[/\(tag)]\n")
+          } else {
+            text.replaceSubrange(range, with: "[\(tag)][/\(tag)]")
+          }
+        }
+      @unknown default:
+        break
+      }
+    } else {
+      text += "[\(tag)][/\(tag)]"
+    }
   }
 
   var body: some View {
@@ -152,8 +170,8 @@ private struct BBCodeEditor: View {
       } else {
         ScrollView(.horizontal, showsIndicators: false) {
           HStack(spacing: 8) {
-            ForEach(BBCodeButton.allCases) { button in
-              Button(action: { insertBBCode(button.tag) }) {
+            ForEach(BBCodeType.allCases) { button in
+              Button(action: { insertBBCode(button) }) {
                 Image(systemName: button.icon)
                   .frame(width: 16, height: 16)
               }.buttonStyle(.bordered)
@@ -165,21 +183,6 @@ private struct BBCodeEditor: View {
             .frame(height: height)
             .autocorrectionDisabled()
             .textInputAutocapitalization(.never)
-            .onChange(of: textSelection) {
-              guard let textSelection else {
-                return
-              }
-              switch textSelection.indices {
-              case .selection(let range):
-                print(text[range])
-              case .multiSelection(let rangeSet):
-                rangeSet.ranges.forEach { range in
-                  print(text[range])
-                }
-              @unknown default:
-                break
-              }
-            }
         }
         Rectangle()
           .fill(.secondary.opacity(0.2))
@@ -229,7 +232,7 @@ private struct PlainTextEditor: View {
   }
 }
 
-private enum BBCodeButton: String, CaseIterable, Identifiable {
+private enum BBCodeType: String, CaseIterable, Identifiable {
   case bold
   case italic
   case underline
@@ -261,6 +264,13 @@ private enum BBCodeButton: String, CaseIterable, Identifiable {
     case .mask: return "character.square.fill"
     case .quote: return "text.quote"
     case .code: return "chevron.left.forwardslash.chevron.right"
+    }
+  }
+
+  var isBlock: Bool {
+    switch self {
+    case .quote, .code: return true
+    default: return false
     }
   }
 }
