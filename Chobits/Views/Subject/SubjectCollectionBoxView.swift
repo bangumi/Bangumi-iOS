@@ -87,8 +87,7 @@ struct SubjectCollectionBoxView: View {
             Spacer()
             Text(buttonText)
             Spacer()
-          }
-          .buttonStyle(.borderedProminent)
+          }.buttonStyle(.borderedProminent)
           Toggle(isOn: $priv) {
             Image(systemName: priv ? "lock" : "lock.open")
           }

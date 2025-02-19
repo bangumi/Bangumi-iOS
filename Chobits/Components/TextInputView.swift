@@ -1,3 +1,4 @@
+import BBCode
 import SwiftData
 import SwiftUI
 
@@ -42,8 +43,6 @@ struct TextInputView: View {
   @State private var showingBBCodeMenu = false
   @State private var showingDrafts = false
   @State private var currentDraft: Draft?
-  @State private var editorHeight: CGFloat = 120
-  private let minHeight: CGFloat = 80
 
   init(type: String, text: Binding<String>) {
     self.type = type
@@ -78,58 +77,19 @@ struct TextInputView: View {
     showingDrafts = false
   }
 
-  private func insertBBCode(_ tag: String) {
-    // 获取选中的文本范围
-    // 由于 SwiftUI 的 TextField 目前不支持获取选择范围
-    // 我们先实现简单的在光标位置插入标签
-    text += "[\(tag)][/\(tag)]"
-  }
-
   var body: some View {
     VStack {
-      if style.bbcode && isEditing {
-        ScrollView(.horizontal, showsIndicators: false) {
-          HStack(spacing: 8) {
-            ForEach(BBCodeButton.allCases) { button in
-              Button(action: { insertBBCode(button.tag) }) {
-                Image(systemName: button.icon)
-                  .frame(width: 16, height: 16)
-              }.buttonStyle(.bordered)
-            }
-          }.padding(.horizontal, 2)
-        }
+      if style.bbcode, #available(iOS 18.0, *) {
+        BBCodeEditor(text: $text)
+      } else {
+        PlainTextEditor(text: $text)
       }
-
-      BorderView(color: .secondary.opacity(0.2), padding: 4) {
-        TextEditor(text: $text)
-          .focused($isEditing)
-          .frame(height: editorHeight)
-          .autocorrectionDisabled()
-          .textInputAutocapitalization(.never)
-          .onChange(of: text) { _, newValue in
-            if !newValue.isEmpty {
-              saveDraft()
-            }
-          }
-      }
-      Rectangle()
-        .fill(.secondary.opacity(0.2))
-        .frame(height: 4)
-        .cornerRadius(2)
-        .frame(width: 40)
-        .gesture(
-          DragGesture()
-            .onChanged { value in
-              let newHeight = editorHeight + value.translation.height
-              editorHeight = max(minHeight, newHeight)
-            }
-        ).padding(.vertical, 2)
 
       HStack {
         Button(action: { showingDrafts = true }) {
           Label(draftDesc, systemImage: "doc.text.fill")
             .font(.footnote)
-            .foregroundStyle(.secondary)
+            .foregroundStyle(drafts.count == 0 ? .secondary : .primary)
         }
         .sheet(isPresented: $showingDrafts) {
           DraftBoxView(
@@ -146,7 +106,126 @@ struct TextInputView: View {
             .foregroundStyle(text.count > wordLimit ? .red : .secondary)
         }
       }
-    }.animation(.default, value: isEditing)
+    }
+    .onChange(of: text) { _, newValue in
+      if !newValue.isEmpty {
+        saveDraft()
+      }
+    }
+  }
+}
+
+@available(iOS 18.0, *)
+private struct BBCodeEditor: View {
+  @Binding var text: String
+
+  @State private var height: CGFloat = 120
+  private let minHeight: CGFloat = 80
+  @State private var textSelection: TextSelection?
+  @State private var preview: Bool = false
+
+  private func insertBBCode(_ tag: String) {
+    // 获取选中的文本范围
+    // 由于 SwiftUI 的 TextField 目前不支持获取选择范围
+    // 我们先实现简单的在光标位置插入标签
+    text += "[\(tag)][/\(tag)]"
+  }
+
+  var body: some View {
+    VStack {
+      Button {
+        preview.toggle()
+      } label: {
+        HStack {
+          Spacer()
+          Label(preview ? "返回编辑" : "预览", systemImage: preview ? "eye.slash" : "eye")
+          Spacer()
+        }
+      }.buttonStyle(.borderedProminent)
+      if preview {
+        BorderView(color: .secondary.opacity(0.2), padding: 4) {
+          HStack {
+            BBCodeView(text).tint(.linkText)
+            Spacer()
+          }
+        }
+      } else {
+        ScrollView(.horizontal, showsIndicators: false) {
+          HStack(spacing: 8) {
+            ForEach(BBCodeButton.allCases) { button in
+              Button(action: { insertBBCode(button.tag) }) {
+                Image(systemName: button.icon)
+                  .frame(width: 16, height: 16)
+              }.buttonStyle(.bordered)
+            }
+          }.padding(.horizontal, 2)
+        }
+        BorderView(color: .secondary.opacity(0.2), padding: 4) {
+          TextEditor(text: $text, selection: $textSelection)
+            .frame(height: height)
+            .autocorrectionDisabled()
+            .textInputAutocapitalization(.never)
+            .onChange(of: textSelection) {
+              guard let textSelection else {
+                return
+              }
+              switch textSelection.indices {
+              case .selection(let range):
+                print(text[range])
+              case .multiSelection(let rangeSet):
+                rangeSet.ranges.forEach { range in
+                  print(text[range])
+                }
+              @unknown default:
+                break
+              }
+            }
+        }
+        Rectangle()
+          .fill(.secondary.opacity(0.2))
+          .frame(height: 4)
+          .cornerRadius(2)
+          .frame(width: 40)
+          .gesture(
+            DragGesture()
+              .onChanged { value in
+                let newHeight = height + value.translation.height
+                height = max(minHeight, newHeight)
+              }
+          ).padding(.vertical, 2)
+      }
+    }
+    .animation(.default, value: preview)
+  }
+}
+
+private struct PlainTextEditor: View {
+  @Binding var text: String
+
+  @State private var height: CGFloat = 120
+  private let minHeight: CGFloat = 80
+
+  var body: some View {
+    VStack {
+      BorderView(color: .secondary.opacity(0.2), padding: 4) {
+        TextEditor(text: $text)
+          .frame(height: height)
+          .autocorrectionDisabled()
+          .textInputAutocapitalization(.never)
+      }
+      Rectangle()
+        .fill(.secondary.opacity(0.2))
+        .frame(height: 4)
+        .cornerRadius(2)
+        .frame(width: 40)
+        .gesture(
+          DragGesture()
+            .onChanged { value in
+              let newHeight = height + value.translation.height
+              height = max(minHeight, newHeight)
+            }
+        ).padding(.vertical, 2)
+    }
   }
 }
 

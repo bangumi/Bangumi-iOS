@@ -95,8 +95,7 @@ struct TimelineListView: View {
             .disabled(showInput)
             .sheet(isPresented: $showInput) {
               TimelineSayView()
-                .presentationDragIndicator(.visible)
-                .presentationDetents(.init([.medium, .large]))
+                .presentationDetents(.init([.large]))
             }
           }
         } else {
