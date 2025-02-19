@@ -124,6 +124,9 @@ private struct BBCodeEditor: View {
   @State private var textSelection: TextSelection?
   @State private var preview: Bool = false
 
+  @State private var inputURL = ""
+  @State private var showingImageInput = false
+
   func insertBasicBBCode(_ tag: BBCodeType) {
     let tagBefore = "[\(tag.code)]"
     let tagAfter = "[/\(tag.code)]"
@@ -191,6 +194,10 @@ private struct BBCodeEditor: View {
               }.buttonStyle(.bordered)
             }
             Divider()
+            Button(action: { showingImageInput = true }) {
+              Image(systemName: BBCodeType.image.icon)
+                .frame(width: 16, height: 16)
+            }.buttonStyle(.bordered)
           }.padding(.horizontal, 2)
         }
         BorderView(color: .secondary.opacity(0.2), padding: 4) {
@@ -214,6 +221,22 @@ private struct BBCodeEditor: View {
       }
     }
     .animation(.default, value: preview)
+    .alert("插入图片", isPresented: $showingImageInput) {
+      TextField("图片链接", text: $inputURL)
+        .textInputAutocapitalization(.never)
+        .autocorrectionDisabled()
+      Button("确定") {
+        let tagBefore = "[\(BBCodeType.image.code)]"
+        let tagAfter = "[/\(BBCodeType.image.code)]"
+        text += "\(tagBefore)\(inputURL)\(tagAfter)"
+        inputURL = ""
+      }
+      Button("取消", role: .cancel) {
+        inputURL = ""
+      }
+    } message: {
+      Text("请输入图片链接地址")
+    }
   }
 }
 
@@ -253,6 +276,9 @@ private enum BBCodeType: String, CaseIterable, Identifiable {
   case underline
   case strike
 
+  case image
+  case url
+
   case mask
   case quote
   case code
@@ -269,6 +295,8 @@ private enum BBCodeType: String, CaseIterable, Identifiable {
     case .italic: return "i"
     case .underline: return "u"
     case .strike: return "s"
+    case .image: return "img"
+    case .url: return "url"
     case .mask: return "mask"
     case .quote: return "quote"
     case .code: return "code"
@@ -281,6 +309,8 @@ private enum BBCodeType: String, CaseIterable, Identifiable {
     case .italic: return "italic"
     case .underline: return "underline"
     case .strike: return "strikethrough"
+    case .image: return "photo"
+    case .url: return "link"
     case .mask: return "character.square.fill"
     case .quote: return "text.quote"
     case .code: return "chevron.left.forwardslash.chevron.right"
