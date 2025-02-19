@@ -124,28 +124,42 @@ private struct BBCodeEditor: View {
   @State private var textSelection: TextSelection?
   @State private var preview: Bool = false
 
-  private func insertBBCode(_ tag: BBCodeType) {
-    if let textSelection {
-      switch textSelection.indices {
+  func insertBasicBBCode(_ tag: BBCodeType) {
+    let tagBefore = "[\(tag.code)]"
+    let tagAfter = "[/\(tag.code)]"
+    if let selection = textSelection {
+      switch selection.indices {
       case .selection(let range):
-        if tag.isBlock {
-          text.replaceSubrange(range, with: "\n[\(tag)]\(text[range])[/\(tag)]\n")
+        if range.lowerBound == range.upperBound {
+          text = text.replacingCharacters(in: range, with: tagBefore + tagAfter)
+          let cursorPosition = range.lowerBound.utf16Offset(in: text) + tagBefore.count
+          let cursorIndex = text.index(text.startIndex, offsetBy: cursorPosition)
+          textSelection = TextSelection(range: cursorIndex..<cursorIndex)
         } else {
-          text.replaceSubrange(range, with: "[\(tag)][/\(tag)]")
+          if tag.isBlock {
+            text.replaceSubrange(range, with: "\n\(tagBefore)\(text[range])\(tagAfter)\n")
+          } else {
+            text.replaceSubrange(range, with: "\(tagBefore)\(text[range])\(tagAfter)")
+          }
+          let cursorIndex = text.endIndex
+          textSelection = TextSelection(range: cursorIndex..<cursorIndex)
         }
       case .multiSelection(let rangeSet):
         rangeSet.ranges.forEach { range in
           if tag.isBlock {
-            text.replaceSubrange(range, with: "\n[\(tag)]\(text[range])[/\(tag)]\n")
+            text.replaceSubrange(range, with: "\n\(tagBefore)\(text[range])\(tagAfter)\n")
           } else {
-            text.replaceSubrange(range, with: "[\(tag)][/\(tag)]")
+            text.replaceSubrange(range, with: "\(tagBefore)\(text[range])\(tagAfter)")
           }
         }
       @unknown default:
         break
       }
     } else {
-      text += "[\(tag)][/\(tag)]"
+      text += tagBefore
+      let cursorIndex = text.endIndex
+      text += tagAfter
+      textSelection = TextSelection(range: cursorIndex..<cursorIndex)
     }
   }
 
@@ -170,12 +184,13 @@ private struct BBCodeEditor: View {
       } else {
         ScrollView(.horizontal, showsIndicators: false) {
           HStack(spacing: 8) {
-            ForEach(BBCodeType.allCases) { button in
-              Button(action: { insertBBCode(button) }) {
+            ForEach(BBCodeType.basic) { button in
+              Button(action: { insertBasicBBCode(button) }) {
                 Image(systemName: button.icon)
                   .frame(width: 16, height: 16)
               }.buttonStyle(.bordered)
             }
+            Divider()
           }.padding(.horizontal, 2)
         }
         BorderView(color: .secondary.opacity(0.2), padding: 4) {
@@ -237,13 +252,18 @@ private enum BBCodeType: String, CaseIterable, Identifiable {
   case italic
   case underline
   case strike
+
   case mask
   case quote
   case code
 
   var id: String { rawValue }
 
-  var tag: String {
+  static var basic: [Self] {
+    [.bold, .italic, .underline, .strike]
+  }
+
+  var code: String {
     switch self {
     case .bold: return "b"
     case .italic: return "i"
