@@ -452,54 +452,106 @@ struct BBCodeEditor: View {
       }.presentationDetents([.medium])
     }
     .sheet(isPresented: $showingColorInput) {
-      NavigationStack {
-        ScrollView {
-          VStack {
-            HStack {
-              ColorPicker("", selection: $inputColorStart)
+      ColorEditor(
+        start: $inputColorStart,
+        end: $inputColorEnd,
+        gradient: $inputColorGradient,
+        show: $showingColorInput,
+        handleColorInput: handleColorInput,
+        handleGradientInput: handleGradientInput
+      )
+      .presentationDetents([.medium])
+    }
+  }
+}
+
+struct ColorEditor: View {
+  @Binding var start: Color
+  @Binding var end: Color
+  @Binding var gradient: Bool
+  @Binding var show: Bool
+
+  let handleColorInput: () -> Void
+  let handleGradientInput: () -> Void
+
+  let gradientPresets: [(Color, Color)] = [
+    (Color(hex: 0x639494), Color(hex: 0xFBCDCC)),
+    (Color(hex: 0x6C77A1), Color(hex: 0xFDD0D9)),
+    (Color(hex: 0x966160), Color(hex: 0xCFDAA2)),
+    (Color(hex: 0x9c6B97), Color(hex: 0xC8E6FC)),
+    (Color(hex: 0x608297), Color(hex: 0xFFD5C2)),
+    (Color(hex: 0x608A78), Color(hex: 0xFFCCE0)),
+    (Color(hex: 0x796E9E), Color(hex: 0xBDF4C4)),
+    (Color(hex: 0x7F9B62), Color(hex: 0xFEE5C8)),
+    (Color(hex: 0x6A81A4), Color(hex: 0xFFDCD6)),
+  ]
+
+  var body: some View {
+    NavigationStack {
+      ScrollView {
+        VStack {
+          HStack {
+            ColorPicker("", selection: $start)
+              .labelsHidden()
+            if gradient {
+              Rectangle()
+                .fill(
+                  .linearGradient(
+                    colors: [start, end],
+                    startPoint: .leading,
+                    endPoint: .trailing)
+                ).frame(height: 40)
+              ColorPicker("", selection: $end)
                 .labelsHidden()
-              if inputColorGradient {
-                Rectangle()
-                  .fill(
-                    .linearGradient(
-                      colors: [inputColorStart, inputColorEnd],
-                      startPoint: .leading,
-                      endPoint: .trailing)
-                  ).frame(height: 40)
-                ColorPicker("", selection: $inputColorEnd)
-                  .labelsHidden()
-              } else {
-                Rectangle()
-                  .fill(inputColorStart)
-                  .frame(height: 40)
-              }
-            }
-            Toggle("渐变", isOn: $inputColorGradient)
-              .toggleStyle(.switch)
-          }.padding()
-        }
-        .navigationTitle("选择颜色")
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-          ToolbarItem(placement: .cancellationAction) {
-            Button("取消") {
-              showingColorInput = false
-              inputColorGradient = false
+            } else {
+              Rectangle()
+                .fill(start)
+                .frame(height: 40)
             }
           }
-          ToolbarItem(placement: .confirmationAction) {
-            Button("确定") {
-              if inputColorGradient {
-                handleGradientInput()
-              } else {
-                handleColorInput()
+          Toggle("渐变", isOn: $gradient)
+          if gradient {
+            VStack(spacing: 4) {
+              Text("预设")
+              ForEach(gradientPresets, id: \.0) { preset in
+                HStack {
+                  Rectangle()
+                    .fill(
+                      .linearGradient(
+                        colors: [preset.0, preset.1],
+                        startPoint: .leading,
+                        endPoint: .trailing)
+                    ).frame(height: 20)
+                }.onTapGesture {
+                  start = preset.0
+                  end = preset.1
+                }
               }
-              showingColorInput = false
-              inputColorGradient = false
             }
           }
+        }.padding()
+      }
+      .navigationTitle("选择颜色")
+      .navigationBarTitleDisplayMode(.inline)
+      .toolbar {
+        ToolbarItem(placement: .cancellationAction) {
+          Button("取消") {
+            show = false
+            gradient = false
+          }
         }
-      }.presentationDetents([.medium])
+        ToolbarItem(placement: .confirmationAction) {
+          Button("确定") {
+            if gradient {
+              handleGradientInput()
+            } else {
+              handleColorInput()
+            }
+            show = false
+            gradient = false
+          }
+        }
+      }
     }
   }
 }
