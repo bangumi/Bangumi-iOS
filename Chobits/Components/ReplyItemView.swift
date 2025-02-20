@@ -6,6 +6,23 @@ enum TopicParentType {
   case group
 }
 
+struct ReplyItemView: View {
+  let type: TopicParentType
+  let topicId: Int
+  let idx: Int
+  let reply: ReplyDTO
+  let author: SlimUserDTO
+
+  var body: some View {
+    switch reply.state {
+    case .userDelete:
+      ReplyUserDeleteView(idx: idx, reply: reply.base, author: author)
+    default:
+      ReplyItemNormalView(type: type, topicId: topicId, idx: idx, reply: reply, author: author)
+    }
+  }
+}
+
 struct ReplyItemNormalView: View {
   let type: TopicParentType
   let topicId: Int
@@ -55,7 +72,7 @@ struct ReplyItemNormalView: View {
                 showReplyBox = true
               } label: {
                 Text("回复")
-              }.disabled(true)
+              }
               Divider()
               ShareLink(item: shareLink) {
                 Label("分享", systemImage: "square.and.arrow.up")
@@ -86,6 +103,10 @@ struct ReplyItemNormalView: View {
             }
           }
         }
+      }
+      .sheet(isPresented: $showReplyBox) {
+        ReplyBoxView(type: type, topicId: topicId, idx: idx, reply: reply)
+          .presentationDetents([.large])
       }
     }
   }
@@ -119,23 +140,6 @@ struct ReplyUserDeleteView: View {
         .lineLimit(1)
         .font(.caption)
         .foregroundStyle(.secondary)
-    }
-  }
-}
-
-struct ReplyItemView: View {
-  let type: TopicParentType
-  let topicId: Int
-  let idx: Int
-  let reply: ReplyDTO
-  let author: SlimUserDTO
-
-  var body: some View {
-    switch reply.state {
-    case .userDelete:
-      ReplyUserDeleteView(idx: idx, reply: reply.base, author: author)
-    default:
-      ReplyItemNormalView(type: type, topicId: topicId, idx: idx, reply: reply, author: author)
     }
   }
 }
@@ -206,6 +210,90 @@ struct ReplyBaseNormalView: View {
           .tint(.linkText)
           .textSelection(.enabled)
       }
+    }
+  }
+}
+
+struct ReplyBoxView: View {
+  let type: TopicParentType
+  let topicId: Int
+  let idx: Int
+  let reply: ReplyDTO?
+
+  @Environment(\.dismiss) private var dismiss
+
+  @State private var content: String = ""
+  @State private var token: String = ""
+  @State private var updating: Bool = false
+
+  func postReply(content: String) async {
+    do {
+      updating = true
+      let replyTo: Int?
+      if idx == 0 {
+        replyTo = nil
+      } else {
+        replyTo = reply?.id
+      }
+
+      switch type {
+      case .subject:
+        try await Chii.shared.createSubjectReply(
+          topicId: topicId, content: content,
+          replyTo: replyTo, token: token)
+      case .group:
+        try await Chii.shared.createGroupReply(
+          topicId: topicId, content: content,
+          replyTo: replyTo, token: token)
+      }
+      updating = false
+      Notifier.shared.notify(message: "回复成功")
+      dismiss()
+    } catch {
+      Notifier.shared.alert(error: error)
+    }
+  }
+
+  var title: String {
+    if idx == 0 {
+      return "添加新回复"
+    } else {
+      if let user = reply?.creator {
+        return "回复 \(user.nickname.withLink(user.link))"
+      } else {
+        return "回复"
+      }
+    }
+  }
+
+  var body: some View {
+    ScrollView {
+      VStack {
+        Text(title)
+          .font(.headline)
+        HStack {
+          Button {
+            dismiss()
+          } label: {
+            Label("取消", systemImage: "xmark")
+          }
+          .disabled(updating)
+          .buttonStyle(.bordered)
+          Spacer()
+          Button {
+            Task {
+              await postReply(content: content)
+            }
+          } label: {
+            Label("发送", systemImage: "paperplane")
+          }
+          .disabled(content.isEmpty || token.isEmpty || updating)
+          .buttonStyle(.borderedProminent)
+        }
+        TextInputView(type: "回复", text: $content)
+          .textInputStyle(bbcode: true)
+        TrunstileView(token: $token).frame(height: 65)
+      }.padding()
     }
   }
 }

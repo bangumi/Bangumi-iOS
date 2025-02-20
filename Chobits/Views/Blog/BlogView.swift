@@ -72,23 +72,23 @@ struct BlogView: View {
                 .padding(.top, 8)
             }
             .sheet(isPresented: $showSubjects) {
-              NavigationStack {
-                ScrollView {
-                  LazyVStack(alignment: .leading, spacing: 8) {
-                    ForEach(subjects) { subject in
-                      SubjectSmallView(subject: subject)
-                    }
-                  }.padding(.horizontal, 8)
-                }
-                .navigationTitle("关联条目")
-                .navigationBarTitleDisplayMode(.inline)
-                .toolbar {
-                  ToolbarItem(placement: .topBarTrailing) {
+              ScrollView {
+                LazyVStack(alignment: .leading, spacing: 8) {
+                  Text("关联条目")
+                    .font(.title)
+                    .fontWeight(.bold)
+                    .padding(.top, 16)
+                  HStack {
                     Button("关闭", role: .cancel) {
                       showSubjects = false
                     }
+                    .buttonStyle(.bordered)
+                    Spacer()
                   }
-                }
+                  ForEach(subjects) { subject in
+                    SubjectSmallView(subject: subject)
+                  }
+                }.padding(.horizontal, 8)
               }.presentationDetents([.medium])
             }
 

@@ -5,8 +5,8 @@ import SwiftUI
 struct BBCodeEditor: View {
   @Binding var text: String
 
-  @State private var height: CGFloat = 120
   private let minHeight: CGFloat = 80
+  @State private var height: CGFloat = 120
   @State private var textSelection: TextSelection?
   @State private var preview: Bool = false
 
@@ -25,7 +25,7 @@ struct BBCodeEditor: View {
   @State private var showingURLInput = false
   @State private var showingEmojiInput = false
 
-  func handleBasicInput(_ tag: BBCodeType) {
+  private func handleBasicInput(_ tag: BBCodeType) {
     let tagBefore = "[\(tag.code)]"
     let tagAfter = "[/\(tag.code)]"
     if let selection = textSelection {
@@ -45,14 +45,8 @@ struct BBCodeEditor: View {
           let cursorIndex = text.endIndex
           textSelection = TextSelection(range: cursorIndex..<cursorIndex)
         }
-      case .multiSelection(let rangeSet):
-        rangeSet.ranges.forEach { range in
-          if tag.isBlock {
-            text.replaceSubrange(range, with: "\n\(tagBefore)\(text[range])\(tagAfter)\n")
-          } else {
-            text.replaceSubrange(range, with: "\(tagBefore)\(text[range])\(tagAfter)")
-          }
-        }
+      case .multiSelection:
+        break
       @unknown default:
         break
       }
@@ -437,7 +431,7 @@ struct BBCodeEditor: View {
         handleSizeInput()
       }
       Button("取消", role: .cancel) {
-        inputSize = 14  // 重置为默认值
+        inputSize = 14
       }
     } message: {
       Text("请输入字号大小（\(minFontSize)-\(maxFontSize)）")
@@ -493,60 +487,15 @@ struct ColorEditor: View {
   ]
 
   var body: some View {
-    NavigationStack {
-      ScrollView {
-        VStack {
-          HStack {
-            ColorPicker("", selection: $start)
-              .labelsHidden()
-            if gradient {
-              Rectangle()
-                .fill(
-                  .linearGradient(
-                    colors: [start, end],
-                    startPoint: .leading,
-                    endPoint: .trailing)
-                ).frame(height: 40)
-              ColorPicker("", selection: $end)
-                .labelsHidden()
-            } else {
-              Rectangle()
-                .fill(start)
-                .frame(height: 40)
-            }
-          }
-          Toggle("渐变", isOn: $gradient)
-          if gradient {
-            VStack(spacing: 4) {
-              Text("预设")
-              ForEach(gradientPresets, id: \.0) { preset in
-                HStack {
-                  Rectangle()
-                    .fill(
-                      .linearGradient(
-                        colors: [preset.0, preset.1],
-                        startPoint: .leading,
-                        endPoint: .trailing)
-                    ).frame(height: 20)
-                }.onTapGesture {
-                  start = preset.0
-                  end = preset.1
-                }
-              }
-            }
-          }
-        }.padding()
-      }
-      .navigationTitle("选择颜色")
-      .navigationBarTitleDisplayMode(.inline)
-      .toolbar {
-        ToolbarItem(placement: .cancellationAction) {
+    ScrollView {
+      VStack {
+        HStack {
           Button("取消") {
             show = false
             gradient = false
           }
-        }
-        ToolbarItem(placement: .confirmationAction) {
+          .buttonStyle(.bordered)
+          Spacer()
           Button("确定") {
             if gradient {
               handleGradientInput()
@@ -556,8 +505,48 @@ struct ColorEditor: View {
             show = false
             gradient = false
           }
+          .buttonStyle(.borderedProminent)
         }
-      }
+        HStack {
+          ColorPicker("", selection: $start)
+            .labelsHidden()
+          if gradient {
+            Rectangle()
+              .fill(
+                .linearGradient(
+                  colors: [start, end],
+                  startPoint: .leading,
+                  endPoint: .trailing)
+              ).frame(height: 40)
+            ColorPicker("", selection: $end)
+              .labelsHidden()
+          } else {
+            Rectangle()
+              .fill(start)
+              .frame(height: 40)
+          }
+        }
+        Toggle("渐变", isOn: $gradient)
+        if gradient {
+          VStack(spacing: 4) {
+            Text("预设")
+            ForEach(gradientPresets, id: \.0) { preset in
+              HStack {
+                Rectangle()
+                  .fill(
+                    .linearGradient(
+                      colors: [preset.0, preset.1],
+                      startPoint: .leading,
+                      endPoint: .trailing)
+                  ).frame(height: 20)
+              }.onTapGesture {
+                start = preset.0
+                end = preset.1
+              }
+            }
+          }
+        }
+      }.padding()
     }
   }
 }

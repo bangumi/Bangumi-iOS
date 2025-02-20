@@ -353,6 +353,31 @@ extension Chii {
     let resp: SubjectTopicDTO = try self.decodeResponse(data)
     return resp
   }
+
+  func createSubjectReply(topicId: Int, content: String, replyTo: Int?, token: String) async throws
+  {
+    let url = BangumiAPI.priv.build("p1/subjects/-/topics/\(topicId)/replies")
+    var body: [String: Any] = [
+      "content": content,
+      "turnstileToken": token,
+    ]
+    if let replyTo = replyTo {
+      body["replyTo"] = replyTo
+    }
+    _ = try await self.request(url: url, method: "POST", body: body, auth: .required)
+  }
+
+  func createGroupReply(topicId: Int, content: String, replyTo: Int?, token: String) async throws {
+    let url = BangumiAPI.priv.build("p1/groups/-/topics/\(topicId)/replies")
+    var body: [String: Any] = [
+      "content": content,
+      "turnstileToken": token,
+    ]
+    if let replyTo = replyTo {
+      body["replyTo"] = replyTo
+    }
+    _ = try await self.request(url: url, method: "POST", body: body, auth: .required)
+  }
 }
 
 // MARK: - Group

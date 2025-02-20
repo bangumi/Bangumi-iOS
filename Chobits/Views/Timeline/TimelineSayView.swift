@@ -2,14 +2,13 @@ import SwiftUI
 import WebKit
 
 struct TimelineSayView: View {
-  @State private var content: String = ""
-  @State private var token: String = ""
-
-  @State private var updating: Bool = false
-
   @Environment(\.dismiss) private var dismiss
 
-  func postTimeline(content: String) async {
+  @State private var content: String = ""
+  @State private var token: String = ""
+  @State private var updating: Bool = false
+
+  func postTimeline() async {
     do {
       updating = true
       try await Chii.shared.postTimeline(content: content, token: token)
@@ -21,10 +20,22 @@ struct TimelineSayView: View {
     }
   }
 
+  var submitDisabled: Bool {
+    if content.isEmpty {
+      return true
+    }
+    if token.isEmpty {
+      return true
+    }
+    if content.count > 380 {
+      return true
+    }
+    return updating
+  }
+
   var body: some View {
     ScrollView {
       VStack {
-        Spacer()
         HStack {
           Button {
             dismiss()
@@ -36,12 +47,12 @@ struct TimelineSayView: View {
           Spacer()
           Button {
             Task {
-              await postTimeline(content: content)
+              await postTimeline()
             }
           } label: {
             Label("发送", systemImage: "paperplane")
           }
-          .disabled(content.isEmpty || token.isEmpty || updating || content.count > 380)
+          .disabled(submitDisabled)
           .buttonStyle(.borderedProminent)
         }
         TextInputView(type: "吐槽", text: $content)
