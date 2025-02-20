@@ -105,6 +105,7 @@ enum ProgressMode: String, CaseIterable {
 enum ChiiViewTab: String {
   case timeline = "timeline"
   case discover = "discover"
+  case rakuen = "rakuen"
 
   case progress = "progress"
   case collection = "collection"
@@ -118,6 +119,8 @@ enum ChiiViewTab: String {
       self = .timeline
     case "discover":
       self = .discover
+    case "rakuen":
+      self = .rakuen
     case "progress":
       self = .progress
     case "collection":
@@ -137,6 +140,8 @@ enum ChiiViewTab: String {
       "时间线"
     case .discover:
       "发现"
+    case .rakuen:
+      "超展开"
     case .progress:
       "进度管理"
     case .collection:
@@ -154,6 +159,8 @@ enum ChiiViewTab: String {
       "person"
     case .discover:
       "magnifyingglass"
+    case .rakuen:
+      "bubble.left.and.bubble.right"
     case .progress:
       "square.grid.2x2"
     case .collection:
@@ -166,6 +173,6 @@ enum ChiiViewTab: String {
   }
 
   static var defaultTabs: [Self] {
-    return [.timeline, .progress, .discover]
+    return [.timeline, .progress, .discover, .rakuen]
   }
 }

@@ -12,6 +12,7 @@ struct PadView: View {
   @State private var timelineNav: NavigationPath = NavigationPath()
   @State private var progressNav: NavigationPath = NavigationPath()
   @State private var discoverNav: NavigationPath = NavigationPath()
+  @State private var rakuenNav: NavigationPath = NavigationPath()
 
   @State private var searchQuery: String = ""
   @State private var searching: Bool = false
@@ -83,6 +84,24 @@ struct PadView: View {
         .onContinueUserActivity(CSSearchableItemActionType) { activity in
           handleSearchActivity(activity, nav: $discoverNav)
           selectedTab = .discover
+        }
+      }
+
+      if !isolationMode {
+        Tab(ChiiViewTab.rakuen.title, systemImage: ChiiViewTab.rakuen.icon, value: .rakuen) {
+          NavigationStack(path: $rakuenNav) {
+            ChiiRakuenView()
+              .navigationDestination(for: NavDestination.self) { $0 }
+          }.environment(
+            \.openURL,
+            OpenURLAction { url in
+              if handleChiiURL(url, nav: $rakuenNav) {
+                return .handled
+              } else {
+                return .systemAction
+              }
+            }
+          )
         }
       }
     }

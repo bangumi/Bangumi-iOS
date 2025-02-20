@@ -3,12 +3,14 @@ import SwiftUI
 
 struct PhoneView: View {
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
+  @AppStorage("isolationMode") var isolationMode: Bool = false
 
   @State private var selectedTab: ChiiViewTab
 
   @State private var timelineNav: NavigationPath = NavigationPath()
   @State private var progressNav: NavigationPath = NavigationPath()
   @State private var discoverNav: NavigationPath = NavigationPath()
+  @State private var rakuenNav: NavigationPath = NavigationPath()
 
   @State private var searchQuery: String = ""
   @State private var searching: Bool = false
@@ -90,6 +92,27 @@ struct PhoneView: View {
       .tag(ChiiViewTab.discover)
       .tabItem {
         Label(ChiiViewTab.discover.title, systemImage: ChiiViewTab.discover.icon)
+      }
+
+      if !isolationMode {
+        NavigationStack(path: $rakuenNav) {
+          ChiiRakuenView()
+            .navigationDestination(for: NavDestination.self) { $0 }
+        }
+        .tag(ChiiViewTab.rakuen)
+        .tabItem {
+          Label(ChiiViewTab.rakuen.title, systemImage: ChiiViewTab.rakuen.icon)
+        }
+        .environment(
+          \.openURL,
+          OpenURLAction { url in
+            if handleChiiURL(url, nav: $rakuenNav) {
+              return .handled
+            } else {
+              return .systemAction
+            }
+          }
+        )
       }
     }
   }
