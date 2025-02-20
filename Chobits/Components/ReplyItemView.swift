@@ -271,6 +271,7 @@ struct ReplyBoxView: View {
       VStack {
         Text(title)
           .font(.headline)
+          .lineLimit(1)
         HStack {
           Button {
             dismiss()

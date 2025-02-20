@@ -51,27 +51,28 @@ struct ContentView: View {
             .padding(.horizontal, 16)
             .padding(.vertical, 8)
             .foregroundStyle(.white)
-            .background(.accent.opacity(0.9))
+            .background(.accent)
+            .shadow(color: .black.opacity(0.2), radius: 10, x: 0, y: 10)
             .clipShape(RoundedRectangle(cornerRadius: 16))
         }
       }
       .animation(.default, value: notifier.notifications)
       .padding(.horizontal, 8)
       .padding(.bottom, 64)
-    }
-    .alert("ERROR", isPresented: $notifier.hasAlert) {
-      Button("OK") {
-        Notifier.shared.vanishError()
-      }
-      Button("Copy") {
-        UIPasteboard.general.string = notifier.currentError?.description
-        Notifier.shared.notify(message: "已复制")
-      }
-    } message: {
-      if let error = notifier.currentError {
-        Text("\(error)")
-      } else {
-        Text("Unknown Error")
+      .alert("ERROR", isPresented: $notifier.hasAlert) {
+        Button("OK") {
+          Notifier.shared.vanishError()
+        }
+        Button("Copy") {
+          UIPasteboard.general.string = notifier.currentError?.description
+          Notifier.shared.notify(message: "已复制")
+        }
+      } message: {
+        if let error = notifier.currentError {
+          Text("\(error)")
+        } else {
+          Text("Unknown Error")
+        }
       }
     }
     .task {
