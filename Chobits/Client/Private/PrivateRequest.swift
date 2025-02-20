@@ -71,7 +71,7 @@ extension Chii {
     return resp
   }
 
-  func postBlogComment(blogId: Int, content: String, replyTo: Int?, token: String) async throws {
+  func createBlogComment(blogId: Int, content: String, replyTo: Int?, token: String) async throws {
     let url = BangumiAPI.priv.build("p1/blogs/\(blogId)/comments")
     var body: [String: Any] = [
       "content": content,
@@ -159,7 +159,7 @@ extension Chii {
     return resp
   }
 
-  func postCharacterComment(characterId: Int, content: String, replyTo: Int?, token: String)
+  func createCharacterComment(characterId: Int, content: String, replyTo: Int?, token: String)
     async throws
   {
     let url = BangumiAPI.priv.build("p1/characters/\(characterId)/comments")
@@ -340,7 +340,7 @@ extension Chii {
     return resp
   }
 
-  func postEpisodeComment(episodeId: Int, content: String, replyTo: Int?, token: String)
+  func createEpisodeComment(episodeId: Int, content: String, replyTo: Int?, token: String)
     async throws
   {
     let url = BangumiAPI.priv.build("p1/episodes/\(episodeId)/comments")
@@ -619,7 +619,8 @@ extension Chii {
     return resp
   }
 
-  func postPersonComment(personId: Int, content: String, replyTo: Int?, token: String) async throws
+  func createPersonComment(personId: Int, content: String, replyTo: Int?, token: String)
+    async throws
   {
     let url = BangumiAPI.priv.build("p1/persons/\(personId)/comments")
     var body: [String: Any] = [

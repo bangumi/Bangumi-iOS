@@ -16,6 +16,7 @@ struct PersonView: View {
 
   @State private var comments: [CommentDTO] = []
   @State private var loadingComments: Bool = false
+  @State private var showCommentBox: Bool = false
 
   init(personId: Int) {
     self.personId = personId
@@ -37,7 +38,6 @@ struct PersonView: View {
   }
 
   func refresh() async {
-    if refreshed { return }
     do {
       try await Chii.shared.loadPerson(personId)
       refreshed = true
@@ -67,12 +67,12 @@ struct PersonView: View {
             if !isolationMode {
               VStack(alignment: .leading, spacing: 2) {
                 Text("吐槽箱").font(.title3)
-                Divider()
-              }
-              LazyVStack(alignment: .leading, spacing: 8) {
                 if loadingComments {
                   ProgressView()
                 }
+                Divider()
+              }
+              LazyVStack(alignment: .leading, spacing: 8) {
                 ForEach(Array(zip(comments.indices, comments)), id: \.1) { idx, comment in
                   CommentItemView(type: .person(personId), comment: comment, idx: idx)
                   if comment.id != comments.last?.id {
@@ -83,28 +83,39 @@ struct PersonView: View {
             }
           }.padding(.horizontal, 8)
         }
+        .refreshable {
+          Task {
+            await refresh()
+          }
+        }
+        .sheet(isPresented: $showCommentBox) {
+          CommentReplyBoxView(type: .person(personId))
+            .presentationDetents([.large])
+        }
       } else if refreshed {
         NotFoundView()
       } else {
         ProgressView()
       }
     }
+    .task(refresh)
     .navigationTitle(title)
     .navigationBarTitleDisplayMode(.inline)
     .toolbar {
       ToolbarItem(placement: .topBarTrailing) {
         Menu {
+          Button {
+            showCommentBox = true
+          } label: {
+            Label("吐槽", systemImage: "plus.bubble")
+          }
+          Divider()
           ShareLink(item: shareLink) {
             Label("分享", systemImage: "square.and.arrow.up")
           }
         } label: {
           Image(systemName: "ellipsis.circle")
         }
-      }
-    }
-    .onAppear {
-      Task {
-        await refresh()
       }
     }
   }

@@ -1,107 +1,85 @@
-import OSLog
-import SwiftData
+import BBCode
 import SwiftUI
 
-struct ChiiTimelineView: View {
-  @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
-  @AppStorage("profile") var profile: Profile = Profile()
-  @AppStorage("isolationMode") var isolationMode: Bool = false
-  @AppStorage("hasUnreadNotice") var hasUnreadNotice: Bool = false
+struct TimelineView: View {
+  let item: TimelineDTO
 
-  @State private var logoutConfirm: Bool = false
+  @State private var comments: [CommentDTO] = []
+  @State private var loadingComments: Bool = false
+  @State private var showCommentBox: Bool = false
 
-  func checkNotice() async {
+  func load() async {
     do {
-      let resp = try await Chii.shared.listNotice(limit: 1, unread: true)
-      if resp.total == 0 {
-        hasUnreadNotice = false
-      } else {
-        hasUnreadNotice = true
-      }
+      loadingComments = true
+      comments = try await Chii.shared.getTimelineReplies(item.id)
+      loadingComments = false
     } catch {
-      Logger.app.error("check notice failed: \(error)")
+      Notifier.shared.alert(error: error)
     }
   }
 
   var body: some View {
-    TimelineListView()
-      .navigationTitle("时间线")
-      .navigationBarTitleDisplayMode(.inline)
-      .toolbar {
-        if isAuthenticated {
-          ToolbarItem(placement: .topBarLeading) {
-            Menu {
-              NavigationLink(value: NavDestination.user(profile.user.username)) {
-                Label("时光机", systemImage: "house")
-              }
-              NavigationLink(value: NavDestination.collections) {
-                Label("收藏", systemImage: "star")
-              }
-              NavigationLink(value: NavDestination.userMono(profile.user)) {
-                Label("人物", systemImage: "person")
-              }
-              NavigationLink(value: NavDestination.userBlog(profile.user)) {
-                Label("日志", systemImage: "text.below.photo")
-              }
-              NavigationLink(value: NavDestination.userIndex(profile.user)) {
-                Label("目录", systemImage: "list.bullet")
-              }
-              NavigationLink(value: NavDestination.userTimeline(profile.user)) {
-                Label("时间胶囊", systemImage: "clock")
-              }
-              NavigationLink(value: NavDestination.userGroup(profile.user)) {
-                Label("小组", systemImage: "rectangle.3.group.bubble")
-              }
-              NavigationLink(value: NavDestination.friends) {
-                Label("好友", systemImage: "person.2")
-              }
-              Divider()
-              Button(role: .destructive) {
-                logoutConfirm = true
-              } label: {
-                Text("退出登录")
-              }
-            } label: {
-              ImageView(img: profile.avatar?.large)
-                .imageStyle(width: 32, height: 32)
-                .imageType(.avatar)
-            }
-          }
-        } else {
-          ToolbarItem(placement: .topBarLeading) {
+    ScrollView {
+      VStack(alignment: .leading, spacing: 8) {
+        CardView {
+          VStack(alignment: .leading, spacing: 8) {
             HStack {
-              ImageView(img: nil)
-                .imageStyle(width: 32, height: 32)
-                .imageType(.avatar)
-              Text("未登录")
+              if let user = item.user {
+                ImageView(img: user.avatar?.large)
+                  .imageStyle(width: 20, height: 20)
+                  .imageType(.avatar)
+                  .imageLink(user.link)
+                Text(user.nickname.withLink(user.link)).font(.headline)
+              }
+              Spacer()
+              Text(item.createdAt.datetimeDisplay)
                 .font(.footnote)
-                .lineLimit(2)
                 .foregroundStyle(.secondary)
             }
+            Divider()
+            BBCodeView(item.memo.status?.tsukkomi ?? "")
+              .tint(.linkText)
+              .textSelection(.enabled)
           }
         }
-        ToolbarItem(placement: .topBarTrailing) {
-          HStack {
-            if isAuthenticated, !isolationMode {
-              NavigationLink(value: NavDestination.notice) {
-                Image(systemName: hasUnreadNotice ? "bell.badge.fill" : "bell")
-                  .task(checkNotice)
-              }
-            }
-            NavigationLink(value: NavDestination.setting) {
-              Image(systemName: "gearshape")
+
+        LazyVStack(alignment: .leading, spacing: 8) {
+          if loadingComments {
+            ProgressView()
+          }
+          ForEach(Array(zip(comments.indices, comments)), id: \.1) { idx, comment in
+            CommentItemView(type: .timeline(item.id), comment: comment, idx: idx)
+            if comment.id != comments.last?.id {
+              Divider()
             }
           }
+        }
+      }.padding(.horizontal, 8)
+    }
+    .task(load)
+    .refreshable {
+      Task {
+        await load()
+      }
+    }
+    .navigationTitle("吐槽")
+    .navigationBarTitleDisplayMode(.inline)
+    .toolbar {
+      ToolbarItem(placement: .topBarTrailing) {
+        Menu {
+          Button {
+            showCommentBox = true
+          } label: {
+            Label("回复", systemImage: "plus.bubble")
+          }
+        } label: {
+          Image(systemName: "ellipsis.circle")
         }
       }
-      .alert("退出登录", isPresented: $logoutConfirm) {
-        Button("确定", role: .destructive) {
-          Task {
-            await Chii.shared.logout()
-          }
-        }
-      } message: {
-        Text("确定要退出登录吗？")
-      }
+    }
+    .sheet(isPresented: $showCommentBox) {
+      CommentReplyBoxView(type: .timeline(item.id))
+        .presentationDetents([.large])
+    }
   }
 }

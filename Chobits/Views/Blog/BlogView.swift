@@ -14,6 +14,7 @@ struct BlogView: View {
   @State private var showSubjects: Bool = false
   @State private var comments: [CommentDTO] = []
   @State private var loadingComments: Bool = false
+  @State private var showCommentBox: Bool = false
 
   var title: String {
     guard let blog = blog else {
@@ -29,6 +30,7 @@ struct BlogView: View {
   func load() async {
     do {
       blog = try await Chii.shared.getBlogEntry(blogId)
+      refreshed = true
       subjects = try await Chii.shared.getBlogSubjects(blogId)
       if !isolationMode {
         loadingComments = true
@@ -93,6 +95,15 @@ struct BlogView: View {
             }
           }.padding(.horizontal, 8)
         }
+        .refreshable {
+          Task {
+            await load()
+          }
+        }
+        .sheet(isPresented: $showCommentBox) {
+          CommentReplyBoxView(type: .blog(blogId))
+            .presentationDetents([.large])
+        }
       } else if refreshed {
         NotFoundView()
       } else {
@@ -104,6 +115,12 @@ struct BlogView: View {
     .toolbar {
       ToolbarItem(placement: .topBarTrailing) {
         Menu {
+          Button {
+            showCommentBox = true
+          } label: {
+            Label("吐槽", systemImage: "plus.bubble")
+          }
+          Divider()
           ShareLink(item: shareLink) {
             Label("分享", systemImage: "square.and.arrow.up")
           }
@@ -111,12 +128,7 @@ struct BlogView: View {
           Image(systemName: "ellipsis.circle")
         }
       }
-    }
-    .onAppear {
-      Task {
-        await load()
-      }
-    }
+    }.task(load)
   }
 }
 

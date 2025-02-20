@@ -42,19 +42,19 @@ enum CommentParentType {
   func reply(commentId: Int?, content: String, token: String) async throws {
     switch self {
     case .blog(let id):
-      try await Chii.shared.postBlogComment(
+      try await Chii.shared.createBlogComment(
         blogId: id, content: content, replyTo: commentId, token: token)
     case .character(let id):
-      try await Chii.shared.postCharacterComment(
+      try await Chii.shared.createCharacterComment(
         characterId: id, content: content, replyTo: commentId, token: token)
     case .person(let id):
-      try await Chii.shared.postPersonComment(
+      try await Chii.shared.createPersonComment(
         personId: id, content: content, replyTo: commentId, token: token)
     case .episode(let id):
-      try await Chii.shared.postEpisodeComment(
+      try await Chii.shared.createEpisodeComment(
         episodeId: id, content: content, replyTo: commentId, token: token)
     case .timeline(let id):
-      try await Chii.shared.postTimelineReply(
+      try await Chii.shared.createTimelineReply(
         timelineId: id, content: content, replyTo: commentId, token: token)
     }
   }
@@ -233,10 +233,16 @@ struct CommentReplyBoxView: View {
   @State private var token: String = ""
   @State private var updating: Bool = false
 
+  init(type: CommentParentType, comment: CommentDTO? = nil) {
+    self.type = type
+    self.comment = comment
+  }
+
   func postReply(content: String) async {
     do {
       updating = true
       try await type.reply(commentId: comment?.id, content: content, token: token)
+      Notifier.shared.notify(message: "回复成功")
       dismiss()
     } catch {
       Notifier.shared.alert(error: error)

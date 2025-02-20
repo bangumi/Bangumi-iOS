@@ -144,7 +144,7 @@ struct TimelineItemView: View {
         }
         HStack {
           if item.cat == .status, item.type == 1 {
-            NavigationLink(value: NavDestination.timelineReply(item)) {
+            NavigationLink(value: NavDestination.timeline(item)) {
               Text(item.replies > 0 ? "\(item.replies) 回复 " : "回复")
             }.buttonStyle(.navLink)
             Text("·")

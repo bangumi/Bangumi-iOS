@@ -12,6 +12,7 @@ struct EpisodeView: View {
 
   @State private var comments: [CommentDTO] = []
   @State private var loadingComments: Bool = false
+  @State private var showCommentBox: Bool = false
 
   init(episodeId: Int) {
     self.episodeId = episodeId
@@ -54,12 +55,12 @@ struct EpisodeView: View {
         if !isolationMode {
           VStack(alignment: .leading, spacing: 2) {
             Text("吐槽箱").font(.title3)
-            Divider()
-          }
-          LazyVStack(alignment: .leading, spacing: 8) {
             if loadingComments {
               ProgressView()
             }
+            Divider()
+          }
+          LazyVStack(alignment: .leading, spacing: 8) {
             ForEach(Array(zip(comments.indices, comments)), id: \.1) { idx, comment in
               CommentItemView(type: .episode(episodeId), comment: comment, idx: idx)
               if comment.id != comments.last?.id {
@@ -71,6 +72,11 @@ struct EpisodeView: View {
         Spacer()
       }.padding(.horizontal, 8)
     }
+    .refreshable {
+      Task {
+        await load()
+      }
+    }
     .task(load)
     .animation(.default, value: comments)
     .navigationTitle("章节详情")
@@ -78,6 +84,12 @@ struct EpisodeView: View {
     .toolbar {
       ToolbarItem(placement: .topBarTrailing) {
         Menu {
+          Button {
+            showCommentBox = true
+          } label: {
+            Label("吐槽", systemImage: "plus.bubble")
+          }
+          Divider()
           ShareLink(item: shareLink) {
             Label("分享", systemImage: "square.and.arrow.up")
           }
@@ -85,6 +97,10 @@ struct EpisodeView: View {
           Image(systemName: "ellipsis.circle")
         }
       }
+    }
+    .sheet(isPresented: $showCommentBox) {
+      CommentReplyBoxView(type: .episode(episodeId))
+        .presentationDetents([.large])
     }
   }
 }
