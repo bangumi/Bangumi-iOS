@@ -108,7 +108,6 @@ enum ChiiViewTab: String {
   case rakuen = "rakuen"
 
   case progress = "progress"
-  case collection = "collection"
   case notice = "notice"
 
   case settings = "settings"
@@ -123,8 +122,6 @@ enum ChiiViewTab: String {
       self = .rakuen
     case "progress":
       self = .progress
-    case "collection":
-      self = .collection
     case "notice":
       self = .notice
     case "settings":
@@ -144,8 +141,6 @@ enum ChiiViewTab: String {
       "超展开"
     case .progress:
       "进度管理"
-    case .collection:
-      "时光机"
     case .notice:
       "电波提醒"
     case .settings:
@@ -163,8 +158,6 @@ enum ChiiViewTab: String {
       "bubble.left.and.bubble.right"
     case .progress:
       "square.grid.2x2"
-    case .collection:
-      "person.badge.clock"
     case .notice:
       "bell"
     case .settings:
