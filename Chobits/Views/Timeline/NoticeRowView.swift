@@ -30,6 +30,7 @@ struct NoticeRowView: View {
       }
       Spacer()
     }
+    .animation(.default, value: notice)
     Divider()
   }
 }
