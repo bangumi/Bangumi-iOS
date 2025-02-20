@@ -15,7 +15,9 @@ struct BBCodeEditor: View {
   private let minFontSize: Int = 8
   private let maxFontSize: Int = 50
 
-  @State private var inputColor: Color = .black
+  @State private var inputColorStart: Color = .black
+  @State private var inputColorEnd: Color = .black
+  @State private var inputColorGradient: Bool = false
   @State private var showingColorInput = false
 
   @State private var inputURL = ""
@@ -163,8 +165,33 @@ struct BBCodeEditor: View {
     inputSize = 14  // 重置为默认值
   }
 
+  private func convertColorToHex(_ color: Color) -> String {
+    let uiColor = UIColor(color)
+    var red: CGFloat = 0
+    var green: CGFloat = 0
+    var blue: CGFloat = 0
+    var alpha: CGFloat = 0
+    uiColor.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
+    if alpha == 1 {
+      return String(
+        format: "#%02X%02X%02X",
+        Int(red * 255),
+        Int(green * 255),
+        Int(blue * 255)
+      )
+    } else {
+      return String(
+        format: "#%02X%02X%02X%02X",
+        Int(alpha * 255),
+        Int(red * 255),
+        Int(green * 255),
+        Int(blue * 255)
+      )
+    }
+  }
+
   private func handleColorInput() {
-    let hexColor = convertColorToHex(inputColor)
+    let hexColor = convertColorToHex(inputColorStart)
     let tagBefore = "[\(BBCodeType.color.code)=\(hexColor)]"
     let tagAfter = "[/\(BBCodeType.color.code)]"
     if let selection = textSelection {
@@ -197,29 +224,67 @@ struct BBCodeEditor: View {
     }
   }
 
-  private func convertColorToHex(_ color: Color) -> String {
-    let uiColor = UIColor(color)
-    var red: CGFloat = 0
-    var green: CGFloat = 0
-    var blue: CGFloat = 0
-    var alpha: CGFloat = 0
-    uiColor.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
-    if alpha == 1 {
-      return String(
-        format: "#%02X%02X%02X",
-        Int(red * 255),
-        Int(green * 255),
-        Int(blue * 255)
-      )
-    } else {
-      return String(
-        format: "#%02X%02X%02X%02X",
-        Int(alpha * 255),
-        Int(red * 255),
-        Int(green * 255),
-        Int(blue * 255)
-      )
+  private func handleGradientInput() {
+    if let selection = textSelection {
+      switch selection.indices {
+      case .selection(let range):
+        if range.lowerBound == range.upperBound {
+          break
+        } else {
+          // Get the selected text and its length
+          let selectedText = text[range]
+          let charCount = selectedText.count
+
+          // Create a new string with gradient colors
+          var gradientText = ""
+          selectedText.enumerated().forEach { index, char in
+            // Calculate the color for this position
+            let progress = Double(index) / Double(max(1, charCount - 1))
+            let currentColor = interpolateColor(
+              start: inputColorStart, end: inputColorEnd, progress: progress)
+            let hexColor = convertColorToHex(currentColor)
+
+            // Add the colored character
+            gradientText +=
+              "[\(BBCodeType.color.code)=\(hexColor)]\(char)[/\(BBCodeType.color.code)]"
+          }
+
+          // Replace the selected text with the gradient version
+          text.replaceSubrange(range, with: gradientText)
+          let cursorPosition = range.lowerBound.utf16Offset(in: text) + gradientText.count
+          let cursorIndex = text.index(text.startIndex, offsetBy: cursorPosition)
+          textSelection = TextSelection(range: cursorIndex..<cursorIndex)
+        }
+      case .multiSelection:
+        break
+      @unknown default:
+        break
+      }
     }
+  }
+
+  private func interpolateColor(start: Color, end: Color, progress: Double) -> Color {
+    let startComponents = extractColorComponents(from: start)
+    let endComponents = extractColorComponents(from: end)
+
+    let r = startComponents.r + (endComponents.r - startComponents.r) * progress
+    let g = startComponents.g + (endComponents.g - startComponents.g) * progress
+    let b = startComponents.b + (endComponents.b - startComponents.b) * progress
+    let a = startComponents.a + (endComponents.a - startComponents.a) * progress
+
+    return Color(uiColor: UIColor(red: r, green: g, blue: b, alpha: a))
+  }
+
+  private func extractColorComponents(from color: Color) -> (
+    r: CGFloat, g: CGFloat, b: CGFloat, a: CGFloat
+  ) {
+    let uiColor = UIColor(color)
+    var r: CGFloat = 0
+    var g: CGFloat = 0
+    var b: CGFloat = 0
+    var a: CGFloat = 0
+    uiColor.getRed(&r, green: &g, blue: &b, alpha: &a)
+    return (r, g, b, a)
   }
 
   private func handleEmojiInput(_ index: Int) {
@@ -390,28 +455,50 @@ struct BBCodeEditor: View {
       NavigationStack {
         ScrollView {
           VStack {
-            Rectangle()
-              .fill(inputColor)
-              .frame(height: 40)
             HStack {
-              Button("取消", role: .cancel) {
-                showingColorInput = false
-                inputColor = .black
-              }
-              Spacer()
-              ColorPicker("", selection: $inputColor)
+              ColorPicker("", selection: $inputColorStart)
                 .labelsHidden()
-              Spacer()
-              Button("确定") {
-                handleColorInput()
-                showingColorInput = false
-                inputColor = .black
+              if inputColorGradient {
+                Rectangle()
+                  .fill(
+                    .linearGradient(
+                      colors: [inputColorStart, inputColorEnd],
+                      startPoint: .leading,
+                      endPoint: .trailing)
+                  ).frame(height: 40)
+                ColorPicker("", selection: $inputColorEnd)
+                  .labelsHidden()
+              } else {
+                Rectangle()
+                  .fill(inputColorStart)
+                  .frame(height: 40)
               }
             }
+            Toggle("渐变", isOn: $inputColorGradient)
+              .toggleStyle(.switch)
           }.padding()
         }
         .navigationTitle("选择颜色")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+          ToolbarItem(placement: .cancellationAction) {
+            Button("取消") {
+              showingColorInput = false
+              inputColorGradient = false
+            }
+          }
+          ToolbarItem(placement: .confirmationAction) {
+            Button("确定") {
+              if inputColorGradient {
+                handleGradientInput()
+              } else {
+                handleColorInput()
+              }
+              showingColorInput = false
+              inputColorGradient = false
+            }
+          }
+        }
       }.presentationDetents([.medium])
     }
   }
