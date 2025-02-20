@@ -226,6 +226,7 @@ struct CommentSubReplyNormalView: View {
 struct CommentReplyBoxView: View {
   let type: CommentParentType
   let comment: CommentDTO?
+  let reply: CommentBaseDTO?
 
   @Environment(\.dismiss) private var dismiss
 
@@ -233,14 +234,21 @@ struct CommentReplyBoxView: View {
   @State private var token: String = ""
   @State private var updating: Bool = false
 
-  init(type: CommentParentType, comment: CommentDTO? = nil) {
+  init(type: CommentParentType, comment: CommentDTO? = nil, reply: CommentBaseDTO? = nil) {
     self.type = type
     self.comment = comment
+    self.reply = reply
   }
 
   func postReply(content: String) async {
     do {
       updating = true
+      var content = content
+      if let reply = reply {
+        let quote =
+          "[quote][b]\(reply.user?.nickname ?? "用户 \(reply.creatorID)")[/b]说: \(reply.content)[/quote]\n"
+        content = quote + content
+      }
       try await type.reply(commentId: comment?.id, content: content, token: token)
       Notifier.shared.notify(message: "回复成功")
       dismiss()
@@ -251,7 +259,9 @@ struct CommentReplyBoxView: View {
   }
 
   var title: String {
-    if let comment = comment {
+    if let reply = reply {
+      return "回复 \(reply.user?.nickname ?? "用户 \(reply.creatorID)")"
+    } else if let comment = comment {
       return "回复 \(comment.user.nickname)"
     } else {
       return "回复 \(type.title)"

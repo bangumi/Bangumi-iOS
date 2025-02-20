@@ -8,6 +8,7 @@ struct GroupTopicDetailView: View {
 
   @State private var topic: GroupTopicDTO?
   @State private var refreshed = false
+  @State private var showReplyBox = false
 
   var title: String {
     topic?.title ?? "讨论详情"
@@ -66,7 +67,17 @@ struct GroupTopicDetailView: View {
               }
             }
           }
-        }.padding(8)
+        }
+        .padding(8)
+        .refreshable {
+          Task {
+            await refresh()
+          }
+        }
+        .sheet(isPresented: $showReplyBox) {
+          ReplyBoxView(type: .group, topicId: topicId)
+            .presentationDetents([.large])
+        }
       } else if refreshed {
         NotFoundView()
       } else {
@@ -78,6 +89,12 @@ struct GroupTopicDetailView: View {
     .toolbar {
       ToolbarItem(placement: .topBarTrailing) {
         Menu {
+          Button {
+            showReplyBox = true
+          } label: {
+            Label("回复", systemImage: "plus.bubble")
+          }
+          Divider()
           ShareLink(item: shareLink) {
             Label("分享", systemImage: "square.and.arrow.up")
           }

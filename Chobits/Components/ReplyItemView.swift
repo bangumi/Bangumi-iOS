@@ -97,15 +97,15 @@ struct ReplyItemNormalView: View {
                 ReplyUserDeleteView(idx: subidx, reply: subreply, author: author)
               default:
                 SubReplyNormalView(
-                  type: type, topicId: topicId, idx: idx, subidx: subidx,
-                  subreply: subreply, author: author)
+                  type: type, topicId: topicId, idx: idx, reply: reply,
+                  subidx: subidx, subreply: subreply, author: author)
               }
             }
           }
         }
       }
       .sheet(isPresented: $showReplyBox) {
-        ReplyBoxView(type: type, topicId: topicId, idx: idx, reply: reply)
+        ReplyBoxView(type: type, topicId: topicId, reply: idx == 0 ? nil : reply)
           .presentationDetents([.large])
       }
     }
@@ -148,6 +148,7 @@ struct SubReplyNormalView: View {
   let type: TopicParentType
   let topicId: Int
   let idx: Int
+  let reply: ReplyDTO
   let subidx: Int
   let subreply: ReplyBaseDTO
   let author: SlimUserDTO
@@ -192,7 +193,7 @@ struct SubReplyNormalView: View {
               showReplyBox = true
             } label: {
               Text("回复")
-            }.disabled(true)
+            }
             Divider()
             ShareLink(item: shareLink) {
               Label("分享", systemImage: "square.and.arrow.up")
@@ -211,14 +212,18 @@ struct SubReplyNormalView: View {
           .textSelection(.enabled)
       }
     }
+    .sheet(isPresented: $showReplyBox) {
+      ReplyBoxView(type: type, topicId: topicId, reply: reply, subreply: subreply)
+        .presentationDetents([.large])
+    }
   }
 }
 
 struct ReplyBoxView: View {
   let type: TopicParentType
   let topicId: Int
-  let idx: Int
   let reply: ReplyDTO?
+  let subreply: ReplyBaseDTO?
 
   @Environment(\.dismiss) private var dismiss
 
@@ -226,25 +231,36 @@ struct ReplyBoxView: View {
   @State private var token: String = ""
   @State private var updating: Bool = false
 
+  init(
+    type: TopicParentType, topicId: Int,
+    reply: ReplyDTO? = nil,
+    subreply: ReplyBaseDTO? = nil
+  ) {
+    self.type = type
+    self.topicId = topicId
+    self.reply = reply
+    self.subreply = subreply
+  }
+
   func postReply(content: String) async {
     do {
       updating = true
-      let replyTo: Int?
-      if idx == 0 {
-        replyTo = nil
-      } else {
-        replyTo = reply?.id
+      var content = content
+      if let subreply = subreply {
+        let quote =
+          "[quote][b]\(subreply.creator?.nickname ?? "用户 \(subreply.creatorID)")[/b]说: \(subreply.content)[/quote]\n"
+        content = quote + content
       }
 
       switch type {
       case .subject:
         try await Chii.shared.postSubjectTopicReply(
           topicId: topicId, content: content,
-          replyTo: replyTo, token: token)
+          replyTo: reply?.id, token: token)
       case .group:
         try await Chii.shared.postGroupTopicReply(
           topicId: topicId, content: content,
-          replyTo: replyTo, token: token)
+          replyTo: reply?.id, token: token)
       }
       updating = false
       Notifier.shared.notify(message: "回复成功")
@@ -255,14 +271,12 @@ struct ReplyBoxView: View {
   }
 
   var title: String {
-    if idx == 0 {
-      return "添加新回复"
+    if let subreply = subreply {
+      return "回复 \(subreply.creator?.nickname ?? "用户 \(subreply.creatorID)")"
+    } else if let reply = reply {
+      return "回复 \(reply.creator?.nickname ?? "用户 \(reply.creatorID)")"
     } else {
-      if let user = reply?.creator {
-        return "回复 \(user.nickname)"
-      } else {
-        return "回复"
-      }
+      return "添加新回复"
     }
   }
 
