@@ -245,8 +245,9 @@ struct CommentReplyBoxView: View {
       updating = true
       var content = content
       if let reply = reply {
-        let quote =
-          "[quote][b]\(reply.user?.nickname ?? "用户 \(reply.creatorID)")[/b]说: \(reply.content)[/quote]\n"
+        let quoteUser = reply.user?.nickname ?? "用户 \(reply.creatorID)"
+        let quoteContent = try BBCode().plain(reply.content)
+        let quote = "[quote][b]\(quoteUser)[/b]说: \(quoteContent)[/quote]\n"
         content = quote + content
       }
       try await type.reply(commentId: comment?.id, content: content, token: token)

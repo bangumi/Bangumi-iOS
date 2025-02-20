@@ -247,8 +247,9 @@ struct ReplyBoxView: View {
       updating = true
       var content = content
       if let subreply = subreply {
-        let quote =
-          "[quote][b]\(subreply.creator?.nickname ?? "用户 \(subreply.creatorID)")[/b]说: \(subreply.content)[/quote]\n"
+        let quoteUser = subreply.creator?.nickname ?? "用户 \(subreply.creatorID)"
+        let quoteContent = try BBCode().plain(subreply.content)
+        let quote = "[quote][b]\(quoteUser)[/b]说: \(quoteContent)[/quote]\n"
         content = quote + content
       }
 
