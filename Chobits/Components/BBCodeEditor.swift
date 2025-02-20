@@ -363,6 +363,13 @@ struct BBCodeEditor: View {
               }
             }
             Divider()
+            ForEach(BBCodeType.alignment) { code in
+              Button(action: { handleBasicInput(code) }) {
+                Image(systemName: code.icon)
+                  .frame(width: 12, height: 12)
+              }
+            }
+            Divider()
             Button(action: { showingEmojiInput = true }) {
               Image(systemName: BBCodeType.emoji.icon)
                 .frame(width: 12, height: 12)
@@ -459,8 +466,7 @@ struct BBCodeEditor: View {
         show: $showingColorInput,
         handleColorInput: handleColorInput,
         handleGradientInput: handleGradientInput
-      )
-      .presentationDetents([.medium])
+      ).presentationDetents([.medium])
     }
   }
 }
@@ -572,6 +578,10 @@ enum BBCodeType: String, CaseIterable, Identifiable {
   case mask
   case code
 
+  case left
+  case center
+  case right
+
   case emoji
 
   var id: String { rawValue }
@@ -582,6 +592,10 @@ enum BBCodeType: String, CaseIterable, Identifiable {
 
   static var block: [Self] {
     [.quote, .mask, .code]
+  }
+
+  static var alignment: [Self] {
+    [.left, .center, .right]
   }
 
   var code: String {
@@ -597,6 +611,9 @@ enum BBCodeType: String, CaseIterable, Identifiable {
     case .quote: return "quote"
     case .mask: return "mask"
     case .code: return "code"
+    case .left: return "left"
+    case .center: return "center"
+    case .right: return "right"
     case .emoji: return "bgm"
     }
   }
@@ -614,13 +631,16 @@ enum BBCodeType: String, CaseIterable, Identifiable {
     case .quote: return "text.quote"
     case .mask: return "character.square.fill"
     case .code: return "chevron.left.forwardslash.chevron.right"
+    case .left: return "text.alignleft"
+    case .center: return "text.aligncenter"
+    case .right: return "text.alignright"
     case .emoji: return "smiley"
     }
   }
 
   var isBlock: Bool {
     switch self {
-    case .quote, .code: return true
+    case .quote, .code, .left, .center, .right: return true
     default: return false
     }
   }
