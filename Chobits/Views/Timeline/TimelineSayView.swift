@@ -45,6 +45,9 @@ struct TimelineSayView: View {
           .disabled(updating)
           .buttonStyle(.bordered)
           Spacer()
+          Text("吐槽")
+            .font(.headline)
+          Spacer()
           Button {
             Task {
               await postTimeline()
