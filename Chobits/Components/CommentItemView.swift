@@ -108,7 +108,8 @@ struct CommentItemNormalView: View {
                 CommentUserDeleteView(reply.creatorID, reply.user, reply.createdAt)
               default:
                 CommentSubReplyNormalView(
-                  type: type, reply: reply, idx: idx, subidx: subidx)
+                  type: type, comment: comment,
+                  reply: reply, idx: idx, subidx: subidx)
               }
             }
           }
@@ -170,6 +171,7 @@ struct CommentItemView: View {
 
 struct CommentSubReplyNormalView: View {
   let type: CommentParentType
+  let comment: CommentDTO
   let reply: CommentBaseDTO
   let idx: Int
   let subidx: Int
@@ -201,7 +203,7 @@ struct CommentSubReplyNormalView: View {
               showReplyBox = true
             } label: {
               Text("回复")
-            }.disabled(true)
+            }
             Divider()
             ShareLink(item: type.shareLink(commentId: reply.id)) {
               Label("分享", systemImage: "square.and.arrow.up")
@@ -219,6 +221,10 @@ struct CommentSubReplyNormalView: View {
           .tint(.linkText)
           .textSelection(.enabled)
       }
+    }
+    .sheet(isPresented: $showReplyBox) {
+      CommentReplyBoxView(type: type, comment: comment, reply: reply)
+        .presentationDetents([.large])
     }
   }
 }
