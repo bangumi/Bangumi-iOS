@@ -60,6 +60,24 @@ struct PadView: View {
         }
       }
 
+      if !isolationMode {
+        Tab(ChiiViewTab.rakuen.title, systemImage: ChiiViewTab.rakuen.icon, value: .rakuen) {
+          NavigationStack(path: $rakuenNav) {
+            ChiiRakuenView()
+              .navigationDestination(for: NavDestination.self) { $0 }
+          }.environment(
+            \.openURL,
+            OpenURLAction { url in
+              if handleChiiURL(url, nav: $rakuenNav) {
+                return .handled
+              } else {
+                return .systemAction
+              }
+            }
+          )
+        }
+      }
+
       Tab(ChiiViewTab.discover.title, systemImage: ChiiViewTab.discover.icon, value: .discover) {
         NavigationStack(path: $discoverNav) {
           Section {
@@ -87,23 +105,6 @@ struct PadView: View {
         }
       }
 
-      if !isolationMode {
-        Tab(ChiiViewTab.rakuen.title, systemImage: ChiiViewTab.rakuen.icon, value: .rakuen) {
-          NavigationStack(path: $rakuenNav) {
-            ChiiRakuenView()
-              .navigationDestination(for: NavDestination.self) { $0 }
-          }.environment(
-            \.openURL,
-            OpenURLAction { url in
-              if handleChiiURL(url, nav: $rakuenNav) {
-                return .handled
-              } else {
-                return .systemAction
-              }
-            }
-          )
-        }
-      }
     }
   }
 }

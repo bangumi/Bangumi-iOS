@@ -63,6 +63,27 @@ struct PhoneView: View {
         )
       }
 
+      if !isolationMode {
+        NavigationStack(path: $rakuenNav) {
+          ChiiRakuenView()
+            .navigationDestination(for: NavDestination.self) { $0 }
+        }
+        .tag(ChiiViewTab.rakuen)
+        .tabItem {
+          Label(ChiiViewTab.rakuen.title, systemImage: ChiiViewTab.rakuen.icon)
+        }
+        .environment(
+          \.openURL,
+          OpenURLAction { url in
+            if handleChiiURL(url, nav: $rakuenNav) {
+              return .handled
+            } else {
+              return .systemAction
+            }
+          }
+        )
+      }
+
       Section {
         NavigationStack(path: $discoverNav) {
           Section {
@@ -94,26 +115,6 @@ struct PhoneView: View {
         Label(ChiiViewTab.discover.title, systemImage: ChiiViewTab.discover.icon)
       }
 
-      if !isolationMode {
-        NavigationStack(path: $rakuenNav) {
-          ChiiRakuenView()
-            .navigationDestination(for: NavDestination.self) { $0 }
-        }
-        .tag(ChiiViewTab.rakuen)
-        .tabItem {
-          Label(ChiiViewTab.rakuen.title, systemImage: ChiiViewTab.rakuen.icon)
-        }
-        .environment(
-          \.openURL,
-          OpenURLAction { url in
-            if handleChiiURL(url, nav: $rakuenNav) {
-              return .handled
-            } else {
-              return .systemAction
-            }
-          }
-        )
-      }
     }
   }
 }
