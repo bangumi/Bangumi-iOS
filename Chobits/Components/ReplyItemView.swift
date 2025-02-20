@@ -96,7 +96,7 @@ struct ReplyItemNormalView: View {
               case .userDelete:
                 ReplyUserDeleteView(idx: subidx, reply: subreply, author: author)
               default:
-                ReplyBaseNormalView(
+                SubReplyNormalView(
                   type: type, topicId: topicId, idx: idx, subidx: subidx,
                   subreply: subreply, author: author)
               }
@@ -144,7 +144,7 @@ struct ReplyUserDeleteView: View {
   }
 }
 
-struct ReplyBaseNormalView: View {
+struct SubReplyNormalView: View {
   let type: TopicParentType
   let topicId: Int
   let idx: Int
@@ -259,7 +259,7 @@ struct ReplyBoxView: View {
       return "添加新回复"
     } else {
       if let user = reply?.creator {
-        return "回复 \(user.nickname.withLink(user.link))"
+        return "回复 \(user.nickname)"
       } else {
         return "回复"
       }
