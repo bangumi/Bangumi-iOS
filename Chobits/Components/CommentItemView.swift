@@ -8,6 +8,21 @@ enum CommentParentType {
   case episode(Int)
   case timeline(Int)
 
+  var title: String {
+    switch self {
+    case .blog:
+      return "日志"
+    case .character:
+      return "角色"
+    case .person:
+      return "人物"
+    case .episode:
+      return "章节"
+    case .timeline:
+      return "时间线"
+    }
+  }
+
   func shareLink(commentId: Int) -> URL {
     @AppStorage("shareDomain") var shareDomain: ShareDomain = .chii
     switch self {
@@ -101,7 +116,7 @@ struct CommentItemNormalView: View {
       }
     }
     .sheet(isPresented: $showReplyBox) {
-      CommentReplyBoxView(type: type, commentId: comment.id, reply: nil)
+      CommentReplyBoxView(type: type, comment: comment)
         .presentationDetents([.large])
     }
   }
@@ -210,8 +225,7 @@ struct CommentSubReplyNormalView: View {
 
 struct CommentReplyBoxView: View {
   let type: CommentParentType
-  let commentId: Int
-  let reply: CommentBaseDTO?
+  let comment: CommentDTO?
 
   @Environment(\.dismiss) private var dismiss
 
@@ -222,7 +236,7 @@ struct CommentReplyBoxView: View {
   func postReply(content: String) async {
     do {
       updating = true
-      try await type.reply(commentId: commentId, content: content, token: token)
+      try await type.reply(commentId: comment?.id, content: content, token: token)
       dismiss()
     } catch {
       Notifier.shared.alert(error: error)
@@ -231,10 +245,10 @@ struct CommentReplyBoxView: View {
   }
 
   var title: String {
-    if let user = reply?.user {
-      return "回复 \(user.nickname)"
+    if let comment = comment {
+      return "回复 \(comment.user.nickname)"
     } else {
-      return "回复 用户 \(reply?.creatorID ?? 0)"
+      return "回复 \(type.title)"
     }
   }
 
