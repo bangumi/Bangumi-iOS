@@ -10,14 +10,15 @@ struct BBCodeEditor: View {
   @State private var textSelection: TextSelection?
   @State private var preview: Bool = false
 
-  @State private var inputURL = ""
-  @State private var showingImageInput = false
-  @State private var showingURLInput = false
-
   @State private var inputSize: Int = 14
   @State private var showingSizeInput = false
   private let minFontSize: Int = 8
   private let maxFontSize: Int = 50
+
+  @State private var inputURL = ""
+  @State private var showingImageInput = false
+  @State private var showingURLInput = false
+  @State private var showingEmojiInput = false
 
   func handleBasicInput(_ tag: BBCodeType) {
     let tagBefore = "[\(tag.code)]"
@@ -159,6 +160,29 @@ struct BBCodeEditor: View {
     inputSize = 14  // 重置为默认值
   }
 
+  private func handleEmojiInput(_ index: Int) {
+    let emoji = "(bgm\(index))"
+    if let selection = textSelection {
+      switch selection.indices {
+      case .selection(let range):
+        text.replaceSubrange(range, with: emoji)
+        let cursorPosition = range.lowerBound.utf16Offset(in: text) + emoji.count
+        let cursorIndex = text.index(text.startIndex, offsetBy: cursorPosition)
+        textSelection = TextSelection(range: cursorIndex..<cursorIndex)
+      case .multiSelection:
+        break
+      @unknown default:
+        break
+      }
+    } else {
+      text += emoji
+      let cursorPosition = text.count
+      let cursorIndex = text.index(text.startIndex, offsetBy: cursorPosition)
+      textSelection = TextSelection(range: cursorIndex..<cursorIndex)
+    }
+    showingEmojiInput = false
+  }
+
   var body: some View {
     VStack {
       Button {
@@ -183,30 +207,36 @@ struct BBCodeEditor: View {
             ForEach(BBCodeType.basic) { code in
               Button(action: { handleBasicInput(code) }) {
                 Image(systemName: code.icon)
-                  .frame(width: 16, height: 16)
+                  .frame(width: 12, height: 12)
               }
             }
             Divider()
             Button(action: { showingImageInput = true }) {
               Image(systemName: BBCodeType.image.icon)
-                .frame(width: 16, height: 16)
+                .frame(width: 12, height: 12)
             }
             Button(action: { showingURLInput = true }) {
               Image(systemName: BBCodeType.url.icon)
-                .frame(width: 16, height: 16)
+                .frame(width: 12, height: 12)
             }
             Divider()
             Button(action: { showingSizeInput = true }) {
               Image(systemName: BBCodeType.size.icon)
-                .frame(width: 16, height: 16)
+                .frame(width: 12, height: 12)
             }
             Divider()
             ForEach(BBCodeType.block) { code in
               Button(action: { handleBasicInput(code) }) {
                 Image(systemName: code.icon)
-                  .frame(width: 16, height: 16)
+                  .frame(width: 12, height: 12)
               }
             }
+            Divider()
+            Button(action: { showingEmojiInput = true }) {
+              Image(systemName: BBCodeType.emoji.icon)
+                .frame(width: 12, height: 12)
+            }
+            Divider()
           }.padding(.horizontal, 2)
         }.buttonStyle(.bordered)
         BorderView(color: .secondary.opacity(0.2), padding: 4) {
@@ -274,6 +304,22 @@ struct BBCodeEditor: View {
     } message: {
       Text("请输入字号大小（\(minFontSize)-\(maxFontSize)）")
     }
+    .sheet(isPresented: $showingEmojiInput) {
+      ScrollView {
+        LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 10)) {
+          ForEach(24..<126) { index in
+            Button {
+              handleEmojiInput(index)
+            } label: {
+              Image("bgm\(index)")
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 24, height: 24)
+            }
+          }
+        }.padding()
+      }.presentationDetents([.medium])
+    }
   }
 }
 
@@ -291,6 +337,8 @@ enum BBCodeType: String, CaseIterable, Identifiable {
   case quote
   case mask
   case code
+
+  case emoji
 
   var id: String { rawValue }
 
@@ -314,6 +362,7 @@ enum BBCodeType: String, CaseIterable, Identifiable {
     case .quote: return "quote"
     case .mask: return "mask"
     case .code: return "code"
+    case .emoji: return "bgm"
     }
   }
 
@@ -329,6 +378,7 @@ enum BBCodeType: String, CaseIterable, Identifiable {
     case .quote: return "text.quote"
     case .mask: return "character.square.fill"
     case .code: return "chevron.left.forwardslash.chevron.right"
+    case .emoji: return "smiley"
     }
   }
 
@@ -337,5 +387,15 @@ enum BBCodeType: String, CaseIterable, Identifiable {
     case .quote, .code: return true
     default: return false
     }
+  }
+}
+
+@available(iOS 18.0, *)
+#Preview {
+  @Previewable @State var text = ""
+  ScrollView {
+    VStack {
+      BBCodeEditor(text: $text)
+    }.padding()
   }
 }

@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "bgm85.png",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}
