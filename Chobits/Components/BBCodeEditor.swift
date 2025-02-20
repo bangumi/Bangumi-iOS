@@ -15,6 +15,9 @@ struct BBCodeEditor: View {
   private let minFontSize: Int = 8
   private let maxFontSize: Int = 50
 
+  @State private var inputColor: Color = .black
+  @State private var showingColorInput = false
+
   @State private var inputURL = ""
   @State private var showingImageInput = false
   @State private var showingURLInput = false
@@ -160,6 +163,65 @@ struct BBCodeEditor: View {
     inputSize = 14  // 重置为默认值
   }
 
+  private func handleColorInput() {
+    let hexColor = convertColorToHex(inputColor)
+    let tagBefore = "[\(BBCodeType.color.code)=\(hexColor)]"
+    let tagAfter = "[/\(BBCodeType.color.code)]"
+    if let selection = textSelection {
+      switch selection.indices {
+      case .selection(let range):
+        if range.lowerBound == range.upperBound {
+          text.replaceSubrange(range, with: tagBefore + tagAfter)
+          let cursorPosition = range.lowerBound.utf16Offset(in: text) + tagBefore.count
+          let cursorIndex = text.index(text.startIndex, offsetBy: cursorPosition)
+          textSelection = TextSelection(range: cursorIndex..<cursorIndex)
+        } else {
+          let selectedText = text[range]
+          text.replaceSubrange(range, with: "\(tagBefore)\(selectedText)\(tagAfter)")
+          let cursorPosition =
+            range.lowerBound.utf16Offset(in: text) + tagBefore.count + selectedText.count
+            + tagAfter.count
+          let cursorIndex = text.index(text.startIndex, offsetBy: cursorPosition)
+          textSelection = TextSelection(range: cursorIndex..<cursorIndex)
+        }
+      case .multiSelection:
+        break
+      @unknown default:
+        break
+      }
+    } else {
+      text += tagBefore + tagAfter
+      let cursorPosition = text.count - tagAfter.count
+      let cursorIndex = text.index(text.startIndex, offsetBy: cursorPosition)
+      textSelection = TextSelection(range: cursorIndex..<cursorIndex)
+    }
+  }
+
+  private func convertColorToHex(_ color: Color) -> String {
+    let uiColor = UIColor(color)
+    var red: CGFloat = 0
+    var green: CGFloat = 0
+    var blue: CGFloat = 0
+    var alpha: CGFloat = 0
+    uiColor.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
+    if alpha == 1 {
+      return String(
+        format: "#%02X%02X%02X",
+        Int(red * 255),
+        Int(green * 255),
+        Int(blue * 255)
+      )
+    } else {
+      return String(
+        format: "#%02X%02X%02X%02X",
+        Int(alpha * 255),
+        Int(red * 255),
+        Int(green * 255),
+        Int(blue * 255)
+      )
+    }
+  }
+
   private func handleEmojiInput(_ index: Int) {
     let emoji = "(bgm\(index))"
     if let selection = textSelection {
@@ -222,6 +284,10 @@ struct BBCodeEditor: View {
             Divider()
             Button(action: { showingSizeInput = true }) {
               Image(systemName: BBCodeType.size.icon)
+                .frame(width: 12, height: 12)
+            }
+            Button(action: { showingColorInput = true }) {
+              Image(systemName: BBCodeType.color.icon)
                 .frame(width: 12, height: 12)
             }
             Divider()
@@ -320,6 +386,34 @@ struct BBCodeEditor: View {
         }.padding()
       }.presentationDetents([.medium])
     }
+    .sheet(isPresented: $showingColorInput) {
+      NavigationStack {
+        ScrollView {
+          VStack {
+            Rectangle()
+              .fill(inputColor)
+              .frame(height: 40)
+            HStack {
+              Button("取消", role: .cancel) {
+                showingColorInput = false
+                inputColor = .black
+              }
+              Spacer()
+              ColorPicker("", selection: $inputColor)
+                .labelsHidden()
+              Spacer()
+              Button("确定") {
+                handleColorInput()
+                showingColorInput = false
+                inputColor = .black
+              }
+            }
+          }.padding()
+        }
+        .navigationTitle("选择颜色")
+        .navigationBarTitleDisplayMode(.inline)
+      }.presentationDetents([.medium])
+    }
   }
 }
 
@@ -333,6 +427,7 @@ enum BBCodeType: String, CaseIterable, Identifiable {
   case url
 
   case size
+  case color
 
   case quote
   case mask
@@ -359,6 +454,7 @@ enum BBCodeType: String, CaseIterable, Identifiable {
     case .image: return "img"
     case .url: return "url"
     case .size: return "size"
+    case .color: return "color"
     case .quote: return "quote"
     case .mask: return "mask"
     case .code: return "code"
@@ -375,6 +471,7 @@ enum BBCodeType: String, CaseIterable, Identifiable {
     case .image: return "photo"
     case .url: return "link"
     case .size: return "textformat.size"
+    case .color: return "paintpalette"
     case .quote: return "text.quote"
     case .mask: return "character.square.fill"
     case .code: return "chevron.left.forwardslash.chevron.right"
