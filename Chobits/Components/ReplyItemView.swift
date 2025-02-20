@@ -238,11 +238,11 @@ struct ReplyBoxView: View {
 
       switch type {
       case .subject:
-        try await Chii.shared.createSubjectReply(
+        try await Chii.shared.postSubjectTopicReply(
           topicId: topicId, content: content,
           replyTo: replyTo, token: token)
       case .group:
-        try await Chii.shared.createGroupReply(
+        try await Chii.shared.postGroupTopicReply(
           topicId: topicId, content: content,
           replyTo: replyTo, token: token)
       }

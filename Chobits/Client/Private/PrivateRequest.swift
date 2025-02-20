@@ -70,6 +70,18 @@ extension Chii {
     let resp: [CommentDTO] = try self.decodeResponse(data)
     return resp
   }
+
+  func postBlogComment(blogId: Int, content: String, replyTo: Int?, token: String) async throws {
+    let url = BangumiAPI.priv.build("p1/blogs/\(blogId)/comments")
+    var body: [String: Any] = [
+      "content": content,
+      "turnstileToken": token,
+    ]
+    if let replyTo = replyTo {
+      body["replyTo"] = replyTo
+    }
+    _ = try await self.request(url: url, method: "POST", body: body, auth: .required)
+  }
 }
 
 // MARK: - Calendar
@@ -145,6 +157,20 @@ extension Chii {
     let data = try await self.request(url: url, method: "GET")
     let resp: [CommentDTO] = try self.decodeResponse(data)
     return resp
+  }
+
+  func postCharacterComment(characterId: Int, content: String, replyTo: Int?, token: String)
+    async throws
+  {
+    let url = BangumiAPI.priv.build("p1/characters/\(characterId)/comments")
+    var body: [String: Any] = [
+      "content": content,
+      "turnstileToken": token,
+    ]
+    if let replyTo = replyTo {
+      body["replyTo"] = replyTo
+    }
+    _ = try await self.request(url: url, method: "POST", body: body, auth: .required)
   }
 }
 
@@ -313,6 +339,20 @@ extension Chii {
     let resp: [CommentDTO] = try self.decodeResponse(data)
     return resp
   }
+
+  func postEpisodeComment(episodeId: Int, content: String, replyTo: Int?, token: String)
+    async throws
+  {
+    let url = BangumiAPI.priv.build("p1/episodes/\(episodeId)/comments")
+    var body: [String: Any] = [
+      "content": content,
+      "turnstileToken": token,
+    ]
+    if let replyTo = replyTo {
+      body["replyTo"] = replyTo
+    }
+    _ = try await self.request(url: url, method: "POST", body: body, auth: .required)
+  }
 }
 
 // MARK: - Friend
@@ -354,7 +394,8 @@ extension Chii {
     return resp
   }
 
-  func createSubjectReply(topicId: Int, content: String, replyTo: Int?, token: String) async throws
+  func postSubjectTopicReply(topicId: Int, content: String, replyTo: Int?, token: String)
+    async throws
   {
     let url = BangumiAPI.priv.build("p1/subjects/-/topics/\(topicId)/replies")
     var body: [String: Any] = [
@@ -367,8 +408,67 @@ extension Chii {
     _ = try await self.request(url: url, method: "POST", body: body, auth: .required)
   }
 
-  func createGroupReply(topicId: Int, content: String, replyTo: Int?, token: String) async throws {
+  func postGroupTopicReply(topicId: Int, content: String, replyTo: Int?, token: String) async throws
+  {
     let url = BangumiAPI.priv.build("p1/groups/-/topics/\(topicId)/replies")
+    var body: [String: Any] = [
+      "content": content,
+      "turnstileToken": token,
+    ]
+    if let replyTo = replyTo {
+      body["replyTo"] = replyTo
+    }
+    _ = try await self.request(url: url, method: "POST", body: body, auth: .required)
+  }
+}
+
+// MARK: - Comment
+extension Chii {
+  func createCharacterReply(characterId: Int, content: String, replyTo: Int?, token: String)
+    async throws
+  {
+    let url = BangumiAPI.priv.build("p1/characters/\(characterId)/comments")
+    var body: [String: Any] = [
+      "content": content,
+      "turnstileToken": token,
+    ]
+    if let replyTo = replyTo {
+      body["replyTo"] = replyTo
+    }
+    _ = try await self.request(url: url, method: "POST", body: body, auth: .required)
+  }
+
+  func createPersonReply(personId: Int, content: String, replyTo: Int?, token: String) async throws
+  {
+    let url = BangumiAPI.priv.build("p1/persons/\(personId)/comments")
+    var body: [String: Any] = [
+      "content": content,
+      "turnstileToken": token,
+    ]
+    if let replyTo = replyTo {
+      body["replyTo"] = replyTo
+    }
+    _ = try await self.request(url: url, method: "POST", body: body, auth: .required)
+  }
+
+  func createEpisodeReply(episodeId: Int, content: String, replyTo: Int?, token: String)
+    async throws
+  {
+    let url = BangumiAPI.priv.build("p1/episodes/\(episodeId)/comments")
+    var body: [String: Any] = [
+      "content": content,
+      "turnstileToken": token,
+    ]
+    if let replyTo = replyTo {
+      body["replyTo"] = replyTo
+    }
+    _ = try await self.request(url: url, method: "POST", body: body, auth: .required)
+  }
+
+  func createTimelineReply(timelineId: Int, content: String, replyTo: Int?, token: String)
+    async throws
+  {
+    let url = BangumiAPI.priv.build("p1/timeline/\(timelineId)/replies")
     var body: [String: Any] = [
       "content": content,
       "turnstileToken": token,
@@ -517,6 +617,19 @@ extension Chii {
     let data = try await self.request(url: url, method: "GET")
     let resp: [CommentDTO] = try self.decodeResponse(data)
     return resp
+  }
+
+  func postPersonComment(personId: Int, content: String, replyTo: Int?, token: String) async throws
+  {
+    let url = BangumiAPI.priv.build("p1/persons/\(personId)/comments")
+    var body: [String: Any] = [
+      "content": content,
+      "turnstileToken": token,
+    ]
+    if let replyTo = replyTo {
+      body["replyTo"] = replyTo
+    }
+    _ = try await self.request(url: url, method: "POST", body: body, auth: .required)
   }
 }
 
@@ -756,6 +869,20 @@ extension Chii {
     ]
     let data = try await self.request(url: url, method: "POST", body: body)
     let _: IDResponseDTO = try self.decodeResponse(data)
+  }
+
+  func postTimelineReply(timelineId: Int, content: String, replyTo: Int?, token: String)
+    async throws
+  {
+    let url = BangumiAPI.priv.build("p1/timeline/\(timelineId)/replies")
+    var body: [String: Any] = [
+      "content": content,
+      "turnstileToken": token,
+    ]
+    if let replyTo = replyTo {
+      body["replyTo"] = replyTo
+    }
+    _ = try await self.request(url: url, method: "POST", body: body, auth: .required)
   }
 }
 

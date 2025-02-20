@@ -72,24 +72,8 @@ struct BlogView: View {
                 .padding(.top, 8)
             }
             .sheet(isPresented: $showSubjects) {
-              ScrollView {
-                LazyVStack(alignment: .leading, spacing: 8) {
-                  Text("关联条目")
-                    .font(.title)
-                    .fontWeight(.bold)
-                    .padding(.top, 16)
-                  HStack {
-                    Button("关闭", role: .cancel) {
-                      showSubjects = false
-                    }
-                    .buttonStyle(.bordered)
-                    Spacer()
-                  }
-                  ForEach(subjects) { subject in
-                    SubjectSmallView(subject: subject)
-                  }
-                }.padding(.horizontal, 8)
-              }.presentationDetents([.medium])
+              BlogSubjectsView(subjects: subjects)
+                .presentationDetents([.medium])
             }
 
             /// comments
@@ -131,6 +115,33 @@ struct BlogView: View {
     .onAppear {
       Task {
         await load()
+      }
+    }
+  }
+}
+
+struct BlogSubjectsView: View {
+  let subjects: [SlimSubjectDTO]
+
+  @Environment(\.dismiss) private var dismiss
+
+  var body: some View {
+    NavigationStack {
+      ScrollView {
+        LazyVStack(alignment: .leading, spacing: 8) {
+          ForEach(subjects) { subject in
+            SubjectSmallView(subject: subject)
+          }
+        }.padding(.horizontal, 8)
+      }
+      .navigationTitle("关联条目")
+      .navigationBarTitleDisplayMode(.inline)
+      .toolbar {
+        ToolbarItem(placement: .topBarTrailing) {
+          Button("关闭") {
+            dismiss()
+          }
+        }
       }
     }
   }

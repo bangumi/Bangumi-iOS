@@ -23,6 +23,26 @@ enum CommentParentType {
       return URL(string: "https://\(shareDomain.rawValue)/timeline/\(id)#post_\(commentId)")!
     }
   }
+
+  func reply(commentId: Int?, content: String, token: String) async throws {
+    switch self {
+    case .blog(let id):
+      try await Chii.shared.postBlogComment(
+        blogId: id, content: content, replyTo: commentId, token: token)
+    case .character(let id):
+      try await Chii.shared.postCharacterComment(
+        characterId: id, content: content, replyTo: commentId, token: token)
+    case .person(let id):
+      try await Chii.shared.postPersonComment(
+        personId: id, content: content, replyTo: commentId, token: token)
+    case .episode(let id):
+      try await Chii.shared.postEpisodeComment(
+        episodeId: id, content: content, replyTo: commentId, token: token)
+    case .timeline(let id):
+      try await Chii.shared.postTimelineReply(
+        timelineId: id, content: content, replyTo: commentId, token: token)
+    }
+  }
 }
 
 struct CommentItemNormalView: View {
@@ -47,7 +67,7 @@ struct CommentItemNormalView: View {
                 showReplyBox = true
               } label: {
                 Text("回复")
-              }.disabled(true)
+              }
               Divider()
               ShareLink(item: type.shareLink(commentId: comment.id)) {
                 Label("分享", systemImage: "square.and.arrow.up")
@@ -79,6 +99,10 @@ struct CommentItemNormalView: View {
           }
         }
       }
+    }
+    .sheet(isPresented: $showReplyBox) {
+      CommentReplyBoxView(type: type, commentId: comment.id, reply: nil)
+        .presentationDetents([.large])
     }
   }
 }
@@ -180,6 +204,69 @@ struct CommentSubReplyNormalView: View {
           .tint(.linkText)
           .textSelection(.enabled)
       }
+    }
+  }
+}
+
+struct CommentReplyBoxView: View {
+  let type: CommentParentType
+  let commentId: Int
+  let reply: CommentBaseDTO?
+
+  @Environment(\.dismiss) private var dismiss
+
+  @State private var content: String = ""
+  @State private var token: String = ""
+  @State private var updating: Bool = false
+
+  func postReply(content: String) async {
+    do {
+      updating = true
+      try await type.reply(commentId: commentId, content: content, token: token)
+      dismiss()
+    } catch {
+      Notifier.shared.alert(error: error)
+    }
+    updating = false
+  }
+
+  var title: String {
+    if let user = reply?.user {
+      return "回复 \(user.nickname)"
+    } else {
+      return "回复 用户 \(reply?.creatorID ?? 0)"
+    }
+  }
+
+  var body: some View {
+    ScrollView {
+      VStack {
+        Text(title)
+          .font(.headline)
+          .lineLimit(1)
+        HStack {
+          Button {
+            dismiss()
+          } label: {
+            Label("取消", systemImage: "xmark")
+          }
+          .disabled(updating)
+          .buttonStyle(.bordered)
+          Spacer()
+          Button {
+            Task {
+              await postReply(content: content)
+            }
+          } label: {
+            Label("发送", systemImage: "paperplane")
+          }
+          .disabled(content.isEmpty || token.isEmpty || updating)
+          .buttonStyle(.borderedProminent)
+        }
+        TextInputView(type: "回复", text: $content)
+          .textInputStyle(bbcode: true)
+        TrunstileView(token: $token).frame(height: 65)
+      }.padding()
     }
   }
 }
