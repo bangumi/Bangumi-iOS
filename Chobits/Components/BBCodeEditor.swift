@@ -475,15 +475,15 @@ struct ColorEditor: View {
   let handleGradientInput: () -> Void
 
   let gradientPresets: [(Color, Color)] = [
-    (Color(hex: 0x639494), Color(hex: 0xFBCDCC)),
-    (Color(hex: 0x6C77A1), Color(hex: 0xFDD0D9)),
-    (Color(hex: 0x966160), Color(hex: 0xCFDAA2)),
-    (Color(hex: 0x9c6B97), Color(hex: 0xC8E6FC)),
-    (Color(hex: 0x608297), Color(hex: 0xFFD5C2)),
-    (Color(hex: 0x608A78), Color(hex: 0xFFCCE0)),
-    (Color(hex: 0x796E9E), Color(hex: 0xBDF4C4)),
-    (Color(hex: 0x7F9B62), Color(hex: 0xFEE5C8)),
-    (Color(hex: 0x6A81A4), Color(hex: 0xFFDCD6)),
+    (Color(hex: 0x4CD596), Color(hex: 0xB8EA4B)),
+    (Color(hex: 0x8CEEED), Color(hex: 0xE0FF9D)),
+    (Color(hex: 0x8367EE), Color(hex: 0x19EAA3)),
+    (Color(hex: 0xFF63AC), Color(hex: 0xF7FF72)),
+    (Color(hex: 0x5EFF6D), Color(hex: 0x1319FF)),
+    (Color(hex: 0xD42068), Color(hex: 0xBD5EFF)),
+    (Color(hex: 0xDD77FF), Color(hex: 0x6C6CFF)),
+    (Color(hex: 0xD84FFF), Color(hex: 0x999BFF)),
+    (Color(hex: 0x4DA1FF), Color(hex: 0xE1FF3B)),
   ]
 
   var body: some View {
