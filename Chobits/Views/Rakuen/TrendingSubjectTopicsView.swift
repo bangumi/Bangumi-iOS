@@ -20,7 +20,7 @@ struct TrendingSubjectTopicsView: View {
     VStack {
       VStack(alignment: .leading, spacing: 2) {
         HStack {
-          Text("热门条目讨论").font(.title3)
+          Text("热门条目讨论").font(.title2)
           if loading {
             ProgressView()
           } else {
@@ -51,10 +51,16 @@ struct TrendingSubjectTopicsView: View {
                 .font(.footnote)
                 .foregroundStyle(.secondary)
             }
-            NavigationLink(value: NavDestination.subject(topic.subject.id)) {
-              Text(topic.subject.name)
-                .font(.footnote)
-            }.buttonStyle(.plain)
+            HStack {
+              topic.updatedAt.relativeText
+                .font(.caption)
+                .foregroundStyle(.secondary)
+              Spacer()
+              NavigationLink(value: NavDestination.subject(topic.subject.id)) {
+                Text(topic.subject.name)
+                  .font(.footnote)
+              }.buttonStyle(.plain)
+            }
           }
           Spacer()
         }

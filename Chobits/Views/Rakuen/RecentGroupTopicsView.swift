@@ -20,7 +20,7 @@ struct RecentGroupTopicsView: View {
     VStack {
       VStack(alignment: .leading, spacing: 2) {
         HStack {
-          Text("小组话题").font(.title3)
+          Text("小组话题").font(.title2)
           if loading {
             ProgressView()
           } else {
@@ -51,10 +51,16 @@ struct RecentGroupTopicsView: View {
                 .font(.footnote)
                 .foregroundStyle(.secondary)
             }
-            NavigationLink(value: NavDestination.group(topic.group.name)) {
-              Text(topic.group.title)
-                .font(.footnote)
-            }.buttonStyle(.plain)
+            HStack {
+              topic.updatedAt.relativeText
+                .font(.caption)
+                .foregroundStyle(.secondary)
+              NavigationLink(value: NavDestination.group(topic.group.name)) {
+                Spacer()
+                Text(topic.group.title)
+                  .font(.footnote)
+              }.buttonStyle(.plain)
+            }
           }
           Spacer()
         }
