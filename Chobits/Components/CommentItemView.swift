@@ -104,12 +104,14 @@ struct CommentItemNormalView: View {
             VStack(alignment: .leading) {
               Divider()
               switch reply.state {
-              case .userDelete:
-                CommentUserDeleteView(reply.creatorID, reply.user, reply.createdAt)
-              default:
+              case .normal:
                 CommentSubReplyNormalView(
                   type: type, comment: comment,
                   reply: reply, idx: idx, subidx: subidx)
+              case .userDelete:
+                CommentUserDeleteView(reply.creatorID, reply.user, reply.createdAt)
+              default:
+                Text(reply.state.description)
               }
             }
           }
@@ -161,10 +163,12 @@ struct CommentItemView: View {
 
   var body: some View {
     switch comment.state {
+    case .normal:
+      CommentItemNormalView(type: type, comment: comment, idx: idx)
     case .userDelete:
       CommentUserDeleteView(comment.creatorID, comment.user, comment.createdAt)
     default:
-      CommentItemNormalView(type: type, comment: comment, idx: idx)
+      Text(comment.state.description)
     }
   }
 }

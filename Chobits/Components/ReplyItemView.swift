@@ -15,10 +15,12 @@ struct ReplyItemView: View {
 
   var body: some View {
     switch reply.state {
+    case .normal:
+      ReplyItemNormalView(type: type, topicId: topicId, idx: idx, reply: reply, author: author)
     case .userDelete:
       ReplyUserDeleteView(idx: idx, reply: reply.base, author: author)
     default:
-      ReplyItemNormalView(type: type, topicId: topicId, idx: idx, reply: reply, author: author)
+      Text(reply.state.description)
     }
   }
 }
@@ -93,12 +95,14 @@ struct ReplyItemNormalView: View {
             VStack(alignment: .leading) {
               Divider()
               switch subreply.state {
-              case .userDelete:
-                ReplyUserDeleteView(idx: subidx, reply: subreply, author: author)
-              default:
+              case .normal:
                 SubReplyNormalView(
                   type: type, topicId: topicId, idx: idx, reply: reply,
                   subidx: subidx, subreply: subreply, author: author)
+              case .userDelete:
+                ReplyUserDeleteView(idx: subidx, reply: subreply, author: author)
+              default:
+                Text(subreply.state.description)
               }
             }
           }
