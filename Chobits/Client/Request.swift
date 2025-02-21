@@ -463,6 +463,31 @@ extension Chii {
     let resp: PagedDTO<GroupTopicDTO> = try self.decodeResponse(data)
     return resp
   }
+
+  func deleteSubjectPost(postId: Int) async throws {
+    let url = BangumiAPI.priv.build("p1/subjects/-/posts/\(postId)")
+    let body: [String: Any] = [:]
+    _ = try await self.request(url: url, method: "DELETE", body: body, auth: .required)
+  }
+
+  func editSubjectPost(postId: Int, content: String) async throws {
+    let url = BangumiAPI.priv.build("p1/subjects/-/posts/\(postId)")
+    let body: [String: Any] = ["content": content]
+    _ = try await self.request(url: url, method: "PUT", body: body, auth: .required)
+  }
+
+  func createSubjectReply(topicId: Int, content: String, replyTo: Int?, token: String) async throws
+  {
+    let url = BangumiAPI.priv.build("p1/subjects/-/topics/\(topicId)/replies")
+    var body: [String: Any] = [
+      "content": content,
+      "turnstileToken": token,
+    ]
+    if let replyTo = replyTo {
+      body["replyTo"] = replyTo
+    }
+    _ = try await self.request(url: url, method: "POST", body: body, auth: .required)
+  }
 }
 
 // MARK: - Comment
@@ -1233,5 +1258,44 @@ extension Chii {
     let data = try await self.request(url: url, method: "POST", body: body)
     let resp: PagedDTO<SlimPersonDTO> = try self.decodeResponse(data)
     return resp
+  }
+}
+
+// MARK: - Comments
+extension Chii {
+  func deleteComment(type: CommentParentType, commentId: Int) async throws {
+    let url: URL
+    switch type {
+    case .blog:
+      url = BangumiAPI.priv.build("p1/blogs/-/comments/\(commentId)")
+    case .character:
+      url = BangumiAPI.priv.build("p1/characters/-/comments/\(commentId)")
+    case .person:
+      url = BangumiAPI.priv.build("p1/persons/-/comments/\(commentId)")
+    case .episode:
+      url = BangumiAPI.priv.build("p1/episodes/-/comments/\(commentId)")
+    case .timeline:
+      url = BangumiAPI.priv.build("p1/timeline/\(commentId)")
+    }
+    let body: [String: Any] = [:]
+    _ = try await self.request(url: url, method: "DELETE", body: body, auth: .required)
+  }
+
+  func updateComment(type: CommentParentType, commentId: Int, content: String) async throws {
+    let url: URL
+    switch type {
+    case .blog:
+      url = BangumiAPI.priv.build("p1/blogs/-/comments/\(commentId)")
+    case .character:
+      url = BangumiAPI.priv.build("p1/characters/-/comments/\(commentId)")
+    case .person:
+      url = BangumiAPI.priv.build("p1/persons/-/comments/\(commentId)")
+    case .episode:
+      url = BangumiAPI.priv.build("p1/episodes/-/comments/\(commentId)")
+    case .timeline:
+      url = BangumiAPI.priv.build("p1/timeline/\(commentId)")
+    }
+    let body: [String: Any] = ["content": content]
+    _ = try await self.request(url: url, method: "PUT", body: body, auth: .required)
   }
 }

@@ -58,6 +58,14 @@ enum CommentParentType {
         timelineId: id, content: content, replyTo: commentId, token: token)
     }
   }
+
+  func edit(commentId: Int, content: String) async throws {
+    try await Chii.shared.updateComment(type: self, commentId: commentId, content: content)
+  }
+
+  func delete(commentId: Int) async throws {
+    try await Chii.shared.deleteComment(type: self, commentId: commentId)
+  }
 }
 
 struct CommentItemNormalView: View {
@@ -65,7 +73,10 @@ struct CommentItemNormalView: View {
   let comment: CommentDTO
   let idx: Int
 
+  @AppStorage("profile") var profile: Profile = Profile()
   @State private var showReplyBox: Bool = false
+  @State private var showEditBox: Bool = false
+  @State private var updating: Bool = false
 
   var body: some View {
     VStack(alignment: .leading) {
@@ -82,6 +93,29 @@ struct CommentItemNormalView: View {
                 showReplyBox = true
               } label: {
                 Text("回复")
+              }
+              if comment.creatorID == profile.id {
+                Button {
+                  showEditBox = true
+                } label: {
+                  Text("编辑")
+                }
+                Divider()
+                Button(role: .destructive) {
+                  Task {
+                    updating = true
+                    do {
+                      try await type.delete(commentId: comment.id)
+                      Notifier.shared.notify(message: "删除成功")
+                    } catch {
+                      Notifier.shared.alert(error: error)
+                    }
+                    updating = false
+                  }
+                } label: {
+                  Text("删除")
+                }
+                .disabled(updating)
               }
               Divider()
               ShareLink(item: type.shareLink(commentId: comment.id)) {
@@ -120,6 +154,10 @@ struct CommentItemNormalView: View {
     }
     .sheet(isPresented: $showReplyBox) {
       CommentReplyBoxView(type: type, comment: comment)
+        .presentationDetents([.large])
+    }
+    .sheet(isPresented: $showEditBox) {
+      CommentReplyBoxView(type: type, comment: comment, isEdit: true)
         .presentationDetents([.large])
     }
   }
@@ -180,7 +218,10 @@ struct CommentSubReplyNormalView: View {
   let idx: Int
   let subidx: Int
 
+  @AppStorage("profile") var profile: Profile = Profile()
   @State private var showReplyBox: Bool = false
+  @State private var showEditBox: Bool = false
+  @State private var updating: Bool = false
 
   var body: some View {
     HStack(alignment: .top) {
@@ -208,6 +249,29 @@ struct CommentSubReplyNormalView: View {
             } label: {
               Text("回复")
             }
+            if reply.creatorID == profile.id {
+              Button {
+                showEditBox = true
+              } label: {
+                Text("编辑")
+              }
+              Divider()
+              Button(role: .destructive) {
+                Task {
+                  updating = true
+                  do {
+                    try await type.delete(commentId: reply.id)
+                    Notifier.shared.notify(message: "删除成功")
+                  } catch {
+                    Notifier.shared.alert(error: error)
+                  }
+                  updating = false
+                }
+              } label: {
+                Text("删除")
+              }
+              .disabled(updating)
+            }
             Divider()
             ShareLink(item: type.shareLink(commentId: reply.id)) {
               Label("分享", systemImage: "square.and.arrow.up")
@@ -230,6 +294,10 @@ struct CommentSubReplyNormalView: View {
       CommentReplyBoxView(type: type, comment: comment, reply: reply)
         .presentationDetents([.large])
     }
+    .sheet(isPresented: $showEditBox) {
+      CommentReplyBoxView(type: type, comment: comment, reply: reply, isEdit: true)
+        .presentationDetents([.large])
+    }
   }
 }
 
@@ -237,6 +305,7 @@ struct CommentReplyBoxView: View {
   let type: CommentParentType
   let comment: CommentDTO?
   let reply: CommentBaseDTO?
+  let isEdit: Bool
 
   @Environment(\.dismiss) private var dismiss
 
@@ -244,24 +313,44 @@ struct CommentReplyBoxView: View {
   @State private var token: String = ""
   @State private var updating: Bool = false
 
-  init(type: CommentParentType, comment: CommentDTO? = nil, reply: CommentBaseDTO? = nil) {
+  init(
+    type: CommentParentType, comment: CommentDTO? = nil, reply: CommentBaseDTO? = nil,
+    isEdit: Bool = false
+  ) {
     self.type = type
     self.comment = comment
     self.reply = reply
+    self.isEdit = isEdit
+    if isEdit {
+      _content = State(initialValue: reply?.content ?? comment?.content ?? "")
+    }
   }
 
   func postReply(content: String) async {
     do {
       updating = true
       var content = content
-      if let reply = reply {
+      if !isEdit, let reply = reply {
         let quoteUser = reply.user?.nickname ?? "用户 \(reply.creatorID)"
         let quoteContent = try BBCode().plain(reply.content)
         let quote = "[quote][b]\(quoteUser)[/b]说: \(quoteContent)[/quote]\n"
         content = quote + content
       }
-      try await type.reply(commentId: comment?.id, content: content, token: token)
-      Notifier.shared.notify(message: "回复成功")
+      if isEdit {
+        let commentId: Int
+        if let reply = reply {
+          commentId = reply.id
+        } else if let comment = comment {
+          commentId = comment.id
+        } else {
+          Notifier.shared.alert(message: "找不到要编辑的评论")
+          return
+        }
+        try await type.edit(commentId: commentId, content: content)
+      } else {
+        try await type.reply(commentId: comment?.id, content: content, token: token)
+      }
+      Notifier.shared.notify(message: isEdit ? "编辑成功" : "回复成功")
       dismiss()
     } catch {
       Notifier.shared.alert(error: error)
@@ -270,12 +359,22 @@ struct CommentReplyBoxView: View {
   }
 
   var title: String {
-    if let reply = reply {
-      return "回复 \(reply.user?.nickname ?? "用户 \(reply.creatorID)")"
-    } else if let comment = comment {
-      return "回复 \(comment.user.nickname)"
+    if isEdit {
+      if reply != nil {
+        return "编辑回复"
+      } else if comment != nil {
+        return "编辑评论"
+      } else {
+        return "编辑"
+      }
     } else {
-      return "回复 \(type.title)"
+      if let reply = reply {
+        return "回复 \(reply.user?.nickname ?? "用户 \(reply.creatorID)")"
+      } else if let comment = comment {
+        return "回复 \(comment.user.nickname)"
+      } else {
+        return "回复 \(type.title)"
+      }
     }
   }
 
@@ -299,12 +398,12 @@ struct CommentReplyBoxView: View {
               await postReply(content: content)
             }
           } label: {
-            Label("发送", systemImage: "paperplane")
+            Label(isEdit ? "保存" : "发送", systemImage: isEdit ? "checkmark" : "paperplane")
           }
           .disabled(content.isEmpty || token.isEmpty || updating)
           .buttonStyle(.borderedProminent)
         }
-        TextInputView(type: "回复", text: $content)
+        TextInputView(type: isEdit ? "内容" : "回复", text: $content)
           .textInputStyle(bbcode: true)
         TrunstileView(token: $token).frame(height: 65)
       }.padding()

@@ -32,9 +32,12 @@ struct ReplyItemNormalView: View {
   let reply: ReplyDTO
   let author: SlimUserDTO?
 
+  @AppStorage("profile") var profile: Profile = Profile()
   @AppStorage("shareDomain") var shareDomain: ShareDomain = .chii
 
   @State private var showReplyBox: Bool = false
+  @State private var showEditBox: Bool = false
+  @State private var updating: Bool = false
 
   var shareLink: URL {
     URL(
@@ -75,6 +78,29 @@ struct ReplyItemNormalView: View {
               } label: {
                 Text("回复")
               }
+              if reply.creatorID == profile.id {
+                Button {
+                  showEditBox = true
+                } label: {
+                  Text("编辑")
+                }
+                Divider()
+                Button(role: .destructive) {
+                  Task {
+                    updating = true
+                    do {
+                      try await Chii.shared.deleteSubjectPost(postId: reply.id)
+                      Notifier.shared.notify(message: "删除成功")
+                    } catch {
+                      Notifier.shared.alert(error: error)
+                    }
+                    updating = false
+                  }
+                } label: {
+                  Text("删除")
+                }
+                .disabled(updating)
+              }
               Divider()
               ShareLink(item: shareLink) {
                 Label("分享", systemImage: "square.and.arrow.up")
@@ -97,8 +123,8 @@ struct ReplyItemNormalView: View {
               switch subreply.state {
               case .normal:
                 SubReplyNormalView(
-                  type: type, topicId: topicId, idx: idx, reply: reply,
-                  subidx: subidx, subreply: subreply, author: author)
+                  type: type, idx: idx, reply: reply, subidx: subidx, subreply: subreply,
+                  author: author, topicId: topicId)
               case .userDelete:
                 ReplyUserDeleteView(idx: subidx, reply: subreply, author: author)
               default:
@@ -110,6 +136,10 @@ struct ReplyItemNormalView: View {
       }
       .sheet(isPresented: $showReplyBox) {
         ReplyBoxView(type: type, topicId: topicId, reply: idx == 0 ? nil : reply)
+          .presentationDetents([.large])
+      }
+      .sheet(isPresented: $showEditBox) {
+        ReplyBoxView(type: type, topicId: topicId, reply: reply, isEdit: true)
           .presentationDetents([.large])
       }
     }
@@ -150,42 +180,45 @@ struct ReplyUserDeleteView: View {
 
 struct SubReplyNormalView: View {
   let type: TopicParentType
-  let topicId: Int
   let idx: Int
   let reply: ReplyDTO
   let subidx: Int
   let subreply: ReplyBaseDTO
   let author: SlimUserDTO?
+  let topicId: Int
 
-  @State private var showReplyBox: Bool = false
-
+  @AppStorage("profile") var profile: Profile = Profile()
   @AppStorage("shareDomain") var shareDomain: ShareDomain = .chii
 
+  @State private var showReplyBox: Bool = false
+  @State private var showEditBox: Bool = false
+  @State private var updating: Bool = false
+
   var shareLink: URL {
-    URL(string: "https://\(shareDomain.rawValue)/\(type)/topic/\(topicId)#post_\(subreply.id)")!
+    URL(string: "https://\(shareDomain.rawValue)/\(type)/topic/\(reply.id)#post_\(subreply.id)")!
   }
 
   var body: some View {
     HStack(alignment: .top) {
-      if let user = subreply.creator {
-        ImageView(img: user.avatar?.large)
+      if let creator = subreply.creator {
+        ImageView(img: creator.avatar?.large)
           .imageStyle(width: 40, height: 40)
           .imageType(.avatar)
-          .imageLink(user.link)
+          .imageLink(creator.link)
       } else {
         Rectangle().fill(.clear).frame(width: 40, height: 40)
       }
       VStack(alignment: .leading) {
         HStack {
-          if let user = subreply.creator, let author = author {
-            if user.id == author.id {
+          if let creator = subreply.creator, let author = author {
+            if creator.id == author.id {
               BorderView {
                 Text("楼主")
                   .font(.caption)
                   .foregroundStyle(.secondary)
               }
             }
-            Text(user.nickname.withLink(user.link))
+            Text(creator.nickname.withLink(creator.link))
               .lineLimit(1)
           } else {
             Text("用户 \(subreply.creatorID)")
@@ -198,12 +231,35 @@ struct SubReplyNormalView: View {
             } label: {
               Text("回复")
             }
+            if subreply.creatorID == profile.id {
+              Button {
+                showEditBox = true
+              } label: {
+                Text("编辑")
+              }
+              Divider()
+              Button(role: .destructive) {
+                Task {
+                  updating = true
+                  do {
+                    try await Chii.shared.deleteSubjectPost(postId: subreply.id)
+                    Notifier.shared.notify(message: "删除成功")
+                  } catch {
+                    Notifier.shared.alert(error: error)
+                  }
+                  updating = false
+                }
+              } label: {
+                Text("删除")
+              }
+              .disabled(updating)
+            }
             Divider()
             ShareLink(item: shareLink) {
               Label("分享", systemImage: "square.and.arrow.up")
             }
           } label: {
-            Text("#\(idx + 1)-\(subidx + 1) - \(subreply.createdAt.datetimeDisplay)")
+            Text("#\(idx+1)-\(subidx+1) - \(subreply.createdAt.datetimeDisplay)")
               .lineLimit(1)
               .font(.caption)
               .foregroundStyle(.secondary)
@@ -220,6 +276,10 @@ struct SubReplyNormalView: View {
       ReplyBoxView(type: type, topicId: topicId, reply: reply, subreply: subreply)
         .presentationDetents([.large])
     }
+    .sheet(isPresented: $showEditBox) {
+      ReplyBoxView(type: type, topicId: topicId, reply: reply, subreply: subreply, isEdit: true)
+        .presentationDetents([.large])
+    }
   }
 }
 
@@ -228,6 +288,7 @@ struct ReplyBoxView: View {
   let topicId: Int
   let reply: ReplyDTO?
   let subreply: ReplyBaseDTO?
+  let isEdit: Bool
 
   @Environment(\.dismiss) private var dismiss
 
@@ -236,52 +297,70 @@ struct ReplyBoxView: View {
   @State private var updating: Bool = false
 
   init(
-    type: TopicParentType, topicId: Int,
-    reply: ReplyDTO? = nil,
-    subreply: ReplyBaseDTO? = nil
+    type: TopicParentType, topicId: Int, reply: ReplyDTO? = nil, subreply: ReplyBaseDTO? = nil,
+    isEdit: Bool = false
   ) {
     self.type = type
     self.topicId = topicId
     self.reply = reply
     self.subreply = subreply
+    self.isEdit = isEdit
+    if isEdit {
+      _content = State(initialValue: subreply?.content ?? reply?.content ?? "")
+    }
   }
 
   func postReply(content: String) async {
     do {
       updating = true
       var content = content
-      if let subreply = subreply {
+      if !isEdit, let subreply = subreply {
         let quoteUser = subreply.creator?.nickname ?? "用户 \(subreply.creatorID)"
         let quoteContent = try BBCode().plain(subreply.content)
         let quote = "[quote][b]\(quoteUser)[/b]说: \(quoteContent)[/quote]\n"
         content = quote + content
       }
-
-      switch type {
-      case .subject:
-        try await Chii.shared.postSubjectTopicReply(
-          topicId: topicId, content: content,
-          replyTo: reply?.id, token: token)
-      case .group:
-        try await Chii.shared.postGroupTopicReply(
+      if isEdit {
+        let postId: Int
+        if let subreply = subreply {
+          postId = subreply.id
+        } else if let reply = reply {
+          postId = reply.id
+        } else {
+          Notifier.shared.alert(message: "找不到要编辑的回复")
+          return
+        }
+        try await Chii.shared.editSubjectPost(postId: postId, content: content)
+      } else {
+        try await Chii.shared.createSubjectReply(
           topicId: topicId, content: content,
           replyTo: reply?.id, token: token)
       }
-      updating = false
-      Notifier.shared.notify(message: "回复成功")
+      Notifier.shared.notify(message: isEdit ? "编辑成功" : "回复成功")
       dismiss()
     } catch {
       Notifier.shared.alert(error: error)
     }
+    updating = false
   }
 
   var title: String {
-    if let subreply = subreply {
-      return "回复 \(subreply.creator?.nickname ?? "用户 \(subreply.creatorID)")"
-    } else if let reply = reply {
-      return "回复 \(reply.creator?.nickname ?? "用户 \(reply.creatorID)")"
+    if isEdit {
+      if subreply != nil {
+        return "编辑回复"
+      } else if reply != nil {
+        return "编辑回复"
+      } else {
+        return "编辑"
+      }
     } else {
-      return "添加新回复"
+      if let subreply = subreply {
+        return "回复 \(subreply.creator?.nickname ?? "用户 \(subreply.creatorID)")"
+      } else if let reply = reply {
+        return "回复 \(reply.creator?.nickname ?? "用户 \(reply.creatorID)")"
+      } else {
+        return "添加新回复"
+      }
     }
   }
 
@@ -305,14 +384,16 @@ struct ReplyBoxView: View {
               await postReply(content: content)
             }
           } label: {
-            Label("发送", systemImage: "paperplane")
+            Label(isEdit ? "保存" : "发送", systemImage: isEdit ? "checkmark" : "paperplane")
           }
-          .disabled(content.isEmpty || token.isEmpty || updating)
+          .disabled(content.isEmpty || (!isEdit && token.isEmpty) || updating)
           .buttonStyle(.borderedProminent)
         }
-        TextInputView(type: "回复", text: $content)
+        TextInputView(type: isEdit ? "内容" : "回复", text: $content)
           .textInputStyle(bbcode: true)
-        TrunstileView(token: $token).frame(height: 65)
+        if !isEdit {
+          TrunstileView(token: $token).frame(height: 65)
+        }
       }.padding()
     }
   }
