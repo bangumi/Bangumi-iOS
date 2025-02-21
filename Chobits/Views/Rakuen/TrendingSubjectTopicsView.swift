@@ -69,6 +69,7 @@ struct TrendingSubjectTopicsView: View {
         }
       }
     }
+    .animation(.default, value: topics)
     .onAppear {
       if topics.isEmpty {
         Task {
