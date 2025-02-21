@@ -152,8 +152,15 @@ func handleChiiURL(_ url: URL, nav: Binding<NavigationPath>) -> Bool {
       nav.wrappedValue.append(NavDestination.user(username))
     }
   case "subject":
-    if let subjectId = components.first.flatMap({ Int($0) }) {
-      nav.wrappedValue.append(NavDestination.subject(subjectId))
+    switch components.first {
+    case "topic":
+      if let topicId = components.last.flatMap({ Int($0) }) {
+        nav.wrappedValue.append(NavDestination.subjectTopicDetail(topicId))
+      }
+    default:
+      if let subjectId = components.first.flatMap({ Int($0) }) {
+        nav.wrappedValue.append(NavDestination.subject(subjectId))
+      }
     }
   case "episode":
     if let episodeId = components.first.flatMap({ Int($0) }) {
@@ -168,8 +175,15 @@ func handleChiiURL(_ url: URL, nav: Binding<NavigationPath>) -> Bool {
       nav.wrappedValue.append(NavDestination.person(personId))
     }
   case "group":
-    if let groupName = components.first {
-      nav.wrappedValue.append(NavDestination.group(groupName))
+    switch components.first {
+    case "topic":
+      if let topicId = components.last.flatMap({ Int($0) }) {
+        nav.wrappedValue.append(NavDestination.groupTopicDetail(topicId))
+      }
+    default:
+      if let groupName = components.first {
+        nav.wrappedValue.append(NavDestination.group(groupName))
+      }
     }
   case "index":
     if let indexId = components.first.flatMap({ Int($0) }) {

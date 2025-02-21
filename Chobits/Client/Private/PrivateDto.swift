@@ -287,7 +287,7 @@ struct TopicDTO: Codable, Identifiable, Hashable {
   var updatedAt: Int
 }
 
-struct SubjectTopicDTO: Codable, Identifiable, Hashable {
+struct SubjectTopicDTO: Codable, Identifiable, Hashable, Linkable {
   var id: Int
   var parentID: Int
   var creatorID: Int
@@ -299,9 +299,17 @@ struct SubjectTopicDTO: Codable, Identifiable, Hashable {
   var createdAt: Int
   var updatedAt: Int
   var replies: [ReplyDTO]
+
+  var name: String {
+    title
+  }
+
+  var link: String {
+    "chii://subject/topic/\(id)"
+  }
 }
 
-struct GroupTopicDTO: Codable, Identifiable, Hashable {
+struct GroupTopicDTO: Codable, Identifiable, Hashable, Linkable {
   var id: Int
   var parentID: Int
   var creatorID: Int
@@ -313,6 +321,14 @@ struct GroupTopicDTO: Codable, Identifiable, Hashable {
   var createdAt: Int
   var updatedAt: Int
   var replies: [ReplyDTO]
+
+  var name: String {
+    title
+  }
+
+  var link: String {
+    "chii://group/topic/\(id)"
+  }
 }
 
 struct SubjectCommentDTO: Codable, Identifiable, Hashable {

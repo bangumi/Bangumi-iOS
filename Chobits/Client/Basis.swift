@@ -919,6 +919,13 @@ enum GroupMemberRole: Int, Codable, CaseIterable {
   }
 }
 
+enum GroupTopicFilterMode: String, Codable {
+  case all = "all"
+  case joined = "joined"
+  case created = "created"
+  case replied = "replied"
+}
+
 /// TODO: use bangumi/common
 
 struct SubjectCategory: Identifiable {

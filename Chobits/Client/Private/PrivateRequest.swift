@@ -420,6 +420,33 @@ extension Chii {
     }
     _ = try await self.request(url: url, method: "POST", body: body, auth: .required)
   }
+
+  func getTrendingSubjectTopics(limit: Int = 20, offset: Int = 0) async throws -> PagedDTO<
+    SubjectTopicDTO
+  > {
+    let url = BangumiAPI.priv.build("p1/trending/subjects/topics")
+    let queryItems: [URLQueryItem] = [
+      URLQueryItem(name: "limit", value: String(limit)),
+      URLQueryItem(name: "offset", value: String(offset)),
+    ]
+    let pageURL = url.appending(queryItems: queryItems)
+    let data = try await self.request(url: pageURL, method: "GET")
+    let resp: PagedDTO<SubjectTopicDTO> = try self.decodeResponse(data)
+    return resp
+  }
+
+  func getRecentGroupTopics(mode: GroupTopicFilterMode = .joined, limit: Int = 20, offset: Int = 0) async throws -> PagedDTO<GroupTopicDTO> {
+    let url = BangumiAPI.priv.build("p1/groups/-/topics")
+    let queryItems: [URLQueryItem] = [
+      URLQueryItem(name: "mode", value: mode.rawValue),
+      URLQueryItem(name: "limit", value: String(limit)),
+      URLQueryItem(name: "offset", value: String(offset)),
+    ]
+    let pageURL = url.appending(queryItems: queryItems)
+    let data = try await self.request(url: pageURL, method: "GET")
+    let resp: PagedDTO<GroupTopicDTO> = try self.decodeResponse(data)
+    return resp
+  }
 }
 
 // MARK: - Comment
