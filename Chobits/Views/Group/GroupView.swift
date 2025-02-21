@@ -223,8 +223,8 @@ struct GroupRecentTopicView: View {
                   .lineLimit(1)
               }.buttonStyle(.navLink)
               Spacer()
-              if topic.replies > 0 {
-                Text("(+\(topic.replies))")
+              if topic.replyCount ?? 0 > 0 {
+                Text("(+\(topic.replyCount ?? 0))")
                   .font(.footnote)
                   .foregroundStyle(.orange)
               }

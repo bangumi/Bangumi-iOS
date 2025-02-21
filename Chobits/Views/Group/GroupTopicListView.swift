@@ -30,8 +30,8 @@ struct GroupTopicListView: View {
                   .multilineTextAlignment(.leading)
               }.buttonStyle(.navLink)
               Spacer()
-              if topic.replies > 0 {
-                Text("(+\(topic.replies))")
+              if topic.replyCount ?? 0 > 0 {
+                Text("(+\(topic.replyCount ?? 0))")
                   .font(.footnote)
                   .foregroundStyle(.orange)
               }

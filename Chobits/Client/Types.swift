@@ -280,7 +280,7 @@ struct TopicDTO: Codable, Identifiable, Hashable {
   var creatorID: Int
   var creator: SlimUserDTO?
   var title: String
-  var replies: Int
+  var replyCount: Int?
   var state: Int
   var display: Int
   var createdAt: Int
@@ -291,9 +291,10 @@ struct SubjectTopicDTO: Codable, Identifiable, Hashable, Linkable {
   var id: Int
   var parentID: Int
   var creatorID: Int
-  var creator: SlimUserDTO
+  var creator: SlimUserDTO?
   var subject: SlimSubjectDTO
   var title: String
+  var replyCount: Int
   var state: Int
   var display: Int
   var createdAt: Int
@@ -313,9 +314,10 @@ struct GroupTopicDTO: Codable, Identifiable, Hashable, Linkable {
   var id: Int
   var parentID: Int
   var creatorID: Int
-  var creator: SlimUserDTO
+  var creator: SlimUserDTO?
   var group: SlimGroupDTO
   var title: String
+  var replyCount: Int
   var state: Int
   var display: Int
   var createdAt: Int

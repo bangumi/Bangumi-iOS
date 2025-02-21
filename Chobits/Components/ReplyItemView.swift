@@ -11,7 +11,7 @@ struct ReplyItemView: View {
   let topicId: Int
   let idx: Int
   let reply: ReplyDTO
-  let author: SlimUserDTO
+  let author: SlimUserDTO?
 
   var body: some View {
     switch reply.state {
@@ -28,7 +28,7 @@ struct ReplyItemNormalView: View {
   let topicId: Int
   let idx: Int
   let reply: ReplyDTO
-  let author: SlimUserDTO
+  let author: SlimUserDTO?
 
   @AppStorage("shareDomain") var shareDomain: ShareDomain = .chii
 
@@ -53,7 +53,7 @@ struct ReplyItemNormalView: View {
         }
         VStack(alignment: .leading) {
           HStack {
-            if let creator = reply.creator {
+            if let creator = reply.creator, let author = author {
               if creator.id == author.id {
                 BorderView {
                   Text("楼主")
@@ -115,11 +115,11 @@ struct ReplyItemNormalView: View {
 struct ReplyUserDeleteView: View {
   let idx: Int
   let reply: ReplyBaseDTO
-  let author: SlimUserDTO
+  let author: SlimUserDTO?
 
   var body: some View {
     HStack {
-      if let creator = reply.creator {
+      if let creator = reply.creator, let author = author {
         if creator.id == author.id {
           BorderView {
             Text("楼主")
@@ -151,7 +151,7 @@ struct SubReplyNormalView: View {
   let reply: ReplyDTO
   let subidx: Int
   let subreply: ReplyBaseDTO
-  let author: SlimUserDTO
+  let author: SlimUserDTO?
 
   @State private var showReplyBox: Bool = false
 
@@ -173,7 +173,7 @@ struct SubReplyNormalView: View {
       }
       VStack(alignment: .leading) {
         HStack {
-          if let user = subreply.creator {
+          if let user = subreply.creator, let author = author {
             if user.id == author.id {
               BorderView {
                 Text("楼主")

@@ -39,7 +39,7 @@ struct RecentGroupTopicsView: View {
       }
       ForEach(topics, id: \.id) { topic in
         HStack(alignment: .top) {
-          ImageView(img: topic.creator.avatar?.large)
+          ImageView(img: topic.creator?.avatar?.large)
             .imageStyle(width: 40, height: 40)
             .imageType(.avatar)
             .imageLink(topic.link)

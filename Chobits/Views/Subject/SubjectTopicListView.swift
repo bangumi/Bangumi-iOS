@@ -68,8 +68,8 @@ struct SubjectTopicListView: View {
                   .lineLimit(1)
               }
               Spacer()
-              if topic.replies > 0 {
-                Text("(+\(topic.replies))")
+              if topic.replyCount ?? 0 > 0 {
+                Text("(+\(topic.replyCount ?? 0))")
                   .font(.footnote)
                   .foregroundStyle(.orange)
               }
