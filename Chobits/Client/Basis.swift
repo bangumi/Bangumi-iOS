@@ -1191,3 +1191,21 @@ let GAME_PLATFORMS: [String] = [
   "GB",
   "Virtual Boy",
 ]
+
+enum GroupSortMode: String, CaseIterable {
+  case created = "created"
+  case updated = "updated"
+  case posts = "posts"
+  case topics = "topics"
+  case members = "members"
+
+  var description: String {
+    switch self {
+    case .created: return "创建时间"
+    case .updated: return "最新讨论"
+    case .posts: return "帖子数"
+    case .topics: return "主题数"
+    case .members: return "成员数"
+    }
+  }
+}

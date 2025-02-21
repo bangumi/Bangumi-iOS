@@ -32,6 +32,14 @@ struct ChiiRakuenView: View {
           } header: {
             Text("小组话题")
           }
+          Divider()
+          Section {
+            NavigationLink(value: NavDestination.groupList) {
+              Text("小组列表")
+            }
+          } header: {
+            Text("小组")
+          }
         } label: {
           Image(systemName: "ellipsis.circle")
         }
