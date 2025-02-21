@@ -1,8 +1,9 @@
 import SwiftUI
 
 struct RakuenGroupTopicView: View {
+  let mode: GroupTopicFilterMode
+
   @State private var reloader = false
-  @State private var mode: GroupTopicFilterMode = .joined
 
   private func load(limit: Int, offset: Int) async -> PagedDTO<GroupTopicDTO>? {
     do {
@@ -17,14 +18,6 @@ struct RakuenGroupTopicView: View {
 
   var body: some View {
     ScrollView {
-      HStack {
-        Picker("Mode", selection: $mode) {
-          ForEach(GroupTopicFilterMode.allCases, id: \.self) { mode in
-            Text(mode.description).tag(mode)
-          }
-        }.pickerStyle(.menu)
-        Spacer()
-      }.padding(.horizontal, 8)
       PageView<GroupTopicDTO, _>(reloader: reloader, nextPageFunc: load) { topic in
         CardView {
           HStack(alignment: .top) {
@@ -48,15 +41,16 @@ struct RakuenGroupTopicView: View {
                   Spacer()
                   Text(topic.group.title)
                     .font(.footnote)
+                    .lineLimit(1)
                 }.buttonStyle(.plain)
               }
             }
             Spacer()
           }
         }
-      }.padding(8)
+      }.padding(.horizontal, 8)
     }
-    .navigationTitle("小组话题")
+    .navigationTitle(mode.description)
     .navigationBarTitleDisplayMode(.inline)
     .refreshable {
       reloader.toggle()

@@ -939,6 +939,20 @@ enum GroupTopicFilterMode: String, Codable, CaseIterable {
   }
 }
 
+enum SubjectTopicFilterMode: String, Codable, CaseIterable {
+  case trending = "trending"
+  case latest = "latest"
+
+  var description: String {
+    switch self {
+    case .trending:
+      return "热门条目讨论"
+    case .latest:
+      return "最新条目讨论"
+    }
+  }
+}
+
 /// TODO: use bangumi/common
 
 struct SubjectCategory: Identifiable {

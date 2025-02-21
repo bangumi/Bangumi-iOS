@@ -45,7 +45,7 @@ where C: View, T: Identifiable & Hashable & Codable & Sendable {
       loading = false
       return
     }
-    if resp.data.count < limit {
+    if resp.data.count == 0 {
       exhausted = true
     }
     let data = resp.data.enumerated().map { (idx, item) in

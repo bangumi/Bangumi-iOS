@@ -1,12 +1,20 @@
 import SwiftUI
 
 struct RakuenSubjectTopicView: View {
+  let mode: SubjectTopicFilterMode
+
   @State private var reloader = false
 
   private func load(limit: Int, offset: Int) async -> PagedDTO<SubjectTopicDTO>? {
     do {
-      let resp = try await Chii.shared.getTrendingSubjectTopics(limit: limit, offset: offset)
-      return resp
+      switch mode {
+      case .trending:
+        let resp = try await Chii.shared.getTrendingSubjectTopics(limit: limit, offset: offset)
+        return resp
+      case .latest:
+        let resp = try await Chii.shared.getRecentSubjectTopics(limit: limit, offset: offset)
+        return resp
+      }
     } catch {
       Notifier.shared.alert(error: error)
       return nil
@@ -38,15 +46,16 @@ struct RakuenSubjectTopicView: View {
                 NavigationLink(value: NavDestination.subject(topic.subject.id)) {
                   Text(topic.subject.name)
                     .font(.footnote)
+                    .lineLimit(1)
                 }.buttonStyle(.plain)
               }
             }
             Spacer()
           }
         }
-      }.padding(8)
+      }.padding(.horizontal, 8)
     }
-    .navigationTitle("条目讨论")
+    .navigationTitle(mode.description)
     .navigationBarTitleDisplayMode(.inline)
     .refreshable {
       reloader.toggle()

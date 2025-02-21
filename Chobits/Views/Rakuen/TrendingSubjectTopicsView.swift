@@ -9,7 +9,7 @@ struct TrendingSubjectTopicsView: View {
     defer { loading = false }
 
     do {
-      let resp = try await Chii.shared.getTrendingSubjectTopics(limit: 10)
+      let resp = try await Chii.shared.getTrendingSubjectTopics(limit: 6)
       topics = resp.data
     } catch {
       Notifier.shared.alert(error: error)
@@ -21,6 +21,7 @@ struct TrendingSubjectTopicsView: View {
       VStack(alignment: .leading, spacing: 2) {
         HStack {
           Text("热门条目讨论").font(.title2)
+          Spacer()
           if loading {
             ProgressView()
           } else {
@@ -32,10 +33,6 @@ struct TrendingSubjectTopicsView: View {
               Image(systemName: "arrow.counterclockwise.circle")
             }
           }
-          Spacer()
-          NavigationLink(value: NavDestination.rakuenSubjectTopics) {
-            Text("更多 »").font(.caption)
-          }.buttonStyle(.navLink)
         }
         Divider()
       }
@@ -49,7 +46,7 @@ struct TrendingSubjectTopicsView: View {
             Section {
               Text(topic.title.withLink(topic.link))
                 .font(.headline)
-                + Text("(+\(topic.replies))")
+                + Text("(+\(topic.replyCount))")
                 .font(.footnote)
                 .foregroundStyle(.secondary)
             }
@@ -66,9 +63,7 @@ struct TrendingSubjectTopicsView: View {
           }
           Spacer()
         }
-        if topics.last?.id != topic.id {
-          Divider()
-        }
+        Divider()
       }
     }
     .animation(.default, value: topics)

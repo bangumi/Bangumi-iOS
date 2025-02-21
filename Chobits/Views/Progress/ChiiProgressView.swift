@@ -167,7 +167,7 @@ struct ChiiProgressView: View {
             }
           }
         }
-        .searchable(text: $search)
+        .searchable(text: $search, placement: .navigationBarDrawer(displayMode: .always))
         .animation(.default, value: subjectType)
         .animation(.default, value: counts)
         .onGeometryChange(for: CGSize.self) { proxy in

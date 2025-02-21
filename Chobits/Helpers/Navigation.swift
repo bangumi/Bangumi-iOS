@@ -52,8 +52,8 @@ enum NavDestination: Hashable, View {
 
   case blog(_ blogId: Int)
 
-  case rakuenGroupTopics
-  case rakuenSubjectTopics
+  case rakuenGroupTopics(_ mode: GroupTopicFilterMode)
+  case rakuenSubjectTopics(_ mode: SubjectTopicFilterMode)
 
   var body: some View {
     switch self {
@@ -139,10 +139,10 @@ enum NavDestination: Hashable, View {
     case .subjectTopicDetail(let topicId):
       SubjectTopicDetailView(topicId: topicId)
 
-    case .rakuenGroupTopics:
-      RakuenGroupTopicView()
-    case .rakuenSubjectTopics:
-      RakuenSubjectTopicView()
+    case .rakuenGroupTopics(let mode):
+      RakuenGroupTopicView(mode: mode)
+    case .rakuenSubjectTopics(let mode):
+      RakuenSubjectTopicView(mode: mode)
     }
   }
 }
