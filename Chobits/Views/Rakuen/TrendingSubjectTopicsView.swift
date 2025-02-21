@@ -33,7 +33,9 @@ struct TrendingSubjectTopicsView: View {
             }
           }
           Spacer()
-          Text("更多 »").font(.caption)
+          NavigationLink(value: NavDestination.rakuenSubjectTopics) {
+            Text("更多 »").font(.caption)
+          }.buttonStyle(.navLink)
         }
         Divider()
       }

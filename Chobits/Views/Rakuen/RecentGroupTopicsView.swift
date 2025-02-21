@@ -33,7 +33,9 @@ struct RecentGroupTopicsView: View {
             }
           }
           Spacer()
-          Text("更多 »").font(.caption)
+          NavigationLink(value: NavDestination.rakuenGroupTopics) {
+            Text("更多 »").font(.caption)
+          }.buttonStyle(.navLink)
         }
         Divider()
       }

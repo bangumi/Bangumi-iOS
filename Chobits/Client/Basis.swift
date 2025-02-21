@@ -919,11 +919,24 @@ enum GroupMemberRole: Int, Codable, CaseIterable {
   }
 }
 
-enum GroupTopicFilterMode: String, Codable {
+enum GroupTopicFilterMode: String, Codable, CaseIterable {
   case all = "all"
   case joined = "joined"
   case created = "created"
   case replied = "replied"
+
+  var description: String {
+    switch self {
+    case .all:
+      return "所有小组的最新话题"
+    case .joined:
+      return "我参加的小组的最新话题"
+    case .created:
+      return "我发表的话题"
+    case .replied:
+      return "我回复的话题"
+    }
+  }
 }
 
 /// TODO: use bangumi/common

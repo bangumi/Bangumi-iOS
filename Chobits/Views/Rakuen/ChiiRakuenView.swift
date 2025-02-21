@@ -1,7 +1,6 @@
 import SwiftUI
 
 struct ChiiRakuenView: View {
-
   var body: some View {
     ScrollView {
       VStack {

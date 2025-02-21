@@ -52,6 +52,9 @@ enum NavDestination: Hashable, View {
 
   case blog(_ blogId: Int)
 
+  case rakuenGroupTopics
+  case rakuenSubjectTopics
+
   var body: some View {
     switch self {
     case .setting:
@@ -135,6 +138,11 @@ enum NavDestination: Hashable, View {
       BlogView(blogId: blogId)
     case .subjectTopicDetail(let topicId):
       SubjectTopicDetailView(topicId: topicId)
+
+    case .rakuenGroupTopics:
+      RakuenGroupTopicView()
+    case .rakuenSubjectTopics:
+      RakuenSubjectTopicView()
     }
   }
 }
