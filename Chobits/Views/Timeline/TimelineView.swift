@@ -78,7 +78,7 @@ struct TimelineView: View {
       }
     }
     .sheet(isPresented: $showCommentBox) {
-      CommentReplyBoxView(type: .timeline(item.id))
+      CreateCommentBoxView(type: .timeline(item.id))
         .presentationDetents([.large])
     }
   }

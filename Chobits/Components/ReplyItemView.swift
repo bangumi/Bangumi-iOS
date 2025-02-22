@@ -135,11 +135,11 @@ struct ReplyItemNormalView: View {
         }
       }
       .sheet(isPresented: $showReplyBox) {
-        ReplyBoxView(type: type, topicId: topicId, reply: idx == 0 ? nil : reply)
+        CreateReplyBoxView(type: type, topicId: topicId, reply: idx == 0 ? nil : reply)
           .presentationDetents([.large])
       }
       .sheet(isPresented: $showEditBox) {
-        ReplyBoxView(type: type, topicId: topicId, reply: reply, isEdit: true)
+        EditReplyBoxView(type: type, topicId: topicId, reply: reply)
           .presentationDetents([.large])
       }
       .alert("确认删除", isPresented: $showDeleteConfirm) {
@@ -282,11 +282,11 @@ struct SubReplyNormalView: View {
       }
     }
     .sheet(isPresented: $showReplyBox) {
-      ReplyBoxView(type: type, topicId: topicId, reply: reply, subreply: subreply)
+      CreateReplyBoxView(type: type, topicId: topicId, reply: reply, subreply: subreply)
         .presentationDetents([.large])
     }
     .sheet(isPresented: $showEditBox) {
-      ReplyBoxView(type: type, topicId: topicId, reply: reply, subreply: subreply, isEdit: true)
+      EditReplyBoxView(type: type, topicId: topicId, reply: reply, subreply: subreply)
         .presentationDetents([.large])
     }
     .alert("确认删除", isPresented: $showDeleteConfirm) {
@@ -309,12 +309,11 @@ struct SubReplyNormalView: View {
   }
 }
 
-struct ReplyBoxView: View {
+struct CreateReplyBoxView: View {
   let type: TopicParentType
   let topicId: Int
   let reply: ReplyDTO?
   let subreply: ReplyBaseDTO?
-  let isEdit: Bool
 
   @Environment(\.dismiss) private var dismiss
 
@@ -322,85 +321,49 @@ struct ReplyBoxView: View {
   @State private var token: String = ""
   @State private var updating: Bool = false
 
-  init(
-    type: TopicParentType, topicId: Int, reply: ReplyDTO? = nil, subreply: ReplyBaseDTO? = nil,
-    isEdit: Bool = false
-  ) {
+  var title: String {
+    if let subreply = subreply {
+      return "回复 \(subreply.creator?.nickname ?? "用户 \(subreply.creatorID)")"
+    } else if let reply = reply {
+      return "回复 \(reply.creator?.nickname ?? "用户 \(reply.creatorID)")"
+    } else {
+      return "添加新回复"
+    }
+  }
+
+  init(type: TopicParentType, topicId: Int, reply: ReplyDTO? = nil, subreply: ReplyBaseDTO? = nil) {
     self.type = type
     self.topicId = topicId
     self.reply = reply
     self.subreply = subreply
-    self.isEdit = isEdit
-    if isEdit {
-      _content = State(initialValue: subreply?.content ?? reply?.content ?? "")
-    }
   }
 
   func postReply(content: String) async {
     do {
       updating = true
       var content = content
-      if !isEdit, let subreply = subreply {
+      if let subreply = subreply {
         let quoteUser = subreply.creator?.nickname ?? "用户 \(subreply.creatorID)"
         let quoteContent = try BBCode().plain(subreply.content)
         let quote = "[quote][b]\(quoteUser)[/b]说: \(quoteContent)[/quote]\n"
         content = quote + content
       }
-      if isEdit {
-        let postId: Int
-        if let subreply = subreply {
-          postId = subreply.id
-        } else if let reply = reply {
-          postId = reply.id
-        } else {
-          Notifier.shared.alert(message: "找不到要编辑的回复")
-          return
-        }
-        switch type {
-        case .subject:
-          try await Chii.shared.editSubjectPost(postId: postId, content: content)
-        case .group:
-          try await Chii.shared.editGroupPost(postId: postId, content: content)
-        }
-        Notifier.shared.notify(message: "编辑成功")
-      } else {
-        switch type {
-        case .subject:
-          try await Chii.shared.createSubjectReply(
-            topicId: topicId, content: content,
-            replyTo: reply?.id, token: token)
-        case .group:
-          try await Chii.shared.createGroupReply(
-            topicId: topicId, content: content,
-            replyTo: reply?.id, token: token)
-        }
-        Notifier.shared.notify(message: "回复成功")
+      switch type {
+      case .subject:
+        try await Chii.shared.createSubjectReply(
+          topicId: topicId, content: content,
+          replyTo: reply?.id, token: token)
+      case .group:
+        try await Chii.shared.createGroupReply(
+          topicId: topicId, content: content,
+          replyTo: reply?.id, token: token)
       }
+      Notifier.shared.notify(message: "回复成功")
       dismiss()
     } catch {
       Notifier.shared.alert(error: error)
     }
     updating = false
-  }
-
-  var title: String {
-    if isEdit {
-      if subreply != nil {
-        return "编辑回复"
-      } else if reply != nil {
-        return "编辑回复"
-      } else {
-        return "编辑"
-      }
-    } else {
-      if let subreply = subreply {
-        return "回复 \(subreply.creator?.nickname ?? "用户 \(subreply.creatorID)")"
-      } else if let reply = reply {
-        return "回复 \(reply.creator?.nickname ?? "用户 \(reply.creatorID)")"
-      } else {
-        return "添加新回复"
-      }
-    }
   }
 
   var body: some View {
@@ -423,16 +386,101 @@ struct ReplyBoxView: View {
               await postReply(content: content)
             }
           } label: {
-            Label(isEdit ? "保存" : "发送", systemImage: isEdit ? "checkmark" : "paperplane")
+            Label("发送", systemImage: "paperplane")
           }
-          .disabled(content.isEmpty || (!isEdit && token.isEmpty) || updating)
+          .disabled(content.isEmpty || token.isEmpty || updating)
           .buttonStyle(.borderedProminent)
         }
-        TextInputView(type: isEdit ? "内容" : "回复", text: $content)
+        TextInputView(type: "回复", text: $content)
           .textInputStyle(bbcode: true)
-        if !isEdit {
-          TrunstileView(token: $token).frame(height: 65)
+        TrunstileView(token: $token).frame(height: 65)
+      }.padding()
+    }
+  }
+}
+
+struct EditReplyBoxView: View {
+  let type: TopicParentType
+  let topicId: Int
+  let reply: ReplyDTO?
+  let subreply: ReplyBaseDTO?
+
+  @Environment(\.dismiss) private var dismiss
+
+  @State private var content: String
+  @State private var updating: Bool = false
+
+  init(type: TopicParentType, topicId: Int, reply: ReplyDTO? = nil, subreply: ReplyBaseDTO? = nil) {
+    self.type = type
+    self.topicId = topicId
+    self.reply = reply
+    self.subreply = subreply
+    _content = State(initialValue: subreply?.content ?? reply?.content ?? "")
+  }
+
+  func editReply(content: String) async {
+    do {
+      updating = true
+      let postId: Int
+      if let subreply = subreply {
+        postId = subreply.id
+      } else if let reply = reply {
+        postId = reply.id
+      } else {
+        Notifier.shared.alert(message: "找不到要编辑的回复")
+        return
+      }
+      switch type {
+      case .subject:
+        try await Chii.shared.editSubjectPost(postId: postId, content: content)
+      case .group:
+        try await Chii.shared.editGroupPost(postId: postId, content: content)
+      }
+      Notifier.shared.notify(message: "编辑成功")
+      dismiss()
+    } catch {
+      Notifier.shared.alert(error: error)
+    }
+    updating = false
+  }
+
+  var title: String {
+    if subreply != nil {
+      return "编辑回复"
+    } else if reply != nil {
+      return "编辑回复"
+    } else {
+      return "编辑"
+    }
+  }
+
+  var body: some View {
+    ScrollView {
+      VStack {
+        Text(title)
+          .font(.headline)
+          .lineLimit(1)
+        HStack {
+          Button {
+            dismiss()
+          } label: {
+            Label("取消", systemImage: "xmark")
+          }
+          .disabled(updating)
+          .buttonStyle(.bordered)
+          Spacer()
+          Button {
+            Task {
+              await editReply(content: content)
+            }
+          } label: {
+            Label("保存", systemImage: "checkmark")
+          }
+          .disabled(content.isEmpty || updating)
+          .buttonStyle(.borderedProminent)
         }
+        TextInputView(type: "内容", text: $content)
+          .textInputStyle(bbcode: true)
       }.padding()
     }
   }

@@ -101,7 +101,7 @@ struct BlogView: View {
           }
         }
         .sheet(isPresented: $showCommentBox) {
-          CommentReplyBoxView(type: .blog(blogId))
+          CreateCommentBoxView(type: .blog(blogId))
             .presentationDetents([.large])
         }
       } else if refreshed {

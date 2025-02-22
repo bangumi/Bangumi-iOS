@@ -171,11 +171,11 @@ struct CommentItemNormalView: View {
       }
     }
     .sheet(isPresented: $showReplyBox) {
-      CommentReplyBoxView(type: type, comment: comment)
+      CreateCommentBoxView(type: type, comment: comment)
         .presentationDetents([.large])
     }
     .sheet(isPresented: $showEditBox) {
-      CommentReplyBoxView(type: type, comment: comment, isEdit: true)
+      EditCommentBoxView(type: type, comment: comment)
         .presentationDetents([.large])
     }
     .alert("确认删除", isPresented: $showDeleteConfirm) {
@@ -301,11 +301,11 @@ struct CommentSubReplyNormalView: View {
       }
     }
     .sheet(isPresented: $showReplyBox) {
-      CommentReplyBoxView(type: type, comment: comment, reply: reply)
+      CreateCommentBoxView(type: type, comment: comment, reply: reply)
         .presentationDetents([.large])
     }
     .sheet(isPresented: $showEditBox) {
-      CommentReplyBoxView(type: type, comment: comment, reply: reply, isEdit: true)
+      EditCommentBoxView(type: type, comment: comment, reply: reply)
         .presentationDetents([.large])
     }
     .alert("确认删除", isPresented: $showDeleteConfirm) {
@@ -328,11 +328,10 @@ struct CommentSubReplyNormalView: View {
   }
 }
 
-struct CommentReplyBoxView: View {
+struct CreateCommentBoxView: View {
   let type: CommentParentType
   let comment: CommentDTO?
   let reply: CommentBaseDTO?
-  let isEdit: Bool
 
   @Environment(\.dismiss) private var dismiss
 
@@ -340,69 +339,39 @@ struct CommentReplyBoxView: View {
   @State private var token: String = ""
   @State private var updating: Bool = false
 
-  init(
-    type: CommentParentType, comment: CommentDTO? = nil, reply: CommentBaseDTO? = nil,
-    isEdit: Bool = false
-  ) {
+  var title: String {
+    if let reply = reply {
+      return "回复 \(reply.user?.nickname ?? "用户 \(reply.creatorID)")"
+    } else if let comment = comment {
+      return "回复 \(comment.user.nickname)"
+    } else {
+      return "回复 \(type.title)"
+    }
+  }
+
+  init(type: CommentParentType, comment: CommentDTO? = nil, reply: CommentBaseDTO? = nil) {
     self.type = type
     self.comment = comment
     self.reply = reply
-    self.isEdit = isEdit
-    if isEdit {
-      _content = State(initialValue: reply?.content ?? comment?.content ?? "")
-    }
   }
 
   func postReply(content: String) async {
     do {
       updating = true
       var content = content
-      if !isEdit, let reply = reply {
+      if let reply = reply {
         let quoteUser = reply.user?.nickname ?? "用户 \(reply.creatorID)"
         let quoteContent = try BBCode().plain(reply.content)
         let quote = "[quote][b]\(quoteUser)[/b]说: \(quoteContent)[/quote]\n"
         content = quote + content
       }
-      if isEdit {
-        let commentId: Int
-        if let reply = reply {
-          commentId = reply.id
-        } else if let comment = comment {
-          commentId = comment.id
-        } else {
-          Notifier.shared.alert(message: "找不到要编辑的评论")
-          return
-        }
-        try await type.edit(commentId: commentId, content: content)
-      } else {
-        try await type.reply(commentId: comment?.id, content: content, token: token)
-      }
-      Notifier.shared.notify(message: isEdit ? "编辑成功" : "回复成功")
+      try await type.reply(commentId: comment?.id, content: content, token: token)
+      Notifier.shared.notify(message: "回复成功")
       dismiss()
     } catch {
       Notifier.shared.alert(error: error)
     }
     updating = false
-  }
-
-  var title: String {
-    if isEdit {
-      if reply != nil {
-        return "编辑回复"
-      } else if comment != nil {
-        return "编辑评论"
-      } else {
-        return "编辑"
-      }
-    } else {
-      if let reply = reply {
-        return "回复 \(reply.user?.nickname ?? "用户 \(reply.creatorID)")"
-      } else if let comment = comment {
-        return "回复 \(comment.user.nickname)"
-      } else {
-        return "回复 \(type.title)"
-      }
-    }
   }
 
   var body: some View {
@@ -425,14 +394,94 @@ struct CommentReplyBoxView: View {
               await postReply(content: content)
             }
           } label: {
-            Label(isEdit ? "保存" : "发送", systemImage: isEdit ? "checkmark" : "paperplane")
+            Label("发送", systemImage: "paperplane")
           }
           .disabled(content.isEmpty || token.isEmpty || updating)
           .buttonStyle(.borderedProminent)
         }
-        TextInputView(type: isEdit ? "内容" : "回复", text: $content)
+        TextInputView(type: "回复", text: $content)
           .textInputStyle(bbcode: true)
         TrunstileView(token: $token).frame(height: 65)
+      }.padding()
+    }
+  }
+}
+
+struct EditCommentBoxView: View {
+  let type: CommentParentType
+  let comment: CommentDTO?
+  let reply: CommentBaseDTO?
+
+  @Environment(\.dismiss) private var dismiss
+
+  @State private var content: String
+  @State private var updating: Bool = false
+
+  var title: String {
+    if reply != nil {
+      return "编辑回复"
+    } else if comment != nil {
+      return "编辑评论"
+    } else {
+      return "编辑"
+    }
+  }
+
+  init(type: CommentParentType, comment: CommentDTO? = nil, reply: CommentBaseDTO? = nil) {
+    self.type = type
+    self.comment = comment
+    self.reply = reply
+    _content = State(initialValue: reply?.content ?? comment?.content ?? "")
+  }
+
+  func editComment(content: String) async {
+    do {
+      updating = true
+      let commentId: Int
+      if let reply = reply {
+        commentId = reply.id
+      } else if let comment = comment {
+        commentId = comment.id
+      } else {
+        Notifier.shared.alert(message: "找不到要编辑的评论")
+        return
+      }
+      try await type.edit(commentId: commentId, content: content)
+      Notifier.shared.notify(message: "编辑成功")
+      dismiss()
+    } catch {
+      Notifier.shared.alert(error: error)
+    }
+    updating = false
+  }
+
+  var body: some View {
+    ScrollView {
+      VStack {
+        Text(title)
+          .font(.headline)
+          .lineLimit(1)
+        HStack {
+          Button {
+            dismiss()
+          } label: {
+            Label("取消", systemImage: "xmark")
+          }
+          .disabled(updating)
+          .buttonStyle(.bordered)
+          Spacer()
+          Button {
+            Task {
+              await editComment(content: content)
+            }
+          } label: {
+            Label("保存", systemImage: "checkmark")
+          }
+          .disabled(content.isEmpty || updating)
+          .buttonStyle(.borderedProminent)
+        }
+        TextInputView(type: "内容", text: $content)
+          .textInputStyle(bbcode: true)
       }.padding()
     }
   }

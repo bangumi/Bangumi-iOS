@@ -89,7 +89,7 @@ struct PersonView: View {
           }
         }
         .sheet(isPresented: $showCommentBox) {
-          CommentReplyBoxView(type: .person(personId))
+          CreateCommentBoxView(type: .person(personId))
             .presentationDetents([.large])
         }
       } else if refreshed {

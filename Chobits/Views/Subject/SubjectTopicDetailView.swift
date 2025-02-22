@@ -75,7 +75,7 @@ struct SubjectTopicDetailView: View {
           }
         }
         .sheet(isPresented: $showReplyBox) {
-          ReplyBoxView(type: .subject, topicId: topicId)
+          CreateReplyBoxView(type: .subject, topicId: topicId)
             .presentationDetents([.large])
         }
       } else if refreshed {

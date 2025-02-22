@@ -89,7 +89,7 @@ struct CharacterView: View {
           }
         }
         .sheet(isPresented: $showCommentBox) {
-          CommentReplyBoxView(type: .character(characterId))
+          CreateCommentBoxView(type: .character(characterId))
             .presentationDetents([.large])
         }
       } else if refreshed {

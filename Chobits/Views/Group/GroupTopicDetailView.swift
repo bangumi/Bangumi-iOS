@@ -75,7 +75,7 @@ struct GroupTopicDetailView: View {
           }
         }
         .sheet(isPresented: $showReplyBox) {
-          ReplyBoxView(type: .group, topicId: topicId)
+          CreateReplyBoxView(type: .group, topicId: topicId)
             .presentationDetents([.large])
         }
       } else if refreshed {
