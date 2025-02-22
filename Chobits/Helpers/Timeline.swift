@@ -163,31 +163,38 @@ extension TimelineDTO {
             text += person.name.withLink(person.link)
           }
         case 1:
+          text += AttributedString("收藏了 ")
           if self.batch {
-            if mono.characters.count > 0 {
-              text += AttributedString("收藏了 ")
-              text += genBatch(mono.characters)
-              text += AttributedString(" \(mono.characters.count) 个角色")
-            } else if mono.persons.count > 0 {
-              text += AttributedString("收藏了 ")
-              text += genBatch(mono.persons)
-              text += AttributedString(" \(mono.persons.count) 个人物")
+            if mono.characters.count + mono.persons.count > 0 {
+              var items: [LinkableDTO] = []
+              for character in mono.characters {
+                items.append(LinkableDTO(name: character.name, link: character.link))
+              }
+              for person in mono.persons {
+                items.append(LinkableDTO(name: person.name, link: person.link))
+              }
+              text += genBatch(items)
+              if mono.persons.count > 0 {
+                text += AttributedString(" \(mono.persons.count + mono.characters.count) 个人物")
+              } else {
+                text += AttributedString(" \(mono.characters.count) 个角色")
+              }
             } else {
-              text += AttributedString(" 没有收藏角色或人物")
+              text += self.unknown("人物")
             }
           } else {
-            text += AttributedString("收藏了")
             if let character = mono.characters.first {
               text += AttributedString("角色 ")
               text += character.name.withLink(character.link)
-            }
-            if let person = mono.persons.first {
+            } else if let person = mono.persons.first {
               text += AttributedString("人物 ")
               text += person.name.withLink(person.link)
+            } else {
+              text += self.unknown("人物")
             }
           }
         default:
-          text += self.unknown("人物")
+          text += self.unknown("人物操作")
         }
       } else {
         text += self.unknown("人物")

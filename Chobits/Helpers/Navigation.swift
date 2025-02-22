@@ -7,6 +7,11 @@ protocol Linkable {
   var link: String { get }
 }
 
+struct LinkableDTO: Codable, Hashable, Linkable {
+  var name: String
+  var link: String
+}
+
 enum NavDestination: Hashable, View {
   case setting
   case notice
