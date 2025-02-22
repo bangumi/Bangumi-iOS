@@ -20,35 +20,13 @@ struct TrendingSubjectTopicsView: View {
     ScrollView {
       LazyVStack {
         ForEach(topics, id: \.id) { topic in
-          HStack(alignment: .top) {
-            ImageView(img: topic.creator?.avatar?.large)
-              .imageStyle(width: 40, height: 40)
-              .imageType(.avatar)
-              .imageLink(topic.link)
-            VStack(alignment: .leading) {
-              Section {
-                Text(topic.title.withLink(topic.link))
-                  .font(.headline)
-                  + Text("(+\(topic.replyCount))")
-                  .font(.footnote)
-                  .foregroundStyle(.secondary)
-              }
-              HStack {
-                topic.updatedAt.relativeText
-                  .font(.caption)
-                  .foregroundStyle(.secondary)
-                Spacer()
-                NavigationLink(value: NavDestination.subject(topic.subject.id)) {
-                  Text(topic.subject.name)
-                    .font(.footnote)
-                }.buttonStyle(.plain)
-              }
-            }
-            Spacer()
+          CardView {
+            SubjectTopicItemView(topic: topic)
           }
-          Divider()
         }
-      }.padding(.horizontal, 8)
+      }
+      .padding(.vertical, 4)
+      .padding(.horizontal, 8)
     }
     .animation(.default, value: topics)
     .onAppear {
@@ -60,6 +38,39 @@ struct TrendingSubjectTopicsView: View {
     }
     .refreshable {
       await load()
+    }
+  }
+}
+
+struct SubjectTopicItemView: View {
+  let topic: SubjectTopicDTO
+
+  var body: some View {
+    HStack(alignment: .top) {
+      ImageView(img: topic.creator?.avatar?.large)
+        .imageStyle(width: 40, height: 40)
+        .imageType(.avatar)
+        .imageLink(topic.link)
+      VStack(alignment: .leading) {
+        Section {
+          Text(topic.title.withLink(topic.link))
+            .font(.headline)
+            + Text("(+\(topic.replyCount))")
+            .font(.footnote)
+            .foregroundStyle(.secondary)
+        }
+        HStack {
+          topic.updatedAt.relativeText
+            .font(.caption)
+            .foregroundStyle(.secondary)
+          Spacer()
+          NavigationLink(value: NavDestination.subject(topic.subject.id)) {
+            Text(topic.subject.name)
+              .font(.footnote)
+          }.buttonStyle(.plain)
+        }
+      }
+      Spacer()
     }
   }
 }

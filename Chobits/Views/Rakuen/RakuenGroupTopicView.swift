@@ -20,33 +20,7 @@ struct RakuenGroupTopicView: View {
     ScrollView {
       PageView<GroupTopicDTO, _>(reloader: reloader, nextPageFunc: load) { topic in
         CardView {
-          HStack(alignment: .top) {
-            ImageView(img: topic.creator?.avatar?.large)
-              .imageStyle(width: 40, height: 40)
-              .imageType(.avatar)
-              .imageLink(topic.link)
-            VStack(alignment: .leading) {
-              Section {
-                Text(topic.title.withLink(topic.link))
-                  .font(.headline)
-                  + Text("(+\(topic.replyCount))")
-                  .font(.footnote)
-                  .foregroundStyle(.secondary)
-              }
-              HStack {
-                topic.updatedAt.relativeText
-                  .font(.caption)
-                  .foregroundStyle(.secondary)
-                NavigationLink(value: NavDestination.group(topic.group.name)) {
-                  Spacer()
-                  Text(topic.group.title)
-                    .font(.footnote)
-                    .lineLimit(1)
-                }.buttonStyle(.plain)
-              }
-            }
-            Spacer()
-          }
+          GroupTopicItemView(topic: topic)
         }
       }.padding(.horizontal, 8)
     }
