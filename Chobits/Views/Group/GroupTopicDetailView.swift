@@ -61,7 +61,7 @@ struct GroupTopicDetailView: View {
                 ReplyItemView(
                   type: .group, topicId: topicId, idx: idx,
                   reply: reply, author: topic.creator)
-                if idx <= topic.replies.count - 1 {
+                if reply.id != topic.replies.last?.id {
                   Divider()
                 }
               }
