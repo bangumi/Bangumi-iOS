@@ -96,10 +96,12 @@ struct EpisodeGridView: View {
     HFlow(alignment: .center, spacing: 2) {
       ForEach(episodeMains) { episode in
         Text("\(episode.sort.episodeDisplay)")
-          .foregroundStyle(Color(hex: episode.textColor))
+          .monospacedDigit()
+          .foregroundStyle(episode.textColor)
           .padding(3)
-          .background(Color(hex: episode.backgroundColor))
-          .border(Color(hex: episode.borderColor), width: 1)
+          .background(episode.backgroundColor)
+          .border(episode.borderColor, width: 1)
+          .episodeTrend(episode)
           .padding(2)
           .strikethrough(episode.status == EpisodeCollectionType.dropped.rawValue)
           .contextMenu {
@@ -149,10 +151,12 @@ struct EpisodeGridView: View {
           .bold()
         ForEach(episodeSps) { episode in
           Text("\(episode.sort.episodeDisplay)")
-            .foregroundStyle(Color(hex: episode.textColor))
+            .monospacedDigit()
+            .foregroundStyle(episode.textColor)
             .padding(3)
-            .background(Color(hex: episode.backgroundColor))
-            .border(Color(hex: episode.borderColor), width: 1)
+            .background(episode.backgroundColor)
+            .border(episode.borderColor, width: 1)
+            .episodeTrend(episode)
             .padding(2)
             .strikethrough(episode.status == EpisodeCollectionType.dropped.rawValue)
             .contextMenu {
@@ -194,6 +198,25 @@ struct EpisodeGridView: View {
     )
     .animation(.default, value: episodeMains)
     .animation(.default, value: episodeSps)
+  }
+}
+
+extension View {
+  @ViewBuilder
+  func episodeTrend(_ episode: Episode) -> some View {
+    @AppStorage("showEpisodeTrends") var showEpisodeTrends: Bool = true
+    if showEpisodeTrends {
+      self
+        .padding(.bottom, 2)
+        .overlay(alignment: .bottomLeading) {
+          Rectangle()
+            .frame(height: 2)
+            .foregroundStyle(episode.trendColor)
+            .offset(x: 0, y: 0)
+        }
+    } else {
+      self
+    }
   }
 }
 

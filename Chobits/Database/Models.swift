@@ -634,55 +634,67 @@ final class EpisodeV2: Linkable {
     }
   }
 
-  var borderColor: Int {
+  var borderColor: Color {
+    var hex = 0x666666
     switch self.collectionTypeEnum {
     case .none:
       if air > Date() || air.timeIntervalSince1970 == 0 {
-        return 0x909090
+        hex = 0x909090
       } else {
-        return 0x00A8FF
+        hex = 0x00A8FF
       }
     case .wish:
-      return 0xFF2293
+      hex = 0xFF2293
     case .collect:
-      return 0x1175a8
+      hex = 0x1175a8
     case .dropped:
-      return 0x666666
+      hex = 0x666666
     }
+    return Color(hex: hex)
   }
 
-  var backgroundColor: Int {
+  var backgroundColor: Color {
+    var hex = 0xCCCCCC
     switch self.collectionTypeEnum {
     case .none:
       if air > Date() || air.timeIntervalSince1970 == 0 {
-        return 0xe0e0e0
+        hex = 0xe0e0e0
       } else {
-        return 0xDAEAFF
+        hex = 0xDAEAFF
       }
     case .wish:
-      return 0xFFADD1
+      hex = 0xFFADD1
     case .collect:
-      return 0x4897ff
+      hex = 0x4897ff
     case .dropped:
-      return 0xCCCCCC
+      hex = 0xCCCCCC
     }
+    return Color(hex: hex)
   }
 
-  var textColor: Int {
+  var textColor: Color {
+    var hex = 0xFFFFFF
     switch self.collectionTypeEnum {
     case .none:
       if air > Date() || air.timeIntervalSince1970 == 0 {
-        return 0x909090
+        hex = 0x909090
       } else {
-        return 0x0066CC
+        hex = 0x0066CC
       }
     case .wish:
-      return 0xFF2293
+      hex = 0xFF2293
     case .collect:
-      return 0xFFFFFF
+      hex = 0xFFFFFF
     case .dropped:
-      return 0xFFFFFF
+      hex = 0xFFFFFF
     }
+    return Color(hex: hex)
+  }
+
+  var trendColor: Color {
+    let base: Double = 100.0  // 基准评论数，用于调整曲线斜率
+    let ratio = 1.0 - exp(-Double(comment) / base)
+    return Color(hex: 0xFF8040, opacity: ratio)
   }
 
   func update(_ item: EpisodeDTO) {

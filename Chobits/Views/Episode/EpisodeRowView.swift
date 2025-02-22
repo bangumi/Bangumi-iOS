@@ -16,16 +16,16 @@ struct EpisodeRowView: View {
         .lineLimit(1)
       HStack {
         if isAuthenticated && episode.collectionTypeEnum != .none {
-          BorderView(color: Color(hex: episode.borderColor), padding: 4) {
+          BorderView(color: episode.borderColor, padding: 4) {
             Text("\(episode.collectionTypeEnum.description)")
-              .foregroundStyle(Color(hex: episode.textColor))
+              .foregroundStyle(episode.textColor)
               .font(.footnote)
           }
           .padding(2)
           .strikethrough(episode.status == EpisodeCollectionType.dropped.rawValue)
           .background {
             RoundedRectangle(cornerRadius: 5)
-              .fill(Color(hex: episode.backgroundColor))
+              .fill(episode.backgroundColor)
           }
         } else {
           if episode.typeEnum == .main {

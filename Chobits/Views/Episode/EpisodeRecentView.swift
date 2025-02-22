@@ -88,10 +88,12 @@ struct EpisodeRecentView: View {
       HStack(spacing: 2) {
         ForEach(recentEpisodes) { episode in
           Text("\(episode.sort.episodeDisplay)")
-            .foregroundStyle(Color(hex: episode.textColor))
+            .monospacedDigit()
+            .foregroundStyle(episode.textColor)
             .padding(2)
-            .background(Color(hex: episode.backgroundColor))
-            .border(Color(hex: episode.borderColor), width: 1)
+            .background(episode.backgroundColor)
+            .border(episode.borderColor, width: 1)
+            .episodeTrend(episode)
             .padding(2)
             .strikethrough(episode.status == EpisodeCollectionType.dropped.rawValue)
             .contextMenu {

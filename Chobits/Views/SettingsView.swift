@@ -12,6 +12,7 @@ struct SettingsView: View {
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
   @AppStorage("isolationMode") var isolationMode: Bool = false
   @AppStorage("showNSFWBadge") var showNSFWBadge: Bool = true
+  @AppStorage("showEpisodeTrends") var showEpisodeTrends: Bool = true
 
   @Environment(\.modelContext) var modelContext
 
@@ -94,12 +95,15 @@ struct SettingsView: View {
         }
       }
 
-      Section(header: Text("特殊")) {
+      Section(header: Text("其它")) {
         Toggle(isOn: $showNSFWBadge) {
           Text("显示 NSFW 标记")
         }
         Toggle(isOn: $isolationMode) {
           Text("社恐模式")
+        }
+        Toggle(isOn: $showEpisodeTrends) {
+          Text("显示章节热度")
         }
       }
 
