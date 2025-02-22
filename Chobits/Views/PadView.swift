@@ -14,9 +14,6 @@ struct PadView: View {
   @State private var discoverNav: NavigationPath = NavigationPath()
   @State private var rakuenNav: NavigationPath = NavigationPath()
 
-  @State private var searchQuery: String = ""
-  @State private var searching: Bool = false
-
   @State private var profile: SlimUserDTO?
 
   init() {
@@ -80,15 +77,9 @@ struct PadView: View {
 
       Tab(ChiiViewTab.discover.title, systemImage: ChiiViewTab.discover.icon, value: .discover) {
         NavigationStack(path: $discoverNav) {
-          Section {
-            if searching {
-              SearchView(text: $searchQuery, searching: $searching)
-            } else {
-              ChiiDiscoverView()
-            }
-          }.navigationDestination(for: NavDestination.self) { $0 }
+          ChiiDiscoverView()
+            .navigationDestination(for: NavDestination.self) { $0 }
         }
-        .searchable(text: $searchQuery, isPresented: $searching, placement: .toolbar)
         .environment(
           \.openURL,
           OpenURLAction { url in

@@ -17,24 +17,25 @@ struct TrendingSubjectView: View {
 
   var body: some View {
     VStack(spacing: 5) {
-      HStack(alignment: .bottom) {
-        Text("热门")
-        Picker("SubjectType", selection: $type) {
-          ForEach(SubjectType.allTypes) { st in
-            Text(st.description).tag(st)
-          }
+      Picker("SubjectType", selection: $type) {
+        ForEach(SubjectType.allTypes) { st in
+          Text(st.description).tag(st)
         }
-        .pickerStyle(.menu)
-        .task(load)
-        .onChange(of: type) {
-          Task {
-            await load()
-          }
+      }
+      .pickerStyle(.segmented)
+      .padding(.horizontal, 8)
+      .task(load)
+      .onChange(of: type) {
+        Task {
+          await load()
         }
-        Spacer()
-      }.font(.title)
-
-      TrendingSubjectTypeView(type: type, width: width)
+      }
+      TabView(selection: $type) {
+        ForEach(SubjectType.allTypes) { st in
+          TrendingSubjectTypeView(type: st, width: width)
+            .tag(st)
+        }
+      }.tabViewStyle(.page)
     }
     .animation(.default, value: type)
     .onGeometryChange(for: CGSize.self) { proxy in
@@ -119,57 +120,59 @@ struct TrendingSubjectTypeView: View {
   }
 
   var body: some View {
-    VStack(spacing: 5) {
-      if items.isEmpty {
-        ProgressView()
-      } else {
-        LazyVGrid(columns: largeColumns, spacing: 8) {
-          ForEach(largeItems) { item in
-            ImageView(img: item.subject.images?.resize(.r800))
-              .imageStyle(width: largeCardWidth, height: largeCardWidth * 1.2)
-              .imageType(.subject)
-              .imageCaption {
-                Text(item.subject.name)
-                  .multilineTextAlignment(.leading)
-                  .truncationMode(.middle)
-                  .lineLimit(2)
-                  .font(.body)
-                  .padding(8)
-              }
-              .imageBadge(show: item.count > 10) {
-                Text("\(item.count) 人关注")
-                  .font(.callout)
-              }
-              .imageLink(item.subject.link)
-              .padding(8)
-              .shadow(color: Color.black.opacity(0.2), radius: 4)
-              .subjectPreview(item.subject)
+    ScrollView {
+      VStack(spacing: 5) {
+        if items.isEmpty {
+          ProgressView()
+        } else {
+          LazyVGrid(columns: largeColumns, spacing: 8) {
+            ForEach(largeItems) { item in
+              ImageView(img: item.subject.images?.resize(.r800))
+                .imageStyle(width: largeCardWidth, height: largeCardWidth * 1.2)
+                .imageType(.subject)
+                .imageCaption {
+                  Text(item.subject.name)
+                    .multilineTextAlignment(.leading)
+                    .truncationMode(.middle)
+                    .lineLimit(2)
+                    .font(.body)
+                    .padding(8)
+                }
+                .imageBadge(show: item.count > 10) {
+                  Text("\(item.count) 人关注")
+                    .font(.callout)
+                }
+                .imageLink(item.subject.link)
+                .padding(8)
+                .shadow(color: Color.black.opacity(0.2), radius: 4)
+                .subjectPreview(item.subject)
+            }
+          }
+          LazyVGrid(columns: smallColumns, spacing: 8) {
+            ForEach(smallItems) { item in
+              ImageView(img: item.subject.images?.resize(.r400))
+                .imageStyle(width: smallCardWidth, height: smallCardWidth * 1.3)
+                .imageType(.subject)
+                .imageCaption {
+                  Text(item.subject.name)
+                    .multilineTextAlignment(.leading)
+                    .truncationMode(.middle)
+                    .lineLimit(2)
+                    .font(.footnote)
+                    .padding(4)
+                }
+                .imageBadge(show: item.count > 10) {
+                  Text("\(item.count) 人关注")
+                    .font(.footnote)
+                }
+                .imageLink(item.subject.link)
+                .padding(8)
+                .shadow(color: Color.black.opacity(0.2), radius: 4)
+                .subjectPreview(item.subject)
+            }
           }
         }
-        LazyVGrid(columns: smallColumns, spacing: 8) {
-          ForEach(smallItems) { item in
-            ImageView(img: item.subject.images?.resize(.r400))
-              .imageStyle(width: smallCardWidth, height: smallCardWidth * 1.3)
-              .imageType(.subject)
-              .imageCaption {
-                Text(item.subject.name)
-                  .multilineTextAlignment(.leading)
-                  .truncationMode(.middle)
-                  .lineLimit(2)
-                  .font(.footnote)
-                  .padding(4)
-              }
-              .imageBadge(show: item.count > 10) {
-                Text("\(item.count) 人关注")
-                  .font(.footnote)
-              }
-              .imageLink(item.subject.link)
-              .padding(8)
-              .shadow(color: Color.black.opacity(0.2), radius: 4)
-              .subjectPreview(item.subject)
-          }
-        }
-      }
+      }.padding(.horizontal, 8)
     }.animation(.default, value: items)
   }
 }

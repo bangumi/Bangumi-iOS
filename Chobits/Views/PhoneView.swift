@@ -12,9 +12,6 @@ struct PhoneView: View {
   @State private var discoverNav: NavigationPath = NavigationPath()
   @State private var rakuenNav: NavigationPath = NavigationPath()
 
-  @State private var searchQuery: String = ""
-  @State private var searching: Bool = false
-
   init() {
     let defaultTab = UserDefaults.standard.string(forKey: "defaultTab") ?? ""
     self.selectedTab = ChiiViewTab(defaultTab)
@@ -84,37 +81,28 @@ struct PhoneView: View {
         )
       }
 
-      Section {
-        NavigationStack(path: $discoverNav) {
-          Section {
-            if searching {
-              SearchView(text: $searchQuery, searching: $searching)
-            } else {
-              ChiiDiscoverView()
-            }
-          }.navigationDestination(for: NavDestination.self) { $0 }
-        }
-        .searchable(text: $searchQuery, isPresented: $searching)
-        .environment(
-          \.openURL,
-          OpenURLAction { url in
-            if handleChiiURL(url, nav: $discoverNav) {
-              return .handled
-            } else {
-              return .systemAction
-            }
-          }
-        )
-        .onContinueUserActivity(CSSearchableItemActionType) { activity in
-          handleSearchActivity(activity, nav: $discoverNav)
-          selectedTab = .discover
-        }
+      NavigationStack(path: $discoverNav) {
+        ChiiDiscoverView()
+          .navigationDestination(for: NavDestination.self) { $0 }
       }
       .tag(ChiiViewTab.discover)
       .tabItem {
         Label(ChiiViewTab.discover.title, systemImage: ChiiViewTab.discover.icon)
       }
-
+      .environment(
+        \.openURL,
+        OpenURLAction { url in
+          if handleChiiURL(url, nav: $discoverNav) {
+            return .handled
+          } else {
+            return .systemAction
+          }
+        }
+      )
+      .onContinueUserActivity(CSSearchableItemActionType) { activity in
+        handleSearchActivity(activity, nav: $discoverNav)
+        selectedTab = .discover
+      }
     }
   }
 }

@@ -9,7 +9,7 @@ struct ChiiRakuenView: View {
   @State private var selectedTab: RakuenTab = .latestGroupTopics
 
   var body: some View {
-    VStack {
+    VStack(spacing: 5) {
       Picker("Tab", selection: $selectedTab) {
         Text("最新小组话题").tag(RakuenTab.latestGroupTopics)
         Text("热门条目讨论").tag(RakuenTab.trendingSubjectTopics)

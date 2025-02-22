@@ -44,38 +44,42 @@ struct CalendarSlimView: View {
   }
 
   var body: some View {
-    if calendars.isEmpty {
-      ProgressView().task {
-        await refreshCalendar()
-      }
-    } else {
-      VStack(alignment: .leading, spacing: 5) {
-        HStack(alignment: .bottom) {
-          Text("每日放送: \(Date().formatted(date: .long, time: .omitted))")
-          Spacer()
-          NavigationLink(value: NavDestination.calendar) {
-            Text("更多 »").font(.caption)
-          }.buttonStyle(.navLink)
-        }
-        ForEach(dates, id: \.weekday) { item in
-          HStack(spacing: 0) {
-            VStack {
-              Text(item.desc)
-              Text(item.weekday.desc)
+    ScrollView {
+      VStack {
+        if calendars.isEmpty {
+          ProgressView().task {
+            await refreshCalendar()
+          }
+        } else {
+          VStack(alignment: .leading, spacing: 5) {
+            HStack(alignment: .bottom) {
+              Text("每日放送: \(Date().formatted(date: .long, time: .omitted))")
               Spacer()
+              NavigationLink(value: NavDestination.calendar) {
+                Text("更多 »").font(.caption)
+              }.buttonStyle(.navLink)
             }
-            .padding(5)
-            .background(item.weekday.color)
-            .foregroundStyle(.white)
-            CalendarWeekdaySlimView()
-              .environment(calendars.first { $0.weekday == item.weekday.rawValue })
+            ForEach(dates, id: \.weekday) { item in
+              HStack(alignment: .top, spacing: 0) {
+                VStack {
+                  Text(item.desc)
+                  Text(item.weekday.desc)
+                  Spacer()
+                }
+                .padding(5)
+                .background(item.weekday.color)
+                .foregroundStyle(.white)
+                CalendarWeekdaySlimView()
+                  .environment(calendars.first { $0.weekday == item.weekday.rawValue })
+              }
+            }
+            Text("今日上映 \(todayTotal) 部。共 \(todayWatchers) 人收看今日番组。")
+              .font(.footnote)
+              .foregroundStyle(.secondary)
+            Divider()
           }
         }
-        Text("今日上映 \(todayTotal) 部。共 \(todayWatchers) 人收看今日番组。")
-          .font(.footnote)
-          .foregroundStyle(.secondary)
-        Divider()
-      }
+      }.padding(.horizontal, 8)
     }
   }
 }
