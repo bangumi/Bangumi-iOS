@@ -136,19 +136,31 @@ struct SettingsView: View {
       }
 
       if isAuthenticated {
-        Section {
-          if refreshing {
-            HStack {
-              ProgressView(value: refreshProgress)
-            }
-            .padding()
-            .frame(height: 20)
+        if refreshing {
+          HStack {
+            ProgressView(value: refreshProgress)
           }
+          .padding()
+          .frame(height: 20)
+        }
+        Section {
+          Button(role: .destructive) {
+            do {
+              try modelContext.delete(model: Draft.self)
+              Notifier.shared.notify(message: "草稿箱已清空")
+            } catch {
+              Notifier.shared.alert(error: error)
+            }
+          } label: {
+            Text("清空草稿箱")
+          }
+
           Button(role: .destructive) {
             reindex()
           } label: {
             Text("重建 Spotlight 索引")
           }
+
           Button(role: .destructive) {
             logoutConfirm = true
           } label: {
