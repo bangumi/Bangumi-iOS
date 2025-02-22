@@ -38,6 +38,7 @@ struct ReplyItemNormalView: View {
   @State private var showReplyBox: Bool = false
   @State private var showEditBox: Bool = false
   @State private var updating: Bool = false
+  @State private var showDeleteConfirm: Bool = false
 
   var shareLink: URL {
     URL(
@@ -86,16 +87,7 @@ struct ReplyItemNormalView: View {
                 }
                 Divider()
                 Button(role: .destructive) {
-                  Task {
-                    updating = true
-                    do {
-                      try await Chii.shared.deleteSubjectPost(postId: reply.id)
-                      Notifier.shared.notify(message: "删除成功")
-                    } catch {
-                      Notifier.shared.alert(error: error)
-                    }
-                    updating = false
-                  }
+                  showDeleteConfirm = true
                 } label: {
                   Text("删除")
                 }
@@ -141,6 +133,23 @@ struct ReplyItemNormalView: View {
       .sheet(isPresented: $showEditBox) {
         ReplyBoxView(type: type, topicId: topicId, reply: reply, isEdit: true)
           .presentationDetents([.large])
+      }
+      .alert("确认删除", isPresented: $showDeleteConfirm) {
+        Button("取消", role: .cancel) {}
+        Button("删除", role: .destructive) {
+          Task {
+            updating = true
+            do {
+              try await Chii.shared.deleteSubjectPost(postId: reply.id)
+              Notifier.shared.notify(message: "删除成功")
+            } catch {
+              Notifier.shared.alert(error: error)
+            }
+            updating = false
+          }
+        }
+      } message: {
+        Text("确定要删除这条回复吗？")
       }
     }
   }
@@ -193,6 +202,7 @@ struct SubReplyNormalView: View {
   @State private var showReplyBox: Bool = false
   @State private var showEditBox: Bool = false
   @State private var updating: Bool = false
+  @State private var showDeleteConfirm: Bool = false
 
   var shareLink: URL {
     URL(string: "https://\(shareDomain.rawValue)/\(type)/topic/\(reply.id)#post_\(subreply.id)")!
@@ -239,16 +249,7 @@ struct SubReplyNormalView: View {
               }
               Divider()
               Button(role: .destructive) {
-                Task {
-                  updating = true
-                  do {
-                    try await Chii.shared.deleteSubjectPost(postId: subreply.id)
-                    Notifier.shared.notify(message: "删除成功")
-                  } catch {
-                    Notifier.shared.alert(error: error)
-                  }
-                  updating = false
-                }
+                showDeleteConfirm = true
               } label: {
                 Text("删除")
               }
@@ -279,6 +280,23 @@ struct SubReplyNormalView: View {
     .sheet(isPresented: $showEditBox) {
       ReplyBoxView(type: type, topicId: topicId, reply: reply, subreply: subreply, isEdit: true)
         .presentationDetents([.large])
+    }
+    .alert("确认删除", isPresented: $showDeleteConfirm) {
+      Button("取消", role: .cancel) {}
+      Button("删除", role: .destructive) {
+        Task {
+          updating = true
+          do {
+            try await Chii.shared.deleteSubjectPost(postId: subreply.id)
+            Notifier.shared.notify(message: "删除成功")
+          } catch {
+            Notifier.shared.alert(error: error)
+          }
+          updating = false
+        }
+      }
+    } message: {
+      Text("确定要删除这条回复吗？")
     }
   }
 }

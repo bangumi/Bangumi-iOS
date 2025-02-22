@@ -57,8 +57,7 @@ struct SubjectTopicsView: View {
           }.font(.footnote)
         }.padding(.top, 2)
       }
-    }
-    .animation(.default, value: topics)
+    }.animation(.default, value: topics)
   }
 }
 

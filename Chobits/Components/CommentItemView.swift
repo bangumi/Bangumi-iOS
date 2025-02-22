@@ -77,6 +77,7 @@ struct CommentItemNormalView: View {
   @State private var showReplyBox: Bool = false
   @State private var showEditBox: Bool = false
   @State private var updating: Bool = false
+  @State private var showDeleteConfirm: Bool = false
 
   var body: some View {
     VStack(alignment: .leading) {
@@ -102,16 +103,7 @@ struct CommentItemNormalView: View {
                 }
                 Divider()
                 Button(role: .destructive) {
-                  Task {
-                    updating = true
-                    do {
-                      try await type.delete(commentId: comment.id)
-                      Notifier.shared.notify(message: "删除成功")
-                    } catch {
-                      Notifier.shared.alert(error: error)
-                    }
-                    updating = false
-                  }
+                  showDeleteConfirm = true
                 } label: {
                   Text("删除")
                 }
@@ -159,6 +151,23 @@ struct CommentItemNormalView: View {
     .sheet(isPresented: $showEditBox) {
       CommentReplyBoxView(type: type, comment: comment, isEdit: true)
         .presentationDetents([.large])
+    }
+    .alert("确认删除", isPresented: $showDeleteConfirm) {
+      Button("取消", role: .cancel) {}
+      Button("删除", role: .destructive) {
+        Task {
+          updating = true
+          do {
+            try await type.delete(commentId: comment.id)
+            Notifier.shared.notify(message: "删除成功")
+          } catch {
+            Notifier.shared.alert(error: error)
+          }
+          updating = false
+        }
+      }
+    } message: {
+      Text("确定要删除这条评论吗？")
     }
   }
 }
@@ -222,6 +231,7 @@ struct CommentSubReplyNormalView: View {
   @State private var showReplyBox: Bool = false
   @State private var showEditBox: Bool = false
   @State private var updating: Bool = false
+  @State private var showDeleteConfirm: Bool = false
 
   var body: some View {
     HStack(alignment: .top) {
@@ -257,16 +267,7 @@ struct CommentSubReplyNormalView: View {
               }
               Divider()
               Button(role: .destructive) {
-                Task {
-                  updating = true
-                  do {
-                    try await type.delete(commentId: reply.id)
-                    Notifier.shared.notify(message: "删除成功")
-                  } catch {
-                    Notifier.shared.alert(error: error)
-                  }
-                  updating = false
-                }
+                showDeleteConfirm = true
               } label: {
                 Text("删除")
               }
@@ -297,6 +298,23 @@ struct CommentSubReplyNormalView: View {
     .sheet(isPresented: $showEditBox) {
       CommentReplyBoxView(type: type, comment: comment, reply: reply, isEdit: true)
         .presentationDetents([.large])
+    }
+    .alert("确认删除", isPresented: $showDeleteConfirm) {
+      Button("取消", role: .cancel) {}
+      Button("删除", role: .destructive) {
+        Task {
+          updating = true
+          do {
+            try await type.delete(commentId: reply.id)
+            Notifier.shared.notify(message: "删除成功")
+          } catch {
+            Notifier.shared.alert(error: error)
+          }
+          updating = false
+        }
+      }
+    } message: {
+      Text("确定要删除这条回复吗？")
     }
   }
 }
