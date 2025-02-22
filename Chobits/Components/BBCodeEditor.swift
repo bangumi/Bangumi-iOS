@@ -15,8 +15,8 @@ struct BBCodeEditor: View {
   private let minFontSize: Int = 8
   private let maxFontSize: Int = 50
 
-  @State private var inputColorStart: Color = .black
-  @State private var inputColorEnd: Color = .black
+  @State private var inputColorStart: Color = .primary
+  @State private var inputColorEnd: Color = .primary
   @State private var inputColorGradient: Bool = false
   @State private var showingColorInput = false
 
@@ -465,6 +465,26 @@ struct BBCodeEditor: View {
   }
 }
 
+struct GradientColor {
+  let name: String
+  let start: Color
+  let end: Color
+
+  init(_ name: String, _ start: Int, _ end: Int) {
+    self.name = name
+    self.start = Color(hex: start)
+    self.end = Color(hex: end)
+  }
+
+  var title: AttributedString {
+    var prefix = AttributedString(name.prefix(2))
+    prefix.foregroundColor = start
+    var suffix = AttributedString(name.dropFirst(2))
+    suffix.foregroundColor = end
+    return prefix + suffix
+  }
+}
+
 struct ColorEditor: View {
   @Binding var start: Color
   @Binding var end: Color
@@ -474,16 +494,15 @@ struct ColorEditor: View {
   let handleColorInput: () -> Void
   let handleGradientInput: () -> Void
 
-  let gradientPresets: [(Color, Color)] = [
-    (Color(hex: 0x4CD596), Color(hex: 0xB8EA4B)),
-    (Color(hex: 0x8CEEED), Color(hex: 0xE0FF9D)),
-    (Color(hex: 0x8367EE), Color(hex: 0x19EAA3)),
-    (Color(hex: 0xFF63AC), Color(hex: 0xF7FF72)),
-    (Color(hex: 0x5EFF6D), Color(hex: 0x1319FF)),
-    (Color(hex: 0xD42068), Color(hex: 0xBD5EFF)),
-    (Color(hex: 0xDD77FF), Color(hex: 0x6C6CFF)),
-    (Color(hex: 0xD84FFF), Color(hex: 0x999BFF)),
-    (Color(hex: 0x4DA1FF), Color(hex: 0xE1FF3B)),
+  let gradientPresets: [GradientColor] = [
+    GradientColor("黄昏樱海", 0xFCEBA7, 0xC2B7FF),
+    GradientColor("仙桃晴雨", 0xFFCAD3, 0x46E7D9),
+    GradientColor("梦幻青绿", 0xD3F09D, 0x58BFF2),
+    GradientColor("雾紫轻烟", 0xD2CAFF, 0x7DD7DD),
+    GradientColor("天蓝藕粉", 0xBBD8FF, 0xFFB79C),
+    GradientColor("烟粉迷紫", 0xF8C6C6, 0xC4B5F1),
+    GradientColor("紫绮檬绿", 0xFFC8FB, 0xD2FFE9),
+    GradientColor("莓粉天青", 0xA6E4E9, 0xF4B0EB),
   ]
 
   var body: some View {
@@ -517,31 +536,39 @@ struct ColorEditor: View {
                   colors: [start, end],
                   startPoint: .leading,
                   endPoint: .trailing)
-              ).frame(height: 40)
+              )
+              .frame(height: 32)
+              .cornerRadius(16)
+              .shadow(color: .black.opacity(0.2), radius: 2, x: 0, y: 1)
             ColorPicker("", selection: $end)
               .labelsHidden()
           } else {
             Rectangle()
               .fill(start)
-              .frame(height: 40)
+              .frame(height: 32)
+              .cornerRadius(16)
+              .shadow(color: .black.opacity(0.2), radius: 2, x: 0, y: 1)
           }
         }
         Toggle("渐变", isOn: $gradient)
         if gradient {
-          VStack(spacing: 4) {
-            Text("预设")
-            ForEach(gradientPresets, id: \.0) { preset in
+          VStack(alignment: .leading, spacing: 5) {
+            ForEach(gradientPresets, id: \.name) { preset in
               HStack {
+                Text(preset.title)
                 Rectangle()
                   .fill(
                     .linearGradient(
-                      colors: [preset.0, preset.1],
+                      colors: [preset.start, preset.end],
                       startPoint: .leading,
                       endPoint: .trailing)
-                  ).frame(height: 20)
+                  )
+                  .frame(height: 24)
+                  .cornerRadius(12)
+                  .shadow(color: .black.opacity(0.2), radius: 2, x: 0, y: 1)
               }.onTapGesture {
-                start = preset.0
-                end = preset.1
+                start = preset.start
+                end = preset.end
               }
             }
           }
