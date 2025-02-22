@@ -68,12 +68,36 @@ enum CommentParentType {
   }
 }
 
+struct CommentItemView: View {
+  let type: CommentParentType
+  let comment: CommentDTO
+  let idx: Int
+
+  @AppStorage("hideBlocklist") var hideBlocklist: Bool = false
+  @AppStorage("profile") var profile: Profile = Profile()
+
+  var body: some View {
+    if !hideBlocklist || !profile.blocklist.contains(comment.creatorID) {
+      switch comment.state {
+      case .normal:
+        CommentItemNormalView(type: type, comment: comment, idx: idx)
+      case .userDelete:
+        CommentUserDeleteView(comment.creatorID, comment.user, comment.createdAt)
+      default:
+        Text(comment.state.description)
+      }
+    }
+  }
+}
+
 struct CommentItemNormalView: View {
   let type: CommentParentType
   let comment: CommentDTO
   let idx: Int
 
   @AppStorage("profile") var profile: Profile = Profile()
+  @AppStorage("hideBlocklist") var hideBlocklist: Bool = false
+
   @State private var showReplyBox: Bool = false
   @State private var showEditBox: Bool = false
   @State private var updating: Bool = false
@@ -127,17 +151,19 @@ struct CommentItemNormalView: View {
             .tint(.linkText)
             .textSelection(.enabled)
           ForEach(Array(zip(comment.replies.indices, comment.replies)), id: \.1) { subidx, reply in
-            VStack(alignment: .leading) {
-              Divider()
-              switch reply.state {
-              case .normal:
-                CommentSubReplyNormalView(
-                  type: type, comment: comment,
-                  reply: reply, idx: idx, subidx: subidx)
-              case .userDelete:
-                CommentUserDeleteView(reply.creatorID, reply.user, reply.createdAt)
-              default:
-                Text(reply.state.description)
+            if !hideBlocklist || !profile.blocklist.contains(reply.creatorID) {
+              VStack(alignment: .leading) {
+                Divider()
+                switch reply.state {
+                case .normal:
+                  CommentSubReplyNormalView(
+                    type: type, comment: comment,
+                    reply: reply, idx: idx, subidx: subidx)
+                case .userDelete:
+                  CommentUserDeleteView(reply.creatorID, reply.user, reply.createdAt)
+                default:
+                  Text(reply.state.description)
+                }
               }
             }
           }
@@ -199,23 +225,6 @@ struct CommentUserDeleteView: View {
         .lineLimit(1)
         .font(.caption)
         .foregroundStyle(.secondary)
-    }
-  }
-}
-
-struct CommentItemView: View {
-  let type: CommentParentType
-  let comment: CommentDTO
-  let idx: Int
-
-  var body: some View {
-    switch comment.state {
-    case .normal:
-      CommentItemNormalView(type: type, comment: comment, idx: idx)
-    case .userDelete:
-      CommentUserDeleteView(comment.creatorID, comment.user, comment.createdAt)
-    default:
-      Text(comment.state.description)
     }
   }
 }

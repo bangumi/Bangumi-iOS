@@ -13,6 +13,7 @@ struct SettingsView: View {
   @AppStorage("isolationMode") var isolationMode: Bool = false
   @AppStorage("showNSFWBadge") var showNSFWBadge: Bool = true
   @AppStorage("showEpisodeTrends") var showEpisodeTrends: Bool = true
+  @AppStorage("hideBlocklist") var hideBlocklist: Bool = false
 
   @Environment(\.modelContext) var modelContext
 
@@ -104,6 +105,9 @@ struct SettingsView: View {
         }
         Toggle(isOn: $showEpisodeTrends) {
           Text("显示章节热度")
+        }
+        Toggle(isOn: $hideBlocklist) {
+          Text("屏蔽绝交用户言论")
         }
       }
 

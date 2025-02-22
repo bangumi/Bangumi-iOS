@@ -5,6 +5,9 @@ struct SubjectCommentsView: View {
   let subjectType: SubjectType
   let comments: [SubjectCommentDTO]
 
+  @AppStorage("hideBlocklist") var hideBlocklist: Bool = false
+  @AppStorage("profile") var profile: Profile = Profile()
+
   var body: some View {
     VStack(spacing: 2) {
       HStack(alignment: .bottom) {
@@ -31,29 +34,31 @@ struct SubjectCommentsView: View {
     }
     VStack {
       ForEach(comments) { comment in
-        HStack(alignment: .top) {
-          ImageView(img: comment.user.avatar?.large)
-            .imageStyle(width: 32, height: 32)
-            .imageType(.avatar)
-            .imageLink(comment.user.link)
-          VStack(alignment: .leading) {
-            HStack {
-              Text(comment.user.nickname.withLink(comment.user.link))
-                .font(.footnote)
-                .lineLimit(1)
-              if comment.rate > 0 {
-                StarsView(score: Float(comment.rate), size: 10)
+        if !hideBlocklist || !profile.blocklist.contains(comment.user.id) {
+          HStack(alignment: .top) {
+            ImageView(img: comment.user.avatar?.large)
+              .imageStyle(width: 32, height: 32)
+              .imageType(.avatar)
+              .imageLink(comment.user.link)
+            VStack(alignment: .leading) {
+              HStack {
+                Text(comment.user.nickname.withLink(comment.user.link))
+                  .font(.footnote)
+                  .lineLimit(1)
+                if comment.rate > 0 {
+                  StarsView(score: Float(comment.rate), size: 10)
+                }
+                comment.header(subjectType)
+                  .lineLimit(1)
+                  .font(.caption)
+                  .foregroundStyle(.secondary)
+                Spacer()
               }
-              comment.header(subjectType)
-                .lineLimit(1)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-              Spacer()
+              Text(comment.comment).font(.footnote)
             }
-            Text(comment.comment).font(.footnote)
-          }
-          Spacer()
-        }.padding(.top, 2)
+            Spacer()
+          }.padding(.top, 2)
+        }
       }
     }.animation(.default, value: comments)
   }

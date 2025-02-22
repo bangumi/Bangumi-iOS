@@ -4,6 +4,9 @@ struct SubjectReviewsView: View {
   let subjectId: Int
   let reviews: [SubjectReviewDTO]
 
+  @AppStorage("hideBlocklist") var hideBlocklist: Bool = false
+  @AppStorage("profile") var profile: Profile = Profile()
+
   var body: some View {
     VStack(spacing: 2) {
       HStack(alignment: .bottom) {
@@ -30,7 +33,12 @@ struct SubjectReviewsView: View {
     }
     VStack {
       ForEach(reviews) { review in
-        SubjectReviewItemView(item: review).padding(.top, 2)
+        if !hideBlocklist || !profile.blocklist.contains(review.user.id) {
+          VStack {
+            SubjectReviewItemView(item: review)
+            Divider()
+          }.padding(.top, 2)
+        }
       }
     }
     .animation(.default, value: reviews)

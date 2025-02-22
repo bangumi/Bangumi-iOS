@@ -3,6 +3,9 @@ import SwiftUI
 struct RakuenSubjectTopicView: View {
   let mode: SubjectTopicFilterMode
 
+  @AppStorage("hideBlocklist") var hideBlocklist: Bool = false
+  @AppStorage("profile") var profile: Profile = Profile()
+
   @State private var reloader = false
 
   private func load(limit: Int, offset: Int) async -> PagedDTO<SubjectTopicDTO>? {
@@ -24,8 +27,10 @@ struct RakuenSubjectTopicView: View {
   var body: some View {
     ScrollView {
       PageView<SubjectTopicDTO, _>(reloader: reloader, nextPageFunc: load) { topic in
-        CardView {
-          SubjectTopicItemView(topic: topic)
+        if !hideBlocklist || !profile.blocklist.contains(topic.creator?.id ?? 0) {
+          CardView {
+            SubjectTopicItemView(topic: topic)
+          }
         }
       }.padding(.horizontal, 8)
     }

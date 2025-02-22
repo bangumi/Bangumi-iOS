@@ -199,6 +199,9 @@ struct GroupRecentMemberView: View {
 struct GroupRecentTopicView: View {
   @Environment(Group.self) var group
 
+  @AppStorage("hideBlocklist") var hideBlocklist: Bool = false
+  @AppStorage("profile") var profile: Profile = Profile()
+
   var body: some View {
     VStack(alignment: .leading) {
       VStack(spacing: 4) {
@@ -215,32 +218,34 @@ struct GroupRecentTopicView: View {
       }
       VStack {
         ForEach(group.recentTopics) { topic in
-          VStack {
-            HStack {
-              NavigationLink(value: NavDestination.groupTopicDetail(topic.id)) {
-                Text(topic.title)
-                  .font(.callout)
-                  .lineLimit(1)
-              }.buttonStyle(.navLink)
-              Spacer()
-              if topic.replyCount ?? 0 > 0 {
-                Text("(+\(topic.replyCount ?? 0))")
-                  .font(.footnote)
-                  .foregroundStyle(.orange)
+          if !hideBlocklist || !profile.blocklist.contains(topic.creator?.id ?? 0) {
+            VStack {
+              HStack {
+                NavigationLink(value: NavDestination.groupTopicDetail(topic.id)) {
+                  Text(topic.title)
+                    .font(.callout)
+                    .lineLimit(1)
+                }.buttonStyle(.navLink)
+                Spacer()
+                if topic.replyCount ?? 0 > 0 {
+                  Text("(+\(topic.replyCount ?? 0))")
+                    .font(.footnote)
+                    .foregroundStyle(.orange)
+                }
               }
-            }
-            HStack {
-              Text(topic.createdAt.datetimeDisplay)
-                .lineLimit(1)
-                .foregroundStyle(.secondary)
-              Spacer()
-              if let creator = topic.creator {
-                Text(creator.nickname.withLink(creator.link))
+              HStack {
+                Text(topic.createdAt.datetimeDisplay)
                   .lineLimit(1)
-              }
-            }.font(.footnote)
-            Divider()
-          }.padding(.top, 2)
+                  .foregroundStyle(.secondary)
+                Spacer()
+                if let creator = topic.creator {
+                  Text(creator.nickname.withLink(creator.link))
+                    .lineLimit(1)
+                }
+              }.font(.footnote)
+              Divider()
+            }.padding(.top, 2)
+          }
         }
       }
     }.animation(.default, value: group.recentTopics)

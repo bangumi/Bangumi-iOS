@@ -1,6 +1,9 @@
 import SwiftUI
 
 struct TrendingSubjectTopicsView: View {
+  @AppStorage("hideBlocklist") var hideBlocklist: Bool = false
+  @AppStorage("profile") var profile: Profile = Profile()
+
   @State private var topics: [SubjectTopicDTO] = []
   @State private var loading = false
 
@@ -20,8 +23,10 @@ struct TrendingSubjectTopicsView: View {
     ScrollView {
       LazyVStack {
         ForEach(topics, id: \.id) { topic in
-          CardView {
-            SubjectTopicItemView(topic: topic)
+          if !hideBlocklist || !profile.blocklist.contains(topic.creator?.id ?? 0) {
+            CardView {
+              SubjectTopicItemView(topic: topic)
+            }
           }
         }
       }

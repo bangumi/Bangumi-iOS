@@ -5,6 +5,9 @@ struct SubjectTopicsView: View {
   let subjectId: Int
   let topics: [TopicDTO]
 
+  @AppStorage("hideBlocklist") var hideBlocklist: Bool = false
+  @AppStorage("profile") var profile: Profile = Profile()
+
   var body: some View {
     VStack(spacing: 2) {
       HStack(alignment: .bottom) {
@@ -31,31 +34,33 @@ struct SubjectTopicsView: View {
     }
     VStack {
       ForEach(topics) { topic in
-        VStack {
-          HStack {
-            NavigationLink(value: NavDestination.subjectTopicDetail(topic.id)) {
-              Text(topic.title)
-                .font(.callout)
-                .lineLimit(1)
-            }.buttonStyle(.navLink)
-            Spacer()
-            if topic.replyCount ?? 0 > 0 {
-              Text("(+\(topic.replyCount ?? 0))")
-                .font(.footnote)
-                .foregroundStyle(.orange)
+        if !hideBlocklist || !profile.blocklist.contains(topic.creator?.id ?? 0) {
+          VStack {
+            HStack {
+              NavigationLink(value: NavDestination.subjectTopicDetail(topic.id)) {
+                Text(topic.title)
+                  .font(.callout)
+                  .lineLimit(1)
+              }.buttonStyle(.navLink)
+              Spacer()
+              if topic.replyCount ?? 0 > 0 {
+                Text("(+\(topic.replyCount ?? 0))")
+                  .font(.footnote)
+                  .foregroundStyle(.orange)
+              }
             }
-          }
-          HStack {
-            Text(topic.createdAt.dateDisplay)
-              .lineLimit(1)
-              .foregroundStyle(.secondary)
-            Spacer()
-            if let creator = topic.creator {
-              Text(creator.nickname.withLink(creator.link))
+            HStack {
+              Text(topic.createdAt.dateDisplay)
                 .lineLimit(1)
-            }
-          }.font(.footnote)
-        }.padding(.top, 2)
+                .foregroundStyle(.secondary)
+              Spacer()
+              if let creator = topic.creator {
+                Text(creator.nickname.withLink(creator.link))
+                  .lineLimit(1)
+              }
+            }.font(.footnote)
+          }.padding(.top, 2)
+        }
       }
     }.animation(.default, value: topics)
   }

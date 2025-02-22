@@ -5,61 +5,25 @@ import SwiftUI
 struct SubjectTopicListView: View {
   let subjectId: Int
 
-  @State private var fetching: Bool = false
-  @State private var offset: Int = 0
-  @State private var exhausted: Bool = false
-  @State private var loadedIdx: [Int: Bool] = [:]
-  @State private var topics: [EnumerateItem<TopicDTO>] = []
+  @AppStorage("hideBlocklist") var hideBlocklist: Bool = false
+  @AppStorage("profile") var profile: Profile = Profile()
 
-  func fetch(limit: Int = 20) async -> [EnumerateItem<TopicDTO>] {
-    fetching = true
+  @State private var reloader = false
+
+  func load(limit: Int, offset: Int) async -> PagedDTO<TopicDTO>? {
     do {
       let resp = try await Chii.shared.getSubjectTopics(subjectId, limit: limit, offset: offset)
-      if resp.total < offset + limit {
-        exhausted = true
-      }
-      let result = resp.data.enumerated().map { (idx, item) in
-        EnumerateItem(idx: idx + offset, inner: item)
-      }
-      offset += limit
-      fetching = false
-      return result
+      return resp
     } catch {
       Notifier.shared.alert(error: error)
     }
-    fetching = false
-    return []
-  }
-
-  func load() async {
-    offset = 0
-    exhausted = false
-    loadedIdx.removeAll()
-    topics.removeAll()
-    let items = await fetch()
-    self.topics.append(contentsOf: items)
-  }
-
-  func loadNextPage(idx: Int) async {
-    if exhausted {
-      return
-    }
-    if idx != offset - 5 {
-      return
-    }
-    if loadedIdx[idx, default: false] {
-      return
-    }
-    loadedIdx[idx] = true
-    let items = await fetch()
-    self.topics.append(contentsOf: items)
+    return nil
   }
 
   var body: some View {
     ScrollView {
-      LazyVStack(alignment: .leading) {
-        ForEach(topics, id: \.inner.self) { item in
-          let topic = item.inner
+      PageView<TopicDTO, _>(reloader: reloader, nextPageFunc: load) { topic in
+        if !hideBlocklist || !profile.blocklist.contains(topic.creator?.id ?? 0) {
           VStack {
             HStack {
               NavigationLink(value: NavDestination.subjectTopicDetail(topic.id)) {
@@ -85,47 +49,16 @@ struct SubjectTopicListView: View {
               }
             }.font(.footnote)
             Divider()
-          }
-          .padding(.top, 2)
-          .onAppear {
-            Task {
-              await loadNextPage(idx: item.idx)
-            }
-          }
-        }
-        if fetching {
-          HStack {
-            Spacer()
-            ProgressView()
-            Spacer()
-          }
-        }
-        if exhausted {
-          HStack {
-            Spacer()
-            Text("没有更多了")
-              .font(.footnote)
-              .foregroundStyle(.secondary)
-            Spacer()
-          }
+          }.padding(.top, 2)
         }
       }.padding(.horizontal, 8)
     }
     .buttonStyle(.navLink)
-    .animation(.default, value: topics)
     .navigationTitle("讨论版")
     .navigationBarTitleDisplayMode(.inline)
     .toolbar {
       ToolbarItem(placement: .automatic) {
         Image(systemName: "list.bullet.circle").foregroundStyle(.secondary)
-      }
-    }
-    .onAppear {
-      if topics.count > 0 {
-        return
-      }
-      Task {
-        await load()
       }
     }
   }

@@ -3,6 +3,9 @@ import SwiftUI
 struct RakuenGroupTopicView: View {
   let mode: GroupTopicFilterMode
 
+  @AppStorage("hideBlocklist") var hideBlocklist: Bool = false
+  @AppStorage("profile") var profile: Profile = Profile()
+
   @State private var reloader = false
 
   private func load(limit: Int, offset: Int) async -> PagedDTO<GroupTopicDTO>? {
@@ -19,8 +22,10 @@ struct RakuenGroupTopicView: View {
   var body: some View {
     ScrollView {
       PageView<GroupTopicDTO, _>(reloader: reloader, nextPageFunc: load) { topic in
-        CardView {
-          GroupTopicItemView(topic: topic)
+        if !hideBlocklist || !profile.blocklist.contains(topic.creator?.id ?? 0) {
+          CardView {
+            GroupTopicItemView(topic: topic)
+          }
         }
       }.padding(.horizontal, 8)
     }

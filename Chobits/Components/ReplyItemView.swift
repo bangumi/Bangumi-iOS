@@ -13,14 +13,19 @@ struct ReplyItemView: View {
   let reply: ReplyDTO
   let author: SlimUserDTO?
 
+  @AppStorage("hideBlocklist") var hideBlocklist: Bool = false
+  @AppStorage("profile") var profile: Profile = Profile()
+
   var body: some View {
-    switch reply.state {
-    case .normal:
-      ReplyItemNormalView(type: type, topicId: topicId, idx: idx, reply: reply, author: author)
-    case .userDelete:
-      ReplyUserDeleteView(idx: idx, reply: reply.base, author: author)
-    default:
-      Text(reply.state.description)
+    if !hideBlocklist || !profile.blocklist.contains(reply.creator?.id ?? 0) {
+      switch reply.state {
+      case .normal:
+        ReplyItemNormalView(type: type, topicId: topicId, idx: idx, reply: reply, author: author)
+      case .userDelete:
+        ReplyUserDeleteView(idx: idx, reply: reply.base, author: author)
+      default:
+        Text(reply.state.description)
+      }
     }
   }
 }
@@ -33,6 +38,7 @@ struct ReplyItemNormalView: View {
   let author: SlimUserDTO?
 
   @AppStorage("profile") var profile: Profile = Profile()
+  @AppStorage("hideBlocklist") var hideBlocklist: Bool = false
   @AppStorage("shareDomain") var shareDomain: ShareDomain = .chii
 
   @State private var showReplyBox: Bool = false
@@ -110,17 +116,19 @@ struct ReplyItemNormalView: View {
             .tint(.linkText)
             .textSelection(.enabled)
           ForEach(Array(zip(reply.replies.indices, reply.replies)), id: \.1) { subidx, subreply in
-            VStack(alignment: .leading) {
-              Divider()
-              switch subreply.state {
-              case .normal:
-                SubReplyNormalView(
-                  type: type, idx: idx, reply: reply, subidx: subidx, subreply: subreply,
-                  author: author, topicId: topicId)
-              case .userDelete:
-                ReplyUserDeleteView(idx: subidx, reply: subreply, author: author)
-              default:
-                Text(subreply.state.description)
+            if !hideBlocklist || !profile.blocklist.contains(subreply.creator?.id ?? 0) {
+              VStack(alignment: .leading) {
+                Divider()
+                switch subreply.state {
+                case .normal:
+                  SubReplyNormalView(
+                    type: type, idx: idx, reply: reply, subidx: subidx, subreply: subreply,
+                    author: author, topicId: topicId)
+                case .userDelete:
+                  ReplyUserDeleteView(idx: subidx, reply: subreply, author: author)
+                default:
+                  Text(subreply.state.description)
+                }
               }
             }
           }
