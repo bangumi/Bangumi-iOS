@@ -1,13 +1,36 @@
 import SwiftUI
 
+enum RakuenTab {
+  case latestGroupTopics
+  case trendingSubjectTopics
+}
+
 struct ChiiRakuenView: View {
+  @State private var selectedTab: RakuenTab = .latestGroupTopics
+
   var body: some View {
-    ScrollView {
-      VStack(spacing: 16) {
+    VStack {
+      Picker("Tab", selection: $selectedTab) {
+        Text("最新小组话题").tag(RakuenTab.latestGroupTopics)
+        Text("热门条目讨论").tag(RakuenTab.trendingSubjectTopics)
+      }
+      .pickerStyle(.segmented)
+      .padding(.horizontal, 8)
+      TabView(selection: $selectedTab) {
         RecentGroupTopicsView()
+          .tag(RakuenTab.latestGroupTopics)
+          .tabItem {
+            Text("最新小组话题")
+          }
         TrendingSubjectTopicsView()
-      }.padding(8)
+          .tag(RakuenTab.trendingSubjectTopics)
+          .tabItem {
+            Text("热门条目讨论")
+          }
+      }
     }
+    .tabViewStyle(.page)
+    .animation(.default, value: selectedTab)
     .navigationTitle("超展开")
     .toolbarTitleDisplayMode(.inline)
     .toolbar {
