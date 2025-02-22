@@ -488,6 +488,30 @@ extension Chii {
     }
     _ = try await self.request(url: url, method: "POST", body: body, auth: .required)
   }
+
+  func deleteGroupPost(postId: Int) async throws {
+    let url = BangumiAPI.priv.build("p1/groups/-/posts/\(postId)")
+    let body: [String: Any] = [:]
+    _ = try await self.request(url: url, method: "DELETE", body: body, auth: .required)
+  }
+
+  func editGroupPost(postId: Int, content: String) async throws {
+    let url = BangumiAPI.priv.build("p1/groups/-/posts/\(postId)")
+    let body: [String: Any] = ["content": content]
+    _ = try await self.request(url: url, method: "PUT", body: body, auth: .required)
+  }
+
+  func createGroupReply(topicId: Int, content: String, replyTo: Int?, token: String) async throws {
+    let url = BangumiAPI.priv.build("p1/groups/-/topics/\(topicId)/replies")
+    var body: [String: Any] = [
+      "content": content,
+      "turnstileToken": token,
+    ]
+    if let replyTo = replyTo {
+      body["replyTo"] = replyTo
+    }
+    _ = try await self.request(url: url, method: "POST", body: body, auth: .required)
+  }
 }
 
 // MARK: - Comment

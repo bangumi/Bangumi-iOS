@@ -356,13 +356,26 @@ struct ReplyBoxView: View {
           Notifier.shared.alert(message: "找不到要编辑的回复")
           return
         }
-        try await Chii.shared.editSubjectPost(postId: postId, content: content)
+        switch type {
+        case .subject:
+          try await Chii.shared.editSubjectPost(postId: postId, content: content)
+        case .group:
+          try await Chii.shared.editGroupPost(postId: postId, content: content)
+        }
+        Notifier.shared.notify(message: "编辑成功")
       } else {
-        try await Chii.shared.createSubjectReply(
-          topicId: topicId, content: content,
-          replyTo: reply?.id, token: token)
+        switch type {
+        case .subject:
+          try await Chii.shared.createSubjectReply(
+            topicId: topicId, content: content,
+            replyTo: reply?.id, token: token)
+        case .group:
+          try await Chii.shared.createGroupReply(
+            topicId: topicId, content: content,
+            replyTo: reply?.id, token: token)
+        }
+        Notifier.shared.notify(message: "回复成功")
       }
-      Notifier.shared.notify(message: isEdit ? "编辑成功" : "回复成功")
       dismiss()
     } catch {
       Notifier.shared.alert(error: error)
