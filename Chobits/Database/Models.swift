@@ -692,9 +692,11 @@ final class EpisodeV2: Linkable {
   }
 
   var trendColor: Color {
-    let base: Double = 100.0  // 基准评论数，用于调整曲线斜率
-    let ratio = 1.0 - exp(-Double(comment) / base)
-    return Color(hex: 0xFF8040, opacity: ratio)
+    var opacity = 0.0
+    if comment > 0 {
+      opacity = 0.1 + 0.9 * (1.0 - exp(-Double(comment - 1) / 200.0))
+    }
+    return Color(hex: 0xFF8040, opacity: opacity)
   }
 
   func update(_ item: EpisodeDTO) {

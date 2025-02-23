@@ -207,10 +207,10 @@ extension View {
     @AppStorage("showEpisodeTrends") var showEpisodeTrends: Bool = true
     if showEpisodeTrends {
       self
-        .padding(.bottom, 2)
+        .padding(.bottom, 3)
         .overlay(alignment: .bottomLeading) {
           Rectangle()
-            .frame(height: 2)
+            .frame(height: 3)
             .foregroundStyle(episode.trendColor)
             .offset(x: 0, y: 0)
         }
