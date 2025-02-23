@@ -148,18 +148,19 @@ extension Chii {
       Logger.api.error("response error: \(response)")
       throw ChiiError(message: "api response nil")
     }
+    let requestID = response.allHeaderFields["x-request-id"] as? String
     if response.statusCode < 400 {
       return data
     } else if response.statusCode == 429 {
       throw ChiiError(notice: "请求过于频繁，请稍后再试")
-    } else if response.statusCode < 500 {
-      let error = String(data: data, encoding: .utf8) ?? ""
-      Logger.api.warning("response \(response.statusCode): \(url.absoluteString): \(error)")
-      throw ChiiError(code: response.statusCode, response: error, headers: response.allHeaderFields)
+    } else if response.statusCode == 401 {
+      throw ChiiError(notice: "请求未授权，请重新登录")
+    } else if response.statusCode == 403 {
+      throw ChiiError(notice: "请求被拒绝，请检查权限")
     } else {
       let error = String(data: data, encoding: .utf8) ?? ""
       Logger.api.error("response: \(response.statusCode): \(url.absoluteString): \(error)")
-      throw ChiiError(code: response.statusCode, response: error, headers: response.allHeaderFields)
+      throw ChiiError(code: response.statusCode, response: error, requestID: requestID)
     }
   }
 

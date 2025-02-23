@@ -27,6 +27,7 @@ enum ChiiError: Error, CustomStringConvertible {
   case request(String)
   case badRequest(String)
   case notAuthorized(String)
+  case forbidden(String)
   case notFound(String)
   case generic(String)
   case notice(String)
@@ -48,18 +49,20 @@ enum ChiiError: Error, CustomStringConvertible {
     self = .ignore(ignore)
   }
 
-  init(code: Int, response: String, headers: [AnyHashable: Any]) {
+  init(code: Int, response: String, requestID: String?) {
     switch code {
     case 400:
       self = .badRequest(response)
-    case 401, 403:
+    case 401:
       self = .notAuthorized(response)
+    case 403:
+      self = .forbidden(response)
     case 404:
       self = .notFound(response)
     default:
       var text = "code: \(code)\n"
       text += "response: \(response)\n"
-      if let reqID = headers["x-request-id"] as? String {
+      if let reqID = requestID {
         text += "requestID: \(reqID)\n"
       }
       self = .generic(text)
@@ -78,6 +81,8 @@ enum ChiiError: Error, CustomStringConvertible {
       return "Bad Request!\n\(error)"
     case .notAuthorized(let error):
       return "Unauthorized!\n\(error)"
+    case .forbidden(let error):
+      return "Forbidden!\n\(error)"
     case .notFound(let error):
       return "Not Found!\n\(error)"
     case .generic(let message):
