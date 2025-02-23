@@ -25,6 +25,14 @@ struct BBCodeEditor: View {
   @State private var showingURLInput = false
   @State private var showingEmojiInput = false
 
+  private func newSelection(_ bound: String.Index, _ offset: Int, _ length: Int = 0) {
+    let cursorStartIndex =
+      text.index(bound, offsetBy: offset, limitedBy: text.endIndex) ?? text.endIndex
+    let cursorEndIndex =
+      text.index(cursorStartIndex, offsetBy: length, limitedBy: text.endIndex) ?? text.endIndex
+    textSelection = TextSelection(range: cursorStartIndex..<cursorEndIndex)
+  }
+
   private func handleBasicInput(_ tag: BBCodeType) {
     let tagBefore = "[\(tag.code)]"
     let tagAfter = "[/\(tag.code)]"
@@ -33,17 +41,16 @@ struct BBCodeEditor: View {
       case .selection(let range):
         if range.lowerBound == range.upperBound {
           text = text.replacingCharacters(in: range, with: tagBefore + tagAfter)
-          let cursorPosition = range.lowerBound.utf16Offset(in: text) + tagBefore.count
-          let cursorIndex = text.index(text.startIndex, offsetBy: cursorPosition)
-          textSelection = TextSelection(range: cursorIndex..<cursorIndex)
+          newSelection(range.lowerBound, tagBefore.count)
         } else {
+          let newText = "\(tagBefore)\(text[range])\(tagAfter)"
           if tag.isBlock {
-            text.replaceSubrange(range, with: "\n\(tagBefore)\(text[range])\(tagAfter)\n")
+            text.replaceSubrange(range, with: "\n\(newText)\n")
+            newSelection(range.lowerBound, newText.count + 2)
           } else {
-            text.replaceSubrange(range, with: "\(tagBefore)\(text[range])\(tagAfter)")
+            text.replaceSubrange(range, with: newText)
+            newSelection(range.lowerBound, newText.count)
           }
-          let cursorIndex = text.endIndex
-          textSelection = TextSelection(range: cursorIndex..<cursorIndex)
         }
       case .multiSelection:
         break
@@ -51,10 +58,10 @@ struct BBCodeEditor: View {
         break
       }
     } else {
+      let endIndex = text.endIndex
       text += tagBefore
-      let cursorIndex = text.endIndex
       text += tagAfter
-      textSelection = TextSelection(range: cursorIndex..<cursorIndex)
+      newSelection(endIndex, tagBefore.count)
     }
   }
 
@@ -65,20 +72,16 @@ struct BBCodeEditor: View {
       switch selection.indices {
       case .selection(let range):
         text.replaceSubrange(range, with: "\(tagBefore)\(inputURL)\(tagAfter)")
-        let cursorPosition =
-          range.lowerBound.utf16Offset(in: text) + tagBefore.count + inputURL.count + tagAfter.count
-        let cursorIndex = text.index(text.startIndex, offsetBy: cursorPosition)
-        textSelection = TextSelection(range: cursorIndex..<cursorIndex)
+        newSelection(range.lowerBound, tagBefore.count + inputURL.count + tagAfter.count)
       case .multiSelection:
         break
       @unknown default:
         break
       }
     } else {
+      let endIndex = text.endIndex
       text += "\(tagBefore)\(inputURL)\(tagAfter)"
-      let cursorPosition = text.count
-      let cursorIndex = text.index(text.startIndex, offsetBy: cursorPosition)
-      textSelection = TextSelection(range: cursorIndex..<cursorIndex)
+      newSelection(endIndex, tagBefore.count + inputURL.count + tagAfter.count)
     }
     inputURL = ""
   }
@@ -92,19 +95,11 @@ struct BBCodeEditor: View {
         if range.lowerBound == range.upperBound {
           let placeholder = "链接描述"
           text.replaceSubrange(range, with: tagBefore + placeholder + tagAfter)
-          let cursorPosition = range.lowerBound.utf16Offset(in: text)
-          let startIndex = text.index(text.startIndex, offsetBy: cursorPosition + tagBefore.count)
-          let endIndex = text.index(
-            text.startIndex, offsetBy: cursorPosition + tagBefore.count + placeholder.count)
-          textSelection = TextSelection(range: startIndex..<endIndex)
+          newSelection(range.lowerBound, tagBefore.count, placeholder.count)
         } else {
           let selectedText = text[range]
           text.replaceSubrange(range, with: "\(tagBefore)\(selectedText)\(tagAfter)")
-          let cursorPosition =
-            range.lowerBound.utf16Offset(in: text) + tagBefore.count + selectedText.count
-            + tagAfter.count
-          let cursorIndex = text.index(text.startIndex, offsetBy: cursorPosition)
-          textSelection = TextSelection(range: cursorIndex..<cursorIndex)
+          newSelection(range.lowerBound, tagBefore.count + selectedText.count + tagAfter.count)
         }
       case .multiSelection:
         break
@@ -112,15 +107,12 @@ struct BBCodeEditor: View {
         break
       }
     } else {
-      let insertPosition = text.count
+      let endIndex = text.endIndex
       let tagBefore = "[\(BBCodeType.url.code)=\(inputURL)]"
       let tagAfter = "[/\(BBCodeType.url.code)]"
       let placeholder = "链接描述"
       text += tagBefore + placeholder + tagAfter
-      let startIndex = text.index(text.startIndex, offsetBy: insertPosition + tagBefore.count)
-      let endIndex = text.index(
-        text.startIndex, offsetBy: insertPosition + tagBefore.count + placeholder.count)
-      textSelection = TextSelection(range: startIndex..<endIndex)
+      newSelection(endIndex, tagBefore.count, placeholder.count)
     }
     inputURL = ""
   }
@@ -133,17 +125,11 @@ struct BBCodeEditor: View {
       case .selection(let range):
         if range.lowerBound == range.upperBound {
           text.replaceSubrange(range, with: tagBefore + tagAfter)
-          let cursorPosition = range.lowerBound.utf16Offset(in: text) + tagBefore.count
-          let cursorIndex = text.index(text.startIndex, offsetBy: cursorPosition)
-          textSelection = TextSelection(range: cursorIndex..<cursorIndex)
+          newSelection(range.lowerBound, tagBefore.count)
         } else {
           let selectedText = text[range]
           text.replaceSubrange(range, with: "\(tagBefore)\(selectedText)\(tagAfter)")
-          let cursorPosition =
-            range.lowerBound.utf16Offset(in: text) + tagBefore.count + selectedText.count
-            + tagAfter.count
-          let cursorIndex = text.index(text.startIndex, offsetBy: cursorPosition)
-          textSelection = TextSelection(range: cursorIndex..<cursorIndex)
+          newSelection(range.lowerBound, tagBefore.count + selectedText.count + tagAfter.count)
         }
       case .multiSelection:
         break
@@ -151,12 +137,11 @@ struct BBCodeEditor: View {
         break
       }
     } else {
+      let endIndex = text.endIndex
       text += tagBefore + tagAfter
-      let cursorPosition = text.count - tagAfter.count
-      let cursorIndex = text.index(text.startIndex, offsetBy: cursorPosition)
-      textSelection = TextSelection(range: cursorIndex..<cursorIndex)
+      newSelection(endIndex, tagBefore.count)
     }
-    inputSize = 14  // 重置为默认值
+    inputSize = 14
   }
 
   private func convertColorToHex(_ color: Color) -> String {
@@ -193,17 +178,11 @@ struct BBCodeEditor: View {
       case .selection(let range):
         if range.lowerBound == range.upperBound {
           text.replaceSubrange(range, with: tagBefore + tagAfter)
-          let cursorPosition = range.lowerBound.utf16Offset(in: text) + tagBefore.count
-          let cursorIndex = text.index(text.startIndex, offsetBy: cursorPosition)
-          textSelection = TextSelection(range: cursorIndex..<cursorIndex)
+          newSelection(range.lowerBound, tagBefore.count)
         } else {
           let selectedText = text[range]
           text.replaceSubrange(range, with: "\(tagBefore)\(selectedText)\(tagAfter)")
-          let cursorPosition =
-            range.lowerBound.utf16Offset(in: text) + tagBefore.count + selectedText.count
-            + tagAfter.count
-          let cursorIndex = text.index(text.startIndex, offsetBy: cursorPosition)
-          textSelection = TextSelection(range: cursorIndex..<cursorIndex)
+          newSelection(range.lowerBound, tagBefore.count + selectedText.count + tagAfter.count)
         }
       case .multiSelection:
         break
@@ -211,10 +190,9 @@ struct BBCodeEditor: View {
         break
       }
     } else {
+      let endIndex = text.endIndex
       text += tagBefore + tagAfter
-      let cursorPosition = text.count - tagAfter.count
-      let cursorIndex = text.index(text.startIndex, offsetBy: cursorPosition)
-      textSelection = TextSelection(range: cursorIndex..<cursorIndex)
+      newSelection(endIndex, tagBefore.count)
     }
   }
 
@@ -245,9 +223,7 @@ struct BBCodeEditor: View {
 
           // Replace the selected text with the gradient version
           text.replaceSubrange(range, with: gradientText)
-          let cursorPosition = range.lowerBound.utf16Offset(in: text) + gradientText.count
-          let cursorIndex = text.index(text.startIndex, offsetBy: cursorPosition)
-          textSelection = TextSelection(range: cursorIndex..<cursorIndex)
+          newSelection(range.lowerBound, gradientText.count)
         }
       case .multiSelection:
         break
@@ -287,19 +263,16 @@ struct BBCodeEditor: View {
       switch selection.indices {
       case .selection(let range):
         text.replaceSubrange(range, with: emoji)
-        let cursorPosition = range.lowerBound.utf16Offset(in: text) + emoji.count
-        let cursorIndex = text.index(text.startIndex, offsetBy: cursorPosition)
-        textSelection = TextSelection(range: cursorIndex..<cursorIndex)
+        newSelection(range.lowerBound, emoji.count)
       case .multiSelection:
         break
       @unknown default:
         break
       }
     } else {
+      let endIndex = text.endIndex
       text += emoji
-      let cursorPosition = text.count
-      let cursorIndex = text.index(text.startIndex, offsetBy: cursorPosition)
-      textSelection = TextSelection(range: cursorIndex..<cursorIndex)
+      newSelection(endIndex, emoji.count)
     }
     showingEmojiInput = false
   }
