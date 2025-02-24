@@ -3,7 +3,7 @@ import SwiftData
 import SwiftUI
 
 struct SubjectCollectionBoxView: View {
-  @AppStorage("autoCompleteProgress") var autoCompleteProgress: Bool = true
+  @AppStorage("autoCompleteProgress") var autoCompleteProgress: Bool = false
 
   @Environment(\.modelContext) var modelContext
   @Environment(\.dismiss) private var dismiss

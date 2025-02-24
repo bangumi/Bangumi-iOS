@@ -14,7 +14,7 @@ struct SettingsView: View {
   @AppStorage("showNSFWBadge") var showNSFWBadge: Bool = true
   @AppStorage("showEpisodeTrends") var showEpisodeTrends: Bool = true
   @AppStorage("hideBlocklist") var hideBlocklist: Bool = false
-  @AppStorage("autoCompleteProgress") var autoCompleteProgress: Bool = true
+  @AppStorage("autoCompleteProgress") var autoCompleteProgress: Bool = false
 
   @Environment(\.modelContext) var modelContext
 
@@ -97,7 +97,7 @@ struct SettingsView: View {
         }
       }
 
-      Section(header: Text("其它")) {
+      Section(header: Text("超合金")) {
         Toggle(isOn: $showNSFWBadge) {
           Text("显示 NSFW 标记")
         }
