@@ -264,7 +264,7 @@ extension Chii {
 
   func updateSubjectCollection(
     subjectId: Int, type: CollectionType?, rate: Int?, comment: String?, priv: Bool?,
-    tags: [String]?
+    tags: [String]?, progress: Bool?
   ) async throws {
     if self.mock {
       return
@@ -286,6 +286,9 @@ extension Chii {
     if let tags = tags {
       body["tags"] = tags
     }
+    if let progress = progress {
+      body["progress"] = progress
+    }
     if body.count == 0 {
       return
     }
@@ -294,7 +297,7 @@ extension Chii {
     let db = try self.getDB()
     try await db.updateSubjectCollection(
       subjectId: subjectId, type: type, rate: rate,
-      comment: comment, priv: priv, tags: tags
+      comment: comment, priv: priv, tags: tags, progress: progress
     )
   }
 

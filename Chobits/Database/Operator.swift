@@ -185,7 +185,7 @@ extension DatabaseOperator {
 
   public func updateSubjectCollection(
     subjectId: Int, type: CollectionType?, rate: Int?, comment: String?, priv: Bool?,
-    tags: [String]?
+    tags: [String]?, progress: Bool?
   ) throws {
     let subject = try self.fetchOne(
       predicate: #Predicate<Subject> {
@@ -222,6 +222,20 @@ extension DatabaseOperator {
       }
       if let tags = tags {
         subject.interest?.tags = tags
+      }
+    }
+    if let progress = progress, progress {
+      subject.interest?.epStatus = subject.eps
+      subject.interest?.volStatus = subject.volumes
+      let eps = try modelContext.fetch(
+        FetchDescriptor<Episode>(
+          predicate: #Predicate<Episode> {
+            $0.subjectId == subjectId && $0.type == 0
+          }
+        )
+      )
+      for episode in eps {
+        episode.status = EpisodeCollectionType.collect.rawValue
       }
     }
     subject.interest?.updatedAt = now - 1

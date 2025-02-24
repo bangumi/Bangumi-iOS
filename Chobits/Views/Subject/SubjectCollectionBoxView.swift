@@ -3,6 +3,8 @@ import SwiftData
 import SwiftUI
 
 struct SubjectCollectionBoxView: View {
+  @AppStorage("autoCompleteProgress") var autoCompleteProgress: Bool = true
+
   @Environment(\.modelContext) var modelContext
   @Environment(\.dismiss) private var dismiss
   @Environment(Subject.self) var subject
@@ -68,7 +70,8 @@ struct SubjectCollectionBoxView: View {
           rate: rate,
           comment: comment,
           priv: priv,
-          tags: Array(tags.sorted().prefix(10))
+          tags: Array(tags.sorted().prefix(10)),
+          progress: autoCompleteProgress
         )
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
         dismiss()

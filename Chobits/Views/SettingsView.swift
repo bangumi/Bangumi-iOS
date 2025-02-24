@@ -14,6 +14,7 @@ struct SettingsView: View {
   @AppStorage("showNSFWBadge") var showNSFWBadge: Bool = true
   @AppStorage("showEpisodeTrends") var showEpisodeTrends: Bool = true
   @AppStorage("hideBlocklist") var hideBlocklist: Bool = false
+  @AppStorage("autoCompleteProgress") var autoCompleteProgress: Bool = true
 
   @Environment(\.modelContext) var modelContext
 
@@ -108,6 +109,9 @@ struct SettingsView: View {
         }
         Toggle(isOn: $hideBlocklist) {
           Text("屏蔽绝交用户言论")
+        }
+        Toggle(isOn: $autoCompleteProgress) {
+          Text("标记看过时自动完成所有进度")
         }
       }
 
