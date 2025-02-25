@@ -1000,7 +1000,7 @@ extension Chii {
 // MARK: - Trending
 extension Chii {
   func getTrendingSubjects(
-    type: SubjectType, limit: Int = 20, offset: Int = 0
+    type: SubjectType, limit: Int = 12, offset: Int = 0
   ) async throws -> PagedDTO<TrendingSubjectDTO> {
     if self.mock {
       return loadFixture(

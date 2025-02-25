@@ -4,40 +4,30 @@ import SwiftUI
 struct TrendingSubjectView: View {
   @Environment(\.modelContext) private var modelContext
 
-  @State private var type: SubjectType = .anime
   @State private var width: CGFloat = 0
+  @State private var loaded: Bool = false
 
   func load() async {
+    if loaded {
+      return
+    }
     do {
-      try await Chii.shared.loadTrendingSubjects(type: type)
+      try await Chii.shared.loadTrendingSubjects()
+      loaded = true
     } catch {
       Notifier.shared.alert(error: error)
     }
   }
 
   var body: some View {
-    VStack(spacing: 5) {
-      Picker("SubjectType", selection: $type) {
-        ForEach(SubjectType.allTypes) { st in
-          Text(st.description).tag(st)
-        }
+    LazyVStack {
+      ForEach(SubjectType.allTypes) { st in
+        TrendingSubjectTypeView(type: st, width: width)
       }
-      .pickerStyle(.segmented)
-      .padding(.horizontal, 8)
-      .task(load)
-      .onChange(of: type) {
-        Task {
-          await load()
-        }
-      }
-      TabView(selection: $type) {
-        ForEach(SubjectType.allTypes) { st in
-          TrendingSubjectTypeView(type: st, width: width)
-            .tag(st)
-        }
-      }.tabViewStyle(.page)
     }
-    .animation(.default, value: type)
+    .padding(.horizontal, 8)
+    .animation(.default, value: width)
+    .task(load)
     .onGeometryChange(for: CGSize.self) { proxy in
       proxy.size
     } action: { newSize in
@@ -67,88 +57,62 @@ struct TrendingSubjectTypeView: View {
   }
 
   var columnCount: Int {
-    let cols = Int((width - 8) / (320 + 8))
-    return cols > 0 ? cols : 1
+    Int(width / 600) + 1
   }
 
   var largeCardWidth: CGFloat {
-    let cols = CGFloat(self.columnCount)
-    let cw = (width - 8) / cols - 8
-    if cw < 320 {
-      return 320
+    var w = CGFloat(300)
+    if columnCount == 1 {
+      w = width - 16
     }
-    return cw
+    w = (width + 8) / CGFloat(columnCount) - 24
+    return max(w, 300)
   }
 
   var smallCardWidth: CGFloat {
-    let cols = CGFloat(self.columnCount * 2)
-    let cw = (width - 8) / cols - 8
-    if cw < 160 {
-      return 160
-    }
-    return cw
-  }
-
-  var largeColumns: [GridItem] {
-    Array(repeating: GridItem(.flexible()), count: columnCount)
-  }
-
-  var smallColumns: [GridItem] {
-    Array(repeating: GridItem(.flexible()), count: columnCount * 2)
+    let w = (width + 8) / CGFloat(columnCount * 2) - 8
+    return max(w, 150)
   }
 
   var largeItems: [TrendingSubjectDTO] {
-    var itemLimit = 6
-    if columnCount == 2 {
-      itemLimit = 10
-    } else if columnCount == 3 {
-      itemLimit = 12
-    } else if columnCount == 4 {
-      itemLimit = 12
-    }
-    return Array(items.prefix(itemLimit))
+    return Array(items.prefix(columnCount))
   }
 
   var smallItems: [TrendingSubjectDTO] {
-    let itemLimit = columnCount * 2
-    let largeCount = largeItems.count
-    return Array(items.dropFirst(largeCount).prefix(itemLimit))
-  }
-
-  var firstItem: TrendingSubject? {
-    trending.first
+    return Array(items.dropFirst(largeItems.count))
   }
 
   var body: some View {
-    ScrollView {
-      VStack(spacing: 5) {
-        if items.isEmpty {
-          ProgressView()
-        } else {
-          LazyVGrid(columns: largeColumns, spacing: 8) {
-            ForEach(largeItems) { item in
-              ImageView(img: item.subject.images?.resize(.r800))
-                .imageStyle(width: largeCardWidth, height: largeCardWidth * 1.2)
-                .imageType(.subject)
-                .imageCaption {
-                  Text(item.subject.name)
-                    .multilineTextAlignment(.leading)
-                    .truncationMode(.middle)
-                    .lineLimit(2)
-                    .font(.body)
-                    .padding(8)
-                }
-                .imageBadge(show: item.count > 10) {
-                  Text("\(item.count) 人关注")
-                    .font(.callout)
-                }
-                .imageLink(item.subject.link)
-                .padding(8)
-                .shadow(color: Color.black.opacity(0.2), radius: 4)
-                .subjectPreview(item.subject)
-            }
+    VStack(spacing: 2) {
+      if items.isEmpty {
+        ProgressView()
+      } else {
+        Text("热门\(type.description)").font(.title)
+        HStack {
+          ForEach(largeItems) { item in
+            ImageView(img: item.subject.images?.resize(.r800))
+              .imageStyle(width: largeCardWidth, height: largeCardWidth * 1.2)
+              .imageType(.subject)
+              .imageCaption {
+                Text(item.subject.name)
+                  .multilineTextAlignment(.leading)
+                  .truncationMode(.middle)
+                  .lineLimit(2)
+                  .font(.body)
+                  .padding(8)
+              }
+              .imageBadge(show: item.count > 10) {
+                Text("\(item.count) 人关注")
+                  .font(.callout)
+              }
+              .imageLink(item.subject.link)
+              .padding(8)
+              .shadow(color: Color.black.opacity(0.2), radius: 4)
+              .subjectPreview(item.subject)
           }
-          LazyVGrid(columns: smallColumns, spacing: 8) {
+        }
+        ScrollView(.horizontal, showsIndicators: false) {
+          LazyHStack(spacing: 8) {
             ForEach(smallItems) { item in
               ImageView(img: item.subject.images?.resize(.r400))
                 .imageStyle(width: smallCardWidth, height: smallCardWidth * 1.3)
@@ -166,13 +130,12 @@ struct TrendingSubjectTypeView: View {
                     .font(.footnote)
                 }
                 .imageLink(item.subject.link)
-                .padding(8)
                 .shadow(color: Color.black.opacity(0.2), radius: 4)
                 .subjectPreview(item.subject)
             }
-          }
+          }.padding(8)
         }
-      }.padding(.horizontal, 8)
+      }
     }.animation(.default, value: items)
   }
 }
