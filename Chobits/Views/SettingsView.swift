@@ -18,13 +18,13 @@ struct SettingsView: View {
 
   @Environment(\.modelContext) var modelContext
 
-  @State private var refreshing: Bool = false
-  @State private var refreshProgress: CGFloat = 0
+  @State private var spotlightRefreshing: Bool = false
+  @State private var spotlightProgress: CGFloat = 0
   @State private var logoutConfirm: Bool = false
 
   func reindex() {
-    refreshing = true
-    refreshProgress = 0
+    spotlightRefreshing = true
+    spotlightProgress = 0
     let limit: Int = 50
     var offset: Int = 0
     Task {
@@ -45,14 +45,14 @@ struct SettingsView: View {
             break
           }
           await Chii.shared.index(resp.data)
-          refreshProgress = CGFloat(offset) / CGFloat(resp.total)
+          spotlightProgress = CGFloat(offset) / CGFloat(resp.total)
           offset += limit
           if offset >= resp.total {
             break
           }
         }
         Notifier.shared.notify(message: "Spotlight 索引重建完成")
-        refreshing = false
+        spotlightRefreshing = false
       } catch {
         Notifier.shared.alert(error: error)
       }
@@ -140,13 +140,6 @@ struct SettingsView: View {
       }
 
       if isAuthenticated {
-        if refreshing {
-          HStack {
-            ProgressView(value: refreshProgress)
-          }
-          .padding()
-          .frame(height: 20)
-        }
         Section {
           Button(role: .destructive) {
             do {
@@ -159,10 +152,16 @@ struct SettingsView: View {
             Text("清空草稿箱")
           }
 
-          Button(role: .destructive) {
-            reindex()
-          } label: {
-            Text("重建 Spotlight 索引")
+          if spotlightRefreshing {
+            HStack {
+              ProgressView(value: spotlightProgress)
+            }.frame(height: 20)
+          } else {
+            Button(role: .destructive) {
+              reindex()
+            } label: {
+              Text("重建 Spotlight 索引")
+            }.disabled(spotlightRefreshing)
           }
 
           Button(role: .destructive) {
@@ -179,7 +178,7 @@ struct SettingsView: View {
           } message: {
             Text("确定要退出登录吗？")
           }
-        }.disabled(refreshing)
+        }
       }
     }
     .navigationTitle("设置")
