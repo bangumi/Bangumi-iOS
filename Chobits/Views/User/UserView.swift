@@ -62,12 +62,26 @@ struct UserView: View {
               ImageView(img: user.avatar?.large)
                 .imageStyle(width: 100, height: 100)
                 .imageType(.avatar)
-              VStack(alignment: .leading) {
 
+              VStack(alignment: .leading) {
                 HStack(spacing: 5) {
                   BadgeView {
-                    Text(user.groupEnum.description)
-                      .font(.caption)
+                    Text(user.groupEnum.description).font(.caption)
+                  }
+                  if profile.username == user.username {
+                    BadgeView {
+                      Text("我自己").font(.caption)
+                    }
+                  }
+                  if profile.friendIDs.contains(user.userId) {
+                    BadgeView {
+                      Text("好友").font(.caption)
+                    }
+                  }
+                  if profile.blocklist.contains(user.userId) {
+                    BadgeView(background: .secondary) {
+                      Text("已拉黑").font(.caption)
+                    }
                   }
                   Text("@\(user.username)")
                     .font(.footnote)
