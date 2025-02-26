@@ -25,7 +25,6 @@ struct TrendingSubjectView: View {
         TrendingSubjectTypeView(type: st, width: width)
       }
     }
-    .padding(.horizontal, 8)
     .animation(.default, value: width)
     .task(load)
     .onGeometryChange(for: CGSize.self) { proxy in
@@ -62,16 +61,13 @@ struct TrendingSubjectTypeView: View {
 
   var largeCardWidth: CGFloat {
     var w = CGFloat(300)
-    if columnCount == 1 {
-      w = width - 16
-    }
-    w = (width + 8) / CGFloat(columnCount) - 24
-    return max(w, 300)
+    w = (width + 8) / CGFloat(columnCount) - 8
+    return max(w, 240)
   }
 
   var smallCardWidth: CGFloat {
     let w = (width + 8) / CGFloat(columnCount * 2) - 8
-    return max(w, 150)
+    return max(w, 120)
   }
 
   var largeItems: [TrendingSubjectDTO] {
@@ -83,7 +79,7 @@ struct TrendingSubjectTypeView: View {
   }
 
   var body: some View {
-    VStack(spacing: 2) {
+    VStack(spacing: 8) {
       if items.isEmpty {
         ProgressView()
       } else {
@@ -106,13 +102,11 @@ struct TrendingSubjectTypeView: View {
                   .font(.callout)
               }
               .imageLink(item.subject.link)
-              .padding(8)
-              .shadow(color: Color.black.opacity(0.2), radius: 4)
               .subjectPreview(item.subject)
           }
         }
         ScrollView(.horizontal, showsIndicators: false) {
-          LazyHStack(spacing: 8) {
+          LazyHStack {
             ForEach(smallItems) { item in
               ImageView(img: item.subject.images?.resize(.r400))
                 .imageStyle(width: smallCardWidth, height: smallCardWidth * 1.3)
@@ -130,10 +124,9 @@ struct TrendingSubjectTypeView: View {
                     .font(.footnote)
                 }
                 .imageLink(item.subject.link)
-                .shadow(color: Color.black.opacity(0.2), radius: 4)
                 .subjectPreview(item.subject)
             }
-          }.padding(8)
+          }
         }
       }
     }.animation(.default, value: items)
