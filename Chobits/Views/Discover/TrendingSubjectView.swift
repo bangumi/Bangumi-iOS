@@ -20,7 +20,7 @@ struct TrendingSubjectView: View {
   }
 
   var body: some View {
-    LazyVStack {
+    LazyVStack(spacing: 24) {
       ForEach(SubjectType.allTypes) { st in
         TrendingSubjectTypeView(type: st, width: width)
       }
@@ -56,18 +56,19 @@ struct TrendingSubjectTypeView: View {
   }
 
   var columnCount: Int {
-    Int(width / 600) + 1
+    let count = Int(width / 320)
+    return max(count, 1)
   }
 
   var largeCardWidth: CGFloat {
-    var w = CGFloat(300)
+    var w = CGFloat(320)
     w = (width + 8) / CGFloat(columnCount) - 8
-    return max(w, 240)
+    return max(w, 300)
   }
 
   var smallCardWidth: CGFloat {
     let w = (width + 8) / CGFloat(columnCount * 2) - 8
-    return max(w, 120)
+    return max(w, 150)
   }
 
   var largeItems: [TrendingSubjectDTO] {
@@ -83,7 +84,7 @@ struct TrendingSubjectTypeView: View {
       if items.isEmpty {
         ProgressView()
       } else {
-        Text("热门\(type.description)").font(.title)
+        Text("\(type.description)").font(.title)
         HStack {
           ForEach(largeItems) { item in
             ImageView(img: item.subject.images?.resize(.r800))
