@@ -212,7 +212,6 @@ extension View {
           Rectangle()
             .frame(height: 3)
             .foregroundStyle(episode.trendColor)
-            .offset(x: 0, y: 0)
         }
     } else {
       self
