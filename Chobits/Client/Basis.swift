@@ -33,6 +33,47 @@ struct Auth: Codable {
   }
 }
 
+enum ImageQuality: Int, CaseIterable {
+  case low = 0
+  case high = 1
+
+  var desc: String {
+    switch self {
+    case .low:
+      return "低(更流畅)"
+    case .high:
+      return "高(更清晰)"
+    }
+  }
+
+  var largeSize: ImageSize {
+    switch self {
+    case .low:
+      return .r400
+    case .high:
+      return .r800
+    }
+  }
+
+  var mediumSize: ImageSize {
+    switch self {
+    case .low:
+      return .r200
+    case .high:
+      return .r400
+    }
+  }
+
+  var smallSize: ImageSize {
+    switch self {
+    case .low:
+      return .r100
+    case .high:
+      return .r200
+    }
+  }
+}
+
 enum ImageSize: Int {
   case r100 = 100
   case r200 = 200

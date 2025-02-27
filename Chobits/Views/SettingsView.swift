@@ -15,6 +15,7 @@ struct SettingsView: View {
   @AppStorage("showEpisodeTrends") var showEpisodeTrends: Bool = true
   @AppStorage("hideBlocklist") var hideBlocklist: Bool = false
   @AppStorage("autoCompleteProgress") var autoCompleteProgress: Bool = false
+  @AppStorage("subjectImageQuality") var subjectImageQuality: ImageQuality = .high
 
   @Environment(\.modelContext) var modelContext
 
@@ -112,6 +113,11 @@ struct SettingsView: View {
         }
         Toggle(isOn: $autoCompleteProgress) {
           Text("标记看过时自动完成所有进度")
+        }
+        Picker(selection: $subjectImageQuality, label: Text("条目封面图片质量")) {
+          ForEach(ImageQuality.allCases, id: \.self) { quality in
+            Text(quality.desc).tag(quality)
+          }
         }
       }
 

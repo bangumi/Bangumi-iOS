@@ -41,6 +41,8 @@ struct TrendingSubjectTypeView: View {
   let type: SubjectType
   let width: CGFloat
 
+  @AppStorage("subjectImageQuality") var subjectImageQuality: ImageQuality = .high
+
   @Environment(\.modelContext) private var modelContext
 
   @Query private var trending: [TrendingSubject]
@@ -87,7 +89,7 @@ struct TrendingSubjectTypeView: View {
         Text("\(type.description)").font(.title)
         HStack {
           ForEach(largeItems) { item in
-            ImageView(img: item.subject.images?.resize(.r800))
+            ImageView(img: item.subject.images?.resize(subjectImageQuality.largeSize))
               .imageStyle(width: largeCardWidth, height: largeCardWidth * 1.2)
               .imageType(.subject)
               .imageCaption {
@@ -109,7 +111,7 @@ struct TrendingSubjectTypeView: View {
         ScrollView(.horizontal, showsIndicators: false) {
           LazyHStack {
             ForEach(smallItems) { item in
-              ImageView(img: item.subject.images?.resize(.r400))
+              ImageView(img: item.subject.images?.resize(subjectImageQuality.mediumSize))
                 .imageStyle(width: smallCardWidth, height: smallCardWidth * 1.3)
                 .imageType(.subject)
                 .imageCaption {

@@ -69,6 +69,8 @@ struct ProgressTileItemView: View {
   let subjectId: Int
   let width: CGFloat
 
+  @AppStorage("subjectImageQuality") var subjectImageQuality: ImageQuality = .high
+
   @Environment(Subject.self) var subject
   @Environment(\.modelContext) var modelContext
 
@@ -78,7 +80,7 @@ struct ProgressTileItemView: View {
 
   var body: some View {
     VStack(alignment: .leading, spacing: 8) {
-      ImageView(img: subject.images?.resize(.r400))
+      ImageView(img: subject.images?.resize(subjectImageQuality.mediumSize))
         .imageStyle(width: width, height: imageHeight)
         .imageType(.subject)
         .imageBadge(show: subject.interest?.private ?? false) {
