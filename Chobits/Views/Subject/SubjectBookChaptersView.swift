@@ -8,6 +8,29 @@ enum BookChapterMode {
   case tile
 }
 
+struct ChapterData {
+  let epStatus: Int
+  let volStatus: Int
+  let epsDesc: String
+  let volumesDesc: String
+}
+
+struct ChapterState {
+  let updating: Bool
+  let updateButtonDisable: Bool
+}
+
+struct ChapterInputs {
+  let eps: Binding<String>
+  let vols: Binding<String>
+}
+
+struct ChapterActions {
+  let incrEps: () -> Void
+  let incrVols: () -> Void
+  let update: () -> Void
+}
+
 struct SubjectBookChaptersView: View {
   let mode: BookChapterMode
 
@@ -56,6 +79,7 @@ struct SubjectBookChaptersView: View {
     } else {
       self.inputEps = "\(epStatus+1)"
     }
+    parseInputEps()
   }
 
   func incrVols() {
@@ -64,6 +88,7 @@ struct SubjectBookChaptersView: View {
     } else {
       self.inputVols = "\(volStatus+1)"
     }
+    parseInputVols()
   }
 
   func reset() {
@@ -75,6 +100,7 @@ struct SubjectBookChaptersView: View {
 
   func update() {
     self.updating = true
+
     Task {
       do {
         try await Chii.shared.updateSubjectProgress(
@@ -88,212 +114,278 @@ struct SubjectBookChaptersView: View {
     }
   }
 
+  var chapterData: ChapterData {
+    ChapterData(
+      epStatus: epStatus,
+      volStatus: volStatus,
+      epsDesc: subject.epsDesc,
+      volumesDesc: subject.volumesDesc
+    )
+  }
+
+  var chapterState: ChapterState {
+    ChapterState(
+      updating: updating,
+      updateButtonDisable: updateButtonDisable
+    )
+  }
+
+  var chapterInputs: ChapterInputs {
+    ChapterInputs(
+      eps: $inputEps,
+      vols: $inputVols
+    )
+  }
+
+  var chapterActions: ChapterActions {
+    ChapterActions(
+      incrEps: incrEps,
+      incrVols: incrVols,
+      update: update
+    )
+  }
+
   var body: some View {
-    HStack {
+    VStack {
       switch mode {
       case .large:
-        VStack {
-          HStack(alignment: .firstTextBaseline, spacing: 0) {
-            Text("Chap.").foregroundStyle(.secondary)
-            TextField("\(epStatus)", text: $inputEps)
-              .keyboardType(.numberPad)
-              .frame(minWidth: 50, maxWidth: 75)
-              .multilineTextAlignment(.trailing)
-              .fixedSize(horizontal: true, vertical: false)
-              .padding(.trailing, 2)
-              .textFieldStyle(.roundedBorder)
-              .onChange(of: inputEps) {
-                parseInputEps()
-              }
-            Text("/").foregroundStyle(.secondary)
-            Text(subject.epsDesc).foregroundStyle(.secondary)
-              .padding(.trailing, 5)
-            Button {
-              incrEps()
-            } label: {
-              Image(systemName: "plus.circle")
-                .foregroundStyle(.secondary)
-            }.buttonStyle(.plain)
-            Spacer()
-          }.monospaced()
-          HStack(alignment: .firstTextBaseline, spacing: 0) {
-            Text("Vol. ").foregroundStyle(.secondary)
-            TextField("\(volStatus)", text: $inputVols)
-              .keyboardType(.numberPad)
-              .frame(minWidth: 50, maxWidth: 75)
-              .multilineTextAlignment(.trailing)
-              .fixedSize(horizontal: true, vertical: false)
-              .padding(.trailing, 2)
-              .textFieldStyle(.roundedBorder)
-              .onChange(of: inputVols) {
-                parseInputVols()
-              }
-            Text("/").foregroundStyle(.secondary)
-            Text(subject.volumesDesc).foregroundStyle(.secondary)
-              .padding(.trailing, 5)
-            Button {
-              incrVols()
-            } label: {
-              Image(systemName: "plus.circle")
-                .foregroundStyle(.secondary)
-            }.buttonStyle(.plain)
-            Spacer()
-          }.monospaced()
-        }
-        Spacer()
-        if updating {
-          ZStack {
-            Button("更新", action: {})
-              .disabled(true)
-              .hidden()
-              .buttonStyle(.borderedProminent)
-            ProgressView()
-          }
-        } else {
-          Button("更新", action: update)
-            .disabled(updateButtonDisable)
-            .buttonStyle(.borderedProminent)
-        }
+        LargeChapterView(
+          data: chapterData,
+          state: chapterState,
+          inputs: chapterInputs,
+          actions: chapterActions
+        )
       case .row:
-        HStack {
-          HStack(alignment: .firstTextBaseline, spacing: 0) {
-            TextField("\(epStatus)", text: $inputEps)
-              .keyboardType(.numberPad)
-              .frame(minWidth: 15, maxWidth: 30)
-              .multilineTextAlignment(.trailing)
-              .fixedSize(horizontal: true, vertical: false)
-              .padding(.trailing, 2)
-              .textFieldStyle(.plain)
-              .onChange(of: inputEps) {
-                parseInputEps()
-              }
-            Text("/\(subject.epsDesc)话")
+        RowChapterView(
+          data: chapterData,
+          state: chapterState,
+          inputs: chapterInputs,
+          actions: chapterActions
+        )
+      case .tile:
+        TileChapterView(
+          data: chapterData,
+          state: chapterState,
+          inputs: chapterInputs,
+          actions: chapterActions
+        )
+      }
+    }
+    .disabled(updating)
+    .onChange(of: inputEps) { _, _ in parseInputEps() }
+    .onChange(of: inputVols) { _, _ in parseInputVols() }
+  }
+}
+
+struct LargeChapterView: View {
+  let data: ChapterData
+  let state: ChapterState
+  let inputs: ChapterInputs
+  let actions: ChapterActions
+
+  var body: some View {
+    HStack {
+      VStack {
+        HStack(alignment: .firstTextBaseline, spacing: 0) {
+          Text("Chap.").foregroundStyle(.secondary)
+          TextField("\(data.epStatus)", text: inputs.eps)
+            .keyboardType(.numberPad)
+            .frame(minWidth: 50, maxWidth: 75)
+            .multilineTextAlignment(.trailing)
+            .fixedSize(horizontal: true, vertical: false)
+            .padding(.trailing, 2)
+            .textFieldStyle(.roundedBorder)
+          Text("/").foregroundStyle(.secondary)
+          Text(data.epsDesc).foregroundStyle(.secondary)
+            .padding(.trailing, 5)
+          Button {
+            actions.incrEps()
+          } label: {
+            Image(systemName: "plus.circle")
               .foregroundStyle(.secondary)
-              .padding(.trailing, 2)
-            Button {
-              incrEps()
-            } label: {
-              Image(systemName: "plus.circle")
-                .foregroundStyle(.secondary)
-            }.buttonStyle(.plain)
-          }
-          .monospaced()
-          HStack(alignment: .firstTextBaseline, spacing: 0) {
-            TextField("\(volStatus)", text: $inputVols)
-              .keyboardType(.numberPad)
-              .frame(minWidth: 15, maxWidth: 30)
-              .multilineTextAlignment(.trailing)
-              .fixedSize(horizontal: true, vertical: false)
-              .padding(.trailing, 2)
-              .textFieldStyle(.plain)
-              .onChange(of: inputVols) {
-                parseInputVols()
-              }
-            Text("/\(subject.volumesDesc)卷")
-              .foregroundStyle(.secondary)
-              .padding(.trailing, 2)
-            Button {
-              incrVols()
-            } label: {
-              Image(systemName: "plus.circle")
-                .foregroundStyle(.secondary)
-            }.buttonStyle(.plain)
-          }
-          .monospaced()
+          }.buttonStyle(.plain)
           Spacer()
-          if updating {
-            ZStack {
-              Button {
-              } label: {
-                Image(systemName: "checkmark.circle")
-              }
-              .disabled(true)
-              .hidden()
-              .buttonStyle(.plain)
-              ProgressView()
-            }
-          } else {
+        }.monospaced()
+        HStack(alignment: .firstTextBaseline, spacing: 0) {
+          Text("Vol. ").foregroundStyle(.secondary)
+          TextField("\(data.volStatus)", text: inputs.vols)
+            .keyboardType(.numberPad)
+            .frame(minWidth: 50, maxWidth: 75)
+            .multilineTextAlignment(.trailing)
+            .fixedSize(horizontal: true, vertical: false)
+            .padding(.trailing, 2)
+            .textFieldStyle(.roundedBorder)
+          Text("/").foregroundStyle(.secondary)
+          Text(data.volumesDesc).foregroundStyle(.secondary)
+            .padding(.trailing, 5)
+          Button {
+            actions.incrVols()
+          } label: {
+            Image(systemName: "plus.circle")
+              .foregroundStyle(.secondary)
+          }.buttonStyle(.plain)
+          Spacer()
+        }.monospaced()
+      }
+      Spacer()
+      if state.updating {
+        ZStack {
+          Button("更新", action: {})
+            .disabled(true)
+            .hidden()
+            .buttonStyle(.borderedProminent)
+          ProgressView()
+        }
+      } else {
+        Button("更新", action: actions.update)
+          .disabled(state.updateButtonDisable)
+          .buttonStyle(.borderedProminent)
+      }
+    }
+  }
+}
+
+struct RowChapterView: View {
+  let data: ChapterData
+  let state: ChapterState
+  let inputs: ChapterInputs
+  let actions: ChapterActions
+
+  var body: some View {
+    HStack {
+      HStack(alignment: .firstTextBaseline, spacing: 0) {
+        TextField("\(data.epStatus)", text: inputs.eps)
+          .keyboardType(.numberPad)
+          .frame(minWidth: 15, maxWidth: 30)
+          .multilineTextAlignment(.trailing)
+          .fixedSize(horizontal: true, vertical: false)
+          .padding(.trailing, 2)
+          .textFieldStyle(.plain)
+        Text("/\(data.epsDesc)话")
+          .foregroundStyle(.secondary)
+          .padding(.trailing, 2)
+        Button {
+          actions.incrEps()
+        } label: {
+          Image(systemName: "plus.circle")
+            .foregroundStyle(.secondary)
+        }.buttonStyle(.plain)
+      }
+      .monospaced()
+      HStack(alignment: .firstTextBaseline, spacing: 0) {
+        TextField("\(data.volStatus)", text: inputs.vols)
+          .keyboardType(.numberPad)
+          .frame(minWidth: 15, maxWidth: 30)
+          .multilineTextAlignment(.trailing)
+          .fixedSize(horizontal: true, vertical: false)
+          .padding(.trailing, 2)
+          .textFieldStyle(.plain)
+        Text("/\(data.volumesDesc)卷")
+          .foregroundStyle(.secondary)
+          .padding(.trailing, 2)
+        Button {
+          actions.incrVols()
+        } label: {
+          Image(systemName: "plus.circle")
+            .foregroundStyle(.secondary)
+        }.buttonStyle(.plain)
+      }
+      .monospaced()
+      Spacer()
+      if state.updating {
+        ZStack {
+          Button {
+          } label: {
+            Image(systemName: "checkmark.circle")
+          }
+          .disabled(true)
+          .hidden()
+          .buttonStyle(.plain)
+          ProgressView()
+        }
+      } else {
+        Button {
+          actions.update()
+        } label: {
+          Image(systemName: "checkmark.circle")
+        }
+        .disabled(state.updateButtonDisable)
+        .buttonStyle(.borderless)
+      }
+    }.font(.callout)
+  }
+}
+
+struct TileChapterView: View {
+  let data: ChapterData
+  let state: ChapterState
+  let inputs: ChapterInputs
+  let actions: ChapterActions
+
+  var body: some View {
+    HStack {
+      VStack {
+        if state.updating {
+          ZStack {
             Button {
-              update()
             } label: {
               Image(systemName: "checkmark.circle")
             }
-            .disabled(updateButtonDisable)
+            .disabled(true)
+            .hidden()
             .buttonStyle(.borderless)
+            ProgressView()
           }
-        }.font(.callout)
-      case .tile:
-        HStack {
-          VStack {
-            if updating {
-              ZStack {
-                Button {
-                } label: {
-                  Image(systemName: "checkmark.circle")
-                }
-                .disabled(true)
-                .hidden()
-                .buttonStyle(.borderless)
-                ProgressView()
-              }
-            } else {
-              Button {
-                update()
-              } label: {
-                Image(systemName: "checkmark.circle")
-              }
-              .disabled(updateButtonDisable)
-              .buttonStyle(.borderless)
-            }
-          }.font(.title3)
-          Spacer()
-          VStack(alignment: .trailing) {
-            HStack(alignment: .firstTextBaseline, spacing: 0) {
-              TextField("\(epStatus)", text: $inputEps)
-                .keyboardType(.numberPad)
-                .frame(minWidth: 32, maxWidth: 48)
-                .multilineTextAlignment(.trailing)
-                .fixedSize(horizontal: true, vertical: false)
-                .padding(.trailing, 2)
-                .textFieldStyle(.plain)
-                .onChange(of: inputEps) {
-                  parseInputEps()
-                }
-              Text("/\(subject.epsDesc)话")
-                .foregroundStyle(.secondary)
-                .padding(.trailing, 2)
-              Button {
-                incrEps()
-              } label: {
-                Image(systemName: "plus.circle")
-                  .foregroundStyle(.secondary)
-              }.buttonStyle(.plain)
-            }.monospaced()
-            HStack(alignment: .firstTextBaseline, spacing: 0) {
-              TextField("\(volStatus)", text: $inputVols)
-                .keyboardType(.numberPad)
-                .frame(minWidth: 32, maxWidth: 48)
-                .multilineTextAlignment(.trailing)
-                .fixedSize(horizontal: true, vertical: false)
-                .padding(.trailing, 2)
-                .textFieldStyle(.plain)
-                .onChange(of: inputVols) {
-                  parseInputVols()
-                }
-              Text("/\(subject.volumesDesc)卷")
-                .foregroundStyle(.secondary)
-                .padding(.trailing, 2)
-              Button {
-                incrVols()
-              } label: {
-                Image(systemName: "plus.circle")
-                  .foregroundStyle(.secondary)
-              }.buttonStyle(.plain)
-            }.monospaced()
+        } else {
+          Button {
+            actions.update()
+          } label: {
+            Image(systemName: "checkmark.circle")
           }
+          .disabled(state.updateButtonDisable)
+          .buttonStyle(.borderless)
         }
+      }.font(.title3)
+      Spacer()
+      VStack(alignment: .trailing) {
+        HStack(alignment: .firstTextBaseline, spacing: 0) {
+          TextField("\(data.epStatus)", text: inputs.eps)
+            .keyboardType(.numberPad)
+            .frame(minWidth: 32, maxWidth: 48)
+            .multilineTextAlignment(.trailing)
+            .fixedSize(horizontal: true, vertical: false)
+            .padding(.trailing, 2)
+            .textFieldStyle(.plain)
+          Text("/\(data.epsDesc)话")
+            .foregroundStyle(.secondary)
+            .padding(.trailing, 2)
+          Button {
+            actions.incrEps()
+          } label: {
+            Image(systemName: "plus.circle")
+              .foregroundStyle(.secondary)
+          }.buttonStyle(.plain)
+        }.monospaced()
+        HStack(alignment: .firstTextBaseline, spacing: 0) {
+          TextField("\(data.volStatus)", text: inputs.vols)
+            .keyboardType(.numberPad)
+            .frame(minWidth: 32, maxWidth: 48)
+            .multilineTextAlignment(.trailing)
+            .fixedSize(horizontal: true, vertical: false)
+            .padding(.trailing, 2)
+            .textFieldStyle(.plain)
+          Text("/\(data.volumesDesc)卷")
+            .foregroundStyle(.secondary)
+            .padding(.trailing, 2)
+          Button {
+            actions.incrVols()
+          } label: {
+            Image(systemName: "plus.circle")
+              .foregroundStyle(.secondary)
+          }.buttonStyle(.plain)
+        }.monospaced()
       }
-    }.disabled(updating)
+    }
   }
 }
 
