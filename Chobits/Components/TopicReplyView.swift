@@ -2,8 +2,48 @@ import BBCode
 import SwiftUI
 
 enum TopicParentType {
-  case subject
-  case group
+  case subject(Int)
+  case group(String)
+
+  func reply(topicId: Int, content: String, replyTo: Int?, token: String) async throws {
+    switch self {
+    case .subject:
+      try await Chii.shared.createSubjectReply(
+        topicId: topicId, content: content, replyTo: replyTo, token: token)
+    case .group:
+      try await Chii.shared.createGroupReply(
+        topicId: topicId, content: content, replyTo: replyTo, token: token)
+    }
+  }
+
+  func editPost(postId: Int, content: String) async throws {
+    switch self {
+    case .subject:
+      try await Chii.shared.editSubjectPost(postId: postId, content: content)
+    case .group:
+      try await Chii.shared.editGroupPost(postId: postId, content: content)
+    }
+  }
+
+  func editTopic(topicId: Int, title: String, content: String) async throws {
+    switch self {
+    case .subject:
+      try await Chii.shared.editSubjectTopic(topicId: topicId, title: title, content: content)
+    case .group:
+      try await Chii.shared.editGroupTopic(topicId: topicId, title: title, content: content)
+    }
+  }
+
+  func createTopic(title: String, content: String, token: String) async throws {
+    switch self {
+    case .subject(let subjectId):
+      try await Chii.shared.createSubjectTopic(
+        subjectId: subjectId, title: title, content: content, token: token)
+    case .group(let groupName):
+      try await Chii.shared.createGroupTopic(
+        groupName: groupName, title: title, content: content, token: token)
+    }
+  }
 }
 
 struct ReplyItemView: View {
@@ -348,16 +388,7 @@ struct CreateReplyBoxView: View {
         let quote = "[quote][b]\(quoteUser)[/b]说: \(quoteContent)[/quote]\n"
         content = quote + content
       }
-      switch type {
-      case .subject:
-        try await Chii.shared.createSubjectReply(
-          topicId: topicId, content: content,
-          replyTo: reply?.id, token: token)
-      case .group:
-        try await Chii.shared.createGroupReply(
-          topicId: topicId, content: content,
-          replyTo: reply?.id, token: token)
-      }
+      try await type.reply(topicId: topicId, content: content, replyTo: reply?.id, token: token)
       Notifier.shared.notify(message: "回复成功")
       dismiss()
     } catch {
@@ -430,12 +461,7 @@ struct EditReplyBoxView: View {
         Notifier.shared.alert(message: "找不到要编辑的回复")
         return
       }
-      switch type {
-      case .subject:
-        try await Chii.shared.editSubjectPost(postId: postId, content: content)
-      case .group:
-        try await Chii.shared.editGroupPost(postId: postId, content: content)
-      }
+      try await type.editPost(postId: postId, content: content)
       Notifier.shared.notify(message: "编辑成功")
       dismiss()
     } catch {
@@ -513,12 +539,7 @@ struct EditTopicBoxView: View {
   func editTopic(title: String, content: String) async {
     do {
       updating = true
-      switch type {
-      case .subject:
-        try await Chii.shared.editSubjectTopic(topicId: topicId, title: title, content: content)
-      case .group:
-        try await Chii.shared.editGroupTopic(topicId: topicId, title: title, content: content)
-      }
+      try await type.editTopic(topicId: topicId, title: title, content: content)
       Notifier.shared.notify(message: "编辑成功")
       dismiss()
     } catch {

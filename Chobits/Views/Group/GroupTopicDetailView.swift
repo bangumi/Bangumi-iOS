@@ -61,7 +61,7 @@ struct GroupTopicDetailView: View {
             LazyVStack(alignment: .leading, spacing: 8) {
               ForEach(Array(zip(topic.replies.indices, topic.replies)), id: \.1) { idx, reply in
                 ReplyItemView(
-                  type: .group, topicId: topicId, idx: idx,
+                  type: .group(topic.group.name), topicId: topicId, idx: idx,
                   reply: reply, author: topic.creator)
                 if reply.id != topic.replies.last?.id {
                   Divider()
@@ -77,12 +77,12 @@ struct GroupTopicDetailView: View {
           }
         }
         .sheet(isPresented: $showReplyBox) {
-          CreateReplyBoxView(type: .group, topicId: topicId)
+          CreateReplyBoxView(type: .group(topic.group.name), topicId: topicId)
             .presentationDetents([.large])
         }
         .sheet(isPresented: $showEditBox) {
           EditTopicBoxView(
-            type: .group, topicId: topicId,
+            type: .group(topic.group.name), topicId: topicId,
             title: topic.title, post: topic.replies.first
           ).presentationDetents([.large])
         }

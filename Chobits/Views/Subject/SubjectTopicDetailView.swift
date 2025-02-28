@@ -61,7 +61,7 @@ struct SubjectTopicDetailView: View {
             LazyVStack(alignment: .leading, spacing: 8) {
               ForEach(Array(zip(topic.replies.indices, topic.replies)), id: \.1) { idx, reply in
                 ReplyItemView(
-                  type: .subject, topicId: topicId, idx: idx,
+                  type: .subject(topic.subject.id), topicId: topicId, idx: idx,
                   reply: reply, author: topic.creator)
                 if reply.id != topic.replies.last?.id {
                   Divider()
@@ -77,12 +77,12 @@ struct SubjectTopicDetailView: View {
           }
         }
         .sheet(isPresented: $showReplyBox) {
-          CreateReplyBoxView(type: .subject, topicId: topicId)
+          CreateReplyBoxView(type: .subject(topic.subject.id), topicId: topicId)
             .presentationDetents([.large])
         }
         .sheet(isPresented: $showEditBox) {
           EditTopicBoxView(
-            type: .subject, topicId: topicId,
+            type: .subject(topic.subject.id), topicId: topicId,
             title: topic.title, post: topic.replies.first
           ).presentationDetents([.large])
         }

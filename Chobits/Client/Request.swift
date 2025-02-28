@@ -387,6 +387,18 @@ extension Chii {
     return resp
   }
 
+  func createGroupTopic(groupName: String, title: String, content: String, token: String)
+    async throws
+  {
+    let url = BangumiAPI.priv.build("p1/groups/\(groupName)/topics")
+    let body: [String: Any] = [
+      "title": title,
+      "content": content,
+      "turnstileToken": token,
+    ]
+    _ = try await self.request(url: url, method: "POST", body: body, auth: .required)
+  }
+
   func getSubjectTopic(_ topicId: Int) async throws -> SubjectTopicDTO {
     if self.mock {
       return loadFixture(fixture: "subject_topic.json", target: SubjectTopicDTO.self)
@@ -395,6 +407,18 @@ extension Chii {
     let data = try await self.request(url: url, method: "GET")
     let resp: SubjectTopicDTO = try self.decodeResponse(data)
     return resp
+  }
+
+  func createSubjectTopic(subjectId: Int, title: String, content: String, token: String)
+    async throws
+  {
+    let url = BangumiAPI.priv.build("p1/subjects/\(subjectId)/topics")
+    let body: [String: Any] = [
+      "title": title,
+      "content": content,
+      "turnstileToken": token,
+    ]
+    _ = try await self.request(url: url, method: "POST", body: body, auth: .required)
   }
 
   func postSubjectTopicReply(topicId: Int, content: String, replyTo: Int?, token: String)
