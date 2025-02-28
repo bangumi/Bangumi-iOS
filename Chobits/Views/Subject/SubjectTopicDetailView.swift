@@ -5,10 +5,12 @@ struct SubjectTopicDetailView: View {
   let topicId: Int
 
   @AppStorage("shareDomain") var shareDomain: ShareDomain = .chii
+  @AppStorage("profile") var profile: Profile = Profile()
 
   @State private var topic: SubjectTopicDTO?
   @State private var refreshed = false
   @State private var showReplyBox = false
+  @State private var showEditBox = false
 
   var title: String {
     topic?.title ?? "讨论详情"
@@ -78,6 +80,12 @@ struct SubjectTopicDetailView: View {
           CreateReplyBoxView(type: .subject, topicId: topicId)
             .presentationDetents([.large])
         }
+        .sheet(isPresented: $showEditBox) {
+          EditTopicBoxView(
+            type: .subject, topicId: topicId,
+            title: topic.title, post: topic.replies.first
+          ).presentationDetents([.large])
+        }
       } else if refreshed {
         NotFoundView()
       } else {
@@ -89,14 +97,22 @@ struct SubjectTopicDetailView: View {
     .toolbar {
       ToolbarItem(placement: .topBarTrailing) {
         Menu {
+          ShareLink(item: shareLink) {
+            Label("分享", systemImage: "square.and.arrow.up")
+          }
+          Divider()
           Button {
             showReplyBox = true
           } label: {
             Label("回复", systemImage: "plus.bubble")
           }
-          Divider()
-          ShareLink(item: shareLink) {
-            Label("分享", systemImage: "square.and.arrow.up")
+          if let authorID = topic?.creatorID, profile.user.id == authorID {
+            Divider()
+            Button {
+              showEditBox = true
+            } label: {
+              Label("编辑", systemImage: "pencil")
+            }
           }
         } label: {
           Image(systemName: "ellipsis.circle")

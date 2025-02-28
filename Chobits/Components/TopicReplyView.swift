@@ -485,3 +485,111 @@ struct EditReplyBoxView: View {
     }
   }
 }
+
+struct EditTopicBoxView: View {
+  let type: TopicParentType
+  let topicId: Int
+  let post: ReplyDTO?
+
+  @Environment(\.dismiss) private var dismiss
+
+  @State private var title: String
+  @State private var content: String
+  @State private var updating: Bool = false
+
+  init(type: TopicParentType, topicId: Int, title: String, post: ReplyDTO? = nil) {
+    self.type = type
+    self.topicId = topicId
+    self._title = State(initialValue: title)
+    if let post = post {
+      self.post = post
+      self._content = State(initialValue: post.content)
+    } else {
+      self.post = nil
+      self._content = State(initialValue: "")
+    }
+  }
+
+  func editTopic(title: String, content: String) async {
+    do {
+      updating = true
+      switch type {
+      case .subject:
+        try await Chii.shared.editSubjectTopic(topicId: topicId, title: title, content: content)
+      case .group:
+        try await Chii.shared.editGroupTopic(topicId: topicId, title: title, content: content)
+      }
+      Notifier.shared.notify(message: "编辑成功")
+      dismiss()
+    } catch {
+      Notifier.shared.alert(error: error)
+    }
+    updating = false
+  }
+
+  var header: String {
+    switch type {
+    case .subject:
+      return "编辑条目讨论"
+    case .group:
+      return "编辑小组话题"
+    }
+  }
+
+  var submitDisabled: Bool {
+    if post == nil {
+      return false
+    }
+    return title.isEmpty || content.isEmpty || updating
+  }
+
+  var body: some View {
+    ScrollView {
+      VStack {
+        Text(header)
+          .font(.headline)
+          .lineLimit(1)
+        if post == nil {
+          ZStack {
+            VStack(alignment: .leading) {
+              Text("找不到对应的内容，请检查 topic 并重新编辑")
+                .font(.callout.bold())
+                .foregroundStyle(.red)
+            }
+            RoundedRectangle(cornerRadius: 5)
+              .stroke(.accent, lineWidth: 1)
+              .padding(.horizontal, 1)
+          }
+        }
+        HStack {
+          Button {
+            dismiss()
+          } label: {
+            Label("取消", systemImage: "xmark")
+          }
+          .disabled(updating)
+          .buttonStyle(.bordered)
+          Spacer()
+          Button {
+            Task {
+              await editTopic(title: title, content: content)
+            }
+          } label: {
+            Label("保存", systemImage: "checkmark")
+          }
+          .disabled(submitDisabled)
+          .buttonStyle(.borderedProminent)
+        }
+        VStack {
+          BorderView(color: .secondary.opacity(0.2), padding: 4) {
+            TextField("标题", text: $title)
+              .textInputAutocapitalization(.never)
+              .disableAutocorrection(true)
+          }
+          TextInputView(type: "内容", text: $content)
+            .textInputStyle(bbcode: true)
+        }
+      }.padding()
+    }
+  }
+}

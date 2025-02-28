@@ -492,6 +492,15 @@ extension Chii {
     _ = try await self.request(url: url, method: "POST", body: body, auth: .required)
   }
 
+  func editSubjectTopic(topicId: Int, title: String, content: String) async throws {
+    let url = BangumiAPI.priv.build("p1/subjects/-/topics/\(topicId)")
+    let body: [String: Any] = [
+      "title": title,
+      "content": content,
+    ]
+    _ = try await self.request(url: url, method: "PUT", body: body, auth: .required)
+  }
+
   func deleteGroupPost(postId: Int) async throws {
     let url = BangumiAPI.priv.build("p1/groups/-/posts/\(postId)")
     let body: [String: Any] = [:]
@@ -514,6 +523,15 @@ extension Chii {
       body["replyTo"] = replyTo
     }
     _ = try await self.request(url: url, method: "POST", body: body, auth: .required)
+  }
+
+  func editGroupTopic(topicId: Int, title: String, content: String) async throws {
+    let url = BangumiAPI.priv.build("p1/groups/-/topics/\(topicId)")
+    let body: [String: Any] = [
+      "title": title,
+      "content": content,
+    ]
+    _ = try await self.request(url: url, method: "PUT", body: body, auth: .required)
   }
 }
 
