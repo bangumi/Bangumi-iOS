@@ -82,6 +82,11 @@ struct TextInputView: View {
       if style.bbcode, #available(iOS 18.0, *) {
         BBCodeEditor(text: $text)
       } else {
+        if style.bbcode {
+          Text("BBCode 编辑器需要 iOS 18 及以上版本")
+            .font(.footnote)
+            .foregroundStyle(.secondary)
+        }
         PlainTextEditor(text: $text)
       }
 
