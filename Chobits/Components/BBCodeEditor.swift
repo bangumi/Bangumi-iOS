@@ -347,6 +347,58 @@ struct BBCodeEditor: View {
             .autocorrectionDisabled()
             .textInputAutocapitalization(.never)
         }
+        .toolbar {
+          ToolbarItem(placement: .keyboard) {
+            ScrollView(.horizontal, showsIndicators: false) {
+              HStack(spacing: 8) {
+                ForEach(BBCodeType.basic) { code in
+                  Button(action: { handleBasicInput(code) }) {
+                    Image(systemName: code.icon)
+                      .frame(width: 12, height: 12)
+                  }
+                }
+                Divider()
+                Button(action: { showingImageInput = true }) {
+                  Image(systemName: BBCodeType.image.icon)
+                    .frame(width: 12, height: 12)
+                }
+                Button(action: { showingURLInput = true }) {
+                  Image(systemName: BBCodeType.url.icon)
+                    .frame(width: 12, height: 12)
+                }
+                Divider()
+                Button(action: { showingSizeInput = true }) {
+                  Image(systemName: BBCodeType.size.icon)
+                    .frame(width: 12, height: 12)
+                }
+                Button(action: { showingColorInput = true }) {
+                  Image(systemName: BBCodeType.color.icon)
+                    .frame(width: 12, height: 12)
+                }
+                Divider()
+                ForEach(BBCodeType.block) { code in
+                  Button(action: { handleBasicInput(code) }) {
+                    Image(systemName: code.icon)
+                      .frame(width: 12, height: 12)
+                  }
+                }
+                Divider()
+                ForEach(BBCodeType.alignment) { code in
+                  Button(action: { handleBasicInput(code) }) {
+                    Image(systemName: code.icon)
+                      .frame(width: 12, height: 12)
+                  }
+                }
+                Divider()
+                Button(action: { showingEmojiInput = true }) {
+                  Image(systemName: BBCodeType.emoji.icon)
+                    .frame(width: 12, height: 12)
+                }
+                Divider()
+              }.padding(.horizontal, 2)
+            }.buttonStyle(.bordered)
+          }
+        }
         Rectangle()
           .fill(.secondary.opacity(0.2))
           .frame(height: 4)
