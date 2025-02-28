@@ -33,6 +33,12 @@ struct BBCodeEditor: View {
     textSelection = TextSelection(range: cursorStartIndex..<cursorEndIndex)
   }
 
+  private func insertTagToEnd(_ before: String, _ after: String) {
+    let endIndex = text.endIndex
+    text += before + after
+    newSelection(endIndex, before.count)
+  }
+
   private func handleBasicInput(_ tag: BBCodeType) {
     let tagBefore = "[\(tag.code)]"
     let tagAfter = "[/\(tag.code)]"
@@ -58,10 +64,7 @@ struct BBCodeEditor: View {
         break
       }
     } else {
-      let endIndex = text.endIndex
-      text += tagBefore
-      text += tagAfter
-      newSelection(endIndex, tagBefore.count)
+      insertTagToEnd(tagBefore, tagAfter)
     }
   }
 
@@ -79,9 +82,7 @@ struct BBCodeEditor: View {
         break
       }
     } else {
-      let endIndex = text.endIndex
-      text += "\(tagBefore)\(inputURL)\(tagAfter)"
-      newSelection(endIndex, tagBefore.count + inputURL.count + tagAfter.count)
+      insertTagToEnd("\(tagBefore)\(inputURL)\(tagAfter)", "")
     }
     inputURL = ""
   }
@@ -137,9 +138,7 @@ struct BBCodeEditor: View {
         break
       }
     } else {
-      let endIndex = text.endIndex
-      text += tagBefore + tagAfter
-      newSelection(endIndex, tagBefore.count)
+      insertTagToEnd(tagBefore, tagAfter)
     }
     inputSize = 14
   }
@@ -190,9 +189,7 @@ struct BBCodeEditor: View {
         break
       }
     } else {
-      let endIndex = text.endIndex
-      text += tagBefore + tagAfter
-      newSelection(endIndex, tagBefore.count)
+      insertTagToEnd(tagBefore, tagAfter)
     }
   }
 

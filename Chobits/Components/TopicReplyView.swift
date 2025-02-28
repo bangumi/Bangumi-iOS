@@ -505,7 +505,7 @@ struct EditReplyBoxView: View {
           .disabled(content.isEmpty || updating)
           .buttonStyle(.borderedProminent)
         }
-        TextInputView(type: "内容", text: $content)
+        TextInputView(type: "回复", text: $content)
           .textInputStyle(bbcode: true)
       }.padding()
     }
@@ -607,7 +607,7 @@ struct EditTopicBoxView: View {
               .textInputAutocapitalization(.never)
               .disableAutocorrection(true)
           }
-          TextInputView(type: "内容", text: $content)
+          TextInputView(type: "讨论", text: $content)
             .textInputStyle(bbcode: true)
         }
       }.padding()

@@ -480,7 +480,7 @@ struct EditCommentBoxView: View {
           .disabled(content.isEmpty || updating)
           .buttonStyle(.borderedProminent)
         }
-        TextInputView(type: "内容", text: $content)
+        TextInputView(type: "回复", text: $content)
           .textInputStyle(bbcode: true)
       }.padding()
     }

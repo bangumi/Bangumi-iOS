@@ -91,6 +91,9 @@ struct ChiiTimelineView: View {
             NavigationLink(value: NavDestination.setting) {
               Image(systemName: "gearshape")
             }
+            // NavigationLink(value: NavDestination.test) {
+            //   Image(systemName: "testtube.2")
+            // }
           }
         }
       }

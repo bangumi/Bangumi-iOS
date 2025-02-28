@@ -13,6 +13,8 @@ struct LinkableDTO: Codable, Hashable, Linkable {
 }
 
 enum NavDestination: Hashable, View {
+  case test
+
   case setting
   case notice
   case friends
@@ -63,6 +65,13 @@ enum NavDestination: Hashable, View {
 
   var body: some View {
     switch self {
+    case .test:
+      if #available(iOS 18.0, *) {
+        ChiiTestView()
+      } else {
+        EmptyView()
+      }
+
     case .setting:
       SettingsView()
     case .notice:
