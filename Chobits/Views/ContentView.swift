@@ -45,7 +45,6 @@ struct ContentView: View {
         PhoneView()
       }
       VStack(alignment: .center) {
-        Spacer()
         ForEach($notifier.notifications, id: \.self) { $notification in
           Text(notification)
             .padding(.horizontal, 16)
@@ -55,6 +54,7 @@ struct ContentView: View {
             .shadow(color: .black.opacity(0.2), radius: 10, x: 0, y: 10)
             .clipShape(RoundedRectangle(cornerRadius: 16))
         }
+        Spacer()
       }
       .animation(.default, value: notifier.notifications)
       .padding(.horizontal, 8)
