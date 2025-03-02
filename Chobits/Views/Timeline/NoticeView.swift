@@ -44,6 +44,7 @@ struct NoticeView: View {
         } else {
           ScrollView {
             HStack {
+              Text("全部提醒").font(.title3)
               Spacer()
               if updating {
                 ZStack {

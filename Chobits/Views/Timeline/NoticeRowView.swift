@@ -10,8 +10,12 @@ struct NoticeRowView: View {
     HStack {
       if notice.unread {
         Circle()
-          .frame(width: 10, height: 10)
+          .frame(width: 4)
           .foregroundStyle(.accent)
+      } else {
+        Rectangle()
+          .frame(width: 4)
+          .foregroundStyle(.secondary.opacity(0.5))
       }
       ImageView(img: notice.sender.avatar?.large)
         .imageStyle(width: 40, height: 40)
