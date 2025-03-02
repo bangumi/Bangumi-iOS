@@ -52,6 +52,12 @@ struct TimelineItemView: View {
             EmptyView()
           }
 
+        case .wiki:
+          Text(item.desc)
+          if let subject = item.memo.wiki?.subject {
+            SubjectSmallView(subject: subject)
+          }
+
         case .subject:
           Text(item.desc)
           if item.batch {
