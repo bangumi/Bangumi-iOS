@@ -24,7 +24,7 @@ struct BlogView: View {
   }
 
   var shareLink: URL {
-    URL(string: "https://\(shareDomain.rawValue)/blog/\(blogId)")!
+    URL(string: "\(shareDomain.url)/blog/\(blogId)")!
   }
 
   func load() async {

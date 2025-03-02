@@ -17,7 +17,7 @@ struct GroupTopicDetailView: View {
   }
 
   var shareLink: URL {
-    URL(string: "https://\(shareDomain.rawValue)/group/topic/\(topicId)")!
+    URL(string: "\(shareDomain.url)/group/topic/\(topicId)")!
   }
 
   func refresh() async {

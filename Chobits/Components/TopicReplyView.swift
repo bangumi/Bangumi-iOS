@@ -5,6 +5,16 @@ enum TopicParentType {
   case subject(Int)
   case group(String)
 
+  func shareLink(topicId: Int, postId: Int) -> URL {
+    @AppStorage("shareDomain") var shareDomain: ShareDomain = .chii
+    switch self {
+    case .subject:
+      return URL(string: "\(shareDomain.url)/subject/-/topic/\(topicId)#post_\(postId)")!
+    case .group:
+      return URL(string: "\(shareDomain.url)/group/-/topic/\(topicId)#post_\(postId)")!
+    }
+  }
+
   func reply(topicId: Int, content: String, replyTo: Int?, token: String) async throws {
     switch self {
     case .subject:
@@ -79,18 +89,11 @@ struct ReplyItemNormalView: View {
 
   @AppStorage("profile") var profile: Profile = Profile()
   @AppStorage("hideBlocklist") var hideBlocklist: Bool = false
-  @AppStorage("shareDomain") var shareDomain: ShareDomain = .chii
 
   @State private var showReplyBox: Bool = false
   @State private var showEditBox: Bool = false
   @State private var updating: Bool = false
   @State private var showDeleteConfirm: Bool = false
-
-  var shareLink: URL {
-    URL(
-      string:
-        "https://\(shareDomain.rawValue)/\(type)/topic/\(topicId)#post_\(reply.id)")!
-  }
 
   var body: some View {
     VStack(alignment: .leading) {
@@ -140,7 +143,7 @@ struct ReplyItemNormalView: View {
                 .disabled(updating)
               }
               Divider()
-              ShareLink(item: shareLink) {
+              ShareLink(item: type.shareLink(topicId: topicId, postId: reply.id)) {
                 Label("分享", systemImage: "square.and.arrow.up")
               }
             } label: {
@@ -245,16 +248,11 @@ struct SubReplyNormalView: View {
   let topicId: Int
 
   @AppStorage("profile") var profile: Profile = Profile()
-  @AppStorage("shareDomain") var shareDomain: ShareDomain = .chii
 
   @State private var showReplyBox: Bool = false
   @State private var showEditBox: Bool = false
   @State private var updating: Bool = false
   @State private var showDeleteConfirm: Bool = false
-
-  var shareLink: URL {
-    URL(string: "https://\(shareDomain.rawValue)/\(type)/topic/\(reply.id)#post_\(subreply.id)")!
-  }
 
   var body: some View {
     HStack(alignment: .top) {
@@ -304,7 +302,7 @@ struct SubReplyNormalView: View {
               .disabled(updating)
             }
             Divider()
-            ShareLink(item: shareLink) {
+            ShareLink(item: type.shareLink(topicId: topicId, postId: subreply.id)) {
               Label("分享", systemImage: "square.and.arrow.up")
             }
           } label: {

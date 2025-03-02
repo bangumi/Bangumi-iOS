@@ -17,7 +17,7 @@ struct SubjectTopicDetailView: View {
   }
 
   var shareLink: URL {
-    URL(string: "https://\(shareDomain.rawValue)/subject/topic/\(topicId)")!
+    URL(string: "\(shareDomain.url)/subject/topic/\(topicId)")!
   }
 
   func refresh() async {

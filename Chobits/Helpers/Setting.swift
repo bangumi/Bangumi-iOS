@@ -59,6 +59,10 @@ enum ShareDomain: String, CaseIterable {
       self = .chii
     }
   }
+
+  var url: String {
+    "https://\(self.rawValue)"
+  }
 }
 
 enum AuthDomain: String, CaseIterable {

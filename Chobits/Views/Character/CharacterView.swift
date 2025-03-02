@@ -27,7 +27,7 @@ struct CharacterView: View {
   }
 
   var shareLink: URL {
-    URL(string: "https://\(shareDomain.rawValue)/character/\(characterId)")!
+    URL(string: "\(shareDomain.url)/character/\(characterId)")!
   }
 
   var title: String {

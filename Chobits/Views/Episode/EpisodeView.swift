@@ -34,7 +34,7 @@ struct EpisodeView: View {
   }
 
   var shareLink: URL {
-    URL(string: "https://\(shareDomain.rawValue)/ep/\(episodeId)")!
+    URL(string: "\(shareDomain.url)/ep/\(episodeId)")!
   }
 
   var body: some View {

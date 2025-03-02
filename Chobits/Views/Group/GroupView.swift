@@ -22,7 +22,7 @@ struct GroupView: View {
   }
 
   var shareLink: URL {
-    URL(string: "https://\(shareDomain.rawValue)/group/\(name)")!
+    URL(string: "\(shareDomain.url)/group/\(name)")!
   }
 
   var title: String {

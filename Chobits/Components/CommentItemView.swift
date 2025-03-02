@@ -27,15 +27,15 @@ enum CommentParentType {
     @AppStorage("shareDomain") var shareDomain: ShareDomain = .chii
     switch self {
     case .blog(let id):
-      return URL(string: "https://\(shareDomain.rawValue)/blog/\(id)#post_\(commentId)")!
+      return URL(string: "\(shareDomain.url)/blog/\(id)#post_\(commentId)")!
     case .character(let id):
-      return URL(string: "https://\(shareDomain.rawValue)/character/\(id)#post_\(commentId)")!
+      return URL(string: "\(shareDomain.url)/character/\(id)#post_\(commentId)")!
     case .person(let id):
-      return URL(string: "https://\(shareDomain.rawValue)/person/\(id)#post_\(commentId)")!
+      return URL(string: "\(shareDomain.url)/person/\(id)#post_\(commentId)")!
     case .episode(let id):
-      return URL(string: "https://\(shareDomain.rawValue)/ep/\(id)#post_\(commentId)")!
+      return URL(string: "\(shareDomain.url)/ep/\(id)#post_\(commentId)")!
     case .timeline(let id):
-      return URL(string: "https://\(shareDomain.rawValue)/timeline/\(id)#post_\(commentId)")!
+      return URL(string: "\(shareDomain.url)/timeline/\(id)#post_\(commentId)")!
     }
   }
 
