@@ -994,6 +994,34 @@ enum SubjectTopicFilterMode: String, Codable, CaseIterable {
   }
 }
 
+let REACTIONS: [Int: String] = [
+  0: "bgm67",
+  79: "bgm63",
+  54: "bgm38",
+  140: "bgm124",
+
+  62: "bgm46",
+  122: "bgm106",
+  104: "bgm88",
+  80: "bgm64",
+
+  88: "bgm72",
+  85: "bgm69",
+  90: "bgm74",
+
+  // hidden
+  53: "bgm37",
+  92: "bgm76",
+  118: "bgm102",
+  60: "bgm44",
+  128: "bgm112",
+  47: "bgm31",
+  68: "bgm52",
+  137: "bgm121",
+  76: "bgm60",
+  132: "bgm116",
+]
+
 /// TODO: use bangumi/common
 
 struct SubjectCategory: Identifiable {

@@ -624,6 +624,10 @@ struct ReactionDTO: Codable, Identifiable, Hashable {
   var id: Int {
     value
   }
+
+  var icon: String {
+    REACTIONS[value] ?? "bgm125"
+  }
 }
 
 struct CommentBaseDTO: Codable, Identifiable, Hashable {
@@ -938,6 +942,8 @@ struct TimelineSubjectDTO: Codable, Hashable {
   var subject: SlimSubjectDTO
   var comment: String
   var rate: Float
+  var collectID: Int?
+  var reactions: [ReactionDTO]?
 }
 
 struct TimelineWikiDTO: Codable, Hashable {

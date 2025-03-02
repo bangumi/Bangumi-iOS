@@ -5,6 +5,8 @@ struct TimelineItemView: View {
   let item: TimelineDTO
   let previous: TimelineDTO?
 
+  @State private var showReactions = false
+
   var body: some View {
     HStack(alignment: .top) {
       if let user = item.user {
@@ -148,6 +150,34 @@ struct TimelineItemView: View {
         default:
           Text(item.desc)
         }
+        if item.cat == .subject, let collect = item.memo.subject?.first,
+          let reactions = collect.reactions, !reactions.isEmpty
+        {
+          HStack {
+            ForEach(reactions, id: \.value) { reaction in
+              Menu {
+                ForEach(reaction.users, id: \.id) { user in
+                  NavigationLink(value: NavDestination.user(user.username)) {
+                    Text(user.nickname)
+                  }.buttonStyle(.plain)
+                }
+                Divider()
+              } label: {
+                CardView(padding: 2, cornerRadius: 10) {
+                  HStack(spacing: 4) {
+                    Image(reaction.icon)
+                      .resizable()
+                      .aspectRatio(contentMode: .fit)
+                      .frame(width: 18, height: 18)
+                    Text("\(reaction.users.count)")
+                      .font(.callout)
+                      .foregroundStyle(.secondary)
+                  }.padding(.horizontal, 4)
+                }
+              }.buttonStyle(.plain)
+            }
+          }
+        }
         HStack {
           if item.cat == .status, item.type == 1 {
             NavigationLink(value: NavDestination.timeline(item)) {
@@ -155,7 +185,21 @@ struct TimelineItemView: View {
             }.buttonStyle(.navLink)
             Text("·")
           } else if item.cat == .subject, !item.batch {
-            // reactions
+            Menu {
+              // TODO: add reactions
+              Button {
+                print("reaction")
+              } label: {
+                Image("bgm125")
+                  .resizable()
+                  .aspectRatio(contentMode: .fit)
+                  .frame(width: 18, height: 18)
+              }.buttonStyle(.plain)
+            } label: {
+              Image(systemName: "heart")
+                .foregroundStyle(.secondary)
+            }.buttonStyle(.plain)
+            Text("·")
           }
           Menu {
             Text("\(item.createdAt.datetimeDisplay)")
