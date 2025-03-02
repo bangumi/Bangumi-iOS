@@ -6,17 +6,15 @@ import SwiftUI
 struct NoticeRowView: View {
   @Binding var notice: NoticeDTO
 
+  var statusColor: Color {
+    notice.unread ? .accent : .secondary.opacity(0.5)
+  }
+
   var body: some View {
     HStack {
-      if notice.unread {
-        Circle()
-          .frame(width: 4)
-          .foregroundStyle(.accent)
-      } else {
-        Rectangle()
-          .frame(width: 4)
-          .foregroundStyle(.secondary.opacity(0.5))
-      }
+      Rectangle()
+        .frame(width: 4)
+        .foregroundStyle(statusColor)
       ImageView(img: notice.sender.avatar?.large)
         .imageStyle(width: 40, height: 40)
         .imageType(.avatar)
