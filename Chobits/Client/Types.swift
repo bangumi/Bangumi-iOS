@@ -63,6 +63,10 @@ struct Profile: Codable, Identifiable, Hashable, Linkable {
     SlimUserDTO(self)
   }
 
+  var simple: SimpleUserDTO {
+    SimpleUserDTO(self)
+  }
+
   init() {
     self.id = 0
     self.username = ""
@@ -258,6 +262,12 @@ struct SimpleUserDTO: Codable, Identifiable, Hashable, Linkable {
   var id: Int
   var nickname: String
   var username: String
+
+  init(_ profile: Profile) {
+    self.id = profile.id
+    self.nickname = profile.nickname
+    self.username = profile.username
+  }
 
   var name: String {
     nickname.isEmpty ? "用户\(username)" : nickname

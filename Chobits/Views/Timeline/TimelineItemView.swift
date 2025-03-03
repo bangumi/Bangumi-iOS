@@ -7,7 +7,43 @@ struct TimelineItemView: View {
 
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
 
+  @State private var reactions: [ReactionDTO]
   @State private var showTime = false
+
+  var showReactions: Bool {
+    if item.cat != .subject {
+      return false
+    }
+    if item.batch {
+      return false
+    }
+    guard let collect = item.memo.subject?.first else {
+      return false
+    }
+    if collect.comment.isEmpty {
+      return false
+    }
+    return true
+  }
+
+  var collectID: Int? {
+    guard let collect = item.memo.subject?.first else {
+      return nil
+    }
+    return collect.collectID
+  }
+
+  init(item: TimelineDTO, previous: TimelineDTO?) {
+    self.item = item
+    self.previous = previous
+    if item.cat == .subject, !item.batch, let collect = item.memo.subject?.first,
+      !collect.comment.isEmpty, let reactions = collect.reactions
+    {
+      self._reactions = State(initialValue: reactions)
+    } else {
+      self._reactions = State(initialValue: [])
+    }
+  }
 
   var body: some View {
     HStack(alignment: .top) {
@@ -152,14 +188,8 @@ struct TimelineItemView: View {
         default:
           Text(item.desc)
         }
-        if item.cat == .subject, let collect = item.memo.subject?.first,
-          let collectID = collect.collectID,
-          let reactions = collect.reactions, !reactions.isEmpty
-        {
-          ReactionsView(
-            type: .subjectCollect(collectID), reactions: reactions,
-            onAdd: { _ in },
-            onDelete: { _ in })
+        if showReactions, let collectID = collectID {
+          ReactionsView(type: .subjectCollect(collectID), reactions: $reactions)
         }
         HStack {
           if isAuthenticated {
@@ -168,13 +198,8 @@ struct TimelineItemView: View {
                 Text(item.replies > 0 ? "\(item.replies) 回复 " : "回复")
               }.buttonStyle(.navLink)
               Text("·")
-            } else if item.cat == .subject, !item.batch, let collect = item.memo.subject?.first,
-              let collectID = collect.collectID,
-              !collect.comment.isEmpty
-            {
-              ReactionButton(
-                type: .subjectCollect(collectID),
-                onAdd: { _ in }, onDelete: { _ in })
+            } else if showReactions, let collectID = collectID {
+              ReactionButton(type: .subjectCollect(collectID), reactions: $reactions)
               Text("·")
             }
           }
