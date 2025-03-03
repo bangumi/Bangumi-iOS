@@ -6,7 +6,7 @@ struct SubjectTopicListView: View {
   let subjectId: Int
 
   @AppStorage("hideBlocklist") var hideBlocklist: Bool = false
-  @AppStorage("profile") var profile: Profile = Profile()
+  @AppStorage("blocklist") var blocklist: [Int] = []
 
   @State private var reloader = false
 
@@ -23,7 +23,7 @@ struct SubjectTopicListView: View {
   var body: some View {
     ScrollView {
       PageView<TopicDTO, _>(reloader: reloader, nextPageFunc: load) { topic in
-        if !hideBlocklist || !profile.blocklist.contains(topic.creator?.id ?? 0) {
+        if !hideBlocklist || !blocklist.contains(topic.creator?.id ?? 0) {
           VStack {
             HStack {
               NavigationLink(value: NavDestination.subjectTopicDetail(topic.id)) {

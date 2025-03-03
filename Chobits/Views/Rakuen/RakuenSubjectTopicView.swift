@@ -4,7 +4,7 @@ struct RakuenSubjectTopicView: View {
   let mode: SubjectTopicFilterMode
 
   @AppStorage("hideBlocklist") var hideBlocklist: Bool = false
-  @AppStorage("profile") var profile: Profile = Profile()
+  @AppStorage("blocklist") var blocklist: [Int] = []
 
   @State private var reloader = false
 
@@ -27,7 +27,7 @@ struct RakuenSubjectTopicView: View {
   var body: some View {
     ScrollView {
       PageView<SubjectTopicDTO, _>(reloader: reloader, nextPageFunc: load) { topic in
-        if !hideBlocklist || !profile.blocklist.contains(topic.creator?.id ?? 0) {
+        if !hideBlocklist || !blocklist.contains(topic.creator?.id ?? 0) {
           CardView {
             SubjectTopicItemView(topic: topic)
           }

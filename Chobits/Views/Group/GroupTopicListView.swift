@@ -4,7 +4,7 @@ struct GroupTopicListView: View {
   let name: String
 
   @AppStorage("hideBlocklist") var hideBlocklist: Bool = false
-  @AppStorage("profile") var profile: Profile = Profile()
+  @AppStorage("blocklist") var blocklist: [Int] = []
 
   var title: String {
     "小组讨论"
@@ -23,7 +23,7 @@ struct GroupTopicListView: View {
   var body: some View {
     ScrollView {
       PageView<TopicDTO, _>(nextPageFunc: loadTopics) { topic in
-        if !hideBlocklist || !profile.blocklist.contains(topic.creator?.id ?? 0) {
+        if !hideBlocklist || !blocklist.contains(topic.creator?.id ?? 0) {
           CardView {
             VStack(alignment: .leading, spacing: 4) {
               HStack {

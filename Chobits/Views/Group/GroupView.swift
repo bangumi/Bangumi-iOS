@@ -200,7 +200,7 @@ struct GroupRecentTopicView: View {
   @Environment(Group.self) var group
 
   @AppStorage("hideBlocklist") var hideBlocklist: Bool = false
-  @AppStorage("profile") var profile: Profile = Profile()
+  @AppStorage("blocklist") var blocklist: [Int] = []
 
   var body: some View {
     VStack(alignment: .leading) {
@@ -218,7 +218,7 @@ struct GroupRecentTopicView: View {
       }
       VStack {
         ForEach(group.recentTopics) { topic in
-          if !hideBlocklist || !profile.blocklist.contains(topic.creator?.id ?? 0) {
+          if !hideBlocklist || !blocklist.contains(topic.creator?.id ?? 0) {
             VStack {
               HStack {
                 NavigationLink(value: NavDestination.groupTopicDetail(topic.id)) {

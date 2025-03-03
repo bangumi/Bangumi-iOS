@@ -5,7 +5,7 @@ struct SubjectReviewsView: View {
   let reviews: [SubjectReviewDTO]
 
   @AppStorage("hideBlocklist") var hideBlocklist: Bool = false
-  @AppStorage("profile") var profile: Profile = Profile()
+  @AppStorage("blocklist") var blocklist: [Int] = []
 
   var body: some View {
     VStack(spacing: 2) {
@@ -33,7 +33,7 @@ struct SubjectReviewsView: View {
     }
     VStack {
       ForEach(reviews) { review in
-        if !hideBlocklist || !profile.blocklist.contains(review.user.id) {
+        if !hideBlocklist || !blocklist.contains(review.user.id) {
           VStack {
             SubjectReviewItemView(item: review)
             Divider()

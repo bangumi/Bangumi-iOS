@@ -74,10 +74,10 @@ struct CommentItemView: View {
   let idx: Int
 
   @AppStorage("hideBlocklist") var hideBlocklist: Bool = false
-  @AppStorage("profile") var profile: Profile = Profile()
+  @AppStorage("blocklist") var blocklist: [Int] = []
 
   var body: some View {
-    if !hideBlocklist || !profile.blocklist.contains(comment.creatorID) {
+    if !hideBlocklist || !blocklist.contains(comment.creatorID) {
       switch comment.state {
       case .normal:
         CommentItemNormalView(type: type, comment: comment, idx: idx)
@@ -95,8 +95,9 @@ struct CommentItemNormalView: View {
   let comment: CommentDTO
   let idx: Int
 
-  @AppStorage("profile") var profile: Profile = Profile()
   @AppStorage("hideBlocklist") var hideBlocklist: Bool = false
+  @AppStorage("profile") var profile: Profile = Profile()
+  @AppStorage("blocklist") var blocklist: [Int] = []
 
   @State private var showReplyBox: Bool = false
   @State private var showEditBox: Bool = false
@@ -168,7 +169,7 @@ struct CommentItemNormalView: View {
             ReactionsView(type: .episodeReply(id), reactions: $reactions)
           }
           ForEach(Array(zip(comment.replies.indices, comment.replies)), id: \.1) { subidx, reply in
-            if !hideBlocklist || !profile.blocklist.contains(reply.creatorID) {
+            if !hideBlocklist || !blocklist.contains(reply.creatorID) {
               VStack(alignment: .leading) {
                 Divider()
                 switch reply.state {

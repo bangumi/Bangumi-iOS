@@ -8,6 +8,8 @@ struct UserView: View {
 
   @AppStorage("shareDomain") var shareDomain: ShareDomain = .chii
   @AppStorage("profile") var profile: Profile = Profile()
+  @AppStorage("friendlist") var friendlist: [Int] = []
+  @AppStorage("blocklist") var blocklist: [Int] = []
 
   @State private var refreshed: Bool = false
 
@@ -73,12 +75,12 @@ struct UserView: View {
                       Text("我自己").font(.caption)
                     }
                   }
-                  if profile.friendIDs.contains(user.userId) {
+                  if friendlist.contains(user.userId) {
                     BadgeView {
                       Text("好友").font(.caption)
                     }
                   }
-                  if profile.blocklist.contains(user.userId) {
+                  if blocklist.contains(user.userId) {
                     BadgeView(background: .secondary) {
                       Text("已拉黑").font(.caption)
                     }

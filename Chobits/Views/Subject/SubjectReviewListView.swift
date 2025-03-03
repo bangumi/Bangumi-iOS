@@ -6,7 +6,7 @@ struct SubjectReviewListView: View {
   let subjectId: Int
 
   @AppStorage("hideBlocklist") var hideBlocklist: Bool = false
-  @AppStorage("profile") var profile: Profile = Profile()
+  @AppStorage("blocklist") var blocklist: [Int] = []
 
   @State private var reloader = false
 
@@ -23,7 +23,7 @@ struct SubjectReviewListView: View {
   var body: some View {
     ScrollView {
       PageView<SubjectReviewDTO, _>(reloader: reloader, nextPageFunc: load) { review in
-        if !hideBlocklist || !profile.blocklist.contains(review.user.id) {
+        if !hideBlocklist || !blocklist.contains(review.user.id) {
           VStack {
             SubjectReviewItemView(item: review)
             Divider()

@@ -7,7 +7,7 @@ struct SubjectCommentItemView: View {
   @State private var reactions: [ReactionDTO]
 
   @AppStorage("hideBlocklist") var hideBlocklist: Bool = false
-  @AppStorage("profile") var profile: Profile = Profile()
+  @AppStorage("blocklist") var blocklist: [Int] = []
 
   init(subjectType: SubjectType, comment: SubjectCommentDTO) {
     self.subjectType = subjectType
@@ -16,7 +16,7 @@ struct SubjectCommentItemView: View {
   }
 
   var body: some View {
-    if !hideBlocklist || !profile.blocklist.contains(comment.user.id) {
+    if !hideBlocklist || !blocklist.contains(comment.user.id) {
       CardView {
         HStack(alignment: .top) {
           ImageView(img: comment.user.avatar?.large)

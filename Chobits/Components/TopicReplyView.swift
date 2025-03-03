@@ -64,10 +64,10 @@ struct ReplyItemView: View {
   let author: SlimUserDTO?
 
   @AppStorage("hideBlocklist") var hideBlocklist: Bool = false
-  @AppStorage("profile") var profile: Profile = Profile()
+  @AppStorage("blocklist") var blocklist: [Int] = []
 
   var body: some View {
-    if !hideBlocklist || !profile.blocklist.contains(reply.creator?.id ?? 0) {
+    if !hideBlocklist || !blocklist.contains(reply.creator?.id ?? 0) {
       switch reply.state {
       case .normal:
         ReplyItemNormalView(type: type, topicId: topicId, idx: idx, reply: reply, author: author)
@@ -89,6 +89,7 @@ struct ReplyItemNormalView: View {
 
   @AppStorage("profile") var profile: Profile = Profile()
   @AppStorage("hideBlocklist") var hideBlocklist: Bool = false
+  @AppStorage("blocklist") var blocklist: [Int] = []
 
   @State private var showReplyBox: Bool = false
   @State private var showEditBox: Bool = false
@@ -188,7 +189,7 @@ struct ReplyItemNormalView: View {
             }
           }
           ForEach(Array(zip(reply.replies.indices, reply.replies)), id: \.1) { subidx, subreply in
-            if !hideBlocklist || !profile.blocklist.contains(subreply.creator?.id ?? 0) {
+            if !hideBlocklist || !blocklist.contains(subreply.creator?.id ?? 0) {
               VStack(alignment: .leading) {
                 Divider()
                 switch subreply.state {

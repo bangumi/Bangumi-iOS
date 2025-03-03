@@ -6,7 +6,7 @@ struct SubjectTopicsView: View {
   let topics: [TopicDTO]
 
   @AppStorage("hideBlocklist") var hideBlocklist: Bool = false
-  @AppStorage("profile") var profile: Profile = Profile()
+  @AppStorage("blocklist") var blocklist: [Int] = []
 
   var body: some View {
     VStack(spacing: 2) {
@@ -34,7 +34,7 @@ struct SubjectTopicsView: View {
     }
     VStack {
       ForEach(topics) { topic in
-        if !hideBlocklist || !profile.blocklist.contains(topic.creator?.id ?? 0) {
+        if !hideBlocklist || !blocklist.contains(topic.creator?.id ?? 0) {
           VStack {
             HStack {
               NavigationLink(value: NavDestination.subjectTopicDetail(topic.id)) {
