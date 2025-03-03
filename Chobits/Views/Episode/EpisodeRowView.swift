@@ -28,27 +28,31 @@ struct EpisodeRowView: View {
               .fill(episode.backgroundColor)
           }
         } else {
-          if episode.typeEnum == .main {
-            if episode.air > now {
-              BorderView(padding: 4) {
-                Text("未播")
-                  .foregroundStyle(.secondary)
-                  .font(.footnote)
+          Menu {
+            EpisodeUpdateMenu().environment(episode)
+          } label: {
+            if episode.typeEnum == .main {
+              if episode.air > now {
+                BorderView(padding: 4) {
+                  Text("未播")
+                    .foregroundStyle(.secondary)
+                    .font(.footnote)
+                }
+              } else {
+                BorderView(color: .primary, padding: 4) {
+                  Text("已播")
+                    .foregroundStyle(.primary)
+                    .font(.footnote)
+                }
               }
             } else {
               BorderView(color: .primary, padding: 4) {
-                Text("已播")
+                Text(episode.typeEnum.description)
                   .foregroundStyle(.primary)
                   .font(.footnote)
               }
             }
-          } else {
-            BorderView(color: .primary, padding: 4) {
-              Text(episode.typeEnum.description)
-                .foregroundStyle(.primary)
-                .font(.footnote)
-            }
-          }
+          }.buttonStyle(.plain)
         }
         VStack(alignment: .leading) {
           HStack {

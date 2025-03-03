@@ -15,17 +15,6 @@ struct EpisodeRecentView: View {
 
   @Query private var episodes: [Episode] = []
 
-  init(subjectId: Int) {
-    self.subjectId = subjectId
-
-    let descriptor = FetchDescriptor<Episode>(
-      predicate: #Predicate<Episode> {
-        $0.subjectId == subjectId && $0.type == 0
-      }, sortBy: [SortDescriptor<Episode>(\.sort, order: .forward)])
-
-    _episodes = Query(descriptor)
-  }
-
   var nextEpisode: Episode? {
     episodes.first { $0.status == EpisodeCollectionType.none.rawValue }
   }
@@ -53,9 +42,18 @@ struct EpisodeRecentView: View {
     }
   }
 
+  init(subjectId: Int) {
+    self.subjectId = subjectId
+
+    let descriptor = FetchDescriptor<Episode>(
+      predicate: #Predicate<Episode> {
+        $0.subjectId == subjectId && $0.type == 0
+      }, sortBy: [SortDescriptor<Episode>(\.sort, order: .forward)])
+
+    _episodes = Query(descriptor)
+  }
+
   func updateSingle(episode: Episode, type: EpisodeCollectionType) {
-    if updating { return }
-    updating = true
     Task {
       do {
         try await Chii.shared.updateEpisodeCollection(
@@ -64,22 +62,6 @@ struct EpisodeRecentView: View {
       } catch {
         Notifier.shared.alert(error: error)
       }
-      updating = false
-    }
-  }
-
-  func updateBatch(episode: Episode) {
-    if updating { return }
-    updating = true
-    Task {
-      do {
-        try await Chii.shared.updateEpisodeCollection(
-          episodeId: episode.episodeId, type: .collect, batch: true)
-        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-      } catch {
-        Notifier.shared.alert(error: error)
-      }
-      updating = false
     }
   }
 
@@ -97,27 +79,7 @@ struct EpisodeRecentView: View {
             .padding(2)
             .strikethrough(episode.status == EpisodeCollectionType.dropped.rawValue)
             .contextMenu {
-              ForEach(episode.collectionTypeEnum.otherTypes()) { type in
-                Button {
-                  updateSingle(episode: episode, type: type)
-                } label: {
-                  Label(type.action, systemImage: type.icon)
-                }
-              }
-              Divider()
-              Button {
-                updateBatch(episode: episode)
-              } label: {
-                Label("看到", systemImage: "checkmark.rectangle.stack")
-              }
-              Divider()
-              NavigationLink(value: NavDestination.episode(episode.episodeId)) {
-                if isolationMode {
-                  Label("详情...", systemImage: "info")
-                } else {
-                  Label("参与讨论...", systemImage: "bubble")
-                }
-              }
+              EpisodeUpdateMenu().environment(episode)
             } preview: {
               EpisodeInfoView()
                 .environment(episode)
