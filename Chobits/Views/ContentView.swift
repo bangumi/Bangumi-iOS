@@ -5,6 +5,8 @@ import SwiftUI
 struct ContentView: View {
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
   @AppStorage("profile") var profile: Profile = Profile()
+  @AppStorage("friendlist") var friendlist: [Int] = []
+  @AppStorage("blocklist") var blocklist: [Int] = []
 
   @State var notifier = Notifier.shared
 
@@ -35,6 +37,19 @@ struct ContentView: View {
     }
     Notifier.shared.alert(message: "无法获取当前用户信息，请重新登录")
     await Chii.shared.setAuthStatus(false)
+  }
+
+  func refreshRelationships() async {
+    if !isAuthenticated {
+      return
+    }
+    do {
+      friendlist = try await Chii.shared.getFriendList()
+      blocklist = try await Chii.shared.getBlockList()
+    } catch {
+      Notifier.shared.notify(message: "获取好友/黑名单列表失败")
+      Logger.api.warning("refresh relationships failed: \(error)")
+    }
   }
 
   var body: some View {
@@ -77,6 +92,7 @@ struct ContentView: View {
     }
     .task {
       await refreshProfile()
+      await refreshRelationships()
     }
   }
 }

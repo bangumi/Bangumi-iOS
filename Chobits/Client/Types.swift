@@ -16,6 +16,14 @@ struct IDResponseDTO: Codable, Hashable {
   var id: Int
 }
 
+struct FriendListResponseDTO: Codable, Hashable {
+  var friendlist: [Int]
+}
+
+struct BlockListResponseDTO: Codable, Hashable {
+  var blocklist: [Int]
+}
+
 struct Permissions: Codable, Hashable {
   var subjectWikiEdit: Bool
 }
@@ -23,9 +31,6 @@ struct Permissions: Codable, Hashable {
 struct Profile: Codable, Identifiable, Hashable, Linkable {
   var id: Int
   var avatar: Avatar?
-  var bio: String
-  var friendIDs: [Int]
-  var blocklist: [Int]
   var group: Int
   var location: String
   var nickname: String
@@ -40,9 +45,6 @@ struct Profile: Codable, Identifiable, Hashable, Linkable {
     case username
     case nickname
     case avatar
-    case bio
-    case friendIDs
-    case blocklist
     case group
     case location
     case permissions
@@ -74,9 +76,6 @@ struct Profile: Codable, Identifiable, Hashable, Linkable {
     self.avatar = nil
     self.sign = ""
     self.joinedAt = 0
-    self.bio = ""
-    self.friendIDs = []
-    self.blocklist = []
     self.group = 0
     self.location = ""
     self.permissions = Permissions(subjectWikiEdit: false)
@@ -99,9 +98,6 @@ struct Profile: Codable, Identifiable, Hashable, Linkable {
     try container.encode(avatar, forKey: .avatar)
     try container.encode(sign, forKey: .sign)
     try container.encode(joinedAt, forKey: .joinedAt)
-    try container.encode(bio, forKey: .bio)
-    try container.encode(friendIDs, forKey: .friendIDs)
-    try container.encode(blocklist, forKey: .blocklist)
     try container.encode(group, forKey: .group)
     try container.encode(location, forKey: .location)
     try container.encode(permissions, forKey: .permissions)
@@ -116,9 +112,6 @@ struct Profile: Codable, Identifiable, Hashable, Linkable {
     self.avatar = try container.decodeIfPresent(Avatar.self, forKey: .avatar)
     self.sign = try container.decode(String.self, forKey: .sign)
     self.joinedAt = try container.decodeIfPresent(Int.self, forKey: .joinedAt)
-    self.bio = try container.decode(String.self, forKey: .bio)
-    self.friendIDs = try container.decode([Int].self, forKey: .friendIDs)
-    self.blocklist = try container.decode([Int].self, forKey: .blocklist)
     self.group = try container.decode(Int.self, forKey: .group)
     self.location = try container.decode(String.self, forKey: .location)
     self.permissions = try container.decode(Permissions.self, forKey: .permissions)

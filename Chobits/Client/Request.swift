@@ -16,6 +16,20 @@ extension Chii {
     return profile
   }
 
+  func getFriendList() async throws -> [Int] {
+    let url = BangumiAPI.priv.build("p1/friendlist")
+    let data = try await self.request(url: url, method: "GET", auth: .required)
+    let resp: FriendListResponseDTO = try self.decodeResponse(data)
+    return resp.friendlist
+  }
+
+  func getBlockList() async throws -> [Int] {
+    let url = BangumiAPI.priv.build("p1/blocklist")
+    let data = try await self.request(url: url, method: "GET", auth: .required)
+    let resp: BlockListResponseDTO = try self.decodeResponse(data)
+    return resp.blocklist
+  }
+
   func listNotice(limit: Int? = nil, unread: Bool? = nil) async throws -> PagedDTO<NoticeDTO> {
     let url = BangumiAPI.priv.build("p1/notify")
     var queryItems: [URLQueryItem] = []
