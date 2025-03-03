@@ -12,11 +12,7 @@ struct SubjectCommentItemView: View {
   init(subjectType: SubjectType, comment: SubjectCommentDTO) {
     self.subjectType = subjectType
     self.comment = comment
-    if let reactions = comment.reactions {
-      self._reactions = State(initialValue: reactions)
-    } else {
-      self._reactions = State(initialValue: [])
-    }
+    self._reactions = State(initialValue: comment.reactions ?? [])
   }
 
   var body: some View {

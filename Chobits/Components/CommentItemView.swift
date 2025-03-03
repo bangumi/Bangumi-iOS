@@ -103,6 +103,15 @@ struct CommentItemNormalView: View {
   @State private var updating: Bool = false
   @State private var showDeleteConfirm: Bool = false
 
+  @State private var reactions: [ReactionDTO]
+
+  init(type: CommentParentType, comment: CommentDTO, idx: Int) {
+    self.type = type
+    self.comment = comment
+    self.idx = idx
+    self._reactions = State(initialValue: comment.reactions ?? [])
+  }
+
   var body: some View {
     VStack(alignment: .leading) {
       HStack(alignment: .top) {
@@ -111,45 +120,52 @@ struct CommentItemNormalView: View {
           .imageType(.avatar)
           .imageLink(comment.user.link)
         VStack(alignment: .leading) {
-          HStack {
+          VStack(alignment: .leading, spacing: 0) {
             Text(comment.user.header).lineLimit(1)
-            Menu {
+            HStack {
+              Text("#\(idx+1) - \(comment.createdAt.datetimeDisplay)")
+                .lineLimit(1)
+              Spacer()
               Button {
                 showReplyBox = true
               } label: {
-                Text("回复")
+                Image(systemName: "bubble.fill")
+              }.buttonStyle(.plain)
+              if case .episode(let id) = type {
+                ReactionButton(type: .episodeReply(id), reactions: $reactions)
               }
-              if comment.creatorID == profile.id {
-                Button {
-                  showEditBox = true
-                } label: {
-                  Text("编辑")
+              Menu {
+                if comment.creatorID == profile.id {
+                  Button {
+                    showEditBox = true
+                  } label: {
+                    Text("编辑")
+                  }
+                  Divider()
+                  Button(role: .destructive) {
+                    showDeleteConfirm = true
+                  } label: {
+                    Text("删除")
+                  }
+                  .disabled(updating)
                 }
                 Divider()
-                Button(role: .destructive) {
-                  showDeleteConfirm = true
-                } label: {
-                  Text("删除")
+                ShareLink(item: type.shareLink(commentId: comment.id)) {
+                  Label("分享", systemImage: "square.and.arrow.up")
                 }
-                .disabled(updating)
-              }
-              Divider()
-              ShareLink(item: type.shareLink(commentId: comment.id)) {
-                Label("分享", systemImage: "square.and.arrow.up")
-              }
-            } label: {
-              Spacer()
-              Text("#\(idx+1) - \(comment.createdAt.datetimeDisplay)")
-                .lineLimit(1)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-              Image(systemName: "ellipsis")
-                .foregroundStyle(.secondary)
-            }.buttonStyle(.plain)
+              } label: {
+                Image(systemName: "ellipsis")
+              }.buttonStyle(.plain)
+            }
+            .font(.footnote)
+            .foregroundStyle(.secondary)
           }
           BBCodeView(comment.content)
             .tint(.linkText)
             .textSelection(.enabled)
+          if !reactions.isEmpty, case .episode(let id) = type {
+            ReactionsView(type: .episodeReply(id), reactions: $reactions)
+          }
           ForEach(Array(zip(comment.replies.indices, comment.replies)), id: \.1) { subidx, reply in
             if !hideBlocklist || !profile.blocklist.contains(reply.creatorID) {
               VStack(alignment: .leading) {
@@ -237,10 +253,22 @@ struct CommentSubReplyNormalView: View {
   let subidx: Int
 
   @AppStorage("profile") var profile: Profile = Profile()
+
   @State private var showReplyBox: Bool = false
   @State private var showEditBox: Bool = false
   @State private var updating: Bool = false
   @State private var showDeleteConfirm: Bool = false
+
+  @State private var reactions: [ReactionDTO]
+
+  init(type: CommentParentType, comment: CommentDTO, reply: CommentBaseDTO, idx: Int, subidx: Int) {
+    self.type = type
+    self.comment = comment
+    self.reply = reply
+    self.idx = idx
+    self.subidx = subidx
+    self._reactions = State(initialValue: reply.reactions ?? [])
+  }
 
   var body: some View {
     HStack(alignment: .top) {
@@ -253,7 +281,7 @@ struct CommentSubReplyNormalView: View {
         Rectangle().fill(.clear).frame(width: 40, height: 40)
       }
       VStack(alignment: .leading) {
-        HStack {
+        VStack(alignment: .leading, spacing: 0) {
           if let user = reply.user {
             Text(user.nickname.withLink(user.link))
               .lineLimit(1)
@@ -261,43 +289,50 @@ struct CommentSubReplyNormalView: View {
             Text("用户 \(reply.creatorID)")
               .lineLimit(1)
           }
-          Spacer()
-          Menu {
+          HStack {
+            Text("#\(idx+1)-\(subidx+1) - \(reply.createdAt.datetimeDisplay)")
+              .lineLimit(1)
+            Spacer()
             Button {
               showReplyBox = true
             } label: {
-              Text("回复")
+              Image(systemName: "bubble.fill")
+            }.buttonStyle(.plain)
+            if case .episode(let id) = type {
+              ReactionButton(type: .episodeReply(id), reactions: $reactions)
             }
-            if reply.creatorID == profile.id {
-              Button {
-                showEditBox = true
-              } label: {
-                Text("编辑")
+            Menu {
+              if reply.creatorID == profile.id {
+                Button {
+                  showEditBox = true
+                } label: {
+                  Text("编辑")
+                }
+                Divider()
+                Button(role: .destructive) {
+                  showDeleteConfirm = true
+                } label: {
+                  Text("删除")
+                }
+                .disabled(updating)
               }
               Divider()
-              Button(role: .destructive) {
-                showDeleteConfirm = true
-              } label: {
-                Text("删除")
+              ShareLink(item: type.shareLink(commentId: reply.id)) {
+                Label("分享", systemImage: "square.and.arrow.up")
               }
-              .disabled(updating)
-            }
-            Divider()
-            ShareLink(item: type.shareLink(commentId: reply.id)) {
-              Label("分享", systemImage: "square.and.arrow.up")
-            }
-          } label: {
-            Text("#\(idx+1)-\(subidx+1) - \(reply.createdAt.datetimeDisplay)")
-              .lineLimit(1)
-              .font(.caption)
-              .foregroundStyle(.secondary)
-            Image(systemName: "ellipsis")
-              .foregroundStyle(.secondary)
-          }.buttonStyle(.plain)
+            } label: {
+              Image(systemName: "ellipsis")
+            }.buttonStyle(.plain)
+          }
+          .font(.footnote)
+          .foregroundStyle(.secondary)
         }
         BBCodeView(reply.content)
           .tint(.linkText)
           .textSelection(.enabled)
+        if !reactions.isEmpty, case .episode(let id) = type {
+          ReactionsView(type: .episodeReply(id), reactions: $reactions)
+        }
       }
     }
     .sheet(isPresented: $showReplyBox) {
