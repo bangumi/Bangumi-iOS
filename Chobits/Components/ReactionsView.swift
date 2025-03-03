@@ -7,6 +7,8 @@ struct ReactionsView: View {
   @AppStorage("profile") var profile: Profile = Profile()
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
 
+  @State private var updating = false
+
   func shadowColor(_ reaction: ReactionDTO) -> Color {
     if reaction.users.contains(where: { $0.id == profile.id }) {
       return .linkText.opacity(0.5)
@@ -23,10 +25,11 @@ struct ReactionsView: View {
 
   func onClick(_ reaction: ReactionDTO) {
     Task {
+      updating = true
       do {
         if reaction.users.contains(where: { $0.id == profile.id }) {
           try await Chii.shared.unlike(path: type.path)
-          onDelete(reaction.value)
+          onDelete()
         } else {
           try await Chii.shared.like(path: type.path, value: reaction.value)
           onAdd(reaction.value)
@@ -34,67 +37,65 @@ struct ReactionsView: View {
       } catch {
         Notifier.shared.alert(error: error)
       }
+      updating = false
     }
   }
 
   func onAdd(_ value: Int) {
-    for reaction in reactions {
-      if reaction.value == value {
-        if !reaction.users.contains(where: { $0.id == profile.id }) {
-          var updatedReaction = reaction
-          updatedReaction.users.append(profile.simple)
-          reactions = reactions.map { $0.value == value ? updatedReaction : $0 }
+    var updatedReactions = reactions
+    for i in 0..<updatedReactions.count {
+      if updatedReactions[i].value == value {
+        if !updatedReactions[i].users.contains(where: { $0.id == profile.id }) {
+          updatedReactions[i].users.append(profile.simple)
         }
-        return
       } else {
-        if reaction.users.contains(where: { $0.id == profile.id }) {
-          var updatedReaction = reaction
-          updatedReaction.users.removeAll(where: { $0.id == profile.id })
-          reactions = reactions.map { $0.value == value ? updatedReaction : $0 }
-        }
+        updatedReactions[i].users.removeAll(where: { $0.id == profile.id })
       }
     }
-    reactions.append(ReactionDTO(users: [profile.simple], value: value))
+    if !updatedReactions.contains(where: { $0.value == value }) {
+      updatedReactions.append(ReactionDTO(users: [profile.simple], value: value))
+    }
+    updatedReactions = updatedReactions.filter { !$0.users.isEmpty }
+    reactions = updatedReactions
   }
 
-  func onDelete(_ value: Int) {
-    for reaction in reactions {
-      if reaction.value == value {
-        var updatedReaction = reaction
-        updatedReaction.users.removeAll(where: { $0.id == profile.id })
-        reactions = reactions.map { $0.value == value ? updatedReaction : $0 }
-        if updatedReaction.users.isEmpty {
-          reactions = reactions.filter { $0.value != value }
-        }
-        return
-      }
+  func onDelete() {
+    var updatedReactions = reactions
+    for i in 0..<updatedReactions.count {
+      updatedReactions[i].users.removeAll(where: { $0.id == profile.id })
     }
+    updatedReactions = updatedReactions.filter { !$0.users.isEmpty }
+    reactions = updatedReactions
   }
 
   var body: some View {
     HStack {
       ForEach(reactions, id: \.value) { reaction in
-        Menu {
+        CardView(padding: 2, cornerRadius: 10, shadow: shadowColor(reaction)) {
+          HStack(spacing: 4) {
+            Image(reaction.icon)
+              .resizable()
+              .aspectRatio(contentMode: .fit)
+              .frame(width: 16, height: 16)
+            Text("\(reaction.users.count)")
+              .font(.callout)
+              .foregroundStyle(textColor(reaction))
+          }.padding(.horizontal, 4)
+        }
+        .onTapGesture {
+          onClick(reaction)
+        }
+        .contextMenu {
           ForEach(reaction.users, id: \.id) { user in
             NavigationLink(value: NavDestination.user(user.username)) {
               Text(user.nickname)
             }.buttonStyle(.plain)
           }
-        } label: {
-          CardView(padding: 2, cornerRadius: 10, shadow: shadowColor(reaction)) {
-            HStack(spacing: 4) {
-              Image(reaction.icon)
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .frame(width: 16, height: 16)
-              Text("\(reaction.users.count)")
-                .font(.callout)
-                .foregroundStyle(textColor(reaction))
-            }.padding(.horizontal, 4)
-          }
-        }.buttonStyle(.plain)
+        }
       }
-    }.disabled(!isAuthenticated)
+    }
+    .animation(.default, value: reactions)
+    .disabled(!isAuthenticated || updating)
   }
 }
 
@@ -106,6 +107,7 @@ struct ReactionButton: View {
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
 
   @State private var showPopover = false
+  @State private var updating = false
 
   var columns: [GridItem] {
     Array(repeating: GridItem(.flexible()), count: 4)
@@ -113,33 +115,34 @@ struct ReactionButton: View {
 
   func onClick(_ value: Int) {
     Task {
+      updating = true
       do {
         try await Chii.shared.like(path: type.path, value: value)
+        showPopover = false
         onAdd(value)
       } catch {
         Notifier.shared.alert(error: error)
       }
+      updating = false
     }
   }
 
   func onAdd(_ value: Int) {
-    for reaction in reactions {
-      if reaction.value == value {
-        if !reaction.users.contains(where: { $0.id == profile.id }) {
-          var updatedReaction = reaction
-          updatedReaction.users.append(profile.simple)
-          reactions = reactions.map { $0.value == value ? updatedReaction : $0 }
+    var updatedReactions = reactions
+    for i in 0..<updatedReactions.count {
+      if updatedReactions[i].value == value {
+        if !updatedReactions[i].users.contains(where: { $0.id == profile.id }) {
+          updatedReactions[i].users.append(profile.simple)
         }
-        return
       } else {
-        if reaction.users.contains(where: { $0.id == profile.id }) {
-          var updatedReaction = reaction
-          updatedReaction.users.removeAll(where: { $0.id == profile.id })
-          reactions = reactions.map { $0.value == value ? updatedReaction : $0 }
-        }
+        updatedReactions[i].users.removeAll(where: { $0.id == profile.id })
       }
     }
-    reactions.append(ReactionDTO(users: [profile.simple], value: value))
+    if !updatedReactions.contains(where: { $0.value == value }) {
+      updatedReactions.append(ReactionDTO(users: [profile.simple], value: value))
+    }
+    updatedReactions = updatedReactions.filter { !$0.users.isEmpty }
+    reactions = updatedReactions
   }
 
   var body: some View {
@@ -147,24 +150,22 @@ struct ReactionButton: View {
       showPopover = true
     } label: {
       Image(systemName: "heart")
-        .foregroundStyle(.secondary)
     }
-    .disabled(!isAuthenticated)
+    .disabled(!isAuthenticated || updating)
     .buttonStyle(.plain)
     .popover(isPresented: $showPopover) {
       LazyVGrid(columns: columns) {
         ForEach(type.available, id: \.self) { value in
-          Button {
-            print("reaction: \(value)")
-          } label: {
-            Image(REACTIONS[value] ?? "bgm125")
-              .resizable()
-              .aspectRatio(contentMode: .fit)
-              .frame(width: 24, height: 24)
-          }.buttonStyle(.plain)
+          Image(REACTIONS[value] ?? "bgm125")
+            .resizable()
+            .aspectRatio(contentMode: .fit)
+            .frame(width: 24, height: 24)
+            .onTapGesture {
+              onClick(value)
+            }
         }
       }
-      .disabled(!isAuthenticated)
+      .disabled(!isAuthenticated || updating)
       .padding()
       .presentationCompactAdaptation(.popover)
     }

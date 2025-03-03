@@ -188,7 +188,7 @@ struct TimelineItemView: View {
         default:
           Text(item.desc)
         }
-        if showReactions, let collectID = collectID {
+        if showReactions, let collectID = collectID, !reactions.isEmpty {
           ReactionsView(type: .subjectCollect(collectID), reactions: $reactions)
         }
         HStack {

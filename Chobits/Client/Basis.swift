@@ -1025,13 +1025,13 @@ enum ReactionType {
   var path: String {
     switch self {
     case .groupReply(let relatedID):
-      return "groups/-/posts/\(relatedID)/like"
+      return "groups/-/posts/\(relatedID)"
     case .subjectReply(let relatedID):
-      return "subjects/-/posts/\(relatedID)/like"
+      return "subjects/-/posts/\(relatedID)"
     case .episodeReply(let relatedID):
-      return "episodes/-/comments/\(relatedID)/like"
+      return "episodes/-/comments/\(relatedID)"
     case .subjectCollect(let relatedID):
-      return "subjects/-/collects/\(relatedID)/like"
+      return "subjects/-/collects/\(relatedID)"
     }
   }
 }
