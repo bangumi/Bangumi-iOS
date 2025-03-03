@@ -34,31 +34,7 @@ struct SubjectCommentsView: View {
     }
     VStack {
       ForEach(comments) { comment in
-        if !hideBlocklist || !profile.blocklist.contains(comment.user.id) {
-          HStack(alignment: .top) {
-            ImageView(img: comment.user.avatar?.large)
-              .imageStyle(width: 32, height: 32)
-              .imageType(.avatar)
-              .imageLink(comment.user.link)
-            VStack(alignment: .leading) {
-              HStack {
-                Text(comment.user.nickname.withLink(comment.user.link))
-                  .font(.footnote)
-                  .lineLimit(1)
-                if comment.rate > 0 {
-                  StarsView(score: Float(comment.rate), size: 10)
-                }
-                comment.header(subjectType)
-                  .lineLimit(1)
-                  .font(.caption)
-                  .foregroundStyle(.secondary)
-                Spacer()
-              }
-              Text(comment.comment).font(.footnote)
-            }
-            Spacer()
-          }.padding(.top, 2)
-        }
+        SubjectCommentItemView(subjectType: subjectType, comment: comment)
       }
     }.animation(.default, value: comments)
   }

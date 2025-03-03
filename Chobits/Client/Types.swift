@@ -354,6 +354,7 @@ struct SubjectCommentDTO: Codable, Identifiable, Hashable {
   var type: CollectionType
   var updatedAt: Int
   var user: SlimUserDTO
+  var reactions: [ReactionDTO]?
 
   var id: Int {
     user.id
