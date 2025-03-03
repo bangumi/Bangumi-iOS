@@ -11,7 +11,7 @@ struct NoticeRowView: View {
   }
 
   var body: some View {
-    HStack {
+    HStack(alignment: .top) {
       Rectangle()
         .frame(width: 4)
         .foregroundStyle(statusColor)
