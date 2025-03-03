@@ -68,7 +68,9 @@ struct CharacterView: View {
               VStack(alignment: .leading, spacing: 2) {
                 Text("吐槽箱").font(.title3)
                 if loadingComments {
-                  ProgressView()
+                  HStack {
+                    ProgressView()
+                  }
                 }
                 Divider()
               }

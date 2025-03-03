@@ -83,7 +83,9 @@ struct BlogView: View {
               Divider()
               LazyVStack(alignment: .leading, spacing: 8) {
                 if loadingComments {
-                  ProgressView()
+                  HStack {
+                    ProgressView()
+                  }
                 }
                 ForEach(Array(zip(comments.indices, comments)), id: \.1) { idx, comment in
                   CommentItemView(type: .blog(blogId), comment: comment, idx: idx)

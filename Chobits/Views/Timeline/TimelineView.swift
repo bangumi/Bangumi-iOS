@@ -45,7 +45,9 @@ struct TimelineView: View {
 
         LazyVStack(alignment: .leading, spacing: 8) {
           if loadingComments {
-            ProgressView()
+            HStack {
+              ProgressView()
+            }
           }
           ForEach(Array(zip(comments.indices, comments)), id: \.1) { idx, comment in
             CommentItemView(type: .timeline(item.id), comment: comment, idx: idx)
