@@ -270,10 +270,10 @@ struct SimpleUserDTO: Codable, Identifiable, Hashable, Linkable {
 
 struct NoticeDTO: Codable, Identifiable, Hashable {
   var id: Int
-  var postID: Int
+  var relatedID: Int
   var sender: SlimUserDTO
   var title: String
-  var topicID: Int
+  var mainID: Int
   var type: Int
   var unread: Bool
   var createdAt: Int
