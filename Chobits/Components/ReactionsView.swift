@@ -21,7 +21,7 @@ struct ReactionsView: View {
               Image(reaction.icon)
                 .resizable()
                 .aspectRatio(contentMode: .fit)
-                .frame(width: 18, height: 18)
+                .frame(width: 16, height: 16)
               Text("\(reaction.users.count)")
                 .font(.callout)
                 .foregroundStyle(.secondary)
@@ -36,12 +36,21 @@ struct ReactionsView: View {
 struct ReactionButton: View {
   let type: ReactionType
 
+  @State private var showPopover = false
+
   var columns: [GridItem] {
     Array(repeating: GridItem(.flexible()), count: 4)
   }
 
   var body: some View {
-    Menu {
+    Button {
+      showPopover = true
+    } label: {
+      Image(systemName: "heart")
+        .foregroundStyle(.secondary)
+    }
+    .buttonStyle(.plain)
+    .popover(isPresented: $showPopover) {
       LazyVGrid(columns: columns) {
         ForEach(type.available, id: \.self) { value in
           Button {
@@ -50,13 +59,12 @@ struct ReactionButton: View {
             Image(REACTIONS[value] ?? "bgm125")
               .resizable()
               .aspectRatio(contentMode: .fit)
-              .frame(width: 18, height: 18)
+              .frame(width: 24, height: 24)
           }.buttonStyle(.plain)
         }
       }
-    } label: {
-      Image(systemName: "heart")
-        .foregroundStyle(.secondary)
-    }.buttonStyle(.plain)
+      .padding()
+      .presentationCompactAdaptation(.popover)
+    }
   }
 }

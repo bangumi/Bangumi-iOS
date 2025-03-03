@@ -5,7 +5,7 @@ struct TimelineItemView: View {
   let item: TimelineDTO
   let previous: TimelineDTO?
 
-  @State private var showReactions = false
+  @State private var showTime = false
 
   var body: some View {
     HStack(alignment: .top) {
@@ -169,11 +169,18 @@ struct TimelineItemView: View {
             ReactionButton(type: .subjectCollect(collectID))
             Text("·")
           }
-          Menu {
-            Text("\(item.createdAt.datetimeDisplay)")
+          Button {
+            showTime = true
           } label: {
             item.createdAt.relativeText
-          }.buttonStyle(.plain)
+          }
+          .buttonStyle(.plain)
+          .popover(isPresented: $showTime) {
+            Text("\(item.createdAt.datetimeDisplay)")
+              .font(.callout)
+              .padding()
+              .presentationCompactAdaptation(.popover)
+          }
           Text("·")
           Text("\(item.source.desc)")
         }

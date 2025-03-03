@@ -338,6 +338,24 @@ struct BBCodeEditor: View {
               Image(systemName: BBCodeType.emoji.icon)
                 .frame(width: 12, height: 12)
             }
+            .popover(isPresented: $showingEmojiInput) {
+              ScrollView {
+                LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 8)) {
+                  ForEach(24..<126) { index in
+                    Button {
+                      handleEmojiInput(index)
+                    } label: {
+                      Image("bgm\(index)")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 24, height: 24)
+                    }
+                  }
+                }
+              }
+              .padding()
+              .presentationCompactAdaptation(.popover)
+            }
             Divider()
           }.padding(.horizontal, 2)
         }.buttonStyle(.bordered)
@@ -457,22 +475,6 @@ struct BBCodeEditor: View {
       }
     } message: {
       Text("请输入字号大小（\(minFontSize)-\(maxFontSize)）")
-    }
-    .sheet(isPresented: $showingEmojiInput) {
-      ScrollView {
-        LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 10)) {
-          ForEach(24..<126) { index in
-            Button {
-              handleEmojiInput(index)
-            } label: {
-              Image("bgm\(index)")
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .frame(width: 24, height: 24)
-            }
-          }
-        }.padding()
-      }.presentationDetents([.medium])
     }
     .sheet(isPresented: $showingColorInput) {
       ColorEditor(
