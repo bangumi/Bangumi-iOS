@@ -994,6 +994,48 @@ enum SubjectTopicFilterMode: String, Codable, CaseIterable {
   }
 }
 
+enum ReactionType {
+  case groupReply(Int)
+  case subjectReply(Int)
+  case episodeReply(Int)
+  case subjectCollect(Int)
+
+  var value: Int {
+    switch self {
+    case .groupReply:
+      return 8
+    case .subjectReply:
+      return 10
+    case .episodeReply:
+      return 11
+    case .subjectCollect:
+      return 40
+    }
+  }
+
+  var available: [Int] {
+    switch self {
+    case .subjectCollect:
+      return SubjectCollectReactions
+    default:
+      return CommonReactions
+    }
+  }
+
+  var path: String {
+    switch self {
+    case .groupReply(let relatedID):
+      return "groups/-/posts/\(relatedID)/like"
+    case .subjectReply(let relatedID):
+      return "subjects/-/posts/\(relatedID)/like"
+    case .episodeReply(let relatedID):
+      return "episodes/-/comments/\(relatedID)/like"
+    case .subjectCollect(let relatedID):
+      return "subjects/-/collects/\(relatedID)/like"
+    }
+  }
+}
+
 let REACTIONS: [Int: String] = [
   0: "bgm67",
   79: "bgm63",
@@ -1005,6 +1047,7 @@ let REACTIONS: [Int: String] = [
   104: "bgm88",
   80: "bgm64",
 
+  141: "bgm125",
   88: "bgm72",
   85: "bgm69",
   90: "bgm74",
@@ -1020,6 +1063,35 @@ let REACTIONS: [Int: String] = [
   137: "bgm121",
   76: "bgm60",
   132: "bgm116",
+]
+
+let SubjectCollectReactions: [Int] = [
+  0,  // bgm67
+  104,  // bgm88
+  54,  // bgm38
+  140,  // bgm124
+
+  122,  // bgm106
+  90,  // bgm74
+  88,  // bgm72
+  80,  // bgm64
+]
+
+let CommonReactions: [Int] = [
+  0,  // bgm67
+  79,  // bgm63
+  54,  // bgm38
+  140,  // bgm124
+
+  62,  // bgm46
+  122,  // bgm106
+  104,  // bgm88
+  80,  // bgm64
+
+  141,  // bgm125
+  88,  // bgm72
+  85,  // bgm69
+  90,  // bgm74
 ]
 
 /// TODO: use bangumi/common

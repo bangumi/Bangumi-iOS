@@ -151,32 +151,10 @@ struct TimelineItemView: View {
           Text(item.desc)
         }
         if item.cat == .subject, let collect = item.memo.subject?.first,
+          let collectID = collect.collectID,
           let reactions = collect.reactions, !reactions.isEmpty
         {
-          HStack {
-            ForEach(reactions, id: \.value) { reaction in
-              Menu {
-                ForEach(reaction.users, id: \.id) { user in
-                  NavigationLink(value: NavDestination.user(user.username)) {
-                    Text(user.nickname)
-                  }.buttonStyle(.plain)
-                }
-                Divider()
-              } label: {
-                CardView(padding: 2, cornerRadius: 10) {
-                  HStack(spacing: 4) {
-                    Image(reaction.icon)
-                      .resizable()
-                      .aspectRatio(contentMode: .fit)
-                      .frame(width: 18, height: 18)
-                    Text("\(reaction.users.count)")
-                      .font(.callout)
-                      .foregroundStyle(.secondary)
-                  }.padding(.horizontal, 4)
-                }
-              }.buttonStyle(.plain)
-            }
-          }
+          ReactionsView(type: .subjectCollect(collectID), reactions: reactions)
         }
         HStack {
           if item.cat == .status, item.type == 1 {
@@ -184,21 +162,11 @@ struct TimelineItemView: View {
               Text(item.replies > 0 ? "\(item.replies) 回复 " : "回复")
             }.buttonStyle(.navLink)
             Text("·")
-          } else if item.cat == .subject, !item.batch {
-            Menu {
-              // TODO: add reactions
-              Button {
-                print("reaction")
-              } label: {
-                Image("bgm125")
-                  .resizable()
-                  .aspectRatio(contentMode: .fit)
-                  .frame(width: 18, height: 18)
-              }.buttonStyle(.plain)
-            } label: {
-              Image(systemName: "heart")
-                .foregroundStyle(.secondary)
-            }.buttonStyle(.plain)
+          } else if item.cat == .subject, !item.batch, let collect = item.memo.subject?.first,
+            let collectID = collect.collectID,
+            !collect.comment.isEmpty
+          {
+            ReactionButton(type: .subjectCollect(collectID))
             Text("·")
           }
           Menu {
