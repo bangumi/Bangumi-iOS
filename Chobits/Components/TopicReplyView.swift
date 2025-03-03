@@ -119,18 +119,20 @@ struct ReplyItemNormalView: View {
         }
         VStack(alignment: .leading) {
           VStack(alignment: .leading, spacing: 0) {
-            if let creator = reply.creator, let author = author {
-              if creator.id == author.id {
-                BorderView {
-                  Text("楼主")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+            HStack {
+              if let creator = reply.creator, let author = author {
+                if creator.id == author.id {
+                  BorderView {
+                    Text("楼主")
+                      .font(.caption)
+                      .foregroundStyle(.secondary)
+                  }
                 }
+                Text(creator.header).lineLimit(1)
+              } else {
+                Text("用户 \(reply.creatorID)")
+                  .lineLimit(1)
               }
-              Text(creator.header).lineLimit(1)
-            } else {
-              Text("用户 \(reply.creatorID)")
-                .lineLimit(1)
             }
             HStack {
               Text("#\(idx+1) - \(reply.createdAt.datetimeDisplay)")
@@ -311,19 +313,21 @@ struct SubReplyNormalView: View {
       }
       VStack(alignment: .leading) {
         VStack(alignment: .leading, spacing: 0) {
-          if let creator = subreply.creator, let author = author {
-            if creator.id == author.id {
-              BorderView {
-                Text("楼主")
-                  .font(.caption)
-                  .foregroundStyle(.secondary)
+          HStack {
+            if let creator = subreply.creator, let author = author {
+              if creator.id == author.id {
+                BorderView {
+                  Text("楼主")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                }
               }
+              Text(creator.nickname.withLink(creator.link))
+                .lineLimit(1)
+            } else {
+              Text("用户 \(subreply.creatorID)")
+                .lineLimit(1)
             }
-            Text(creator.nickname.withLink(creator.link))
-              .lineLimit(1)
-          } else {
-            Text("用户 \(subreply.creatorID)")
-              .lineLimit(1)
           }
           HStack {
             Text("#\(idx+1)-\(subidx+1) - \(subreply.createdAt.datetimeDisplay)")
