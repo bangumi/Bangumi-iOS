@@ -168,7 +168,7 @@ struct ReplyItemNormalView: View {
                 }
               } label: {
                 Image(systemName: "ellipsis")
-              }
+              }.padding(.trailing, 24)
             }
             .buttonStyle(.plain)
             .font(.footnote)
@@ -361,7 +361,7 @@ struct SubReplyNormalView: View {
               }
             } label: {
               Image(systemName: "ellipsis")
-            }
+            }.padding(.trailing, 24)
           }
           .font(.footnote)
           .buttonStyle(.plain)
