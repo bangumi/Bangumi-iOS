@@ -95,6 +95,17 @@ struct ReplyItemNormalView: View {
   @State private var updating: Bool = false
   @State private var showDeleteConfirm: Bool = false
 
+  @State private var reactions: [ReactionDTO]
+
+  init(type: TopicParentType, topicId: Int, idx: Int, reply: ReplyDTO, author: SlimUserDTO?) {
+    self.type = type
+    self.topicId = topicId
+    self.idx = idx
+    self.reply = reply
+    self.author = author
+    self._reactions = State(initialValue: reply.reactions ?? [])
+  }
+
   var body: some View {
     VStack(alignment: .leading) {
       HStack(alignment: .top) {
@@ -107,7 +118,7 @@ struct ReplyItemNormalView: View {
           Rectangle().fill(.clear).frame(width: 40, height: 40)
         }
         VStack(alignment: .leading) {
-          HStack {
+          VStack(alignment: .leading, spacing: 0) {
             if let creator = reply.creator, let author = author {
               if creator.id == author.id {
                 BorderView {
@@ -121,43 +132,59 @@ struct ReplyItemNormalView: View {
               Text("用户 \(reply.creatorID)")
                 .lineLimit(1)
             }
-            Spacer()
-            Menu {
+            HStack {
+              Text("#\(idx+1) - \(reply.createdAt.datetimeDisplay)")
+                .lineLimit(1)
+              Spacer()
               Button {
                 showReplyBox = true
               } label: {
-                Text("回复")
+                Image(systemName: "bubble.fill")
               }
-              if reply.creatorID == profile.id {
-                Button {
-                  showEditBox = true
-                } label: {
-                  Text("编辑")
+              switch type {
+              case .subject:
+                ReactionButton(type: .subjectReply(topicId), reactions: $reactions)
+              case .group:
+                ReactionButton(type: .groupReply(topicId), reactions: $reactions)
+              }
+              Menu {
+                if reply.creatorID == profile.id {
+                  Button {
+                    showEditBox = true
+                  } label: {
+                    Text("编辑")
+                  }
+                  Divider()
+                  Button(role: .destructive) {
+                    showDeleteConfirm = true
+                  } label: {
+                    Text("删除")
+                  }
+                  .disabled(updating)
                 }
                 Divider()
-                Button(role: .destructive) {
-                  showDeleteConfirm = true
-                } label: {
-                  Text("删除")
+                ShareLink(item: type.shareLink(topicId: topicId, postId: reply.id)) {
+                  Label("分享", systemImage: "square.and.arrow.up")
                 }
-                .disabled(updating)
+              } label: {
+                Image(systemName: "ellipsis")
               }
-              Divider()
-              ShareLink(item: type.shareLink(topicId: topicId, postId: reply.id)) {
-                Label("分享", systemImage: "square.and.arrow.up")
-              }
-            } label: {
-              Text("#\(idx+1) - \(reply.createdAt.datetimeDisplay)")
-                .lineLimit(1)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-              Image(systemName: "ellipsis")
-                .foregroundStyle(.secondary)
-            }.buttonStyle(.plain)
+            }
+            .buttonStyle(.plain)
+            .font(.footnote)
+            .foregroundStyle(.secondary)
           }
           BBCodeView(reply.content)
             .tint(.linkText)
             .textSelection(.enabled)
+          if !reactions.isEmpty {
+            switch type {
+            case .subject:
+              ReactionsView(type: .subjectReply(topicId), reactions: $reactions)
+            case .group:
+              ReactionsView(type: .groupReply(topicId), reactions: $reactions)
+            }
+          }
           ForEach(Array(zip(reply.replies.indices, reply.replies)), id: \.1) { subidx, subreply in
             if !hideBlocklist || !profile.blocklist.contains(subreply.creator?.id ?? 0) {
               VStack(alignment: .leading) {
@@ -254,6 +281,24 @@ struct SubReplyNormalView: View {
   @State private var updating: Bool = false
   @State private var showDeleteConfirm: Bool = false
 
+  @State private var reactions: [ReactionDTO]
+
+  init(
+    type: TopicParentType,
+    idx: Int, reply: ReplyDTO, subidx: Int,
+    subreply: ReplyBaseDTO,
+    author: SlimUserDTO?, topicId: Int
+  ) {
+    self.type = type
+    self.idx = idx
+    self.reply = reply
+    self.subidx = subidx
+    self.subreply = subreply
+    self.author = author
+    self.topicId = topicId
+    self._reactions = State(initialValue: subreply.reactions ?? [])
+  }
+
   var body: some View {
     HStack(alignment: .top) {
       if let creator = subreply.creator {
@@ -265,7 +310,7 @@ struct SubReplyNormalView: View {
         Rectangle().fill(.clear).frame(width: 40, height: 40)
       }
       VStack(alignment: .leading) {
-        HStack {
+        VStack(alignment: .leading, spacing: 0) {
           if let creator = subreply.creator, let author = author {
             if creator.id == author.id {
               BorderView {
@@ -280,39 +325,47 @@ struct SubReplyNormalView: View {
             Text("用户 \(subreply.creatorID)")
               .lineLimit(1)
           }
-          Spacer()
-          Menu {
+          HStack {
+            Text("#\(idx+1)-\(subidx+1) - \(subreply.createdAt.datetimeDisplay)")
+              .lineLimit(1)
+            Spacer()
             Button {
               showReplyBox = true
             } label: {
-              Text("回复")
+              Image(systemName: "bubble.fill")
             }
-            if subreply.creatorID == profile.id {
-              Button {
-                showEditBox = true
-              } label: {
-                Text("编辑")
+            switch type {
+            case .subject:
+              ReactionButton(type: .subjectReply(topicId), reactions: $reactions)
+            case .group:
+              ReactionButton(type: .groupReply(topicId), reactions: $reactions)
+            }
+            Menu {
+              if subreply.creatorID == profile.id {
+                Button {
+                  showEditBox = true
+                } label: {
+                  Text("编辑")
+                }
+                Divider()
+                Button(role: .destructive) {
+                  showDeleteConfirm = true
+                } label: {
+                  Text("删除")
+                }
+                .disabled(updating)
               }
               Divider()
-              Button(role: .destructive) {
-                showDeleteConfirm = true
-              } label: {
-                Text("删除")
+              ShareLink(item: type.shareLink(topicId: topicId, postId: subreply.id)) {
+                Label("分享", systemImage: "square.and.arrow.up")
               }
-              .disabled(updating)
+            } label: {
+              Image(systemName: "ellipsis")
             }
-            Divider()
-            ShareLink(item: type.shareLink(topicId: topicId, postId: subreply.id)) {
-              Label("分享", systemImage: "square.and.arrow.up")
-            }
-          } label: {
-            Text("#\(idx+1)-\(subidx+1) - \(subreply.createdAt.datetimeDisplay)")
-              .lineLimit(1)
-              .font(.caption)
-              .foregroundStyle(.secondary)
-            Image(systemName: "ellipsis")
-              .foregroundStyle(.secondary)
-          }.buttonStyle(.plain)
+          }
+          .font(.footnote)
+          .buttonStyle(.plain)
+          .foregroundStyle(.secondary)
         }
         BBCodeView(subreply.content)
           .tint(.linkText)

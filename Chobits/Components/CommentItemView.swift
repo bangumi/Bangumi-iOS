@@ -130,7 +130,7 @@ struct CommentItemNormalView: View {
                 showReplyBox = true
               } label: {
                 Image(systemName: "bubble.fill")
-              }.buttonStyle(.plain)
+              }
               if case .episode(let id) = type {
                 ReactionButton(type: .episodeReply(id), reactions: $reactions)
               }
@@ -155,8 +155,9 @@ struct CommentItemNormalView: View {
                 }
               } label: {
                 Image(systemName: "ellipsis")
-              }.buttonStyle(.plain)
+              }
             }
+            .buttonStyle(.plain)
             .font(.footnote)
             .foregroundStyle(.secondary)
           }
@@ -297,7 +298,7 @@ struct CommentSubReplyNormalView: View {
               showReplyBox = true
             } label: {
               Image(systemName: "bubble.fill")
-            }.buttonStyle(.plain)
+            }
             if case .episode(let id) = type {
               ReactionButton(type: .episodeReply(id), reactions: $reactions)
             }
@@ -322,8 +323,9 @@ struct CommentSubReplyNormalView: View {
               }
             } label: {
               Image(systemName: "ellipsis")
-            }.buttonStyle(.plain)
+            }
           }
+          .buttonStyle(.plain)
           .font(.footnote)
           .foregroundStyle(.secondary)
         }
