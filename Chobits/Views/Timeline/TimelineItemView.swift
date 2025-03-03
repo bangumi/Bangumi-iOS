@@ -5,6 +5,8 @@ struct TimelineItemView: View {
   let item: TimelineDTO
   let previous: TimelineDTO?
 
+  @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
+
   @State private var showTime = false
 
   var body: some View {
@@ -157,17 +159,19 @@ struct TimelineItemView: View {
           ReactionsView(type: .subjectCollect(collectID), reactions: reactions)
         }
         HStack {
-          if item.cat == .status, item.type == 1 {
-            NavigationLink(value: NavDestination.timeline(item)) {
-              Text(item.replies > 0 ? "\(item.replies) 回复 " : "回复")
-            }.buttonStyle(.navLink)
-            Text("·")
-          } else if item.cat == .subject, !item.batch, let collect = item.memo.subject?.first,
-            let collectID = collect.collectID,
-            !collect.comment.isEmpty
-          {
-            ReactionButton(type: .subjectCollect(collectID))
-            Text("·")
+          if isAuthenticated {
+            if item.cat == .status, item.type == 1 {
+              NavigationLink(value: NavDestination.timeline(item)) {
+                Text(item.replies > 0 ? "\(item.replies) 回复 " : "回复")
+              }.buttonStyle(.navLink)
+              Text("·")
+            } else if item.cat == .subject, !item.batch, let collect = item.memo.subject?.first,
+              let collectID = collect.collectID,
+              !collect.comment.isEmpty
+            {
+              ReactionButton(type: .subjectCollect(collectID))
+              Text("·")
+            }
           }
           Button {
             showTime = true

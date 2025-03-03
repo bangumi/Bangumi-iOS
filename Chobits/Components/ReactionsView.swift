@@ -36,6 +36,8 @@ struct ReactionsView: View {
 struct ReactionButton: View {
   let type: ReactionType
 
+  @AppStorage("profile") var profile: Profile = Profile()
+
   @State private var showPopover = false
 
   var columns: [GridItem] {
@@ -54,7 +56,7 @@ struct ReactionButton: View {
       LazyVGrid(columns: columns) {
         ForEach(type.available, id: \.self) { value in
           Button {
-            print("reaction")
+            print("reaction: \(value)")
           } label: {
             Image(REACTIONS[value] ?? "bgm125")
               .resizable()
