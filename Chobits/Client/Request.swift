@@ -37,6 +37,19 @@ extension Chii {
     body["id"] = ids
     _ = try await self.request(url: url, method: "POST", body: body, auth: .required)
   }
+
+  func like(path: String, value: Int) async throws {
+    let url = BangumiAPI.priv.build("p1/\(path)/like")
+    var body: [String: Any] = [:]
+    body["value"] = value
+    _ = try await self.request(url: url, method: "PUT", body: body, auth: .required)
+  }
+
+  func unlike(path: String) async throws {
+    let url = BangumiAPI.priv.build("p1/\(path)/like")
+    let body: [String: Any] = [:]
+    _ = try await self.request(url: url, method: "DELETE", body: body, auth: .required)
+  }
 }
 
 // MARK: - Blog
