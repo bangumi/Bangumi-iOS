@@ -156,7 +156,10 @@ struct TimelineItemView: View {
           let collectID = collect.collectID,
           let reactions = collect.reactions, !reactions.isEmpty
         {
-          ReactionsView(type: .subjectCollect(collectID), reactions: reactions)
+          ReactionsView(
+            type: .subjectCollect(collectID), reactions: reactions,
+            onAdd: { _ in },
+            onDelete: { _ in })
         }
         HStack {
           if isAuthenticated {
@@ -169,7 +172,9 @@ struct TimelineItemView: View {
               let collectID = collect.collectID,
               !collect.comment.isEmpty
             {
-              ReactionButton(type: .subjectCollect(collectID))
+              ReactionButton(
+                type: .subjectCollect(collectID),
+                onAdd: { _ in }, onDelete: { _ in })
               Text("·")
             }
           }

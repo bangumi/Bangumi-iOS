@@ -3,8 +3,24 @@ import SwiftUI
 struct ReactionsView: View {
   let type: ReactionType
   let reactions: [ReactionDTO]
+  let onAdd: (Int) -> Void
+  let onDelete: (Int) -> Void
 
   @AppStorage("profile") var profile: Profile = Profile()
+
+  func shadowColor(_ reaction: ReactionDTO) -> Color {
+    if reaction.users.contains(where: { $0.id == profile.id }) {
+      return .linkText.opacity(0.5)
+    }
+    return .black.opacity(0.2)
+  }
+
+  func textColor(_ reaction: ReactionDTO) -> Color {
+    if reaction.users.contains(where: { $0.id == profile.id }) {
+      return .linkText
+    }
+    return .secondary
+  }
 
   var body: some View {
     HStack {
@@ -16,7 +32,7 @@ struct ReactionsView: View {
             }.buttonStyle(.plain)
           }
         } label: {
-          CardView(padding: 2, cornerRadius: 10) {
+          CardView(padding: 2, cornerRadius: 10, shadow: shadowColor(reaction)) {
             HStack(spacing: 4) {
               Image(reaction.icon)
                 .resizable()
@@ -24,7 +40,7 @@ struct ReactionsView: View {
                 .frame(width: 16, height: 16)
               Text("\(reaction.users.count)")
                 .font(.callout)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(textColor(reaction))
             }.padding(.horizontal, 4)
           }
         }.buttonStyle(.plain)
@@ -35,6 +51,8 @@ struct ReactionsView: View {
 
 struct ReactionButton: View {
   let type: ReactionType
+  let onAdd: (Int) -> Void
+  let onDelete: (Int) -> Void
 
   @AppStorage("profile") var profile: Profile = Profile()
 
