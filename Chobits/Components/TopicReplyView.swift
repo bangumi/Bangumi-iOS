@@ -146,9 +146,9 @@ struct ReplyItemNormalView: View {
               }
               switch type {
               case .subject:
-                ReactionButton(type: .subjectReply(topicId), reactions: $reactions)
+                ReactionButton(type: .subjectReply(reply.id), reactions: $reactions)
               case .group:
-                ReactionButton(type: .groupReply(topicId), reactions: $reactions)
+                ReactionButton(type: .groupReply(reply.id), reactions: $reactions)
               }
               Menu {
                 if reply.creatorID == profile.id {
@@ -183,9 +183,9 @@ struct ReplyItemNormalView: View {
           if !reactions.isEmpty {
             switch type {
             case .subject:
-              ReactionsView(type: .subjectReply(topicId), reactions: $reactions)
+              ReactionsView(type: .subjectReply(reply.id), reactions: $reactions)
             case .group:
-              ReactionsView(type: .groupReply(topicId), reactions: $reactions)
+              ReactionsView(type: .groupReply(reply.id), reactions: $reactions)
             }
           }
           ForEach(Array(zip(reply.replies.indices, reply.replies)), id: \.1) { subidx, subreply in
@@ -341,9 +341,9 @@ struct SubReplyNormalView: View {
             }
             switch type {
             case .subject:
-              ReactionButton(type: .subjectReply(topicId), reactions: $reactions)
+              ReactionButton(type: .subjectReply(subreply.id), reactions: $reactions)
             case .group:
-              ReactionButton(type: .groupReply(topicId), reactions: $reactions)
+              ReactionButton(type: .groupReply(subreply.id), reactions: $reactions)
             }
             Menu {
               if subreply.creatorID == profile.id {
@@ -375,6 +375,14 @@ struct SubReplyNormalView: View {
         BBCodeView(subreply.content)
           .tint(.linkText)
           .textSelection(.enabled)
+        if !reactions.isEmpty {
+          switch type {
+          case .subject:
+            ReactionsView(type: .subjectReply(subreply.id), reactions: $reactions)
+          case .group:
+            ReactionsView(type: .groupReply(subreply.id), reactions: $reactions)
+          }
+        }
       }
     }
     .sheet(isPresented: $showReplyBox) {
