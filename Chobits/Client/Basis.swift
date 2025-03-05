@@ -40,9 +40,9 @@ enum ImageQuality: Int, CaseIterable {
   var desc: String {
     switch self {
     case .low:
-      return "低(更流畅)"
+      return "流畅"
     case .high:
-      return "高(更清晰)"
+      return "清晰"
     }
   }
 

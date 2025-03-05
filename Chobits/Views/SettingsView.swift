@@ -96,6 +96,11 @@ struct SettingsView: View {
           Text("100").tag(100)
           Text("无限制").tag(0)
         }
+        Picker(selection: $subjectImageQuality, label: Text("条目封面图片质量")) {
+          ForEach(ImageQuality.allCases, id: \.self) { quality in
+            Text(quality.desc).tag(quality)
+          }
+        }
       }
 
       Section(header: Text("超合金")) {
@@ -113,11 +118,6 @@ struct SettingsView: View {
         }
         Toggle(isOn: $autoCompleteProgress) {
           Text("标记看过时自动完成所有进度")
-        }
-        Picker(selection: $subjectImageQuality, label: Text("条目封面图片质量")) {
-          ForEach(ImageQuality.allCases, id: \.self) { quality in
-            Text(quality.desc).tag(quality)
-          }
         }
       }
 
