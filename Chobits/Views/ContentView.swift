@@ -72,8 +72,8 @@ struct ContentView: View {
         Spacer()
       }
       .animation(.default, value: notifier.notifications)
-      .padding(.horizontal, 8)
-      .padding(.bottom, 64)
+      .padding(.horizontal, 64)
+      .padding(.bottom, 8)
       .alert("ERROR", isPresented: $notifier.hasAlert) {
         Button("OK") {
           Notifier.shared.vanishError()
