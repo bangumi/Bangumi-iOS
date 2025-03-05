@@ -82,6 +82,7 @@ struct ReactionsView: View {
                 .frame(width: 16, height: 16)
               Text("\(reaction.users.count)")
                 .font(.callout)
+                .monospacedDigit()
                 .foregroundStyle(textColor(reaction))
             }.padding(.horizontal, 4)
           }
