@@ -34,6 +34,7 @@ struct ReactionsView: View {
           try await Chii.shared.like(path: type.path, value: reaction.value)
           onAdd(reaction.value)
         }
+        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
       } catch {
         Notifier.shared.alert(error: error)
       }
@@ -121,6 +122,7 @@ struct ReactionButton: View {
       do {
         try await Chii.shared.like(path: type.path, value: value)
         showPopover = false
+        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
         onAdd(value)
       } catch {
         Notifier.shared.alert(error: error)
