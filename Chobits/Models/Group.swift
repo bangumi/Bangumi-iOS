@@ -66,8 +66,7 @@ final class GroupV2: Linkable {
     if self.posts != item.posts { self.posts = item.posts }
     if self.topics != item.topics { self.topics = item.topics }
     if self.createdAt != item.createdAt { self.createdAt = item.createdAt }
-    if let membership = item.membership, self.joinedAt != membership.joinedAt {
-      self.joinedAt = membership.joinedAt
-    }
+    let joinedAt = item.membership?.joinedAt ?? 0
+    if self.joinedAt != joinedAt { self.joinedAt = joinedAt }
   }
 }

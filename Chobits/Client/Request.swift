@@ -708,6 +708,20 @@ extension Chii {
     let resp: PagedDTO<TopicDTO> = try self.decodeResponse(data)
     return resp
   }
+
+  // TODO:
+  func joinGroup(_ groupName: String) async throws {
+    let url = BangumiAPI.priv.build("p1/groups/\(groupName)/join")
+    let body: [String: Any] = [:]
+    _ = try await self.request(url: url, method: "POST", body: body, auth: .required)
+  }
+
+  // TODO:
+  func leaveGroup(_ groupName: String) async throws {
+    let url = BangumiAPI.priv.build("p1/groups/\(groupName)/leave")
+    let body: [String: Any] = [:]
+    _ = try await self.request(url: url, method: "POST", body: body, auth: .required)
+  }
 }
 
 // MARK: - Person

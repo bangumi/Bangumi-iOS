@@ -97,6 +97,32 @@ struct GroupDetailView: View {
 
   @Environment(Group.self) var group
 
+  @State private var updating: Bool = false
+
+  func joinGroup(_ name: String) {
+    Task {
+      updating = true
+      do {
+        try await Chii.shared.joinGroup(name)
+      } catch {
+        Notifier.shared.alert(error: error)
+      }
+      updating = false
+    }
+  }
+
+  func leaveGroup(_ name: String) {
+    Task {
+      updating = true
+      do {
+        try await Chii.shared.leaveGroup(name)
+      } catch {
+        Notifier.shared.alert(error: error)
+      }
+      updating = false
+    }
+  }
+
   var body: some View {
     CardView(background: .introBackground) {
       VStack(alignment: .leading, spacing: 8) {
@@ -111,13 +137,14 @@ struct GroupDetailView: View {
               .font(.title2.bold())
               .multilineTextAlignment(.leading)
             Divider()
+            Spacer(minLength: 0)
             Section {
-              Label("创建于 \(group.createdAt.datetimeDisplay)", systemImage: "calendar")
               Label("\(group.members) 位成员", systemImage: "person")
               Label("\(group.topics) 个讨论", systemImage: "bubble")
             }
             .font(.subheadline)
             .foregroundStyle(.secondary)
+            Spacer(minLength: 0)
           }
         }
         if !group.desc.isEmpty {
@@ -128,6 +155,27 @@ struct GroupDetailView: View {
             Spacer()
           }
         }
+        Divider()
+        HStack {
+          Text("创建于 \(group.createdAt.datetimeDisplay)")
+            .foregroundStyle(.secondary)
+          Spacer()
+          if group.joinedAt == 0 {
+            Button {
+              joinGroup(group.name)
+            } label: {
+              Label("加入这个小组", systemImage: "plus").labelStyle(.compact)
+            }.buttonStyle(.borderedProminent)
+          } else {
+            Button(role: .destructive) {
+              leaveGroup(group.name)
+            } label: {
+              Label("退出这个小组", systemImage: "xmark.bin").labelStyle(.compact)
+            }.buttonStyle(.bordered)
+          }
+        }
+        .disabled(updating)
+        .font(.footnote)
       }
     }
     GroupRecentMemberView(width)
