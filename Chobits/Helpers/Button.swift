@@ -45,10 +45,9 @@ struct ScaleButtonStyle: PrimitiveButtonStyle {
 
     configuration.label
       .compositingGroup()
-      .foregroundColor(.primary)
       .scaleEffect(isPressing ? 0.8 : 1)
       .shadow(radius: isPressing ? 2 : 0)
-      .offset(y: isPressing ? 8 : 0)
+      .offset(y: isPressing ? 4 : 0)
       .animation(.default, value: isPressing)
       .gesture(drag)
       .simultaneousGesture(
