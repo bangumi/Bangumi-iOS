@@ -104,6 +104,7 @@ struct GroupDetailView: View {
       updating = true
       do {
         try await Chii.shared.joinGroup(name)
+        group.joinedAt = Int(Date().timeIntervalSince1970)
       } catch {
         Notifier.shared.alert(error: error)
       }
@@ -116,6 +117,7 @@ struct GroupDetailView: View {
       updating = true
       do {
         try await Chii.shared.leaveGroup(name)
+        group.joinedAt = 0
       } catch {
         Notifier.shared.alert(error: error)
       }
