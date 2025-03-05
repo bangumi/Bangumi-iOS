@@ -87,7 +87,7 @@ struct ReactionsView: View {
             }.padding(.horizontal, 4)
           }
         }
-        .buttonStyle(.explode)
+        .buttonStyle(.scale)
         .disabled(!isAuthenticated || updating)
         .contextMenu {
           ForEach(reaction.users, id: \.id) { user in
