@@ -12,9 +12,10 @@ struct NavigationButtonStyle: PrimitiveButtonStyle {
         })
 
     configuration.label
-      .foregroundColor(.linkText)
       .compositingGroup()
-      .scaleEffect(isPressing ? 0.8 : 1)
+      .foregroundColor(.linkText)
+      .underline(isPressing, color: .linkText)
+      .scaleEffect(isPressing ? 0.9 : 1)
       .shadow(radius: isPressing ? 1 : 0)
       .animation(.default, value: isPressing)
       .gesture(drag)
@@ -43,10 +44,11 @@ struct ScaleButtonStyle: PrimitiveButtonStyle {
         })
 
     configuration.label
-      .foregroundColor(.primary)
       .compositingGroup()
+      .foregroundColor(.primary)
       .scaleEffect(isPressing ? 0.8 : 1)
       .shadow(radius: isPressing ? 2 : 0)
+      .offset(y: isPressing ? 8 : 0)
       .animation(.default, value: isPressing)
       .gesture(drag)
       .simultaneousGesture(
