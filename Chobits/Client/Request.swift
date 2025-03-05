@@ -400,6 +400,18 @@ extension Chii {
     let resp: PagedDTO<FriendDTO> = try self.decodeResponse(data)
     return resp
   }
+
+  func addFriend(_ username: String) async throws {
+    let url = BangumiAPI.priv.build("p1/friends/\(username)")
+    let body: [String: Any] = [:]
+    _ = try await self.request(url: url, method: "PUT", body: body, auth: .required)
+  }
+
+  func removeFriend(_ username: String) async throws {
+    let url = BangumiAPI.priv.build("p1/friends/\(username)")
+    let body: [String: Any] = [:]
+    _ = try await self.request(url: url, method: "DELETE", body: body, auth: .required)
+  }
 }
 
 // MARK: - Topic

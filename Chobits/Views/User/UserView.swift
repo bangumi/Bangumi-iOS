@@ -49,112 +49,34 @@ struct UserView: View {
     refreshed = true
   }
 
+  func addFriend() {
+    guard let user = user else { return }
+    Task {
+      do {
+        try await Chii.shared.addFriend(username)
+        friendlist.append(user.userId)
+      } catch {
+        Notifier.shared.alert(error: error)
+      }
+    }
+  }
+
+  func removeFriend() {
+    guard let user = user else { return }
+    Task {
+      do {
+        try await Chii.shared.removeFriend(username)
+        friendlist = friendlist.filter { $0 != user.userId }
+      } catch {
+        Notifier.shared.alert(error: error)
+      }
+    }
+  }
+
   var body: some View {
     Section {
       if let user = user {
-        ScrollView {
-          VStack(alignment: .leading) {
-            Text(user.nickname)
-              .font(.title3)
-              .fontWeight(.bold)
-              .padding(.top, 8)
-
-            /// header
-            HStack {
-              ImageView(img: user.avatar?.large)
-                .imageStyle(width: 100, height: 100)
-                .imageType(.avatar)
-
-              VStack(alignment: .leading) {
-                HStack(spacing: 5) {
-                  BadgeView {
-                    Text(user.groupEnum.description).font(.caption)
-                  }
-                  if profile.username == user.username {
-                    BadgeView {
-                      Text("我自己").font(.caption)
-                    }
-                  }
-                  if friendlist.contains(user.userId) {
-                    BadgeView {
-                      Text("好友").font(.caption)
-                    }
-                  }
-                  if blocklist.contains(user.userId) {
-                    BadgeView(background: .secondary) {
-                      Text("已拉黑").font(.caption)
-                    }
-                  }
-                  Text("@\(user.username)")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-                    .textSelection(.enabled)
-                }
-
-                HStack(spacing: 5) {
-                  BadgeView {
-                    Text("Bangumi")
-                      .font(.caption)
-                      .fixedSize()
-                  }
-                  Text("\(user.joinedAt.dateDisplay)加入")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-                }
-
-                Divider()
-                Text(user.sign)
-                  .font(.footnote)
-                  .textSelection(.enabled)
-
-              }
-            }.frame(height: 100)
-
-            /// user bio
-            if user.bio.isEmpty {
-              Divider()
-            } else {
-              CardView(background: .bioBackground) {
-                HStack {
-                  BBCodeView(user.bio, textSize: 12)
-                    .textSelection(.enabled)
-                    .tint(.linkText)
-                  Spacer()
-                }
-              }
-            }
-
-            HFlow {
-              if !user.site.isEmpty {
-                HStack(spacing: 5) {
-                  BadgeView(background: .accentColor) {
-                    Text("Home")
-                      .font(.caption)
-                      .fixedSize()
-                  }
-                  Text(user.site.withLink(user.site))
-                    .font(.footnote)
-                    .textSelection(.enabled)
-                }
-              }
-              ForEach(user.networkServices) { service in
-                HStack(spacing: 5) {
-                  BadgeView(background: Color(service.color)) {
-                    Text(service.title)
-                      .font(.caption)
-                      .fixedSize()
-                  }
-                  Text(service.account.withLink(service.link))
-                    .font(.footnote)
-                    .textSelection(.enabled)
-                }
-              }
-            }
-
-            /// user homepage
-            UserHomeView().environment(user)
-          }.padding(.horizontal, 8)
-        }
+        UserDetailView().environment(user)
       } else if refreshed {
         NotFoundView()
       } else {
@@ -193,6 +115,22 @@ struct UserView: View {
           ShareLink(item: shareLink) {
             Label("分享", systemImage: "square.and.arrow.up")
           }
+          if let user = user, profile.username != user.username {
+            Divider()
+            if friendlist.contains(user.userId) {
+              Button(role: .destructive) {
+                removeFriend()
+              } label: {
+                Label("解除好友", systemImage: "person.2.slash")
+              }
+            } else {
+              Button {
+                addFriend()
+              } label: {
+                Label("加为好友", systemImage: "person.2.badge.plus")
+              }
+            }
+          }
         } label: {
           Image(systemName: "ellipsis.circle")
         }
@@ -202,6 +140,112 @@ struct UserView: View {
       Task {
         await refresh()
       }
+    }
+  }
+}
+
+struct UserDetailView: View {
+  @AppStorage("profile") var profile: Profile = Profile()
+  @AppStorage("friendlist") var friendlist: [Int] = []
+  @AppStorage("blocklist") var blocklist: [Int] = []
+
+  @Environment(User.self) var user
+
+  var body: some View {
+    ScrollView {
+      VStack(alignment: .leading) {
+        HStack(alignment: .top) {
+          ImageView(img: user.avatar?.large)
+            .imageStyle(width: 100, height: 100)
+            .imageType(.avatar)
+          VStack(alignment: .leading) {
+            Text(user.nickname)
+              .font(.title3)
+              .fontWeight(.bold)
+              .padding(.top, 8)
+            HStack(spacing: 5) {
+              BadgeView {
+                Text(user.groupEnum.description).font(.caption)
+              }
+              if profile.username == user.username {
+                BadgeView {
+                  Text("我自己").font(.caption)
+                }
+              }
+              if friendlist.contains(user.userId) {
+                BadgeView {
+                  Text("好友").font(.caption)
+                }
+              }
+              if blocklist.contains(user.userId) {
+                BadgeView(background: .secondary) {
+                  Text("已拉黑").font(.caption)
+                }
+              }
+              Text("@\(user.username)")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+                .textSelection(.enabled)
+            }
+            Divider()
+            Text(user.sign)
+              .font(.footnote)
+              .textSelection(.enabled)
+          }
+        }.frame(height: 100)
+
+        if user.bio.isEmpty {
+          Divider()
+        } else {
+          CardView(background: .bioBackground) {
+            HStack {
+              BBCodeView(user.bio, textSize: 12)
+                .textSelection(.enabled)
+                .tint(.linkText)
+              Spacer()
+            }
+          }
+        }
+
+        HFlow {
+          HStack(spacing: 5) {
+            BadgeView {
+              Text("Bangumi")
+                .font(.caption)
+                .fixedSize()
+            }
+            Text("\(user.joinedAt.dateDisplay)加入")
+              .font(.footnote)
+              .foregroundStyle(.secondary)
+          }
+          if !user.site.isEmpty {
+            HStack(spacing: 5) {
+              BadgeView(background: .accentColor) {
+                Text("Home")
+                  .font(.caption)
+                  .fixedSize()
+              }
+              Text(user.site.withLink(user.site))
+                .font(.footnote)
+                .textSelection(.enabled)
+            }
+          }
+          ForEach(user.networkServices) { service in
+            HStack(spacing: 5) {
+              BadgeView(background: Color(service.color)) {
+                Text(service.title)
+                  .font(.caption)
+                  .fixedSize()
+              }
+              Text(service.account.withLink(service.link))
+                .font(.footnote)
+                .textSelection(.enabled)
+            }
+          }
+        }
+
+        UserHomeView().environment(user)
+      }.padding(.horizontal, 8)
     }
   }
 }
