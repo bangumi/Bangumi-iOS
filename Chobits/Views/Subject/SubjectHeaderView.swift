@@ -79,7 +79,7 @@ struct SubjectHeaderView: View {
             Image(systemName: "chevron.right")
           }
         }
-        .buttonStyle(.navLink)
+        .buttonStyle(.navigation)
         .padding(.vertical, 4)
 
         if !collectStats.isEmpty {

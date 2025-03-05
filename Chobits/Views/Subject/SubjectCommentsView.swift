@@ -18,7 +18,7 @@ struct SubjectCommentsView: View {
         if comments.count > 0 {
           NavigationLink(value: NavDestination.subjectCommentList(subjectId)) {
             Text("更多吐槽 »").font(.caption)
-          }.buttonStyle(.navLink)
+          }.buttonStyle(.navigation)
         }
       }
       Divider()

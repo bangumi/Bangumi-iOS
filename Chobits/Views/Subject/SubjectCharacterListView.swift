@@ -86,7 +86,7 @@ struct SubjectCharacterListView: View {
         }
       }.padding(8)
     }
-    .buttonStyle(.plain)
+    .buttonStyle(.scale)
     .navigationTitle("角色列表")
     .navigationBarTitleDisplayMode(.inline)
     .toolbar {

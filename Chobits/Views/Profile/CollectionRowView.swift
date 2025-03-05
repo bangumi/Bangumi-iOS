@@ -46,7 +46,7 @@ struct CollectionRowView: View {
         }
       }
     }
-    .buttonStyle(.navLink)
+    .buttonStyle(.navigation)
     .frame(minHeight: 60)
     .padding(2)
     .clipShape(RoundedRectangle(cornerRadius: 10))

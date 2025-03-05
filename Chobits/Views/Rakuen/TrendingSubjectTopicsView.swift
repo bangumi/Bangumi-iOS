@@ -72,7 +72,7 @@ struct SubjectTopicItemView: View {
           NavigationLink(value: NavDestination.subject(topic.subject.id)) {
             Text(topic.subject.name)
               .font(.footnote)
-          }.buttonStyle(.plain)
+          }.buttonStyle(.scale)
         }
       }
       Spacer()

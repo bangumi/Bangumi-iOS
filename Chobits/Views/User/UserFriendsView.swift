@@ -50,7 +50,7 @@ struct UserFriendsView: View {
           NavigationLink(value: NavDestination.userFriend(user.slim)) {
             Text("更多 »")
               .font(.caption)
-          }.buttonStyle(.navLink)
+          }.buttonStyle(.navigation)
         }
         .padding(.top, 8)
         .task(refresh)

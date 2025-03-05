@@ -203,7 +203,7 @@ struct LargeChapterView: View {
           } label: {
             Image(systemName: "plus.circle")
               .foregroundStyle(.secondary)
-          }.buttonStyle(.plain)
+          }.buttonStyle(.scale)
           Spacer()
         }.monospaced()
         HStack(alignment: .firstTextBaseline, spacing: 0) {
@@ -223,7 +223,7 @@ struct LargeChapterView: View {
           } label: {
             Image(systemName: "plus.circle")
               .foregroundStyle(.secondary)
-          }.buttonStyle(.plain)
+          }.buttonStyle(.scale)
           Spacer()
         }.monospaced()
       }
@@ -269,7 +269,7 @@ struct RowChapterView: View {
         } label: {
           Image(systemName: "plus.circle")
             .foregroundStyle(.secondary)
-        }.buttonStyle(.plain)
+        }.buttonStyle(.scale)
       }
       .monospaced()
       HStack(alignment: .firstTextBaseline, spacing: 0) {
@@ -288,7 +288,7 @@ struct RowChapterView: View {
         } label: {
           Image(systemName: "plus.circle")
             .foregroundStyle(.secondary)
-        }.buttonStyle(.plain)
+        }.buttonStyle(.scale)
       }
       .monospaced()
       Spacer()
@@ -300,7 +300,7 @@ struct RowChapterView: View {
           }
           .disabled(true)
           .hidden()
-          .buttonStyle(.plain)
+          .buttonStyle(.scale)
           ProgressView()
         }
       } else {
@@ -364,7 +364,7 @@ struct TileChapterView: View {
           } label: {
             Image(systemName: "plus.circle")
               .foregroundStyle(.secondary)
-          }.buttonStyle(.plain)
+          }.buttonStyle(.scale)
         }.monospaced()
         HStack(alignment: .firstTextBaseline, spacing: 0) {
           TextField("\(data.volStatus)", text: inputs.vols)
@@ -382,7 +382,7 @@ struct TileChapterView: View {
           } label: {
             Image(systemName: "plus.circle")
               .foregroundStyle(.secondary)
-          }.buttonStyle(.plain)
+          }.buttonStyle(.scale)
         }.monospaced()
       }
     }

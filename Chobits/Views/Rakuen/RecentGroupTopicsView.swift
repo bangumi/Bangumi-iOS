@@ -72,7 +72,7 @@ struct GroupTopicItemView: View {
             Spacer()
             Text(topic.group.title)
               .font(.footnote)
-          }.buttonStyle(.plain)
+          }.buttonStyle(.scale)
         }
       }
       Spacer()

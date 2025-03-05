@@ -54,7 +54,7 @@ struct SubjectStaffListView: View {
       }
       .padding(8)
     }
-    .buttonStyle(.navLink)
+    .buttonStyle(.navigation)
     .navigationTitle("制作人员")
     .navigationBarTitleDisplayMode(.inline)
     .toolbar {

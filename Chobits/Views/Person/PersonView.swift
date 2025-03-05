@@ -178,7 +178,7 @@ struct PersonDetailView: View {
             Image(systemName: "chevron.right")
           }
         }
-        .buttonStyle(.navLink)
+        .buttonStyle(.navigation)
         .padding(.vertical, 4)
 
         Label("\(person.collects)人收藏", systemImage: "heart")

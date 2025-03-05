@@ -65,7 +65,7 @@ struct EpisodeGridView: View {
         Spacer()
         NavigationLink(value: NavDestination.episodeList(subjectId)) {
           Text("全部章节 »").font(.caption)
-        }.buttonStyle(.navLink)
+        }.buttonStyle(.navigation)
       }.onAppear(perform: refresh)
       Divider()
     }.padding(.top, 5)

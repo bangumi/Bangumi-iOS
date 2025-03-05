@@ -25,7 +25,7 @@ struct UserBlogsView: View {
           NavigationLink(value: NavDestination.userBlog(user.slim)) {
             Text("更多 »")
               .font(.caption)
-          }.buttonStyle(.navLink)
+          }.buttonStyle(.navigation)
         }
         .padding(.top, 8)
         .task(refresh)

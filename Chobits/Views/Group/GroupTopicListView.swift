@@ -32,7 +32,7 @@ struct GroupTopicListView: View {
                     .font(.headline)
                     .lineLimit(2)
                     .multilineTextAlignment(.leading)
-                }.buttonStyle(.navLink)
+                }.buttonStyle(.navigation)
                 Spacer()
                 if topic.replyCount ?? 0 > 0 {
                   Text("(+\(topic.replyCount ?? 0))")

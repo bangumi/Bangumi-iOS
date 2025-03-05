@@ -53,7 +53,7 @@ struct SubjectTopicListView: View {
         }
       }.padding(.horizontal, 8)
     }
-    .buttonStyle(.navLink)
+    .buttonStyle(.navigation)
     .navigationTitle("讨论版")
     .navigationBarTitleDisplayMode(.inline)
     .toolbar {

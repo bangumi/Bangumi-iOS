@@ -59,7 +59,7 @@ struct UserSubjectCollectionView: View {
             NavigationLink(value: NavDestination.userCollection(user.slim, stype, ctypes)) {
               Text("更多 »")
                 .font(.caption)
-            }.buttonStyle(.navLink)
+            }.buttonStyle(.navigation)
           }
           .padding(.top, 8)
           .task {

@@ -158,7 +158,7 @@ struct CommentItemNormalView: View {
                 Image(systemName: "ellipsis")
               }.padding(.trailing, 24)
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.scale)
             .font(.footnote)
             .foregroundStyle(.secondary)
           }
@@ -326,7 +326,7 @@ struct CommentSubReplyNormalView: View {
               Image(systemName: "ellipsis")
             }.padding(.trailing, 24)
           }
-          .buttonStyle(.plain)
+          .buttonStyle(.scale)
           .font(.footnote)
           .foregroundStyle(.secondary)
         }

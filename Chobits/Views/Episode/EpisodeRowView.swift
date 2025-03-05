@@ -52,7 +52,7 @@ struct EpisodeRowView: View {
                   .font(.footnote)
               }
             }
-          }.buttonStyle(.plain)
+          }.buttonStyle(.scale)
         }
         VStack(alignment: .leading) {
           HStack {

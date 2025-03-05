@@ -15,7 +15,7 @@ struct PersonCastsView: View {
         if casts.count > 0 {
           NavigationLink(value: NavDestination.personCastList(personId)) {
             Text("更多角色 »").font(.caption)
-          }.buttonStyle(.navLink)
+          }.buttonStyle(.navigation)
         }
       }
       Divider()

@@ -37,7 +37,7 @@ struct PersonCastListView: View {
       }
       .padding(8)
     }
-    .buttonStyle(.navLink)
+    .buttonStyle(.navigation)
     .navigationTitle("出演角色")
     .navigationBarTitleDisplayMode(.inline)
     .toolbar {

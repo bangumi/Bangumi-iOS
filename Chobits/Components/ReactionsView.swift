@@ -89,7 +89,7 @@ struct ReactionsView: View {
           ForEach(reaction.users, id: \.id) { user in
             NavigationLink(value: NavDestination.user(user.username)) {
               Text(user.nickname)
-            }.buttonStyle(.plain)
+            }.buttonStyle(.scale)
           }
         }
       }
@@ -152,7 +152,7 @@ struct ReactionButton: View {
       Image(systemName: "heart")
     }
     .disabled(!isAuthenticated || updating)
-    .buttonStyle(.plain)
+    .buttonStyle(.scale)
     .popover(isPresented: $showPopover) {
       LazyVGrid(columns: columns) {
         ForEach(type.available, id: \.self) { value in

@@ -185,7 +185,7 @@ private struct DraftBoxView: View {
                   .foregroundStyle(.secondary)
               }
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.scale)
             .swipeActions {
               Button(role: .destructive) {
                 modelContext.delete(draft)

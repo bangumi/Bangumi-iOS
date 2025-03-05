@@ -166,7 +166,7 @@ struct CharacterDetailView: View {
             Image(systemName: "chevron.right")
           }
         }
-        .buttonStyle(.navLink)
+        .buttonStyle(.navigation)
         .padding(.vertical, 4)
 
         Label("\(character.collects)人收藏", systemImage: "heart")

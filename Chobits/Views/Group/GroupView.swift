@@ -175,7 +175,7 @@ struct GroupRecentMemberView: View {
           NavigationLink(value: NavDestination.groupMemberList(group.name)) {
             Text("更多成员 »")
               .font(.caption)
-          }.buttonStyle(.navLink)
+          }.buttonStyle(.navigation)
         }
         Divider()
       }
@@ -212,7 +212,7 @@ struct GroupRecentTopicView: View {
           NavigationLink(value: NavDestination.groupTopicList(group.name)) {
             Text("更多讨论 »")
               .font(.caption)
-          }.buttonStyle(.navLink)
+          }.buttonStyle(.navigation)
         }
         Divider()
       }
@@ -225,7 +225,7 @@ struct GroupRecentTopicView: View {
                   Text(topic.title)
                     .font(.callout)
                     .lineLimit(1)
-                }.buttonStyle(.navLink)
+                }.buttonStyle(.navigation)
                 Spacer()
                 if topic.replyCount ?? 0 > 0 {
                   Text("(+\(topic.replyCount ?? 0))")

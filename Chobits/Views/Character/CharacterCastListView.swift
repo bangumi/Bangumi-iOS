@@ -38,7 +38,7 @@ struct CharacterCastListView: View {
       }
       .padding(8)
     }
-    .buttonStyle(.navLink)
+    .buttonStyle(.navigation)
     .navigationTitle("出演作品")
     .navigationBarTitleDisplayMode(.inline)
     .toolbar {

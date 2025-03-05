@@ -78,7 +78,7 @@ struct PersonWorkListView: View {
       }
       .padding(8)
     }
-    .buttonStyle(.navLink)
+    .buttonStyle(.navigation)
     .navigationTitle("参与作品")
     .navigationBarTitleDisplayMode(.inline)
     .toolbar {

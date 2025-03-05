@@ -17,7 +17,7 @@ struct SubjectReviewsView: View {
         if reviews.count > 0 {
           NavigationLink(value: NavDestination.subjectReviewList(subjectId)) {
             Text("更多评论 »").font(.caption)
-          }.buttonStyle(.navLink)
+          }.buttonStyle(.navigation)
         }
       }
       Divider()

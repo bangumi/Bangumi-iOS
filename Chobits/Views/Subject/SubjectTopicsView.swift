@@ -18,7 +18,7 @@ struct SubjectTopicsView: View {
         if topics.count > 0 {
           NavigationLink(value: NavDestination.subjectTopicList(subjectId)) {
             Text("更多讨论 »").font(.caption)
-          }.buttonStyle(.navLink)
+          }.buttonStyle(.navigation)
         }
       }
       Divider()
@@ -41,7 +41,7 @@ struct SubjectTopicsView: View {
                 Text(topic.title)
                   .font(.callout)
                   .lineLimit(1)
-              }.buttonStyle(.navLink)
+              }.buttonStyle(.navigation)
               Spacer()
               if topic.replyCount ?? 0 > 0 {
                 Text("(+\(topic.replyCount ?? 0))")

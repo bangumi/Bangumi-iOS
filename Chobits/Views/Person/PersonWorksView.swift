@@ -16,7 +16,7 @@ struct PersonWorksView: View {
         if works.count > 0 {
           NavigationLink(value: NavDestination.personWorkList(personId)) {
             Text("更多作品 »").font(.caption)
-          }.buttonStyle(.navLink)
+          }.buttonStyle(.navigation)
         }
       }
       Divider()
@@ -64,7 +64,7 @@ struct PersonWorksView: View {
               }
             }
             Spacer()
-          }.buttonStyle(.navLink)
+          }.buttonStyle(.navigation)
         }
       }
     }

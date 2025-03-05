@@ -37,7 +37,7 @@ struct SubjectCharactersView: View {
         if characters.count > 0 {
           NavigationLink(value: NavDestination.subjectCharacterList(subjectId)) {
             Text("更多角色 »").font(.caption)
-          }.buttonStyle(.navLink)
+          }.buttonStyle(.navigation)
         }
       }
     }.padding(.top, 5)

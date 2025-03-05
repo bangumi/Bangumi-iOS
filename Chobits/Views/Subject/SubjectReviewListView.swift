@@ -31,7 +31,7 @@ struct SubjectReviewListView: View {
         }
       }.padding(.horizontal, 8)
     }
-    .buttonStyle(.navLink)
+    .buttonStyle(.navigation)
     .navigationTitle("评论")
     .navigationBarTitleDisplayMode(.inline)
     .toolbar {

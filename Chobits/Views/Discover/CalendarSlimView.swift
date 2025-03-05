@@ -56,7 +56,7 @@ struct CalendarSlimView: View {
             Spacer()
             NavigationLink(value: NavDestination.calendar) {
               Text("更多 »").font(.caption)
-            }.buttonStyle(.navLink)
+            }.buttonStyle(.navigation)
           }
           ForEach(dates, id: \.weekday) { item in
             HStack(alignment: .top, spacing: 0) {

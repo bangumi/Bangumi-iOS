@@ -37,7 +37,7 @@ struct SubjectCommentListView: View {
         SubjectCommentItemView(subjectType: subject?.typeEnum ?? .none, comment: comment)
       }.padding(.horizontal, 8)
     }
-    .buttonStyle(.navLink)
+    .buttonStyle(.navigation)
     .navigationTitle("吐槽")
     .navigationBarTitleDisplayMode(.inline)
     .toolbar {

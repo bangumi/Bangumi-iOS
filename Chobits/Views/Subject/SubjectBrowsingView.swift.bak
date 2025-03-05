@@ -217,7 +217,7 @@ struct SubjectBrowsingView: View {
                 Text("不限").foregroundStyle(.linkText)
               }
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.scale)
             HFlow(alignment: .center, spacing: 2, justification: .stretchSpaces) {
               ForEach(categories, id: \.id) { category in
                 Button {
@@ -235,7 +235,7 @@ struct SubjectBrowsingView: View {
                     Text(category.name).foregroundStyle(.linkText)
                   }
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.scale)
               }
             }
           case "series":
@@ -254,7 +254,7 @@ struct SubjectBrowsingView: View {
                 Text("不限").foregroundStyle(.linkText)
               }
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.scale)
             HFlow(alignment: .center, spacing: 2, justification: .stretchSpaces) {
               Button {
                 if filter.series != true {
@@ -271,7 +271,7 @@ struct SubjectBrowsingView: View {
                   Text("系列").foregroundStyle(.linkText)
                 }
               }
-              .buttonStyle(.plain)
+              .buttonStyle(.scale)
               Button {
                 if filter.series != false {
                   filter.series = false
@@ -287,7 +287,7 @@ struct SubjectBrowsingView: View {
                   Text("单行本").foregroundStyle(.linkText)
                 }
               }
-              .buttonStyle(.plain)
+              .buttonStyle(.scale)
             }
           case "platform":
             Button {
@@ -305,7 +305,7 @@ struct SubjectBrowsingView: View {
                 Text("不限").foregroundStyle(.linkText)
               }
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.scale)
             HFlow(alignment: .center, spacing: 2, justification: .stretchSpaces) {
               ForEach(GAME_PLATFORMS, id: \.self) { platform in
                 Button {
@@ -323,7 +323,7 @@ struct SubjectBrowsingView: View {
                     Text(platform).foregroundStyle(.linkText)
                   }
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.scale)
               }
             }
           case "year":
@@ -341,7 +341,7 @@ struct SubjectBrowsingView: View {
                 Text("不限").foregroundStyle(.linkText)
               }
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.scale)
             .padding(2)
             LazyVGrid(columns: [
               GridItem(.flexible()),
@@ -354,7 +354,7 @@ struct SubjectBrowsingView: View {
               } label: {
                 Text("来年们").foregroundStyle(.linkText)
               }
-              .buttonStyle(.plain)
+              .buttonStyle(.scale)
               .padding(2)
               ForEach(years, id: \.self) { year in
                 Button {
@@ -367,7 +367,7 @@ struct SubjectBrowsingView: View {
                     Text("\(String(year))年").foregroundStyle(.linkText)
                   }
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.scale)
                 .padding(2)
               }
               Button {
@@ -375,7 +375,7 @@ struct SubjectBrowsingView: View {
               } label: {
                 Text("往年们").foregroundStyle(.linkText)
               }
-              .buttonStyle(.plain)
+              .buttonStyle(.scale)
               .padding(2)
             }.animation(.default, value: years)
           case "month":
@@ -392,7 +392,7 @@ struct SubjectBrowsingView: View {
                 Text("不限").foregroundStyle(.linkText)
               }
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.scale)
             .padding(2)
             LazyVGrid(columns: [
               GridItem(.flexible()),
@@ -416,7 +416,7 @@ struct SubjectBrowsingView: View {
                     Text("\(month)月").foregroundStyle(.linkText)
                   }
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.scale)
                 .padding(2)
               }
             }
@@ -471,7 +471,7 @@ struct SubjectBrowsingView: View {
               } label: {
                 Label("排名", systemImage: "chart.bar.xaxis")
                   .foregroundStyle(filter.sort == "rank" ? .accent : .linkText)
-              }.buttonStyle(.plain)
+              }.buttonStyle(.scale)
               Button {
                 if filter.sort != "date" {
                   filter.sort = "date"
@@ -483,7 +483,7 @@ struct SubjectBrowsingView: View {
               } label: {
                 Label("日期", systemImage: "calendar")
                   .foregroundStyle(filter.sort == "date" ? .accent : .linkText)
-              }.buttonStyle(.plain)
+              }.buttonStyle(.scale)
             }
           default:
             EmptyView()
@@ -500,7 +500,7 @@ struct SubjectBrowsingView: View {
                   await browseNextPage(idx: item.idx)
                 }
               }
-          }.buttonStyle(.plain)
+          }.buttonStyle(.scale)
           Divider()
         }
 

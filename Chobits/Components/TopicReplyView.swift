@@ -173,7 +173,7 @@ struct ReplyItemNormalView: View {
                 Image(systemName: "ellipsis")
               }.padding(.trailing, 24)
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.scale)
             .font(.footnote)
             .foregroundStyle(.secondary)
           }
@@ -369,7 +369,7 @@ struct SubReplyNormalView: View {
             }.padding(.trailing, 24)
           }
           .font(.footnote)
-          .buttonStyle(.plain)
+          .buttonStyle(.scale)
           .foregroundStyle(.secondary)
         }
         BBCodeView(subreply.content)

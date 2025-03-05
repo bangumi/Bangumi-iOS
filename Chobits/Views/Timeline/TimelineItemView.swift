@@ -196,7 +196,7 @@ struct TimelineItemView: View {
             if item.cat == .status, item.type == 1 {
               NavigationLink(value: NavDestination.timeline(item)) {
                 Text(item.replies > 0 ? "\(item.replies) 回复 " : "回复")
-              }.buttonStyle(.navLink)
+              }.buttonStyle(.navigation)
               Text("·")
             } else if showReactions, let collectID = collectID {
               ReactionButton(type: .subjectCollect(collectID), reactions: $reactions)
@@ -208,7 +208,7 @@ struct TimelineItemView: View {
           } label: {
             item.createdAt.relativeText
           }
-          .buttonStyle(.plain)
+          .buttonStyle(.scale)
           .popover(isPresented: $showTime) {
             Text("\(item.createdAt.datetimeDisplay)")
               .font(.callout)

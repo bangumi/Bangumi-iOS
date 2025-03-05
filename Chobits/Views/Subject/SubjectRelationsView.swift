@@ -35,7 +35,7 @@ struct SubjectRelationsView: View {
         if relations.count > 0 {
           NavigationLink(value: NavDestination.subjectRelationList(subjectId)) {
             Text("更多条目 »").font(.caption)
-          }.buttonStyle(.navLink)
+          }.buttonStyle(.navigation)
         }
       }
       Divider()

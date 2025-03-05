@@ -120,7 +120,7 @@ struct EpisodeRecentView: View {
             )
             .labelStyle(.compact)
             .foregroundStyle(.secondary)
-          }.buttonStyle(.plain)
+          }.buttonStyle(.scale)
         }
       }
     }.animation(.default, value: episodes)
@@ -195,7 +195,7 @@ struct EpisodeRecentSlimView: View {
         NavigationLink(value: NavDestination.subject(subjectId)) {
           Image(systemName: "square.grid.2x2.fill")
             .foregroundStyle(.secondary)
-        }.buttonStyle(.plain)
+        }.buttonStyle(.scale)
       }
     }.font(.callout)
   }

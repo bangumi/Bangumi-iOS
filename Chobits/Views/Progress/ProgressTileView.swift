@@ -92,7 +92,7 @@ struct ProgressTileItemView: View {
         VStack(alignment: .leading) {
           NavigationLink(value: NavDestination.subject(subjectId)) {
             Text(subject.name).font(.headline)
-          }.buttonStyle(.plain)
+          }.buttonStyle(.scale)
           if !subject.nameCN.isEmpty {
             Text(subject.nameCN)
               .foregroundStyle(.secondary)

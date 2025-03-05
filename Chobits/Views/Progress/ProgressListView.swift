@@ -73,7 +73,7 @@ struct ProgressListItemView: View {
                 .font(.subheadline)
                 .lineLimit(1)
             }
-          }.buttonStyle(.plain)
+          }.buttonStyle(.scale)
 
           Spacer()
 

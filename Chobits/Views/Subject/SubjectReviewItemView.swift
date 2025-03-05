@@ -25,6 +25,6 @@ struct SubjectReviewItemView: View {
           .font(.caption)
       }
       Spacer()
-    }.buttonStyle(.navLink)
+    }.buttonStyle(.navigation)
   }
 }

@@ -49,7 +49,7 @@ struct CharacterCastItemView: View {
         }
       }
     }
-    .buttonStyle(.navLink)
+    .buttonStyle(.navigation)
     .frame(minHeight: 60)
   }
 }
