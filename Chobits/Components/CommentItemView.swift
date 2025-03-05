@@ -156,7 +156,7 @@ struct CommentItemNormalView: View {
                 }
               } label: {
                 Image(systemName: "ellipsis")
-              }.padding(.trailing, 24)
+              }.padding(.trailing, 8)
             }
             .buttonStyle(.scale)
             .font(.footnote)
@@ -324,7 +324,7 @@ struct CommentSubReplyNormalView: View {
               }
             } label: {
               Image(systemName: "ellipsis")
-            }.padding(.trailing, 24)
+            }.padding(.trailing, 8)
           }
           .buttonStyle(.scale)
           .font(.footnote)
