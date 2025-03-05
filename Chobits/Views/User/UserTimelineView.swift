@@ -69,10 +69,11 @@ struct UserTimelineView: View {
       UserSmallView(user: user)
         .padding(.top, 8)
         .padding(.horizontal, 8)
-      LazyVStack(alignment: .leading, spacing: 16) {
+      LazyVStack(alignment: .leading) {
         ForEach(Array(zip(items.indices, items)), id: \.1) { idx, item in
           TimelineItemView(
-            item: item, previous: idx == items.startIndex ? nil : items[idx - 1]
+            item: item,
+            previous: idx == items.startIndex ? nil : items[idx - 1]
           ).onAppear {
             Task {
               await loadNextPage(item)
