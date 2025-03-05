@@ -1,63 +1,35 @@
 import SwiftUI
 
-struct NavigationButtonStyle: PrimitiveButtonStyle {
-  @GestureState var isPressing = false
-
+struct NavigationButtonStyle: ButtonStyle {
   func makeBody(configuration: Configuration) -> some View {
-    let drag = DragGesture(minimumDistance: 0)
-      .updating(
-        $isPressing,
-        body: { _, pressing, _ in
-          if !pressing { pressing = true }
-        })
-
     configuration.label
       .compositingGroup()
       .foregroundColor(.linkText)
-      .underline(isPressing, color: .linkText)
-      .scaleEffect(isPressing ? 0.9 : 1)
-      .shadow(radius: isPressing ? 1 : 0)
-      .animation(.default, value: isPressing)
-      .gesture(drag)
-      .simultaneousGesture(
-        TapGesture().onEnded {
-          configuration.trigger()
-        })
+      .underline(configuration.isPressed, color: .linkText)
+      .scaleEffect(configuration.isPressed ? 0.9 : 1)
+      .shadow(radius: configuration.isPressed ? 1 : 0)
+      .animation(.default, value: configuration.isPressed)
   }
 }
 
-extension PrimitiveButtonStyle where Self == NavigationButtonStyle {
+extension ButtonStyle where Self == NavigationButtonStyle {
   static var navigation: NavigationButtonStyle {
     NavigationButtonStyle()
   }
 }
 
-struct ScaleButtonStyle: PrimitiveButtonStyle {
-  @GestureState var isPressing = false
-
+struct ScaleButtonStyle: ButtonStyle {
   func makeBody(configuration: Configuration) -> some View {
-    let drag = DragGesture(minimumDistance: 0)
-      .updating(
-        $isPressing,
-        body: { _, pressing, _ in
-          if !pressing { pressing = true }
-        })
-
     configuration.label
       .compositingGroup()
-      .scaleEffect(isPressing ? 0.8 : 1)
-      .shadow(radius: isPressing ? 2 : 0)
-      .offset(y: isPressing ? 4 : 0)
-      .animation(.default, value: isPressing)
-      .gesture(drag)
-      .simultaneousGesture(
-        TapGesture().onEnded {
-          configuration.trigger()
-        })
+      .scaleEffect(configuration.isPressed ? 0.8 : 1)
+      .shadow(radius: configuration.isPressed ? 2 : 0)
+      .offset(y: configuration.isPressed ? 2 : 0)
+      .animation(.default, value: configuration.isPressed)
   }
 }
 
-extension PrimitiveButtonStyle where Self == ScaleButtonStyle {
+extension ButtonStyle where Self == ScaleButtonStyle {
   static var scale: ScaleButtonStyle {
     ScaleButtonStyle()
   }
