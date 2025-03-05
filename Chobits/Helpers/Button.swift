@@ -71,7 +71,6 @@ extension PrimitiveButtonStyle where Self == ScaleButtonStyle {
   Button(action: {}) {
     Image(systemName: "heart")
   }
-  .padding()
   .buttonStyle(.scale)
   .padding()
 }
