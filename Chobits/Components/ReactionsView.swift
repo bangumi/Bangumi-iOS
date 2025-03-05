@@ -72,7 +72,7 @@ struct ReactionsView: View {
     HStack {
       ForEach(reactions, id: \.value) { reaction in
         CardView(padding: 2, cornerRadius: 10, shadow: shadowColor(reaction)) {
-          HStack(alignment: .bottom, spacing: 4) {
+          HStack(alignment: .center, spacing: 4) {
             Image(reaction.icon)
               .resizable()
               .aspectRatio(contentMode: .fit)
