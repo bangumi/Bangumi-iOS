@@ -6,7 +6,7 @@ struct NavigationButtonStyle: ButtonStyle {
       .compositingGroup()
       .foregroundColor(.linkText)
       .underline(configuration.isPressed, color: .linkText)
-      .scaleEffect(configuration.isPressed ? 0.9 : 1)
+      .scaleEffect(configuration.isPressed ? 0.95 : 1)
       .shadow(radius: configuration.isPressed ? 1 : 0)
       .animation(.default, value: configuration.isPressed)
   }
@@ -22,9 +22,8 @@ struct ScaleButtonStyle: ButtonStyle {
   func makeBody(configuration: Configuration) -> some View {
     configuration.label
       .compositingGroup()
-      .scaleEffect(configuration.isPressed ? 0.8 : 1)
-      .shadow(radius: configuration.isPressed ? 2 : 0)
-      .offset(y: configuration.isPressed ? 2 : 0)
+      .scaleEffect(configuration.isPressed ? 0.9 : 1)
+      .shadow(radius: configuration.isPressed ? 1 : 0)
       .animation(.default, value: configuration.isPressed)
   }
 }
