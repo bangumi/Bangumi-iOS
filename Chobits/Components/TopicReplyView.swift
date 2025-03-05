@@ -143,6 +143,7 @@ struct ReplyItemNormalView: View {
                 showReplyBox = true
               } label: {
                 Image(systemName: "bubble.fill")
+                  .foregroundStyle(.secondary.opacity(0.5))
               }
               switch type {
               case .subject:
@@ -338,6 +339,7 @@ struct SubReplyNormalView: View {
               showReplyBox = true
             } label: {
               Image(systemName: "bubble.fill")
+                .foregroundStyle(.secondary.opacity(0.5))
             }
             switch type {
             case .subject:

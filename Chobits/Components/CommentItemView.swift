@@ -131,6 +131,7 @@ struct CommentItemNormalView: View {
                 showReplyBox = true
               } label: {
                 Image(systemName: "bubble.fill")
+                  .foregroundStyle(.secondary.opacity(0.5))
               }
               if case .episode(let id) = type {
                 ReactionButton(type: .episodeReply(id), reactions: $reactions)
@@ -299,6 +300,7 @@ struct CommentSubReplyNormalView: View {
               showReplyBox = true
             } label: {
               Image(systemName: "bubble.fill")
+                .foregroundStyle(.secondary.opacity(0.5))
             }
             if case .episode(let id) = type {
               ReactionButton(type: .episodeReply(id), reactions: $reactions)
