@@ -11,7 +11,7 @@ struct ReactionsView: View {
 
   func shadowColor(_ reaction: ReactionDTO) -> Color {
     if reaction.users.contains(where: { $0.id == profile.id }) {
-      return .linkText.opacity(0.5)
+      return .linkText.opacity(0.8)
     }
     return .black.opacity(0.2)
   }
@@ -71,20 +71,23 @@ struct ReactionsView: View {
   var body: some View {
     HStack {
       ForEach(reactions, id: \.value) { reaction in
-        CardView(padding: 2, cornerRadius: 10, shadow: shadowColor(reaction)) {
-          HStack(alignment: .center, spacing: 4) {
-            Image(reaction.icon)
-              .resizable()
-              .aspectRatio(contentMode: .fit)
-              .frame(width: 16, height: 16)
-            Text("\(reaction.users.count)")
-              .font(.callout)
-              .foregroundStyle(textColor(reaction))
-          }.padding(.horizontal, 4)
-        }
-        .onTapGesture {
+        Button {
           onClick(reaction)
+        } label: {
+          CardView(padding: 2, cornerRadius: 10, shadow: shadowColor(reaction)) {
+            HStack(alignment: .center, spacing: 4) {
+              Image(reaction.icon)
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 16, height: 16)
+              Text("\(reaction.users.count)")
+                .font(.callout)
+                .foregroundStyle(textColor(reaction))
+            }.padding(.horizontal, 4)
+          }
         }
+        .buttonStyle(.explode)
+        .disabled(!isAuthenticated || updating)
         .contextMenu {
           ForEach(reaction.users, id: \.id) { user in
             NavigationLink(value: NavDestination.user(user.username)) {
@@ -93,9 +96,7 @@ struct ReactionsView: View {
           }
         }
       }
-    }
-    .animation(.default, value: reactions)
-    .disabled(!isAuthenticated || updating)
+    }.animation(.default, value: reactions)
   }
 }
 
@@ -152,17 +153,18 @@ struct ReactionButton: View {
       Image(systemName: "heart")
     }
     .disabled(!isAuthenticated || updating)
-    .buttonStyle(.scale)
+    .buttonStyle(.explode)
     .popover(isPresented: $showPopover) {
       LazyVGrid(columns: columns) {
         ForEach(type.available, id: \.self) { value in
-          Image(REACTIONS[value] ?? "bgm125")
-            .resizable()
-            .aspectRatio(contentMode: .fit)
-            .frame(width: 24, height: 24)
-            .onTapGesture {
-              onClick(value)
-            }
+          Button {
+            onClick(value)
+          } label: {
+            Image(REACTIONS[value] ?? "bgm125")
+              .resizable()
+              .aspectRatio(contentMode: .fit)
+              .frame(width: 24, height: 24)
+          }.buttonStyle(.explode)
         }
       }
       .disabled(!isAuthenticated || updating)
