@@ -57,7 +57,9 @@ struct EpisodeView: View {
             Text("吐槽箱").font(.title3)
             if loadingComments {
               HStack {
+                Spacer()
                 ProgressView()
+                Spacer()
               }
             }
             Divider()
