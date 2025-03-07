@@ -65,6 +65,8 @@ struct SubjectDetailView: View {
 
   @Environment(Subject.self) var subject
 
+  @State private var showCreateTopic: Bool = false
+
   var shareLink: URL {
     URL(string: "\(shareDomain.url)/subject/\(subject.subjectId)")!
   }
@@ -112,6 +114,12 @@ struct SubjectDetailView: View {
         Spacer()
       }.padding(.horizontal, 8)
     }
+    .sheet(isPresented: $showCreateTopic) {
+      CreateTopicBoxView(type: .subject(subject.subjectId))
+        .presentationDetents([.large])
+    }
+    .navigationTitle(subject.name)
+    .navigationBarTitleDisplayMode(.inline)
     .toolbar {
       ToolbarItem(placement: .topBarTrailing) {
         Menu {
@@ -120,6 +128,14 @@ struct SubjectDetailView: View {
           }
           NavigationLink(value: NavDestination.subjectRating(subject)) {
             Label("评分分布", systemImage: "chart.bar.xaxis")
+          }
+          if isAuthenticated {
+            Divider()
+            Button {
+              showCreateTopic = true
+            } label: {
+              Label("添加新讨论", systemImage: "plus.bubble")
+            }
           }
           Divider()
           ShareLink(item: shareLink) {
@@ -130,8 +146,6 @@ struct SubjectDetailView: View {
         }
       }
     }
-    .navigationTitle(subject.name)
-    .navigationBarTitleDisplayMode(.inline)
   }
 }
 

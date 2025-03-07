@@ -5,8 +5,6 @@ import SwiftUI
 struct GroupView: View {
   let name: String
 
-  @AppStorage("shareDomain") var shareDomain: ShareDomain = .chii
-
   @State private var refreshed: Bool = false
   @State private var width: CGFloat = 0
 
@@ -19,43 +17,6 @@ struct GroupView: View {
       $0.name == name
     }
     _groups = Query(filter: predicate, sort: \Group.groupId)
-  }
-
-  var shareLink: URL {
-    URL(string: "\(shareDomain.url)/group/\(name)")!
-  }
-
-  var title: String {
-    guard let group = group else {
-      return "小组"
-    }
-    return group.title
-  }
-
-  func joinGroup(_ name: String) {
-    Task {
-      do {
-        try await Chii.shared.joinGroup(name)
-        if let group = group {
-          group.joinedAt = Int(Date().timeIntervalSince1970)
-        }
-      } catch {
-        Notifier.shared.alert(error: error)
-      }
-    }
-  }
-
-  func leaveGroup(_ name: String) {
-    Task {
-      do {
-        try await Chii.shared.leaveGroup(name)
-        if let group = group {
-          group.joinedAt = 0
-        }
-      } catch {
-        Notifier.shared.alert(error: error)
-      }
-    }
   }
 
   func refresh() async {
@@ -74,11 +35,10 @@ struct GroupView: View {
     Section {
       if let group = group {
         ScrollView {
-          VStack(alignment: .leading) {
-            GroupDetailView(width: width)
-              .environment(group)
-          }.padding(.horizontal, 8)
-        }.onGeometryChange(for: CGSize.self) { proxy in
+          GroupDetailView(width: width)
+            .environment(group)
+        }
+        .onGeometryChange(for: CGSize.self) { proxy in
           proxy.size
         } action: { newSize in
           if self.width != newSize.width {
@@ -89,42 +49,6 @@ struct GroupView: View {
         NotFoundView()
       } else {
         ProgressView()
-      }
-    }
-    .navigationTitle(title)
-    .navigationBarTitleDisplayMode(.inline)
-    .toolbar {
-      ToolbarItem(placement: .topBarTrailing) {
-        Menu {
-          NavigationLink(value: NavDestination.groupMemberList(name)) {
-            Label("成员列表", systemImage: "person.3")
-          }
-          NavigationLink(value: NavDestination.groupTopicList(name)) {
-            Label("讨论列表", systemImage: "bubble.left.and.bubble.right")
-          }
-          if let group = group {
-            Divider()
-            if group.joinedAt == 0 {
-              Button {
-                joinGroup(group.name)
-              } label: {
-                Label("加入这个小组", systemImage: "plus")
-              }
-            } else {
-              Button(role: .destructive) {
-                leaveGroup(group.name)
-              } label: {
-                Label("退出这个小组", systemImage: "xmark.bin")
-              }
-            }
-          }
-          Divider()
-          ShareLink(item: shareLink) {
-            Label("分享", systemImage: "square.and.arrow.up")
-          }
-        } label: {
-          Image(systemName: "ellipsis.circle")
-        }
       }
     }
     .onAppear {
@@ -138,58 +62,139 @@ struct GroupView: View {
 struct GroupDetailView: View {
   let width: CGFloat
 
+  @AppStorage("shareDomain") var shareDomain: ShareDomain = .chii
+  @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
+
   @Environment(Group.self) var group
 
+  @State private var showCreateTopic: Bool = false
+
+  var shareLink: URL {
+    URL(string: "\(shareDomain.url)/group/\(group.name)")!
+  }
+
+  func joinGroup() {
+    Task {
+      do {
+        try await Chii.shared.joinGroup(group.name)
+        group.joinedAt = Int(Date().timeIntervalSince1970)
+      } catch {
+        Notifier.shared.alert(error: error)
+      }
+    }
+  }
+
+  func leaveGroup() {
+    Task {
+      do {
+        try await Chii.shared.leaveGroup(group.name)
+        group.joinedAt = 0
+      } catch {
+        Notifier.shared.alert(error: error)
+      }
+    }
+  }
+
   var body: some View {
-    CardView(background: .introBackground) {
-      VStack(alignment: .leading, spacing: 8) {
-        HStack(alignment: .top, spacing: 8) {
-          ImageView(img: group.icon?.large)
-            .imageStyle(width: 96, height: 96, alignment: .top)
-            .imageType(.icon)
-            .padding(4)
-            .shadow(radius: 4)
-          VStack(alignment: .leading, spacing: 4) {
-            Text(group.title)
-              .font(.title2.bold())
-              .multilineTextAlignment(.leading)
-            Divider()
-            Spacer(minLength: 0)
-            Section {
-              Label("\(group.members) 位成员", systemImage: "person")
-              Label("\(group.topics) 个话题", systemImage: "bubble")
+    VStack(alignment: .leading) {
+      CardView(background: .introBackground) {
+        VStack(alignment: .leading, spacing: 8) {
+          HStack(alignment: .top, spacing: 8) {
+            ImageView(img: group.icon?.large)
+              .imageStyle(width: 96, height: 96, alignment: .top)
+              .imageType(.icon)
+              .imageNSFW(group.nsfw)
+              .padding(4)
+              .shadow(radius: 4)
+            VStack(alignment: .leading, spacing: 4) {
+              Text(group.title)
+                .font(.title2.bold())
+                .multilineTextAlignment(.leading)
+              Divider()
+              Spacer(minLength: 0)
+              Section {
+                Label("\(group.members) 位成员", systemImage: "person")
+                Label("\(group.topics) 个话题", systemImage: "text.bubble")
+              }
+              .font(.subheadline)
+              .foregroundStyle(.secondary)
+              Spacer(minLength: 0)
             }
-            .font(.subheadline)
-            .foregroundStyle(.secondary)
-            Spacer(minLength: 0)
           }
-        }
-        if !group.desc.isEmpty {
+          if !group.desc.isEmpty {
+            Divider()
+            HStack {
+              BBCodeView(group.desc)
+                .tint(.linkText)
+              Spacer()
+            }
+          }
           Divider()
           HStack {
-            BBCodeView(group.desc)
-              .tint(.linkText)
+            Text("创建于 \(group.createdAt.datetimeDisplay)")
+              .font(.footnote)
+              .foregroundStyle(.secondary)
             Spacer()
-          }
-        }
-        Divider()
-        HStack {
-          Text("创建于 \(group.createdAt.datetimeDisplay)")
-            .font(.footnote)
-            .foregroundStyle(.secondary)
-          Spacer()
-          BorderView(color: group.memberRole.color) {
-            Text(group.memberRole.description)
-              .font(.caption)
-              .foregroundStyle(group.memberRole.color)
+            BorderView(color: group.memberRole.color) {
+              Text(group.memberRole.description)
+                .font(.caption)
+                .foregroundStyle(group.memberRole.color)
+            }
           }
         }
       }
+      GroupRecentMemberView(width)
+        .environment(group)
+      GroupRecentTopicView()
+        .environment(group)
     }
-    GroupRecentMemberView(width)
-      .environment(group)
-    GroupRecentTopicView()
-      .environment(group)
+    .padding(.horizontal, 8)
+    .navigationTitle(group.title)
+    .navigationBarTitleDisplayMode(.inline)
+    .sheet(isPresented: $showCreateTopic) {
+      CreateTopicBoxView(type: .group(group.name))
+        .presentationDetents([.large])
+    }
+    .toolbar {
+      ToolbarItem(placement: .topBarTrailing) {
+        Menu {
+          NavigationLink(value: NavDestination.groupMemberList(group.name)) {
+            Label("成员列表", systemImage: "person.3")
+          }
+          NavigationLink(value: NavDestination.groupTopicList(group.name)) {
+            Label("讨论列表", systemImage: "bubble.left.and.bubble.right")
+          }
+          Divider()
+          if isAuthenticated, group.canCreateTopic {
+            Button {
+              showCreateTopic = true
+            } label: {
+              Label("发表新主题", systemImage: "plus.bubble")
+            }
+            Divider()
+          }
+          if group.joinedAt == 0 {
+            Button {
+              joinGroup()
+            } label: {
+              Label("加入这个小组", systemImage: "plus")
+            }
+          } else {
+            Button(role: .destructive) {
+              leaveGroup()
+            } label: {
+              Label("退出这个小组", systemImage: "xmark.bin")
+            }
+          }
+          Divider()
+          ShareLink(item: shareLink) {
+            Label("分享", systemImage: "square.and.arrow.up")
+          }
+        } label: {
+          Image(systemName: "ellipsis.circle")
+        }
+      }
+    }
   }
 }
 
@@ -257,6 +262,9 @@ struct GroupRecentTopicView: View {
 
   @AppStorage("hideBlocklist") var hideBlocklist: Bool = false
   @AppStorage("blocklist") var blocklist: [Int] = []
+  @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
+
+  @State private var showCreateTopic: Bool = false
 
   var body: some View {
     VStack(alignment: .leading) {
@@ -264,6 +272,13 @@ struct GroupRecentTopicView: View {
         HStack {
           Text("小组最新讨论")
             .font(.title3)
+          if isAuthenticated {
+            Button {
+              showCreateTopic = true
+            } label: {
+              Image(systemName: "plus.bubble")
+            }.buttonStyle(.borderless)
+          }
           Spacer()
           NavigationLink(value: NavDestination.groupTopicList(group.name)) {
             Text("更多小组讨论 »")
@@ -271,6 +286,10 @@ struct GroupRecentTopicView: View {
           }.buttonStyle(.navigation)
         }
         Divider()
+      }
+      .sheet(isPresented: $showCreateTopic) {
+        CreateTopicBoxView(type: .group(group.name))
+          .presentationDetents([.large])
       }
       VStack {
         ForEach(group.recentTopics) { topic in

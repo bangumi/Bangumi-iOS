@@ -97,10 +97,6 @@ struct GroupTopicDetailView: View {
     .toolbar {
       ToolbarItem(placement: .topBarTrailing) {
         Menu {
-          ShareLink(item: shareLink) {
-            Label("分享", systemImage: "square.and.arrow.up")
-          }
-          Divider()
           Button {
             showReplyBox = true
           } label: {
@@ -113,6 +109,10 @@ struct GroupTopicDetailView: View {
             } label: {
               Label("编辑", systemImage: "pencil")
             }
+          }
+          Divider()
+          ShareLink(item: shareLink) {
+            Label("分享", systemImage: "square.and.arrow.up")
           }
         } label: {
           Image(systemName: "ellipsis.circle")

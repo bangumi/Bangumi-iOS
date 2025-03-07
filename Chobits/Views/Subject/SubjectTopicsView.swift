@@ -7,6 +7,9 @@ struct SubjectTopicsView: View {
 
   @AppStorage("hideBlocklist") var hideBlocklist: Bool = false
   @AppStorage("blocklist") var blocklist: [Int] = []
+  @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
+
+  @State private var showCreateTopic: Bool = false
 
   var body: some View {
     VStack(spacing: 2) {
@@ -14,6 +17,13 @@ struct SubjectTopicsView: View {
         Text("讨论版")
           .foregroundStyle(topics.count > 0 ? .primary : .secondary)
           .font(.title3)
+        if isAuthenticated {
+          Button {
+            showCreateTopic = true
+          } label: {
+            Image(systemName: "plus.bubble")
+          }.buttonStyle(.borderless)
+        }
         Spacer()
         if topics.count > 0 {
           NavigationLink(value: NavDestination.subjectTopicList(subjectId)) {
@@ -22,7 +32,12 @@ struct SubjectTopicsView: View {
         }
       }
       Divider()
-    }.padding(.top, 5)
+    }
+    .padding(.top, 5)
+    .sheet(isPresented: $showCreateTopic) {
+      CreateTopicBoxView(type: .subject(subjectId))
+        .presentationDetents([.large])
+    }
     if topics.count == 0 {
       HStack {
         Spacer()

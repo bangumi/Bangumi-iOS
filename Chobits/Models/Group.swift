@@ -41,6 +41,18 @@ final class GroupV2: Linkable {
     return GroupMemberRole(rawValue: role) ?? .guest
   }
 
+  var canCreateTopic: Bool {
+    if accessible {
+      return true
+    }
+    switch memberRole {
+    case .member, .moderator, .creator:
+      return true
+    default:
+      return false
+    }
+  }
+
   init(_ item: GroupDTO) {
     self.groupId = item.id
     self.name = item.name

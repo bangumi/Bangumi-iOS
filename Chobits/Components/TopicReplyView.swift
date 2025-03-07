@@ -567,6 +567,79 @@ struct EditReplyBoxView: View {
   }
 }
 
+struct CreateTopicBoxView: View {
+  let type: TopicParentType
+
+  @Environment(\.dismiss) private var dismiss
+
+  @State private var title: String = ""
+  @State private var content: String = ""
+  @State private var token: String = ""
+  @State private var updating: Bool = false
+
+  func createTopic(title: String, content: String, token: String) async {
+    do {
+      try await type.createTopic(title: title, content: content, token: token)
+      Notifier.shared.notify(message: "创建成功")
+      dismiss()
+    } catch {
+      Notifier.shared.alert(error: error)
+    }
+  }
+
+  var header: String {
+    switch type {
+    case .subject:
+      return "创建条目讨论"
+    case .group:
+      return "创建小组话题"
+    }
+  }
+
+  var submitDisabled: Bool {
+    return title.isEmpty || content.isEmpty || token.isEmpty || updating
+  }
+
+  var body: some View {
+    ScrollView {
+      VStack {
+        Text(header)
+          .font(.headline)
+          .lineLimit(1)
+        HStack {
+          Button {
+            dismiss()
+          } label: {
+            Label("取消", systemImage: "xmark")
+          }
+          .disabled(updating)
+          .buttonStyle(.bordered)
+          Spacer()
+          Button {
+            Task {
+              await createTopic(title: title, content: content, token: token)
+            }
+          } label: {
+            Label("发送", systemImage: "paperplane")
+          }
+          .disabled(submitDisabled)
+          .buttonStyle(.borderedProminent)
+        }
+        VStack {
+          BorderView(color: .secondary.opacity(0.2), padding: 4) {
+            TextField("标题", text: $title)
+              .textInputAutocapitalization(.never)
+              .disableAutocorrection(true)
+          }
+          TextInputView(type: "讨论", text: $content)
+            .textInputStyle(bbcode: true)
+          TrunstileView(token: $token).frame(height: 65)
+        }
+      }.padding()
+    }
+  }
+}
+
 struct EditTopicBoxView: View {
   let type: TopicParentType
   let topicId: Int
