@@ -98,6 +98,7 @@ struct CommentItemNormalView: View {
   @AppStorage("hideBlocklist") var hideBlocklist: Bool = false
   @AppStorage("profile") var profile: Profile = Profile()
   @AppStorage("blocklist") var blocklist: [Int] = []
+  @AppStorage("friendlist") var friendlist: [Int] = []
 
   @State private var showReplyBox: Bool = false
   @State private var showEditBox: Bool = false
@@ -122,7 +123,10 @@ struct CommentItemNormalView: View {
           .imageLink(comment.user.link)
         VStack(alignment: .leading) {
           VStack(alignment: .leading, spacing: 0) {
-            Text(comment.user.header).lineLimit(1)
+            HStack(spacing: 4) {
+              FriendLabel(uid: comment.creatorID)
+              Text(comment.user.header).lineLimit(1)
+            }
             HStack {
               Text("#\(idx+1) - \(comment.createdAt.datetimeDisplay)")
                 .lineLimit(1)
@@ -157,7 +161,7 @@ struct CommentItemNormalView: View {
                 }
               } label: {
                 Image(systemName: "ellipsis")
-              }.padding(.trailing, 8)
+              }.padding(.trailing, 16)
             }
             .buttonStyle(.scale)
             .font(.footnote)
@@ -222,6 +226,8 @@ struct CommentUserDeleteView: View {
   let creator: SlimUserDTO?
   let createdAt: Int
 
+  @AppStorage("friendlist") var friendlist: [Int] = []
+
   init(_ creatorID: Int, _ creator: SlimUserDTO?, _ createdAt: Int) {
     self.creatorID = creatorID
     self.creator = creator
@@ -229,7 +235,8 @@ struct CommentUserDeleteView: View {
   }
 
   var body: some View {
-    HStack {
+    HStack(spacing: 4) {
+      FriendLabel(uid: creatorID)
       if let creator = creator {
         Text(creator.nickname.withLink(creator.link)).lineLimit(1)
       } else {
@@ -256,6 +263,7 @@ struct CommentSubReplyNormalView: View {
   let subidx: Int
 
   @AppStorage("profile") var profile: Profile = Profile()
+  @AppStorage("friendlist") var friendlist: [Int] = []
 
   @State private var showReplyBox: Bool = false
   @State private var showEditBox: Bool = false
@@ -285,12 +293,15 @@ struct CommentSubReplyNormalView: View {
       }
       VStack(alignment: .leading) {
         VStack(alignment: .leading, spacing: 0) {
-          if let user = reply.user {
-            Text(user.nickname.withLink(user.link))
-              .lineLimit(1)
-          } else {
-            Text("用户 \(reply.creatorID)")
-              .lineLimit(1)
+          HStack(spacing: 4) {
+            FriendLabel(uid: reply.creatorID)
+            if let user = reply.user {
+              Text(user.nickname.withLink(user.link))
+                .lineLimit(1)
+            } else {
+              Text("用户 \(reply.creatorID)")
+                .lineLimit(1)
+            }
           }
           HStack {
             Text("#\(idx+1)-\(subidx+1) - \(reply.createdAt.datetimeDisplay)")
@@ -326,7 +337,7 @@ struct CommentSubReplyNormalView: View {
               }
             } label: {
               Image(systemName: "ellipsis")
-            }.padding(.trailing, 8)
+            }.padding(.trailing, 16)
           }
           .buttonStyle(.scale)
           .font(.footnote)

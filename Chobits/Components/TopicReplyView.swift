@@ -90,6 +90,7 @@ struct ReplyItemNormalView: View {
   @AppStorage("profile") var profile: Profile = Profile()
   @AppStorage("hideBlocklist") var hideBlocklist: Bool = false
   @AppStorage("blocklist") var blocklist: [Int] = []
+  @AppStorage("friendlist") var friendlist: [Int] = []
 
   @State private var showReplyBox: Bool = false
   @State private var showEditBox: Bool = false
@@ -120,15 +121,10 @@ struct ReplyItemNormalView: View {
         }
         VStack(alignment: .leading) {
           VStack(alignment: .leading, spacing: 0) {
-            HStack {
-              if let creator = reply.creator, let author = author {
-                if creator.id == author.id {
-                  BorderView {
-                    Text("楼主")
-                      .font(.caption)
-                      .foregroundStyle(.secondary)
-                  }
-                }
+            HStack(spacing: 4) {
+              PosterLabel(uid: reply.creatorID, poster: author?.id)
+              FriendLabel(uid: reply.creatorID)
+              if let creator = reply.creator {
                 Text(creator.header).lineLimit(1)
               } else {
                 Text("用户 \(reply.creatorID)")
@@ -172,7 +168,7 @@ struct ReplyItemNormalView: View {
                 }
               } label: {
                 Image(systemName: "ellipsis")
-              }.padding(.trailing, 8)
+              }.padding(.trailing, 16)
             }
             .buttonStyle(.scale)
             .font(.footnote)
@@ -242,16 +238,13 @@ struct ReplyUserDeleteView: View {
   let reply: ReplyBaseDTO
   let author: SlimUserDTO?
 
+  @AppStorage("friendlist") var friendlist: [Int] = []
+
   var body: some View {
-    HStack {
-      if let creator = reply.creator, let author = author {
-        if creator.id == author.id {
-          BorderView {
-            Text("楼主")
-              .font(.caption)
-              .foregroundStyle(.secondary)
-          }
-        }
+    HStack(spacing: 4) {
+      PosterLabel(uid: reply.creatorID, poster: author?.id)
+      FriendLabel(uid: reply.creatorID)
+      if let creator = reply.creator {
         Text(creator.nickname.withLink(creator.link)).lineLimit(1)
       } else {
         Text("用户 \(reply.creatorID)")
@@ -279,6 +272,7 @@ struct SubReplyNormalView: View {
   let topicId: Int
 
   @AppStorage("profile") var profile: Profile = Profile()
+  @AppStorage("friendlist") var friendlist: [Int] = []
 
   @State private var showReplyBox: Bool = false
   @State private var showEditBox: Bool = false
@@ -315,15 +309,10 @@ struct SubReplyNormalView: View {
       }
       VStack(alignment: .leading) {
         VStack(alignment: .leading, spacing: 0) {
-          HStack {
-            if let creator = subreply.creator, let author = author {
-              if creator.id == author.id {
-                BorderView {
-                  Text("楼主")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                }
-              }
+          HStack(spacing: 4) {
+            PosterLabel(uid: subreply.creatorID, poster: author?.id)
+            FriendLabel(uid: subreply.creatorID)
+            if let creator = subreply.creator {
               Text(creator.nickname.withLink(creator.link))
                 .lineLimit(1)
             } else {
@@ -368,7 +357,7 @@ struct SubReplyNormalView: View {
               }
             } label: {
               Image(systemName: "ellipsis")
-            }.padding(.trailing, 8)
+            }.padding(.trailing, 16)
           }
           .font(.footnote)
           .buttonStyle(.scale)
