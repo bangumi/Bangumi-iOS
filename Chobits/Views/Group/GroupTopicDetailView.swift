@@ -119,6 +119,11 @@ struct GroupTopicDetailView: View {
         }
       }
     }
+    .refreshable {
+      Task {
+        await refresh()
+      }
+    }
     .onAppear {
       Task {
         await refresh()
