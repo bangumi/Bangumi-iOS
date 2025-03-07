@@ -70,6 +70,10 @@ final class EpisodeV2: Linkable {
     return safeParseDate(str: airdate)
   }
 
+  var aired: Bool {
+    return air < Date() && air.timeIntervalSince1970 != 0
+  }
+
   var waitDesc: String {
     if air.timeIntervalSince1970 == 0 {
       return "未知"
@@ -90,10 +94,10 @@ final class EpisodeV2: Linkable {
     var hex = 0x666666
     switch self.collectionTypeEnum {
     case .none:
-      if air > Date() || air.timeIntervalSince1970 == 0 {
-        hex = 0x909090
-      } else {
+      if aired {
         hex = 0x00A8FF
+      } else {
+        hex = 0x909090
       }
     case .wish:
       hex = 0xFF2293
@@ -109,10 +113,10 @@ final class EpisodeV2: Linkable {
     var hex = 0xCCCCCC
     switch self.collectionTypeEnum {
     case .none:
-      if air > Date() || air.timeIntervalSince1970 == 0 {
-        hex = 0xe0e0e0
-      } else {
+      if aired {
         hex = 0xDAEAFF
+      } else {
+        hex = 0xe0e0e0
       }
     case .wish:
       hex = 0xFFADD1
@@ -128,10 +132,10 @@ final class EpisodeV2: Linkable {
     var hex = 0xFFFFFF
     switch self.collectionTypeEnum {
     case .none:
-      if air > Date() || air.timeIntervalSince1970 == 0 {
-        hex = 0x909090
-      } else {
+      if aired {
         hex = 0x0066CC
+      } else {
+        hex = 0x909090
       }
     case .wish:
       hex = 0xFF2293

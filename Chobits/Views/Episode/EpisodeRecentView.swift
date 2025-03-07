@@ -92,7 +92,7 @@ struct EpisodeRecentView: View {
       HStack {
         Spacer()
         if let episode = nextEpisode {
-          if episode.air > Date() {
+          if !episode.aired {
             Text("EP.\(episode.sort.episodeDisplay) ~ \(episode.waitDesc)")
               .foregroundStyle(.secondary)
           } else {
@@ -169,7 +169,7 @@ struct EpisodeRecentSlimView: View {
         .foregroundStyle(.secondary)
       Spacer()
       if let episode = nextEpisode {
-        if episode.air > Date() {
+        if !episode.aired {
           Text("EP.\(episode.sort.episodeDisplay) ~ \(episode.waitDesc)")
             .foregroundStyle(.secondary)
         } else {

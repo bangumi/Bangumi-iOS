@@ -7,8 +7,6 @@ struct EpisodeRowView: View {
 
   @Environment(Episode.self) var episode
 
-  @State private var now: Date = Date()
-
   var body: some View {
     VStack(alignment: .leading) {
       Text(episode.titleLink)
@@ -32,16 +30,16 @@ struct EpisodeRowView: View {
             EpisodeUpdateMenu().environment(episode)
           } label: {
             if episode.typeEnum == .main {
-              if episode.air > now {
-                BorderView(padding: 4) {
-                  Text("未播")
-                    .foregroundStyle(.secondary)
-                    .font(.footnote)
-                }
-              } else {
+              if episode.aired {
                 BorderView(color: .primary, padding: 4) {
                   Text("已播")
                     .foregroundStyle(.primary)
+                    .font(.footnote)
+                }
+              } else {
+                BorderView(padding: 4) {
+                  Text("未播")
+                    .foregroundStyle(.secondary)
                     .font(.footnote)
                 }
               }
