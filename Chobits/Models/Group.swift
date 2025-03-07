@@ -24,14 +24,21 @@ final class GroupV2: Linkable {
   var topics: Int
   var createdAt: Int
 
+  /// membership
+  var role: Int = -1
   var joinedAt: Int = 0
 
+  /// details
   var moderators: [GroupMemberDTO] = []
   var recentMembers: [GroupMemberDTO] = []
   var recentTopics: [TopicDTO] = []
 
   var link: String {
     return "chii://group/\(name)"
+  }
+
+  var memberRole: GroupMemberRole {
+    return GroupMemberRole(rawValue: role) ?? .guest
   }
 
   init(_ item: GroupDTO) {
@@ -49,6 +56,7 @@ final class GroupV2: Linkable {
     self.posts = item.posts
     self.topics = item.topics
     self.createdAt = item.createdAt
+    self.role = item.membership?.role?.rawValue ?? -1
     self.joinedAt = item.membership?.joinedAt ?? 0
   }
 
@@ -68,5 +76,7 @@ final class GroupV2: Linkable {
     if self.createdAt != item.createdAt { self.createdAt = item.createdAt }
     let joinedAt = item.membership?.joinedAt ?? 0
     if self.joinedAt != joinedAt { self.joinedAt = joinedAt }
+    let role = item.membership?.role?.rawValue ?? -1
+    if self.role != role { self.role = role }
   }
 }

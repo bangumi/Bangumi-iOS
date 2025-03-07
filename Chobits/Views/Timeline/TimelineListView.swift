@@ -108,7 +108,9 @@ struct TimelineListView: View {
           TimelineItemView(
             item: item,
             previous: idx == items.startIndex ? nil : items[idx - 1]
-          ).onAppear {
+          )
+          .padding(.bottom, 8)
+          .onAppear {
             Task {
               await loadNextPage(item)
             }

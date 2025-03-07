@@ -110,26 +110,26 @@ struct UserView: View {
             NavigationLink(value: NavDestination.userFriend(user)) {
               Label("好友", systemImage: "person.2")
             }
+            if profile.username != user.username {
+              Divider()
+              if friendlist.contains(user.id) {
+                Button(role: .destructive) {
+                  removeFriend()
+                } label: {
+                  Label("解除好友", systemImage: "person.2.slash")
+                }
+              } else {
+                Button {
+                  addFriend()
+                } label: {
+                  Label("加为好友", systemImage: "person.2.badge.plus")
+                }
+              }
+            }
             Divider()
           }
           ShareLink(item: shareLink) {
             Label("分享", systemImage: "square.and.arrow.up")
-          }
-          if let user = user, profile.username != user.username {
-            Divider()
-            if friendlist.contains(user.userId) {
-              Button(role: .destructive) {
-                removeFriend()
-              } label: {
-                Label("解除好友", systemImage: "person.2.slash")
-              }
-            } else {
-              Button {
-                addFriend()
-              } label: {
-                Label("加为好友", systemImage: "person.2.badge.plus")
-              }
-            }
           }
         } label: {
           Image(systemName: "ellipsis.circle")
