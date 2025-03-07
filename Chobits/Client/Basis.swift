@@ -1,5 +1,6 @@
 import Foundation
 import OSLog
+import SwiftUI
 
 let HTTPS = "https"
 let CDN_DOMAIN = "lain.bgm.tv"
@@ -956,6 +957,23 @@ enum GroupMemberRole: Int, Codable, CaseIterable {
       return "小组管理员"
     case .blocked:
       return "禁言成员"
+    }
+  }
+
+  var color: Color {
+    switch self {
+    case .visitor:
+      return .secondary
+    case .guest:
+      return .secondary
+    case .member:
+      return .green
+    case .creator:
+      return .orange
+    case .moderator:
+      return .blue
+    case .blocked:
+      return .red
     }
   }
 }

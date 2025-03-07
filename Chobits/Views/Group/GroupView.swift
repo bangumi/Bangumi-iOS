@@ -156,7 +156,6 @@ struct GroupDetailView: View {
             Divider()
             Spacer(minLength: 0)
             Section {
-              Label("创建于 \(group.createdAt.datetimeDisplay)", systemImage: "calendar")
               Label("\(group.members) 位成员", systemImage: "person")
               Label("\(group.topics) 个话题", systemImage: "bubble")
             }
@@ -171,6 +170,18 @@ struct GroupDetailView: View {
             BBCodeView(group.desc)
               .tint(.linkText)
             Spacer()
+          }
+        }
+        Divider()
+        HStack {
+          Text("创建于 \(group.createdAt.datetimeDisplay)")
+            .font(.footnote)
+            .foregroundStyle(.secondary)
+          Spacer()
+          BorderView(color: group.memberRole.color) {
+            Text(group.memberRole.description)
+              .font(.caption)
+              .foregroundStyle(group.memberRole.color)
           }
         }
       }
