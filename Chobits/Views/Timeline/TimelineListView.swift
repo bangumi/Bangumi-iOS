@@ -107,7 +107,7 @@ struct TimelineListView: View {
         ForEach(Array(zip(items.indices, items)), id: \.1) { idx, item in
           TimelineItemView(
             item: item,
-            previous: idx == items.startIndex ? nil : items[idx - 1]
+            previousUID: idx == items.startIndex ? nil : items[idx - 1].user?.id
           )
           .padding(.bottom, 8)
           .onAppear {

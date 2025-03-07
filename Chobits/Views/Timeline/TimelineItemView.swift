@@ -3,7 +3,7 @@ import SwiftUI
 
 struct TimelineItemView: View {
   let item: TimelineDTO
-  let previous: TimelineDTO?
+  let previousUID: Int?
 
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
 
@@ -33,9 +33,9 @@ struct TimelineItemView: View {
     return collect.collectID
   }
 
-  init(item: TimelineDTO, previous: TimelineDTO?) {
+  init(item: TimelineDTO, previousUID: Int?) {
     self.item = item
-    self.previous = previous
+    self.previousUID = previousUID
     if item.cat == .subject, !item.batch, let collect = item.memo.subject?.first,
       !collect.comment.isEmpty, let reactions = collect.reactions
     {
@@ -48,7 +48,7 @@ struct TimelineItemView: View {
   var body: some View {
     HStack(alignment: .top) {
       if let user = item.user {
-        if user.id != previous?.user?.id {
+        if user.id != previousUID {
           ImageView(img: user.avatar?.large)
             .imageStyle(width: 40, height: 40)
             .imageType(.avatar)
