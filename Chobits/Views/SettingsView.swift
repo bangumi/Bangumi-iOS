@@ -16,6 +16,7 @@ struct SettingsView: View {
   @AppStorage("hideBlocklist") var hideBlocklist: Bool = false
   @AppStorage("autoCompleteProgress") var autoCompleteProgress: Bool = false
   @AppStorage("subjectImageQuality") var subjectImageQuality: ImageQuality = .high
+  @AppStorage("rakuenDefaultMode") var rakuenDefaultMode: GroupTopicFilterMode = .joined
 
   @Environment(\.modelContext) var modelContext
 
@@ -99,6 +100,11 @@ struct SettingsView: View {
         Picker(selection: $subjectImageQuality, label: Text("条目封面图片质量")) {
           ForEach(ImageQuality.allCases, id: \.self) { quality in
             Text(quality.desc).tag(quality)
+          }
+        }
+        Picker(selection: $rakuenDefaultMode, label: Text("超展开默认显示")) {
+          ForEach(GroupTopicFilterMode.allCases, id: \.self) { mode in
+            Text(mode.description).tag(mode)
           }
         }
       }

@@ -1,11 +1,8 @@
 import SwiftUI
 
-enum RakuenTab {
-  case latestGroupTopics
-  case trendingSubjectTopics
-}
-
 struct ChiiRakuenView: View {
+  @AppStorage("rakuenDefaultMode") var rakuenDefaultMode: GroupTopicFilterMode = .joined
+
   @State private var reloader = false
 
   var body: some View {
@@ -14,7 +11,7 @@ struct ChiiRakuenView: View {
         JoinedGroupsView()
         VStack(alignment: .leading, spacing: 5) {
           HStack {
-            Text(GroupTopicFilterMode.joined.description)
+            Text(rakuenDefaultMode.description)
               .font(.title3)
             Spacer()
             Menu {
@@ -28,7 +25,7 @@ struct ChiiRakuenView: View {
                 .font(.footnote)
             }.buttonStyle(.navigation)
           }.padding(.top, 8)
-          RakuenGroupTopicListView(mode: .joined, reloader: $reloader)
+          RakuenGroupTopicListView(mode: rakuenDefaultMode, reloader: $reloader)
         }
       }.padding(.horizontal, 8)
     }
