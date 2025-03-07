@@ -8,16 +8,12 @@ struct EpisodeListView: View {
   @Environment(\.modelContext) var modelContext
 
   @State private var refreshed: Bool = false
+  @State private var countMain: Int = 0
+  @State private var countOther: Int = 0
 
-  @State private var offset: Int = 0
   @State private var main: Bool = true
   @State private var filterCollection: Bool = false
   @State private var sortDesc: Bool = false
-  @State private var exhausted: Bool = false
-  @State private var loadedIdx: [Int: Bool] = [:]
-  @State private var episodes: [EnumerateItem<Episode>] = []
-  @State private var countMain: Int = 0
-  @State private var countOther: Int = 0
 
   func loadCounts() async {
     let mainType = EpisodeType.main.rawValue
@@ -40,68 +36,6 @@ struct EpisodeListView: View {
     }
   }
 
-  func fetch(limit: Int = 100) async -> [EnumerateItem<Episode>] {
-    let sortBy =
-      sortDesc ? SortDescriptor<Episode>(\.sort, order: .reverse) : SortDescriptor<Episode>(\.sort)
-    let mainType = EpisodeType.main.rawValue
-    var descriptor = FetchDescriptor<Episode>(
-      predicate: #Predicate<Episode> {
-        if main {
-          if filterCollection {
-            $0.subjectId == subjectId && $0.type == mainType && $0.status == 0
-          } else {
-            $0.subjectId == subjectId && $0.type == mainType
-          }
-        } else {
-          if filterCollection {
-            $0.subjectId == subjectId && $0.type != mainType && $0.status == 0
-          } else {
-            $0.subjectId == subjectId && $0.type != mainType
-          }
-        }
-      }, sortBy: [sortBy])
-    descriptor.fetchLimit = limit
-    descriptor.fetchOffset = offset
-    do {
-      let resp = try modelContext.fetch(descriptor)
-      if resp.count < limit {
-        exhausted = true
-      }
-      let result = resp.enumerated().map { (idx, item) in
-        EnumerateItem(idx: idx + offset, inner: item)
-      }
-      offset += limit
-      return result
-    } catch {
-      Notifier.shared.alert(error: error)
-    }
-    return []
-  }
-
-  func load() async {
-    offset = 0
-    exhausted = false
-    loadedIdx.removeAll()
-    episodes.removeAll()
-    let items = await fetch()
-    self.episodes.append(contentsOf: items)
-  }
-
-  func loadNextPage(idx: Int) async {
-    if exhausted {
-      return
-    }
-    if idx != offset - 10 {
-      return
-    }
-    if loadedIdx[idx, default: false] {
-      return
-    }
-    loadedIdx[idx] = true
-    let items = await fetch()
-    self.episodes.append(contentsOf: items)
-  }
-
   func refresh() async {
     if refreshed { return }
     refreshed = true
@@ -122,22 +56,12 @@ struct EpisodeListView: View {
         .onTapGesture {
           self.filterCollection.toggle()
         }
-        .onChange(of: filterCollection) {
-          Task {
-            await load()
-          }
-        }
       Spacer()
       Picker("Episode Type", selection: $main) {
         Text("本篇(\(countMain))").tag(true)
         Text("其他(\(countOther))").tag(false)
       }
       .pickerStyle(.segmented)
-      .onChange(of: main) {
-        Task {
-          await load()
-        }
-      }
       Spacer()
       Image(systemName: sortDesc ? "arrow.down.circle.fill" : "arrow.up.circle.fill")
         .foregroundStyle(sortDesc ? .accent : .secondary)
@@ -146,34 +70,11 @@ struct EpisodeListView: View {
         .onTapGesture {
           self.sortDesc.toggle()
         }
-        .onChange(of: sortDesc) {
-          Task {
-            await load()
-          }
-        }
     }.padding(.horizontal, 8)
-    ScrollView {
-      LazyVStack(spacing: 10) {
-        ForEach(episodes, id: \.inner.self) { item in
-          EpisodeRowView().environment(item.inner)
-            .onAppear {
-              Task {
-                await loadNextPage(idx: item.idx)
-              }
-            }
-        }
-        if exhausted {
-          HStack {
-            Spacer()
-            Text("没有更多了")
-              .font(.footnote)
-              .foregroundStyle(.secondary)
-            Spacer()
-          }
-        }
-      }.padding(.horizontal, 8)
-    }
-    .animation(.default, value: episodes)
+    EpisodeListDetailView(
+      subjectId: subjectId, sortDesc: sortDesc,
+      main: main, filterCollection: filterCollection
+    )
     .navigationTitle("章节列表")
     .navigationBarTitleDisplayMode(.inline)
     .toolbar {
@@ -184,12 +85,59 @@ struct EpisodeListView: View {
     .onAppear {
       Task {
         await loadCounts()
-        await load()
         await refresh()
         await loadCounts()
-        await load()
       }
     }
+  }
+}
+
+struct EpisodeListDetailView: View {
+  let subjectId: Int
+  let sortDesc: Bool
+  let main: Bool
+  let filterCollection: Bool
+
+  @Environment(\.modelContext) var modelContext
+
+  @Query private var episodes: [Episode]
+
+  init(subjectId: Int, sortDesc: Bool, main: Bool, filterCollection: Bool) {
+    self.subjectId = subjectId
+    self.sortDesc = sortDesc
+    self.main = main
+    self.filterCollection = filterCollection
+
+    let sortBy =
+      sortDesc ? SortDescriptor<Episode>(\.sort, order: .reverse) : SortDescriptor<Episode>(\.sort)
+    let mainType = EpisodeType.main.rawValue
+    let descriptor = FetchDescriptor<Episode>(
+      predicate: #Predicate<Episode> {
+        if main {
+          if filterCollection {
+            $0.subjectId == subjectId && $0.type == mainType && $0.status == 0
+          } else {
+            $0.subjectId == subjectId && $0.type == mainType
+          }
+        } else {
+          if filterCollection {
+            $0.subjectId == subjectId && $0.type != mainType && $0.status == 0
+          } else {
+            $0.subjectId == subjectId && $0.type != mainType
+          }
+        }
+      }, sortBy: [sortBy])
+    _episodes = Query(descriptor)
+  }
+
+  var body: some View {
+    ScrollView {
+      LazyVStack(spacing: 10) {
+        ForEach(episodes) { item in
+          EpisodeRowView().environment(item)
+        }
+      }.padding(.horizontal, 8)
+    }.animation(.default, value: episodes)
   }
 }
 
