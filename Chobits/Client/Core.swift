@@ -135,6 +135,8 @@ extension Chii {
       switch error.code {
       case NSURLErrorNotConnectedToInternet:
         throw ChiiError(notice: "没有网络连接，请检查网络设置或权限后重试")
+      case NSURLErrorTimedOut:
+        throw ChiiError(notice: "请求超时，请稍后再试")
       case NSURLErrorCancelled:
         throw ChiiError(ignore: "请求已取消")
       default:
