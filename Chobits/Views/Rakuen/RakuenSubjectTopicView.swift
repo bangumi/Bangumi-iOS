@@ -3,10 +3,27 @@ import SwiftUI
 struct RakuenSubjectTopicView: View {
   let mode: SubjectTopicFilterMode
 
+  @State private var reloader = false
+
+  var body: some View {
+    ScrollView {
+      RakuenSubjectTopicListView(mode: mode, reloader: $reloader)
+        .padding(.horizontal, 8)
+    }
+    .navigationTitle(mode.description)
+    .navigationBarTitleDisplayMode(.inline)
+    .refreshable {
+      reloader.toggle()
+    }
+  }
+}
+
+struct RakuenSubjectTopicListView: View {
+  let mode: SubjectTopicFilterMode
+  @Binding var reloader: Bool
+
   @AppStorage("hideBlocklist") var hideBlocklist: Bool = false
   @AppStorage("blocklist") var blocklist: [Int] = []
-
-  @State private var reloader = false
 
   private func load(limit: Int, offset: Int) async -> PagedDTO<SubjectTopicDTO>? {
     do {
@@ -25,19 +42,45 @@ struct RakuenSubjectTopicView: View {
   }
 
   var body: some View {
-    ScrollView {
-      PageView<SubjectTopicDTO, _>(reloader: reloader, nextPageFunc: load) { topic in
-        if !hideBlocklist || !blocklist.contains(topic.creator?.id ?? 0) {
-          CardView {
-            SubjectTopicItemView(topic: topic)
-          }
+    PageView<SubjectTopicDTO, _>(reloader: reloader, nextPageFunc: load) { topic in
+      if !hideBlocklist || !blocklist.contains(topic.creator?.id ?? 0) {
+        CardView {
+          SubjectTopicItemView(topic: topic)
         }
-      }.padding(.horizontal, 8)
+      }
     }
-    .navigationTitle(mode.description)
-    .navigationBarTitleDisplayMode(.inline)
-    .refreshable {
-      reloader.toggle()
+  }
+}
+
+struct SubjectTopicItemView: View {
+  let topic: SubjectTopicDTO
+
+  var body: some View {
+    HStack(alignment: .top) {
+      ImageView(img: topic.creator?.avatar?.large)
+        .imageStyle(width: 40, height: 40)
+        .imageType(.avatar)
+        .imageLink(topic.link)
+      VStack(alignment: .leading) {
+        Section {
+          Text(topic.title.withLink(topic.link))
+            .font(.headline)
+            + Text("(+\(topic.replyCount))")
+            .font(.footnote)
+            .foregroundStyle(.secondary)
+        }
+        HStack {
+          topic.updatedAt.relativeText
+            .font(.caption)
+            .foregroundStyle(.secondary)
+          Spacer()
+          NavigationLink(value: NavDestination.subject(topic.subject.id)) {
+            Text(topic.subject.name)
+              .font(.footnote)
+          }.buttonStyle(.scale)
+        }
+      }
+      Spacer()
     }
   }
 }

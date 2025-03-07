@@ -6,31 +6,35 @@ enum RakuenTab {
 }
 
 struct ChiiRakuenView: View {
-  @State private var selectedTab: RakuenTab = .latestGroupTopics
+  @State private var reloader = false
 
   var body: some View {
-    VStack(spacing: 5) {
-      Picker("Tab", selection: $selectedTab) {
-        Text("最新小组话题").tag(RakuenTab.latestGroupTopics)
-        Text("热门条目讨论").tag(RakuenTab.trendingSubjectTopics)
-      }
-      .pickerStyle(.segmented)
-      .padding(.horizontal, 8)
-      TabView(selection: $selectedTab) {
-        RecentGroupTopicsView()
-          .tag(RakuenTab.latestGroupTopics)
-          .tabItem {
-            Text("最新小组话题")
-          }
-        TrendingSubjectTopicsView()
-          .tag(RakuenTab.trendingSubjectTopics)
-          .tabItem {
-            Text("热门条目讨论")
-          }
-      }
+    ScrollView {
+      VStack {
+        JoinedGroupsView()
+        VStack(alignment: .leading, spacing: 5) {
+          HStack {
+            Text(GroupTopicFilterMode.joined.description)
+              .font(.title3)
+            Spacer()
+            Menu {
+              ForEach(GroupTopicFilterMode.allCases, id: \.self) { mode in
+                NavigationLink(value: NavDestination.rakuenGroupTopics(mode)) {
+                  Text(mode.description)
+                }
+              }
+            } label: {
+              Text("更多 »")
+                .font(.footnote)
+            }.buttonStyle(.navigation)
+          }.padding(.top, 8)
+          RakuenGroupTopicListView(mode: .joined, reloader: $reloader)
+        }
+      }.padding(.horizontal, 8)
     }
-    .tabViewStyle(.page)
-    .animation(.default, value: selectedTab)
+    .refreshable {
+      reloader.toggle()
+    }
     .navigationTitle("超展开")
     .toolbarTitleDisplayMode(.inline)
     .toolbar {

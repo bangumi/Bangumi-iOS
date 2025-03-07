@@ -49,7 +49,7 @@ struct GroupListView: View {
         }
       }.padding(.horizontal, 8)
     }
-    .navigationTitle("小组列表")
+    .navigationTitle(mode.description)
     .toolbar {
       ToolbarItem(placement: .navigationBarTrailing) {
         Menu {
