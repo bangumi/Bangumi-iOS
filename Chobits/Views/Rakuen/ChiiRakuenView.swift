@@ -57,8 +57,10 @@ struct ChiiRakuenView: View {
           }
           Divider()
           Section {
-            NavigationLink(value: NavDestination.groupList) {
-              Text("小组列表")
+            ForEach(GroupFilterMode.allCases, id: \.self) { mode in
+              NavigationLink(value: NavDestination.groupList(mode)) {
+                Text(mode.description)
+              }
             }
           } header: {
             Text("小组")

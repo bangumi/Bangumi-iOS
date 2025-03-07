@@ -960,6 +960,23 @@ enum GroupMemberRole: Int, Codable, CaseIterable {
   }
 }
 
+enum GroupFilterMode: String, Codable, CaseIterable {
+  case all = "all"
+  case joined = "joined"
+  case managed = "managed"
+
+  var description: String {
+    switch self {
+    case .all:
+      return "所有小组"
+    case .joined:
+      return "我参加的小组"
+    case .managed:
+      return "我管理的小组"
+    }
+  }
+}
+
 enum GroupTopicFilterMode: String, Codable, CaseIterable {
   case all = "all"
   case joined = "joined"

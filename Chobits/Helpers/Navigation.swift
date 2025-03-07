@@ -53,7 +53,7 @@ enum NavDestination: Hashable, View {
   case index(_ indexId: Int)
 
   case group(_ name: String)
-  case groupList
+  case groupList(_ mode: GroupFilterMode)
   case groupMemberList(_ name: String)
   case groupTopicList(_ name: String)
   case groupTopicDetail(_ topicId: Int)
@@ -142,8 +142,8 @@ enum NavDestination: Hashable, View {
 
     case .group(let name):
       GroupView(name: name)
-    case .groupList:
-      GroupListView()
+    case .groupList(let mode):
+      GroupListView(mode: mode)
     case .groupMemberList(let name):
       GroupMemberListView(name: name)
     case .groupTopicList(let name):

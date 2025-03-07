@@ -658,11 +658,15 @@ extension Chii {
 
 // MARK: - Group
 extension Chii {
-  func getGroups(sort: GroupSortMode = .created, limit: Int = 20, offset: Int = 0) async throws
+  func getGroups(
+    mode: GroupFilterMode = .all, sort: GroupSortMode = .created,
+    limit: Int = 20, offset: Int = 0
+  ) async throws
     -> PagedDTO<SlimGroupDTO>
   {
     let url = BangumiAPI.priv.build("p1/groups")
     let queryItems: [URLQueryItem] = [
+      URLQueryItem(name: "mode", value: mode.rawValue),
       URLQueryItem(name: "sort", value: sort.rawValue),
       URLQueryItem(name: "limit", value: String(limit)),
       URLQueryItem(name: "offset", value: String(offset)),

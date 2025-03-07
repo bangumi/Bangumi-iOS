@@ -1,12 +1,15 @@
 import SwiftUI
 
 struct GroupListView: View {
+  let mode: GroupFilterMode
+
   @State private var sortMode: GroupSortMode = .members
   @State private var reloader = false
 
   private func load(limit: Int, offset: Int) async -> PagedDTO<SlimGroupDTO>? {
     do {
       let resp = try await Chii.shared.getGroups(
+        mode: mode,
         sort: sortMode,
         limit: limit,
         offset: offset
