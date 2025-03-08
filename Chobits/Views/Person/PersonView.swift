@@ -209,15 +209,16 @@ struct PersonDetailView: View {
         .buttonStyle(.navigation)
         .padding(.vertical, 4)
 
-        Label("\(person.collects)人收藏", systemImage: "heart")
-          .font(.footnote)
-          .foregroundStyle(.secondary)
-          .lineLimit(1)
-
-        Label("\(person.comment)条评论", systemImage: "bubble")
-          .font(.footnote)
-          .foregroundStyle(.secondary)
-          .lineLimit(1)
+        HStack {
+          Label("\(person.collects)人收藏", systemImage: "heart")
+            .font(.footnote)
+            .foregroundStyle(.secondary)
+            .lineLimit(1)
+          Label("\(person.comment)条评论", systemImage: "bubble")
+            .font(.footnote)
+            .foregroundStyle(.secondary)
+            .lineLimit(1)
+        }
       }.padding(.leading, 2)
     }.frame(height: 120)
 
