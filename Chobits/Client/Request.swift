@@ -889,6 +889,41 @@ extension Chii {
     return subject
   }
 
+  func getSubjects(
+    type: SubjectType,
+    sort: SubjectSortMode,
+    filter: SubjectsBrowseFilter,
+    page: Int = 1
+  ) async throws -> PagedDTO<SlimSubjectDTO> {
+    let url = BangumiAPI.priv.build("p1/subjects")
+    var queryItems: [URLQueryItem] = [
+      URLQueryItem(name: "type", value: String(type.rawValue)),
+      URLQueryItem(name: "sort", value: sort.rawValue),
+      URLQueryItem(name: "page", value: String(page)),
+    ]
+    if let cat = filter.cat {
+      queryItems.append(URLQueryItem(name: "cat", value: String(cat.id)))
+    }
+    if let series = filter.series {
+      queryItems.append(URLQueryItem(name: "series", value: String(series)))
+    }
+    if let year = filter.year {
+      queryItems.append(URLQueryItem(name: "year", value: String(year)))
+    }
+    if let month = filter.month {
+      queryItems.append(URLQueryItem(name: "month", value: String(month)))
+    }
+    if let tags = filter.tags {
+      for tag in tags {
+        queryItems.append(URLQueryItem(name: "tags", value: tag))
+      }
+    }
+    let pageURL = url.appending(queryItems: queryItems)
+    let data = try await self.request(url: pageURL, method: "GET")
+    let resp: PagedDTO<SlimSubjectDTO> = try self.decodeResponse(data)
+    return resp
+  }
+
   func getSubjectCharacters(
     _ subjectID: Int, type: CastType = .none,
     limit: Int = 20, offset: Int = 0

@@ -26,32 +26,7 @@ struct SearchSubjectView: View {
 
   var body: some View {
     PageView<SlimSubjectDTO, _>(nextPageFunc: fetch) { item in
-      SearchSubjectItemView(subjectId: item.id)
-    }
-  }
-}
-
-struct SearchSubjectItemView: View {
-  let subjectId: Int
-
-  @Query private var subjects: [Subject]
-  private var subject: Subject? { subjects.first }
-
-  init(subjectId: Int) {
-    self.subjectId = subjectId
-
-    let desc = FetchDescriptor<Subject>(
-      predicate: #Predicate<Subject> {
-        return $0.subjectId == subjectId
-      }
-    )
-    _subjects = Query(desc)
-  }
-
-  var body: some View {
-    CardView {
-      SubjectLargeRowView()
-        .environment(subject)
+      SubjectItemView(subjectId: item.id)
     }
   }
 }

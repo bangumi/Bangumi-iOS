@@ -1152,3 +1152,60 @@ struct ReplyDTO: Codable, Identifiable, Hashable {
     ReplyBaseDTO(self)
   }
 }
+
+struct SubjectsBrowseFilter: Codable, Hashable {
+  var cat: PlatformInfo? = nil
+  var series: Bool? = nil
+  var year: Int? = nil
+  var month: Int? = nil
+  var tags: [String]? = nil
+}
+
+enum SubjectSortMode: String, CaseIterable {
+  case rank = "rank"
+  case trends = "trends"
+  case collects = "collects"
+  case comments = "comments"
+  case date = "date"
+  case title = "title"
+
+  var description: String {
+    switch self {
+    case .rank: return "排名"
+    case .trends: return "热度"
+    case .collects: return "收藏"
+    case .comments: return "评论"
+    case .date: return "日期"
+    case .title: return "名称"
+    }
+  }
+
+  var icon: String {
+    switch self {
+    case .rank: return "chart.bar"
+    case .trends: return "flame"
+    case .collects: return "heart"
+    case .comments: return "bubble"
+    case .date: return "calendar"
+    case .title: return "character.textbox"
+    }
+  }
+}
+
+enum GroupSortMode: String, CaseIterable {
+  case created = "created"
+  case updated = "updated"
+  case posts = "posts"
+  case topics = "topics"
+  case members = "members"
+
+  var description: String {
+    switch self {
+    case .created: return "创建时间"
+    case .updated: return "最新讨论"
+    case .posts: return "帖子数"
+    case .topics: return "主题数"
+    case .members: return "成员数"
+    }
+  }
+}

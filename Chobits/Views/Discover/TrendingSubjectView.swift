@@ -86,7 +86,15 @@ struct TrendingSubjectTypeView: View {
       if items.isEmpty {
         ProgressView()
       } else {
-        Text("\(type.description)").font(.title)
+        VStack(spacing: 5) {
+          HStack {
+            Text("\(type.description)").font(.title)
+            Spacer()
+            NavigationLink(value: NavDestination.subjectBrowsing(type)) {
+              Text("更多 »")
+            }.buttonStyle(.navigation)
+          }
+        }
         HStack {
           ForEach(largeItems) { item in
             ImageView(img: item.subject.images?.resize(subjectImageQuality.largeSize))

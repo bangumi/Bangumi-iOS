@@ -43,6 +43,7 @@ enum NavDestination: Hashable, View {
   case subjectTopicDetail(_ topicId: Int)
   case subjectCommentList(_ subjectId: Int)
   case subjectInfobox(_ subjectId: Int)
+  case subjectBrowsing(_ type: SubjectType)
 
   case episode(_ episodeId: Int)
   case episodeList(_ subjectId: Int)
@@ -120,6 +121,8 @@ enum NavDestination: Hashable, View {
       SubjectCommentListView(subjectId: subjectId)
     case .subjectInfobox(let subjectId):
       SubjectInfoboxView(subjectId: subjectId)
+    case .subjectBrowsing(let type):
+      SubjectBrowsingView(type: type)
 
     case .episode(let episodeId):
       EpisodeView(episodeId: episodeId)
