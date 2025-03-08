@@ -94,6 +94,27 @@ extension Chii {
     try await db.commit()
   }
 
+  func loadSubjectPositions(_ subjectId: Int) async throws {
+    let db = try self.getDB()
+    let limit: Int = 100
+    var offset: Int = 0
+    var items: [SubjectPositionDTO] = []
+    while true {
+      let response = try await self.getSubjectStaffPositions(
+        subjectId, limit: limit, offset: offset)
+      if response.data.isEmpty {
+        break
+      }
+      items.append(contentsOf: response.data)
+      offset += limit
+      if offset > response.total {
+        break
+      }
+    }
+    try await db.saveSubjectPositions(subjectId: subjectId, items: items)
+    try await db.commit()
+  }
+
   func loadEpisodes(_ subjectId: Int) async throws {
     let db = try self.getDB()
     var offset: Int = 0

@@ -578,6 +578,13 @@ extension DatabaseOperator {
       subject?.comments = items
     }
   }
+
+  public func saveSubjectPositions(subjectId: Int, items: [SubjectPositionDTO]) throws {
+    let subject = try self.getSubject(subjectId)
+    if subject?.positions != items {
+      subject?.positions = items
+    }
+  }
 }
 
 // MARK: - save character

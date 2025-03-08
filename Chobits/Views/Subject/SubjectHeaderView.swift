@@ -70,7 +70,7 @@ struct SubjectHeaderView: View {
             .lineLimit(1)
         }
 
-        NavigationLink(value: NavDestination.infobox("条目信息", subject.infobox)) {
+        NavigationLink(value: NavDestination.subjectInfobox(subject.subjectId)) {
           HStack {
             Text(subject.info)
               .font(.caption)

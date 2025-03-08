@@ -13,8 +13,6 @@ struct LinkableDTO: Codable, Hashable, Linkable {
 }
 
 enum NavDestination: Hashable, View {
-  case test
-
   case setting
   case notice
   case friends
@@ -34,6 +32,7 @@ enum NavDestination: Hashable, View {
   case timeline(_ timeline: TimelineDTO)
 
   case infobox(_ title: String, _ infobox: Infobox)
+
   case subject(_ subjectId: Int)
   case subjectRating(_ subject: Subject)
   case subjectRelationList(_ subjectId: Int)
@@ -43,6 +42,8 @@ enum NavDestination: Hashable, View {
   case subjectTopicList(_ subjectId: Int)
   case subjectTopicDetail(_ topicId: Int)
   case subjectCommentList(_ subjectId: Int)
+  case subjectInfobox(_ subjectId: Int)
+
   case episode(_ episodeId: Int)
   case episodeList(_ subjectId: Int)
   case character(_ characterId: Int)
@@ -65,13 +66,6 @@ enum NavDestination: Hashable, View {
 
   var body: some View {
     switch self {
-    case .test:
-      if #available(iOS 18.0, *) {
-        ChiiTestView()
-      } else {
-        EmptyView()
-      }
-
     case .setting:
       SettingsView()
     case .notice:
@@ -107,6 +101,7 @@ enum NavDestination: Hashable, View {
 
     case .infobox(let title, let infobox):
       InfoboxView(title: title, infobox: infobox)
+
     case .subject(let subjectId):
       SubjectView(subjectId: subjectId)
     case .subjectRating(let subject):
@@ -123,6 +118,9 @@ enum NavDestination: Hashable, View {
       SubjectTopicListView(subjectId: subjectId)
     case .subjectCommentList(let subjectId):
       SubjectCommentListView(subjectId: subjectId)
+    case .subjectInfobox(let subjectId):
+      SubjectInfoboxView(subjectId: subjectId)
+
     case .episode(let episodeId):
       EpisodeView(episodeId: episodeId)
     case .episodeList(let subjectId):

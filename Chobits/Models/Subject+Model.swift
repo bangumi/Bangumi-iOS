@@ -34,6 +34,8 @@ final class SubjectV2: Searchable, Linkable {
   var collectedAt: Int = 0
   var interest: SubjectInterest?
 
+  var positions: [SubjectPositionDTO] = []
+
   var characters: [SubjectCharacterDTO] = []
   var offprints: [SubjectRelationDTO] = []
   var relations: [SubjectRelationDTO] = []
