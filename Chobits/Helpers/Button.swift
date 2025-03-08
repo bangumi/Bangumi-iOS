@@ -8,7 +8,7 @@ struct NavigationButtonStyle: ButtonStyle {
       .underline(configuration.isPressed, color: .linkText)
       .scaleEffect(configuration.isPressed ? 0.9 : 1)
       .shadow(radius: configuration.isPressed ? 1 : 0)
-      .animation(.spring(response: 0.2, dampingFraction: 0.6), value: configuration.isPressed)
+      .animation(.spring(response: 0.2, dampingFraction: 0.4), value: configuration.isPressed)
   }
 }
 
@@ -24,7 +24,7 @@ struct ScaleButtonStyle: ButtonStyle {
       .compositingGroup()
       .scaleEffect(configuration.isPressed ? 0.8 : 1)
       .shadow(radius: configuration.isPressed ? 1 : 0)
-      .animation(.spring(response: 0.2, dampingFraction: 0.6), value: configuration.isPressed)
+      .animation(.spring(response: 0.2, dampingFraction: 0.4), value: configuration.isPressed)
   }
 }
 
@@ -42,7 +42,7 @@ struct ExplodeButtonStyle: ButtonStyle {
       .opacity(configuration.isPressed ? 0.6 : 1)
       .blur(radius: configuration.isPressed ? 2 : 0)
       .shadow(radius: configuration.isPressed ? 2 : 0)
-      .animation(.spring(response: 0.2, dampingFraction: 0.6), value: configuration.isPressed)
+      .animation(.spring(response: 0.2, dampingFraction: 0.4), value: configuration.isPressed)
   }
 }
 
