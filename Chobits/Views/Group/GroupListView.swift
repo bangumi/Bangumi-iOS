@@ -25,7 +25,7 @@ struct GroupListView: View {
     ScrollView {
       PageView(reloader: reloader, nextPageFunc: load) { (group: SlimGroupDTO) in
         CardView {
-          HStack {
+          HStack(alignment: .top) {
             ImageView(img: group.icon?.large)
               .imageStyle(width: 60, height: 60)
               .imageType(.icon)
