@@ -30,3 +30,19 @@ struct PosterLabel: View {
     }
   }
 }
+
+struct HeartView: View {
+  let collected: Bool
+  let updating: Bool
+
+  var body: some View {
+    if #available(iOS 18.0, *), updating {
+      Image(systemName: collected ? "arrow.clockwise.heart.fill" : "arrow.clockwise.heart")
+        .foregroundStyle(collected ? .red : .secondary)
+        .symbolEffect(.rotate.byLayer.clockwise)
+    } else {
+      Image(systemName: collected ? "heart.fill" : "heart")
+        .foregroundStyle(collected ? .red : .secondary)
+    }
+  }
+}

@@ -346,6 +346,40 @@ extension Chii {
     let db = try self.getDB()
     try await db.updateEpisodeCollection(episodeId: episodeId, type: type, batch: batch)
   }
+
+  func collectCharacter(_ characterID: Int) async throws {
+    let url = BangumiAPI.priv.build("p1/collections/characters/\(characterID)")
+    let body: [String: Any] = [:]
+    _ = try await self.request(url: url, method: "PUT", body: body, auth: .required)
+    let db = try self.getDB()
+    let now = Int(Date().timeIntervalSince1970)
+    try await db.updateCharacterCollection(characterId: characterID, collectedAt: now - 1)
+  }
+
+  func uncollectCharacter(_ characterID: Int) async throws {
+    let url = BangumiAPI.priv.build("p1/collections/characters/\(characterID)")
+    let body: [String: Any] = [:]
+    _ = try await self.request(url: url, method: "DELETE", body: body, auth: .required)
+    let db = try self.getDB()
+    try await db.updateCharacterCollection(characterId: characterID, collectedAt: 0)
+  }
+
+  func collectPerson(_ personID: Int) async throws {
+    let url = BangumiAPI.priv.build("p1/collections/persons/\(personID)")
+    let body: [String: Any] = [:]
+    _ = try await self.request(url: url, method: "PUT", body: body, auth: .required)
+    let db = try self.getDB()
+    let now = Int(Date().timeIntervalSince1970)
+    try await db.updatePersonCollection(personId: personID, collectedAt: now - 1)
+  }
+
+  func uncollectPerson(_ personID: Int) async throws {
+    let url = BangumiAPI.priv.build("p1/collections/persons/\(personID)")
+    let body: [String: Any] = [:]
+    _ = try await self.request(url: url, method: "DELETE", body: body, auth: .required)
+    let db = try self.getDB()
+    try await db.updatePersonCollection(personId: personID, collectedAt: 0)
+  }
 }
 
 // MARK: - Episode

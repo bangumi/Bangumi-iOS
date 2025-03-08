@@ -276,6 +276,32 @@ extension DatabaseOperator {
     episode.subject?.collectedAt = now - 1
     try self.commit()
   }
+
+  public func updateCharacterCollection(characterId: Int, collectedAt: Int) throws {
+    let character = try self.fetchOne(
+      predicate: #Predicate<Character> {
+        $0.characterId == characterId
+      }
+    )
+    guard let character = character else {
+      return
+    }
+    character.collectedAt = collectedAt
+    try self.commit()
+  }
+
+  public func updatePersonCollection(personId: Int, collectedAt: Int) throws {
+    let person = try self.fetchOne(
+      predicate: #Predicate<Person> {
+        $0.personId == personId
+      }
+    )
+    guard let person = person else {
+      return
+    }
+    person.collectedAt = collectedAt
+    try self.commit()
+  }
 }
 
 // MARK: - ensure

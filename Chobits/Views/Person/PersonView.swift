@@ -128,9 +128,26 @@ struct PersonView: View {
 struct PersonDetailView: View {
   @Environment(Person.self) var person
 
+  @State private var updating: Bool = false
+
   var careers: String {
     let vals = Set(person.career).sorted().map { PersonCareer($0).description }
     return vals.joined(separator: " / ")
+  }
+
+  func collect() async {
+    updating = true
+    defer { updating = false }
+    do {
+      if person.collectedAt == 0 {
+        try await Chii.shared.collectPerson(person.personId)
+      } else {
+        try await Chii.shared.uncollectPerson(person.personId)
+      }
+      UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+    } catch {
+      Notifier.shared.alert(error: error)
+    }
   }
 
   var body: some View {
@@ -151,10 +168,19 @@ struct PersonDetailView: View {
       VStack(alignment: .leading) {
         HStack {
           Label(person.typeEnum.description, systemImage: person.typeEnum.icon)
+            .font(.footnote)
+            .foregroundStyle(.secondary)
           Spacer()
+          Button {
+            Task {
+              await collect()
+            }
+          } label: {
+            HeartView(collected: person.collectedAt != 0, updating: updating)
+          }
         }
-        .font(.footnote)
-        .foregroundStyle(.secondary)
+        .buttonStyle(.explode)
+        .padding(.trailing, 16)
 
         Spacer()
         Text(person.title)

@@ -128,6 +128,23 @@ struct CharacterView: View {
 struct CharacterDetailView: View {
   @Environment(Character.self) var character
 
+  @State private var updating: Bool = false
+
+  func collect() async {
+    updating = true
+    defer { updating = false }
+    do {
+      if character.collectedAt == 0 {
+        try await Chii.shared.collectCharacter(character.characterId)
+      } else {
+        try await Chii.shared.uncollectCharacter(character.characterId)
+      }
+      UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+    } catch {
+      Notifier.shared.alert(error: error)
+    }
+  }
+
   var body: some View {
     /// title
     Text(character.name)
@@ -146,10 +163,19 @@ struct CharacterDetailView: View {
       VStack(alignment: .leading) {
         HStack {
           Label(character.roleEnum.description, systemImage: character.roleEnum.icon)
+            .font(.footnote)
+            .foregroundStyle(.secondary)
           Spacer()
+          Button {
+            Task {
+              await collect()
+            }
+          } label: {
+            HeartView(collected: character.collectedAt != 0, updating: updating)
+          }
         }
-        .font(.footnote)
-        .foregroundStyle(.secondary)
+        .buttonStyle(.explode)
+        .padding(.trailing, 16)
 
         Spacer()
         Text(character.title)
