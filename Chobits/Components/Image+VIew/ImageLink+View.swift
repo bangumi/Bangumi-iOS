@@ -5,6 +5,6 @@ extension View {
     let url = URL(string: link ?? "") ?? URL(string: "")!
     return Link(destination: url) {
       self
-    }.buttonStyle(.scale)
+    }.buttonStyle(.plain)
   }
 }

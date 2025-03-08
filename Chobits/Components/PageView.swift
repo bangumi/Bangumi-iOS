@@ -19,44 +19,47 @@ where C: View, T: Identifiable & Hashable & Codable & Sendable {
   @State private var items: [EnumerateItem<(Item)>] = []
 
   func reload() {
-    offset = 0
     exhausted = false
     loadedIdx = [:]
-    items = []
     Task {
-      await loadNextPage(idx: 0)
+      let result = await loadPage(currentOffset: 0)
+      if let newData = result {
+        items = newData
+      }
     }
   }
 
   func loadNextPage(idx: Int) async {
-    if exhausted {
-      return
-    }
-    if idx > 0 && idx != offset - 5 {
-      return
-    }
-    if loadedIdx[idx, default: false] {
-      return
-    }
-    loading = true
+    if loading { return }
+    if exhausted { return }
+    if idx > 0 && idx != offset - 5 { return }
+    if loadedIdx[idx, default: false] { return }
     loadedIdx[idx] = true
-    let resp = await nextPageFunc(limit, offset)
+    loading = true
+    defer { loading = false }
+    let result = await loadPage(currentOffset: offset)
+    if let newData = result {
+      items.append(contentsOf: newData)
+    }
+  }
+
+  private func loadPage(currentOffset: Int) async -> [EnumerateItem<Item>]? {
+    let resp = await nextPageFunc(limit, currentOffset)
     guard let resp = resp else {
-      loading = false
-      return
+      return nil
     }
     if resp.data.count == 0 {
       exhausted = true
+      return []
     }
-    let data = resp.data.enumerated().map { (idx, item) in
-      EnumerateItem(idx: idx + offset, inner: item)
+    let newData = resp.data.enumerated().map { (idx, item) in
+      EnumerateItem(idx: idx + currentOffset, inner: item)
     }
-    offset += limit
+    offset = currentOffset + limit
     if offset >= resp.total {
       exhausted = true
     }
-    items.append(contentsOf: data)
-    loading = false
+    return newData
   }
 
   public init(
@@ -80,6 +83,7 @@ where C: View, T: Identifiable & Hashable & Codable & Sendable {
           }
         }
       }
+
       if loading {
         HStack {
           Spacer()
@@ -87,6 +91,7 @@ where C: View, T: Identifiable & Hashable & Codable & Sendable {
           Spacer()
         }
       }
+
       if exhausted {
         HStack {
           Spacer()
