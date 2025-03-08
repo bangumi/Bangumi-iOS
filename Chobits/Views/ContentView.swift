@@ -62,8 +62,7 @@ struct ContentView: View {
       VStack(alignment: .center) {
         ForEach($notifier.notifications, id: \.self) { $notification in
           Text(notification)
-            .padding(.horizontal, 16)
-            .padding(.vertical, 8)
+            .padding(8)
             .foregroundStyle(.white)
             .background(.accent)
             .shadow(color: .black.opacity(0.2), radius: 10, x: 0, y: 10)
@@ -72,8 +71,8 @@ struct ContentView: View {
         Spacer()
       }
       .animation(.default, value: notifier.notifications)
-      .padding(.horizontal, 64)
-      .padding(.bottom, 8)
+      .padding(.horizontal, 8)
+      .padding(.top, 64)
       .alert("ERROR", isPresented: $notifier.hasAlert) {
         Button("OK") {
           Notifier.shared.vanishError()
