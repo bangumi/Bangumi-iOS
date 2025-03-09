@@ -454,44 +454,35 @@ struct SubjectBrowsingFilterTagView: View {
   let title: String
   let tags: [String]
 
-  func tagTextColor(_ tag: String) -> Color {
-    guard let ftags = filter.tags else {
-      return .linkText
-    }
-    if ftags.contains(tag) {
-      return .white
-    }
-    return .linkText
-  }
+  @State private var tagTextColors: [String: Color] = [:]
+  @State private var tagBackgroundColors: [String: Color] = [:]
+  @State private var allTagsBackgroundColor: Color = .accent
+  @State private var allTagsTextColor: Color = .white
 
-  func tagBackgroundColor(_ tag: String) -> Color {
-    guard let ftags = filter.tags else {
-      return .clear
-    }
-    if ftags.contains(tag) {
-      return .accent
-    }
-    return .clear
-  }
+  @State private var lastFilterTags: [String]? = nil
 
-  func tagsBackgroundColor(_ tags: [String]) -> Color {
-    guard let ftags = filter.tags else {
-      return .accent
-    }
-    if ftags.contains(where: { tag in tags.contains(tag) }) {
-      return .clear
-    }
-    return .accent
-  }
+  private func updateColors() {
+    if lastFilterTags == filter.tags { return }
 
-  func tagsTextColor(_ tags: [String]) -> Color {
-    guard let ftags = filter.tags else {
-      return .white
+    lastFilterTags = filter.tags
+
+    if let ftags = filter.tags {
+      allTagsBackgroundColor = ftags.contains(where: { tags.contains($0) }) ? .clear : .accent
+      allTagsTextColor = ftags.contains(where: { tags.contains($0) }) ? .linkText : .white
+    } else {
+      allTagsBackgroundColor = .accent
+      allTagsTextColor = .white
     }
-    if ftags.contains(where: { tag in tags.contains(tag) }) {
-      return .linkText
+
+    for tag in tags {
+      if let ftags = filter.tags {
+        tagTextColors[tag] = ftags.contains(tag) ? .white : .linkText
+        tagBackgroundColors[tag] = ftags.contains(tag) ? .accent : .clear
+      } else {
+        tagTextColors[tag] = .linkText
+        tagBackgroundColors[tag] = .clear
+      }
     }
-    return .white
   }
 
   func appendTag(_ tag: String, tags: [String]) {
@@ -531,22 +522,29 @@ struct SubjectBrowsingFilterTagView: View {
         Button {
           removeTags(tags)
         } label: {
-          BadgeView(background: tagsBackgroundColor(tags), padding: 5) {
+          BadgeView(background: allTagsBackgroundColor, padding: 5) {
             Text("全部")
-              .foregroundStyle(tagsTextColor(tags))
+              .foregroundStyle(allTagsTextColor)
           }
         }
         ForEach(tags, id: \.self) { tag in
           Button {
             appendTag(tag, tags: tags)
           } label: {
-            BadgeView(background: tagBackgroundColor(tag), padding: 5) {
+            BadgeView(background: tagBackgroundColors[tag, default: .clear], padding: 5) {
               Text(tag)
-                .foregroundStyle(tagTextColor(tag))
+                .foregroundStyle(tagTextColors[tag, default: .linkText])
             }
           }.buttonStyle(.scale)
         }
       }
+    }
+    .onAppear {
+      lastFilterTags = nil
+      updateColors()
+    }
+    .onChange(of: filter.tags) { _, _ in
+      updateColors()
     }
   }
 }
