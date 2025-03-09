@@ -68,10 +68,12 @@ struct GroupTopicItemView: View {
           topic.updatedAt.relativeText
             .font(.caption)
             .foregroundStyle(.secondary)
+            .lineLimit(1)
           Spacer()
           NavigationLink(value: NavDestination.group(topic.group.name)) {
             Text(topic.group.title)
               .font(.footnote)
+              .lineLimit(1)
           }.buttonStyle(.scale)
         }
       }

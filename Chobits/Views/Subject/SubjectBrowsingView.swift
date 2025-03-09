@@ -59,7 +59,7 @@ struct SubjectBrowsingView: View {
 
   var body: some View {
     ScrollView {
-      LazyVStack(alignment: .leading) {
+      VStack(alignment: .leading) {
         HFlow {
           Label("筛选", systemImage: "line.3.horizontal.decrease.circle")
           // cat
@@ -211,6 +211,34 @@ struct SubjectBrowsingFilterView: View {
     return .clear
   }
 
+  func yearTextColor(_ year: Int?) -> Color {
+    if filter.year == year {
+      return .white
+    }
+    return .linkText
+  }
+
+  func yearBackgroundColor(_ year: Int?) -> Color {
+    if filter.year == year {
+      return .accent
+    }
+    return .clear
+  }
+
+  func monthTextColor(_ month: Int?) -> Color {
+    if filter.month == month {
+      return .white
+    }
+    return .linkText
+  }
+
+  func monthBackgroundColor(_ month: Int?) -> Color {
+    if filter.month == month {
+      return .accent
+    }
+    return .clear
+  }
+
   func updateYears(modifier: Int) {
     years = years.map { $0 + modifier }
   }
@@ -330,11 +358,13 @@ struct SubjectBrowsingFilterView: View {
               filter.year = nil
               filter.month = nil
             } label: {
-              HStack {
-                Spacer()
-                Text("不限年份")
-                  .foregroundStyle(filter.year == nil ? .accent : .linkText)
-                Spacer()
+              BadgeView(background: yearBackgroundColor(nil), padding: 4) {
+                HStack {
+                  Spacer()
+                  Text("不限年份")
+                    .foregroundStyle(yearTextColor(nil))
+                  Spacer()
+                }
               }
             }
             LazyVGrid(columns: [
@@ -346,40 +376,39 @@ struct SubjectBrowsingFilterView: View {
               Button {
                 updateYears(modifier: 10)
               } label: {
-                Text("来年们").foregroundStyle(.linkText)
-              }
-              .buttonStyle(.scale)
-              .padding(2)
+                BadgeView(background: .clear, padding: 4) {
+                  Text("来年们").foregroundStyle(.linkText)
+                }
+              }.buttonStyle(.scale)
               ForEach(years, id: \.self) { year in
                 Button {
                   filter.year = year
                 } label: {
-                  if filter.year == year {
-                    Text("\(String(year))年").foregroundStyle(.accent)
-                  } else {
-                    Text("\(String(year))年").foregroundStyle(.linkText)
+                  BadgeView(background: yearBackgroundColor(year), padding: 4) {
+                    Text("\(String(year))年")
+                      .foregroundStyle(yearTextColor(year))
                   }
-                }
-                .buttonStyle(.scale)
-                .padding(2)
+                }.buttonStyle(.scale)
               }
               Button {
                 updateYears(modifier: -10)
               } label: {
-                Text("往年们").foregroundStyle(.linkText)
-              }
-              .buttonStyle(.scale)
-              .padding(2)
+                BadgeView(background: .clear, padding: 4) {
+                  Text("往年们").foregroundStyle(.linkText)
+                }
+              }.buttonStyle(.scale)
             }.animation(.default, value: years)
             if filter.year != nil {
               Button {
                 filter.month = nil
               } label: {
-                HStack {
-                  Spacer()
-                  Text("不限月份")
-                    .foregroundStyle(filter.month == nil ? .accent : .linkText)
-                  Spacer()
+                BadgeView(background: monthBackgroundColor(nil), padding: 4) {
+                  HStack {
+                    Spacer()
+                    Text("不限月份")
+                      .foregroundStyle(monthTextColor(nil))
+                    Spacer()
+                  }
                 }
               }
               LazyVGrid(columns: [
@@ -392,18 +421,15 @@ struct SubjectBrowsingFilterView: View {
                   Button {
                     filter.month = Int(month)
                   } label: {
-                    if filter.month == month {
-                      Text("\(month)月").foregroundStyle(.accent)
-                    } else {
-                      Text("\(month)月").foregroundStyle(.linkText)
+                    BadgeView(background: monthBackgroundColor(month), padding: 4) {
+                      Text("\(month)月")
+                        .foregroundStyle(monthTextColor(month))
                     }
-                  }
-                  .buttonStyle(.scale)
-                  .padding(2)
+                  }.buttonStyle(.scale)
                 }
               }
             }
-          }
+          }.monospacedDigit()
 
         }.padding()
       }

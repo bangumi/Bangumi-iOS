@@ -73,10 +73,12 @@ struct SubjectTopicItemView: View {
           topic.updatedAt.relativeText
             .font(.caption)
             .foregroundStyle(.secondary)
+            .lineLimit(1)
           Spacer()
           NavigationLink(value: NavDestination.subject(topic.subject.id)) {
             Text(topic.subject.name)
               .font(.footnote)
+              .lineLimit(1)
           }.buttonStyle(.scale)
         }
       }
