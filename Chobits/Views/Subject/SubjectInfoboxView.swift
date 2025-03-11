@@ -25,7 +25,7 @@ let WIKI_FOLDED: [String] = [
   "顾问",
   "仕上",
 ]
-let WIKI_TAG_SET: Set<String> = ["平台", "其他电视台"]
+// let WIKI_TAG_SET: Set<String> = ["平台", "其他电视台"]
 let WIKI_LINK_SET: Set<String> = [
   "链接", "相关链接", "官网", "官方网站", "website",
   "引用来源", "HP", "个人博客", "博客", "Blog", "主页",
@@ -126,11 +126,10 @@ struct SubjectInfoboxDetailView: View {
   func fieldContent(key: String) -> AttributedString {
     let infoboxValues = infobox[key] ?? []
     let positionValues = positions[key] ?? []
-    var persons: [String: SlimPersonDTO] = positionValues.reduce(into: [String: SlimPersonDTO]()) {
+    let persons: [String: SlimPersonDTO] = positionValues.reduce(into: [String: SlimPersonDTO]()) {
       $0[$1.person.name] = $1.person
     }
     var lines: [AttributedString] = []
-    var values: [AttributedString] = []
     if WIKI_LINK_SET.contains(key) {
       for value in infoboxValues {
         if let k = value.k {
@@ -145,49 +144,38 @@ struct SubjectInfoboxDetailView: View {
           lines.append(text)
         }
       }
-    } else if WIKI_TAG_SET.contains(key) {
-      for value in infoboxValues {
-        let text = AttributedString("【\(value.v)】")
-        lines.append(text)
-      }
     } else {
       for value in infoboxValues {
         var text = AttributedString("")
-        if let k = value.k {
+        var vps: [String: SlimPersonDTO] = [:]
+        if let k = value.k, !k.isEmpty {
           var ks = AttributedString("\(k): ")
           ks.foregroundColor = .secondary
           text += ks
+          for position in positions[k] ?? [] {
+            vps[position.person.name] = position.person
+          }
         }
         var val = AttributedString(value.v)
         for (name, person) in persons {
-          let valString = String(val.characters)
-          var searchRange = valString.startIndex..<valString.endIndex
-          while let range = valString.range(of: name, options: [], range: searchRange) {
-            if let attrRange = Range(range, in: val) {
-              val[attrRange].link = URL(string: person.link)
-            }
-            searchRange = range.upperBound..<valString.endIndex
+          if let range = val.range(of: name) {
+            val[range].link = URL(string: person.link)
           }
-          persons.removeValue(forKey: name)
+        }
+        for (name, person) in vps {
+          if let range = val.range(of: name) {
+            val[range].link = URL(string: person.link)
+          }
         }
         lines.append(text + val)
-      }
-      for person in persons.values {
-        values.append(person.name.withLink(person.link))
       }
     }
     var result = AttributedString("")
     for line in lines {
-      result += line
-      if line != lines.last {
+      if !result.characters.isEmpty {
         result += AttributedString("\n")
       }
-    }
-    for value in values {
-      result += value
-      if value != values.last {
-        result += AttributedString("、")
-      }
+      result += line
     }
     return result
   }
