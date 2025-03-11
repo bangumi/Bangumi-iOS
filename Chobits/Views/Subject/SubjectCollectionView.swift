@@ -1,3 +1,4 @@
+import Flow
 import OSLog
 import SwiftData
 import SwiftUI
@@ -8,10 +9,6 @@ struct SubjectCollectionView: View {
   @Environment(Subject.self) var subject
 
   @State private var edit: Bool = false
-
-  var tags: String {
-    subject.interest?.tags.joined(separator: " / ") ?? ""
-  }
 
   var body: some View {
     Section {
@@ -35,22 +32,34 @@ struct SubjectCollectionView: View {
           .onTapGesture {
             edit.toggle()
           }
-
-          if !tags.isEmpty {
-            Text(tags)
-              .padding(2)
-              .font(.footnote)
+          HStack {
+            Spacer()
+            Text("\(interest.updatedAt.datetimeDisplay)")
+              + Text(" / \(interest.updatedAt.date, style: .relative)前")
               .foregroundStyle(.secondary)
+            Spacer()
           }
+          .monospacedDigit()
+          .font(.footnote)
           Divider()
+
+          HFlow {
+            ForEach(interest.tags, id: \.self) { tag in
+              BorderView {
+                Text(tag)
+                  .font(.footnote)
+                  .foregroundStyle(.secondary)
+              }
+            }
+          }
           if !interest.comment.isEmpty {
             CardView {
               Text(interest.comment)
                 .padding(2)
                 .font(.footnote)
+                .foregroundStyle(.secondary)
                 .multilineTextAlignment(.leading)
                 .textSelection(.enabled)
-                .foregroundStyle(.secondary)
             }
           }
 
@@ -60,7 +69,7 @@ struct SubjectCollectionView: View {
           }
         }
       } else {
-        VStack(alignment: .leading) {
+        VStack {
           BorderView(color: .linkText, padding: 5) {
             HStack {
               Spacer()
