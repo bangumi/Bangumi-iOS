@@ -197,16 +197,14 @@ struct TimelineItemView: View {
               NavigationLink(value: NavDestination.timeline(item)) {
                 Text(item.replies > 0 ? "\(item.replies) 回复 " : "回复")
               }.buttonStyle(.navigation)
-              Text("·")
             } else if showReactions, let collectID = collectID {
               ReactionButton(type: .subjectCollect(collectID), reactions: $reactions)
-              Text("·")
             }
           }
           Button {
             showTime = true
           } label: {
-            item.createdAt.relativeText
+            item.createdAt.relativeText + Text(" · \(item.source.desc)")
           }
           .buttonStyle(.scale)
           .popover(isPresented: $showTime) {
@@ -215,8 +213,6 @@ struct TimelineItemView: View {
               .padding()
               .presentationCompactAdaptation(.popover)
           }
-          Text("·")
-          Text("\(item.source.desc)")
         }
         .foregroundStyle(.secondary)
         .font(.footnote)
