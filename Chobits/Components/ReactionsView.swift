@@ -1,3 +1,4 @@
+import Flow
 import SwiftUI
 
 struct ReactionsView: View {
@@ -70,7 +71,7 @@ struct ReactionsView: View {
   }
 
   var body: some View {
-    HStack {
+    HFlow {
       ForEach(reactions, id: \.value) { reaction in
         Button {
           onClick(reaction)
