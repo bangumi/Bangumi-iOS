@@ -142,37 +142,35 @@ struct SubjectInfoboxDetailView: View {
         } else {
           var text = AttributedString(value.v)
           text.link = URL(string: value.v)
-          text.strokeWidth = 1
-          text.strokeColor = .gray
           lines.append(text)
         }
       }
     } else if WIKI_TAG_SET.contains(key) {
       for value in infoboxValues {
-        var text = AttributedString(value.v)
-        text.strokeWidth = 1
-        text.strokeColor = .gray
+        let text = AttributedString("【\(value.v)】")
         lines.append(text)
       }
     } else {
       for value in infoboxValues {
+        var text = AttributedString("")
         if let k = value.k {
-          var text = AttributedString("\(k): ")
-          text.foregroundColor = .secondary
-          text += AttributedString(value.v)
-          lines.append(text)
-        } else {
-          for val in value.v.split(separator: "、") {
-            let val = String(val)
-            if let person = persons[val] {
-              values.append(person.name.withLink(person.link))
-              persons.removeValue(forKey: val)
-            } else {
-              let text = AttributedString(val)
-              values.append(text)
-            }
-          }
+          var ks = AttributedString("\(k): ")
+          ks.foregroundColor = .secondary
+          text += ks
         }
+        var val = AttributedString(value.v)
+        for (name, person) in persons {
+          let valString = String(val.characters)
+          var searchRange = valString.startIndex..<valString.endIndex
+          while let range = valString.range(of: name, options: [], range: searchRange) {
+            if let attrRange = Range(range, in: val) {
+              val[attrRange].link = URL(string: person.link)
+            }
+            searchRange = range.upperBound..<valString.endIndex
+          }
+          persons.removeValue(forKey: name)
+        }
+        lines.append(text + val)
       }
       for person in persons.values {
         values.append(person.name.withLink(person.link))
