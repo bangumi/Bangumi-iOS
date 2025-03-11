@@ -2,6 +2,9 @@ import SwiftData
 import SwiftUI
 
 let WIKI_PINS: [String] = ["中文名", "册数", "话数", "放送开始", "放送星期"]
+let WIKI_NEWLINES: Set<String> = [
+  "别名"
+]
 let WIKI_FOLDED: [String] = [
   "主动画师",
   "作画监督助理",
@@ -100,6 +103,7 @@ struct SubjectInfoboxDetailView: View {
     }
     fields.append(contentsOf: positionKeys)
     fields.removeAll { WIKI_PINS.contains($0) }
+    fields.removeAll { WIKI_NEWLINES.contains($0) }
     fields.removeAll { WIKI_FOLDED.contains($0) }
     return fields
   }
@@ -194,6 +198,29 @@ struct SubjectInfoboxDetailView: View {
     return items
   }
 
+  var newlineItems: [String: [AttributedString]] {
+    var items: [String: [AttributedString]] = [:]
+    for field in WIKI_NEWLINES {
+      let values = infobox[field] ?? []
+      if values.isEmpty {
+        continue
+      }
+      var vals: [AttributedString] = []
+      for value in values {
+        var text = AttributedString("")
+        if let k = value.k, !k.isEmpty {
+          var ks = AttributedString("\(k): ")
+          ks.foregroundColor = .secondary
+          text += ks
+        }
+        text += AttributedString(value.v)
+        vals.append(text)
+      }
+      items[field] = vals
+    }
+    return items
+  }
+
   var items: [AttributedString] {
     var items: [AttributedString] = []
     for field in fields {
@@ -244,6 +271,21 @@ struct SubjectInfoboxDetailView: View {
         Text(item)
           .tint(.linkText)
           .textSelection(.enabled)
+        Divider()
+      }
+      ForEach(Array(newlineItems.keys.sorted()), id: \.self) { key in
+        HStack(alignment: .top) {
+          Text("\(key): ").bold()
+          VStack(alignment: .leading, spacing: 5) {
+            ForEach(newlineItems[key] ?? [], id: \.self) { item in
+              Text(item).textSelection(.enabled)
+              if item != newlineItems[key]?.last {
+                Divider()
+              }
+            }
+          }
+          Spacer(minLength: 0)
+        }
         Divider()
       }
       ForEach(items, id: \.self) { item in
