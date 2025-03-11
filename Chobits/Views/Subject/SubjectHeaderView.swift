@@ -70,6 +70,7 @@ struct SubjectHeaderView: View {
         }
         .buttonStyle(.navigation)
         .padding(.vertical, 4)
+        Spacer()
 
         if !collectStats.isEmpty {
           Text(collectStats)
