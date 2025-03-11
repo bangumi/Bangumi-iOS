@@ -88,6 +88,7 @@ struct SubjectInfoboxView: View {
 struct SubjectInfoboxDetailView: View {
   @Environment(Subject.self) private var subject
 
+  @State private var showVersion: [String: Bool] = [:]
   @State private var showFolded: Bool = false
 
   var fields: [String] {
@@ -130,41 +131,53 @@ struct SubjectInfoboxDetailView: View {
     }
     var lines: [AttributedString] = []
     var values: [AttributedString] = []
-    for value in infoboxValues {
-      if let k = value.k {
-        var text = AttributedString("\(k): ")
-        text.foregroundColor = .secondary
-        if WIKI_LINK_SET.contains(k) {
-          var link = AttributedString(value.v)
-          link.link = URL(string: value.v)
-          text += link
+    if WIKI_LINK_SET.contains(key) {
+      for value in infoboxValues {
+        if let k = value.k {
+          var text = AttributedString(k)
+          text.link = URL(string: value.v)
+          text.strokeWidth = 1
+          text.strokeColor = .gray
+          lines.append(text)
         } else {
-          if WIKI_TAG_SET.contains(k) {
-            var link = AttributedString(value.v)
-            link.link = URL(string: "https://bgm.tv/subject/\(subject.subjectId)/wiki?t=\(k)")
-            text += link
-          } else {
-            text += AttributedString(value.v)
-          }
+          var text = AttributedString(value.v)
+          text.link = URL(string: value.v)
+          text.strokeWidth = 1
+          text.strokeColor = .gray
+          lines.append(text)
         }
+      }
+    } else if WIKI_TAG_SET.contains(key) {
+      for value in infoboxValues {
+        var text = AttributedString(value.v)
+        text.strokeWidth = 1
+        text.strokeColor = .gray
         lines.append(text)
-      } else {
-        for val in value.v.split(separator: "、") {
-          if let person = persons[String(val)] {
-            values.append(person.name.withLink(person.link))
-            persons.removeValue(forKey: String(val))
-          } else {
-            var text = AttributedString(String(val))
-            text += AttributedString("")
-            values.append(text)
+      }
+    } else {
+      for value in infoboxValues {
+        if let k = value.k {
+          var text = AttributedString("\(k): ")
+          text.foregroundColor = .secondary
+          text += AttributedString(value.v)
+          lines.append(text)
+        } else {
+          for val in value.v.split(separator: "、") {
+            let val = String(val)
+            if let person = persons[val] {
+              values.append(person.name.withLink(person.link))
+              persons.removeValue(forKey: val)
+            } else {
+              let text = AttributedString(val)
+              values.append(text)
+            }
           }
         }
       }
+      for person in persons.values {
+        values.append(person.name.withLink(person.link))
+      }
     }
-    for value in positionValues {
-      values.append(value.person.name.withLink(value.person.link))
-    }
-
     var result = AttributedString("")
     for line in lines {
       result += line
@@ -198,6 +211,9 @@ struct SubjectInfoboxDetailView: View {
   var items: [AttributedString] {
     var items: [AttributedString] = []
     for field in fields {
+      if field.starts(with: "版本:") {
+        continue
+      }
       let content = fieldContent(key: field)
       if !content.characters.isEmpty {
         var text = AttributedString("\(field): ")
@@ -205,6 +221,19 @@ struct SubjectInfoboxDetailView: View {
         text += content
         items.append(text)
       }
+    }
+    return items
+  }
+
+  var versionItems: [String: AttributedString] {
+    var items: [String: AttributedString] = [:]
+    for field in fields {
+      if !field.starts(with: "版本:") {
+        continue
+      }
+      let key = field.replacingOccurrences(of: "版本:", with: "")
+      let content = fieldContent(key: field)
+      items[key] = content
     }
     return items
   }
@@ -237,6 +266,25 @@ struct SubjectInfoboxDetailView: View {
           .textSelection(.enabled)
         Divider()
       }
+      ForEach(Array(versionItems.keys.sorted()), id: \.self) { key in
+        Button {
+          if showVersion[key] == nil {
+            showVersion[key] = true
+          } else {
+            showVersion[key]?.toggle()
+          }
+        } label: {
+          Text(key + " " + (showVersion[key] ?? false ? "▼" : "▶"))
+            .font(.headline)
+        }.buttonStyle(.navigation)
+        Divider()
+        if showVersion[key] ?? false {
+          Text(versionItems[key] ?? AttributedString(""))
+            .tint(.linkText)
+            .textSelection(.enabled)
+          Divider()
+        }
+      }
       if showFolded {
         ForEach(foldedItems, id: \.self) { item in
           Text(item)
@@ -258,6 +306,7 @@ struct SubjectInfoboxDetailView: View {
     }
     .animation(.default, value: subject.positions)
     .animation(.default, value: showFolded)
+    .animation(.default, value: showVersion)
     .padding(8)
   }
 }
