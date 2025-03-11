@@ -23,10 +23,6 @@ struct SubjectRatingView: View {
     return data
   }
 
-  var tags: [Tag] {
-    return Array(subject.tags.sorted { $0.count > $1.count }.prefix(20))
-  }
-
   var body: some View {
     ScrollView {
       GeometryReader { geometry in
@@ -91,21 +87,6 @@ struct SubjectRatingView: View {
               Text(CollectionType.dropped.description(subject.typeEnum))
             }
           }.font(.footnote)
-          HFlow(alignment: .center, spacing: 2) {
-            ForEach(tags, id: \.name) { tag in
-              BorderView {
-                HStack {
-                  Text(tag.name)
-                    .font(.footnote)
-                    .lineLimit(1)
-                  Text("\(tag.count)")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                }
-              }.padding(1)
-            }
-          }
-          .animation(.default, value: tags)
           Spacer()
         }
       }.padding()

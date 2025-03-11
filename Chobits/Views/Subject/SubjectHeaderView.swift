@@ -8,10 +8,6 @@ struct SubjectHeaderView: View {
     subject.typeEnum
   }
 
-  var metaTags: String {
-    subject.metaTags.joined(separator: " / ")
-  }
-
   var collectStats: String {
     var text = ""
     if subject.collection.doing > 0 {
@@ -62,13 +58,6 @@ struct SubjectHeaderView: View {
           .lineLimit(2)
           .textSelection(.enabled)
         Spacer()
-
-        if !metaTags.isEmpty {
-          Text(metaTags)
-            .font(.footnote)
-            .foregroundStyle(.secondary)
-            .lineLimit(1)
-        }
 
         NavigationLink(value: NavDestination.subjectInfobox(subject.subjectId)) {
           HStack {
