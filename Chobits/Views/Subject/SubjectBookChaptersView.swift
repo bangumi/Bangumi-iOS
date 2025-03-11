@@ -184,62 +184,64 @@ struct LargeChapterView: View {
   let actions: ChapterActions
 
   var body: some View {
-    HStack {
-      VStack {
-        HStack(alignment: .firstTextBaseline, spacing: 0) {
-          Text("Chap.").foregroundStyle(.secondary)
-          TextField("\(data.epStatus)", text: inputs.eps)
-            .keyboardType(.numberPad)
-            .frame(minWidth: 50, maxWidth: 75)
-            .multilineTextAlignment(.trailing)
-            .fixedSize(horizontal: true, vertical: false)
-            .padding(.trailing, 2)
-            .textFieldStyle(.roundedBorder)
-          Text("/").foregroundStyle(.secondary)
-          Text(data.epsDesc).foregroundStyle(.secondary)
-            .padding(.trailing, 5)
-          Button {
-            actions.incrEps()
-          } label: {
-            Image(systemName: "plus.circle")
-              .foregroundStyle(.secondary)
-          }.buttonStyle(.scale)
-          Spacer()
-        }.monospaced()
-        HStack(alignment: .firstTextBaseline, spacing: 0) {
-          Text("Vol. ").foregroundStyle(.secondary)
-          TextField("\(data.volStatus)", text: inputs.vols)
-            .keyboardType(.numberPad)
-            .frame(minWidth: 50, maxWidth: 75)
-            .multilineTextAlignment(.trailing)
-            .fixedSize(horizontal: true, vertical: false)
-            .padding(.trailing, 2)
-            .textFieldStyle(.roundedBorder)
-          Text("/").foregroundStyle(.secondary)
-          Text(data.volumesDesc).foregroundStyle(.secondary)
-            .padding(.trailing, 5)
-          Button {
-            actions.incrVols()
-          } label: {
-            Image(systemName: "plus.circle")
-              .foregroundStyle(.secondary)
-          }.buttonStyle(.scale)
-          Spacer()
-        }.monospaced()
-      }
-      Spacer()
-      if state.updating {
-        ZStack {
-          Button("更新", action: {})
-            .disabled(true)
-            .hidden()
-            .buttonStyle(.borderedProminent)
-          ProgressView()
+    CardView {
+      HStack {
+        VStack {
+          HStack(alignment: .firstTextBaseline, spacing: 0) {
+            Text("Chap.").foregroundStyle(.secondary)
+            TextField("\(data.epStatus)", text: inputs.eps)
+              .keyboardType(.numberPad)
+              .frame(minWidth: 50, maxWidth: 75)
+              .multilineTextAlignment(.trailing)
+              .fixedSize(horizontal: true, vertical: false)
+              .padding(.trailing, 2)
+              .textFieldStyle(.roundedBorder)
+            Text("/").foregroundStyle(.secondary)
+            Text(data.epsDesc).foregroundStyle(.secondary)
+              .padding(.trailing, 5)
+            Button {
+              actions.incrEps()
+            } label: {
+              Image(systemName: "plus.circle")
+                .foregroundStyle(.secondary)
+            }.buttonStyle(.scale)
+            Spacer()
+          }.monospaced()
+          HStack(alignment: .firstTextBaseline, spacing: 0) {
+            Text("Vol. ").foregroundStyle(.secondary)
+            TextField("\(data.volStatus)", text: inputs.vols)
+              .keyboardType(.numberPad)
+              .frame(minWidth: 50, maxWidth: 75)
+              .multilineTextAlignment(.trailing)
+              .fixedSize(horizontal: true, vertical: false)
+              .padding(.trailing, 2)
+              .textFieldStyle(.roundedBorder)
+            Text("/").foregroundStyle(.secondary)
+            Text(data.volumesDesc).foregroundStyle(.secondary)
+              .padding(.trailing, 5)
+            Button {
+              actions.incrVols()
+            } label: {
+              Image(systemName: "plus.circle")
+                .foregroundStyle(.secondary)
+            }.buttonStyle(.scale)
+            Spacer()
+          }.monospaced()
         }
-      } else {
-        Button("更新", action: actions.update)
-          .disabled(state.updateButtonDisable)
-          .buttonStyle(.borderedProminent)
+        Spacer()
+        if state.updating {
+          ZStack {
+            Button("更新", action: {})
+              .disabled(true)
+              .hidden()
+              .buttonStyle(.borderedProminent)
+            ProgressView()
+          }
+        } else {
+          Button("更新", action: actions.update)
+            .disabled(state.updateButtonDisable)
+            .buttonStyle(.borderedProminent)
+        }
       }
     }
   }

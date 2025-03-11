@@ -41,14 +41,15 @@ struct SubjectCollectionView: View {
           }
           .monospacedDigit()
           .font(.footnote)
-          Divider()
 
-          HFlow {
-            ForEach(interest.tags, id: \.self) { tag in
-              BorderView {
-                Text(tag)
-                  .font(.footnote)
-                  .foregroundStyle(.secondary)
+          if !interest.tags.isEmpty {
+            HFlow {
+              ForEach(interest.tags, id: \.self) { tag in
+                BorderView {
+                  Text(tag)
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                }
               }
             }
           }
