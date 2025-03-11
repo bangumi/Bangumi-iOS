@@ -271,23 +271,25 @@ struct SubjectInfoboxDetailView: View {
           Divider()
         }
       }
-      if showFolded {
-        ForEach(foldedItems, id: \.self) { item in
-          Text(item)
-            .tint(.linkText)
-            .textSelection(.enabled)
-          Divider()
-        }
-      } else {
-        Button {
-          showFolded.toggle()
-        } label: {
-          HStack {
-            Spacer()
-            Label("更多制作人员", systemImage: "plus")
-            Spacer()
+      if !foldedItems.isEmpty {
+        if showFolded {
+          ForEach(foldedItems, id: \.self) { item in
+            Text(item)
+              .tint(.linkText)
+              .textSelection(.enabled)
+            Divider()
           }
-        }.buttonStyle(.navigation)
+        } else {
+          Button {
+            showFolded.toggle()
+          } label: {
+            HStack {
+              Spacer()
+              Label("更多制作人员", systemImage: "plus")
+              Spacer()
+            }
+          }.buttonStyle(.navigation)
+        }
       }
     }
     .animation(.default, value: subject.positions)
