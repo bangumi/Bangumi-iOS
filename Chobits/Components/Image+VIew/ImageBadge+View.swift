@@ -1,34 +1,31 @@
 import SwiftUI
 
-struct NSFWBadgeView: View {
+struct ImageNSFW: ViewModifier {
+  let nsfw: Bool
+
   @AppStorage("showNSFWBadge") var showNSFWBadge: Bool = true
 
-  var body: some View {
-    if showNSFWBadge {
-      Text("R18")
-        .padding(2)
-        .background(.red)
-        .clipShape(RoundedRectangle(cornerRadius: 5))
-        .padding(4)
-        .foregroundStyle(.white)
-        .font(.caption)
-        .shadow(radius: 2)
+  func body(content: Content) -> some View {
+    if nsfw, showNSFWBadge {
+      content.overlay(alignment: .topLeading) {
+        Text("R18")
+          .padding(2)
+          .background(.red)
+          .clipShape(RoundedRectangle(cornerRadius: 5))
+          .padding(4)
+          .foregroundStyle(.white)
+          .font(.caption)
+          .shadow(radius: 2)
+      }
     } else {
-      EmptyView()
+      content
     }
   }
 }
 
 extension View {
-  @ViewBuilder
   func imageNSFW(_ nsfw: Bool) -> some View {
-    if nsfw {
-      self.overlay(alignment: .topLeading) {
-        NSFWBadgeView()
-      }
-    } else {
-      self
-    }
+    modifier(ImageNSFW(nsfw: nsfw))
   }
 }
 
