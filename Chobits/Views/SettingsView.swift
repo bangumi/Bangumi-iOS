@@ -110,17 +110,17 @@ struct SettingsView: View {
       }
 
       Section(header: Text("超合金")) {
-        Toggle(isOn: $showNSFWBadge) {
-          Text("显示 NSFW 标记")
-        }
         Toggle(isOn: $isolationMode) {
           Text("社恐模式")
         }
-        Toggle(isOn: $showEpisodeTrends) {
-          Text("显示章节热度")
-        }
         Toggle(isOn: $hideBlocklist) {
           Text("屏蔽绝交用户言论")
+        }
+        Toggle(isOn: $showNSFWBadge) {
+          Text("显示 NSFW 标记")
+        }
+        Toggle(isOn: $showEpisodeTrends) {
+          Text("显示章节热度")
         }
         Toggle(isOn: $autoCompleteProgress) {
           Text("标记看过时自动完成所有进度")
