@@ -446,6 +446,18 @@ extension Chii {
     let body: [String: Any] = [:]
     _ = try await self.request(url: url, method: "DELETE", body: body, auth: .required)
   }
+
+  func blockUser(_ username: String) async throws {
+    let url = BangumiAPI.priv.build("p1/blocklist/\(username)")
+    let body: [String: Any] = [:]
+    _ = try await self.request(url: url, method: "PUT", body: body, auth: .required)
+  }
+
+  func unblockUser(_ username: String) async throws {
+    let url = BangumiAPI.priv.build("p1/blocklist/\(username)")
+    let body: [String: Any] = [:]
+    _ = try await self.request(url: url, method: "DELETE", body: body, auth: .required)
+  }
 }
 
 // MARK: - Topic

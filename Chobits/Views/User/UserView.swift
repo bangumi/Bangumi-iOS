@@ -55,6 +55,7 @@ struct UserView: View {
       do {
         try await Chii.shared.addFriend(username)
         friendlist.append(user.userId)
+        Notifier.shared.notify(message: "添加好友成功")
       } catch {
         Notifier.shared.alert(error: error)
       }
@@ -67,6 +68,33 @@ struct UserView: View {
       do {
         try await Chii.shared.removeFriend(username)
         friendlist = friendlist.filter { $0 != user.userId }
+        Notifier.shared.notify(message: "解除好友成功")
+      } catch {
+        Notifier.shared.alert(error: error)
+      }
+    }
+  }
+
+  func blockUser() {
+    guard let user = user else { return }
+    Task {
+      do {
+        try await Chii.shared.blockUser(username)
+        blocklist.append(user.userId)
+        Notifier.shared.notify(message: "已绝交")
+      } catch {
+        Notifier.shared.alert(error: error)
+      }
+    }
+  }
+
+  func unblockUser() {
+    guard let user = user else { return }
+    Task {
+      do {
+        try await Chii.shared.unblockUser(username)
+        blocklist = blocklist.filter { $0 != user.userId }
+        Notifier.shared.notify(message: "取消绝交")
       } catch {
         Notifier.shared.alert(error: error)
       }
@@ -123,6 +151,20 @@ struct UserView: View {
                   addFriend()
                 } label: {
                   Label("加为好友", systemImage: "person.2.badge.plus")
+                }
+              }
+              Divider()
+              if blocklist.contains(user.id) {
+                Button {
+                  unblockUser()
+                } label: {
+                  Label("取消绝交", systemImage: "person")
+                }
+              } else {
+                Button(role: .destructive) {
+                  blockUser()
+                } label: {
+                  Label("绝交", systemImage: "person.slash")
                 }
               }
             }
