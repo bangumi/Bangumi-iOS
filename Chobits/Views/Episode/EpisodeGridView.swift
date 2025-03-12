@@ -139,12 +139,14 @@ struct EpisodeGridView: View {
   }
 }
 
-extension View {
-  @ViewBuilder
-  func episodeTrend(_ episode: Episode) -> some View {
-    @AppStorage("showEpisodeTrends") var showEpisodeTrends: Bool = true
+struct EpisodeTrend: ViewModifier {
+  let episode: Episode
+
+  @AppStorage("showEpisodeTrends") var showEpisodeTrends: Bool = true
+
+  func body(content: Content) -> some View {
     if showEpisodeTrends {
-      self
+      content
         .padding(.bottom, 3)
         .overlay(alignment: .bottomLeading) {
           Rectangle()
@@ -152,8 +154,14 @@ extension View {
             .foregroundStyle(episode.trendColor)
         }
     } else {
-      self
+      content
     }
+  }
+}
+
+extension View {
+  func episodeTrend(_ episode: Episode) -> some View {
+    modifier(EpisodeTrend(episode: episode))
   }
 }
 
