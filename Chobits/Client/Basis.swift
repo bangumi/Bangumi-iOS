@@ -933,6 +933,29 @@ enum PostState: Int, Codable, CaseIterable {
       return "管理员折叠主题"
     }
   }
+
+  var color: Color {
+    switch self {
+    case .normal:
+      return .primary
+    case .adminCloseTopic:
+      return .red
+    case .adminReopen:
+      return .green
+    case .adminPin:
+      return .orange
+    case .adminMerge:
+      return .purple
+    case .adminSilentTopic:
+      return .secondary
+    case .userDelete:
+      return .secondary
+    case .adminDelete:
+      return .secondary
+    case .adminOffTopic:
+      return .secondary
+    }
+  }
 }
 
 enum GroupMemberRole: Int, Codable, CaseIterable {

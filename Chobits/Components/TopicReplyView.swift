@@ -72,9 +72,9 @@ struct ReplyItemView: View {
       case .normal:
         ReplyItemNormalView(type: type, topicId: topicId, idx: idx, reply: reply, author: author)
       case .userDelete:
-        ReplyUserDeleteView(idx: idx, reply: reply.base, author: author)
+        PostUserDeleteStateView(reply.creatorID, reply.creator, reply.createdAt, author)
       default:
-        Text(reply.state.description)
+        PostStateView(reply.state)
       }
     }
   }
@@ -195,9 +195,10 @@ struct ReplyItemNormalView: View {
                     type: type, idx: idx, reply: reply, subidx: subidx, subreply: subreply,
                     author: author, topicId: topicId)
                 case .userDelete:
-                  ReplyUserDeleteView(idx: subidx, reply: subreply, author: author)
+                  PostUserDeleteStateView(
+                    subreply.creatorID, subreply.creator, subreply.createdAt, author)
                 default:
-                  Text(subreply.state.description)
+                  PostStateView(subreply.state)
                 }
               }
             }
@@ -229,35 +230,6 @@ struct ReplyItemNormalView: View {
       } message: {
         Text("确定要删除这条回复吗？")
       }
-    }
-  }
-}
-
-struct ReplyUserDeleteView: View {
-  let idx: Int
-  let reply: ReplyBaseDTO
-  let author: SlimUserDTO?
-
-  @AppStorage("friendlist") var friendlist: [Int] = []
-
-  var body: some View {
-    HStack(spacing: 4) {
-      PosterLabel(uid: reply.creatorID, poster: author?.id)
-      FriendLabel(uid: reply.creatorID)
-      if let creator = reply.creator {
-        Text(creator.nickname.withLink(creator.link)).lineLimit(1)
-      } else {
-        Text("用户 \(reply.creatorID)")
-          .lineLimit(1)
-      }
-      Text("删除了回复")
-        .font(.footnote)
-        .foregroundStyle(.secondary)
-      Spacer()
-      Text(reply.createdAt.datetimeDisplay)
-        .lineLimit(1)
-        .font(.caption)
-        .foregroundStyle(.secondary)
     }
   }
 }

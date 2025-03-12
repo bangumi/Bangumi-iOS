@@ -82,9 +82,9 @@ struct CommentItemView: View {
       case .normal:
         CommentItemNormalView(type: type, comment: comment, idx: idx)
       case .userDelete:
-        CommentUserDeleteView(comment.creatorID, comment.user, comment.createdAt)
+        PostUserDeleteStateView(comment.creatorID, comment.user, comment.createdAt)
       default:
-        Text(comment.state.description)
+        PostStateView(comment.state)
       }
     }
   }
@@ -183,9 +183,9 @@ struct CommentItemNormalView: View {
                     type: type, comment: comment,
                     reply: reply, idx: idx, subidx: subidx)
                 case .userDelete:
-                  CommentUserDeleteView(reply.creatorID, reply.user, reply.createdAt)
+                  PostUserDeleteStateView(reply.creatorID, reply.user, reply.createdAt)
                 default:
-                  Text(reply.state.description)
+                  PostStateView(reply.state)
                 }
               }
             }
@@ -217,40 +217,6 @@ struct CommentItemNormalView: View {
       }
     } message: {
       Text("确定要删除这条评论吗？")
-    }
-  }
-}
-
-struct CommentUserDeleteView: View {
-  let creatorID: Int
-  let creator: SlimUserDTO?
-  let createdAt: Int
-
-  @AppStorage("friendlist") var friendlist: [Int] = []
-
-  init(_ creatorID: Int, _ creator: SlimUserDTO?, _ createdAt: Int) {
-    self.creatorID = creatorID
-    self.creator = creator
-    self.createdAt = createdAt
-  }
-
-  var body: some View {
-    HStack(spacing: 4) {
-      FriendLabel(uid: creatorID)
-      if let creator = creator {
-        Text(creator.nickname.withLink(creator.link)).lineLimit(1)
-      } else {
-        Text("用户 \(creatorID)")
-          .lineLimit(1)
-      }
-      Text("删除了评论")
-        .font(.footnote)
-        .foregroundStyle(.secondary)
-      Spacer()
-      Text(createdAt.datetimeDisplay)
-        .lineLimit(1)
-        .font(.caption)
-        .foregroundStyle(.secondary)
     }
   }
 }
