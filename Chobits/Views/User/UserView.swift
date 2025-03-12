@@ -221,7 +221,7 @@ struct UserDetailView: View {
               }
               if blocklist.contains(user.userId) {
                 BadgeView(background: .secondary) {
-                  Text("已拉黑").font(.caption)
+                  Text("已绝交").font(.caption)
                 }
               }
               Text("@\(user.username)")
