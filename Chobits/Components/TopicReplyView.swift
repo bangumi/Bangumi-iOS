@@ -63,19 +63,15 @@ struct ReplyItemView: View {
   let reply: ReplyDTO
   let author: SlimUserDTO?
 
-  @AppStorage("hideBlocklist") var hideBlocklist: Bool = false
-  @AppStorage("blocklist") var blocklist: [Int] = []
-
   var body: some View {
-    if !hideBlocklist || !blocklist.contains(reply.creator?.id ?? 0) {
-      switch reply.state {
-      case .normal:
-        ReplyItemNormalView(type: type, topicId: topicId, idx: idx, reply: reply, author: author)
-      case .userDelete:
-        PostUserDeleteStateView(reply.creatorID, reply.creator, reply.createdAt, author)
-      default:
-        PostStateView(reply.state)
-      }
+    switch reply.state {
+    case .normal:
+      ReplyItemNormalView(type: type, topicId: topicId, idx: idx, reply: reply, author: author)
+        .filterBlocklist(reply.creatorID)
+    case .userDelete:
+      PostUserDeleteStateView(reply.creatorID, reply.creator, reply.createdAt, author)
+    default:
+      PostStateView(reply.state)
     }
   }
 }
@@ -88,8 +84,6 @@ struct ReplyItemNormalView: View {
   let author: SlimUserDTO?
 
   @AppStorage("profile") var profile: Profile = Profile()
-  @AppStorage("hideBlocklist") var hideBlocklist: Bool = false
-  @AppStorage("blocklist") var blocklist: [Int] = []
   @AppStorage("friendlist") var friendlist: [Int] = []
 
   @State private var showReplyBox: Bool = false
@@ -186,22 +180,20 @@ struct ReplyItemNormalView: View {
             }
           }
           ForEach(Array(zip(reply.replies.indices, reply.replies)), id: \.1) { subidx, subreply in
-            if !hideBlocklist || !blocklist.contains(subreply.creator?.id ?? 0) {
-              VStack(alignment: .leading) {
-                Divider()
-                switch subreply.state {
-                case .normal:
-                  SubReplyNormalView(
-                    type: type, idx: idx, reply: reply, subidx: subidx, subreply: subreply,
-                    author: author, topicId: topicId)
-                case .userDelete:
-                  PostUserDeleteStateView(
-                    subreply.creatorID, subreply.creator, subreply.createdAt, author)
-                default:
-                  PostStateView(subreply.state)
-                }
+            VStack(alignment: .leading) {
+              Divider()
+              switch subreply.state {
+              case .normal:
+                SubReplyNormalView(
+                  type: type, idx: idx, reply: reply, subidx: subidx, subreply: subreply,
+                  author: author, topicId: topicId)
+              case .userDelete:
+                PostUserDeleteStateView(
+                  subreply.creatorID, subreply.creator, subreply.createdAt, author)
+              default:
+                PostStateView(subreply.state)
               }
-            }
+            }.filterBlocklist(subreply.creatorID)
           }
         }
       }

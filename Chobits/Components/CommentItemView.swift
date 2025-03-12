@@ -73,19 +73,15 @@ struct CommentItemView: View {
   let comment: CommentDTO
   let idx: Int
 
-  @AppStorage("hideBlocklist") var hideBlocklist: Bool = false
-  @AppStorage("blocklist") var blocklist: [Int] = []
-
   var body: some View {
-    if !hideBlocklist || !blocklist.contains(comment.creatorID) {
-      switch comment.state {
-      case .normal:
-        CommentItemNormalView(type: type, comment: comment, idx: idx)
-      case .userDelete:
-        PostUserDeleteStateView(comment.creatorID, comment.user, comment.createdAt)
-      default:
-        PostStateView(comment.state)
-      }
+    switch comment.state {
+    case .normal:
+      CommentItemNormalView(type: type, comment: comment, idx: idx)
+        .filterBlocklist(comment.creatorID)
+    case .userDelete:
+      PostUserDeleteStateView(comment.creatorID, comment.user, comment.createdAt)
+    default:
+      PostStateView(comment.state)
     }
   }
 }
@@ -95,9 +91,7 @@ struct CommentItemNormalView: View {
   let comment: CommentDTO
   let idx: Int
 
-  @AppStorage("hideBlocklist") var hideBlocklist: Bool = false
   @AppStorage("profile") var profile: Profile = Profile()
-  @AppStorage("blocklist") var blocklist: [Int] = []
   @AppStorage("friendlist") var friendlist: [Int] = []
 
   @State private var showReplyBox: Bool = false
@@ -174,21 +168,19 @@ struct CommentItemNormalView: View {
             ReactionsView(type: .episodeReply(id), reactions: $reactions)
           }
           ForEach(Array(zip(comment.replies.indices, comment.replies)), id: \.1) { subidx, reply in
-            if !hideBlocklist || !blocklist.contains(reply.creatorID) {
-              VStack(alignment: .leading) {
-                Divider()
-                switch reply.state {
-                case .normal:
-                  CommentSubReplyNormalView(
-                    type: type, comment: comment,
-                    reply: reply, idx: idx, subidx: subidx)
-                case .userDelete:
-                  PostUserDeleteStateView(reply.creatorID, reply.user, reply.createdAt)
-                default:
-                  PostStateView(reply.state)
-                }
+            VStack(alignment: .leading) {
+              Divider()
+              switch reply.state {
+              case .normal:
+                CommentSubReplyNormalView(
+                  type: type, comment: comment,
+                  reply: reply, idx: idx, subidx: subidx)
+              case .userDelete:
+                PostUserDeleteStateView(reply.creatorID, reply.user, reply.createdAt)
+              default:
+                PostStateView(reply.state)
               }
-            }
+            }.filterBlocklist(reply.creatorID)
           }
         }
       }

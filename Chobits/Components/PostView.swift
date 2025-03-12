@@ -54,3 +54,25 @@ struct PostUserDeleteStateView: View {
     }
   }
 }
+
+extension View {
+  @ViewBuilder
+  func filterBlocklist(_ uid: Int) -> some View {
+    @AppStorage("hideBlocklist") var hideBlocklist: Bool = false
+    @AppStorage("blocklist") var blocklist: [Int] = []
+
+    if hideBlocklist, blocklist.contains(uid) {
+      Rectangle()
+        .fill(
+          LinearGradient(
+            gradient: Gradient(colors: [Color.secondary, Color.secondary.opacity(0.5)]),
+            startPoint: .leading,
+            endPoint: .trailing)
+        )
+        .frame(height: 5)
+        .padding(.horizontal, 8)
+    } else {
+      self
+    }
+  }
+}
