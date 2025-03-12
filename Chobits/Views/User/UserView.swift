@@ -234,7 +234,7 @@ struct UserDetailView: View {
               .font(.footnote)
               .textSelection(.enabled)
           }
-        }
+        }.frame(minHeight: 100)
 
         if user.bio.isEmpty {
           Divider()
