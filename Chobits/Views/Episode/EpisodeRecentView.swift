@@ -54,7 +54,10 @@ struct EpisodeRecentView: View {
   }
 
   func updateSingle(episode: Episode, type: EpisodeCollectionType) {
+    if updating { return }
     Task {
+      updating = true
+      defer { updating = false }
       do {
         try await Chii.shared.updateEpisodeCollection(
           episodeId: episode.episodeId, type: type)
