@@ -171,13 +171,13 @@ struct TimelineItemView: View {
               HStack {
                 ForEach(mono.characters.prefix(5)) { character in
                   ImageView(img: character.images?.grid)
-                    .imageStyle(width: 40, height: 40)
+                    .imageStyle(width: 60, height: 60)
                     .imageType(.avatar)
                     .imageLink(character.link)
                 }
                 ForEach(mono.persons.prefix(5)) { person in
                   ImageView(img: person.images?.grid)
-                    .imageStyle(width: 40, height: 40)
+                    .imageStyle(width: 60, height: 60)
                     .imageType(.avatar)
                     .imageLink(person.link)
                 }
