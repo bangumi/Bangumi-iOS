@@ -32,35 +32,38 @@ struct SubjectSummaryView: View {
         .padding(2)
         .tint(.linkText)
       CardView {
-        HFlow(alignment: .center, spacing: 3) {
-          ForEach(metaTags, id: \.name) { tag in
-            BorderView(color: .linkText, padding: 3, cornerRadius: 16) {
-              HStack(spacing: 2) {
-                Text(tag.name)
-                  .font(.footnote)
-                  .foregroundStyle(.linkText)
-                  .lineLimit(1)
-                Text("\(tag.count)")
-                  .font(.caption)
-                  .foregroundStyle(.secondary)
-                  .monospacedDigit()
-              }
-            }.padding(1)
+        HStack {
+          HFlow(alignment: .center, spacing: 3) {
+            ForEach(metaTags, id: \.name) { tag in
+              BorderView(color: .linkText, padding: 3, cornerRadius: 16) {
+                HStack(spacing: 2) {
+                  Text(tag.name)
+                    .font(.footnote)
+                    .foregroundStyle(.linkText)
+                    .lineLimit(1)
+                  Text("\(tag.count)")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .monospacedDigit()
+                }
+              }.padding(1)
+            }
+            ForEach(tags, id: \.name) { tag in
+              BorderView(color: .secondary.opacity(0.2), padding: 3, cornerRadius: 16) {
+                HStack(spacing: 2) {
+                  Text(tag.name)
+                    .font(.footnote)
+                    .foregroundStyle(.linkText)
+                    .lineLimit(1)
+                  Text("\(tag.count)")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .monospacedDigit()
+                }
+              }.padding(1)
+            }
           }
-          ForEach(tags, id: \.name) { tag in
-            BorderView(color: .secondary.opacity(0.2), padding: 3, cornerRadius: 16) {
-              HStack(spacing: 2) {
-                Text(tag.name)
-                  .font(.footnote)
-                  .foregroundStyle(.linkText)
-                  .lineLimit(1)
-                Text("\(tag.count)")
-                  .font(.caption)
-                  .foregroundStyle(.secondary)
-                  .monospacedDigit()
-              }
-            }.padding(1)
-          }
+          Spacer(minLength: 0)
         }
         .animation(.default, value: tags)
         .animation(.default, value: metaTags)

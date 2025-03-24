@@ -96,7 +96,7 @@ struct SubjectCharactersView: View {
               }
               Spacer()
             }
-          }.frame(width: 180)
+          }.frame(width: 220)
         }
       }.frame(height: height)
     }.animation(.default, value: characters)
