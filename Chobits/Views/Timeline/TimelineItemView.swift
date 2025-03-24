@@ -124,7 +124,7 @@ struct TimelineItemView: View {
                 BorderView(color: .secondary.opacity(0.2), cornerRadius: 8) {
                   HStack {
                     Text(collect.comment).font(.callout)
-                    Spacer()
+                    Spacer(minLength: 0)
                   }.padding(4)
                 }
               }
@@ -218,7 +218,7 @@ struct TimelineItemView: View {
         .font(.footnote)
         Divider()
       }
-      Spacer()
+      Spacer(minLength: 0)
     }
   }
 }
