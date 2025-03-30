@@ -159,7 +159,7 @@ enum ChiiViewTab: String {
     case .discover:
       "magnifyingglass"
     case .rakuen:
-      "bubble"
+      "rectangle.3.group.bubble"
     case .progress:
       "square.grid.2x2"
     case .notice:
