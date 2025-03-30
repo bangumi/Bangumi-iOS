@@ -71,23 +71,8 @@ struct EpisodeGridView: View {
     }.padding(.top, 5)
     HFlow(alignment: .center, spacing: 2) {
       ForEach(episodeMains) { episode in
-        Text("\(episode.sort.episodeDisplay)")
-          .monospacedDigit()
-          .foregroundStyle(episode.textColor)
-          .padding(3)
-          .background(episode.backgroundColor)
-          .border(episode.borderColor, width: 1)
-          .episodeTrend(episode)
-          .padding(2)
-          .strikethrough(episode.status == EpisodeCollectionType.dropped.rawValue)
-          .contextMenu {
-            EpisodeUpdateMenu().environment(episode)
-          } preview: {
-            EpisodeInfoView()
-              .environment(episode)
-              .padding()
-              .frame(idealWidth: 360)
-          }
+        EpisodeItemView()
+          .environment(episode)
       }
       if !episodeSps.isEmpty {
         Text("SP")
@@ -104,23 +89,8 @@ struct EpisodeGridView: View {
           .padding(2)
           .bold()
         ForEach(episodeSps) { episode in
-          Text("\(episode.sort.episodeDisplay)")
-            .monospacedDigit()
-            .foregroundStyle(episode.textColor)
-            .padding(3)
-            .background(episode.backgroundColor)
-            .border(episode.borderColor, width: 1)
-            .episodeTrend(episode)
-            .padding(2)
-            .strikethrough(episode.status == EpisodeCollectionType.dropped.rawValue)
-            .contextMenu {
-              EpisodeUpdateMenu().environment(episode)
-            } preview: {
-              EpisodeInfoView()
-                .environment(episode)
-                .padding()
-                .frame(idealWidth: 360)
-            }
+          EpisodeItemView()
+            .environment(episode)
         }
       }
     }

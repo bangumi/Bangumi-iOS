@@ -79,7 +79,7 @@ struct ProgressListItemView: View {
 
           switch subject.typeEnum {
           case .anime, .real:
-            EpisodeRecentSlimView(subjectId: subjectId)
+            EpisodeRecentView(subjectId: subjectId, mode: .list)
               .environment(subject)
 
           case .book:

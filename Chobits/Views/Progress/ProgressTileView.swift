@@ -104,7 +104,7 @@ struct ProgressTileItemView: View {
 
         switch subject.typeEnum {
         case .anime, .real:
-          EpisodeRecentView(subjectId: subjectId)
+          EpisodeRecentView(subjectId: subjectId, mode: .tile)
             .environment(subject)
         case .book:
           SubjectBookChaptersView(mode: .tile)
