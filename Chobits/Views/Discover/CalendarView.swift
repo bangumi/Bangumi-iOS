@@ -200,7 +200,7 @@ struct CalendarWeekdayView: View {
                     }
                     Text(item.subject.name)
                       .lineLimit(1)
-                      .font(.callout)
+                      .font(.footnote)
                       .bold()
                   }
                   Spacer(minLength: 0)
