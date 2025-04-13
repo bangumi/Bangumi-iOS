@@ -101,16 +101,21 @@ struct TrendingSubjectTypeView: View {
               .imageStyle(width: largeCardWidth, height: largeCardWidth * 1.2)
               .imageType(.subject)
               .imageCaption {
-                Text(item.subject.name)
-                  .multilineTextAlignment(.leading)
-                  .truncationMode(.middle)
-                  .lineLimit(2)
-                  .font(.body)
-                  .padding(8)
-              }
-              .imageBadge(show: item.count > 10) {
-                Text("\(item.count) 人关注")
-                  .font(.callout)
+                HStack {
+                  VStack(alignment: .leading) {
+                    if item.count > 10 {
+                      Text("\(item.count) 人关注")
+                        .font(.caption)
+                    }
+                    Text(item.subject.name)
+                      .multilineTextAlignment(.leading)
+                      .truncationMode(.middle)
+                      .lineLimit(2)
+                      .font(.body)
+                      .bold()
+                  }
+                  Spacer(minLength: 0)
+                }.padding(8)
               }
               .imageLink(item.subject.link)
               .subjectPreview(item.subject)
@@ -123,16 +128,21 @@ struct TrendingSubjectTypeView: View {
                 .imageStyle(width: smallCardWidth, height: smallCardWidth * 1.3)
                 .imageType(.subject)
                 .imageCaption {
-                  Text(item.subject.name)
-                    .multilineTextAlignment(.leading)
-                    .truncationMode(.middle)
-                    .lineLimit(2)
-                    .font(.footnote)
-                    .padding(4)
-                }
-                .imageBadge(show: item.count > 10) {
-                  Text("\(item.count) 人关注")
-                    .font(.footnote)
+                  HStack {
+                    VStack(alignment: .leading) {
+                      if item.count > 10 {
+                        Text("\(item.count) 人关注")
+                          .font(.caption)
+                      }
+                      Text(item.subject.name)
+                        .multilineTextAlignment(.leading)
+                        .truncationMode(.middle)
+                        .lineLimit(2)
+                        .font(.footnote)
+                        .bold()
+                    }
+                    Spacer(minLength: 0)
+                  }.padding(4)
                 }
                 .imageLink(item.subject.link)
                 .subjectPreview(item.subject)
