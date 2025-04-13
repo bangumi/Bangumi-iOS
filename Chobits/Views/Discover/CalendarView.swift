@@ -192,12 +192,19 @@ struct CalendarWeekdayView: View {
               .imageStyle(width: 110, height: 140)
               .imageType(.subject)
               .imageCaption {
-                Text(item.subject.name)
-                  .lineLimit(1)
-                  .padding(.horizontal, 2)
-              }
-              .imageBadge(show: item.watchers > 10) {
-                Text("\(item.watchers)人追番")
+                HStack {
+                  VStack(alignment: .leading) {
+                    if item.watchers > 10 {
+                      Text("\(item.watchers)人追番")
+                        .font(.caption)
+                    }
+                    Text(item.subject.name)
+                      .lineLimit(1)
+                      .font(.callout)
+                      .bold()
+                  }
+                  Spacer(minLength: 0)
+                }.padding(4)
               }
               .imageLink(item.subject.link)
               .subjectPreview(item.subject)
