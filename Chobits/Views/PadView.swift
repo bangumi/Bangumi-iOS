@@ -30,7 +30,7 @@ struct PadView: View {
         }.environment(
           \.openURL,
           OpenURLAction { url in
-            if handleChiiURL(url, nav: $timelineNav) {
+            if handleURL(url, nav: $timelineNav) {
               return .handled
             } else {
               return .systemAction
@@ -47,7 +47,7 @@ struct PadView: View {
           }.environment(
             \.openURL,
             OpenURLAction { url in
-              if handleChiiURL(url, nav: $progressNav) {
+              if handleURL(url, nav: $progressNav) {
                 return .handled
               } else {
                 return .systemAction
@@ -65,7 +65,7 @@ struct PadView: View {
           }.environment(
             \.openURL,
             OpenURLAction { url in
-              if handleChiiURL(url, nav: $rakuenNav) {
+              if handleURL(url, nav: $rakuenNav) {
                 return .handled
               } else {
                 return .systemAction
@@ -83,7 +83,7 @@ struct PadView: View {
         .environment(
           \.openURL,
           OpenURLAction { url in
-            if handleChiiURL(url, nav: $discoverNav) {
+            if handleURL(url, nav: $discoverNav) {
               return .handled
             } else {
               return .systemAction
