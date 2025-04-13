@@ -122,7 +122,9 @@ struct TimelineItemView: View {
               }
               if !collect.comment.isEmpty {
                 BorderView(color: .secondary.opacity(0.2), padding: 4, paddingRatio: 1) {
-                  Text(collect.comment).font(.callout)
+                  Text(collect.comment)
+                    .font(.callout)
+                    .fixedSize(horizontal: false, vertical: true)
                 }
               }
               SubjectSmallView(subject: collect.subject)
