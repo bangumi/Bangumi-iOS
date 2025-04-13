@@ -5,21 +5,17 @@ struct SubjectTinyView: View {
   let subject: SlimSubjectDTO
 
   var body: some View {
-    HStack {
-      ImageView(img: subject.images?.small)
-        .imageStyle(width: 32, height: 32)
-        .imageType(.subject)
-      VStack(alignment: .leading) {
-        Text(subject.title)
-          .lineLimit(1)
+    BorderView(color: .secondary.opacity(0.2), padding: 4, paddingRatio: 1, cornerRadius: 8) {
+      HStack {
+        ImageView(img: subject.images?.small)
+          .imageStyle(width: 32, height: 32)
+          .imageType(.subject)
+        VStack(alignment: .leading) {
+          Text(subject.title)
+            .lineLimit(1)
+        }
+        Spacer(minLength: 0)
       }
-      Spacer()
-    }
-    .padding(5)
-    .overlay {
-      RoundedRectangle(cornerRadius: 8)
-        .inset(by: 1)
-        .stroke(.secondary.opacity(0.2), lineWidth: 1)
     }
     .background(.secondary.opacity(0.01))
     .clipShape(RoundedRectangle(cornerRadius: 8))
@@ -52,28 +48,23 @@ struct SubjectSmallView: View {
   }
 
   var body: some View {
-
-    HStack {
-      ImageView(img: subject.images?.resize(.r200))
-        .imageStyle(width: 60, height: 72)
-        .imageType(.subject)
-        .imageNSFW(subject.nsfw)
-      VStack(alignment: .leading) {
-        Text(subject.title)
-        Text(subject.info ?? "")
-          .font(.footnote)
-          .foregroundStyle(.secondary)
-        ratingLine
-          .font(.footnote)
-          .foregroundStyle(.secondary)
-      }.lineLimit(1)
-      Spacer()
-    }
-    .padding(5)
-    .overlay {
-      RoundedRectangle(cornerRadius: 8)
-        .inset(by: 1)
-        .stroke(.secondary.opacity(0.2), lineWidth: 1)
+    BorderView(color: .secondary.opacity(0.2), padding: 4, paddingRatio: 1, cornerRadius: 8) {
+      HStack {
+        ImageView(img: subject.images?.resize(.r200))
+          .imageStyle(width: 60, height: 72)
+          .imageType(.subject)
+          .imageNSFW(subject.nsfw)
+        VStack(alignment: .leading) {
+          Text(subject.title)
+          Text(subject.info ?? "")
+            .font(.footnote)
+            .foregroundStyle(.secondary)
+          ratingLine
+            .font(.footnote)
+            .foregroundStyle(.secondary)
+        }.lineLimit(1)
+        Spacer(minLength: 0)
+      }
     }
     .background(.secondary.opacity(0.01))
     .clipShape(RoundedRectangle(cornerRadius: 8))
@@ -132,7 +123,7 @@ struct SubjectCardView: View {
             .foregroundStyle(.secondary)
             .lineLimit(1)
         }
-        Spacer()
+        Spacer(minLength: 0)
       }
     }
   }
