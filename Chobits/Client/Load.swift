@@ -30,8 +30,8 @@ extension Chii {
     for type in SubjectType.allTypes {
       let response = try await self.getTrendingSubjects(type: type)
       try await db.saveTrendingSubjects(type: type.rawValue, items: response.data)
+      try await db.commit()
     }
-    try await db.commit()
   }
 
   func loadSubject(_ sid: Int) async throws -> SubjectDTO {
