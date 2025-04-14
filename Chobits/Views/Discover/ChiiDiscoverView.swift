@@ -15,7 +15,7 @@ struct ChiiDiscoverView: View {
   }
 
   var body: some View {
-    Section {
+    VStack {
       if searching {
         SearchView(text: $searchQuery, searching: $searching)
       } else {
@@ -24,13 +24,17 @@ struct ChiiDiscoverView: View {
             CalendarSlimView()
             TrendingSubjectView()
           }.padding(.horizontal, 8)
-        }.refreshable {
+        }
+        .refreshable {
           await refresh()
         }
+        .navigationTitle("发现")
+        .toolbarTitleDisplayMode(.inline)
       }
     }
     .searchable(
       text: $searchQuery, isPresented: $searching,
-      placement: .navigationBarDrawer(displayMode: .always))
+      placement: .navigationBarDrawer(displayMode: .always)
+    )
   }
 }
