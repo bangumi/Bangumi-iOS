@@ -81,8 +81,8 @@ struct EpisodeGridView: View {
           .padding(.leading, 5)
           .padding(.trailing, 1)
           .overlay(
-            Rectangle()
-              .frame(width: 3)
+            RoundedRectangle(cornerRadius: 4)
+              .frame(width: 4)
               .foregroundStyle(.leadingBorder)
               .offset(x: -12, y: 0)
           )
@@ -97,8 +97,8 @@ struct EpisodeGridView: View {
     .padding(.leading, 10)
     .overlay(
       HStack {
-        Rectangle()
-          .frame(width: 5)
+        RoundedRectangle(cornerRadius: 4)
+          .frame(width: 4)
           .foregroundStyle(.leadingBorder)
           .offset(x: 0, y: 0)
         Spacer()
@@ -117,10 +117,10 @@ struct EpisodeTrend: ViewModifier {
   func body(content: Content) -> some View {
     if showEpisodeTrends {
       content
-        .padding(.bottom, 3)
+        .padding(.bottom, 4)
         .overlay(alignment: .bottomLeading) {
-          Rectangle()
-            .frame(height: 3)
+          RoundedRectangle(cornerRadius: 4)
+            .frame(height: 4)
             .foregroundStyle(episode.trendColor)
         }
     } else {

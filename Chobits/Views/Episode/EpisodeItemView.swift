@@ -10,10 +10,15 @@ struct EpisodeItemView: View {
       .foregroundStyle(episode.textColor)
       .padding(2)
       .background(episode.backgroundColor)
-      .border(episode.borderColor, width: 1)
+      .cornerRadius(2)
+      .strikethrough(episode.status == EpisodeCollectionType.dropped.rawValue)
+      .overlay {
+        RoundedRectangle(cornerRadius: 2)
+          .fill(.clear)
+          .stroke(episode.borderColor, lineWidth: 1)
+      }
       .episodeTrend(episode)
       .padding(2)
-      .strikethrough(episode.status == EpisodeCollectionType.dropped.rawValue)
       .contextMenu {
         EpisodeUpdateMenu().environment(episode)
       } preview: {
@@ -22,5 +27,25 @@ struct EpisodeItemView: View {
           .padding()
           .frame(idealWidth: 360)
       }
+  }
+}
+
+
+#Preview {
+  let container = mockContainer()
+
+  let subject = Subject.previewAnime
+  container.mainContext.insert(subject)
+
+  let episodes = Episode.previewAnime
+  for episode in episodes {
+    container.mainContext.insert(episode)
+  }
+
+  return ScrollView {
+    LazyVStack {
+      EpisodeItemView().environment(episodes.first!)
+        .modelContainer(container)
+    }.padding()
   }
 }

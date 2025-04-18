@@ -19,7 +19,6 @@ struct EpisodeRowView: View {
               .foregroundStyle(episode.textColor)
               .font(.footnote)
           }
-          .padding(2)
           .strikethrough(episode.status == EpisodeCollectionType.dropped.rawValue)
           .background {
             RoundedRectangle(cornerRadius: 5)
