@@ -1,6 +1,6 @@
 # Bangumi
 
-![Discord](https://img.shields.io/discord/nZPTwzXxAX)
+![Discord](https://img.shields.io/discord/1242773296521416735)
 
 一个基于 SwiftData & SwiftUI 的 Bangumi iOS 客户端。
 
