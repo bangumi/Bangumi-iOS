@@ -2908,7 +2908,7 @@ info:
     关于订阅通知的 socket.io 相关的文档在
     <https://github.com/bangumi/GraphQL/blob/master/docs/socket.io.md>
   title: bangumi private api
-  version: v0.21.0
+  version: v0.22.6
 openapi: 3.0.3
 paths:
   /p1/blocklist:
