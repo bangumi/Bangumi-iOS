@@ -138,20 +138,13 @@ struct SettingsView: View {
           Text(Chii.shared.version).foregroundStyle(.secondary)
         }
         Link(destination: URL(string: "https://www.everpcpc.com/privacy-policy/chobits/")!) {
-          HStack {
-            Text("隐私声明")
-            Spacer()
-            Image(systemName: "lock.shield")
-            Image(systemName: "chevron.right")
-          }
+          Text("隐私政策")
         }
         Link(destination: URL(string: "https://discord.gg/nZPTwzXxAX")!) {
-          HStack {
-            Text("问题反馈(Discord)")
-            Spacer()
-            Image(systemName: "questionmark.bubble")
-            Image(systemName: "chevron.right")
-          }
+          Text("问题反馈(Discord)")
+        }
+        Link(destination: URL(string: "https://github.com/bangumi/Chobits-iOS")!) {
+          Text("查看源码(GitHub)")
         }
       }
 
