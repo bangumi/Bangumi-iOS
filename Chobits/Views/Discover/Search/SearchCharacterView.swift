@@ -11,7 +11,7 @@ struct SearchCharacterView: View {
         throw ChiiError.uninitialized
       }
       let resp = try await Chii.shared.searchCharacters(
-        keyword: text, limit: limit, offset: offset)
+        keyword: text.gb, limit: limit, offset: offset)
       for item in resp.data {
         try await db.saveCharacter(item)
       }
@@ -61,7 +61,7 @@ struct SearchCharacterLocalView: View {
   @Query private var characters: [Character]
 
   init(text: String) {
-    self.text = text
+    self.text = text.gb
 
     var desc = FetchDescriptor<Character>(
       predicate: #Predicate<Character> {

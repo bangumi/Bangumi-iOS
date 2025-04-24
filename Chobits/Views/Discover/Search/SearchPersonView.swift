@@ -11,7 +11,7 @@ struct SearchPersonView: View {
         throw ChiiError.uninitialized
       }
       let resp = try await Chii.shared.searchPersons(
-        keyword: text, limit: limit, offset: offset)
+        keyword: text.gb, limit: limit, offset: offset)
       for item in resp.data {
         try await db.savePerson(item)
       }
@@ -61,7 +61,7 @@ struct SearchPersonLocalView: View {
   @Query private var persons: [Person]
 
   init(text: String) {
-    self.text = text
+    self.text = text.gb
 
     var desc = FetchDescriptor<Person>(
       predicate: #Predicate<Person> {

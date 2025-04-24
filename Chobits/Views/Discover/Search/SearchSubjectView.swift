@@ -12,7 +12,7 @@ struct SearchSubjectView: View {
         throw ChiiError.uninitialized
       }
       let resp = try await Chii.shared.searchSubjects(
-        keyword: text, type: subjectType, limit: limit, offset: offset)
+        keyword: text.gb, type: subjectType, limit: limit, offset: offset)
       for item in resp.data {
         try await db.saveSubject(item)
       }
@@ -38,7 +38,7 @@ struct SearchSubjectLocalView: View {
   @Query private var subjects: [Subject]
 
   init(text: String, subjectType: SubjectType) {
-    self.text = text
+    self.text = text.gb
     self.subjectType = subjectType
 
     let stype = subjectType.rawValue
