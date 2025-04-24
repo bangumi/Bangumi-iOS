@@ -5,10 +5,9 @@ import SwiftUI
 struct TimelineListView: View {
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
   @AppStorage("profile") var profile: Profile = Profile()
+  @AppStorage("timelineViewMode") var timelineViewMode: TimelineViewMode = .friends
 
   @State private var showInput = false
-
-  @State private var mode: TimelineMode = .friends
 
   @State private var exhausted: Bool = false
   @State private var loading: Bool = false
@@ -18,7 +17,16 @@ struct TimelineListView: View {
 
   func reload() async {
     do {
-      let data = try await Chii.shared.getTimeline(mode: mode, limit: 20, until: nil)
+      var data: [TimelineDTO] = []
+      switch timelineViewMode {
+      case .all:
+        data = try await Chii.shared.getTimeline(mode: .all, limit: 20, until: nil)
+      case .friends:
+        data = try await Chii.shared.getTimeline(mode: .friends, limit: 20, until: nil)
+      case .me:
+        data = try await Chii.shared.getUserTimeline(
+          username: profile.username, limit: 20, until: nil)
+      }
       if data.count == 0 {
         Notifier.shared.notify(message: "没有新动态")
         return
@@ -47,7 +55,16 @@ struct TimelineListView: View {
     }
     loading = true
     do {
-      let data = try await Chii.shared.getTimeline(mode: mode, limit: 20, until: lastID)
+      var data: [TimelineDTO] = []
+      switch timelineViewMode {
+      case .all:
+        data = try await Chii.shared.getTimeline(mode: .all, limit: 20, until: lastID)
+      case .friends:
+        data = try await Chii.shared.getTimeline(mode: .friends, limit: 20, until: lastID)
+      case .me:
+        data = try await Chii.shared.getUserTimeline(
+          username: profile.username, limit: 20, until: lastID)
+      }
       if data.count == 0 {
         exhausted = true
       }
@@ -72,13 +89,13 @@ struct TimelineListView: View {
             if loading, items.count > 0 {
               ProgressView()
             }
-            Picker("", selection: $mode) {
-              ForEach(TimelineMode.allCases, id: \.self) { mode in
+            Picker("", selection: $timelineViewMode) {
+              ForEach(TimelineViewMode.allCases, id: \.self) { mode in
                 Text(mode.desc).tag(mode)
               }
             }
             .disabled(loading)
-            .onChange(of: mode) {
+            .onChange(of: timelineViewMode) {
               Task {
                 loading = true
                 await reload()

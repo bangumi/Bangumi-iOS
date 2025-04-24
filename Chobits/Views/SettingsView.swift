@@ -7,7 +7,8 @@ struct SettingsView: View {
   @AppStorage("shareDomain") var shareDomain: ShareDomain = .chii
   @AppStorage("authDomain") var authDomain: AuthDomain = .next
   @AppStorage("defaultTab") var defaultTab: ChiiViewTab = .timeline
-  @AppStorage("progressMode") var progressMode: ProgressMode = .tile
+  @AppStorage("timelineViewMode") var timelineViewMode: TimelineViewMode = .friends
+  @AppStorage("progressViewMode") var progressViewMode: ProgressViewMode = .tile
   @AppStorage("progressLimit") var progressLimit: Int = 50
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
   @AppStorage("isolationMode") var isolationMode: Bool = false
@@ -88,8 +89,13 @@ struct SettingsView: View {
             Text(tab.title).tag(tab)
           }
         }
-        Picker(selection: $progressMode, label: Text("进度管理模式")) {
-          ForEach(ProgressMode.allCases, id: \.self) { mode in
+        Picker(selection: $timelineViewMode, label: Text("默认时间线")) {
+          ForEach(TimelineViewMode.allCases, id: \.self) { mode in
+            Text(mode.desc).tag(mode)
+          }
+        }
+        Picker(selection: $progressViewMode, label: Text("进度管理模式")) {
+          ForEach(ProgressViewMode.allCases, id: \.self) { mode in
             Text(mode.desc).tag(mode)
           }
         }

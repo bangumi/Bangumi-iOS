@@ -5,7 +5,7 @@ import SwiftUI
 struct ChiiProgressView: View {
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
   @AppStorage("collectionsUpdatedAt") var collectionsUpdatedAt: Int = 0
-  @AppStorage("progressMode") var progressMode: ProgressMode = .tile
+  @AppStorage("progressViewMode") var progressViewMode: ProgressViewMode = .tile
 
   @Environment(\.modelContext) var modelContext
 
@@ -144,7 +144,7 @@ struct ChiiProgressView: View {
             }
           }
           if collectionsUpdatedAt > 0 {
-            switch progressMode {
+            switch progressViewMode {
             case .list:
               ProgressListView(subjectType: subjectType, search: search)
             case .tile:

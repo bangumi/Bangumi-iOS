@@ -81,7 +81,37 @@ enum AuthDomain: String, CaseIterable {
   }
 }
 
-enum ProgressMode: String, CaseIterable {
+enum TimelineViewMode: String, CaseIterable {
+  case all = "all"
+  case friends = "friends"
+  case me = "me"
+
+  init(_ label: String? = nil) {
+    switch label {
+    case "all":
+      self = .all
+    case "friends":
+      self = .friends
+    case "me":
+      self = .me
+    default:
+      self = .friends
+    }
+  }
+
+  var desc: String {
+    switch self {
+    case .all:
+      "全站"
+    case .friends:
+      "好友"
+    case .me:
+      "自己"
+    }
+  }
+}
+
+enum ProgressViewMode: String, CaseIterable {
   case list = "list"
   case tile = "tile"
 
