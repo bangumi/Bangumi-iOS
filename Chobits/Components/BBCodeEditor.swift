@@ -295,6 +295,29 @@ struct BBCodeEditor: View {
       } else {
         ScrollView(.horizontal, showsIndicators: false) {
           HStack(spacing: 8) {
+            Button(action: { showingEmojiInput = true }) {
+              Image(systemName: BBCodeType.emoji.icon)
+                .frame(width: 12, height: 12)
+            }
+            .popover(isPresented: $showingEmojiInput) {
+              ScrollView {
+                LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 8)) {
+                  ForEach(24..<126) { index in
+                    Button {
+                      handleEmojiInput(index)
+                    } label: {
+                      Image("bgm\(index)")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 24, height: 24)
+                    }
+                  }
+                }
+              }
+              .padding()
+              .presentationCompactAdaptation(.popover)
+            }
+            Divider()
             ForEach(BBCodeType.basic) { code in
               Button(action: { handleBasicInput(code) }) {
                 Image(systemName: code.icon)
@@ -332,29 +355,6 @@ struct BBCodeEditor: View {
                 Image(systemName: code.icon)
                   .frame(width: 12, height: 12)
               }
-            }
-            Divider()
-            Button(action: { showingEmojiInput = true }) {
-              Image(systemName: BBCodeType.emoji.icon)
-                .frame(width: 12, height: 12)
-            }
-            .popover(isPresented: $showingEmojiInput) {
-              ScrollView {
-                LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 8)) {
-                  ForEach(24..<126) { index in
-                    Button {
-                      handleEmojiInput(index)
-                    } label: {
-                      Image("bgm\(index)")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 24, height: 24)
-                    }
-                  }
-                }
-              }
-              .padding()
-              .presentationCompactAdaptation(.popover)
             }
             Divider()
           }.padding(.horizontal, 2)
