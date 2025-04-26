@@ -83,7 +83,7 @@ struct TimelineView: View {
     }
     .sheet(isPresented: $showCommentBox) {
       CreateCommentBoxView(type: .timeline(item.id))
-        .presentationDetents([.large])
+        .presentationDetents([.medium, .large])
     }
   }
 }

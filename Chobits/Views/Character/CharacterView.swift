@@ -94,7 +94,7 @@ struct CharacterView: View {
         }
         .sheet(isPresented: $showCommentBox) {
           CreateCommentBoxView(type: .character(characterId))
-            .presentationDetents([.large])
+            .presentationDetents([.medium, .large])
         }
       } else if refreshed {
         NotFoundView()

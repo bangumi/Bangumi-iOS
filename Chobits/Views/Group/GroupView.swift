@@ -153,7 +153,7 @@ struct GroupDetailView: View {
     .navigationBarTitleDisplayMode(.inline)
     .sheet(isPresented: $showCreateTopic) {
       CreateTopicBoxView(type: .group(group.name))
-        .presentationDetents([.large])
+        .presentationDetents([.medium, .large])
     }
     .toolbar {
       ToolbarItem(placement: .topBarTrailing) {
@@ -289,7 +289,7 @@ struct GroupRecentTopicView: View {
       }
       .sheet(isPresented: $showCreateTopic) {
         CreateTopicBoxView(type: .group(group.name))
-          .presentationDetents([.large])
+          .presentationDetents([.medium, .large])
       }
       VStack {
         ForEach(group.recentTopics) { topic in

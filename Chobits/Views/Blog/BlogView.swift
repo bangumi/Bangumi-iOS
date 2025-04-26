@@ -106,7 +106,7 @@ struct BlogView: View {
         }
         .sheet(isPresented: $showCommentBox) {
           CreateCommentBoxView(type: .blog(blogId))
-            .presentationDetents([.large])
+            .presentationDetents([.medium, .large])
         }
       } else if refreshed {
         NotFoundView()

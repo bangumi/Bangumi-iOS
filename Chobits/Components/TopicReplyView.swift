@@ -199,11 +199,11 @@ struct ReplyItemNormalView: View {
       }
       .sheet(isPresented: $showReplyBox) {
         CreateReplyBoxView(type: type, topicId: topicId, reply: idx == 0 ? nil : reply)
-          .presentationDetents([.large])
+          .presentationDetents([.medium, .large])
       }
       .sheet(isPresented: $showEditBox) {
         EditReplyBoxView(type: type, topicId: topicId, reply: reply)
-          .presentationDetents([.large])
+          .presentationDetents([.medium, .large])
       }
       .alert("确认删除", isPresented: $showDeleteConfirm) {
         Button("取消", role: .cancel) {}
@@ -342,11 +342,11 @@ struct SubReplyNormalView: View {
     }
     .sheet(isPresented: $showReplyBox) {
       CreateReplyBoxView(type: type, topicId: topicId, reply: reply, subreply: subreply)
-        .presentationDetents([.large])
+        .presentationDetents([.medium, .large])
     }
     .sheet(isPresented: $showEditBox) {
       EditReplyBoxView(type: type, topicId: topicId, reply: reply, subreply: subreply)
-        .presentationDetents([.large])
+        .presentationDetents([.medium, .large])
     }
     .alert("确认删除", isPresented: $showDeleteConfirm) {
       Button("取消", role: .cancel) {}

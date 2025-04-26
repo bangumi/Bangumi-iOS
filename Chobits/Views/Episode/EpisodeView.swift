@@ -104,7 +104,7 @@ struct EpisodeView: View {
     }
     .sheet(isPresented: $showCommentBox) {
       CreateCommentBoxView(type: .episode(episodeId))
-        .presentationDetents([.large])
+        .presentationDetents([.medium, .large])
     }
   }
 }

@@ -94,7 +94,7 @@ struct PersonView: View {
         }
         .sheet(isPresented: $showCommentBox) {
           CreateCommentBoxView(type: .person(personId))
-            .presentationDetents([.large])
+            .presentationDetents([.medium, .large])
         }
       } else if refreshed {
         NotFoundView()

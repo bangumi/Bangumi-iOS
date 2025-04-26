@@ -187,11 +187,11 @@ struct CommentItemNormalView: View {
     }
     .sheet(isPresented: $showReplyBox) {
       CreateCommentBoxView(type: type, comment: comment)
-        .presentationDetents([.large])
+        .presentationDetents([.medium, .large])
     }
     .sheet(isPresented: $showEditBox) {
       EditCommentBoxView(type: type, comment: comment)
-        .presentationDetents([.large])
+        .presentationDetents([.medium, .large])
     }
     .alert("确认删除", isPresented: $showDeleteConfirm) {
       Button("取消", role: .cancel) {}
@@ -311,11 +311,11 @@ struct CommentSubReplyNormalView: View {
     }
     .sheet(isPresented: $showReplyBox) {
       CreateCommentBoxView(type: type, comment: comment, reply: reply)
-        .presentationDetents([.large])
+        .presentationDetents([.medium, .large])
     }
     .sheet(isPresented: $showEditBox) {
       EditCommentBoxView(type: type, comment: comment, reply: reply)
-        .presentationDetents([.large])
+        .presentationDetents([.medium, .large])
     }
     .alert("确认删除", isPresented: $showDeleteConfirm) {
       Button("取消", role: .cancel) {}

@@ -113,7 +113,7 @@ struct SubjectDetailView: View {
     }
     .sheet(isPresented: $showCreateTopic) {
       CreateTopicBoxView(type: .subject(subject.subjectId))
-        .presentationDetents([.large])
+        .presentationDetents([.medium, .large])
     }
     .navigationTitle(subject.name)
     .navigationBarTitleDisplayMode(.inline)

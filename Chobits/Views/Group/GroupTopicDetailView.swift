@@ -78,13 +78,13 @@ struct GroupTopicDetailView: View {
         }
         .sheet(isPresented: $showReplyBox) {
           CreateReplyBoxView(type: .group(topic.group.name), topicId: topicId)
-            .presentationDetents([.large])
+            .presentationDetents([.medium, .large])
         }
         .sheet(isPresented: $showEditBox) {
           EditTopicBoxView(
             type: .group(topic.group.name), topicId: topicId,
             title: topic.title, post: topic.replies.first
-          ).presentationDetents([.large])
+          ).presentationDetents([.medium, .large])
         }
       } else if refreshed {
         NotFoundView()
