@@ -346,6 +346,7 @@ struct CreateCommentBoxView: View {
 
   @State private var content: String = ""
   @State private var token: String = ""
+  @State private var showTurnstile: Bool = false
   @State private var updating: Bool = false
 
   var title: String {
@@ -399,18 +400,24 @@ struct CreateCommentBoxView: View {
           .buttonStyle(.bordered)
           Spacer()
           Button {
-            Task {
-              await postReply(content: content)
-            }
+            showTurnstile = true
           } label: {
             Label("发送", systemImage: "paperplane")
           }
-          .disabled(content.isEmpty || token.isEmpty || updating)
+          .disabled(content.isEmpty || updating)
           .buttonStyle(.borderedProminent)
         }
         TextInputView(type: "回复", text: $content)
           .textInputStyle(bbcode: true)
-        TrunstileView(token: $token).frame(height: 65)
+          .sheet(isPresented: $showTurnstile) {
+            TurnstileSheetView(
+              token: $token,
+              onSuccess: {
+                Task {
+                  await postReply(content: content)
+                }
+              })
+          }
       }.padding()
     }
   }

@@ -6,6 +6,7 @@ struct TimelineSayView: View {
 
   @State private var content: String = ""
   @State private var token: String = ""
+  @State private var showTurnstile: Bool = false
   @State private var updating: Bool = false
 
   func postTimeline() async {
@@ -18,19 +19,6 @@ struct TimelineSayView: View {
     } catch {
       Notifier.shared.alert(error: error)
     }
-  }
-
-  var submitDisabled: Bool {
-    if content.isEmpty {
-      return true
-    }
-    if token.isEmpty {
-      return true
-    }
-    if content.count > 380 {
-      return true
-    }
-    return updating
   }
 
   var body: some View {
@@ -49,18 +37,24 @@ struct TimelineSayView: View {
             .font(.headline)
           Spacer()
           Button {
-            Task {
-              await postTimeline()
-            }
+            showTurnstile = true
           } label: {
             Label("发送", systemImage: "paperplane")
           }
-          .disabled(submitDisabled)
+          .disabled(content.isEmpty || updating || content.count > 380)
           .buttonStyle(.borderedProminent)
         }
         TextInputView(type: "吐槽", text: $content)
           .textInputStyle(wordLimit: 380)
-        TrunstileView(token: $token).frame(height: 65)
+          .sheet(isPresented: $showTurnstile) {
+            TurnstileSheetView(
+              token: $token,
+              onSuccess: {
+                Task {
+                  await postTimeline()
+                }
+              })
+          }
       }.padding()
     }
   }

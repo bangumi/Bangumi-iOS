@@ -378,6 +378,7 @@ struct CreateReplyBoxView: View {
 
   @State private var content: String = ""
   @State private var token: String = ""
+  @State private var showTurnstile: Bool = false
   @State private var updating: Bool = false
 
   var title: String {
@@ -432,18 +433,24 @@ struct CreateReplyBoxView: View {
           .buttonStyle(.bordered)
           Spacer()
           Button {
-            Task {
-              await postReply(content: content)
-            }
+            showTurnstile = true
           } label: {
             Label("发送", systemImage: "paperplane")
           }
-          .disabled(content.isEmpty || token.isEmpty || updating)
+          .disabled(content.isEmpty || updating)
           .buttonStyle(.borderedProminent)
         }
         TextInputView(type: "回复", text: $content)
           .textInputStyle(bbcode: true)
-        TrunstileView(token: $token).frame(height: 65)
+          .sheet(isPresented: $showTurnstile) {
+            TurnstileSheetView(
+              token: $token,
+              onSuccess: {
+                Task {
+                  await postReply(content: content)
+                }
+              })
+          }
       }.padding()
     }
   }
@@ -539,6 +546,7 @@ struct CreateTopicBoxView: View {
   @State private var title: String = ""
   @State private var content: String = ""
   @State private var token: String = ""
+  @State private var showTurnstile: Bool = false
   @State private var updating: Bool = false
 
   func createTopic(title: String, content: String, token: String) async {
@@ -560,10 +568,6 @@ struct CreateTopicBoxView: View {
     }
   }
 
-  var submitDisabled: Bool {
-    return title.isEmpty || content.isEmpty || token.isEmpty || updating
-  }
-
   var body: some View {
     ScrollView {
       VStack {
@@ -580,13 +584,11 @@ struct CreateTopicBoxView: View {
           .buttonStyle(.bordered)
           Spacer()
           Button {
-            Task {
-              await createTopic(title: title, content: content, token: token)
-            }
+            showTurnstile = true
           } label: {
             Label("发送", systemImage: "paperplane")
           }
-          .disabled(submitDisabled)
+          .disabled(title.isEmpty || content.isEmpty || updating)
           .buttonStyle(.borderedProminent)
         }
         VStack {
@@ -597,7 +599,15 @@ struct CreateTopicBoxView: View {
           }
           TextInputView(type: "讨论", text: $content)
             .textInputStyle(bbcode: true)
-          TrunstileView(token: $token).frame(height: 65)
+            .sheet(isPresented: $showTurnstile) {
+              TurnstileSheetView(
+                token: $token,
+                onSuccess: {
+                  Task {
+                    await createTopic(title: title, content: content, token: token)
+                  }
+                })
+            }
         }
       }.padding()
     }

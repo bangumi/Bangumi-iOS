@@ -81,3 +81,28 @@ struct TrunstileView: UIViewRepresentable {
     }
   }
 }
+
+struct TurnstileSheetView: View {
+  @Binding var token: String
+  let onSuccess: () -> Void
+
+  @Environment(\.dismiss) private var dismiss
+
+  var body: some View {
+    ScrollView {
+      VStack {
+        Text("请完成验证")
+          .font(.headline)
+        TrunstileView(token: $token)
+          .frame(width: 300, height: 65)
+      }
+      .padding()
+      .onChange(of: token) {
+        if !token.isEmpty {
+          dismiss()
+          onSuccess()
+        }
+      }
+    }.presentationDetents([.medium])
+  }
+}
