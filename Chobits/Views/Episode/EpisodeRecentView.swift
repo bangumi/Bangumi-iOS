@@ -21,6 +21,14 @@ struct EpisodeRecentView: View {
     episodes.first { $0.status == EpisodeCollectionType.none.rawValue }
   }
 
+  var progressText: String {
+    return "\(subject.interest?.epStatus ?? 0) / \(subject.eps)"
+  }
+
+  var progressIcon: String {
+    return "square.grid.2x2.fill"
+  }
+
   var recentEpisodes: [Episode] {
     let idx = episodes.firstIndex { $0.status == EpisodeCollectionType.none.rawValue }
     if let idx = idx {
@@ -75,12 +83,9 @@ struct EpisodeRecentView: View {
               .environment(episode)
           } else {
             NavigationLink(value: NavDestination.subject(subjectId)) {
-              Label(
-                "\(subject.interest?.epStatus ?? 0) / \(subject.eps)",
-                systemImage: "square.grid.2x2.fill"
-              )
-              .labelStyle(.compact)
-              .foregroundStyle(.secondary)
+              Label(progressText, systemImage: progressIcon)
+                .labelStyle(.compact)
+                .foregroundStyle(.secondary)
             }.buttonStyle(.scale)
           }
         }
@@ -100,20 +105,15 @@ struct EpisodeRecentView: View {
               .environment(episode)
           } else {
             NavigationLink(value: NavDestination.subject(subjectId)) {
-              Label(
-                "\(subject.interest?.epStatus ?? 0) / \(subject.eps)",
-                systemImage: "square.grid.2x2.fill"
-              )
-              .labelStyle(.compact)
-              .foregroundStyle(.secondary)
+              Label(progressText, systemImage: progressIcon)
+                .labelStyle(.compact)
+                .foregroundStyle(.secondary)
             }.buttonStyle(.scale)
           }
         } else {
           NavigationLink(value: NavDestination.subject(subjectId)) {
-            Label(
-              "\(subject.interest?.epStatus ?? 0) / \(subject.eps)",
-              systemImage: "square.grid.2x2.fill"
-            ).foregroundStyle(.secondary)
+            Label(progressText, systemImage: progressIcon)
+              .foregroundStyle(.secondary)
           }.buttonStyle(.scale)
         }
       }
@@ -125,6 +125,10 @@ struct EpisodeNextView: View {
   @Environment(Episode.self) var episode
 
   @State private var updating: Bool = false
+
+  var buttonText: String {
+    return "EP.\(episode.sort.episodeDisplay) 看过"
+  }
 
   func updateSingle(episode: Episode, type: EpisodeCollectionType) {
     if updating { return }
@@ -148,7 +152,7 @@ struct EpisodeNextView: View {
     } else {
       if updating {
         ZStack {
-          Button("看过", action: {})
+          Button(buttonText, action: {})
             .disabled(true)
             .hidden()
           ProgressView()
@@ -157,8 +161,8 @@ struct EpisodeNextView: View {
         Button {
           updateSingle(episode: episode, type: .collect)
         } label: {
-          Label(
-            "EP.\(episode.sort.episodeDisplay) 看过", systemImage: "checkmark.circle")
+          Label(buttonText, systemImage: "checkmark.circle")
+            .labelStyle(.compact)
         }
       }
     }
