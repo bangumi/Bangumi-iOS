@@ -389,8 +389,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/everpcpc/bangumi-bbcode-swift";
 			requirement = {
-				branch = main;
-				kind = branch;
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.3.0;
 			};
 		};
 		19BD24242BE9C53800595973 /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
