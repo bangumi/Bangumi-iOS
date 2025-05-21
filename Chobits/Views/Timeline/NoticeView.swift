@@ -8,11 +8,15 @@ struct NoticeView: View {
   @State private var notices: [NoticeDTO] = []
   @State private var unreadCount: Int = 0
 
-  func getNotice() async {
+  func loadNotice() async throws {
+    let resp = try await Chii.shared.listNotice(limit: 20)
+    notices = resp.data
+    unreadCount = notices.count(where: { $0.unread })
+  }
+
+  func refreshNotice() async {
     do {
-      let resp = try await Chii.shared.listNotice(limit: 20)
-      notices = resp.data
-      unreadCount = notices.count(where: { $0.unread })
+      try await loadNotice()
     } catch {
       Notifier.shared.alert(error: error)
     }
@@ -26,6 +30,7 @@ struct NoticeView: View {
     Task {
       do {
         try await Chii.shared.clearNotice(ids: ids)
+        try await loadNotice()
       } catch {
         Notifier.shared.alert(error: error)
       }
@@ -71,14 +76,14 @@ struct NoticeView: View {
           .animation(.default, value: notices)
           .refreshable {
             UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-            await getNotice()
+            await refreshNotice()
           }
         }
       }
       .navigationTitle(unreadCount > 0 ? "电波提醒 (\(unreadCount))" : "电波提醒")
       .navigationBarTitleDisplayMode(.inline)
       .task {
-        await getNotice()
+        await refreshNotice()
       }
     } else {
       AuthView(slogan: "请登录 Bangumi 以查看通知")
