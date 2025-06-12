@@ -18,7 +18,9 @@ struct EpisodeInfoView: View {
   var body: some View {
     VStack(alignment: .leading, spacing: 5) {
       HStack(alignment: .bottom) {
-        Text(episode.title).font(.title3).lineLimit(1)
+        Text(episode.title)
+          .font(.title3)
+          .lineLimit(1)
         BorderView {
           Text(episode.typeEnum.description)
             .font(.footnote)
@@ -53,6 +55,7 @@ struct EpisodeInfoView: View {
           Text("(+\(episode.comment))")
             .font(.footnote)
             .foregroundStyle(.red)
+            .monospacedDigit()
             .fixedSize()
         }
         Spacer()
@@ -62,7 +65,7 @@ struct EpisodeInfoView: View {
           )
           .font(.footnote)
           .foregroundStyle(.secondary)
-          .fixedSize()
+          .lineLimit(1)
         }
       }
     }
