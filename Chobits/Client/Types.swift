@@ -597,6 +597,11 @@ struct SubjectRelationType: Codable, Identifiable, Hashable {
   var desc: String
 }
 
+struct EpisodeCollectionStatus: Codable, Hashable {
+  var status: Int
+  var updatedAt: Int?
+}
+
 struct EpisodeDTO: Codable, Identifiable, Hashable, Linkable {
   var id: Int
   var subjectID: Int
@@ -609,7 +614,7 @@ struct EpisodeDTO: Codable, Identifiable, Hashable, Linkable {
   var comment: Int
   var disc: Int
   var desc: String?
-  var status: Int?
+  var collection: EpisodeCollectionStatus?
   var subject: SlimSubjectDTO?
 
   var title: String {

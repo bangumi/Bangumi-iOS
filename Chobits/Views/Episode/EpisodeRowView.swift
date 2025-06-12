@@ -56,6 +56,11 @@ struct EpisodeRowView: View {
             Label("\(episode.duration)", systemImage: "clock")
             Label("\(episode.airdate)", systemImage: "calendar")
             Spacer()
+            if isAuthenticated && episode.collectionTypeEnum != .none, episode.updatedAt > 0 {
+              Text(
+                "\(episode.collectionTypeEnum.description): \(episode.updatedAt.datetimeDisplay)"
+              )
+            }
             if !isolationMode {
               Label("+\(episode.comment)", systemImage: "bubble")
             }

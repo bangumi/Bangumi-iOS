@@ -22,6 +22,7 @@ final class EpisodeV2: Linkable {
   var disc: Int
 
   var status: Int = 0
+  var updatedAt: Int = 0
 
   var subject: Subject?
 
@@ -45,7 +46,10 @@ final class EpisodeV2: Linkable {
     self.comment = item.comment
     self.desc = item.desc ?? ""
     self.disc = item.disc
-    self.status = item.status ?? 0
+    if let collection = item.collection {
+      self.status = collection.status
+      self.updatedAt = collection.updatedAt ?? 0
+    }
   }
 
   var title: AttributedString {
@@ -166,6 +170,11 @@ final class EpisodeV2: Linkable {
     if self.comment != item.comment { self.comment = item.comment }
     if let desc = item.desc, !desc.isEmpty && self.desc != desc { self.desc = desc }
     if self.disc != item.disc { self.disc = item.disc }
-    if let status = item.status, self.status != status { self.status = status }
+    if let collection = item.collection {
+      if self.status != collection.status { self.status = collection.status }
+      if let updatedAt = collection.updatedAt, self.updatedAt != updatedAt {
+        self.updatedAt = updatedAt
+      }
+    }
   }
 }

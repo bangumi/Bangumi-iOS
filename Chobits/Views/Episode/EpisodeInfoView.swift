@@ -2,6 +2,7 @@ import SwiftData
 import SwiftUI
 
 struct EpisodeInfoView: View {
+  @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
   @AppStorage("isolationMode") var isolationMode: Bool = false
 
   @Environment(Episode.self) var episode
@@ -25,16 +26,6 @@ struct EpisodeInfoView: View {
             .fixedSize()
         }
         Spacer()
-        if episode.comment > 0 && !isolationMode {
-          Label("讨论", systemImage: "bubble.fill")
-            .font(.caption)
-            .foregroundStyle(.secondary)
-            .fixedSize()
-          Text("(+\(episode.comment))")
-            .font(.caption)
-            .foregroundStyle(.red)
-            .fixedSize()
-        }
       }
       Divider()
       if !episode.name.isEmpty {
@@ -51,6 +42,28 @@ struct EpisodeInfoView: View {
       }
       if episode.disc > 0 {
         Text(field(name: "Disc", value: "\(episode.disc)"))
+      }
+      Divider()
+      HStack {
+        if episode.comment > 0 && !isolationMode {
+          Label("讨论", systemImage: "bubble.fill")
+            .font(.footnote)
+            .foregroundStyle(.secondary)
+            .fixedSize()
+          Text("(+\(episode.comment))")
+            .font(.footnote)
+            .foregroundStyle(.red)
+            .fixedSize()
+        }
+        Spacer()
+        if isAuthenticated && episode.collectionTypeEnum != .none && episode.updatedAt > 0 {
+          Text(
+            "\(episode.collectionTypeEnum.description): \(episode.updatedAt.datetimeDisplay)"
+          )
+          .font(.footnote)
+          .foregroundStyle(.secondary)
+          .fixedSize()
+        }
       }
     }
   }
