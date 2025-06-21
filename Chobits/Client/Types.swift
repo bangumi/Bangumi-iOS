@@ -565,7 +565,6 @@ struct PersonWorkDTO: Codable, Identifiable, Hashable {
 struct SubjectStaffPositionDTO: Codable, Identifiable, Hashable {
   var type: SubjectStaffPositionType
   var summary: String
-  var appearEps: String
 
   var id: Int {
     type.id
@@ -575,7 +574,6 @@ struct SubjectStaffPositionDTO: Codable, Identifiable, Hashable {
 struct SubjectPositionStaffDTO: Codable, Identifiable, Hashable {
   var person: SlimPersonDTO
   var summary: String
-  var appearEps: String
 
   var id: Int {
     person.id
