@@ -722,11 +722,17 @@ enum CharacterType: Int, Codable, Identifiable, CaseIterable {
 /// 1 为 主角
 /// 2 为 配角
 /// 3 为 客串
+/// 4 为 闲角
+/// 5 为 旁白
+/// 6 为 声库
 enum CastType: Int, Codable, Identifiable, CaseIterable {
   case none = 0
   case main = 1
   case secondary = 2
   case cameo = 3
+  case extra = 4
+  case narrator = 5
+  case voice = 6
 
   var id: Self {
     self
@@ -751,6 +757,12 @@ enum CastType: Int, Codable, Identifiable, CaseIterable {
       return "配角"
     case .cameo:
       return "客串"
+    case .extra:
+      return "闲角"
+    case .narrator:
+      return "旁白"
+    case .voice:
+      return "声库"
     }
   }
 }
