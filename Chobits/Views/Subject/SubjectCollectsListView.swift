@@ -13,7 +13,7 @@ struct SubjectCollectsListView: View {
 
   init(subjectId: Int) {
     self.subjectId = subjectId
-    self._selectedType = State(initialValue: .collect)
+    self._selectedType = State(initialValue: .none)
     _subjects = Query(
       filter: #Predicate<Subject> {
         $0.subjectId == subjectId
@@ -25,7 +25,7 @@ struct SubjectCollectsListView: View {
     case .all:
       return "收藏用户"
     case .friends:
-      return "好友收藏"
+      return "收藏好友"
     }
   }
 
@@ -53,7 +53,7 @@ struct SubjectCollectsListView: View {
     VStack {
       VStack {
         Picker("Type", selection: $selectedType) {
-          ForEach(CollectionType.allTypes(), id: \.self) { ct in
+          ForEach(CollectionType.allCases, id: \.self) { ct in
             Text(ct.description(subjectType))
               .tag(ct)
           }

@@ -139,7 +139,7 @@ enum UserGroup: Int, Codable {
   var description: String {
     switch self {
     case .none:
-      return "未知"
+      return "未知用户组"
     case .admin:
       return "管理员"
     case .bangumiManager:
@@ -395,7 +395,7 @@ enum CollectionType: Int, Codable, Identifiable, CaseIterable {
     }
     switch self {
     case .none:
-      return "未知"
+      return "全部"
     case .wish:
       return "想" + action
     case .collect:
@@ -542,7 +542,7 @@ enum PersonCareer: String, Codable, CaseIterable {
   var description: String {
     switch self {
     case .none:
-      return "未知"
+      return "全部"
     case .producer:
       return "制作人员"
     case .mangaka:
@@ -608,7 +608,7 @@ enum PersonType: Int, Codable, Identifiable, CaseIterable {
   var description: String {
     switch self {
     case .none:
-      return "未知"
+      return "全部"
     case .individual:
       return "个人"
     case .company:
@@ -670,7 +670,7 @@ enum CharacterType: Int, Codable, Identifiable, CaseIterable {
   var description: String {
     switch self {
     case .none:
-      return "未知"
+      return "全部"
     case .crt:
       return "角色"
     case .mecha:
