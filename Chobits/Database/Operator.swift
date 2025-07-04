@@ -246,6 +246,7 @@ extension DatabaseOperator {
   public func updateEpisodeCollection(
     episodeId: Int, type: EpisodeCollectionType, batch: Bool = false
   ) throws {
+    let now = Int(Date().timeIntervalSince1970)
     let episode = try self.fetchOne(
       predicate: #Predicate<Episode> {
         $0.episodeId == episodeId
@@ -265,13 +266,14 @@ extension DatabaseOperator {
       let episodes = try modelContext.fetch(descriptor)
       for episode in episodes {
         episode.status = EpisodeCollectionType.collect.rawValue
+        episode.collectedAt = now - 1
       }
       episode.subject?.interest?.epStatus = episodes.count
     } else {
       episode.status = type.rawValue
+      episode.collectedAt = now - 1
       episode.subject?.interest?.epStatus = (episode.subject?.interest?.epStatus ?? 0) + 1
     }
-    let now = Int(Date().timeIntervalSince1970)
     episode.subject?.interest?.updatedAt = now - 1
     episode.subject?.collectedAt = now - 1
     try self.commit()

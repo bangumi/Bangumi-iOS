@@ -59,9 +59,9 @@ struct EpisodeInfoView: View {
             .fixedSize()
         }
         Spacer()
-        if isAuthenticated && episode.collectionTypeEnum != .none && episode.updatedAt > 0 {
+        if isAuthenticated && episode.collectionTypeEnum != .none && episode.collectedAt > 0 {
           Text(
-            "\(episode.collectionTypeEnum.description): \(episode.updatedAt.datetimeDisplay)"
+            "\(episode.collectionTypeEnum.description): \(episode.collectedAt.datetimeDisplay)"
           )
           .font(.footnote)
           .foregroundStyle(.secondary)

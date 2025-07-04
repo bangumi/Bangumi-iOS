@@ -22,7 +22,7 @@ final class EpisodeV2: Linkable {
   var disc: Int
 
   var status: Int = 0
-  var updatedAt: Int = 0
+  var collectedAt: Int = 0
 
   var subject: Subject?
 
@@ -48,7 +48,7 @@ final class EpisodeV2: Linkable {
     self.disc = item.disc
     if let collection = item.collection {
       self.status = collection.status
-      self.updatedAt = collection.updatedAt ?? 0
+      self.collectedAt = collection.updatedAt ?? 0
     }
   }
 
@@ -172,8 +172,8 @@ final class EpisodeV2: Linkable {
     if self.disc != item.disc { self.disc = item.disc }
     if let collection = item.collection {
       if self.status != collection.status { self.status = collection.status }
-      if let updatedAt = collection.updatedAt, self.updatedAt != updatedAt {
-        self.updatedAt = updatedAt
+      if let collectedAt = collection.updatedAt, self.collectedAt != collectedAt {
+        self.collectedAt = collectedAt
       }
     }
   }
