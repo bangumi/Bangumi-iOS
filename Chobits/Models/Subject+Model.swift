@@ -41,6 +41,7 @@ final class SubjectV2: Searchable, Linkable {
   var relations: [SubjectRelationDTO] = []
   var recs: [SubjectRecDTO] = []
 
+  var collects: [SubjectCollectDTO] = []
   var reviews: [SubjectReviewDTO] = []
   var topics: [TopicDTO] = []
   var comments: [SubjectCommentDTO] = []

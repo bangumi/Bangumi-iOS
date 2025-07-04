@@ -366,6 +366,15 @@ struct SlimSubjectInterestDTO: Codable, Hashable {
   var updatedAt: Int
 }
 
+struct SubjectCollectDTO: Codable, Identifiable, Hashable {
+  var user: SlimUserDTO
+  var interest: SlimSubjectInterestDTO
+
+  var id: Int {
+    user.id
+  }
+}
+
 struct SubjectDTO: Codable, Identifiable, Searchable {
   var id: Int
   var airtime: SubjectAirtime

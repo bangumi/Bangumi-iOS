@@ -1,0 +1,120 @@
+{
+  "data": [
+    {
+      "user": {
+        "id": 1,
+        "username": "sai",
+        "nickname": "Sai🖖",
+        "avatar": {
+          "large": "https://lain.bgm.tv/pic/user/l/000/01/1.jpg",
+          "medium": "https://lain.bgm.tv/pic/user/m/000/01/1.jpg",
+          "small": "https://lain.bgm.tv/pic/user/s/000/01/1.jpg"
+        },
+        "sign": "",
+        "group": 1,
+        "joinedAt": 1234567890
+      },
+      "interest": {
+        "id": 1,
+        "rate": 9,
+        "type": 2,
+        "comment": "非常棒的动画，剧情紧凑，角色塑造深刻。",
+        "tags": ["神作", "剧情", "机战"],
+        "updatedAt": 1703123456
+      }
+    },
+    {
+      "user": {
+        "id": 2,
+        "username": "test",
+        "nickname": "测试用户",
+        "avatar": {
+          "large": "https://lain.bgm.tv/pic/user/l/000/02/2.jpg",
+          "medium": "https://lain.bgm.tv/pic/user/m/000/02/2.jpg",
+          "small": "https://lain.bgm.tv/pic/user/s/000/02/2.jpg"
+        },
+        "sign": "这是一个测试账号",
+        "group": 0,
+        "joinedAt": 1234567891
+      },
+      "interest": {
+        "id": 2,
+        "rate": 8,
+        "type": 2,
+        "comment": "制作精良，音乐很棒。",
+        "tags": ["制作精良", "音乐"],
+        "updatedAt": 1703123457
+      }
+    },
+    {
+      "user": {
+        "id": 3,
+        "username": "anime",
+        "nickname": "动画爱好者",
+        "avatar": {
+          "large": "https://lain.bgm.tv/pic/user/l/000/03/3.jpg",
+          "medium": "https://lain.bgm.tv/pic/user/m/000/03/3.jpg",
+          "small": "https://lain.bgm.tv/pic/user/s/000/03/3.jpg"
+        },
+        "sign": "热爱动画的普通用户",
+        "group": 0,
+        "joinedAt": 1234567892
+      },
+      "interest": {
+        "id": 3,
+        "rate": 7,
+        "type": 2,
+        "comment": "还不错，值得一看。",
+        "tags": ["值得一看"],
+        "updatedAt": 1703123458
+      }
+    },
+    {
+      "user": {
+        "id": 4,
+        "username": "reviewer",
+        "nickname": "评论家",
+        "avatar": {
+          "large": "https://lain.bgm.tv/pic/user/l/000/04/4.jpg",
+          "medium": "https://lain.bgm.tv/pic/user/m/000/04/4.jpg",
+          "small": "https://lain.bgm.tv/pic/user/s/000/04/4.jpg"
+        },
+        "sign": "专业动画评论",
+        "group": 1,
+        "joinedAt": 1234567893
+      },
+      "interest": {
+        "id": 4,
+        "rate": 10,
+        "type": 2,
+        "comment": "这部作品在动画史上具有重要地位，无论是剧情、角色还是制作都达到了极高的水准。",
+        "tags": ["神作", "经典", "必看"],
+        "updatedAt": 1703123459
+      }
+    },
+    {
+      "user": {
+        "id": 5,
+        "username": "fan",
+        "nickname": "粉丝",
+        "avatar": {
+          "large": "https://lain.bgm.tv/pic/user/l/000/05/5.jpg",
+          "medium": "https://lain.bgm.tv/pic/user/m/000/05/5.jpg",
+          "small": "https://lain.bgm.tv/pic/user/s/000/05/5.jpg"
+        },
+        "sign": "",
+        "group": 0,
+        "joinedAt": 1234567894
+      },
+      "interest": {
+        "id": 5,
+        "rate": 9,
+        "type": 2,
+        "comment": "看了很多遍，每次都有新的发现。",
+        "tags": ["多刷", "细节"],
+        "updatedAt": 1703123460
+      }
+    }
+  ],
+  "total": 5
+}

@@ -1013,6 +1013,29 @@ enum GroupMemberRole: Int, Codable, CaseIterable {
   }
 }
 
+enum FilterMode: String, Codable, CaseIterable {
+  case all = "all"
+  case friends = "friends"
+
+  init(_ value: String?) {
+    let tmp = Self(rawValue: value ?? "all")
+    if let out = tmp {
+      self = out
+      return
+    }
+    self = Self.all
+  }
+
+  var description: String {
+    switch self {
+    case .all:
+      return "全站"
+    case .friends:
+      return "好友"
+    }
+  }
+}
+
 enum GroupFilterMode: String, Codable, CaseIterable {
   case all = "all"
   case joined = "joined"

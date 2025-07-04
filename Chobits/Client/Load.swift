@@ -55,6 +55,9 @@ extension Chii {
   }
 
   func loadSubjectDetails(_ subjectId: Int, offprints: Bool, social: Bool) async throws {
+    let collectsModeDefaults = UserDefaults.standard.string(forKey: "subjectCollectsFilterMode")
+    let collectsMode = FilterMode(collectsModeDefaults)
+
     let db = try self.getDB()
     await withThrowingTaskGroup(of: Void.self) { group in
       group.addTask {
@@ -77,6 +80,11 @@ extension Chii {
         try await db.saveSubjectRecs(subjectId: subjectId, items: response.data)
       }
       if social {
+        group.addTask {
+          let response = try await self.getSubjectCollects(
+            subjectId, mode: collectsMode, limit: 10)
+          try await db.saveSubjectCollects(subjectId: subjectId, items: response.data)
+        }
         group.addTask {
           let response = try await self.getSubjectReviews(subjectId, limit: 5)
           try await db.saveSubjectReviews(subjectId: subjectId, items: response.data)

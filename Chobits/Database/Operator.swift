@@ -560,6 +560,13 @@ extension DatabaseOperator {
     }
   }
 
+  public func saveSubjectCollects(subjectId: Int, items: [SubjectCollectDTO]) throws {
+    let subject = try self.getSubject(subjectId)
+    if subject?.collects != items {
+      subject?.collects = items
+    }
+  }
+
   public func saveSubjectReviews(subjectId: Int, items: [SubjectReviewDTO]) throws {
     let subject = try self.getSubject(subjectId)
     if subject?.reviews != items {

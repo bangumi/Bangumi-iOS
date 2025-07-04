@@ -19,6 +19,7 @@ struct SettingsView: View {
   @AppStorage("subjectImageQuality") var subjectImageQuality: ImageQuality = .high
   @AppStorage("rakuenDefaultMode") var rakuenDefaultMode: GroupTopicFilterMode = .joined
   @AppStorage("openLinksInApp") var openLinksInApp: Bool = true
+  @AppStorage("subjectCollectsFilterMode") var subjectCollectsFilterMode: FilterMode = .all
 
   @Environment(\.modelContext) var modelContext
 
@@ -78,7 +79,7 @@ struct SettingsView: View {
         }
       }
 
-      Section(header: Text("外观")) {
+      Section(header: Text("显示")) {
         Picker(selection: $appearance, label: Text("主题")) {
           ForEach(AppearanceType.allCases, id: \.self) { appearance in
             Text(appearance.desc).tag(appearance)
@@ -111,6 +112,11 @@ struct SettingsView: View {
         }
         Picker(selection: $rakuenDefaultMode, label: Text("超展开默认显示")) {
           ForEach(GroupTopicFilterMode.allCases, id: \.self) { mode in
+            Text(mode.description).tag(mode)
+          }
+        }
+        Picker(selection: $subjectCollectsFilterMode, label: Text("条目收藏用户默认显示")) {
+          ForEach(FilterMode.allCases, id: \.self) { mode in
             Text(mode.description).tag(mode)
           }
         }

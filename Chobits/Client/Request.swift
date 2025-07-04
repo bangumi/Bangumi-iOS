@@ -1065,6 +1065,33 @@ extension Chii {
     return resp
   }
 
+  func getSubjectCollects(
+    _ subjectID: Int,
+    type: CollectionType = .none,
+    mode: FilterMode = .all,
+    limit: Int = 20,
+    offset: Int = 0
+  ) async throws -> PagedDTO<SubjectCollectDTO> {
+    if self.mock {
+      return loadFixture(fixture: "subject_collects.json", target: PagedDTO<SubjectCollectDTO>.self)
+    }
+    let url = BangumiAPI.priv.build("p1/subjects/\(subjectID)/collects")
+    var queryItems: [URLQueryItem] = [
+      URLQueryItem(name: "limit", value: String(limit)),
+      URLQueryItem(name: "offset", value: String(offset)),
+    ]
+    if type != .none {
+      queryItems.append(URLQueryItem(name: "type", value: String(type.rawValue)))
+    }
+    if mode != .all {
+      queryItems.append(URLQueryItem(name: "mode", value: mode.rawValue))
+    }
+    let pageURL = url.appending(queryItems: queryItems)
+    let data = try await self.request(url: pageURL, method: "GET")
+    let resp: PagedDTO<SubjectCollectDTO> = try self.decodeResponse(data)
+    return resp
+  }
+
   func getSubjectStaffPersons(
     _ subjectID: Int, position: Int? = nil, limit: Int = 20, offset: Int = 0
   )
