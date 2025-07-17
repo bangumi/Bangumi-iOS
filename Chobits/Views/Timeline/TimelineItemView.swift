@@ -203,7 +203,7 @@ struct TimelineItemView: View {
           Button {
             showTime = true
           } label: {
-            item.createdAt.relativeText + Text(" · \(item.source.desc)")
+            item.createdAt.relativeText + Text(" · \(item.source.name.withLink(item.source.url))")
           }
           .buttonStyle(.scale)
           .popover(isPresented: $showTime) {

@@ -842,6 +842,11 @@ struct BlogEntryDTO: Codable, Hashable, Identifiable, Linkable {
   }
 }
 
+struct TimelineSource: Codable, Hashable {
+  var name: String
+  var url: String?
+}
+
 struct TimelineDTO: Codable, Identifiable, Hashable {
   var id: Int
   var uid: Int
@@ -1029,35 +1034,6 @@ enum TimelineCat: Int, Codable {
   case index = 7
   case mono = 8
   case doujin = 9
-}
-
-enum TimelineSource: Int, Codable {
-  case web = 0
-  case mobile = 1
-  case onAir = 2
-  case inTouch = 3
-  case wp = 4
-  case api = 5
-  case next = 6
-
-  var desc: String {
-    switch self {
-    case .web:
-      return "web"
-    case .mobile:
-      return "mobile"
-    case .onAir:
-      return "OnAir"
-    case .inTouch:
-      return "InTouch"
-    case .wp:
-      return "WP"
-    case .api:
-      return "API"
-    case .next:
-      return "next"
-    }
-  }
 }
 
 enum TimelineMode: String, Codable, CaseIterable {
