@@ -10,6 +10,7 @@ struct SettingsView: View {
   @AppStorage("timelineViewMode") var timelineViewMode: TimelineViewMode = .friends
   @AppStorage("progressViewMode") var progressViewMode: ProgressViewMode = .tile
   @AppStorage("progressLimit") var progressLimit: Int = 50
+  @AppStorage("progressSortMode") var progressSortMode: ProgressSortMode = .collectedAt
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
   @AppStorage("isolationMode") var isolationMode: Bool = false
   @AppStorage("showNSFWBadge") var showNSFWBadge: Bool = true
@@ -104,6 +105,11 @@ struct SettingsView: View {
           Text("50").tag(50)
           Text("100").tag(100)
           Text("无限制").tag(0)
+        }
+        Picker(selection: $progressSortMode, label: Text("进度管理排序")) {
+          ForEach(ProgressSortMode.allCases, id: \.self) { mode in
+            Text(mode.desc).tag(mode)
+          }
         }
         Picker(selection: $subjectImageQuality, label: Text("条目封面图片质量")) {
           ForEach(ImageQuality.allCases, id: \.self) { quality in

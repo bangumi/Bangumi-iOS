@@ -7,6 +7,7 @@ struct ProgressTileView: View {
   let width: CGFloat
 
   @AppStorage("progressLimit") var progressLimit: Int = 50
+  @AppStorage("progressSortMode") var progressSortMode: ProgressSortMode = .collectedAt
 
   @Environment(\.modelContext) var modelContext
 
@@ -49,9 +50,36 @@ struct ProgressTileView: View {
     Array(repeating: .init(.flexible()), count: cols)
   }
 
+  var sortedSubjects: [Subject] {
+    switch progressSortMode {
+    case .airTime:
+      return subjects.sorted { subject1, subject2 in
+        let days1 = subject1.nextEpisodeDays(context: modelContext)
+        let days2 = subject2.nextEpisodeDays(context: modelContext)
+        
+        // 优先显示已播出但未看的剧集 (负数天数)
+        if days1 < 0 && days2 >= 0 {
+          return true
+        } else if days1 >= 0 && days2 < 0 {
+          return false
+        } else if days1 < 0 && days2 < 0 {
+          // 两个都是已播出，按绝对值排序（播出时间越近越优先）
+          return abs(days1) < abs(days2)
+        } else {
+          // 两个都是未播出或没有剧集信息，按天数排序
+          return days1 < days2
+        }
+      }
+    case .collectedAt:
+      return subjects.sorted { subject1, subject2 in
+        return subject1.collectedAt > subject2.collectedAt
+      }
+    }
+  }
+
   var body: some View {
     LazyVGrid(columns: columns) {
-      ForEach(subjects) { subject in
+      ForEach(sortedSubjects) { subject in
         CardView(padding: 8) {
           ProgressTileItemView(subjectId: subject.subjectId, width: cardWidth)
             .environment(subject)
@@ -59,7 +87,8 @@ struct ProgressTileView: View {
         }.frame(width: cardWidth + 16)
       }
     }
-    .animation(.default, value: subjects)
+    .animation(.default, value: sortedSubjects.map(\.subjectId))
+    .animation(.default, value: progressSortMode)
     .padding(.horizontal, 8)
     .frame(width: width)
   }
