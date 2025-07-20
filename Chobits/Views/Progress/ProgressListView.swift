@@ -55,9 +55,7 @@ struct ProgressListView: View {
         }
       }
     case .collectedAt:
-      return subjects.sorted { subject1, subject2 in
-        return subject1.collectedAt > subject2.collectedAt
-      }
+      return subjects
     }
   }
 
