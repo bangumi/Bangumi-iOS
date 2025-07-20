@@ -56,19 +56,7 @@ struct ProgressTileView: View {
       return subjects.sorted { subject1, subject2 in
         let days1 = subject1.nextEpisodeDays(context: modelContext)
         let days2 = subject2.nextEpisodeDays(context: modelContext)
-        
-        // 优先显示已播出但未看的剧集 (负数天数)
-        if days1 < 0 && days2 >= 0 {
-          return true
-        } else if days1 >= 0 && days2 < 0 {
-          return false
-        } else if days1 < 0 && days2 < 0 {
-          // 两个都是已播出，按绝对值排序（播出时间越近越优先）
-          return abs(days1) < abs(days2)
-        } else {
-          // 两个都是未播出或没有剧集信息，按天数排序
-          return days1 < days2
-        }
+        return Subject.compareDays(days1, days2, subject1, subject2)
       }
     case .collectedAt:
       return subjects
