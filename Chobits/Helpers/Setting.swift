@@ -136,6 +136,31 @@ enum ProgressViewMode: String, CaseIterable {
   }
 }
 
+enum ProgressSortMode: String, CaseIterable {
+  case airTime = "airTime"
+  case collectedAt = "collectedAt"
+
+  init(_ label: String? = nil) {
+    switch label {
+    case "airTime":
+      self = .airTime
+    case "collectedAt":
+      self = .collectedAt
+    default:
+      self = .collectedAt
+    }
+  }
+
+  var desc: String {
+    switch self {
+    case .airTime:
+      "播放顺序"
+    case .collectedAt:
+      "收藏时间"
+    }
+  }
+}
+
 enum ChiiViewTab: String {
   case timeline = "timeline"
   case discover = "discover"
