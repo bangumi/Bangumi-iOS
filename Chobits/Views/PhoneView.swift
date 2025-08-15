@@ -101,88 +101,89 @@ struct PhoneView: View {
     } else {
       TabView(selection: $selectedTab) {
 
-      NavigationStack(path: $timelineNav) {
-        ChiiTimelineView()
-          .navigationDestination(for: NavDestination.self) { $0 }
-      }
-      .tag(ChiiViewTab.timeline)
-      .tabItem {
-        Label(ChiiViewTab.timeline.title, systemImage: ChiiViewTab.timeline.icon)
-      }
-      .environment(
-        \.openURL,
-        OpenURLAction { url in
-          if handleURL(url, nav: $timelineNav) {
-            return .handled
-          } else {
-            return .systemAction
-          }
-        }
-      )
-
-      if isAuthenticated {
-        NavigationStack(path: $progressNav) {
-          ChiiProgressView()
+        NavigationStack(path: $timelineNav) {
+          ChiiTimelineView()
             .navigationDestination(for: NavDestination.self) { $0 }
         }
-        .tag(ChiiViewTab.progress)
+        .tag(ChiiViewTab.timeline)
         .tabItem {
-          Label(ChiiViewTab.progress.title, systemImage: ChiiViewTab.progress.icon)
+          Label(ChiiViewTab.timeline.title, systemImage: ChiiViewTab.timeline.icon)
         }
         .environment(
           \.openURL,
           OpenURLAction { url in
-            if handleURL(url, nav: $progressNav) {
+            if handleURL(url, nav: $timelineNav) {
               return .handled
             } else {
               return .systemAction
             }
           }
         )
-      }
 
-      if !isolationMode {
-        NavigationStack(path: $rakuenNav) {
-          ChiiRakuenView()
+        if isAuthenticated {
+          NavigationStack(path: $progressNav) {
+            ChiiProgressView()
+              .navigationDestination(for: NavDestination.self) { $0 }
+          }
+          .tag(ChiiViewTab.progress)
+          .tabItem {
+            Label(ChiiViewTab.progress.title, systemImage: ChiiViewTab.progress.icon)
+          }
+          .environment(
+            \.openURL,
+            OpenURLAction { url in
+              if handleURL(url, nav: $progressNav) {
+                return .handled
+              } else {
+                return .systemAction
+              }
+            }
+          )
+        }
+
+        if !isolationMode {
+          NavigationStack(path: $rakuenNav) {
+            ChiiRakuenView()
+              .navigationDestination(for: NavDestination.self) { $0 }
+          }
+          .tag(ChiiViewTab.rakuen)
+          .tabItem {
+            Label(ChiiViewTab.rakuen.title, systemImage: ChiiViewTab.rakuen.icon)
+          }
+          .environment(
+            \.openURL,
+            OpenURLAction { url in
+              if handleURL(url, nav: $rakuenNav) {
+                return .handled
+              } else {
+                return .systemAction
+              }
+            }
+          )
+        }
+
+        NavigationStack(path: $discoverNav) {
+          ChiiDiscoverView()
             .navigationDestination(for: NavDestination.self) { $0 }
         }
-        .tag(ChiiViewTab.rakuen)
+        .tag(ChiiViewTab.discover)
         .tabItem {
-          Label(ChiiViewTab.rakuen.title, systemImage: ChiiViewTab.rakuen.icon)
+          Label(ChiiViewTab.discover.title, systemImage: ChiiViewTab.discover.icon)
         }
         .environment(
           \.openURL,
           OpenURLAction { url in
-            if handleURL(url, nav: $rakuenNav) {
+            if handleURL(url, nav: $discoverNav) {
               return .handled
             } else {
               return .systemAction
             }
           }
         )
-      }
-
-      NavigationStack(path: $discoverNav) {
-        ChiiDiscoverView()
-          .navigationDestination(for: NavDestination.self) { $0 }
-      }
-      .tag(ChiiViewTab.discover)
-      .tabItem {
-        Label(ChiiViewTab.discover.title, systemImage: ChiiViewTab.discover.icon)
-      }
-      .environment(
-        \.openURL,
-        OpenURLAction { url in
-          if handleURL(url, nav: $discoverNav) {
-            return .handled
-          } else {
-            return .systemAction
-          }
+        .onContinueUserActivity(CSSearchableItemActionType) { activity in
+          handleSearchActivity(activity, nav: $discoverNav)
+          selectedTab = .discover
         }
-      )
-      .onContinueUserActivity(CSSearchableItemActionType) { activity in
-        handleSearchActivity(activity, nav: $discoverNav)
-        selectedTab = .discover
       }
     }
   }
