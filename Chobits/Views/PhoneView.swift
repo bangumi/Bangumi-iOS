@@ -18,7 +18,88 @@ struct PhoneView: View {
   }
 
   var body: some View {
-    TabView(selection: $selectedTab) {
+    if #available(iOS 26.0, *) {
+      TabView(selection: $selectedTab) {
+        Tab(ChiiViewTab.timeline.title, systemImage: ChiiViewTab.timeline.icon, value: ChiiViewTab.timeline) {
+          NavigationStack(path: $timelineNav) {
+            ChiiTimelineView()
+              .navigationDestination(for: NavDestination.self) { $0 }
+          }
+          .environment(
+            \.openURL,
+            OpenURLAction { url in
+              if handleURL(url, nav: $timelineNav) {
+                return .handled
+              } else {
+                return .systemAction
+              }
+            }
+          )
+        }
+
+        if isAuthenticated {
+          Tab(ChiiViewTab.progress.title, systemImage: ChiiViewTab.progress.icon, value: ChiiViewTab.progress) {
+            NavigationStack(path: $progressNav) {
+              ChiiProgressView()
+                .navigationDestination(for: NavDestination.self) { $0 }
+            }
+            .environment(
+              \.openURL,
+              OpenURLAction { url in
+                if handleURL(url, nav: $progressNav) {
+                  return .handled
+                } else {
+                  return .systemAction
+                }
+              }
+            )
+          }
+        }
+
+        if !isolationMode {
+          Tab(ChiiViewTab.rakuen.title, systemImage: ChiiViewTab.rakuen.icon, value: ChiiViewTab.rakuen) {
+            NavigationStack(path: $rakuenNav) {
+              ChiiRakuenView()
+                .navigationDestination(for: NavDestination.self) { $0 }
+            }
+            .environment(
+              \.openURL,
+              OpenURLAction { url in
+                if handleURL(url, nav: $rakuenNav) {
+                  return .handled
+                } else {
+                  return .systemAction
+                }
+              }
+            )
+          }
+        }
+
+        Tab(ChiiViewTab.discover.title, systemImage: ChiiViewTab.discover.icon, value: ChiiViewTab.discover, role: .search) {
+          NavigationStack(path: $discoverNav) {
+            ChiiDiscoverView()
+              .navigationDestination(for: NavDestination.self) { $0 }
+          }
+          .environment(
+            \.openURL,
+            OpenURLAction { url in
+              if handleURL(url, nav: $discoverNav) {
+                return .handled
+              } else {
+                return .systemAction
+              }
+            }
+          )
+          .onContinueUserActivity(CSSearchableItemActionType) { activity in
+            handleSearchActivity(activity, nav: $discoverNav)
+            selectedTab = .discover
+          }
+        }
+      }
+      // 允许 Tab 栏最小化
+      .tabBarMinimizeBehavior(.onScrollDown)
+    } else {
+      TabView(selection: $selectedTab) {
 
       NavigationStack(path: $timelineNav) {
         ChiiTimelineView()
