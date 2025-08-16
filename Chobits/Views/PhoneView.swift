@@ -18,7 +18,7 @@ struct PhoneView: View {
   }
 
   var body: some View {
-    if #available(iOS 26.0, *) {
+    if #available(iOS 18.0, *) {
       TabView(selection: $selectedTab) {
         Tab(ChiiViewTab.timeline.title, systemImage: ChiiViewTab.timeline.icon, value: ChiiViewTab.timeline) {
           NavigationStack(path: $timelineNav) {
@@ -97,7 +97,7 @@ struct PhoneView: View {
         }
       }
       // 允许 Tab 栏最小化
-      .tabBarMinimizeBehavior(.onScrollDown)
+      .tabBarMinimizeBehaviorIfAvailable()
     } else {
       TabView(selection: $selectedTab) {
 
