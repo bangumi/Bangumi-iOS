@@ -13,7 +13,7 @@ extension View {
       self
     }
   }
-  
+
   /// 按钮样式选择器
   /// 在 OS 26+ 使用液态玻璃效果，否则使用指定的样式
   @ViewBuilder
@@ -42,7 +42,7 @@ extension View {
       }
     }
   }
-  
+
   /// 设置 TabBar 最小化行为
   /// https://developer.apple.com/documentation/swiftui/view/tabbarminimizebehavior(_:)
   @ViewBuilder

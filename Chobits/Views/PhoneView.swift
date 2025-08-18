@@ -20,7 +20,10 @@ struct PhoneView: View {
   var body: some View {
     if #available(iOS 18.0, *) {
       TabView(selection: $selectedTab) {
-        Tab(ChiiViewTab.timeline.title, systemImage: ChiiViewTab.timeline.icon, value: ChiiViewTab.timeline) {
+        Tab(
+          ChiiViewTab.timeline.title, systemImage: ChiiViewTab.timeline.icon,
+          value: ChiiViewTab.timeline
+        ) {
           NavigationStack(path: $timelineNav) {
             ChiiTimelineView()
               .navigationDestination(for: NavDestination.self) { $0 }
@@ -38,7 +41,10 @@ struct PhoneView: View {
         }
 
         if isAuthenticated {
-          Tab(ChiiViewTab.progress.title, systemImage: ChiiViewTab.progress.icon, value: ChiiViewTab.progress) {
+          Tab(
+            ChiiViewTab.progress.title, systemImage: ChiiViewTab.progress.icon,
+            value: ChiiViewTab.progress
+          ) {
             NavigationStack(path: $progressNav) {
               ChiiProgressView()
                 .navigationDestination(for: NavDestination.self) { $0 }
@@ -57,7 +63,10 @@ struct PhoneView: View {
         }
 
         if !isolationMode {
-          Tab(ChiiViewTab.rakuen.title, systemImage: ChiiViewTab.rakuen.icon, value: ChiiViewTab.rakuen) {
+          Tab(
+            ChiiViewTab.rakuen.title, systemImage: ChiiViewTab.rakuen.icon,
+            value: ChiiViewTab.rakuen
+          ) {
             NavigationStack(path: $rakuenNav) {
               ChiiRakuenView()
                 .navigationDestination(for: NavDestination.self) { $0 }
@@ -75,7 +84,10 @@ struct PhoneView: View {
           }
         }
 
-        Tab(ChiiViewTab.discover.title, systemImage: ChiiViewTab.discover.icon, value: ChiiViewTab.discover, role: .search) {
+        Tab(
+          ChiiViewTab.discover.title, systemImage: ChiiViewTab.discover.icon,
+          value: ChiiViewTab.discover, role: .search
+        ) {
           NavigationStack(path: $discoverNav) {
             ChiiDiscoverView()
               .navigationDestination(for: NavDestination.self) { $0 }

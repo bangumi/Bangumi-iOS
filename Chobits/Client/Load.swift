@@ -77,7 +77,9 @@ extension Chii {
       async let topicsResp = self.getSubjectTopics(subjectId, limit: 5)
       async let commentsResp = self.getSubjectComments(subjectId, limit: 10)
 
-      let (collectsVal, reviewsVal, topicsVal, commentsVal) = try await (collectsResp, reviewsResp, topicsResp, commentsResp)
+      let (collectsVal, reviewsVal, topicsVal, commentsVal) = try await (
+        collectsResp, reviewsResp, topicsResp, commentsResp
+      )
       try await db.saveSubjectCollects(subjectId: subjectId, items: collectsVal.data)
       try await db.saveSubjectReviews(subjectId: subjectId, items: reviewsVal.data)
       try await db.saveSubjectTopics(subjectId: subjectId, items: topicsVal.data)
