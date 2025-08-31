@@ -1,5 +1,4 @@
 import CoreSpotlight
-import OSLog
 import SwiftUI
 
 @available(iOS 18.0, *)
@@ -75,7 +74,10 @@ struct PadView: View {
         }
       }
 
-      Tab(ChiiViewTab.discover.title, systemImage: ChiiViewTab.discover.icon, value: .discover) {
+      Tab(
+        ChiiViewTab.discover.title, systemImage: ChiiViewTab.discover.icon,
+        value: ChiiViewTab.discover, role: .search
+      ) {
         NavigationStack(path: $discoverNav) {
           ChiiDiscoverView()
             .navigationDestination(for: NavDestination.self) { $0 }
@@ -95,7 +97,7 @@ struct PadView: View {
           selectedTab = .discover
         }
       }
-
     }
+    .tabBarMinimizeBehaviorIfAvailable()
   }
 }

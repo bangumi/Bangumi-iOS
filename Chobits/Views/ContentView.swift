@@ -54,11 +54,16 @@ struct ContentView: View {
 
   var body: some View {
     ZStack {
-      if UIDevice.current.userInterfaceIdiom == .pad, #available(iOS 18.0, *) {
-        PadView()
+      if #available(iOS 18.0, *) {
+        if UIDevice.current.userInterfaceIdiom == .pad {
+          PadView()
+        } else {
+          PhoneView()
+        }
       } else {
-        PhoneView()
+        OldTabView()
       }
+
       VStack(alignment: .center) {
         ForEach($notifier.notifications, id: \.self) { $notification in
           Text(notification)
