@@ -7,26 +7,6 @@ struct SubjectCharactersView: View {
 
   @AppStorage("isolationMode") var isolationMode: Bool = false
 
-  var rowCount: Int {
-    if characters.count == 0 {
-      return 0
-    }
-    let count = characters.count / 3
-    return max(1, min(count, 3))
-  }
-
-  var rows: [GridItem] {
-    return Array(repeating: GridItem(.fixed(60)), count: rowCount)
-  }
-
-  var height: CGFloat {
-    let height = CGFloat(rowCount) * 68
-    if height > 0 {
-      return height
-    }
-    return 2
-  }
-
   var body: some View {
     VStack(spacing: 2) {
       HStack(alignment: .bottom) {
@@ -40,66 +20,79 @@ struct SubjectCharactersView: View {
           }.buttonStyle(.navigation)
         }
       }
-    }.padding(.top, 5)
-    Divider()
-    if characters.count == 0 {
+      .padding(.top, 5)
+
+      Divider()
+
+      if characters.count == 0 {
+        HStack {
+          Spacer()
+          Text("暂无角色")
+            .font(.caption)
+            .foregroundStyle(.secondary)
+          Spacer()
+        }.padding(5)
+      } else {
+        ScrollView(.horizontal, showsIndicators: false) {
+          HStack(spacing: 4) {
+            ForEach(characters, id: \.character.id) { item in
+              CharacterCard(item: item, isolationMode: isolationMode)
+            }
+          }
+        }
+      }
+    }
+    .animation(.default, value: characters)
+  }
+}
+
+struct CharacterCard: View {
+  let item: SubjectCharacterDTO
+  let isolationMode: Bool
+
+  var body: some View {
+    VStack(alignment: .leading, spacing: 2) {
+      // Character Image
+      ImageView(img: item.character.images?.medium)
+        .imageStyle(width: 72, height: 108, alignment: .top)
+        .imageType(.person)
+        .imageLink(item.character.link)
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+        .shadow(radius: 2)
+
+      // Character Name
+      Text(item.character.name.withLink(item.character.link))
+        .font(.footnote)
+        .fontWeight(.medium)
+        .lineLimit(2)
+        .multilineTextAlignment(.leading)
+
+      // Role and Comment
       HStack {
-        Spacer()
-        Text("暂无角色")
+        BorderView(padding: 2) {
+          Text(item.type.description)
+            .foregroundStyle(.secondary)
+        }
+        if let comment = item.character.comment, comment > 0, !isolationMode {
+          Text("(+\(comment))")
+            .lineLimit(1)
+            .foregroundStyle(.accent)
+        }
+        Spacer(minLength: 0)
+      }.font(.caption)
+
+      // CV Information
+      if let actor = item.actors.first {
+        Text("CV \(actor.name.withLink(actor.link))")
           .font(.caption)
           .foregroundStyle(.secondary)
-        Spacer()
-      }.padding(5)
+          .lineLimit(1)
+      }
+
+      Spacer()
     }
-    ScrollView(.horizontal, showsIndicators: false) {
-      LazyHGrid(rows: rows, alignment: .top) {
-        ForEach(characters, id: \.character.id) { item in
-          HStack(alignment: .top) {
-            ImageView(img: item.character.images?.grid)
-              .imageStyle(width: 60, height: 60, alignment: .top)
-              .imageType(.person)
-              .imageLink(item.character.link)
-              .padding(2)
-              .shadow(radius: 2)
-            VStack(alignment: .leading, spacing: 2) {
-              HStack {
-                Text(item.character.name.withLink(item.character.link))
-                  .font(.callout)
-                  .lineLimit(1)
-                Spacer()
-                if let comment = item.character.comment, comment > 0, !isolationMode {
-                  Text("(+\(comment))")
-                    .font(.caption)
-                    .lineLimit(1)
-                    .foregroundStyle(.orange)
-                }
-              }
-              Divider()
-              HStack {
-                BorderView(padding: 2) {
-                  Text(item.type.description)
-                    .font(.caption)
-                }
-                if !item.character.nameCN.isEmpty {
-                  Text(item.character.nameCN)
-                    .font(.footnote)
-                    .lineLimit(1)
-                }
-                Spacer()
-              }.foregroundStyle(.secondary)
-              if let actor = item.actors.first {
-                HStack {
-                  Text("CV:").foregroundStyle(.secondary)
-                  Text(actor.name.withLink(actor.link))
-                    .lineLimit(1)
-                }.font(.caption)
-              }
-              Spacer()
-            }
-          }.frame(width: 220)
-        }
-      }.frame(height: height)
-    }.animation(.default, value: characters)
+    .padding(4)
+    .frame(width: 80)
   }
 }
 
