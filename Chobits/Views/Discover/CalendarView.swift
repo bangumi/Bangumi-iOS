@@ -50,6 +50,10 @@ enum WeekDay: Int, CaseIterable {
     }
   }
 
+  var short: String {
+    Calendar(identifier: .iso8601).shortWeekdaySymbols[rawValue % 7]
+  }
+
   var desc: String {
     Calendar(identifier: .iso8601).weekdaySymbols[rawValue % 7]
   }

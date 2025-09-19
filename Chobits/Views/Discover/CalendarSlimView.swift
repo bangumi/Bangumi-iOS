@@ -62,7 +62,7 @@ struct CalendarSlimView: View {
             HStack(alignment: .top, spacing: 0) {
               VStack {
                 Text(item.desc)
-                Text(item.weekday.desc)
+                Text(item.weekday.short)
                 Spacer()
               }
               .padding(5)
