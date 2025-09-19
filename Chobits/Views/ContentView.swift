@@ -55,11 +55,12 @@ struct ContentView: View {
   var body: some View {
     ZStack {
       if #available(iOS 18.0, *) {
-        if UIDevice.current.userInterfaceIdiom == .pad {
-          PadView()
-        } else {
-          PhoneView()
-        }
+        // if UIDevice.current.userInterfaceIdiom == .pad {
+        //   PadView()
+        // } else {
+        //   PhoneView()
+        // }
+        MainView()
       } else {
         OldTabView()
       }

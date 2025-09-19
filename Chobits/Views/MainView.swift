@@ -2,7 +2,7 @@ import CoreSpotlight
 import SwiftUI
 
 @available(iOS 18.0, *)
-struct PhoneView: View {
+struct MainView: View {
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
   @AppStorage("isolationMode") var isolationMode: Bool = false
 
@@ -20,10 +20,7 @@ struct PhoneView: View {
 
   var body: some View {
     TabView(selection: $selectedTab) {
-      Tab(
-        ChiiViewTab.timeline.title, systemImage: ChiiViewTab.timeline.icon,
-        value: ChiiViewTab.timeline
-      ) {
+      Tab(ChiiViewTab.timeline.title, systemImage: ChiiViewTab.timeline.icon, value: .timeline) {
         NavigationStack(path: $timelineNav) {
           ChiiTimelineView()
             .navigationDestination(for: NavDestination.self) { $0 }
@@ -41,10 +38,7 @@ struct PhoneView: View {
       }
 
       if isAuthenticated {
-        Tab(
-          ChiiViewTab.progress.title, systemImage: ChiiViewTab.progress.icon,
-          value: ChiiViewTab.progress
-        ) {
+        Tab(ChiiViewTab.progress.title, systemImage: ChiiViewTab.progress.icon, value: .progress) {
           NavigationStack(path: $progressNav) {
             ChiiProgressView()
               .navigationDestination(for: NavDestination.self) { $0 }
@@ -63,10 +57,7 @@ struct PhoneView: View {
       }
 
       if !isolationMode {
-        Tab(
-          ChiiViewTab.rakuen.title, systemImage: ChiiViewTab.rakuen.icon,
-          value: ChiiViewTab.rakuen
-        ) {
+        Tab(ChiiViewTab.rakuen.title, systemImage: ChiiViewTab.rakuen.icon, value: .rakuen) {
           NavigationStack(path: $rakuenNav) {
             ChiiRakuenView()
               .navigationDestination(for: NavDestination.self) { $0 }
