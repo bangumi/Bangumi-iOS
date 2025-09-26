@@ -2,8 +2,9 @@ import SwiftUI
 
 struct ChiiDiscoverView: View {
 
-  @State private var searchQuery: String = ""
+  @State private var query: String = ""
   @State private var searching: Bool = false
+  @State private var remote: Bool = false
 
   func refresh() async {
     do {
@@ -17,7 +18,7 @@ struct ChiiDiscoverView: View {
   var body: some View {
     VStack {
       if searching {
-        SearchView(text: $searchQuery, searching: $searching)
+        SearchView(text: $query, searching: $searching, remote: $remote)
       } else {
         ScrollView {
           VStack {
@@ -33,8 +34,14 @@ struct ChiiDiscoverView: View {
       }
     }
     .searchable(
-      text: $searchQuery, isPresented: $searching,
+      text: $query, isPresented: $searching,
       placement: .navigationBarDrawer(displayMode: .always)
     )
+    .onChange(of: query) {
+      remote = false
+    }
+    .onSubmit(of: .search) {
+      remote = true
+    }
   }
 }
