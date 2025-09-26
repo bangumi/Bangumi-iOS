@@ -23,12 +23,20 @@ struct CalendarSlimView: View {
     today?.items.reduce(0) { $0 + $1.watchers } ?? 0
   }
 
-  var dates: [(weekday: WeekDay, desc: String, date: Date)] {
+  var dates: [(weekday: WeekDay, desc: String, date: Date, calendar: BangumiCalendar)] {
     let today = Date()
     let tomorrow = today.addingTimeInterval(86400)
+
+    let todayCalendar =
+      calendars.first { $0.weekday == WeekDay(date: today).rawValue }
+      ?? BangumiCalendar(weekday: WeekDay(date: today).rawValue, items: [])
+    let tomorrowCalendar =
+      calendars.first { $0.weekday == WeekDay(date: tomorrow).rawValue }
+      ?? BangumiCalendar(weekday: WeekDay(date: tomorrow).rawValue, items: [])
+
     let result = [
-      (weekday: WeekDay(date: today), desc: "今天", date: today),
-      (weekday: WeekDay(date: tomorrow), desc: "明天", date: tomorrow),
+      (weekday: WeekDay(date: today), desc: "今天", date: today, calendar: todayCalendar),
+      (weekday: WeekDay(date: tomorrow), desc: "明天", date: tomorrow, calendar: tomorrowCalendar),
     ]
     return result
   }
@@ -69,7 +77,7 @@ struct CalendarSlimView: View {
               .background(item.weekday.color)
               .foregroundStyle(.white)
               CalendarWeekdaySlimView()
-                .environment(calendars.first { $0.weekday == item.weekday.rawValue })
+                .environment(item.calendar)
             }
           }
           Text("今日上映 \(todayTotal) 部。共 \(todayWatchers) 人收看今日番组。")

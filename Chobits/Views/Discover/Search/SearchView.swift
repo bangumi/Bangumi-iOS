@@ -65,11 +65,6 @@ struct SearchView: View {
     .animation(.default, value: searchType)
     .animation(.default, value: subjectType)
     .animation(.default, value: text)
-    .searchable(
-      text: $text,
-      isPresented: $searching,
-      placement: .navigationBarDrawer(displayMode: .always)
-    )
     .onChange(of: text) {
       remote = false
     }
