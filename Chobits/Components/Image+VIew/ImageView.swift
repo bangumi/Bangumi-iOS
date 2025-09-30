@@ -20,6 +20,14 @@ struct ImageView: View {
     return URL(string: url)
   }
 
+  var clipShape: AnyShape {
+    if type == .avatar {
+      return AnyShape(Circle())
+    } else {
+      return AnyShape(RoundedRectangle(cornerRadius: style.cornerRadius))
+    }
+  }
+
   var body: some View {
     ZStack {
       if let imageURL = imageURL {
@@ -29,14 +37,14 @@ struct ImageView: View {
             .resizable()
             .scaledToFill()
             .frame(width: style.width, height: style.height, alignment: style.alignment)
-            .clipShape(RoundedRectangle(cornerRadius: style.cornerRadius))
+            .clipShape(clipShape)
         } else {
           KFImage(imageURL)
             .fade(duration: 0.25)
             .resizable()
             .scaledToFit()
             .frame(width: style.width, height: style.height, alignment: style.alignment)
-            .clipShape(RoundedRectangle(cornerRadius: style.cornerRadius))
+            .clipShape(clipShape)
         }
       } else {
         if style.width != nil, style.height != nil {
@@ -71,11 +79,11 @@ struct ImageView: View {
             }
           }
           .frame(width: style.width, height: style.height, alignment: style.alignment)
-          .clipShape(RoundedRectangle(cornerRadius: style.cornerRadius))
+          .clipShape(clipShape)
         } else {
           Color.secondary.opacity(0.2)
             .frame(alignment: style.alignment)
-            .clipShape(RoundedRectangle(cornerRadius: style.cornerRadius))
+            .clipShape(clipShape)
         }
       }
     }

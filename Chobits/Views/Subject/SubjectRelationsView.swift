@@ -63,9 +63,10 @@ struct SubjectRelationsView: View {
             }
             .lineLimit(1)
             .font(.caption)
+            .foregroundStyle(.secondary)
             let ctype = collections[relation.subject.id] ?? .none
             ImageView(img: relation.subject.images?.resize(.r200))
-              .imageStyle(width: 90, height: 90)
+              .imageStyle(width: 80, height: 80)
               .imageType(.subject)
               .imageBadge(show: ctype != .none) {
                 Label(ctype.description(relation.subject.type), systemImage: ctype.icon)
@@ -80,7 +81,7 @@ struct SubjectRelationsView: View {
               .truncationMode(.middle)
               .lineLimit(2)
             Spacer()
-          }.frame(width: 90, height: 160)
+          }.frame(width: 80, height: 150)
         }
       }.padding(.horizontal, 2)
     }.animation(.default, value: relations)

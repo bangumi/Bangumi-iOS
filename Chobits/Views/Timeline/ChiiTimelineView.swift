@@ -69,15 +69,9 @@ struct ChiiTimelineView: View {
           }
         } else {
           ToolbarItem(placement: .topBarLeading) {
-            HStack {
-              ImageView(img: nil)
-                .imageStyle(width: 32, height: 32)
-                .imageType(.avatar)
-              Text("未登录")
-                .font(.footnote)
-                .lineLimit(2)
-                .foregroundStyle(.secondary)
-            }
+            ImageView(img: nil)
+              .imageStyle(width: 32, height: 32)
+              .imageType(.avatar)
           }
         }
         ToolbarItem(placement: .topBarTrailing) {
