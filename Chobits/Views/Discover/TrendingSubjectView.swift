@@ -2,9 +2,10 @@ import SwiftData
 import SwiftUI
 
 struct TrendingSubjectView: View {
+  let width: CGFloat
+
   @Environment(\.modelContext) private var modelContext
 
-  @State private var width: CGFloat = 360
   @State private var loaded: Bool = false
 
   func load() async {
@@ -25,15 +26,7 @@ struct TrendingSubjectView: View {
         TrendingSubjectTypeView(type: st, width: width)
       }
     }
-    .animation(.default, value: width)
     .task(load)
-    .onGeometryChange(for: CGSize.self) { proxy in
-      proxy.size
-    } action: { newSize in
-      if self.width != newSize.width, newSize.width > 0 {
-        self.width = newSize.width
-      }
-    }
   }
 }
 

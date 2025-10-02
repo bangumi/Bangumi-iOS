@@ -116,40 +116,35 @@ struct CalendarView: View {
         await refreshCalendar()
       }
     } else {
-      ScrollView {
-        VStack {
-          Text("每日放送")
-            .font(.title)
-            .padding(.top, 10)
+      GeometryReader { geometry in
+        ScrollView {
           VStack {
-            Text("\(today.formatted(date: .complete, time: .omitted))")
-            Text("本季度共 \(total) 部番组，今日上映 \(todayTotal) 部。")
-            Text("共 \(todayWatchers) 人收看今日番组。")
-          }
-          .font(.footnote)
-          .foregroundStyle(.secondary)
-        }.padding(.horizontal, 8)
-        LazyVStack {
-          ForEach(sortedCalendars) { calendar in
-            CalendarWeekdayView(width: width)
-              .environment(calendar)
-              .padding(.vertical, 10)
-          }
-        }.padding(.horizontal, 8)
-      }
-      .navigationTitle("每日放送")
-      .navigationBarTitleDisplayMode(.inline)
-      .onGeometryChange(for: CGSize.self) { proxy in
-        proxy.size
-      } action: { newSize in
-        if self.width != newSize.width {
-          self.width = newSize.width
+            Text("每日放送")
+              .font(.title)
+              .padding(.top, 10)
+            VStack {
+              Text("\(today.formatted(date: .complete, time: .omitted))")
+              Text("本季度共 \(total) 部番组，今日上映 \(todayTotal) 部。")
+              Text("共 \(todayWatchers) 人收看今日番组。")
+            }
+            .font(.footnote)
+            .foregroundStyle(.secondary)
+          }.padding(.horizontal, 8)
+          LazyVStack {
+            ForEach(sortedCalendars) { calendar in
+              CalendarWeekdayView(width: geometry.size.width - 16)
+                .environment(calendar)
+                .padding(.vertical, 10)
+            }
+          }.padding(.horizontal, 8)
         }
-      }
-      .refreshable {
-        refreshed = false
-        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-        await refreshCalendar()
+        .navigationTitle("每日放送")
+        .navigationBarTitleDisplayMode(.inline)
+        .refreshable {
+          refreshed = false
+          UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+          await refreshCalendar()
+        }
       }
     }
   }

@@ -3,8 +3,6 @@ import SwiftUI
 struct UserHomeView: View {
   @Environment(User.self) var user
 
-  @State private var width: CGFloat = 0
-
   func ctypes(_ stype: SubjectType) -> [CollectionType: Int] {
     var result: [CollectionType: Int] = [:]
     for ct in CollectionType.allTypes() {
@@ -17,63 +15,59 @@ struct UserHomeView: View {
   }
 
   var body: some View {
-    VStack {
-      ForEach(user.homepage.left, id: \.self) { section in
-        VStack {
-          switch section {
-          case .none:
-            EmptyView()
+    GeometryReader { geometry in
+      VStack {
+        ForEach(user.homepage.left, id: \.self) { section in
+          VStack {
+            switch section {
+            case .none:
+              EmptyView()
 
-          case .anime:
-            UserSubjectCollectionView(width, .anime, ctypes(.anime))
+            case .anime:
+              UserSubjectCollectionView(geometry.size.width, .anime, ctypes(.anime))
 
-          case .blog:
-            if let count = user.stats?.blog, count > 0 {
-              UserBlogsView()
+            case .blog:
+              if let count = user.stats?.blog, count > 0 {
+                UserBlogsView()
+              }
+
+            case .book:
+              UserSubjectCollectionView(geometry.size.width, .book, ctypes(.book))
+
+            case .friend:
+              if let count = user.stats?.friend, count > 0 {
+                UserFriendsView(geometry.size.width)
+              }
+
+            case .game:
+              UserSubjectCollectionView(geometry.size.width, .game, ctypes(.game))
+
+            case .group:
+              if let count = user.stats?.group, count > 0 {
+                UserGroupsView(geometry.size.width)
+              }
+
+            case .index:
+              if let count = user.stats?.index.create, count > 0 {
+                UserIndexesView()
+              }
+
+            case .mono:
+              if let count = user.stats?.mono.character, count > 0 {
+                UserCharacterCollectionView(geometry.size.width)
+              }
+              if let count = user.stats?.mono.person, count > 0 {
+                UserPersonCollectionView(geometry.size.width)
+              }
+
+            case .music:
+              UserSubjectCollectionView(geometry.size.width, .music, ctypes(.music))
+
+            case .real:
+              UserSubjectCollectionView(geometry.size.width, .real, ctypes(.real))
             }
-
-          case .book:
-            UserSubjectCollectionView(width, .book, ctypes(.book))
-
-          case .friend:
-            if let count = user.stats?.friend, count > 0 {
-              UserFriendsView(width)
-            }
-
-          case .game:
-            UserSubjectCollectionView(width, .game, ctypes(.game))
-
-          case .group:
-            if let count = user.stats?.group, count > 0 {
-              UserGroupsView(width)
-            }
-
-          case .index:
-            if let count = user.stats?.index.create, count > 0 {
-              UserIndexesView()
-            }
-
-          case .mono:
-            if let count = user.stats?.mono.character, count > 0 {
-              UserCharacterCollectionView(width)
-            }
-            if let count = user.stats?.mono.person, count > 0 {
-              UserPersonCollectionView(width)
-            }
-
-          case .music:
-            UserSubjectCollectionView(width, .music, ctypes(.music))
-
-          case .real:
-            UserSubjectCollectionView(width, .real, ctypes(.real))
           }
         }
-      }
-    }.onGeometryChange(for: CGSize.self) { proxy in
-      proxy.size
-    } action: { newSize in
-      if self.width != newSize.width {
-        self.width = newSize.width
       }
     }
   }

@@ -20,11 +20,13 @@ struct ChiiDiscoverView: View {
       if searching {
         SearchView(text: $query, searching: $searching, remote: $remote)
       } else {
-        ScrollView {
-          VStack {
-            CalendarSlimView()
-            TrendingSubjectView()
-          }.padding(.horizontal, 8)
+        GeometryReader { geometry in
+          ScrollView {
+            VStack {
+              CalendarSlimView()
+              TrendingSubjectView(width: geometry.size.width - 16)
+            }.padding(.horizontal, 8)
+          }
         }
         .refreshable {
           await refresh()
@@ -35,7 +37,8 @@ struct ChiiDiscoverView: View {
     }
     .searchable(
       text: $query, isPresented: $searching,
-      placement: .navigationBarDrawer(displayMode: .always)
+      placement: .navigationBarDrawer(displayMode: .automatic),
+      prompt: "搜索条目，角色，人物"
     )
     .onChange(of: query) {
       remote = false

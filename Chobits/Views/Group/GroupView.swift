@@ -6,7 +6,6 @@ struct GroupView: View {
   let name: String
 
   @State private var refreshed: Bool = false
-  @State private var width: CGFloat = 0
 
   @Query private var groups: [Group]
   var group: Group? { groups.first }
@@ -34,15 +33,10 @@ struct GroupView: View {
   var body: some View {
     Section {
       if let group = group {
-        ScrollView {
-          GroupDetailView(width: width)
-            .environment(group)
-        }
-        .onGeometryChange(for: CGSize.self) { proxy in
-          proxy.size
-        } action: { newSize in
-          if self.width != newSize.width {
-            self.width = newSize.width
+        GeometryReader { geometry in
+          ScrollView {
+            GroupDetailView(width: geometry.size.width)
+              .environment(group)
           }
         }
       } else if refreshed {
