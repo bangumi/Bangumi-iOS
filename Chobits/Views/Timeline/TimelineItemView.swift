@@ -1,3 +1,4 @@
+import BBCode
 import OSLog
 import SwiftUI
 
@@ -152,7 +153,7 @@ struct TimelineItemView: View {
           case 0:
             Text("**更新了签名:** \(item.memo.status?.sign ?? "")").textSelection(.enabled)
           case 1:
-            Text(.init(item.memo.status?.tsukkomi ?? ""))
+            BBCodeView(item.memo.status?.tsukkomi ?? "")
               .tint(.linkText)
               .textSelection(.enabled)
           case 2:
