@@ -194,100 +194,102 @@ struct UserDetailView: View {
   @Environment(User.self) var user
 
   var body: some View {
-    ScrollView {
-      VStack(alignment: .leading) {
-        HStack(alignment: .top) {
-          ImageView(img: user.avatar?.large)
-            .imageStyle(width: 100, height: 100)
-            .imageType(.avatar)
-          VStack(alignment: .leading) {
-            Text(user.nickname)
-              .font(.title3)
-              .fontWeight(.bold)
-              .padding(.top, 8)
+    GeometryReader { geometry in
+      ScrollView {
+        VStack(alignment: .leading) {
+          HStack(alignment: .top) {
+            ImageView(img: user.avatar?.large)
+              .imageStyle(width: 100, height: 100)
+              .imageType(.avatar)
+            VStack(alignment: .leading) {
+              Text(user.nickname)
+                .font(.title3)
+                .fontWeight(.bold)
+                .padding(.top, 8)
+              HStack(spacing: 5) {
+                BadgeView {
+                  Text(user.groupEnum.description).font(.caption)
+                }
+                if profile.username == user.username {
+                  BadgeView {
+                    Text("我自己").font(.caption)
+                  }
+                }
+                if friendlist.contains(user.userId) {
+                  BadgeView {
+                    Text("好友").font(.caption)
+                  }
+                }
+                if blocklist.contains(user.userId) {
+                  BadgeView(background: .secondary) {
+                    Text("已绝交").font(.caption)
+                  }
+                }
+                Text("@\(user.username)")
+                  .font(.footnote)
+                  .foregroundStyle(.secondary)
+                  .textSelection(.enabled)
+              }
+              Divider()
+              Text(user.sign)
+                .font(.footnote)
+                .textSelection(.enabled)
+            }
+          }.frame(minHeight: 100)
+
+          if user.bio.isEmpty {
+            Divider()
+          } else {
+            CardView(background: .bioBackground) {
+              HStack {
+                BBCodeView(user.bio, textSize: 12)
+                  .textSelection(.enabled)
+                  .tint(.linkText)
+                Spacer()
+              }
+            }
+          }
+
+          HFlow {
             HStack(spacing: 5) {
               BadgeView {
-                Text(user.groupEnum.description).font(.caption)
+                Text("Bangumi")
+                  .font(.caption)
+                  .fixedSize()
               }
-              if profile.username == user.username {
-                BadgeView {
-                  Text("我自己").font(.caption)
-                }
-              }
-              if friendlist.contains(user.userId) {
-                BadgeView {
-                  Text("好友").font(.caption)
-                }
-              }
-              if blocklist.contains(user.userId) {
-                BadgeView(background: .secondary) {
-                  Text("已绝交").font(.caption)
-                }
-              }
-              Text("@\(user.username)")
+              Text("\(user.joinedAt.dateDisplay)加入")
                 .font(.footnote)
                 .foregroundStyle(.secondary)
-                .textSelection(.enabled)
             }
-            Divider()
-            Text(user.sign)
-              .font(.footnote)
-              .textSelection(.enabled)
-          }
-        }.frame(minHeight: 100)
-
-        if user.bio.isEmpty {
-          Divider()
-        } else {
-          CardView(background: .bioBackground) {
-            HStack {
-              BBCodeView(user.bio, textSize: 12)
-                .textSelection(.enabled)
-                .tint(.linkText)
-              Spacer()
-            }
-          }
-        }
-
-        HFlow {
-          HStack(spacing: 5) {
-            BadgeView {
-              Text("Bangumi")
-                .font(.caption)
-                .fixedSize()
-            }
-            Text("\(user.joinedAt.dateDisplay)加入")
-              .font(.footnote)
-              .foregroundStyle(.secondary)
-          }
-          if !user.site.isEmpty {
-            HStack(spacing: 5) {
-              BadgeView(background: .accentColor) {
-                Text("Home")
-                  .font(.caption)
-                  .fixedSize()
+            if !user.site.isEmpty {
+              HStack(spacing: 5) {
+                BadgeView(background: .accentColor) {
+                  Text("Home")
+                    .font(.caption)
+                    .fixedSize()
+                }
+                Text(user.site.withLink(user.site))
+                  .font(.footnote)
+                  .textSelection(.enabled)
               }
-              Text(user.site.withLink(user.site))
-                .font(.footnote)
-                .textSelection(.enabled)
             }
-          }
-          ForEach(user.networkServices) { service in
-            HStack(spacing: 5) {
-              BadgeView(background: Color(service.color)) {
-                Text(service.title)
-                  .font(.caption)
-                  .fixedSize()
+            ForEach(user.networkServices) { service in
+              HStack(spacing: 5) {
+                BadgeView(background: Color(service.color)) {
+                  Text(service.title)
+                    .font(.caption)
+                    .fixedSize()
+                }
+                Text(service.account.withLink(service.link))
+                  .font(.footnote)
+                  .textSelection(.enabled)
               }
-              Text(service.account.withLink(service.link))
-                .font(.footnote)
-                .textSelection(.enabled)
             }
           }
-        }
 
-        UserHomeView().environment(user)
-      }.padding(.horizontal, 8)
+          UserHomeView(width: geometry.size.width).environment(user)
+        }.padding(.horizontal, 8)
+      }
     }
   }
 }
