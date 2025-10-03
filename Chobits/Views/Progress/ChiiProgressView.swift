@@ -169,7 +169,7 @@ struct ChiiProgressView: View {
           }
           .searchable(
             text: $search,
-            placement: .navigationBarDrawer(displayMode: .automatic),
+            placement: .navigationBarDrawer(displayMode: .always),
             prompt: "搜索正在观看的条目"
           )
           .animation(.default, value: subjectType)

@@ -37,7 +37,7 @@ struct ChiiDiscoverView: View {
     }
     .searchable(
       text: $query, isPresented: $searching,
-      placement: .navigationBarDrawer(displayMode: .automatic),
+      placement: .navigationBarDrawer(displayMode: .always),
       prompt: "搜索条目，角色，人物"
     )
     .onChange(of: query) {
