@@ -7,13 +7,30 @@ struct UserSubjectCollectionView: View {
 
   @Environment(User.self) var user
 
-  @State private var ctype: CollectionType = .collect
+  @State private var ctype: CollectionType
+  @State private var refreshing = false
   @State private var subjects: [SlimSubjectDTO] = []
 
   init(_ width: CGFloat, _ stype: SubjectType, _ ctypes: [CollectionType: Int]) {
     self.width = width
     self.stype = stype
     self.ctypes = ctypes
+    self._ctype = State(initialValue: .collect)
+    for ct in CollectionType.timelineTypes() {
+      if let count = ctypes[ct], count > 0 {
+        self._ctype = State(initialValue: ct)
+        break
+      }
+    }
+  }
+
+  var imageHeight: CGFloat {
+    switch stype {
+    case .music:
+      return 60
+    default:
+      return 80
+    }
   }
 
   var columnCount: Int {
@@ -36,6 +53,8 @@ struct UserSubjectCollectionView: View {
   }
 
   func refresh() async {
+    if refreshing { return }
+    refreshing = true
     if width == 0 { return }
     do {
       let resp = try await Chii.shared.getUserSubjectCollections(
@@ -44,6 +63,7 @@ struct UserSubjectCollectionView: View {
     } catch {
       Notifier.shared.alert(error: error)
     }
+    refreshing = false
   }
 
   var body: some View {
@@ -51,15 +71,37 @@ struct UserSubjectCollectionView: View {
       EmptyView()
     } else {
       VStack {
-        VStack(spacing: 2) {
-          HStack(alignment: .bottom) {
-            Text("\(user.nickname)的\(stype.description)").font(.title3)
-            Spacer()
-
+        VStack(alignment: .leading, spacing: 2) {
+          HStack(alignment: .bottom, spacing: 2) {
             NavigationLink(value: NavDestination.userCollection(user.slim, stype, ctypes)) {
-              Text("更多 »")
-                .font(.caption)
-            }.buttonStyle(.navigation)
+              Text(stype.description).font(.title3)
+            }
+            .buttonStyle(.navigation)
+            .padding(.horizontal, 4)
+
+            ForEach(CollectionType.allTypes(), id: \.self) { ct in
+              if let count = ctypes[ct], count > 0 {
+                let borderColor = ctype == ct ? Color.linkText : Color.secondary.opacity(0.2)
+                BorderView(color: borderColor, padding: 3, cornerRadius: 16) {
+                  Text("\(ct.description(stype)) \(count)")
+                    .font(.footnote)
+                    .foregroundStyle(.linkText)
+                    .monospacedDigit()
+                }
+                .padding(1)
+                .onTapGesture {
+                  if ctype == ct {
+                    return
+                  }
+                  Task {
+                    ctype = ct
+                    await refresh()
+                  }
+                }
+              }
+            }
+
+            Spacer(minLength: 0)
           }
           .padding(.top, 8)
           .task {
@@ -73,33 +115,20 @@ struct UserSubjectCollectionView: View {
               await refresh()
             }
           }
-
-          Picker("Collection Type", selection: $ctype) {
-            ForEach(CollectionType.allTypes(), id: \.self) { ct in
-              if let count = ctypes[ct], count > 0 {
-                Text("\(ct.description(stype))(\(count))")
-                  .tag(ct)
-              } else {
-                Text("\(ct.description(stype))")
-                  .tag(ct)
-              }
-            }
-          }
-          .pickerStyle(.segmented)
-          .onChange(of: ctype) { _, _ in
-            Task {
-              await refresh()
-            }
-          }
+          Divider()
         }
 
-        LazyVGrid(columns: columns) {
-          ForEach(Array(subjects.prefix(limit))) { subject in
-            ImageView(img: subject.images?.resize(.r200))
-              .imageStyle(width: 60, height: 60)
-              .imageType(.subject)
-              .imageLink(subject.link)
-              .subjectPreview(subject)
+        if refreshing {
+          ProgressView()
+        } else {
+          LazyVGrid(columns: columns) {
+            ForEach(Array(subjects.prefix(limit))) { subject in
+              ImageView(img: subject.images?.resize(.r200))
+                .imageStyle(width: 60, height: imageHeight)
+                .imageType(.subject)
+                .imageLink(subject.link)
+                .subjectPreview(subject)
+            }
           }
         }
       }.animation(.default, value: subjects)
