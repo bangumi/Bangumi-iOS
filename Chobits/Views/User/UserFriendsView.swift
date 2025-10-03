@@ -45,7 +45,7 @@ struct UserFriendsView: View {
     VStack {
       VStack(spacing: 2) {
         HStack(alignment: .bottom) {
-          Text("\(user.nickname)的好友").font(.title3)
+          Text("好友").font(.title3)
           Spacer()
           NavigationLink(value: NavDestination.userFriend(user.slim)) {
             Text("更多 »")

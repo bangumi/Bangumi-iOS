@@ -84,6 +84,7 @@ struct UserSubjectCollectionView: View {
                 let borderColor = ctype == ct ? Color.linkText : Color.secondary.opacity(0.2)
                 BorderView(color: borderColor, padding: 3, cornerRadius: 16) {
                   Text("\(ct.description(stype)) \(count)")
+                    .lineLimit(1)
                     .font(.footnote)
                     .foregroundStyle(.linkText)
                     .monospacedDigit()
@@ -105,6 +106,9 @@ struct UserSubjectCollectionView: View {
           }
           .padding(.top, 8)
           .task {
+            if !subjects.isEmpty {
+              return
+            }
             await refresh()
           }
           .onChange(of: width) {
@@ -128,10 +132,14 @@ struct UserSubjectCollectionView: View {
                 .imageType(.subject)
                 .imageLink(subject.link)
                 .subjectPreview(subject)
+                .shadow(radius: 2)
             }
           }
         }
-      }.animation(.default, value: subjects)
+      }
+      .animation(.default, value: ctype)
+      .animation(.default, value: refreshing)
+      .animation(.default, value: subjects)
     }
   }
 }

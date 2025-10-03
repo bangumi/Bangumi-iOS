@@ -20,7 +20,7 @@ struct UserBlogsView: View {
     VStack {
       VStack(spacing: 2) {
         HStack(alignment: .bottom) {
-          Text("\(user.nickname)的日志").font(.title3)
+          Text("日志").font(.title3)
           Spacer()
           NavigationLink(value: NavDestination.userBlog(user.slim)) {
             Text("更多 »")
@@ -39,6 +39,7 @@ struct UserBlogsView: View {
               .imageStyle(width: 60, height: 60)
               .imageType(.photo)
               .imageLink(blog.link)
+              .shadow(radius: 2)
             VStack(alignment: .leading) {
               Text(blog.title.withLink(blog.link)).lineLimit(1)
               HStack {

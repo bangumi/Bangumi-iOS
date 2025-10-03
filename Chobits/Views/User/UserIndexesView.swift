@@ -20,7 +20,7 @@ struct UserIndexesView: View {
     VStack {
       VStack(spacing: 2) {
         HStack(alignment: .bottom) {
-          Text("\(user.nickname)的目录").font(.title3)
+          Text("目录").font(.title3)
           Spacer()
           NavigationLink(value: NavDestination.userIndex(user.slim)) {
             Text("更多 »")

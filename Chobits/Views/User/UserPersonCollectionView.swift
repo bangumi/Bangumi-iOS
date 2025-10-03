@@ -45,7 +45,7 @@ struct UserPersonCollectionView: View {
     VStack {
       VStack(spacing: 2) {
         HStack(alignment: .bottom) {
-          Text("\(user.nickname)收藏的人物").font(.title3)
+          Text("人物").font(.title3)
           Spacer()
           NavigationLink(value: NavDestination.userMono(user.slim)) {
             Text("更多 »")
@@ -71,6 +71,7 @@ struct UserPersonCollectionView: View {
             .imageStyle(width: 60, height: 60)
             .imageType(.person)
             .imageLink(person.link)
+            .shadow(radius: 2)
         }
       }
     }.animation(.default, value: persons)

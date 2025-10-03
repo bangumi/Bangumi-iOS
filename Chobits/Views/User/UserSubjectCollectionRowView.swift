@@ -7,13 +7,17 @@ struct UserSubjectCollectionRowView: View {
   var body: some View {
     HStack(alignment: .top) {
       ImageView(img: subject.images?.resize(.r200))
-        .imageStyle(width: 60, height: 60)
+        .imageStyle(width: 60, height: 80)
         .imageType(.subject)
         .imageLink(subject.link)
       VStack(alignment: .leading) {
         Text(subject.name.withLink(subject.link))
           .lineLimit(1)
         Text(subject.nameCN)
+          .lineLimit(1)
+          .font(.caption)
+          .foregroundStyle(.secondary.opacity(0.8))
+        Text(subject.info ?? "")
           .lineLimit(1)
           .font(.footnote)
           .foregroundStyle(.secondary)
