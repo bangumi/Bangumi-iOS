@@ -45,12 +45,10 @@ struct UserPersonCollectionView: View {
     VStack {
       VStack(spacing: 2) {
         HStack(alignment: .bottom) {
-          Text("人物").font(.title3)
-          Spacer()
           NavigationLink(value: NavDestination.userMono(user.slim)) {
-            Text("更多 »")
-              .font(.caption)
+            Text("人物").font(.title3)
           }.buttonStyle(.navigation)
+          Spacer()
         }
         .padding(.top, 8)
         .task(refresh)

@@ -45,12 +45,10 @@ struct UserFriendsView: View {
     VStack {
       VStack(spacing: 2) {
         HStack(alignment: .bottom) {
-          Text("好友").font(.title3)
-          Spacer()
           NavigationLink(value: NavDestination.userFriend(user.slim)) {
-            Text("更多 »")
-              .font(.caption)
+            Text("好友").font(.title3)
           }.buttonStyle(.navigation)
+          Spacer()
         }
         .padding(.top, 8)
         .task(refresh)

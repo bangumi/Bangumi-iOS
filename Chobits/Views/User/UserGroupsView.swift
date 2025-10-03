@@ -45,12 +45,10 @@ struct UserGroupsView: View {
     VStack {
       VStack(spacing: 2) {
         HStack(alignment: .bottom) {
-          Text("加入的小组").font(.title3)
-          Spacer()
           NavigationLink(value: NavDestination.userGroup(user.slim)) {
-            Text("更多 »")
-              .font(.caption)
+            Text("小组").font(.title3)
           }.buttonStyle(.navigation)
+          Spacer()
         }
         .padding(.top, 8)
         .task(refresh)

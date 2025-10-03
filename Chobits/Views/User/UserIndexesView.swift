@@ -20,12 +20,10 @@ struct UserIndexesView: View {
     VStack {
       VStack(spacing: 2) {
         HStack(alignment: .bottom) {
-          Text("目录").font(.title3)
-          Spacer()
           NavigationLink(value: NavDestination.userIndex(user.slim)) {
-            Text("更多 »")
-              .font(.caption)
+            Text("目录").font(.title3)
           }.buttonStyle(.navigation)
+          Spacer()
         }
         .padding(.top, 8)
         .task(refresh)
