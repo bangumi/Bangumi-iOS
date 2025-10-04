@@ -100,7 +100,7 @@ struct SubjectCardView: View {
     VStack(alignment: .leading, spacing: 5) {
       HStack(alignment: .top) {
         ImageView(img: subject.images?.resize(.r200))
-          .imageStyle(width: 80, height: 108)
+          .imageStyle(width: 80, height: 108, cornerRadius: 16)
           .imageType(.subject)
           .imageNSFW(subject.nsfw)
         VStack(alignment: .leading) {
