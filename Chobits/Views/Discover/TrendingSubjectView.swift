@@ -4,8 +4,6 @@ import SwiftUI
 struct TrendingSubjectView: View {
   let width: CGFloat
 
-  @Environment(\.modelContext) private var modelContext
-
   @State private var loaded: Bool = false
 
   func load() async {
@@ -35,8 +33,6 @@ struct TrendingSubjectTypeView: View {
   let width: CGFloat
 
   @AppStorage("subjectImageQuality") var subjectImageQuality: ImageQuality = .high
-
-  @Environment(\.modelContext) private var modelContext
 
   @Query private var trending: [TrendingSubject]
   var items: [TrendingSubjectDTO] { trending.first?.items ?? [] }

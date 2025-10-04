@@ -148,6 +148,12 @@ extension Chii {
     try await db.saveEpisode(item)
     try await db.commit()
   }
+
+  func deleteEpisode(_ episodeId: Int) async throws {
+    let db = try self.getDB()
+    try await db.deleteEpisode(episodeId)
+    try await db.commit()
+  }
 }
 
 extension Chii {

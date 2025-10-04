@@ -13,8 +13,6 @@ enum FilterExpand: String {
 struct SubjectBrowsingView: View {
   let type: SubjectType
 
-  @Environment(\.modelContext) private var modelContext
-
   @State private var showFilter: Bool = false
   @State private var filterExpand: FilterExpand? = nil
   @State private var filter: SubjectsBrowseFilter = SubjectsBrowseFilter()

@@ -7,6 +7,8 @@ struct EpisodeView: View {
   @AppStorage("shareDomain") var shareDomain: ShareDomain = .chii
   @AppStorage("isolationMode") var isolationMode: Bool = false
 
+  @Environment(\.dismiss) private var dismiss
+
   @Query private var episodes: [Episode]
   private var episode: Episode? { episodes.first }
 
@@ -27,6 +29,15 @@ struct EpisodeView: View {
         loadingComments = true
         comments = try await Chii.shared.getEpisodeComments(episodeId)
         loadingComments = false
+      }
+    } catch let error as ChiiError {
+      switch error {
+      case .notFound:
+        // 404 错误，删除当前 episode
+        try? await Chii.shared.deleteEpisode(episodeId)
+        dismiss()
+      default:
+        Notifier.shared.alert(error: error)
       }
     } catch {
       Notifier.shared.alert(error: error)

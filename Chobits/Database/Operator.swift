@@ -520,6 +520,13 @@ extension DatabaseOperator {
   public func saveEpisode(_ item: EpisodeDTO) throws {
     let _ = try self.ensureEpisode(item)
   }
+
+  public func deleteEpisode(_ episodeId: Int) throws {
+    let predicate = #Predicate<Episode> { $0.episodeId == episodeId }
+    if let episode = try self.fetchOne(predicate: predicate) {
+      modelContext.delete(episode)
+    }
+  }
 }
 
 // MARK: - save subject
