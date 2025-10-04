@@ -70,6 +70,8 @@ struct ReplyItemView: View {
         .filterBlocklist(reply.creatorID)
     case .userDelete:
       PostUserDeleteStateView(reply.creatorID, reply.creator, reply.createdAt, author)
+    case .adminOffTopic:
+      PostAdminOffTopicStateView(reply.creatorID, reply.creator, reply.createdAt, author)
     default:
       PostStateView(reply.state)
     }
@@ -189,6 +191,9 @@ struct ReplyItemNormalView: View {
                   author: author, topicId: topicId)
               case .userDelete:
                 PostUserDeleteStateView(
+                  subreply.creatorID, subreply.creator, subreply.createdAt, author)
+              case .adminOffTopic:
+                PostAdminOffTopicStateView(
                   subreply.creatorID, subreply.creator, subreply.createdAt, author)
               default:
                 PostStateView(subreply.state)

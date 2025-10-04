@@ -80,6 +80,8 @@ struct CommentItemView: View {
         .filterBlocklist(comment.creatorID)
     case .userDelete:
       PostUserDeleteStateView(comment.creatorID, comment.user, comment.createdAt)
+    case .adminOffTopic:
+      PostAdminOffTopicStateView(comment.creatorID, comment.user, comment.createdAt)
     default:
       PostStateView(comment.state)
     }
@@ -177,6 +179,8 @@ struct CommentItemNormalView: View {
                   reply: reply, idx: idx, subidx: subidx)
               case .userDelete:
                 PostUserDeleteStateView(reply.creatorID, reply.user, reply.createdAt)
+              case .adminOffTopic:
+                PostAdminOffTopicStateView(reply.creatorID, reply.user, reply.createdAt)
               default:
                 PostStateView(reply.state)
               }
