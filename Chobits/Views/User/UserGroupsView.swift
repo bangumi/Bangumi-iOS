@@ -1,37 +1,14 @@
 import SwiftUI
 
 struct UserGroupsView: View {
-  let width: CGFloat
-
   @Environment(User.self) var user
 
+  @State private var refreshing = false
   @State private var groups: [SlimGroupDTO] = []
 
-  init(_ width: CGFloat) {
-    self.width = width
-  }
-
-  var columnCount: Int {
-    let columns = Int((width - 8) / 110)
-    return columns > 0 ? columns : 1
-  }
-
-  var limit: Int {
-    if columnCount >= 9 {
-      return min(columnCount, 20)
-    } else if columnCount >= 5 {
-      return columnCount * 2
-    } else {
-      return columnCount * 3
-    }
-  }
-
-  var columns: [GridItem] {
-    Array(repeating: .init(.flexible()), count: columnCount)
-  }
-
   func refresh() async {
-    if width == 0 { return }
+    if refreshing { return }
+    refreshing = true
     do {
       let resp = try await Chii.shared.getUserGroups(
         username: user.username, limit: 20)
@@ -39,51 +16,63 @@ struct UserGroupsView: View {
     } catch {
       Notifier.shared.alert(error: error)
     }
+    refreshing = false
   }
 
   var body: some View {
-    VStack {
-      VStack(spacing: 2) {
-        HStack(alignment: .bottom) {
-          NavigationLink(value: NavDestination.userGroup(user.slim)) {
-            Text("小组").font(.title3)
-          }.buttonStyle(.navigation)
+    VStack(alignment: .leading, spacing: 2) {
+      HStack(alignment: .bottom) {
+        NavigationLink(value: NavDestination.userGroup(user.slim)) {
+          Text("小组").font(.title3)
+        }
+        .buttonStyle(.navigation)
+        .padding(.horizontal, 4)
+
+        Spacer(minLength: 0)
+      }
+      .padding(.top, 8)
+      .task {
+        if !groups.isEmpty {
+          return
+        }
+        await refresh()
+      }
+      Divider()
+
+      if refreshing {
+        HStack {
+          Spacer()
+          ProgressView().padding()
           Spacer()
         }
-        .padding(.top, 8)
-        .task(refresh)
-        .onChange(of: width) {
-          if !groups.isEmpty {
-            return
-          }
-          Task {
-            await refresh()
-          }
-        }
-        Divider()
-      }
-
-      LazyVGrid(columns: columns) {
-        ForEach(Array(groups.prefix(limit))) { group in
-          HStack {
-            ImageView(img: group.icon?.large)
-              .imageStyle(width: 32, height: 32)
-              .imageType(.icon)
-              .imageLink(group.link)
-            VStack(alignment: .leading, spacing: 2) {
-              Text(group.title.withLink(group.link))
-                .lineLimit(1)
-                .font(.footnote)
-              Divider()
-              Text("\(group.members ?? 0) 位成员")
-                .foregroundStyle(.secondary)
-                .font(.caption)
-                .lineLimit(1)
+      } else {
+        ScrollView(.horizontal, showsIndicators: false) {
+          LazyHGrid(rows: [GridItem(.flexible()), GridItem(.flexible())], alignment: .top) {
+            ForEach(groups) { group in
+              HStack {
+                ImageView(img: group.icon?.large)
+                  .imageStyle(width: 32, height: 32)
+                  .imageType(.icon)
+                  .imageLink(group.link)
+                VStack(alignment: .leading, spacing: 2) {
+                  Text(group.title.withLink(group.link))
+                    .lineLimit(1)
+                    .font(.footnote)
+                  Divider()
+                  Text("\(group.members ?? 0) 位成员")
+                    .foregroundStyle(.secondary)
+                    .font(.caption)
+                    .lineLimit(1)
+                }
+                Spacer()
+              }
+              .frame(width: 160)
             }
-            Spacer()
-          }
+          }.padding(2)
         }
       }
-    }.animation(.default, value: groups)
+    }
+    .animation(.default, value: refreshing)
+    .animation(.default, value: groups)
   }
 }

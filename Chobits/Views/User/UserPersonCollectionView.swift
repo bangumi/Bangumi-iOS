@@ -1,37 +1,14 @@
 import SwiftUI
 
 struct UserPersonCollectionView: View {
-  let width: CGFloat
-
   @Environment(User.self) var user
 
+  @State private var refreshing = false
   @State private var persons: [SlimPersonDTO] = []
 
-  init(_ width: CGFloat) {
-    self.width = width
-  }
-
-  var columnCount: Int {
-    let columns = Int((width - 8) / 68)
-    return columns > 0 ? columns : 1
-  }
-
-  var limit: Int {
-    if columnCount >= 7 {
-      return min(columnCount, 20)
-    } else if columnCount >= 4 {
-      return columnCount * 2
-    } else {
-      return columnCount * 3
-    }
-  }
-
-  var columns: [GridItem] {
-    Array(repeating: .init(.flexible()), count: columnCount)
-  }
-
   func refresh() async {
-    if width == 0 { return }
+    if refreshing { return }
+    refreshing = true
     do {
       let resp = try await Chii.shared.getUserPersonCollections(
         username: user.username, limit: 20)
@@ -39,39 +16,56 @@ struct UserPersonCollectionView: View {
     } catch {
       Notifier.shared.alert(error: error)
     }
+    refreshing = false
   }
 
   var body: some View {
-    VStack {
-      VStack(spacing: 2) {
-        HStack(alignment: .bottom) {
-          NavigationLink(value: NavDestination.userMono(user.slim)) {
-            Text("人物").font(.title3)
-          }.buttonStyle(.navigation)
+    VStack(alignment: .leading, spacing: 2) {
+      HStack(alignment: .bottom) {
+        NavigationLink(value: NavDestination.userMono(user.slim)) {
+          Text("人物").font(.title3)
+        }
+        .buttonStyle(.navigation)
+        .padding(.horizontal, 4)
+
+        Spacer(minLength: 0)
+      }
+      .padding(.top, 8)
+      .task {
+        if !persons.isEmpty {
+          return
+        }
+        await refresh()
+      }
+      Divider()
+
+      if refreshing {
+        HStack {
+          Spacer()
+          ProgressView().padding()
           Spacer()
         }
-        .padding(.top, 8)
-        .task(refresh)
-        .onChange(of: width) {
-          if !persons.isEmpty {
-            return
-          }
-          Task {
-            await refresh()
-          }
-        }
-        Divider()
-      }
-
-      LazyVGrid(columns: columns) {
-        ForEach(Array(persons.prefix(limit))) { person in
-          ImageView(img: person.images?.resize(.r200))
-            .imageStyle(width: 60, height: 60)
-            .imageType(.person)
-            .imageLink(person.link)
-            .shadow(radius: 2)
+      } else {
+        ScrollView(.horizontal, showsIndicators: false) {
+          LazyHStack(alignment: .top) {
+            ForEach(persons) { person in
+              VStack {
+                ImageView(img: person.images?.resize(.r200))
+                  .imageStyle(width: 60, height: 60)
+                  .imageType(.person)
+                  .imageLink(person.link)
+                  .shadow(radius: 2)
+                Text(person.name)
+                  .font(.caption2)
+                  .lineLimit(2)
+                  .multilineTextAlignment(.leading)
+              }.frame(width: 64)
+            }
+          }.padding(2)
         }
       }
-    }.animation(.default, value: persons)
+    }
+    .animation(.default, value: refreshing)
+    .animation(.default, value: persons)
   }
 }

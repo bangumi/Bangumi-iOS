@@ -1,37 +1,14 @@
 import SwiftUI
 
 struct UserFriendsView: View {
-  let width: CGFloat
-
   @Environment(User.self) var user
 
+  @State private var refreshing = false
   @State private var users: [SlimUserDTO] = []
 
-  init(_ width: CGFloat) {
-    self.width = width
-  }
-
-  var columnCount: Int {
-    let columns = Int((width - 8) / 48)
-    return columns > 0 ? columns : 1
-  }
-
-  var limit: Int {
-    if columnCount >= 10 {
-      return min(columnCount, 20)
-    } else if columnCount >= 6 {
-      return columnCount * 2
-    } else {
-      return columnCount * 3
-    }
-  }
-
-  var columns: [GridItem] {
-    Array(repeating: .init(.flexible()), count: columnCount)
-  }
-
   func refresh() async {
-    if width == 0 { return }
+    if refreshing { return }
+    refreshing = true
     do {
       let resp = try await Chii.shared.getUserFriends(
         username: user.username, limit: 20)
@@ -39,38 +16,55 @@ struct UserFriendsView: View {
     } catch {
       Notifier.shared.alert(error: error)
     }
+    refreshing = false
   }
 
   var body: some View {
-    VStack {
-      VStack(spacing: 2) {
-        HStack(alignment: .bottom) {
-          NavigationLink(value: NavDestination.userFriend(user.slim)) {
-            Text("好友").font(.title3)
-          }.buttonStyle(.navigation)
+    VStack(alignment: .leading, spacing: 2) {
+      HStack(alignment: .bottom) {
+        NavigationLink(value: NavDestination.userFriend(user.slim)) {
+          Text("好友").font(.title3)
+        }
+        .buttonStyle(.navigation)
+        .padding(.horizontal, 4)
+
+        Spacer(minLength: 0)
+      }
+      .padding(.top, 8)
+      .task {
+        if !users.isEmpty {
+          return
+        }
+        await refresh()
+      }
+      Divider()
+
+      if refreshing {
+        HStack {
+          Spacer()
+          ProgressView().padding()
           Spacer()
         }
-        .padding(.top, 8)
-        .task(refresh)
-        .onChange(of: width) {
-          if !users.isEmpty {
-            return
-          }
-          Task {
-            await refresh()
-          }
-        }
-        Divider()
-      }
-
-      LazyVGrid(columns: columns) {
-        ForEach(Array(users.prefix(limit))) { user in
-          ImageView(img: user.avatar?.large)
-            .imageStyle(width: 40, height: 40)
-            .imageType(.avatar)
-            .imageLink(user.link)
+      } else {
+        ScrollView(.horizontal, showsIndicators: false) {
+          LazyHStack(alignment: .top) {
+            ForEach(users) { user in
+              VStack {
+                ImageView(img: user.avatar?.large)
+                  .imageStyle(width: 40, height: 40)
+                  .imageType(.avatar)
+                  .imageLink(user.link)
+                Text(user.nickname)
+                  .font(.caption2)
+                  .lineLimit(2)
+                  .multilineTextAlignment(.leading)
+              }.frame(width: 44)
+            }
+          }.padding(2)
         }
       }
-    }.animation(.default, value: users)
+    }
+    .animation(.default, value: refreshing)
+    .animation(.default, value: users)
   }
 }

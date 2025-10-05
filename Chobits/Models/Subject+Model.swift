@@ -186,7 +186,7 @@ final class SubjectV2: Searchable, Linkable {
     guard typeEnum == .anime || typeEnum == .real else {
       return Int.max
     }
-    
+
     do {
       // 查找该条目的第一个未看的主要剧集
       let currentSubjectId = self.subjectId
@@ -196,30 +196,30 @@ final class SubjectV2: Searchable, Linkable {
         },
         sortBy: [SortDescriptor<Episode>(\.sort, order: .forward)]
       )
-      
+
       let episodes = try context.fetch(descriptor)
-      
+
       // 没有未看的剧集，返回最低优先级
-      guard let nextEpisode = episodes.first else { 
-        return Int.max 
+      guard let nextEpisode = episodes.first else {
+        return Int.max
       }
-      
+
       // 播出时间未知，返回较低优先级
-      if nextEpisode.air.timeIntervalSince1970 == 0 { 
-        return Int.max - 1 
+      if nextEpisode.air.timeIntervalSince1970 == 0 {
+        return Int.max - 1
       }
-      
+
       // 计算与当前时间的天数差
       let calendar = Calendar.current
       let now = Date()
       let episodeDate = nextEpisode.air
-      
+
       // 获取两个日期的开始时间
       let nowDate = calendar.startOfDay(for: now)
       let airDate = calendar.startOfDay(for: episodeDate)
-      
+
       let components = calendar.dateComponents([.day], from: nowDate, to: airDate)
-      
+
       if let days = components.day {
         // 返回实际的天数差
         return days
@@ -229,9 +229,11 @@ final class SubjectV2: Searchable, Linkable {
       return Int.max
     }
   }
-  
+
   /// 用于比较两个条目的播出天数优先级
-  static func compareDays(_ days1: Int, _ days2: Int, _ subject1: Subject, _ subject2: Subject) -> Bool {
+  static func compareDays(_ days1: Int, _ days2: Int, _ subject1: Subject, _ subject2: Subject)
+    -> Bool
+  {
     // 处理无播出时间的情况
     if days1 >= Int.max - 1 && days2 >= Int.max - 1 {
       // 两个都没有播出时间，按收藏时间排序

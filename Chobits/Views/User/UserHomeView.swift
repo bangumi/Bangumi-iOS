@@ -1,8 +1,6 @@
 import SwiftUI
 
 struct UserHomeView: View {
-  let width: CGFloat
-
   @Environment(User.self) var user
 
   func ctypes(_ stype: SubjectType) -> [CollectionType: Int] {
@@ -25,7 +23,7 @@ struct UserHomeView: View {
             EmptyView()
 
           case .anime:
-            UserSubjectCollectionView(width, .anime, ctypes(.anime))
+            UserSubjectCollectionView(.anime, ctypes(.anime))
 
           case .blog:
             if let count = user.stats?.blog, count > 0 {
@@ -33,19 +31,19 @@ struct UserHomeView: View {
             }
 
           case .book:
-            UserSubjectCollectionView(width, .book, ctypes(.book))
+            UserSubjectCollectionView(.book, ctypes(.book))
 
           case .friend:
             if let count = user.stats?.friend, count > 0 {
-              UserFriendsView(width)
+              UserFriendsView()
             }
 
           case .game:
-            UserSubjectCollectionView(width, .game, ctypes(.game))
+            UserSubjectCollectionView(.game, ctypes(.game))
 
           case .group:
             if let count = user.stats?.group, count > 0 {
-              UserGroupsView(width)
+              UserGroupsView()
             }
 
           case .index:
@@ -55,17 +53,17 @@ struct UserHomeView: View {
 
           case .mono:
             if let count = user.stats?.mono.character, count > 0 {
-              UserCharacterCollectionView(width)
+              UserCharacterCollectionView()
             }
             if let count = user.stats?.mono.person, count > 0 {
-              UserPersonCollectionView(width)
+              UserPersonCollectionView()
             }
 
           case .music:
-            UserSubjectCollectionView(width, .music, ctypes(.music))
+            UserSubjectCollectionView(.music, ctypes(.music))
 
           case .real:
-            UserSubjectCollectionView(width, .real, ctypes(.real))
+            UserSubjectCollectionView(.real, ctypes(.real))
           }
         }
       }
