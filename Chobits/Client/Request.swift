@@ -1433,6 +1433,77 @@ extension Chii {
   }
 }
 
+// MARK: - Index
+extension Chii {
+  func getIndex(indexID: Int) async throws -> IndexDTO {
+    let url = BangumiAPI.priv.build("p1/indexes/\(indexID)")
+    let data = try await self.request(url: url, method: "GET")
+    let resp: IndexDTO = try self.decodeResponse(data)
+    return resp
+  }
+
+  func createIndex(title: String, desc: String, private isPrivate: Bool = false) async throws -> Int
+  {
+    let url = BangumiAPI.priv.build("p1/indexes")
+    let body = CreateIndexDTO(title: title, desc: desc, private: isPrivate)
+    let data = try await self.request(url: url, method: "POST", body: body)
+    let resp: [String: Int] = try self.decodeResponse(data)
+    return resp["id"] ?? 0
+  }
+
+  func updateIndex(
+    indexID: Int, title: String? = nil, desc: String? = nil, private isPrivate: Bool? = nil
+  ) async throws {
+    let url = BangumiAPI.priv.build("p1/indexes/\(indexID)")
+    let body = UpdateIndexDTO(title: title, desc: desc, private: isPrivate)
+    _ = try await self.request(url: url, method: "PATCH", body: body)
+  }
+
+  func getIndexRelated(
+    indexID: Int, cat: IndexRelatedCategory? = nil, type: Int? = nil, limit: Int = 20,
+    offset: Int = 0
+  ) async throws -> PagedDTO<IndexRelatedDTO> {
+    let url = BangumiAPI.priv.build("p1/indexes/\(indexID)/related")
+    var queryItems: [URLQueryItem] = [
+      URLQueryItem(name: "limit", value: String(limit)),
+      URLQueryItem(name: "offset", value: String(offset)),
+    ]
+    if let cat = cat {
+      queryItems.append(URLQueryItem(name: "cat", value: String(cat.rawValue)))
+    }
+    if let type = type {
+      queryItems.append(URLQueryItem(name: "type", value: String(type)))
+    }
+    let pageURL = url.appending(queryItems: queryItems)
+    let data = try await self.request(url: pageURL, method: "GET")
+    let resp: PagedDTO<IndexRelatedDTO> = try self.decodeResponse(data)
+    return resp
+  }
+
+  func putIndexRelated(
+    indexID: Int, cat: IndexRelatedCategory, type: Int, sid: Int, order: Int? = nil,
+    comment: String? = nil, award: String? = nil
+  ) async throws -> Int {
+    let url = BangumiAPI.priv.build("p1/indexes/\(indexID)/related")
+    let body = CreateIndexRelatedDTO(
+      cat: cat, type: type, sid: sid, order: order, comment: comment, award: award)
+    let data = try await self.request(url: url, method: "PUT", body: body)
+    let resp: [String: Int] = try self.decodeResponse(data)
+    return resp["id"] ?? 0
+  }
+
+  func patchIndexRelated(indexID: Int, id: Int, order: Int, comment: String) async throws {
+    let url = BangumiAPI.priv.build("p1/indexes/\(indexID)/related/\(id)")
+    let body = UpdateIndexRelatedDTO(order: order, comment: comment)
+    _ = try await self.request(url: url, method: "PATCH", body: body)
+  }
+
+  func deleteIndexRelated(indexID: Int, id: Int) async throws {
+    let url = BangumiAPI.priv.build("p1/indexes/\(indexID)/related/\(id)")
+    _ = try await self.request(url: url, method: "DELETE")
+  }
+}
+
 /// MARK: - Search
 extension Chii {
   func searchSubjects(keyword: String, type: SubjectType = .none, limit: Int = 10, offset: Int = 0)

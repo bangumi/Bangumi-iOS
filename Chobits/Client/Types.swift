@@ -971,20 +971,39 @@ struct TimelineWikiDTO: Codable, Hashable {
   var subject: SlimSubjectDTO?
 }
 
-typealias IndexStats = [Int: Int]
+struct IndexStatsSubject: Codable, Hashable {
+  var book: Int?
+  var anime: Int?
+  var music: Int?
+  var game: Int?
+  var real: Int?
+}
+
+struct IndexStats: Codable, Hashable {
+  var subject: IndexStatsSubject
+  var character: Int?
+  var person: Int?
+  var episode: Int?
+  var blog: Int?
+  var groupTopic: Int?
+  var subjectTopic: Int?
+}
 
 struct IndexDTO: Codable, Identifiable, Hashable, Linkable {
   var id: Int
+  var uid: Int
   var type: Int
   var title: String
   var desc: String
+  var `private`: Bool
   var replies: Int
   var total: Int
   var collects: Int
   var stats: IndexStats
+  var award: Int
   var createdAt: Int
   var updatedAt: Int
-  var creator: SlimUserDTO
+  var user: SlimUserDTO
   var collectedAt: Int?
 
   var name: String {
@@ -1002,15 +1021,19 @@ struct IndexDTO: Codable, Identifiable, Hashable, Linkable {
 
 struct SlimIndexDTO: Codable, Identifiable, Hashable, Linkable {
   var id: Int
+  var uid: Int
   var type: Int
   var title: String
+  var `private`: Bool
   var total: Int
   var createdAt: Int
 
   init(_ index: IndexDTO) {
     self.id = index.id
+    self.uid = index.uid
     self.type = index.type
     self.title = index.title
+    self.private = index.private
     self.total = index.total
     self.createdAt = index.createdAt
   }
@@ -1022,6 +1045,85 @@ struct SlimIndexDTO: Codable, Identifiable, Hashable, Linkable {
   var link: String {
     "chii://index/\(id)"
   }
+}
+
+enum IndexRelatedCategory: Int, Codable, CaseIterable {
+  case subject = 0
+  case character = 1
+  case person = 2
+  case episode = 3
+  case blog = 4
+  case groupTopic = 5
+  case subjectTopic = 6
+
+  var title: String {
+    switch self {
+    case .subject: return "条目"
+    case .character: return "角色"
+    case .person: return "人物"
+    case .episode: return "章节"
+    case .blog: return "日志"
+    case .groupTopic: return "小组话题"
+    case .subjectTopic: return "条目讨论"
+    }
+  }
+}
+
+struct IndexRelatedDTO: Codable, Identifiable, Hashable {
+  var id: Int
+  var cat: IndexRelatedCategory
+  var rid: Int
+  var type: Int
+  var sid: Int
+  var order: Int
+  var comment: String
+  var award: String
+  var createdAt: Int
+  var subject: SlimSubjectDTO?
+  var character: SlimCharacterDTO?
+  var person: SlimPersonDTO?
+  var episode: EpisodeDTO?
+  var blog: SlimBlogEntryDTO?
+  var groupTopic: GroupTopicDTO?
+  var subjectTopic: SubjectTopicDTO?
+
+  var title: String {
+    switch cat {
+    case .subject: return subject?.name ?? ""
+    case .character: return character?.name ?? ""
+    case .person: return person?.name ?? ""
+    case .episode: return episode?.name ?? ""
+    case .blog: return blog?.title ?? ""
+    case .groupTopic: return groupTopic?.title ?? ""
+    case .subjectTopic: return subjectTopic?.title ?? ""
+    }
+  }
+}
+
+struct CreateIndexDTO: Codable {
+  var title: String
+  var desc: String
+  var `private`: Bool = false
+}
+
+struct UpdateIndexDTO: Codable {
+  var title: String?
+  var desc: String?
+  var `private`: Bool?
+}
+
+struct CreateIndexRelatedDTO: Codable {
+  var cat: IndexRelatedCategory
+  var type: Int
+  var sid: Int
+  var order: Int?
+  var comment: String?
+  var award: String?
+}
+
+struct UpdateIndexRelatedDTO: Codable {
+  var order: Int
+  var comment: String
 }
 
 enum TimelineCat: Int, Codable {

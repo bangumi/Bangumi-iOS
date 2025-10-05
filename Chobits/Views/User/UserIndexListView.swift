@@ -21,6 +21,7 @@ struct UserIndexListView: View {
 
   @State private var reloader = false
   @State private var type: IndexListType = .created
+  @State private var showCreateIndex = false
 
   var title: String {
     if user.username == profile.username {
@@ -82,5 +83,21 @@ struct UserIndexListView: View {
     }
     .navigationTitle(title)
     .navigationBarTitleDisplayMode(.inline)
+    .toolbar {
+      if user.username == profile.username && type == .created {
+        ToolbarItem(placement: .primaryAction) {
+          Button {
+            showCreateIndex = true
+          } label: {
+            Image(systemName: "plus")
+          }
+        }
+      }
+    }
+    .sheet(isPresented: $showCreateIndex) {
+      IndexEditView {
+        reloader.toggle()
+      }
+    }
   }
 }
