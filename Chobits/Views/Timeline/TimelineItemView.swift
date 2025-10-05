@@ -83,7 +83,7 @@ struct TimelineItemView: View {
                   ForEach(groups.prefix(5)) { group in
                     ImageView(img: group.icon?.large)
                       .imageStyle(width: 60, height: 60)
-                      .imageType(.avatar)
+                      .imageType(.icon)
                       .imageLink(group.link)
                   }
                 }
@@ -172,13 +172,13 @@ struct TimelineItemView: View {
                 ForEach(mono.characters.prefix(5)) { character in
                   ImageView(img: character.images?.grid)
                     .imageStyle(width: 60, height: 60)
-                    .imageType(.avatar)
+                    .imageType(.person)
                     .imageLink(character.link)
                 }
                 ForEach(mono.persons.prefix(5)) { person in
                   ImageView(img: person.images?.grid)
                     .imageStyle(width: 60, height: 60)
-                    .imageType(.avatar)
+                    .imageType(.person)
                     .imageLink(person.link)
                 }
               }
