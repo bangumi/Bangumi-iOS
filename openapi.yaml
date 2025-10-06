@@ -3005,7 +3005,7 @@ info:
     关于订阅通知的 socket.io 相关的文档在
     <https://github.com/bangumi/GraphQL/blob/master/docs/socket.io.md>
   title: bangumi private api
-  version: v0.33.0
+  version: v0.34.0
 openapi: 3.0.3
 paths:
   /p1/blocklist:
@@ -3837,6 +3837,63 @@ paths:
         - CookiesSession: []
           HTTPBearer: []
       summary: 创建角色的吐槽
+      tags:
+        - character
+  /p1/characters/{characterID}/indexes:
+    get:
+      operationId: getCharacterIndexes
+      parameters:
+        - description: max 100
+          in: query
+          name: limit
+          required: false
+          schema:
+            default: 20
+            maximum: 100
+            minimum: 1
+            type: integer
+        - description: min 0
+          in: query
+          name: offset
+          required: false
+          schema:
+            default: 0
+            minimum: 0
+            type: integer
+        - in: path
+          name: characterID
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  data:
+                    items:
+                      $ref: '#/components/schemas/SlimIndex'
+                    type: array
+                  total:
+                    description: limit+offset 为参数的请求表示总条数，page 为参数的请求表示总页数
+                    type: integer
+                required:
+                  - data
+                  - total
+                type: object
+          description: Default Response
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                description: 意料之外的服务器错误
+          description: 意料之外的服务器错误
+      security:
+        - CookiesSession: []
+          HTTPBearer: []
+      summary: 获取角色关联的目录
       tags:
         - character
   /p1/clear-notify:
@@ -5632,6 +5689,35 @@ paths:
       tags:
         - index
   /p1/indexes/{indexID}:
+    delete:
+      operationId: deleteIndex
+      parameters:
+        - in: path
+          name: indexID
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties: {}
+                type: object
+          description: Default Response
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                description: 意料之外的服务器错误
+          description: 意料之外的服务器错误
+      security:
+        - CookiesSession: []
+          HTTPBearer: []
+      summary: 删除目录
+      tags:
+        - index
     get:
       operationId: getIndex
       parameters:
@@ -6611,6 +6697,63 @@ paths:
         - CookiesSession: []
           HTTPBearer: []
       summary: 创建人物的吐槽
+      tags:
+        - person
+  /p1/persons/{personID}/indexes:
+    get:
+      operationId: getPersonIndexes
+      parameters:
+        - description: max 100
+          in: query
+          name: limit
+          required: false
+          schema:
+            default: 20
+            maximum: 100
+            minimum: 1
+            type: integer
+        - description: min 0
+          in: query
+          name: offset
+          required: false
+          schema:
+            default: 0
+            minimum: 0
+            type: integer
+        - in: path
+          name: personID
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  data:
+                    items:
+                      $ref: '#/components/schemas/SlimIndex'
+                    type: array
+                  total:
+                    description: limit+offset 为参数的请求表示总条数，page 为参数的请求表示总页数
+                    type: integer
+                required:
+                  - data
+                  - total
+                type: object
+          description: Default Response
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                description: 意料之外的服务器错误
+          description: 意料之外的服务器错误
+      security:
+        - CookiesSession: []
+          HTTPBearer: []
+      summary: 获取人物关联的目录
       tags:
         - person
   /p1/persons/{personID}/works:
@@ -7650,6 +7793,63 @@ paths:
         - CookiesSession: []
           HTTPBearer: []
       summary: 获取条目的章节
+      tags:
+        - subject
+  /p1/subjects/{subjectID}/indexes:
+    get:
+      operationId: getSubjectIndexes
+      parameters:
+        - description: max 100
+          in: query
+          name: limit
+          required: false
+          schema:
+            default: 20
+            maximum: 100
+            minimum: 1
+            type: integer
+        - description: min 0
+          in: query
+          name: offset
+          required: false
+          schema:
+            default: 0
+            minimum: 0
+            type: integer
+        - in: path
+          name: subjectID
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  data:
+                    items:
+                      $ref: '#/components/schemas/SlimIndex'
+                    type: array
+                  total:
+                    description: limit+offset 为参数的请求表示总条数，page 为参数的请求表示总页数
+                    type: integer
+                required:
+                  - data
+                  - total
+                type: object
+          description: Default Response
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                description: 意料之外的服务器错误
+          description: 意料之外的服务器错误
+      security:
+        - CookiesSession: []
+          HTTPBearer: []
+      summary: 获取条目关联的目录
       tags:
         - subject
   /p1/subjects/{subjectID}/recs:
