@@ -120,7 +120,7 @@ struct GroupDetailView: View {
             HStack {
               BBCodeView(group.desc)
                 .tint(.linkText)
-              Spacer()
+              Spacer(minLength: 0)
             }
           }
           Divider()

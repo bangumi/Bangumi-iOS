@@ -24,10 +24,11 @@ struct CardView<Content: View>: View {
   public var body: some View {
     VStack {
       content().padding(padding)
+    }.background {
+      RoundedRectangle(cornerRadius: cornerRadius)
+        .fill(background ?? Color(.systemBackground))
+        .shadow(color: shadow ?? Color.black.opacity(0.2), radius: 2)
     }
-    .background(background ?? .cardBackground)
-    .cornerRadius(cornerRadius)
-    .shadow(color: shadow ?? Color.black.opacity(0.2), radius: 2)
   }
 }
 

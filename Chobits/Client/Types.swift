@@ -971,6 +971,24 @@ struct TimelineWikiDTO: Codable, Hashable {
   var subject: SlimSubjectDTO?
 }
 
+struct IndexCategoryItem: Identifiable, Hashable {
+  let category: IndexRelatedCategory
+  let count: Int
+
+  var id: IndexRelatedCategory {
+    category
+  }
+}
+
+struct IndexSubjectTypeItem: Identifiable, Hashable {
+  let type: SubjectType
+  let count: Int
+
+  var id: SubjectType {
+    type
+  }
+}
+
 struct IndexStatsSubject: Codable, Hashable {
   var book: Int?
   var anime: Int?
@@ -987,6 +1005,49 @@ struct IndexStats: Codable, Hashable {
   var blog: Int?
   var groupTopic: Int?
   var subjectTopic: Int?
+
+  var subjectTypeItems: [IndexSubjectTypeItem] {
+    var items: [IndexSubjectTypeItem] = []
+    if let count = subject.book, count > 0 {
+      items.append(IndexSubjectTypeItem(type: .book, count: count))
+    }
+    if let count = subject.anime, count > 0 {
+      items.append(IndexSubjectTypeItem(type: .anime, count: count))
+    }
+    if let count = subject.music, count > 0 {
+      items.append(IndexSubjectTypeItem(type: .music, count: count))
+    }
+    if let count = subject.game, count > 0 {
+      items.append(IndexSubjectTypeItem(type: .game, count: count))
+    }
+    if let count = subject.real, count > 0 {
+      items.append(IndexSubjectTypeItem(type: .real, count: count))
+    }
+    return items
+  }
+
+  var categoryItems: [IndexCategoryItem] {
+    var items: [IndexCategoryItem] = []
+    if let count = character, count > 0 {
+      items.append(IndexCategoryItem(category: .character, count: count))
+    }
+    if let count = person, count > 0 {
+      items.append(IndexCategoryItem(category: .person, count: count))
+    }
+    if let count = episode, count > 0 {
+      items.append(IndexCategoryItem(category: .episode, count: count))
+    }
+    if let count = blog, count > 0 {
+      items.append(IndexCategoryItem(category: .blog, count: count))
+    }
+    if let count = groupTopic, count > 0 {
+      items.append(IndexCategoryItem(category: .groupTopic, count: count))
+    }
+    if let count = subjectTopic, count > 0 {
+      items.append(IndexCategoryItem(category: .subjectTopic, count: count))
+    }
+    return items
+  }
 }
 
 struct IndexDTO: Codable, Identifiable, Hashable, Linkable {

@@ -1459,9 +1459,15 @@ extension Chii {
     _ = try await self.request(url: url, method: "PATCH", body: body)
   }
 
+  func deleteIndex(indexID: Int) async throws {
+    let url = BangumiAPI.priv.build("p1/indexes/\(indexID)")
+    let body: [String: Any] = [:]
+    _ = try await self.request(url: url, method: "DELETE", body: body)
+  }
+
   func getIndexRelated(
-    indexID: Int, cat: IndexRelatedCategory? = nil, type: Int? = nil, limit: Int = 20,
-    offset: Int = 0
+    indexID: Int, cat: IndexRelatedCategory? = nil, type: SubjectType? = nil,
+    limit: Int = 20, offset: Int = 0
   ) async throws -> PagedDTO<IndexRelatedDTO> {
     let url = BangumiAPI.priv.build("p1/indexes/\(indexID)/related")
     var queryItems: [URLQueryItem] = [
@@ -1472,7 +1478,7 @@ extension Chii {
       queryItems.append(URLQueryItem(name: "cat", value: String(cat.rawValue)))
     }
     if let type = type {
-      queryItems.append(URLQueryItem(name: "type", value: String(type)))
+      queryItems.append(URLQueryItem(name: "type", value: String(type.rawValue)))
     }
     let pageURL = url.appending(queryItems: queryItems)
     let data = try await self.request(url: pageURL, method: "GET")
