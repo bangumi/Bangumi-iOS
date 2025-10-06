@@ -799,6 +799,7 @@ struct SubjectReviewDTO: Codable, Identifiable, Hashable {
 struct SlimBlogEntryDTO: Codable, Hashable, Identifiable, Linkable {
   var id: Int
   var uid: Int? = 0
+  var user: SlimUserDTO? = nil
   var title: String
   var icon: String? = ""
   var summary: String
@@ -1128,6 +1129,18 @@ enum IndexRelatedCategory: Int, Codable, CaseIterable {
     case .subjectTopic: return "条目讨论"
     }
   }
+
+  var icon: String {
+    switch self {
+    case .subject: return "questionmark"
+    case .character: return "person.crop.square.on.square.angled"
+    case .person: return "person.fill"
+    case .episode: return "play.circle"
+    case .blog: return "text.below.photo.fill"
+    case .groupTopic: return "rectangle.3.group.bubble"
+    case .subjectTopic: return "rectangle.3.group.bubble"
+    }
+  }
 }
 
 struct IndexRelatedDTO: Codable, Identifiable, Hashable {
@@ -1147,44 +1160,6 @@ struct IndexRelatedDTO: Codable, Identifiable, Hashable {
   var blog: SlimBlogEntryDTO?
   var groupTopic: GroupTopicDTO?
   var subjectTopic: SubjectTopicDTO?
-
-  var title: String {
-    switch cat {
-    case .subject: return subject?.name ?? ""
-    case .character: return character?.name ?? ""
-    case .person: return person?.name ?? ""
-    case .episode: return episode?.name ?? ""
-    case .blog: return blog?.title ?? ""
-    case .groupTopic: return groupTopic?.title ?? ""
-    case .subjectTopic: return subjectTopic?.title ?? ""
-    }
-  }
-}
-
-struct CreateIndexDTO: Codable {
-  var title: String
-  var desc: String
-  var `private`: Bool = false
-}
-
-struct UpdateIndexDTO: Codable {
-  var title: String?
-  var desc: String?
-  var `private`: Bool?
-}
-
-struct CreateIndexRelatedDTO: Codable {
-  var cat: IndexRelatedCategory
-  var type: Int
-  var sid: Int
-  var order: Int?
-  var comment: String?
-  var award: String?
-}
-
-struct UpdateIndexRelatedDTO: Codable {
-  var order: Int
-  var comment: String
 }
 
 enum TimelineCat: Int, Codable {

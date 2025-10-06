@@ -1,64 +1,385 @@
 import SwiftUI
 
 struct IndexRelatedItemView: View {
+  @Binding var reloader: Bool
   let item: IndexRelatedDTO
   let isOwner: Bool
-  let onDelete: () -> Void
 
   @State private var showEditRelated = false
+  @State private var showDeleteRelated = false
+
+  func delete() async {
+    do {
+      try await Chii.shared.deleteIndexRelated(indexId: item.rid, id: item.id)
+      Notifier.shared.notify(message: "已删除")
+      reloader.toggle()
+    } catch {
+      Notifier.shared.alert(error: error)
+    }
+  }
 
   var body: some View {
     CardView {
-      VStack(alignment: .leading, spacing: 8) {
-        HStack {
-          VStack(alignment: .leading) {
-            Text("\(item.order). \(item.title)")
-              .font(.body)
-
-            if !item.comment.isEmpty {
-              Text(item.comment)
+      VStack(alignment: .leading) {
+        switch item.cat {
+        case .subject:
+          HStack(alignment: .top) {
+            if let subject = item.subject {
+              ImageView(img: subject.images?.resize(.r200))
+                .imageStyle(width: 80, height: 108)
+                .imageType(.subject)
+                .imageNSFW(subject.nsfw)
+                .imageLink(subject.link)
+              VStack(alignment: .leading) {
+                HStack {
+                  Image(systemName: subject.type.icon)
+                    .foregroundStyle(.secondary)
+                    .font(.footnote)
+                  Text(subject.name.withLink(subject.link))
+                    .lineLimit(1)
+                  Spacer(minLength: 0)
+                }
+                Text(subject.nameCN)
+                  .font(.footnote)
+                  .foregroundStyle(.secondary)
+                  .lineLimit(1)
+                Text(subject.info ?? "")
+                  .font(.footnote)
+                  .foregroundStyle(.secondary)
+                  .lineLimit(2)
+                if !item.comment.isEmpty {
+                  BorderView(color: .secondary.opacity(0.2), padding: 4) {
+                    HStack {
+                      Text(item.comment)
+                        .font(.footnote)
+                        .textSelection(.enabled)
+                      Spacer(minLength: 0)
+                    }
+                  }
+                }
+              }
+            } else {
+              Text("神秘的条目")
                 .font(.footnote)
                 .foregroundStyle(.secondary)
             }
-
-            if !item.award.isEmpty {
-              HStack {
-                Image(systemName: "award.fill")
-                  .foregroundStyle(.yellow)
-                Text(item.award)
-                  .font(.caption)
-                  .foregroundStyle(.secondary)
-              }
-            }
+            Spacer(minLength: 0)
           }
 
-          Spacer()
-
-          if isOwner {
-            Menu {
-              Button {
-                showEditRelated = true
-              } label: {
-                Label("编辑", systemImage: "pencil")
+        case .character:
+          HStack(alignment: .top) {
+            if let character = item.character {
+              ImageView(img: character.images?.resize(.r200))
+                .imageStyle(width: 80, height: 108)
+                .imageType(.person)
+                .imageLink(character.link)
+              VStack(alignment: .leading) {
+                HStack {
+                  Image(systemName: item.cat.icon)
+                    .foregroundStyle(.secondary)
+                    .font(.footnote)
+                  Text(character.name.withLink(character.link))
+                    .lineLimit(1)
+                  Spacer(minLength: 0)
+                }
+                Text(character.nameCN)
+                  .font(.footnote)
+                  .foregroundStyle(.secondary)
+                  .lineLimit(1)
+                Text(character.info ?? "")
+                  .font(.footnote)
+                  .foregroundStyle(.secondary)
+                  .lineLimit(2)
+                if !item.comment.isEmpty {
+                  BorderView(color: .secondary.opacity(0.2), padding: 4) {
+                    HStack {
+                      Text(item.comment)
+                        .font(.footnote)
+                        .textSelection(.enabled)
+                      Spacer(minLength: 0)
+                    }
+                  }
+                }
               }
+              Spacer(minLength: 0)
+            } else {
+              Text("神秘的角色")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+            }
+            Spacer(minLength: 0)
+          }
 
-              Button(role: .destructive) {
-                onDelete()
-              } label: {
-                Label("删除", systemImage: "trash")
+        case .person:
+          HStack(alignment: .top) {
+            if let person = item.person {
+              ImageView(img: person.images?.resize(.r200))
+                .imageStyle(width: 80, height: 108)
+                .imageType(.person)
+                .imageLink(person.link)
+              VStack(alignment: .leading) {
+                HStack {
+                  Image(systemName: item.cat.icon)
+                    .foregroundStyle(.secondary)
+                    .font(.footnote)
+                  Text(person.name.withLink(person.link))
+                    .lineLimit(1)
+                  Spacer(minLength: 0)
+                }
+                Text(person.nameCN)
+                  .font(.footnote)
+                  .foregroundStyle(.secondary)
+                  .lineLimit(1)
+                Text(person.info ?? "")
+                  .font(.footnote)
+                  .foregroundStyle(.secondary)
+                  .lineLimit(2)
+                if !item.comment.isEmpty {
+                  BorderView(color: .secondary.opacity(0.2), padding: 4) {
+                    HStack {
+                      Text(item.comment)
+                        .font(.footnote)
+                        .textSelection(.enabled)
+                      Spacer(minLength: 0)
+                    }
+                  }
+                }
+              }
+            } else {
+              Text("神秘的人物")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+            }
+            Spacer(minLength: 0)
+          }
+
+        case .episode:
+          HStack(alignment: .top) {
+            if let episode = item.episode, let subject = episode.subject {
+              ImageView(img: subject.images?.resize(.r200))
+                .imageStyle(width: 60, height: 60)
+                .imageType(.subject)
+                .imageLink(subject.link)
+              VStack(alignment: .leading) {
+                HStack {
+                  Image(systemName: item.cat.icon)
+                    .foregroundStyle(.secondary)
+                    .font(.footnote)
+                  Text(episode.title.withLink(episode.link))
+                    .lineLimit(1)
+                  Spacer(minLength: 0)
+                }
+                Text(subject.name)
+                  .font(.footnote)
+                  .foregroundStyle(.secondary)
+                  .lineLimit(1)
+                if !item.comment.isEmpty {
+                  BorderView(color: .secondary.opacity(0.2), padding: 4) {
+                    HStack {
+                      Text(item.comment)
+                        .font(.footnote)
+                        .textSelection(.enabled)
+                      Spacer(minLength: 0)
+                    }
+                  }
+                }
+              }
+            } else {
+              Text("神秘的剧集")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+            }
+            Spacer(minLength: 0)
+          }
+
+        case .blog:
+          HStack(alignment: .top) {
+            if let blog = item.blog, let user = blog.user {
+              if let icon = blog.icon, !icon.isEmpty {
+                ImageView(img: icon)
+                  .imageStyle(width: 60, height: 60)
+                  .imageType(.icon)
+                  .imageLink(blog.link)
+              } else {
+                ImageView(img: user.avatar?.large)
+                  .imageStyle(width: 60, height: 60)
+                  .imageType(.icon)
+                  .imageLink(blog.link)
+              }
+              VStack(alignment: .leading) {
+                HStack {
+                  Image(systemName: item.cat.icon)
+                    .foregroundStyle(.secondary)
+                    .font(.footnote)
+                  Text(blog.title.withLink(blog.link))
+                    .lineLimit(1)
+                  Spacer(minLength: 0)
+                }
+                HStack(spacing: 0) {
+                  Text(user.nickname.withLink(user.link))
+                    .lineLimit(1)
+                    .foregroundStyle(.secondary)
+                  Text(" • ")
+                    .foregroundStyle(.secondary)
+                  Text(blog.createdAt.datetimeDisplay)
+                    .foregroundStyle(.secondary)
+                  Text(" • ")
+                    .foregroundStyle(.secondary)
+                  Text("\(blog.replies)回复".withLink(blog.link))
+                }.font(.footnote)
+                if !item.comment.isEmpty {
+                  BorderView(color: .secondary.opacity(0.2), padding: 4) {
+                    HStack {
+                      Text(item.comment)
+                        .font(.footnote)
+                        .textSelection(.enabled)
+                      Spacer(minLength: 0)
+                    }
+                  }
+                }
+              }
+            } else {
+              Text("神秘的博客")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+            }
+            Spacer(minLength: 0)
+          }
+        case .groupTopic:
+          HStack(alignment: .top) {
+            if let topic = item.groupTopic, let creator = topic.creator {
+              ImageView(img: creator.avatar?.large)
+                .imageStyle(width: 60, height: 60)
+                .imageType(.avatar)
+                .imageLink(creator.link)
+              VStack(alignment: .leading) {
+                HStack {
+                  Image(systemName: item.cat.icon)
+                    .foregroundStyle(.secondary)
+                    .font(.footnote)
+                  Text(topic.title.withLink(topic.link))
+                    .lineLimit(1)
+                  Spacer(minLength: 0)
+                }
+                Text(topic.group.title)
+                  .font(.footnote)
+                  .foregroundStyle(.secondary)
+                  .lineLimit(1)
+                HStack(spacing: 0) {
+                  Text(creator.nickname.withLink(creator.link))
+                    .lineLimit(1)
+                    .foregroundStyle(.secondary)
+                  Text(" • ")
+                    .foregroundStyle(.secondary)
+                  Text(topic.createdAt.datetimeDisplay)
+                    .foregroundStyle(.secondary)
+                  Text(" • ")
+                    .foregroundStyle(.secondary)
+                  Text("\(topic.replyCount)回复".withLink(topic.link))
+                }.font(.footnote)
+                if !item.comment.isEmpty {
+                  BorderView(color: .secondary.opacity(0.2), padding: 4) {
+                    HStack {
+                      Text(item.comment)
+                        .font(.footnote)
+                        .textSelection(.enabled)
+                      Spacer(minLength: 0)
+                    }
+                  }
+                }
+              }
+            } else {
+              Text("神秘的小组话题")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+            }
+            Spacer(minLength: 0)
+          }
+        case .subjectTopic:
+          HStack(alignment: .top) {
+            if let topic = item.subjectTopic, let creator = topic.creator {
+              ImageView(img: creator.avatar?.large)
+                .imageStyle(width: 60, height: 60)
+                .imageType(.avatar)
+                .imageLink(creator.link)
+              VStack(alignment: .leading) {
+                HStack {
+                  Image(systemName: item.cat.icon)
+                    .foregroundStyle(.secondary)
+                    .font(.footnote)
+                  Text(topic.title.withLink(topic.link))
+                    .lineLimit(1)
+                  Spacer(minLength: 0)
+                }
+                Text(topic.subject.name)
+                  .font(.footnote)
+                  .foregroundStyle(.secondary)
+                  .lineLimit(1)
+                HStack(spacing: 0) {
+                  Text(creator.nickname.withLink(creator.link))
+                    .lineLimit(1)
+                    .foregroundStyle(.secondary)
+                  Text(" • ")
+                    .foregroundStyle(.secondary)
+                  Text(topic.createdAt.datetimeDisplay)
+                    .foregroundStyle(.secondary)
+                  Text(" • ")
+                    .foregroundStyle(.secondary)
+                  Text("\(topic.replyCount)回复".withLink(topic.link))
+                }.font(.footnote)
+                if !item.comment.isEmpty {
+                  BorderView(color: .secondary.opacity(0.2), padding: 4) {
+                    HStack {
+                      Text(item.comment)
+                        .font(.footnote)
+                        .textSelection(.enabled)
+                      Spacer(minLength: 0)
+                    }
+                  }
+                }
+              }
+            } else {
+              Text("神秘的条目讨论")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+            }
+            Spacer(minLength: 0)
+          }
+        }
+        if isOwner {
+          Divider()
+          HStack {
+            Button {
+              showEditRelated = true
+            } label: {
+              Text("修改评价")
+            }
+            Spacer()
+            Button(role: .destructive) {
+              Task {
+                showDeleteRelated = true
               }
             } label: {
-              Image(systemName: "ellipsis.circle")
+              Text("删除关联")
             }
-          }
+            .alert("确定删除这个关联吗？", isPresented: $showDeleteRelated) {
+              Button("取消", role: .cancel) {}
+              Button("删除", role: .destructive) {
+                Task {
+                  await delete()
+                }
+              }
+            }
+          }.font(.footnote)
         }
       }
     }
     .sheet(isPresented: $showEditRelated) {
-      IndexRelatedPatchView(
-        indexId: item.rid, relatedId: item.id, order: item.order, comment: item.comment
+      IndexRelatedEditView(
+        indexId: item.rid, relatedId: item.id,
+        order: item.order, comment: item.comment
       ) {
-        // TODO:
+        reloader.toggle()
       }
     }
   }

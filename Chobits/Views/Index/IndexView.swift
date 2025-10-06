@@ -5,6 +5,7 @@ struct IndexView: View {
   let indexId: Int
 
   @AppStorage("profile") var profile: Profile = Profile()
+  @AppStorage("shareDomain") var shareDomain: ShareDomain = .chii
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
 
   @State private var index: IndexDTO?
@@ -19,9 +20,13 @@ struct IndexView: View {
   @State private var showDeleteIndex = false
   @State private var showAddRelated = false
 
+  var shareLink: URL {
+    URL(string: "\(shareDomain.url)/index/\(indexId)")!
+  }
+
   func refresh() async {
     do {
-      let data = try await Chii.shared.getIndex(indexID: indexId)
+      let data = try await Chii.shared.getIndex(indexId)
       availableSubjectTypes = data.stats.subjectTypeItems
       availableCategories = data.stats.categoryItems
       index = data
@@ -33,7 +38,7 @@ struct IndexView: View {
   func loadRelated(limit: Int, offset: Int) async -> PagedDTO<IndexRelatedDTO>? {
     do {
       let resp = try await Chii.shared.getIndexRelated(
-        indexID: indexId, cat: selectedCategory, type: selectedSubjectType, limit: limit,
+        indexId: indexId, cat: selectedCategory, type: selectedSubjectType, limit: limit,
         offset: offset)
       return resp
     } catch {
@@ -44,17 +49,7 @@ struct IndexView: View {
 
   func deleteIndex(_ indexId: Int) async {
     do {
-      try await Chii.shared.deleteIndex(indexID: indexId)
-      Notifier.shared.notify(message: "已删除")
-      reloader.toggle()
-    } catch {
-      Notifier.shared.alert(error: error)
-    }
-  }
-
-  func deleteRelated(_ item: IndexRelatedDTO) async {
-    do {
-      try await Chii.shared.deleteIndexRelated(indexID: indexId, id: item.id)
+      try await Chii.shared.deleteIndex(indexId: indexId)
       Notifier.shared.notify(message: "已删除")
       reloader.toggle()
     } catch {
@@ -85,60 +80,49 @@ struct IndexView: View {
                   .imageType(.avatar)
                   .imageLink(index.user.link)
                   .shadow(radius: 2)
-                BBCodeView(index.desc)
-                  .tint(.linkText)
-                Spacer(minLength: 0)
-              }
-              Divider()
-              HStack {
-                Text(index.user.nickname.withLink(index.user.link))
-                Text("\(index.total) 个条目 · \(index.collects) 人收藏")
-                  .foregroundStyle(.secondary)
-                if isOwner {
-                  Button {
-                    showEditIndex = true
-                  } label: {
-                    Text("修改")
-                  }.buttonStyle(.navigation)
-                  Text("/").foregroundStyle(.secondary)
-                  Button(role: .destructive) {
-                    showDeleteIndex = true
-                  } label: {
-                    Text("删除")
-                  }
-                  .buttonStyle(.navigation)
-                  .alert("确定删除这个目录吗？", isPresented: $showDeleteIndex) {
-                    Button("取消", role: .cancel) {}
-                    Button("删除", role: .destructive) {
-                      Task {
-                        await deleteIndex(indexId)
-                      }
+                VStack(alignment: .leading) {
+                  HStack {
+                    Text(index.user.nickname.withLink(index.user.link))
+                      .lineLimit(1)
+                    Text("\(index.total) 个条目 · \(index.collects) 人收藏")
+                      .foregroundStyle(.secondary)
+                    Spacer(minLength: 0)
+                    if index.private {
+                      Image(systemName: "lock.fill")
+                        .foregroundStyle(.secondary)
+                    }
+                    if index.replies > 0 {
+                      Text("(+\(index.replies))")
+                        .foregroundStyle(.orange)
                     }
                   }
-                }
-
-                Spacer()
-
-                if index.private {
-                  Image(systemName: "lock.fill")
+                  Text("创建: \(index.createdAt.datetimeDisplay)")
                     .foregroundStyle(.secondary)
+                    .monospacedDigit()
+                  Text("更新: \(index.updatedAt.datetimeDisplay)")
+                    .foregroundStyle(.secondary)
+                    .monospacedDigit()
+                  Spacer(minLength: 0)
                 }
-              }.font(.footnote)
-              HStack(spacing: 0) {
-                Text("创建 ")
-                  .foregroundStyle(.secondary)
-                Text("\(index.createdAt.datetimeDisplay)")
-                  .monospacedDigit()
-                Text(" · 更新 ")
-                  .foregroundStyle(.secondary)
-                Text("\(index.updatedAt.datetimeDisplay)")
-                  .monospacedDigit()
-              }.font(.footnote)
+              }.font(.callout)
+              if !index.desc.isEmpty {
+                Divider()
+                BBCodeView(index.desc)
+                  .tint(.linkText)
+              }
             }
           }
 
           ScrollView(.horizontal, showsIndicators: false) {
             HStack {
+              if isOwner {
+                Button {
+                  showAddRelated = true
+                } label: {
+                  Label("添加新关联", systemImage: "plus")
+                }.adaptiveButtonStyle(.borderedProminent)
+              }
+
               HStack {
                 Button {
                   selectedCategory = nil
@@ -198,25 +182,13 @@ struct IndexView: View {
                   .stroke(.white, lineWidth: 1)
                   .shadow(radius: 1)
               )
-
-              if isOwner {
-                Button {
-                  showAddRelated = true
-                } label: {
-                  Label("添加新关联", systemImage: "plus")
-                }.adaptiveButtonStyle(.borderedProminent)
-              }
             }
             .font(.footnote)
             .padding(2)
           }
 
           PageView<IndexRelatedDTO, _>(reloader: reloader, nextPageFunc: loadRelated) { item in
-            IndexRelatedItemView(item: item, isOwner: isOwner) {
-              Task {
-                await deleteRelated(item)
-              }
-            }
+            IndexRelatedItemView(reloader: $reloader, item: item, isOwner: isOwner)
           }
         }
         .padding(8)
@@ -226,6 +198,38 @@ struct IndexView: View {
     }
     .navigationTitle("目录")
     .navigationBarTitleDisplayMode(.inline)
+    .toolbar {
+      ToolbarItem(placement: .topBarTrailing) {
+        Menu {
+          if isOwner {
+            Button {
+              showEditIndex = true
+            } label: {
+              Label("修改", systemImage: "pencil")
+            }
+            Button(role: .destructive) {
+              showDeleteIndex = true
+            } label: {
+              Label("删除", systemImage: "trash")
+            }
+            .alert("确定删除这个目录吗？", isPresented: $showDeleteIndex) {
+              Button("取消", role: .cancel) {}
+              Button("删除", role: .destructive) {
+                Task {
+                  await deleteIndex(indexId)
+                }
+              }
+            }
+            Divider()
+          }
+          ShareLink(item: shareLink) {
+            Label("分享", systemImage: "square.and.arrow.up")
+          }
+        } label: {
+          Image(systemName: "ellipsis.circle")
+        }
+      }
+    }
     .task {
       await refresh()
     }
@@ -241,9 +245,13 @@ struct IndexView: View {
       }
     }
     .sheet(isPresented: $showAddRelated) {
-      IndexRelatedEditView(indexId: indexId) {
+      IndexRelatedAddView(indexId: indexId) {
         reloader.toggle()
       }
     }
   }
+}
+
+#Preview {
+  IndexView(indexId: 83001)
 }

@@ -66,3 +66,7 @@ update_blog:
 
 update_trending:
 	curl -sSfLo "$(PREVIEW_PATH)/trending_subjects_anime.json" https://next.bgm.tv/p1/trending/subjects?type=2
+
+update_index:
+	curl -sSfLo "$(PREVIEW_PATH)/index.json" https://next.bgm.tv/p1/indexes/83001
+	curl -sSfLo "$(PREVIEW_PATH)/index_related.json" https://next.bgm.tv/p1/indexes/83001/related

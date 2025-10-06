@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct IndexRelatedEditView: View {
+struct IndexRelatedAddView: View {
   @Environment(\.dismiss) var dismiss
 
   let indexId: Int
@@ -8,10 +8,8 @@ struct IndexRelatedEditView: View {
 
   @State private var selectedCategory: IndexRelatedCategory = .subject
   @State private var subjectId: String = ""
-  @State private var subjectType: Int = 2  // Default to anime
-  @State private var order: String = "1"
+  @State private var order: String = "0"
   @State private var comment: String = ""
-  @State private var award: String = ""
   @State private var isSubmitting = false
 
   func submit() async {
@@ -23,13 +21,11 @@ struct IndexRelatedEditView: View {
     isSubmitting = true
     do {
       _ = try await Chii.shared.putIndexRelated(
-        indexID: indexId,
+        indexId: indexId,
         cat: selectedCategory,
-        type: subjectType,
         sid: sid,
         order: Int(order),
         comment: comment.isEmpty ? nil : comment,
-        award: award.isEmpty ? nil : award
       )
       Notifier.shared.notify(message: "已添加关联内容")
       onSave()
@@ -56,24 +52,13 @@ struct IndexRelatedEditView: View {
         Section {
           TextField("ID", text: $subjectId)
             .keyboardType(.numberPad)
-
-          if selectedCategory == .subject {
-            Picker("条目类型", selection: $subjectType) {
-              Text("书籍").tag(1)
-              Text("动画").tag(2)
-              Text("音乐").tag(3)
-              Text("游戏").tag(4)
-              Text("三次元").tag(6)
-            }
-          }
-
-          TextField("顺序", text: $order)
-            .keyboardType(.numberPad)
         } header: {
-          Text("基本信息")
+          Text("必填")
         }
 
         Section {
+          TextField("排序", text: $order)
+            .keyboardType(.numberPad)
           TextEditor(text: $comment)
             .frame(minHeight: 60)
             .overlay(alignment: .topLeading) {
@@ -84,10 +69,8 @@ struct IndexRelatedEditView: View {
                   .padding(.leading, 4)
               }
             }
-
-          TextField("推荐语", text: $award)
         } header: {
-          Text("附加信息（可选）")
+          Text("可选")
         }
       }
       .navigationTitle("添加关联内容")
@@ -105,6 +88,7 @@ struct IndexRelatedEditView: View {
               await submit()
             }
           }
+          .adaptiveButtonStyle(.borderedProminent)
           .disabled(isSubmitting || subjectId.isEmpty)
         }
       }
@@ -112,7 +96,7 @@ struct IndexRelatedEditView: View {
   }
 }
 
-struct IndexRelatedPatchView: View {
+struct IndexRelatedEditView: View {
   @Environment(\.dismiss) var dismiss
 
   let indexId: Int
@@ -133,14 +117,17 @@ struct IndexRelatedPatchView: View {
 
   func submit() async {
     guard let orderNum = Int(order) else {
-      Notifier.shared.alert(message: "请输入有效的顺序")
+      Notifier.shared.alert(message: "请输入有效的排序")
+      return
+    }
+    if isSubmitting {
       return
     }
 
     isSubmitting = true
     do {
       try await Chii.shared.patchIndexRelated(
-        indexID: indexId,
+        indexId: indexId,
         id: relatedId,
         order: orderNum,
         comment: comment
@@ -158,10 +145,10 @@ struct IndexRelatedPatchView: View {
     NavigationStack {
       Form {
         Section {
-          TextField("顺序", text: $order)
+          TextField("排序", text: $order)
             .keyboardType(.numberPad)
         } header: {
-          Text("顺序")
+          Text("排序")
         }
 
         Section {
@@ -169,14 +156,14 @@ struct IndexRelatedPatchView: View {
             .frame(minHeight: 100)
             .overlay(alignment: .topLeading) {
               if comment.isEmpty {
-                Text("备注")
+                Text("评价")
                   .foregroundColor(.secondary.opacity(0.5))
                   .padding(.top, 8)
                   .padding(.leading, 4)
               }
             }
         } header: {
-          Text("备注")
+          Text("评价")
         }
       }
       .navigationTitle("编辑关联内容")
@@ -194,6 +181,7 @@ struct IndexRelatedPatchView: View {
               await submit()
             }
           }
+          .adaptiveButtonStyle(.borderedProminent)
           .disabled(isSubmitting || order.isEmpty)
         }
       }

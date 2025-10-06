@@ -68,31 +68,31 @@ extension Chii {
 
 // MARK: - Blog
 extension Chii {
-  func getBlogEntry(_ entryID: Int) async throws -> BlogEntryDTO {
+  func getBlogEntry(_ entryId: Int) async throws -> BlogEntryDTO {
     if self.mock {
       return loadFixture(fixture: "blog.json", target: BlogEntryDTO.self)
     }
-    let url = BangumiAPI.priv.build("p1/blogs/\(entryID)")
+    let url = BangumiAPI.priv.build("p1/blogs/\(entryId)")
     let data = try await self.request(url: url, method: "GET")
     let blog: BlogEntryDTO = try self.decodeResponse(data)
     return blog
   }
 
-  func getBlogSubjects(_ entryID: Int) async throws -> [SlimSubjectDTO] {
+  func getBlogSubjects(_ entryId: Int) async throws -> [SlimSubjectDTO] {
     if self.mock {
       return loadFixture(fixture: "blog_subjects.json", target: [SlimSubjectDTO].self)
     }
-    let url = BangumiAPI.priv.build("p1/blogs/\(entryID)/subjects")
+    let url = BangumiAPI.priv.build("p1/blogs/\(entryId)/subjects")
     let data = try await self.request(url: url, method: "GET")
     let subjects: [SlimSubjectDTO] = try self.decodeResponse(data)
     return subjects
   }
 
-  func getBlogComments(_ entryID: Int) async throws -> [CommentDTO] {
+  func getBlogComments(_ entryId: Int) async throws -> [CommentDTO] {
     if self.mock {
       return loadFixture(fixture: "blog_comments.json", target: [CommentDTO].self)
     }
-    let url = BangumiAPI.priv.build("p1/blogs/\(entryID)/comments")
+    let url = BangumiAPI.priv.build("p1/blogs/\(entryId)/comments")
     let data = try await self.request(url: url, method: "GET")
     let resp: [CommentDTO] = try self.decodeResponse(data)
     return resp
@@ -123,11 +123,11 @@ extension Chii {
 
 // MARK: - Character
 extension Chii {
-  func getCharacter(_ characterID: Int) async throws -> CharacterDTO {
+  func getCharacter(_ characterId: Int) async throws -> CharacterDTO {
     if self.mock {
       return loadFixture(fixture: "character.json", target: CharacterDTO.self)
     }
-    let url = BangumiAPI.priv.build("p1/characters/\(characterID)")
+    let url = BangumiAPI.priv.build("p1/characters/\(characterId)")
     let data = try await self.request(url: url, method: "GET")
     let character: CharacterDTO = try self.decodeResponse(data)
     return character
@@ -788,11 +788,11 @@ extension Chii {
 
 // MARK: - Person
 extension Chii {
-  func getPerson(_ personID: Int) async throws -> PersonDTO {
+  func getPerson(_ personId: Int) async throws -> PersonDTO {
     if self.mock {
       return loadFixture(fixture: "person.json", target: PersonDTO.self)
     }
-    let url = BangumiAPI.priv.build("p1/persons/\(personID)")
+    let url = BangumiAPI.priv.build("p1/persons/\(personId)")
     let data = try await self.request(url: url, method: "GET")
     let person: PersonDTO = try self.decodeResponse(data)
     return person
@@ -891,11 +891,11 @@ extension Chii {
 
 // MARK: - Subject
 extension Chii {
-  func getSubject(_ subjectID: Int) async throws -> SubjectDTO {
+  func getSubject(_ subjectId: Int) async throws -> SubjectDTO {
     if self.mock {
       return loadFixture(fixture: "subject_anime.json", target: SubjectDTO.self)
     }
-    let url = BangumiAPI.priv.build("p1/subjects/\(subjectID)")
+    let url = BangumiAPI.priv.build("p1/subjects/\(subjectId)")
     let data = try await self.request(url: url, method: "GET")
     let subject: SubjectDTO = try self.decodeResponse(data)
     return subject
@@ -1435,8 +1435,11 @@ extension Chii {
 
 // MARK: - Index
 extension Chii {
-  func getIndex(indexID: Int) async throws -> IndexDTO {
-    let url = BangumiAPI.priv.build("p1/indexes/\(indexID)")
+  func getIndex(_ indexId: Int) async throws -> IndexDTO {
+    if self.mock {
+      return loadFixture(fixture: "index.json", target: IndexDTO.self)
+    }
+    let url = BangumiAPI.priv.build("p1/indexes/\(indexId)")
     let data = try await self.request(url: url, method: "GET")
     let resp: IndexDTO = try self.decodeResponse(data)
     return resp
@@ -1445,31 +1448,47 @@ extension Chii {
   func createIndex(title: String, desc: String, private isPrivate: Bool = false) async throws -> Int
   {
     let url = BangumiAPI.priv.build("p1/indexes")
-    let body = CreateIndexDTO(title: title, desc: desc, private: isPrivate)
+    let body: [String: Any] = [
+      "title": title,
+      "desc": desc,
+      "private": isPrivate,
+    ]
     let data = try await self.request(url: url, method: "POST", body: body)
     let resp: [String: Int] = try self.decodeResponse(data)
     return resp["id"] ?? 0
   }
 
   func updateIndex(
-    indexID: Int, title: String? = nil, desc: String? = nil, private isPrivate: Bool? = nil
+    indexId: Int, title: String? = nil, desc: String? = nil, private isPrivate: Bool? = nil
   ) async throws {
-    let url = BangumiAPI.priv.build("p1/indexes/\(indexID)")
-    let body = UpdateIndexDTO(title: title, desc: desc, private: isPrivate)
+    let url = BangumiAPI.priv.build("p1/indexes/\(indexId)")
+    var body: [String: Any] = [:]
+    if let title = title {
+      body["title"] = title
+    }
+    if let desc = desc {
+      body["desc"] = desc
+    }
+    if let isPrivate = isPrivate {
+      body["private"] = isPrivate
+    }
     _ = try await self.request(url: url, method: "PATCH", body: body)
   }
 
-  func deleteIndex(indexID: Int) async throws {
-    let url = BangumiAPI.priv.build("p1/indexes/\(indexID)")
+  func deleteIndex(indexId: Int) async throws {
+    let url = BangumiAPI.priv.build("p1/indexes/\(indexId)")
     let body: [String: Any] = [:]
     _ = try await self.request(url: url, method: "DELETE", body: body)
   }
 
   func getIndexRelated(
-    indexID: Int, cat: IndexRelatedCategory? = nil, type: SubjectType? = nil,
+    indexId: Int, cat: IndexRelatedCategory? = nil, type: SubjectType? = nil,
     limit: Int = 20, offset: Int = 0
   ) async throws -> PagedDTO<IndexRelatedDTO> {
-    let url = BangumiAPI.priv.build("p1/indexes/\(indexID)/related")
+    if self.mock {
+      return loadFixture(fixture: "index_related.json", target: PagedDTO<IndexRelatedDTO>.self)
+    }
+    let url = BangumiAPI.priv.build("p1/indexes/\(indexId)/related")
     var queryItems: [URLQueryItem] = [
       URLQueryItem(name: "limit", value: String(limit)),
       URLQueryItem(name: "offset", value: String(offset)),
@@ -1487,25 +1506,39 @@ extension Chii {
   }
 
   func putIndexRelated(
-    indexID: Int, cat: IndexRelatedCategory, type: Int, sid: Int, order: Int? = nil,
+    indexId: Int, cat: IndexRelatedCategory, sid: Int, order: Int? = nil,
     comment: String? = nil, award: String? = nil
   ) async throws -> Int {
-    let url = BangumiAPI.priv.build("p1/indexes/\(indexID)/related")
-    let body = CreateIndexRelatedDTO(
-      cat: cat, type: type, sid: sid, order: order, comment: comment, award: award)
+    let url = BangumiAPI.priv.build("p1/indexes/\(indexId)/related")
+    var body: [String: Any] = [
+      "cat": cat.rawValue,
+      "sid": sid,
+    ]
+    if let order = order {
+      body["order"] = order
+    }
+    if let comment = comment {
+      body["comment"] = comment
+    }
+    if let award = award {
+      body["award"] = award
+    }
     let data = try await self.request(url: url, method: "PUT", body: body)
     let resp: [String: Int] = try self.decodeResponse(data)
     return resp["id"] ?? 0
   }
 
-  func patchIndexRelated(indexID: Int, id: Int, order: Int, comment: String) async throws {
-    let url = BangumiAPI.priv.build("p1/indexes/\(indexID)/related/\(id)")
-    let body = UpdateIndexRelatedDTO(order: order, comment: comment)
+  func patchIndexRelated(indexId: Int, id: Int, order: Int, comment: String) async throws {
+    let url = BangumiAPI.priv.build("p1/indexes/\(indexId)/related/\(id)")
+    let body: [String: Any] = [
+      "order": order,
+      "comment": comment,
+    ]
     _ = try await self.request(url: url, method: "PATCH", body: body)
   }
 
-  func deleteIndexRelated(indexID: Int, id: Int) async throws {
-    let url = BangumiAPI.priv.build("p1/indexes/\(indexID)/related/\(id)")
+  func deleteIndexRelated(indexId: Int, id: Int) async throws {
+    let url = BangumiAPI.priv.build("p1/indexes/\(indexId)/related/\(id)")
     _ = try await self.request(url: url, method: "DELETE")
   }
 }

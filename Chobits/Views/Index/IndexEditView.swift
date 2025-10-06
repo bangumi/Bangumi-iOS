@@ -32,7 +32,7 @@ struct IndexEditView: View {
     do {
       if let indexId = indexId {
         try await Chii.shared.updateIndex(
-          indexID: indexId,
+          indexId: indexId,
           title: title,
           desc: desc,
           private: isPrivate
