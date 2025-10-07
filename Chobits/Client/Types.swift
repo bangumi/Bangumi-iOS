@@ -1088,7 +1088,9 @@ struct SlimIndexDTO: Codable, Identifiable, Hashable, Linkable {
   var title: String
   var `private`: Bool
   var total: Int
+  var stats: IndexStats
   var createdAt: Int
+  var updatedAt: Int
 
   init(_ index: IndexDTO) {
     self.id = index.id
@@ -1097,7 +1099,9 @@ struct SlimIndexDTO: Codable, Identifiable, Hashable, Linkable {
     self.title = index.title
     self.private = index.private
     self.total = index.total
+    self.stats = index.stats
     self.createdAt = index.createdAt
+    self.updatedAt = index.updatedAt
   }
 
   var name: String {

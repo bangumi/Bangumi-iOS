@@ -66,17 +66,7 @@ struct UserIndexListView: View {
       ScrollView {
         PageView<SlimIndexDTO, _>(reloader: reloader, nextPageFunc: load) { item in
           CardView {
-            VStack(alignment: .leading) {
-              Text(item.title.withLink(item.link))
-              HStack {
-                Text("\(item.total) 个条目")
-                  .foregroundStyle(.secondary)
-                Spacer()
-                Text("创建于: \(item.createdAt.datetimeDisplay)")
-                  .foregroundStyle(.secondary)
-              }
-              .font(.footnote)
-            }
+            UserIndexItemView(index: item)
           }
         }.padding(8)
       }

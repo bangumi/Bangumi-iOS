@@ -3,8 +3,8 @@ import SwiftUI
 struct CompactLabel: LabelStyle {
   func makeBody(configuration: Configuration) -> some View {
     HStack(spacing: 2) {
-      configuration.title
       configuration.icon
+      configuration.title
     }
   }
 }
