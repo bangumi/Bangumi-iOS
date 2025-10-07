@@ -10,4 +10,4 @@
 
 ## Preview
 
-![Preview](https://p.sda1.dev/23/53f5d0d95a81a3975c4dc710086084a8/preview-min.png)
+![Preview](./preview.png)
