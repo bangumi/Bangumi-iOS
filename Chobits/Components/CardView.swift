@@ -26,7 +26,7 @@ struct CardView<Content: View>: View {
       content().padding(padding)
     }.background {
       RoundedRectangle(cornerRadius: cornerRadius)
-        .fill(background ?? Color(.systemBackground))
+        .fill(background ?? .cardBackground)
         .shadow(color: shadow ?? Color.black.opacity(0.2), radius: 2)
     }
   }
