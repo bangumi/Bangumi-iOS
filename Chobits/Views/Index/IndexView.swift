@@ -7,6 +7,7 @@ struct IndexView: View {
   @AppStorage("profile") var profile: Profile = Profile()
   @AppStorage("shareDomain") var shareDomain: ShareDomain = .chii
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
+  @AppStorage("isolationMode") var isolationMode: Bool = false
 
   @State private var index: IndexDTO?
 
@@ -19,6 +20,25 @@ struct IndexView: View {
   @State private var showEditIndex = false
   @State private var showDeleteIndex = false
   @State private var showAddRelated = false
+  @State private var showCommentBox = false
+
+  @State private var selectedTab: IndexTab = .related
+  @State private var comments: [CommentDTO] = []
+  @State private var loadingComments: Bool = false
+
+  enum IndexTab: CaseIterable {
+    case related
+    case comments
+
+    func title(with index: IndexDTO?) -> String {
+      switch self {
+      case .related:
+        return "关联 \(index?.total ?? 0)"
+      case .comments:
+        return "评论 \(index?.replies ?? 0)"
+      }
+    }
+  }
 
   var shareLink: URL {
     URL(string: "\(shareDomain.url)/index/\(indexId)")!
@@ -45,6 +65,20 @@ struct IndexView: View {
       Notifier.shared.alert(error: error)
     }
     return nil
+  }
+
+  func loadComments() async {
+    if isolationMode {
+      return
+    }
+    do {
+      loadingComments = true
+      comments = try await Chii.shared.getIndexComments(indexId)
+      loadingComments = false
+    } catch {
+      Notifier.shared.alert(error: error)
+      loadingComments = false
+    }
   }
 
   func deleteIndex(_ indexId: Int) async {
@@ -91,10 +125,6 @@ struct IndexView: View {
                       Image(systemName: "lock.fill")
                         .foregroundStyle(.secondary)
                     }
-                    if index.replies > 0 {
-                      Text("(+\(index.replies))")
-                        .foregroundStyle(.orange)
-                    }
                   }
                   Text("创建: \(index.createdAt.datetimeDisplay)")
                     .foregroundStyle(.secondary)
@@ -113,85 +143,114 @@ struct IndexView: View {
             }
           }
 
-          ScrollView(.horizontal, showsIndicators: false) {
-            HStack {
-              if isOwner {
-                Button {
-                  showAddRelated = true
-                } label: {
-                  Label("添加新关联", systemImage: "plus")
-                }.adaptiveButtonStyle(.borderedProminent)
+          if !isolationMode {
+            Picker("选择", selection: $selectedTab) {
+              ForEach(IndexTab.allCases, id: \.self) { tab in
+                Text(tab.title(with: index)).tag(tab)
+              }
+            }
+            .pickerStyle(.segmented)
+            .font(.footnote)
+          }
+
+          if !isolationMode && selectedTab == .comments {
+            VStack(alignment: .leading, spacing: 8) {
+              if loadingComments {
+                HStack {
+                  Spacer()
+                  ProgressView()
+                  Spacer()
+                }
               }
 
-              HStack {
-                Button {
-                  selectedCategory = nil
-                  selectedSubjectType = nil
-                  reloader.toggle()
-                } label: {
-                  Text("全部 \(index.total)")
-                    .padding(.horizontal, 6)
-                    .padding(.vertical, 3)
-                    .background(
-                      selectedCategory == nil ? Color.accentColor : Color.clear
-                    )
-                    .foregroundColor(selectedCategory == nil ? .white : .linkText)
-                    .cornerRadius(20)
-                }
-
-                ForEach(availableSubjectTypes) { item in
-                  Button {
-                    selectedCategory = .subject
-                    selectedSubjectType = item.type
-                    reloader.toggle()
-                  } label: {
-                    Text("\(item.type.description) \(item.count)")
-                      .padding(.horizontal, 6)
-                      .padding(.vertical, 3)
-                      .background(
-                        selectedSubjectType == item.type
-                          ? Color.accentColor : Color.clear
-                      )
-                      .foregroundColor(selectedSubjectType == item.type ? .white : .linkText)
-                      .cornerRadius(20)
+              LazyVStack(alignment: .leading, spacing: 8) {
+                ForEach(Array(zip(comments.indices, comments)), id: \.1) { idx, comment in
+                  CommentItemView(type: .index(indexId), comment: comment, idx: idx)
+                  if comment.id != comments.last?.id {
+                    Divider()
                   }
                 }
-
-                ForEach(availableCategories) { item in
+              }
+            }
+          } else {
+            ScrollView(.horizontal, showsIndicators: false) {
+              HStack {
+                if isOwner {
                   Button {
-                    selectedCategory = item.category
+                    showAddRelated = true
+                  } label: {
+                    Label("添加新关联", systemImage: "plus")
+                  }.adaptiveButtonStyle(.borderedProminent)
+                }
+
+                HStack {
+                  Button {
+                    selectedCategory = nil
                     selectedSubjectType = nil
                     reloader.toggle()
                   } label: {
-                    Text("\(item.category.title) \(item.count)")
+                    Text("全部 \(index.total)")
                       .padding(.horizontal, 6)
                       .padding(.vertical, 3)
                       .background(
-                        selectedCategory == item.category
-                          ? Color.accentColor : Color.clear
+                        selectedCategory == nil ? Color.accentColor : Color.clear
                       )
-                      .foregroundColor(selectedCategory == item.category ? .white : .linkText)
+                      .foregroundColor(selectedCategory == nil ? .white : .linkText)
                       .cornerRadius(20)
                   }
-                }
-              }
-              .padding(4)
-              .background(
-                RoundedRectangle(cornerRadius: 20)
-                  .fill(.secondary.opacity(0.03))
-                  .stroke(.white, lineWidth: 1)
-                  .shadow(radius: 1)
-              )
-            }
-            .font(.footnote)
-            .padding(2)
-          }
 
-          PageView<IndexRelatedDTO, _>(reloader: reloader, nextPageFunc: loadRelated) { item in
-            IndexRelatedItemView(reloader: $reloader, item: item, isOwner: isOwner)
+                  ForEach(availableSubjectTypes) { item in
+                    Button {
+                      selectedCategory = .subject
+                      selectedSubjectType = item.type
+                      reloader.toggle()
+                    } label: {
+                      Text("\(item.type.description) \(item.count)")
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 3)
+                        .background(
+                          selectedSubjectType == item.type
+                            ? Color.accentColor : Color.clear
+                        )
+                        .foregroundColor(selectedSubjectType == item.type ? .white : .linkText)
+                        .cornerRadius(20)
+                    }
+                  }
+
+                  ForEach(availableCategories) { item in
+                    Button {
+                      selectedCategory = item.category
+                      selectedSubjectType = nil
+                      reloader.toggle()
+                    } label: {
+                      Text("\(item.category.title) \(item.count)")
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 3)
+                        .background(
+                          selectedCategory == item.category
+                            ? Color.accentColor : Color.clear
+                        )
+                        .foregroundColor(selectedCategory == item.category ? .white : .linkText)
+                        .cornerRadius(20)
+                    }
+                  }
+                }
+                .padding(4)
+                .background(
+                  RoundedRectangle(cornerRadius: 20)
+                    .fill(.secondary.opacity(0.03))
+                    .stroke(.white, lineWidth: 1)
+                    .shadow(radius: 1)
+                )
+              }
+              .font(.footnote)
+              .padding(2)
+            }
+            PageView<IndexRelatedDTO, _>(reloader: reloader, nextPageFunc: loadRelated) { item in
+              IndexRelatedItemView(reloader: $reloader, item: item, isOwner: isOwner)
+            }
           }
-        }
-        .padding(8)
+        }.padding(8)
       } else {
         ProgressView()
       }
@@ -214,6 +273,14 @@ struct IndexView: View {
             }
             Divider()
           }
+          if !isolationMode {
+            Button {
+              showCommentBox = true
+            } label: {
+              Label("留言", systemImage: "plus.bubble")
+            }
+          }
+          Divider()
           ShareLink(item: shareLink) {
             Label("分享", systemImage: "square.and.arrow.up")
           }
@@ -224,6 +291,13 @@ struct IndexView: View {
     }
     .task {
       await refresh()
+    }
+    .onChange(of: selectedTab) { _, newTab in
+      if newTab == .comments && comments.isEmpty {
+        Task {
+          await loadComments()
+        }
+      }
     }
     .alert("确定删除这个目录吗？", isPresented: $showDeleteIndex) {
       Button("取消", role: .cancel) {}
@@ -247,6 +321,12 @@ struct IndexView: View {
     .sheet(isPresented: $showAddRelated) {
       IndexRelatedAddView(indexId: indexId) {
         reloader.toggle()
+      }
+    }
+    .sheet(isPresented: $showCommentBox) {
+      if !isolationMode {
+        CreateCommentBoxView(type: .index(indexId))
+          .presentationDetents([.medium, .large])
       }
     }
   }

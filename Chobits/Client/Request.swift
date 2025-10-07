@@ -1541,6 +1541,29 @@ extension Chii {
     let url = BangumiAPI.priv.build("p1/indexes/\(indexId)/related/\(id)")
     _ = try await self.request(url: url, method: "DELETE")
   }
+
+  func getIndexComments(_ indexId: Int) async throws -> [CommentDTO] {
+    if self.mock {
+      return loadFixture(fixture: "index_comments.json", target: [CommentDTO].self)
+    }
+    let url = BangumiAPI.priv.build("p1/indexes/\(indexId)/comments")
+    let data = try await self.request(url: url, method: "GET")
+    let resp: [CommentDTO] = try self.decodeResponse(data)
+    return resp
+  }
+
+  func createIndexComment(indexId: Int, content: String, replyTo: Int?, token: String) async throws
+  {
+    let url = BangumiAPI.priv.build("p1/indexes/\(indexId)/comments")
+    var body: [String: Any] = [
+      "content": content,
+      "turnstileToken": token,
+    ]
+    if let replyTo = replyTo {
+      body["replyTo"] = replyTo
+    }
+    _ = try await self.request(url: url, method: "POST", body: body, auth: .required)
+  }
 }
 
 /// MARK: - Search
@@ -1620,6 +1643,8 @@ extension Chii {
       url = BangumiAPI.priv.build("p1/episodes/-/comments/\(commentId)")
     case .timeline:
       url = BangumiAPI.priv.build("p1/timeline/\(commentId)")
+    case .index:
+      url = BangumiAPI.priv.build("p1/indexes/-/comments/\(commentId)")
     }
     let body: [String: Any] = [:]
     _ = try await self.request(url: url, method: "DELETE", body: body, auth: .required)
@@ -1638,6 +1663,8 @@ extension Chii {
       url = BangumiAPI.priv.build("p1/episodes/-/comments/\(commentId)")
     case .timeline:
       url = BangumiAPI.priv.build("p1/timeline/\(commentId)")
+    case .index:
+      url = BangumiAPI.priv.build("p1/indexes/-/comments/\(commentId)")
     }
     let body: [String: Any] = ["content": content]
     _ = try await self.request(url: url, method: "PUT", body: body, auth: .required)

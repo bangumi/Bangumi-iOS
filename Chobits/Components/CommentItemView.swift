@@ -7,6 +7,7 @@ enum CommentParentType {
   case person(Int)
   case episode(Int)
   case timeline(Int)
+  case index(Int)
 
   var title: String {
     switch self {
@@ -20,6 +21,8 @@ enum CommentParentType {
       return "章节"
     case .timeline:
       return "时间线"
+    case .index:
+      return "目录"
     }
   }
 
@@ -36,6 +39,8 @@ enum CommentParentType {
       return URL(string: "\(shareDomain.url)/ep/\(id)#post_\(commentId)")!
     case .timeline(let id):
       return URL(string: "\(shareDomain.url)/timeline/\(id)#post_\(commentId)")!
+    case .index(let id):
+      return URL(string: "\(shareDomain.url)/index/\(id)/comments#post_\(commentId)")!
     }
   }
 
@@ -56,6 +61,9 @@ enum CommentParentType {
     case .timeline(let id):
       try await Chii.shared.createTimelineReply(
         timelineId: id, content: content, replyTo: commentId, token: token)
+    case .index(let id):
+      try await Chii.shared.createIndexComment(
+        indexId: id, content: content, replyTo: commentId, token: token)
     }
   }
 
