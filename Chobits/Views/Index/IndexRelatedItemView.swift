@@ -126,10 +126,18 @@ struct IndexRelatedItemView: View {
                     .lineLimit(1)
                   Spacer(minLength: 0)
                 }
-                Text(person.nameCN)
-                  .font(.footnote)
-                  .foregroundStyle(.secondary)
-                  .lineLimit(1)
+                HStack(spacing: 2) {
+                  ForEach(person.career, id: \.self) { career in
+                    BadgeView(background: .badge) {
+                      Text(career.description)
+                        .font(.caption)
+                    }
+                  }
+                  Text(person.nameCN)
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+                }
                 Text(person.info ?? "")
                   .font(.footnote)
                   .foregroundStyle(.secondary)
