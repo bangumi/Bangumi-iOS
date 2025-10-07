@@ -15,6 +15,7 @@ struct EpisodeView: View {
   @State private var comments: [CommentDTO] = []
   @State private var loadingComments: Bool = false
   @State private var showCommentBox: Bool = false
+  @State private var showIndexPicker: Bool = false
 
   init(episodeId: Int) {
     self.episodeId = episodeId
@@ -105,6 +106,11 @@ struct EpisodeView: View {
             Label("吐槽", systemImage: "plus.bubble")
           }
           Divider()
+          Button {
+            showIndexPicker = true
+          } label: {
+            Label("收藏", systemImage: "book")
+          }
           ShareLink(item: shareLink) {
             Label("分享", systemImage: "square.and.arrow.up")
           }
@@ -116,6 +122,14 @@ struct EpisodeView: View {
     .sheet(isPresented: $showCommentBox) {
       CreateCommentBoxView(type: .episode(episodeId))
         .presentationDetents([.medium, .large])
+    }
+    .sheet(isPresented: $showIndexPicker) {
+      IndexPickerView(
+        category: .episode,
+        itemId: episodeId,
+        itemTitle: "章节详情"
+      )
+      .presentationDetents([.medium, .large])
     }
   }
 }

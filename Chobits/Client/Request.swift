@@ -1592,7 +1592,8 @@ extension Chii {
 
   func deleteIndexRelated(indexId: Int, id: Int) async throws {
     let url = BangumiAPI.priv.build("p1/indexes/\(indexId)/related/\(id)")
-    _ = try await self.request(url: url, method: "DELETE")
+    let body: [String: Any] = [:]
+    _ = try await self.request(url: url, method: "DELETE", body: body)
   }
 
   func getIndexComments(_ indexId: Int) async throws -> [CommentDTO] {

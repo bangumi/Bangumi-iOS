@@ -65,6 +65,7 @@ struct SubjectDetailView: View {
   @Environment(Subject.self) var subject
 
   @State private var showCreateTopic: Bool = false
+  @State private var showIndexPicker: Bool = false
 
   var shareLink: URL {
     URL(string: "\(shareDomain.url)/subject/\(subject.subjectId)")!
@@ -118,6 +119,14 @@ struct SubjectDetailView: View {
       CreateTopicBoxView(type: .subject(subject.subjectId))
         .presentationDetents([.medium, .large])
     }
+    .sheet(isPresented: $showIndexPicker) {
+      IndexPickerView(
+        category: .subject,
+        itemId: subject.subjectId,
+        itemTitle: subject.title
+      )
+      .presentationDetents([.medium, .large])
+    }
     .navigationTitle(subject.name)
     .navigationBarTitleDisplayMode(.inline)
     .toolbar {
@@ -138,6 +147,13 @@ struct SubjectDetailView: View {
             }
           }
           Divider()
+          if isAuthenticated {
+            Button {
+              showIndexPicker = true
+            } label: {
+              Label("收藏", systemImage: "book")
+            }
+          }
           ShareLink(item: shareLink) {
             Label("分享", systemImage: "square.and.arrow.up")
           }

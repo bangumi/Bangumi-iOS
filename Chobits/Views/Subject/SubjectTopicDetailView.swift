@@ -11,6 +11,7 @@ struct SubjectTopicDetailView: View {
   @State private var refreshed = false
   @State private var showReplyBox = false
   @State private var showEditBox = false
+  @State private var showIndexPicker = false
 
   var title: String {
     topic?.title ?? "讨论详情"
@@ -86,6 +87,14 @@ struct SubjectTopicDetailView: View {
             title: topic.title, post: topic.replies.first
           ).presentationDetents([.medium, .large])
         }
+        .sheet(isPresented: $showIndexPicker) {
+          IndexPickerView(
+            category: .subjectTopic,
+            itemId: topicId,
+            itemTitle: title
+          )
+          .presentationDetents([.medium, .large])
+        }
       } else if refreshed {
         NotFoundView()
       } else {
@@ -112,6 +121,11 @@ struct SubjectTopicDetailView: View {
             }
           }
           Divider()
+          Button {
+            showIndexPicker = true
+          } label: {
+            Label("收藏", systemImage: "book")
+          }
           ShareLink(item: shareLink) {
             Label("分享", systemImage: "square.and.arrow.up")
           }

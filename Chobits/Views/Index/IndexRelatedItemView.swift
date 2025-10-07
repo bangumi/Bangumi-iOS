@@ -362,19 +362,9 @@ struct IndexRelatedItemView: View {
             }
             Spacer()
             Button(role: .destructive) {
-              Task {
-                showDeleteRelated = true
-              }
+              showDeleteRelated = true
             } label: {
               Text("删除关联")
-            }
-            .alert("确定删除这个关联吗？", isPresented: $showDeleteRelated) {
-              Button("取消", role: .cancel) {}
-              Button("删除", role: .destructive) {
-                Task {
-                  await delete()
-                }
-              }
             }
           }.font(.footnote)
         }
@@ -386,6 +376,14 @@ struct IndexRelatedItemView: View {
         order: item.order, comment: item.comment
       ) {
         reloader.toggle()
+      }
+    }
+    .alert("确定删除这个关联吗？", isPresented: $showDeleteRelated) {
+      Button("取消", role: .cancel) {}
+      Button("删除", role: .destructive) {
+        Task {
+          await delete()
+        }
       }
     }
   }

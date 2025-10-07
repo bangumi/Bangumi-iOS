@@ -15,6 +15,7 @@ struct BlogView: View {
   @State private var comments: [CommentDTO] = []
   @State private var loadingComments: Bool = false
   @State private var showCommentBox: Bool = false
+  @State private var showIndexPicker: Bool = false
 
   var title: String {
     guard let blog = blog else {
@@ -108,6 +109,14 @@ struct BlogView: View {
           CreateCommentBoxView(type: .blog(blogId))
             .presentationDetents([.medium, .large])
         }
+        .sheet(isPresented: $showIndexPicker) {
+          IndexPickerView(
+            category: .blog,
+            itemId: blogId,
+            itemTitle: title
+          )
+          .presentationDetents([.medium, .large])
+        }
       } else if refreshed {
         NotFoundView()
       } else {
@@ -125,6 +134,11 @@ struct BlogView: View {
             Label("吐槽", systemImage: "plus.bubble")
           }
           Divider()
+          Button {
+            showIndexPicker = true
+          } label: {
+            Label("收藏", systemImage: "book")
+          }
           ShareLink(item: shareLink) {
             Label("分享", systemImage: "square.and.arrow.up")
           }

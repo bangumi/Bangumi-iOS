@@ -17,6 +17,7 @@ struct CharacterView: View {
   @State private var comments: [CommentDTO] = []
   @State private var loadingComments: Bool = false
   @State private var showCommentBox: Bool = false
+  @State private var showIndexPicker: Bool = false
 
   init(characterId: Int) {
     self.characterId = characterId
@@ -96,6 +97,14 @@ struct CharacterView: View {
           CreateCommentBoxView(type: .character(characterId))
             .presentationDetents([.medium, .large])
         }
+        .sheet(isPresented: $showIndexPicker) {
+          IndexPickerView(
+            category: .character,
+            itemId: characterId,
+            itemTitle: title
+          )
+          .presentationDetents([.medium, .large])
+        }
       } else if refreshed {
         NotFoundView()
       } else {
@@ -114,6 +123,11 @@ struct CharacterView: View {
             Label("吐槽", systemImage: "plus.bubble")
           }
           Divider()
+          Button {
+            showIndexPicker = true
+          } label: {
+            Label("收藏", systemImage: "book")
+          }
           ShareLink(item: shareLink) {
             Label("分享", systemImage: "square.and.arrow.up")
           }
