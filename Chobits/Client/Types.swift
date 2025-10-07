@@ -715,7 +715,7 @@ struct SlimPersonDTO: Codable, Identifiable, Hashable, Linkable {
   var name: String
   var nameCN: String
   var type: PersonType
-  var career: [PersonCareer]
+  var career: [PersonCareer] = []
   var images: Images?
   var lock: Bool
   var nsfw: Bool
