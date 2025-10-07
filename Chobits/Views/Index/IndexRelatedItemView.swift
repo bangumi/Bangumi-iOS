@@ -26,7 +26,7 @@ struct IndexRelatedItemView: View {
           HStack(alignment: .top) {
             if let subject = item.subject {
               ImageView(img: subject.images?.resize(.r200))
-                .imageStyle(width: 80, height: 108)
+                .imageStyle(width: 80, height: 100)
                 .imageType(.subject)
                 .imageNSFW(subject.nsfw)
                 .imageLink(subject.link)
@@ -70,7 +70,7 @@ struct IndexRelatedItemView: View {
           HStack(alignment: .top) {
             if let character = item.character {
               ImageView(img: character.images?.resize(.r200))
-                .imageStyle(width: 80, height: 108)
+                .imageStyle(width: 72, height: 72)
                 .imageType(.person)
                 .imageLink(character.link)
               VStack(alignment: .leading) {
@@ -114,7 +114,7 @@ struct IndexRelatedItemView: View {
           HStack(alignment: .top) {
             if let person = item.person {
               ImageView(img: person.images?.resize(.r200))
-                .imageStyle(width: 80, height: 108)
+                .imageStyle(width: 72, height: 72)
                 .imageType(.person)
                 .imageLink(person.link)
               VStack(alignment: .leading) {
@@ -159,7 +159,7 @@ struct IndexRelatedItemView: View {
               ImageView(img: subject.images?.resize(.r200))
                 .imageStyle(width: 60, height: 60)
                 .imageType(.subject)
-                .imageLink(subject.link)
+                .imageLink(episode.link)
               VStack(alignment: .leading) {
                 HStack {
                   Image(systemName: item.cat.icon)
@@ -195,17 +195,10 @@ struct IndexRelatedItemView: View {
         case .blog:
           HStack(alignment: .top) {
             if let blog = item.blog, let user = blog.user {
-              if let icon = blog.icon, !icon.isEmpty {
-                ImageView(img: icon)
-                  .imageStyle(width: 60, height: 60)
-                  .imageType(.icon)
-                  .imageLink(blog.link)
-              } else {
-                ImageView(img: user.avatar?.large)
-                  .imageStyle(width: 60, height: 60)
-                  .imageType(.icon)
-                  .imageLink(blog.link)
-              }
+              ImageView(img: blog.icon)
+                .imageStyle(width: 60, height: 60)
+                .imageType(.icon)
+                .imageLink(blog.link)
               VStack(alignment: .leading) {
                 HStack {
                   Image(systemName: item.cat.icon)
@@ -251,7 +244,7 @@ struct IndexRelatedItemView: View {
               ImageView(img: creator.avatar?.large)
                 .imageStyle(width: 60, height: 60)
                 .imageType(.avatar)
-                .imageLink(creator.link)
+                .imageLink(topic.link)
               VStack(alignment: .leading) {
                 HStack {
                   Image(systemName: item.cat.icon)
@@ -301,7 +294,7 @@ struct IndexRelatedItemView: View {
               ImageView(img: creator.avatar?.large)
                 .imageStyle(width: 60, height: 60)
                 .imageType(.avatar)
-                .imageLink(creator.link)
+                .imageLink(topic.link)
               VStack(alignment: .leading) {
                 HStack {
                   Image(systemName: item.cat.icon)
@@ -311,10 +304,15 @@ struct IndexRelatedItemView: View {
                     .lineLimit(1)
                   Spacer(minLength: 0)
                 }
-                Text(topic.subject.name)
-                  .font(.footnote)
-                  .foregroundStyle(.secondary)
-                  .lineLimit(1)
+                HStack {
+                  Image(systemName: topic.subject.type.icon)
+                    .foregroundStyle(.secondary)
+                    .font(.footnote)
+                  Text(topic.subject.name)
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+                }
                 HStack(spacing: 0) {
                   Text(creator.nickname.withLink(creator.link))
                     .lineLimit(1)

@@ -72,7 +72,7 @@ struct IndexView: View {
           Text(index.title)
             .font(.title2)
             .bold()
-          CardView(background: .secondary.opacity(0.05)) {
+          CardView {
             VStack(alignment: .leading, spacing: 4) {
               HStack(alignment: .top, spacing: 8) {
                 ImageView(img: index.user.avatar?.large)
@@ -212,14 +212,6 @@ struct IndexView: View {
             } label: {
               Label("删除", systemImage: "trash")
             }
-            .alert("确定删除这个目录吗？", isPresented: $showDeleteIndex) {
-              Button("取消", role: .cancel) {}
-              Button("删除", role: .destructive) {
-                Task {
-                  await deleteIndex(indexId)
-                }
-              }
-            }
             Divider()
           }
           ShareLink(item: shareLink) {
@@ -232,6 +224,14 @@ struct IndexView: View {
     }
     .task {
       await refresh()
+    }
+    .alert("确定删除这个目录吗？", isPresented: $showDeleteIndex) {
+      Button("取消", role: .cancel) {}
+      Button("删除", role: .destructive) {
+        Task {
+          await deleteIndex(indexId)
+        }
+      }
     }
     .sheet(isPresented: $showEditIndex) {
       if let index = index {

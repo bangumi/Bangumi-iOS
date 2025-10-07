@@ -72,7 +72,7 @@ struct IndexEditView: View {
               }
             }
         } header: {
-          Text("基本信息")
+          Text("内容")
         }
 
         Section {
@@ -85,18 +85,25 @@ struct IndexEditView: View {
       .navigationBarTitleDisplayMode(.inline)
       .toolbar {
         ToolbarItem(placement: .cancellationAction) {
-          Button("取消") {
+          Button {
             dismiss()
+          } label: {
+            Label("取消", systemImage: "xmark")
           }
+          .disabled(isSubmitting)
+          .adaptiveButtonStyle(.bordered)
         }
 
         ToolbarItem(placement: .confirmationAction) {
-          Button("保存") {
+          Button {
             Task {
               await submit()
             }
+          } label: {
+            Label("保存", systemImage: "checkmark")
           }
           .disabled(isSubmitting || title.isEmpty || desc.isEmpty)
+          .adaptiveButtonStyle(.borderedProminent)
         }
       }
     }

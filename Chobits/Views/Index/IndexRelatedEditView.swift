@@ -8,7 +8,7 @@ struct IndexRelatedAddView: View {
 
   @State private var selectedCategory: IndexRelatedCategory = .subject
   @State private var subjectId: String = ""
-  @State private var order: String = "0"
+  @State private var order: String = ""
   @State private var comment: String = ""
   @State private var isSubmitting = false
 
@@ -24,7 +24,7 @@ struct IndexRelatedAddView: View {
         indexId: indexId,
         cat: selectedCategory,
         sid: sid,
-        order: Int(order),
+        order: order.isEmpty ? nil : Int(order),
         comment: comment.isEmpty ? nil : comment,
       )
       Notifier.shared.notify(message: "已添加关联内容")
@@ -45,11 +45,6 @@ struct IndexRelatedAddView: View {
               Text(cat.title).tag(cat)
             }
           }
-        } header: {
-          Text("关联类型")
-        }
-
-        Section {
           TextField("ID", text: $subjectId)
             .keyboardType(.numberPad)
         } header: {
@@ -63,7 +58,7 @@ struct IndexRelatedAddView: View {
             .frame(minHeight: 60)
             .overlay(alignment: .topLeading) {
               if comment.isEmpty {
-                Text("备注")
+                Text("评价")
                   .foregroundColor(.secondary.opacity(0.5))
                   .padding(.top, 8)
                   .padding(.leading, 4)
@@ -77,19 +72,25 @@ struct IndexRelatedAddView: View {
       .navigationBarTitleDisplayMode(.inline)
       .toolbar {
         ToolbarItem(placement: .cancellationAction) {
-          Button("取消") {
+          Button {
             dismiss()
+          } label: {
+            Label("取消", systemImage: "xmark")
           }
+          .disabled(isSubmitting)
+          .adaptiveButtonStyle(.bordered)
         }
 
         ToolbarItem(placement: .confirmationAction) {
-          Button("添加") {
+          Button {
             Task {
               await submit()
             }
+          } label: {
+            Label("添加", systemImage: "plus")
           }
-          .adaptiveButtonStyle(.borderedProminent)
           .disabled(isSubmitting || subjectId.isEmpty)
+          .adaptiveButtonStyle(.borderedProminent)
         }
       }
     }
@@ -144,45 +145,43 @@ struct IndexRelatedEditView: View {
   var body: some View {
     NavigationStack {
       Form {
-        Section {
-          TextField("排序", text: $order)
-            .keyboardType(.numberPad)
-        } header: {
-          Text("排序")
-        }
+        TextField("排序", text: $order)
+          .keyboardType(.numberPad)
 
-        Section {
-          TextEditor(text: $comment)
-            .frame(minHeight: 100)
-            .overlay(alignment: .topLeading) {
-              if comment.isEmpty {
-                Text("评价")
-                  .foregroundColor(.secondary.opacity(0.5))
-                  .padding(.top, 8)
-                  .padding(.leading, 4)
-              }
+        TextEditor(text: $comment)
+          .frame(minHeight: 100)
+          .overlay(alignment: .topLeading) {
+            if comment.isEmpty {
+              Text("评价")
+                .foregroundColor(.secondary.opacity(0.5))
+                .padding(.top, 8)
+                .padding(.leading, 4)
             }
-        } header: {
-          Text("评价")
-        }
+          }
       }
       .navigationTitle("编辑关联内容")
       .navigationBarTitleDisplayMode(.inline)
       .toolbar {
         ToolbarItem(placement: .cancellationAction) {
-          Button("取消") {
+          Button {
             dismiss()
+          } label: {
+            Label("取消", systemImage: "xmark")
           }
+          .disabled(isSubmitting)
+          .adaptiveButtonStyle(.bordered)
         }
 
         ToolbarItem(placement: .confirmationAction) {
-          Button("保存") {
+          Button {
             Task {
               await submit()
             }
+          } label: {
+            Label("保存", systemImage: "checkmark")
           }
-          .adaptiveButtonStyle(.borderedProminent)
           .disabled(isSubmitting || order.isEmpty)
+          .adaptiveButtonStyle(.borderedProminent)
         }
       }
     }
