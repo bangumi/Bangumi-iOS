@@ -127,10 +127,12 @@ struct IndexRelatedItemView: View {
                   Spacer(minLength: 0)
                 }
                 HStack(spacing: 2) {
-                  ForEach(person.career, id: \.self) { career in
-                    BadgeView(background: .badge) {
-                      Text(career.description)
-                        .font(.caption)
+                  if let career = person.career, !career.isEmpty {
+                    ForEach(career, id: \.self) { career in
+                      BadgeView(background: .badge) {
+                        Text(career.description)
+                          .font(.caption)
+                      }
                     }
                   }
                   Text(person.nameCN)
