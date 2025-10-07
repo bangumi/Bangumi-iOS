@@ -28,6 +28,7 @@ final class PersonV2: Searchable, Linkable {
 
   var casts: [PersonCastDTO] = []
   var works: [PersonWorkDTO] = []
+  var indexes: [SlimIndexDTO] = []
 
   var typeEnum: PersonType {
     return PersonType(type)

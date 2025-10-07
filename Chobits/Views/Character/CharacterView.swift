@@ -218,6 +218,9 @@ struct CharacterDetailView: View {
 
     /// casts
     CharacterCastsView(characterId: character.characterId, casts: character.casts)
+
+    /// indexes
+    CharacterIndexsView(characterId: character.characterId, indexes: character.indexes)
   }
 }
 

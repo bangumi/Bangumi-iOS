@@ -176,6 +176,25 @@ extension Chii {
     return resp
   }
 
+  func getCharacterIndexes(characterId: Int, limit: Int = 20, offset: Int = 0) async throws
+    -> PagedDTO<
+      SlimIndexDTO
+    >
+  {
+    if self.mock {
+      return loadFixture(fixture: "character_indexes.json", target: PagedDTO<SlimIndexDTO>.self)
+    }
+    let url = BangumiAPI.priv.build("p1/characters/\(characterId)/indexes")
+    let queryItems: [URLQueryItem] = [
+      URLQueryItem(name: "limit", value: String(limit)),
+      URLQueryItem(name: "offset", value: String(offset)),
+    ]
+    let pageURL = url.appending(queryItems: queryItems)
+    let data = try await self.request(url: pageURL, method: "GET")
+    let resp: PagedDTO<SlimIndexDTO> = try self.decodeResponse(data)
+    return resp
+  }
+
   func getCharacterComments(_ characterID: Int) async throws -> [CommentDTO] {
     if self.mock {
       return loadFixture(fixture: "character_comments.json", target: [CommentDTO].self)
@@ -864,6 +883,23 @@ extension Chii {
     return resp
   }
 
+  func getPersonIndexes(personId: Int, limit: Int = 20, offset: Int = 0) async throws -> PagedDTO<
+    SlimIndexDTO
+  > {
+    if self.mock {
+      return loadFixture(fixture: "person_indexes.json", target: PagedDTO<SlimIndexDTO>.self)
+    }
+    let url = BangumiAPI.priv.build("p1/persons/\(personId)/indexes")
+    let queryItems: [URLQueryItem] = [
+      URLQueryItem(name: "limit", value: String(limit)),
+      URLQueryItem(name: "offset", value: String(offset)),
+    ]
+    let pageURL = url.appending(queryItems: queryItems)
+    let data = try await self.request(url: pageURL, method: "GET")
+    let resp: PagedDTO<SlimIndexDTO> = try self.decodeResponse(data)
+    return resp
+  }
+
   func getPersonComments(_ personID: Int) async throws -> [CommentDTO] {
     if self.mock {
       return loadFixture(fixture: "person_comments.json", target: [CommentDTO].self)
@@ -1126,6 +1162,23 @@ extension Chii {
     let pageURL = url.appending(queryItems: queryItems)
     let data = try await self.request(url: pageURL, method: "GET")
     let resp: PagedDTO<SubjectPositionDTO> = try self.decodeResponse(data)
+    return resp
+  }
+
+  func getSubjectIndexes(subjectId: Int, limit: Int = 20, offset: Int = 0) async throws -> PagedDTO<
+    SlimIndexDTO
+  > {
+    if self.mock {
+      return loadFixture(fixture: "subject_indexes.json", target: PagedDTO<SlimIndexDTO>.self)
+    }
+    let url = BangumiAPI.priv.build("p1/subjects/\(subjectId)/indexes")
+    let queryItems: [URLQueryItem] = [
+      URLQueryItem(name: "limit", value: String(limit)),
+      URLQueryItem(name: "offset", value: String(offset)),
+    ]
+    let pageURL = url.appending(queryItems: queryItems)
+    let data = try await self.request(url: pageURL, method: "GET")
+    let resp: PagedDTO<SlimIndexDTO> = try self.decodeResponse(data)
     return resp
   }
 

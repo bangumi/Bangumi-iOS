@@ -4,8 +4,6 @@ struct SubjectCollectsView: View {
   @Environment(Subject.self) var subject
   @AppStorage("subjectCollectsFilterMode") var subjectCollectsFilterMode: FilterMode = .all
 
-  @State private var loading: Bool = false
-
   var title: String {
     switch subject.typeEnum {
     case .book:
@@ -61,13 +59,7 @@ struct SubjectCollectsView: View {
       Divider()
     }.padding(.top, 5)
 
-    if loading {
-      HStack {
-        Spacer()
-        ProgressView()
-        Spacer()
-      }.padding(.bottom, 5)
-    } else if subject.collects.isEmpty {
+    if subject.collects.isEmpty {
       HStack {
         Spacer()
         Text(emptyText)

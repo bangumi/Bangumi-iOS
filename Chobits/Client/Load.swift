@@ -64,6 +64,7 @@ extension Chii {
     async let charactersResp = self.getSubjectCharacters(subjectId, limit: 12)
     async let relationsResp = self.getSubjectRelations(subjectId, limit: 10)
     async let recsResp = self.getSubjectRecs(subjectId, limit: 10)
+    async let indexesResp = self.getSubjectIndexes(subjectId: subjectId, limit: 5)
 
     if offprints {
       async let offprintsResp = self.getSubjectRelations(subjectId, offprint: true, limit: 100)
@@ -86,10 +87,13 @@ extension Chii {
       try await db.saveSubjectComments(subjectId: subjectId, items: commentsVal.data)
     }
 
-    let (charactersVal, relationsVal, recsVal) = try await (charactersResp, relationsResp, recsResp)
+    let (charactersVal, relationsVal, recsVal, indexesVal) = try await (
+      charactersResp, relationsResp, recsResp, indexesResp
+    )
     try await db.saveSubjectCharacters(subjectId: subjectId, items: charactersVal.data)
     try await db.saveSubjectRelations(subjectId: subjectId, items: relationsVal.data)
     try await db.saveSubjectRecs(subjectId: subjectId, items: recsVal.data)
+    try await db.saveSubjectIndexes(subjectId: subjectId, items: indexesVal.data)
 
     try await db.commit()
   }
@@ -173,9 +177,13 @@ extension Chii {
 
   func loadCharacterDetails(_ characterId: Int) async throws {
     let db = try self.getDB()
-    // 单一请求无需 TaskGroup，直接获取后保存
-    let response = try await self.getCharacterCasts(characterId, limit: 5)
-    try await db.saveCharacterCasts(characterId: characterId, items: response.data)
+
+    async let castsResp = self.getCharacterCasts(characterId, limit: 5)
+    async let indexesResp = self.getCharacterIndexes(characterId: characterId, limit: 5)
+    let (castsVal, indexesVal) = try await (castsResp, indexesResp)
+
+    try await db.saveCharacterCasts(characterId: characterId, items: castsVal.data)
+    try await db.saveCharacterIndexes(characterId: characterId, items: indexesVal.data)
     try await db.commit()
   }
 
@@ -198,10 +206,12 @@ extension Chii {
 
     async let castsResp = self.getPersonCasts(personId, limit: 5)
     async let worksResp = self.getPersonWorks(personId, limit: 5)
-    let (castsVal, worksVal) = try await (castsResp, worksResp)
+    async let indexesResp = self.getPersonIndexes(personId: personId, limit: 5)
+    let (castsVal, worksVal, indexesVal) = try await (castsResp, worksResp, indexesResp)
 
     try await db.savePersonCasts(personId: personId, items: castsVal.data)
     try await db.savePersonWorks(personId: personId, items: worksVal.data)
+    try await db.savePersonIndexes(personId: personId, items: indexesVal.data)
     try await db.commit()
   }
 }

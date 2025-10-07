@@ -45,6 +45,7 @@ final class SubjectV2: Searchable, Linkable {
   var reviews: [SubjectReviewDTO] = []
   var topics: [TopicDTO] = []
   var comments: [SubjectCommentDTO] = []
+  var indexes: [SlimIndexDTO] = []
 
   var typeEnum: SubjectType {
     return SubjectType(type)

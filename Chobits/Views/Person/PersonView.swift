@@ -233,6 +233,9 @@ struct PersonDetailView: View {
 
     /// works
     PersonWorksView(personId: person.personId, works: person.works)
+
+    /// indexes
+    PersonIndexsView(personId: person.personId, indexes: person.indexes)
   }
 }
 

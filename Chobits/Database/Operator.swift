@@ -595,6 +595,13 @@ extension DatabaseOperator {
     }
   }
 
+  public func saveSubjectIndexes(subjectId: Int, items: [SlimIndexDTO]) throws {
+    let subject = try self.getSubject(subjectId)
+    if subject?.indexes != items {
+      subject?.indexes = items
+    }
+  }
+
   public func saveSubjectPositions(subjectId: Int, items: [SubjectPositionDTO]) throws {
     let subject = try self.getSubject(subjectId)
     if subject?.positions != items {
@@ -617,6 +624,13 @@ extension DatabaseOperator {
     let character = try self.getCharacter(characterId)
     if character?.casts != items {
       character?.casts = items
+    }
+  }
+
+  public func saveCharacterIndexes(characterId: Int, items: [SlimIndexDTO]) throws {
+    let character = try self.getCharacter(characterId)
+    if character?.indexes != items {
+      character?.indexes = items
     }
   }
 }
@@ -642,6 +656,13 @@ extension DatabaseOperator {
     let person = try self.getPerson(personId)
     if person?.works != items {
       person?.works = items
+    }
+  }
+
+  public func savePersonIndexes(personId: Int, items: [SlimIndexDTO]) throws {
+    let person = try self.getPerson(personId)
+    if person?.indexes != items {
+      person?.indexes = items
     }
   }
 }

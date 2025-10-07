@@ -66,7 +66,7 @@ struct UserIndexListView: View {
       ScrollView {
         PageView<SlimIndexDTO, _>(reloader: reloader, nextPageFunc: load) { item in
           CardView {
-            UserIndexItemView(index: item)
+            IndexItemView(index: item)
           }
         }.padding(8)
       }

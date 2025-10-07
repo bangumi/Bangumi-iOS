@@ -4,8 +4,6 @@ import SwiftData
 import SwiftUI
 
 struct SubjectCollectionView: View {
-  @Environment(\.modelContext) var modelContext
-
   @Environment(Subject.self) var subject
 
   @State private var edit: Bool = false

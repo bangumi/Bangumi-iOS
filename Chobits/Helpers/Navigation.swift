@@ -43,6 +43,7 @@ enum NavDestination: Hashable, View {
   case subjectTopicDetail(_ topicId: Int)
   case subjectCommentList(_ subjectId: Int)
   case subjectCollectsList(_ subjectId: Int)
+  case subjectIndexList(_ subjectId: Int)
   case subjectInfobox(_ subjectId: Int)
   case subjectBrowsing(_ type: SubjectType)
 
@@ -50,9 +51,11 @@ enum NavDestination: Hashable, View {
   case episodeList(_ subjectId: Int)
   case character(_ characterId: Int)
   case characterCastList(_ characterId: Int)
+  case characterIndexList(_ characterId: Int)
   case person(_ personId: Int)
   case personCastList(_ personId: Int)
   case personWorkList(_ personId: Int)
+  case personIndexList(_ personId: Int)
 
   case index(_ indexId: Int)
 
@@ -123,6 +126,8 @@ enum NavDestination: Hashable, View {
       SubjectCommentListView(subjectId: subjectId)
     case .subjectCollectsList(let subjectId):
       SubjectCollectsListView(subjectId: subjectId)
+    case .subjectIndexList(let subjectId):
+      SubjectIndexListView(subjectId: subjectId)
     case .subjectInfobox(let subjectId):
       SubjectInfoboxView(subjectId: subjectId)
     case .subjectBrowsing(let type):
@@ -132,16 +137,22 @@ enum NavDestination: Hashable, View {
       EpisodeView(episodeId: episodeId)
     case .episodeList(let subjectId):
       EpisodeListView(subjectId: subjectId)
+
     case .character(let characterId):
       CharacterView(characterId: characterId)
     case .characterCastList(let characterId):
       CharacterCastListView(characterId: characterId)
+    case .characterIndexList(let characterId):
+      CharacterIndexListView(characterId: characterId)
+
     case .person(let personId):
       PersonView(personId: personId)
     case .personCastList(let personId):
       PersonCastListView(personId: personId)
     case .personWorkList(let personId):
       PersonWorkListView(personId: personId)
+    case .personIndexList(let personId):
+      PersonIndexListView(personId: personId)
 
     case .index(let indexId):
       IndexView(indexId: indexId)

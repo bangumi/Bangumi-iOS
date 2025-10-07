@@ -101,6 +101,8 @@ struct SubjectDetailView: View {
 
         SubjectRecsView(subjectId: subject.subjectId, recs: subject.recs)
 
+        SubjectIndexsView(subjectId: subject.subjectId, indexes: subject.indexes)
+
         if !isolationMode {
           SubjectCollectsView().environment(subject)
           SubjectReviewsView(subjectId: subject.subjectId, reviews: subject.reviews)

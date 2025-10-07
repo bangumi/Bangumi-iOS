@@ -26,6 +26,7 @@ final class CharacterV2: Searchable, Linkable {
   var collectedAt: Int = 0
 
   var casts: [CharacterCastDTO] = []
+  var indexes: [SlimIndexDTO] = []
 
   var roleEnum: CharacterType {
     return CharacterType(role)
