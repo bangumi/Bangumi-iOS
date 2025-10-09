@@ -90,6 +90,8 @@ struct EpisodeRecentView: View {
           }
         }
       }
+      .animation(.default, value: nextEpisode)
+      .animation(.default, value: recentEpisodes)
     case .list:
       HStack {
         if !recentEpisodes.isEmpty {
@@ -117,6 +119,8 @@ struct EpisodeRecentView: View {
           }.buttonStyle(.scale)
         }
       }
+      .animation(.default, value: nextEpisode)
+      .animation(.default, value: recentEpisodes)
     }
   }
 }
