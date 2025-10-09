@@ -1,7 +1,7 @@
 .PHONY: update_preview_date
 
 UID ?= 873244
-PREVIEW_PATH ?= Chobits/Preview Content
+PREVIEW_PATH ?= App/Preview Content
 
 
 update_api:

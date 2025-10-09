@@ -64,7 +64,7 @@ actor Chii {
       fatalError("Could not find CFBundleVersion in Info.plist")
     }
     self.version = "v\(version)(\(build))"
-    self.userAgent = "everpcpc/Chobits/\(self.version) (iOS)"
+    self.userAgent = "everpcpc/Bangumi/\(self.version) (iOS)"
     self.appInfo = AppInfo(
       clientId: clientId,
       clientSecret: clientSecret,

@@ -161,7 +161,7 @@ struct SettingsView: View {
         Link(destination: URL(string: "https://discord.gg/nZPTwzXxAX")!) {
           Text("问题反馈(Discord)")
         }
-        Link(destination: URL(string: "https://github.com/bangumi/Chobits-iOS")!) {
+        Link(destination: URL(string: "https://github.com/bangumi/Bangumi-iOS")!) {
           Text("查看源码(GitHub)")
         }
       }

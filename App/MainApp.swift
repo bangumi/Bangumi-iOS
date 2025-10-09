@@ -2,7 +2,7 @@ import SwiftData
 import SwiftUI
 
 @main
-struct ChobitsApp: App {
+struct MainApp: App {
   @State var sharedModelContainer: ModelContainer
 
   @AppStorage("appearance") var appearance: AppearanceType = .system

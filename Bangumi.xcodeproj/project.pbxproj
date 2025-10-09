@@ -14,7 +14,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		19BB342B2BD239AB00E5C295 /* Chobits.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Chobits.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		19BB342B2BD239AB00E5C295 /* Bangumi.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Bangumi.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -24,12 +24,12 @@
 				Config.xcconfig,
 				Info.plist,
 			);
-			target = 19BB342A2BD239AB00E5C295 /* Chobits */;
+			target = 19BB342A2BD239AB00E5C295 /* Bangumi */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		198AF2D82D2FB93F0091D376 /* Chobits */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (198AF37E2D2FB93F0091D376 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Chobits; sourceTree = "<group>"; };
+		198AF2D82D2FB93F0091D376 /* App */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (198AF37E2D2FB93F0091D376 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = App; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -50,7 +50,7 @@
 		19BB34222BD239AB00E5C295 = {
 			isa = PBXGroup;
 			children = (
-				198AF2D82D2FB93F0091D376 /* Chobits */,
+				198AF2D82D2FB93F0091D376 /* App */,
 				19BB342C2BD239AB00E5C295 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -58,7 +58,7 @@
 		19BB342C2BD239AB00E5C295 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				19BB342B2BD239AB00E5C295 /* Chobits.app */,
+				19BB342B2BD239AB00E5C295 /* Bangumi.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -66,9 +66,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		19BB342A2BD239AB00E5C295 /* Chobits */ = {
+		19BB342A2BD239AB00E5C295 /* Bangumi */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 19BB343B2BD239AC00E5C295 /* Build configuration list for PBXNativeTarget "Chobits" */;
+			buildConfigurationList = 19BB343B2BD239AC00E5C295 /* Build configuration list for PBXNativeTarget "Bangumi" */;
 			buildPhases = (
 				19BB34272BD239AB00E5C295 /* Sources */,
 				19BB34282BD239AB00E5C295 /* Frameworks */,
@@ -79,17 +79,17 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				198AF2D82D2FB93F0091D376 /* Chobits */,
+				198AF2D82D2FB93F0091D376 /* App */,
 			);
-			name = Chobits;
+			name = Bangumi;
 			packageProductDependencies = (
 				19671C722BDEB8B1000B4D99 /* KeychainSwift */,
 				19BD24252BE9C53800595973 /* Kingfisher */,
 				1968C5DC2CD5010C00242103 /* Flow */,
 				19B2A7092D087968001617BE /* BBCode */,
 			);
-			productName = Chobits;
-			productReference = 19BB342B2BD239AB00E5C295 /* Chobits.app */;
+			productName = Bangumi;
+			productReference = 19BB342B2BD239AB00E5C295 /* Bangumi.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -107,7 +107,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 19BB34262BD239AB00E5C295 /* Build configuration list for PBXProject "Chobits" */;
+			buildConfigurationList = 19BB34262BD239AB00E5C295 /* Build configuration list for PBXProject "Bangumi" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = "zh-Hans";
 			hasScannedForEncodings = 0;
@@ -126,7 +126,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				19BB342A2BD239AB00E5C295 /* Chobits */,
+				19BB342A2BD239AB00E5C295 /* Bangumi */,
 			);
 		};
 /* End PBXProject section */
@@ -154,7 +154,7 @@
 /* Begin XCBuildConfiguration section */
 		19BB34392BD239AC00E5C295 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReferenceAnchor = 198AF2D82D2FB93F0091D376 /* Chobits */;
+			baseConfigurationReferenceAnchor = 198AF2D82D2FB93F0091D376 /* App */;
 			baseConfigurationReferenceRelativePath = Config.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -221,7 +221,7 @@
 		};
 		19BB343A2BD239AC00E5C295 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReferenceAnchor = 198AF2D82D2FB93F0091D376 /* Chobits */;
+			baseConfigurationReferenceAnchor = 198AF2D82D2FB93F0091D376 /* App */;
 			baseConfigurationReferenceRelativePath = Config.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -287,10 +287,10 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 3;
-				DEVELOPMENT_ASSET_PATHS = "\"Chobits/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"App/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = Chobits/Info.plist;
+				INFOPLIST_FILE = App/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "番組計画 Riff";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "保存图片到相册";
@@ -321,10 +321,10 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 3;
-				DEVELOPMENT_ASSET_PATHS = "\"Chobits/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"App/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = Chobits/Info.plist;
+				INFOPLIST_FILE = App/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "番組計画 Riff";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "保存图片到相册";
@@ -350,7 +350,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		19BB34262BD239AB00E5C295 /* Build configuration list for PBXProject "Chobits" */ = {
+		19BB34262BD239AB00E5C295 /* Build configuration list for PBXProject "Bangumi" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				19BB34392BD239AC00E5C295 /* Debug */,
@@ -359,7 +359,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		19BB343B2BD239AC00E5C295 /* Build configuration list for PBXNativeTarget "Chobits" */ = {
+		19BB343B2BD239AC00E5C295 /* Build configuration list for PBXNativeTarget "Bangumi" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				19BB343C2BD239AC00E5C295 /* Debug */,

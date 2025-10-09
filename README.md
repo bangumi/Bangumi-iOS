@@ -1,4 +1,4 @@
-# Chobits iOS
+# Bangumi iOS
 
 [![](https://dcbadge.limes.pink/api/server/nZPTwzXxAX?style=flat)](https://discord.gg/nZPTwzXxAX)
 
