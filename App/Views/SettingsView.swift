@@ -19,7 +19,6 @@ struct SettingsView: View {
   @AppStorage("autoCompleteProgress") var autoCompleteProgress: Bool = false
   @AppStorage("subjectImageQuality") var subjectImageQuality: ImageQuality = .high
   @AppStorage("rakuenDefaultMode") var rakuenDefaultMode: GroupTopicFilterMode = .joined
-  @AppStorage("openLinksInApp") var openLinksInApp: Bool = true
   @AppStorage("subjectCollectsFilterMode") var subjectCollectsFilterMode: FilterMode = .all
 
   @Environment(\.modelContext) var modelContext
@@ -129,9 +128,6 @@ struct SettingsView: View {
       }
 
       Section(header: Text("超合金")) {
-        Toggle(isOn: $openLinksInApp) {
-          Text("在应用内打开链接")
-        }
         Toggle(isOn: $isolationMode) {
           Text("社恐模式")
         }

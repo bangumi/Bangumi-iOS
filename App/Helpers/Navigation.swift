@@ -225,6 +225,14 @@ func handleChiiURL(_ url: URL, _ nav: Binding<NavigationPath>) -> Bool {
     if let personId = components.first.flatMap({ Int($0) }) {
       nav.wrappedValue.append(NavDestination.person(personId))
     }
+  case "blog":
+    if let blogId = components.first.flatMap({ Int($0) }) {
+      nav.wrappedValue.append(NavDestination.blog(blogId))
+    }
+  case "index":
+    if let indexId = components.first.flatMap({ Int($0) }) {
+      nav.wrappedValue.append(NavDestination.index(indexId))
+    }
   case "group":
     switch components.first {
     case "topic":
@@ -235,14 +243,6 @@ func handleChiiURL(_ url: URL, _ nav: Binding<NavigationPath>) -> Bool {
       if let groupName = components.first {
         nav.wrappedValue.append(NavDestination.group(groupName))
       }
-    }
-  case "index":
-    if let indexId = components.first.flatMap({ Int($0) }) {
-      nav.wrappedValue.append(NavDestination.index(indexId))
-    }
-  case "blog":
-    if let blogId = components.first.flatMap({ Int($0) }) {
-      nav.wrappedValue.append(NavDestination.blog(blogId))
     }
   default:
     Notifier.shared.notify(message: "未知的 chii URL: \(url)")
@@ -266,6 +266,11 @@ func handleBangumiURL(_ url: URL, _ nav: Binding<NavigationPath>) -> Bool {
   Logger.app.info("bangumi URL: \(url)")
   let components = url.pathComponents.dropFirst()
   switch components.first {
+  case "user":
+    guard let username = components.dropFirst().first else {
+      return false
+    }
+    nav.wrappedValue.append(NavDestination.user(username))
   case "subject":
     guard let subPath = components.dropFirst().first else {
       return false
@@ -288,16 +293,26 @@ func handleBangumiURL(_ url: URL, _ nav: Binding<NavigationPath>) -> Bool {
       return false
     }
     nav.wrappedValue.append(NavDestination.episode(episodeId))
-  case "person":
-    guard let personId = components.dropFirst().first.flatMap({ Int($0) }) else {
-      return false
-    }
-    nav.wrappedValue.append(NavDestination.person(personId))
   case "character":
     guard let characterId = components.dropFirst().first.flatMap({ Int($0) }) else {
       return false
     }
     nav.wrappedValue.append(NavDestination.character(characterId))
+  case "person":
+    guard let personId = components.dropFirst().first.flatMap({ Int($0) }) else {
+      return false
+    }
+    nav.wrappedValue.append(NavDestination.person(personId))
+  case "blog":
+    guard let blogId = components.dropFirst().first.flatMap({ Int($0) }) else {
+      return false
+    }
+    nav.wrappedValue.append(NavDestination.blog(blogId))
+  case "index":
+    guard let indexId = components.dropFirst().first.flatMap({ Int($0) }) else {
+      return false
+    }
+    nav.wrappedValue.append(NavDestination.index(indexId))
   case "group":
     guard let groupName = components.dropFirst().first else {
       return false
