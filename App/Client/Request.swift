@@ -442,14 +442,24 @@ extension Chii {
 extension Chii {
   func getFollowers(limit: Int = 20, offset: Int = 0) async throws -> PagedDTO<FriendDTO> {
     let url = BangumiAPI.priv.build("p1/followers")
-    let data = try await self.request(url: url, method: "GET")
+    let queryItems: [URLQueryItem] = [
+      URLQueryItem(name: "limit", value: String(limit)),
+      URLQueryItem(name: "offset", value: String(offset)),
+    ]
+    let pageURL = url.appending(queryItems: queryItems)
+    let data = try await self.request(url: pageURL, method: "GET")
     let resp: PagedDTO<FriendDTO> = try self.decodeResponse(data)
     return resp
   }
 
   func getFriends(limit: Int = 20, offset: Int = 0) async throws -> PagedDTO<FriendDTO> {
     let url = BangumiAPI.priv.build("p1/friends")
-    let data = try await self.request(url: url, method: "GET")
+    let queryItems: [URLQueryItem] = [
+      URLQueryItem(name: "limit", value: String(limit)),
+      URLQueryItem(name: "offset", value: String(offset)),
+    ]
+    let pageURL = url.appending(queryItems: queryItems)
+    let data = try await self.request(url: pageURL, method: "GET")
     let resp: PagedDTO<FriendDTO> = try self.decodeResponse(data)
     return resp
   }

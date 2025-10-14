@@ -21,6 +21,7 @@ where C: View, T: Identifiable & Hashable & Codable & Sendable {
   func reload() {
     exhausted = false
     loadedIdx = [:]
+    offset = 0
     Task {
       let result = await loadPage(currentOffset: 0)
       if let newData = result {
