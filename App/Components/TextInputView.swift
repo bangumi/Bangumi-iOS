@@ -128,7 +128,7 @@ private struct PlainTextEditor: View {
 
   var body: some View {
     VStack {
-      BorderView(color: .secondary.opacity(0.2), padding: 4) {
+      BorderView(color: .secondary.opacity(0.2), padding: 0) {
         TextEditor(text: $text)
           .frame(height: height)
           .autocorrectionDisabled()

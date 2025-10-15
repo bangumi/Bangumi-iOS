@@ -359,7 +359,7 @@ struct BBCodeEditor: View {
             Divider()
           }.padding(.horizontal, 2)
         }.buttonStyle(.bordered)
-        BorderView(color: .secondary.opacity(0.2), padding: 4) {
+        BorderView(color: .secondary.opacity(0.2), padding: 0) {
           TextEditor(text: $text, selection: $textSelection)
             .frame(height: height)
             .autocorrectionDisabled()
