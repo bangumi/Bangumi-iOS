@@ -9,3 +9,5 @@ xcshareddata/
 /buildServer.json
 
 .DS_Store
+
+.claude/

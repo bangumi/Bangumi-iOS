@@ -67,12 +67,11 @@ struct PersonView: View {
             /// comments
             if !isolationMode {
               VStack(alignment: .leading, spacing: 2) {
-                Text("吐槽箱").font(.title3)
-                if loadingComments {
-                  HStack {
-                    Spacer()
+                HStack {
+                  Text("吐槽箱").font(.title3)
+                  if loadingComments {
                     ProgressView()
-                    Spacer()
+                      .controlSize(.small)
                   }
                 }
                 Divider()
