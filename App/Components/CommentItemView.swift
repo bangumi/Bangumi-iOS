@@ -397,40 +397,53 @@ struct CreateCommentBoxView: View {
   }
 
   var body: some View {
-    ScrollView {
-      VStack {
+    VStack(spacing: 0) {
+      HStack {
+        Button {
+          dismiss()
+        } label: {
+          Label("取消", systemImage: "xmark")
+        }
+        .disabled(updating)
+        .adaptiveButtonStyle(.bordered)
+
+        Spacer()
+
         Text(title)
           .font(.headline)
+          .fontWeight(.semibold)
           .lineLimit(1)
-        HStack {
-          Button {
-            dismiss()
-          } label: {
-            Label("取消", systemImage: "xmark")
-          }
-          .disabled(updating)
-          .adaptiveButtonStyle(.bordered)
-          Spacer()
-          Button {
-            showTurnstile = true
-          } label: {
-            Label("发送", systemImage: "paperplane")
-          }
-          .disabled(content.isEmpty || updating)
-          .adaptiveButtonStyle(.borderedProminent)
+
+        Spacer()
+
+        Button {
+          showTurnstile = true
+        } label: {
+          Label("发送", systemImage: "paperplane")
         }
-        TextInputView(type: "回复", text: $content)
-          .textInputStyle(bbcode: true)
-          .sheet(isPresented: $showTurnstile) {
-            TurnstileSheetView(
-              token: $token,
-              onSuccess: {
-                Task {
-                  await postReply(content: content)
-                }
-              })
-          }
-      }.padding()
+        .disabled(content.isEmpty || updating)
+        .adaptiveButtonStyle(.borderedProminent)
+      }
+      .padding()
+      .background(Color(.systemBackground))
+
+      Divider()
+
+      ScrollView {
+        VStack {
+          TextInputView(type: "回复", text: $content)
+            .textInputStyle(bbcode: true)
+            .sheet(isPresented: $showTurnstile) {
+              TurnstileSheetView(
+                token: $token,
+                onSuccess: {
+                  Task {
+                    await postReply(content: content)
+                  }
+                })
+            }
+        }.padding()
+      }
     }
   }
 }
@@ -484,33 +497,46 @@ struct EditCommentBoxView: View {
   }
 
   var body: some View {
-    ScrollView {
-      VStack {
+    VStack(spacing: 0) {
+      HStack {
+        Button {
+          dismiss()
+        } label: {
+          Label("取消", systemImage: "xmark")
+        }
+        .disabled(updating)
+        .adaptiveButtonStyle(.bordered)
+
+        Spacer()
+
         Text(title)
           .font(.headline)
+          .fontWeight(.semibold)
           .lineLimit(1)
-        HStack {
-          Button {
-            dismiss()
-          } label: {
-            Label("取消", systemImage: "xmark")
+
+        Spacer()
+
+        Button {
+          Task {
+            await editComment(content: content)
           }
-          .disabled(updating)
-          .adaptiveButtonStyle(.bordered)
-          Spacer()
-          Button {
-            Task {
-              await editComment(content: content)
-            }
-          } label: {
-            Label("保存", systemImage: "checkmark")
-          }
-          .disabled(content.isEmpty || updating)
-          .adaptiveButtonStyle(.borderedProminent)
+        } label: {
+          Label("保存", systemImage: "checkmark")
         }
-        TextInputView(type: "回复", text: $content)
-          .textInputStyle(bbcode: true)
-      }.padding()
+        .disabled(content.isEmpty || updating)
+        .adaptiveButtonStyle(.borderedProminent)
+      }
+      .padding()
+      .background(Color(.systemBackground))
+
+      Divider()
+
+      ScrollView {
+        VStack {
+          TextInputView(type: "回复", text: $content)
+            .textInputStyle(bbcode: true)
+        }.padding()
+      }
     }
   }
 }
