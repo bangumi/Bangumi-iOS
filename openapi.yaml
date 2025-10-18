@@ -41,6 +41,8 @@ components:
           type: string
         type:
           type: integer
+        uid:
+          type: integer
         updatedAt:
           type: integer
         user:
@@ -50,6 +52,7 @@ components:
       required:
         - id
         - type
+        - uid
         - user
         - title
         - icon
@@ -289,7 +292,6 @@ components:
           required:
             - replies
           type: object
-      type: object
     CommentBase:
       properties:
         content:
@@ -375,6 +377,26 @@ components:
           type: integer
       required:
         - content
+      type: object
+    CreateReport:
+      properties:
+        comment:
+          description: 举报说明（可选）
+          maxLength: 2000
+          type: string
+        id:
+          description: 被举报对象的 ID
+          minimum: 1
+          type: integer
+        type:
+          $ref: '#/components/schemas/ReportType'
+        value:
+          $ref: '#/components/schemas/ReportReason'
+      required:
+        - type
+        - id
+        - value
+      title: CreateReport
       type: object
     CreateTopic:
       properties:
@@ -560,11 +582,6 @@ components:
           type: array
         expectedRevision:
           items:
-            description: >-
-              a optional object to check if input is changed by others
-
-              if some key is given, and current data in database doesn't match
-              input, subject will not be changed
             properties:
               date:
                 type: string
@@ -886,8 +903,8 @@ components:
         - title
         - desc
         - private
-        - replies
         - total
+        - replies
         - collects
         - stats
         - award
@@ -956,6 +973,9 @@ components:
         - 1
         - 2
         - 3
+        - 4
+        - 5
+        - 6
       type: integer
       x-enum-varnames:
         - Subject
@@ -1425,6 +1445,96 @@ components:
         - state
       title: ReplyBase
       type: object
+    ReportReason:
+      description: |-
+        举报原因
+          - 1 = 辱骂、人身攻击
+          - 2 = 刷屏、无关内容
+          - 3 = 政治相关
+          - 4 = 违法信息
+          - 5 = 泄露隐私
+          - 6 = 涉嫌刷分
+          - 7 = 引战
+          - 8 = 广告
+          - 9 = 剧透
+          - 99 = 其他
+      enum:
+        - 1
+        - 2
+        - 3
+        - 4
+        - 5
+        - 6
+        - 7
+        - 8
+        - 9
+        - 99
+      type: integer
+      x-enum-varnames:
+        - Abuse
+        - Spam
+        - Political
+        - Illegal
+        - Privacy
+        - CheatScore
+        - Flame
+        - Advertisement
+        - Spoiler
+        - Other
+      x-ms-enum:
+        modelAsString: false
+        name: ReportReason
+    ReportType:
+      description: |-
+        举报类型
+          - 6 = 用户
+          - 7 = 小组话题
+          - 8 = 小组回复
+          - 9 = 条目话题
+          - 10 = 条目回复
+          - 11 = 章节回复
+          - 12 = 角色回复
+          - 13 = 人物回复
+          - 14 = 日志
+          - 15 = 日志回复
+          - 16 = 时间线
+          - 17 = 时间线回复
+          - 18 = 目录
+          - 19 = 目录回复
+      enum:
+        - 6
+        - 7
+        - 8
+        - 9
+        - 10
+        - 11
+        - 12
+        - 13
+        - 14
+        - 15
+        - 16
+        - 17
+        - 18
+        - 19
+      type: integer
+      x-enum-varnames:
+        - User
+        - GroupTopic
+        - GroupReply
+        - SubjectTopic
+        - SubjectReply
+        - EpisodeReply
+        - CharacterReply
+        - PersonReply
+        - Blog
+        - BlogReply
+        - Timeline
+        - TimelineReply
+        - Index
+        - IndexReply
+      x-ms-enum:
+        modelAsString: false
+        name: ReportType
     SearchCharacter:
       properties:
         filter:
@@ -1493,10 +1603,12 @@ components:
           type: integer
         updatedAt:
           type: integer
+        user:
+          $ref: '#/components/schemas/SlimUser'
       required:
         - id
-        - uid
         - type
+        - uid
         - title
         - icon
         - summary
@@ -1577,6 +1689,8 @@ components:
           type: integer
         private:
           type: boolean
+        stats:
+          $ref: '#/components/schemas/IndexStats'
         title:
           type: string
         total:
@@ -1585,6 +1699,8 @@ components:
           $ref: '#/components/schemas/IndexType'
         uid:
           type: integer
+        updatedAt:
+          type: integer
       required:
         - id
         - uid
@@ -1592,11 +1708,19 @@ components:
         - title
         - private
         - total
+        - stats
         - createdAt
+        - updatedAt
       title: SlimIndex
       type: object
     SlimPerson:
       properties:
+        career:
+          description: 职业
+          example: producer
+          items:
+            type: string
+          type: array
         comment:
           type: integer
         id:
@@ -1621,6 +1745,7 @@ components:
         - nameCN
         - type
         - info
+        - career
         - comment
         - lock
         - nsfw
@@ -3000,7 +3125,7 @@ info:
     关于订阅通知的 socket.io 相关的文档在
     <https://github.com/bangumi/GraphQL/blob/master/docs/socket.io.md>
   title: bangumi private api
-  version: v0.35.1
+  version: v0.36.0
 openapi: 3.0.3
 paths:
   /p1/blocklist:
@@ -3256,7 +3381,6 @@ paths:
                       required:
                         - replies
                       type: object
-                  type: object
                 type: array
           description: Default Response
         '404':
@@ -3713,7 +3837,6 @@ paths:
                       required:
                         - replies
                       type: object
-                  type: object
                 type: array
           description: Default Response
         '404':
@@ -4665,7 +4788,6 @@ paths:
                       required:
                         - replies
                       type: object
-                  type: object
                 type: array
           description: Default Response
         '500':
@@ -5720,7 +5842,6 @@ paths:
                       required:
                         - replies
                       type: object
-                  type: object
                 type: array
           description: Default Response
         '404':
@@ -6429,7 +6550,6 @@ paths:
                       required:
                         - replies
                       type: object
-                  type: object
                 type: array
           description: Default Response
         '404':
@@ -6624,6 +6744,44 @@ paths:
       summary: 获取人物的参与作品
       tags:
         - person
+  /p1/report:
+    post:
+      operationId: createReport
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateReport'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  message:
+                    type: string
+                required:
+                  - message
+                type: object
+          description: Default Response
+        '429':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: default error response type
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: 意料之外的服务器错误
+      security:
+        - CookiesSession: []
+          HTTPBearer: []
+      summary: 报告疑虑
+      tags:
+        - user
   /p1/search/characters:
     post:
       operationId: searchCharacters
@@ -8177,7 +8335,6 @@ paths:
                       required:
                         - replies
                       type: object
-                  type: object
                 type: array
           description: Default Response
         '404':
@@ -8358,16 +8515,10 @@ paths:
           name: theme
           required: false
           schema:
-            anyOf:
-              - enum:
-                  - dark
-                type: string
-              - enum:
-                  - light
-                type: string
-              - enum:
-                  - auto
-                type: string
+            enum:
+              - dark
+              - light
+              - auto
         - in: query
           name: redirect_uri
           required: true
@@ -9064,11 +9215,6 @@ paths:
                       $ref: '#/components/schemas/EpisodeType'
                   type: object
                 expectedRevision:
-                  description: >-
-                    a optional object to check if input is changed by others
-
-                    if some key is given, and current data in database doesn't
-                    match input, subject will not be changed
                   properties:
                     date:
                       type: string
@@ -9465,12 +9611,6 @@ paths:
                   minLength: 1
                   type: string
                 expectedRevision:
-                  additionalProperties: false
-                  description: >-
-                    a optional object to check if input is changed by others
-
-                    if `infobox` is given, and current data in database doesn't
-                    match input, subject will not be changed
                   properties:
                     infobox:
                       anyOf:
@@ -9499,41 +9639,6 @@ paths:
                           type: string
                   type: object
                 subject:
-                  example:
-                    infobox: |-
-                      {{Infobox animanga/TVAnime
-                      |中文名= 沙盒
-                      |别名={
-                      }
-                      |话数= 7
-                      |放送开始= 0000-10-06
-                      |放送星期= 
-                      |官方网站= 
-                      |播放电视台= 
-                      |其他电视台= 
-                      |播放结束= 
-                      |其他= 
-                      |Copyright= 
-                      |平台={
-                      [龟壳]
-                      [Xbox Series S]
-                      [Xbox Series X]
-                      [Xbox Series X/S]
-                      [PC]
-                      [Xbox Series X|S]
-                      }
-                      }}
-                    name: 沙盒
-                    nsfw: false
-                    platform: 0
-                    summary: >-
-                      本条目是一个沙盒，可以用于尝试bgm功能。
-
-
-                      普通维基人可以随意编辑条目信息以及相关关联查看编辑效果，但是请不要完全删除沙盒说明并且不要关联非沙盒条目/人物/角色。
-
-
-                      https://bgm.tv/group/topic/366812#post_1923517
                   properties:
                     date:
                       example: '0000-00-00'
@@ -9636,12 +9741,6 @@ paths:
                   minLength: 1
                   type: string
                 expectedRevision:
-                  additionalProperties: false
-                  description: >-
-                    a optional object to check if input is changed by others
-
-                    if `infobox` is given, and current data in database doesn't
-                    match input, subject will not be changed
                   properties:
                     infobox:
                       anyOf:
@@ -9951,11 +10050,6 @@ paths:
                   type: array
                 expectedRevision:
                   items:
-                    description: >-
-                      a optional object to check if input is changed by others
-
-                      if some key is given, and current data in database doesn't
-                      match input, subject will not be changed
                     properties:
                       date:
                         type: string
