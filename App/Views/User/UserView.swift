@@ -13,6 +13,8 @@ struct UserView: View {
 
   @State private var refreshed: Bool = false
 
+  @State private var showReportView: Bool = false
+
   @Query private var users: [User]
   var user: User? { users.first }
 
@@ -113,6 +115,12 @@ struct UserView: View {
     }
     .navigationTitle(title)
     .navigationBarTitleDisplayMode(.inline)
+    .sheet(isPresented: $showReportView) {
+      if let user = user {
+        ReportView(reportType: .user, itemId: user.userId, itemTitle: user.nickname, user: user.slim)
+          .presentationDetents([.medium, .large])
+      }
+    }
     .toolbar {
       ToolbarItem(placement: .topBarTrailing) {
         Menu {
@@ -153,7 +161,6 @@ struct UserView: View {
                   Label("加为好友", systemImage: "person.2.badge.plus")
                 }
               }
-              Divider()
               if blocklist.contains(user.id) {
                 Button {
                   unblockUser()
@@ -168,7 +175,12 @@ struct UserView: View {
                 }
               }
             }
-            Divider()
+          }
+          Divider()
+          Button {
+            showReportView = true
+          } label: {
+            Label("报告疑虑", systemImage: "exclamationmark.triangle")
           }
           ShareLink(item: shareLink) {
             Label("分享", systemImage: "square.and.arrow.up")

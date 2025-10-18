@@ -16,6 +16,7 @@ struct BlogView: View {
   @State private var loadingComments: Bool = false
   @State private var showCommentBox: Bool = false
   @State private var showIndexPicker: Bool = false
+  @State private var showReportView: Bool = false
 
   var title: String {
     guard let blog = blog else {
@@ -139,6 +140,11 @@ struct BlogView: View {
           } label: {
             Label("收藏", systemImage: "book")
           }
+          Button {
+            showReportView = true
+          } label: {
+            Label("报告疑虑", systemImage: "exclamationmark.triangle")
+          }
           ShareLink(item: shareLink) {
             Label("分享", systemImage: "square.and.arrow.up")
           }
@@ -146,7 +152,13 @@ struct BlogView: View {
           Image(systemName: "ellipsis.circle")
         }
       }
-    }.task(load)
+    }
+    .sheet(isPresented: $showReportView) {
+      if let blog = blog {
+        ReportView(reportType: .blog, itemId: blogId, itemTitle: blog.title, user: blog.user)
+      }
+    }
+    .task(load)
   }
 }
 

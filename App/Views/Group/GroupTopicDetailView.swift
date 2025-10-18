@@ -12,6 +12,7 @@ struct GroupTopicDetailView: View {
   @State private var showReplyBox = false
   @State private var showEditBox = false
   @State private var showIndexPicker = false
+  @State private var showReportView = false
 
   var title: String {
     topic?.title ?? "讨论详情"
@@ -95,6 +96,10 @@ struct GroupTopicDetailView: View {
           )
           .presentationDetents([.medium, .large])
         }
+        .sheet(isPresented: $showReportView) {
+          ReportView(reportType: .groupTopic, itemId: topicId, itemTitle: title, user: topic.creator)
+            .presentationDetents([.medium, .large])
+        }
       } else if refreshed {
         NotFoundView()
       } else {
@@ -124,6 +129,11 @@ struct GroupTopicDetailView: View {
             showIndexPicker = true
           } label: {
             Label("收藏", systemImage: "book")
+          }
+          Button {
+            showReportView = true
+          } label: {
+            Label("报告疑虑", systemImage: "exclamationmark.triangle")
           }
           ShareLink(item: shareLink) {
             Label("分享", systemImage: "square.and.arrow.up")

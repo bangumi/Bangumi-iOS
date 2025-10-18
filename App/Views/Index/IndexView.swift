@@ -21,6 +21,7 @@ struct IndexView: View {
   @State private var showDeleteIndex = false
   @State private var showAddRelated = false
   @State private var showCommentBox = false
+  @State private var showReportView = false
 
   @State private var selectedTab: IndexTab = .related
   @State private var comments: [CommentDTO] = []
@@ -281,6 +282,11 @@ struct IndexView: View {
             }
           }
           Divider()
+          Button {
+            showReportView = true
+          } label: {
+            Label("报告疑虑", systemImage: "exclamationmark.triangle")
+          }
           ShareLink(item: shareLink) {
             Label("分享", systemImage: "square.and.arrow.up")
           }
@@ -327,6 +333,11 @@ struct IndexView: View {
       if !isolationMode {
         CreateCommentBoxView(type: .index(indexId))
           .presentationDetents([.medium, .large])
+      }
+    }
+    .sheet(isPresented: $showReportView) {
+      if let index = index {
+        ReportView(reportType: .index, itemId: indexId, itemTitle: index.title, user: index.user)
       }
     }
   }

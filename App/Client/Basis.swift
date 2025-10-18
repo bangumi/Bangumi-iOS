@@ -1187,6 +1187,112 @@ let CommonReactions: [Int] = [
   90,  // bgm74
 ]
 
+/// 举报类型
+/// 6 = 用户
+/// 7 = 小组话题
+/// 8 = 小组回复
+/// 9 = 条目话题
+/// 10 = 条目回复
+/// 11 = 章节回复
+/// 12 = 角色回复
+/// 13 = 人物回复
+/// 14 = 日志
+/// 15 = 日志回复
+/// 16 = 时间线
+/// 17 = 时间线回复
+/// 18 = 目录
+/// 19 = 目录回复
+enum ReportType: Int, Codable, CaseIterable {
+  case user = 6
+  case groupTopic = 7
+  case groupReply = 8
+  case subjectTopic = 9
+  case subjectReply = 10
+  case episodeReply = 11
+  case characterReply = 12
+  case personReply = 13
+  case blog = 14
+  case blogReply = 15
+  case timeline = 16
+  case timelineReply = 17
+  case index = 18
+  case indexReply = 19
+
+  var description: String {
+    switch self {
+    case .user:
+      return "用户"
+    case .groupTopic:
+      return "小组话题"
+    case .groupReply:
+      return "小组回复"
+    case .subjectTopic:
+      return "条目话题"
+    case .subjectReply:
+      return "条目回复"
+    case .episodeReply:
+      return "章节回复"
+    case .characterReply:
+      return "角色回复"
+    case .personReply:
+      return "人物回复"
+    case .blog:
+      return "日志"
+    case .blogReply:
+      return "日志回复"
+    case .timeline:
+      return "时间线"
+    case .timelineReply:
+      return "时间线回复"
+    case .index:
+      return "目录"
+    case .indexReply:
+      return "目录回复"
+    }
+  }
+}
+
+/// 举报原因
+/// 1 = 辱骂、人身攻击
+/// 2 = 刷屏、无关内容
+/// 3 = 政治相关
+/// 4 = 违法信息
+/// 5 = 泄露隐私
+/// 6 = 涉嫌刷分
+/// 7 = 引战
+/// 8 = 广告
+enum ReportReason: Int, Codable, CaseIterable {
+  case abuse = 1
+  case spam = 2
+  case political = 3
+  case illegal = 4
+  case privacy = 5
+  case voting = 6
+  case flamewar = 7
+  case advertisement = 8
+
+  var description: String {
+    switch self {
+    case .abuse:
+      return "辱骂、人身攻击"
+    case .spam:
+      return "刷屏、无关内容"
+    case .political:
+      return "政治相关"
+    case .illegal:
+      return "违法信息"
+    case .privacy:
+      return "泄露隐私"
+    case .voting:
+      return "涉嫌刷分"
+    case .flamewar:
+      return "引战"
+    case .advertisement:
+      return "广告"
+    }
+  }
+}
+
 /// TODO: use bangumi/common
 
 let GAME_PLATFORMS: [String] = [

@@ -1214,6 +1214,20 @@ struct TrendingSubjectDTO: Codable, Identifiable, Hashable {
   }
 }
 
+struct CreateReport: Codable {
+  var type: ReportType
+  var id: Int
+  var value: ReportReason
+  var comment: String?
+
+  init(type: ReportType, id: Int, value: ReportReason, comment: String? = nil) {
+    self.type = type
+    self.id = id
+    self.value = value
+    self.comment = comment
+  }
+}
+
 struct UserStatsDTO: Codable, Hashable {
   var subject: UserSubjectCollectionStatsDTO
   var mono: UserMonoCollectionStatsDTO

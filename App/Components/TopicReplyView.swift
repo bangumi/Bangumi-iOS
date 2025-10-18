@@ -92,6 +92,7 @@ struct ReplyItemNormalView: View {
   @State private var showEditBox: Bool = false
   @State private var updating: Bool = false
   @State private var showDeleteConfirm: Bool = false
+  @State private var showReportView: Bool = false
 
   @State private var reactions: [ReactionDTO]
 
@@ -159,6 +160,11 @@ struct ReplyItemNormalView: View {
                   .disabled(updating)
                 }
                 Divider()
+                Button {
+                  showReportView = true
+                } label: {
+                  Label("报告疑虑", systemImage: "exclamationmark.triangle")
+                }
                 ShareLink(item: type.shareLink(topicId: topicId, postId: reply.id)) {
                   Label("分享", systemImage: "square.and.arrow.up")
                 }
@@ -210,6 +216,16 @@ struct ReplyItemNormalView: View {
         EditReplyBoxView(type: type, topicId: topicId, reply: reply)
           .presentationDetents([.medium, .large])
       }
+      .sheet(isPresented: $showReportView) {
+        switch type {
+        case .group:
+          ReportView(reportType: .groupReply, itemId: reply.id, itemTitle: "回复 #\(idx+1)", user: reply.creator)
+            .presentationDetents([.medium, .large])
+        case .subject:
+          ReportView(reportType: .subjectReply, itemId: reply.id, itemTitle: "回复 #\(idx+1)", user: reply.creator)
+            .presentationDetents([.medium, .large])
+        }
+      }
       .alert("确认删除", isPresented: $showDeleteConfirm) {
         Button("取消", role: .cancel) {}
         Button("删除", role: .destructive) {
@@ -247,6 +263,7 @@ struct SubReplyNormalView: View {
   @State private var showEditBox: Bool = false
   @State private var updating: Bool = false
   @State private var showDeleteConfirm: Bool = false
+  @State private var showReportView: Bool = false
 
   @State private var reactions: [ReactionDTO]
 
@@ -321,6 +338,11 @@ struct SubReplyNormalView: View {
                 .disabled(updating)
               }
               Divider()
+              Button {
+                showReportView = true
+              } label: {
+                Label("报告疑虑", systemImage: "exclamationmark.triangle")
+              }
               ShareLink(item: type.shareLink(topicId: topicId, postId: subreply.id)) {
                 Label("分享", systemImage: "square.and.arrow.up")
               }
@@ -352,6 +374,16 @@ struct SubReplyNormalView: View {
     .sheet(isPresented: $showEditBox) {
       EditReplyBoxView(type: type, topicId: topicId, reply: reply, subreply: subreply)
         .presentationDetents([.medium, .large])
+    }
+    .sheet(isPresented: $showReportView) {
+      switch type {
+      case .group:
+        ReportView(reportType: .groupReply, itemId: subreply.id, itemTitle: "回复 #\(idx+1)-\(subidx+1)", user: subreply.creator)
+          .presentationDetents([.medium, .large])
+      case .subject:
+        ReportView(reportType: .subjectReply, itemId: subreply.id, itemTitle: "回复 #\(idx+1)-\(subidx+1)", user: subreply.creator)
+          .presentationDetents([.medium, .large])
+      }
     }
     .alert("确认删除", isPresented: $showDeleteConfirm) {
       Button("取消", role: .cancel) {}

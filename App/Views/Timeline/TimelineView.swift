@@ -7,6 +7,7 @@ struct TimelineView: View {
   @State private var comments: [CommentDTO] = []
   @State private var loadingComments: Bool = false
   @State private var showCommentBox: Bool = false
+  @State private var showReportView: Bool = false
 
   func load() async {
     do {
@@ -76,6 +77,12 @@ struct TimelineView: View {
           } label: {
             Label("回复", systemImage: "plus.bubble")
           }
+          Divider()
+          Button {
+            showReportView = true
+          } label: {
+            Label("报告疑虑", systemImage: "exclamationmark.triangle")
+          }
         } label: {
           Image(systemName: "ellipsis.circle")
         }
@@ -84,6 +91,9 @@ struct TimelineView: View {
     .sheet(isPresented: $showCommentBox) {
       CreateCommentBoxView(type: .timeline(item.id))
         .presentationDetents([.medium, .large])
+    }
+    .sheet(isPresented: $showReportView) {
+      ReportView(reportType: .timeline, itemId: item.id, itemTitle: "吐槽 #\(item.id)", user: item.user)
     }
   }
 }

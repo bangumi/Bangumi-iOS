@@ -108,6 +108,7 @@ struct CommentItemNormalView: View {
   @State private var showEditBox: Bool = false
   @State private var updating: Bool = false
   @State private var showDeleteConfirm: Bool = false
+  @State private var showReportView: Bool = false
 
   @State private var reactions: [ReactionDTO]
 
@@ -160,6 +161,11 @@ struct CommentItemNormalView: View {
                   .disabled(updating)
                 }
                 Divider()
+                Button {
+                  showReportView = true
+                } label: {
+                  Label("报告疑虑", systemImage: "exclamationmark.triangle")
+                }
                 ShareLink(item: type.shareLink(commentId: comment.id)) {
                   Label("分享", systemImage: "square.and.arrow.up")
                 }
@@ -205,6 +211,28 @@ struct CommentItemNormalView: View {
       EditCommentBoxView(type: type, comment: comment)
         .presentationDetents([.medium, .large])
     }
+    .sheet(isPresented: $showReportView) {
+      switch type {
+      case .episode:
+        ReportView(reportType: .episodeReply, itemId: comment.id, itemTitle: "评论 #\(idx+1)", user: comment.user)
+          .presentationDetents([.medium, .large])
+      case .character:
+        ReportView(reportType: .characterReply, itemId: comment.id, itemTitle: "评论 #\(idx+1)", user: comment.user)
+          .presentationDetents([.medium, .large])
+      case .person:
+        ReportView(reportType: .personReply, itemId: comment.id, itemTitle: "评论 #\(idx+1)", user: comment.user)
+          .presentationDetents([.medium, .large])
+      case .blog:
+        ReportView(reportType: .blogReply, itemId: comment.id, itemTitle: "评论 #\(idx+1)", user: comment.user)
+          .presentationDetents([.medium, .large])
+      case .timeline:
+        ReportView(reportType: .timelineReply, itemId: comment.id, itemTitle: "评论 #\(idx+1)", user: comment.user)
+          .presentationDetents([.medium, .large])
+      case .index:
+        ReportView(reportType: .indexReply, itemId: comment.id, itemTitle: "评论 #\(idx+1)", user: comment.user)
+          .presentationDetents([.medium, .large])
+      }
+    }
     .alert("确认删除", isPresented: $showDeleteConfirm) {
       Button("取消", role: .cancel) {}
       Button("删除", role: .destructive) {
@@ -239,6 +267,7 @@ struct CommentSubReplyNormalView: View {
   @State private var showEditBox: Bool = false
   @State private var updating: Bool = false
   @State private var showDeleteConfirm: Bool = false
+  @State private var showReportView: Bool = false
 
   @State private var reactions: [ReactionDTO]
 
@@ -302,6 +331,11 @@ struct CommentSubReplyNormalView: View {
                 .disabled(updating)
               }
               Divider()
+              Button {
+                showReportView = true
+              } label: {
+                Label("报告疑虑", systemImage: "exclamationmark.triangle")
+              }
               ShareLink(item: type.shareLink(commentId: reply.id)) {
                 Label("分享", systemImage: "square.and.arrow.up")
               }
@@ -328,6 +362,28 @@ struct CommentSubReplyNormalView: View {
     .sheet(isPresented: $showEditBox) {
       EditCommentBoxView(type: type, comment: comment, reply: reply)
         .presentationDetents([.medium, .large])
+    }
+    .sheet(isPresented: $showReportView) {
+      switch type {
+      case .episode:
+        ReportView(reportType: .episodeReply, itemId: reply.id, itemTitle: "回复 #\(idx+1)-\(subidx+1)", user: reply.user)
+          .presentationDetents([.medium, .large])
+      case .character:
+        ReportView(reportType: .characterReply, itemId: reply.id, itemTitle: "回复 #\(idx+1)-\(subidx+1)", user: reply.user)
+          .presentationDetents([.medium, .large])
+      case .person:
+        ReportView(reportType: .personReply, itemId: reply.id, itemTitle: "回复 #\(idx+1)-\(subidx+1)", user: reply.user)
+          .presentationDetents([.medium, .large])
+      case .blog:
+        ReportView(reportType: .blogReply, itemId: reply.id, itemTitle: "回复 #\(idx+1)-\(subidx+1)", user: reply.user)
+          .presentationDetents([.medium, .large])
+      case .timeline:
+        ReportView(reportType: .timelineReply, itemId: reply.id, itemTitle: "回复 #\(idx+1)-\(subidx+1)", user: reply.user)
+          .presentationDetents([.medium, .large])
+      case .index:
+        ReportView(reportType: .indexReply, itemId: reply.id, itemTitle: "回复 #\(idx+1)-\(subidx+1)", user: reply.user)
+          .presentationDetents([.medium, .large])
+      }
     }
     .alert("确认删除", isPresented: $showDeleteConfirm) {
       Button("取消", role: .cancel) {}
