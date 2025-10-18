@@ -46,6 +46,8 @@ actor Chii {
   var db: DatabaseOperator?
   var mock: Bool = false
 
+  private var refreshTask: Task<Auth, Error>?
+
   init() {
     self.keychain = KeychainSwift(keyPrefix: "\(APP_DOMAIN).")
     guard let plist = Bundle.main.infoDictionary else {
@@ -211,7 +213,7 @@ extension Chii {
   func getAccessToken() async throws -> String {
     if let auth = self.auth {
       if auth.isExpired() {
-        let auth = try await self.refreshAccessToken(auth: auth)
+        let auth = try await self.performTokenRefresh(auth: auth)
         return auth.accessToken
       } else {
         return auth.accessToken
@@ -219,7 +221,7 @@ extension Chii {
     } else {
       if let auth = try self.getAuthFromKeychain() {
         if auth.isExpired() {
-          let auth = try await self.refreshAccessToken(auth: auth)
+          let auth = try await self.performTokenRefresh(auth: auth)
           return auth.accessToken
         } else {
           return auth.accessToken
@@ -228,6 +230,22 @@ extension Chii {
         throw ChiiError.requireLogin
       }
     }
+  }
+
+  private func performTokenRefresh(auth: Auth) async throws -> Auth {
+    // If there's already a refresh in progress, wait for it
+    if let existingTask = self.refreshTask {
+      return try await existingTask.value
+    }
+
+    // Create a new refresh task
+    let task = Task<Auth, Error> {
+      defer { self.refreshTask = nil }
+      return try await self.refreshAccessToken(auth: auth)
+    }
+
+    self.refreshTask = task
+    return try await task.value
   }
 }
 
