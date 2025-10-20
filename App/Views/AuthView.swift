@@ -5,17 +5,23 @@ import UIKit
 
 struct AuthView: View {
   var slogan: String
+  @State private var showEULA = false
 
   var body: some View {
     VStack {
       Text(slogan)
       Button {
-        Task {
-          await signInView.signIn()
-        }
+        showEULA = true
       } label: {
         Text("登录")
       }.adaptiveButtonStyle(.borderedProminent)
+    }
+    .fullScreenCover(isPresented: $showEULA) {
+      EULAView(isPresented: $showEULA) {
+        Task {
+          await signInView.signIn()
+        }
+      }
     }
   }
 
