@@ -87,10 +87,20 @@ struct EULAView: View {
       }
       .navigationTitle("用户协议")
       .navigationBarTitleDisplayMode(.inline)
+      .toolbar {
+        ToolbarItem(placement: .navigationBarLeading) {
+          Button {
+            isPresented = false
+          }
+          label: {
+            Label("取消", systemImage: "xmark")
+          }
+        }
+      }
       .safeAreaInset(edge: .bottom) {
         VStack(spacing: 12) {
           Toggle("我已阅读并同意以上社区指导原则", isOn: $hasAgreed)
-            .toggleStyle(SwitchToggleStyle())
+            .toggleStyle(.switch)
             .padding(.horizontal)
 
           Button {
