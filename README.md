@@ -1,6 +1,7 @@
 # Bangumi iOS
 
-[![](https://dcbadge.limes.pink/api/server/nZPTwzXxAX?style=flat)](https://discord.gg/nZPTwzXxAX)
+[![Discord](https://dcbadge.limes.pink/api/server/nZPTwzXxAX?style=flat)](https://discord.gg/nZPTwzXxAX)
+
 [![Download on the App Store](https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg)](https://apps.apple.com/app/%E7%95%AA%E7%B5%84%E8%A8%88%E7%94%BB-riff/id6499502714)
 
 一个基于 SwiftData & SwiftUI 的 Bangumi iOS 客户端。
