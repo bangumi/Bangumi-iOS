@@ -2,6 +2,17 @@ import Foundation
 import SDWebImageSwiftUI
 import SwiftUI
 
+private struct IsInLinkKey: EnvironmentKey {
+  static let defaultValue: Bool = false
+}
+
+extension EnvironmentValues {
+  var isInLink: Bool {
+    get { self[IsInLinkKey.self] }
+    set { self[IsInLinkKey.self] = newValue }
+  }
+}
+
 extension Image {
   init(packageResource name: String, ofType type: String) {
     #if canImport(UIKit)
@@ -28,6 +39,8 @@ struct ImageView: View {
   @State private var currentZoom = 0.0
   @State private var totalZoom = 1.0
 
+  @Environment(\.isInLink) private var isInLink
+
   init(url: URL) {
     if url.scheme == "http",
       let httpsURL = URL(
@@ -50,7 +63,7 @@ struct ImageView: View {
   #endif
 
   var body: some View {
-    WebImage(url: url) { image in
+    let webImage = WebImage(url: url) { image in
       image.resizable()
     } placeholder: {
       if failed {
@@ -73,12 +86,6 @@ struct ImageView: View {
     .transition(.fade(duration: 0.25))
     .scaledToFit()
     .frame(maxWidth: width)
-    .onTapGesture {
-      if failed {
-        return
-      }
-      showPreview = true
-    }
     .contextMenu {
       Button {
         #if canImport(UIKit)
@@ -87,21 +94,35 @@ struct ImageView: View {
       } label: {
         Label("保存", systemImage: "square.and.arrow.down")
       }
-      Button {
-        showPreview = true
-      } label: {
-        Label("预览", systemImage: "eye")
+      if !isInLink {
+        Button {
+          showPreview = true
+        } label: {
+          Label("预览", systemImage: "eye")
+        }
       }
       ShareLink(item: url)
     }
-    #if os(iOS)
-      .fullScreenCover(isPresented: $showPreview) {
-        ImagePreviewer(url: url)
-      }
-    #else
-      .sheet(isPresented: $showPreview) {
-        ImagePreviewer(url: url)
-      }
-    #endif
+
+    if isInLink {
+      webImage
+    } else {
+      webImage
+        .onTapGesture {
+          if failed {
+            return
+          }
+          showPreview = true
+        }
+        #if os(iOS)
+          .fullScreenCover(isPresented: $showPreview) {
+            ImagePreviewer(url: url)
+          }
+        #else
+          .sheet(isPresented: $showPreview) {
+            ImagePreviewer(url: url)
+          }
+        #endif
+    }
   }
 }

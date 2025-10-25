@@ -432,7 +432,7 @@ var textRenders: [BBType: TextRender] {
         return .view(
           AnyView(
             Link(destination: link) {
-              content
+              content.environment(\.isInLink, true)
             }.foregroundStyle(Color(hex: 0x0084B4))
           )
         )
