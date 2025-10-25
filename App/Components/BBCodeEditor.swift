@@ -289,7 +289,8 @@ struct BBCodeEditor: View {
         BorderView(color: .secondary.opacity(0.2), padding: 4) {
           HStack {
             BBCodeView(text).tint(.linkText)
-            Spacer()
+              .fixedSize(horizontal: false, vertical: true)
+            Spacer(minLength: 0)
           }
         }
       } else {

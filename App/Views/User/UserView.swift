@@ -256,7 +256,8 @@ struct UserDetailView: View {
               BBCodeView(user.bio, textSize: 12)
                 .textSelection(.enabled)
                 .tint(.linkText)
-              Spacer()
+                .fixedSize(horizontal: false, vertical: true)
+              Spacer(minLength: 0)
             }
           }
         }

@@ -179,6 +179,7 @@ struct ReplyItemNormalView: View {
           BBCodeView(reply.content)
             .tint(.linkText)
             .textSelection(.enabled)
+            .fixedSize(horizontal: false, vertical: true)
           if !reactions.isEmpty {
             switch type {
             case .subject:
@@ -357,6 +358,7 @@ struct SubReplyNormalView: View {
         BBCodeView(subreply.content)
           .tint(.linkText)
           .textSelection(.enabled)
+          .fixedSize(horizontal: false, vertical: true)
         if !reactions.isEmpty {
           switch type {
           case .subject:

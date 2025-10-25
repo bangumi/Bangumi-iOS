@@ -180,6 +180,7 @@ struct CommentItemNormalView: View {
           BBCodeView(comment.content)
             .tint(.linkText)
             .textSelection(.enabled)
+            .fixedSize(horizontal: false, vertical: true)
           if !reactions.isEmpty, case .episode(let id) = type {
             ReactionsView(type: .episodeReply(id), reactions: $reactions)
           }
@@ -350,6 +351,7 @@ struct CommentSubReplyNormalView: View {
         BBCodeView(reply.content)
           .tint(.linkText)
           .textSelection(.enabled)
+          .fixedSize(horizontal: false, vertical: true)
         if !reactions.isEmpty, case .episode(let id) = type {
           ReactionsView(type: .episodeReply(id), reactions: $reactions)
         }
