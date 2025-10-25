@@ -3,11 +3,14 @@
 
 *.xcuserdatad/
 xcshareddata/
-.vscode/
+
+.build/
+Package.resolved
 
 /apollo-ios-cli
 /buildServer.json
 
 .DS_Store
 
+.vscode/
 .claude/
