@@ -12,14 +12,6 @@ extension Image {
         return
       }
       self.init(uiImage: image)
-    #elseif canImport(AppKit)
-      guard let path = Bundle.module.path(forResource: name, ofType: type),
-        let image = NSImage(contentsOfFile: path)
-      else {
-        self.init(name)
-        return
-      }
-      self.init(nsImage: image)
     #else
       self.init(systemName: "photo")
     #endif
@@ -54,31 +46,6 @@ struct ImageView: View {
         guard let img = UIImage(data: data) else { return }
         UIImageWriteToSavedPhotosAlbum(img, nil, nil, nil)
       }
-    }
-  #elseif canImport(AppKit)
-    func showSavePanel() -> URL? {
-      let savePanel = NSSavePanel()
-      savePanel.allowedContentTypes = [.png]
-      savePanel.canCreateDirectories = true
-      savePanel.isExtensionHidden = false
-      savePanel.title = "Save your image"
-      savePanel.message = "Choose a folder and a name to store the image."
-      savePanel.nameFieldLabel = "Image file name:"
-
-      let response = savePanel.runModal()
-      return response == .OK ? savePanel.url : nil
-    }
-
-    func savePNG(imageName: String, path: URL) {
-      guard let image = NSImage(named: imageName) else { return }
-      guard let tiffData = image.tiffRepresentation else { return }
-      guard let imageRepresentation = NSBitmapImageRep(data: tiffData) else {
-        return
-      }
-      guard let pngData = imageRepresentation.representation(using: .png, properties: [:]) else {
-        return
-      }
-      try? pngData.write(to: path)
     }
   #endif
 
@@ -116,10 +83,6 @@ struct ImageView: View {
       Button {
         #if canImport(UIKit)
           saveImage()
-        #elseif canImport(AppKit)
-          if let path = showSavePanel() {
-            savePNG(imageName: url.lastPathComponent, path: path)
-          }
         #endif
       } label: {
         Label("保存", systemImage: "square.and.arrow.down")

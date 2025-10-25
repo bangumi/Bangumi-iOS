@@ -1,5 +1,6 @@
 import SwiftData
 import SwiftUI
+import BBCode
 
 @main
 struct MainApp: App {
@@ -26,6 +27,8 @@ struct MainApp: App {
       Task {
         await Chii.shared.setUp(container: container)
       }
+
+      configureSVGSupport()
     } catch {
       fatalError("Could not create ModelContainer: \(error)")
     }

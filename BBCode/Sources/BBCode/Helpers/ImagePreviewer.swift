@@ -178,31 +178,8 @@ public struct ImagePreviewer: View {
         guard let img = UIImage(data: data) else { return }
         UIImageWriteToSavedPhotosAlbum(img, nil, nil, nil)
       }
-    #elseif canImport(AppKit)
-      if let path = showSavePanel() {
-        savePNG(imageName: url.lastPathComponent, path: path)
-      }
     #endif
   }
-
-  #if canImport(AppKit)
-    private func showSavePanel() -> URL? {
-      let panel = NSSavePanel()
-      panel.allowedContentTypes = [.png, .jpeg]
-      panel.nameFieldStringValue = url.lastPathComponent
-      let response = panel.runModal()
-      return response == .OK ? panel.url : nil
-    }
-
-    private func savePNG(imageName: String, path: URL) {
-      Task {
-        guard let data = try? await URLSession.shared.data(from: url).0 else { return }
-        guard let img = NSImage(data: data) else { return }
-        guard let pngData = img.pngData else { return }
-        try? pngData.write(to: path)
-      }
-    }
-  #endif
 
   private func adjustMaxOffset(size: CGSize) {
     let maxOffsetX = (size.width * (scale - 1)) / 2

@@ -10,12 +10,13 @@ let package = Package(
     .library(name: "BBCode", targets: ["BBCode"])
   ],
   dependencies: [
-    .package(url: "https://github.com/SDWebImage/SDWebImageSwiftUI.git", from: "3.0.0")
+    .package(url: "https://github.com/SDWebImage/SDWebImageSwiftUI.git", from: "3.0.0"),
+    .package(url: "https://github.com/SDWebImage/SDWebImageSVGCoder.git", from: "1.7.0")
   ],
   targets: [
     .target(
       name: "BBCode",
-      dependencies: ["SDWebImageSwiftUI"],
+      dependencies: ["SDWebImageSwiftUI", "SDWebImageSVGCoder"],
       resources: [.process("Resources")]),
     .testTarget(name: "BBCodeTests", dependencies: ["BBCode"]),
   ]
