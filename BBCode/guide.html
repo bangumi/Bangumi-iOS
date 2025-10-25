@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <div id="header">
+      <h1>BBCode 标签指南</h1>
+    </div>
+
+    <div class="columns clearit">
+      <div id="columnA" class="column">
+        <hr class="board" />
+
+        <h2 class="home_title">/ 基本标记</h2>
+
+        <table class="forumtable" style="width: 100%">
+          <tr>
+            <th width="350">文字内容</th>
+            <th>快捷键</th>
+            <th>显示效果</th>
+          </tr>
+          <tr class="alt">
+            <td>正常文字</td>
+            <td></td>
+            <td class="end">
+              <div class="bbcode">正常文字</div>
+            </td>
+          </tr>
+          <tr>
+            <td>我是 [b]粗体字[/b]</td>
+            <td>Ctrl+B</td>
+            <td class="end">
+              <div class="bbcode">我是<strong>粗体字</strong></div>
+            </td>
+          </tr>
+          <tr class="alt">
+            <td>我是[i]斜体字[/i]</td>
+            <td>Ctrl+I</td>
+            <td class="end">
+              <div class="bbcode">我是<em>斜体字</em></div>
+            </td>
+          </tr>
+          <tr>
+            <td>我是[u]下划线文字[/u]</td>
+            <td>Ctrl+U</td>
+            <td class="end">
+              <div class="bbcode">
+                我是<span style="text-decoration: underline">下划线文字</span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>我是[s]删除线文字[/s]</td>
+            <td>Ctrl+D</td>
+            <td class="end">
+              <div class="bbcode">
+                我是
+                <span style="text-decoration: line-through"> 删除线文字 </span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>我是[mask]马赛克文字[/mask]</td>
+            <td>Ctrl+M</td>
+            <td class="end">
+              <div class="bbcode">
+                我是
+                <span
+                  style="
+                    background-color: #555;
+                    color: #555;
+                    border: 1px solid #555;
+                  "
+                >
+                  马赛克文字
+                </span>
+              </div>
+            </td>
+          </tr>
+          <tr class="alt">
+            <td>
+              我是<br />
+              [color=red]彩[/color][color=green]色[/color][color=blue]的[/color][color=orange]哟[/color]。
+            </td>
+            <td></td>
+            <td class="end">
+              <div class="bbcode">
+                我是<br />
+                <span style="color: red">彩</span>
+                <span style="color: green">色</span>
+                <span style="color: blue">的</span>
+                <span style="color: orange">哟</span>。
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              [size=10]不同[/size][size=14]大小的[/size][size=18]文字[/size]效果也可实现。
+            </td>
+            <td></td>
+            <td class="end">
+              <div class="bbcode">
+                <span style="font-size: 10pt">不同</span>
+                <span style="font-size: 14pt">大小的</span>
+                <span style="font-size: 18pt">文字</span>效果也可实现。
+              </div>
+            </td>
+          </tr>
+          <tr class="alt">
+            <td>Bangumi 番组计划: [url]http://chii.in/[/url]</td>
+            <td>Ctrl+L</td>
+            <td class="end">
+              <div class="bbcode">
+                Bangumi 番组计划:
+                <a href="http://chii.in/" class="l">http://chii.in/</a>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              带文字说明的网站链接：<br />
+              [url=http://chii.in]Bangumi 番组计划[/url]
+            </td>
+            <td>Ctrl+L</td>
+            <td class="end">
+              <div class="bbcode">
+                带文字说明的网站链接：<br />
+
+                <a href="http://chii.in/" class="l">Bangumi 番组计划</a>
+              </div>
+            </td>
+          </tr>
+          <tr class="alt">
+            <td>
+              存放于其他网络服务器的图片：<br />
+              [img]http://chii.in/img/ico/bgm88-31.gif[/img]
+            </td>
+            <td>Ctrl+P</td>
+            <td class="end">
+              <div class="bbcode">
+                存放于其他网络服务器的图片：<br />
+                <img src="http://chii.in/img/ico/bgm88-31.gif" class="code" />
+              </div>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </body>
+</html>
