@@ -28,7 +28,7 @@ struct MainApp: App {
         await Chii.shared.setUp(container: container)
       }
 
-      configureSVGSupport()
+      configureImageSupport()
     } catch {
       fatalError("Could not create ModelContainer: \(error)")
     }
