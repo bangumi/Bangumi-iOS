@@ -456,7 +456,8 @@ private struct BBCodeTextView: UIViewRepresentable {
   }
 
   func updateUIView(_ textView: UITextView, context: Context) {
-    if textView.text != text {
+    // Skip updating text while IME is composing to avoid breaking input flow
+    if textView.text != text, textView.markedTextRange == nil {
       context.coordinator.updatingText = true
       textView.text = text
       context.coordinator.updatingText = false
