@@ -158,9 +158,7 @@ struct ChiiRakuenView: View {
 
             ForEach(category.modes, id: \.self) { mode in
               Button {
-                withAnimation {
-                  rakuenListMode = mode
-                }
+                rakuenListMode = mode
               } label: {
                 Text(mode.description)
               }.adaptiveButtonStyle(rakuenListMode == mode ? .borderedProminent : .bordered)

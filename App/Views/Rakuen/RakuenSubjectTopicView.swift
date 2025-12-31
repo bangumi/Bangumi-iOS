@@ -209,14 +209,15 @@ struct CachedSubjectTopicListView: View {
         }.padding()
       }
 
-      if exhausted && !displayItems.isEmpty {
-        HStack {
-          Spacer()
+      if exhausted {
+        VStack {
           Text("没有更多了")
             .font(.footnote)
             .foregroundStyle(.secondary)
-          Spacer()
+          MusumeView(width: 40)
         }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical)
       }
     }
     .animation(.default, value: items)
