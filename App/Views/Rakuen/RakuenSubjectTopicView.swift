@@ -206,7 +206,7 @@ struct CachedSubjectTopicListView: View {
           Spacer()
           ProgressView()
           Spacer()
-        }
+        }.padding()
       }
 
       if exhausted && !displayItems.isEmpty {
