@@ -15,12 +15,14 @@ where C: View, T: Identifiable & Hashable & Codable & Sendable {
   @State private var loading: Bool = false
   @State private var offset: Int = 0
   @State private var exhausted: Bool = false
-  @State private var loadedIdx: [Int: Bool] = [:]
-  @State private var items: [EnumerateItem<(Item)>] = []
+  @State private var items: [Item] = []
+
+  private func shouldLoadMore(after item: Item, threshold: Int = 5) -> Bool {
+    items.suffix(threshold).contains(item)
+  }
 
   func reload() {
     exhausted = false
-    loadedIdx = [:]
     offset = 0
     Task {
       let result = await loadPage(currentOffset: 0)
@@ -30,12 +32,9 @@ where C: View, T: Identifiable & Hashable & Codable & Sendable {
     }
   }
 
-  func loadNextPage(idx: Int) async {
+  func loadNextPage() async {
     if loading { return }
     if exhausted { return }
-    if idx > 0 && idx != offset - 5 { return }
-    if loadedIdx[idx, default: false] { return }
-    loadedIdx[idx] = true
     loading = true
     defer { loading = false }
     let result = await loadPage(currentOffset: offset)
@@ -44,7 +43,7 @@ where C: View, T: Identifiable & Hashable & Codable & Sendable {
     }
   }
 
-  private func loadPage(currentOffset: Int) async -> [EnumerateItem<Item>]? {
+  private func loadPage(currentOffset: Int) async -> [Item]? {
     let resp = await nextPageFunc(limit, currentOffset)
     guard let resp = resp else {
       return nil
@@ -53,14 +52,11 @@ where C: View, T: Identifiable & Hashable & Codable & Sendable {
       exhausted = true
       return []
     }
-    let newData = resp.data.enumerated().map { (idx, item) in
-      EnumerateItem(idx: idx + currentOffset, inner: item)
-    }
     offset = currentOffset + limit
     if offset >= resp.total {
       exhausted = true
     }
-    return newData
+    return resp.data
   }
 
   public init(
@@ -78,9 +74,11 @@ where C: View, T: Identifiable & Hashable & Codable & Sendable {
   public var body: some View {
     LazyVStack(alignment: .leading) {
       ForEach(items) { item in
-        content(item.inner).onAppear {
-          Task {
-            await loadNextPage(idx: item.idx)
+        content(item).onAppear {
+          if shouldLoadMore(after: item) {
+            Task {
+              await loadNextPage()
+            }
           }
         }
       }

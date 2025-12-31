@@ -10,9 +10,12 @@ struct CollectionListView: View {
   @State private var collectionType = CollectionType.collect
   @State private var offset: Int = 0
   @State private var exhausted: Bool = false
-  @State private var loadedIdx: [Int: Bool] = [:]
   @State private var counts: [CollectionType: Int] = [:]
-  @State private var subjects: [EnumerateItem<(Subject)>] = []
+  @State private var subjects: [Subject] = []
+
+  private func shouldLoadMore(after subject: Subject, threshold: Int = 5) -> Bool {
+    subjects.suffix(threshold).contains(subject)
+  }
 
   func loadCounts() async {
     let stype = subjectType.rawValue
@@ -31,7 +34,7 @@ struct CollectionListView: View {
     }
   }
 
-  func fetch(limit: Int = 20) async -> [EnumerateItem<Subject>] {
+  func fetch(limit: Int = 20) async -> [Subject] {
     let stype = subjectType.rawValue
     let ctype = collectionType.rawValue
     var descriptor = FetchDescriptor<Subject>(
@@ -44,15 +47,12 @@ struct CollectionListView: View {
     descriptor.fetchLimit = limit
     descriptor.fetchOffset = offset
     do {
-      let subjects = try modelContext.fetch(descriptor)
-      if subjects.count < limit {
+      let fetched = try modelContext.fetch(descriptor)
+      if fetched.count < limit {
         exhausted = true
       }
-      let result = subjects.enumerated().map { (idx, subject) in
-        EnumerateItem(idx: idx + offset, inner: subject)
-      }
       offset += limit
-      return result
+      return fetched
     } catch {
       Notifier.shared.alert(error: error)
     }
@@ -62,25 +62,15 @@ struct CollectionListView: View {
   func load() async {
     offset = 0
     exhausted = false
-    loadedIdx.removeAll()
     subjects.removeAll()
-    let subjects = await fetch()
-    self.subjects.append(contentsOf: subjects)
+    let fetched = await fetch()
+    subjects.append(contentsOf: fetched)
   }
 
-  func loadNextPage(idx: Int) async {
-    if exhausted {
-      return
-    }
-    if idx != offset - 10 {
-      return
-    }
-    if loadedIdx[idx, default: false] {
-      return
-    }
-    loadedIdx[idx] = true
-    let subjects = await fetch()
-    self.subjects.append(contentsOf: subjects)
+  func loadNextPage() async {
+    if exhausted { return }
+    let fetched = await fetch()
+    subjects.append(contentsOf: fetched)
   }
 
   var body: some View {
@@ -112,11 +102,13 @@ struct CollectionListView: View {
           }
           ScrollView {
             LazyVStack(alignment: .leading, spacing: 10) {
-              ForEach(subjects, id: \.inner) { item in
-                CollectionRowView(subject: item.inner)
+              ForEach(subjects) { subject in
+                CollectionRowView(subject: subject)
                   .onAppear {
-                    Task {
-                      await loadNextPage(idx: item.idx)
+                    if shouldLoadMore(after: subject) {
+                      Task {
+                        await loadNextPage()
+                      }
                     }
                   }
                 Divider()
