@@ -429,9 +429,10 @@ private struct BBCodeTextView: UIViewRepresentable {
     Coordinator(text: $text, selection: $selection)
   }
 
-  func makeUIView(context: Context) -> UITextView {
-    let textView = UITextView()
+  func makeUIView(context: Context) -> CursorTrailTextView {
+    let textView = CursorTrailTextView()
     textView.delegate = context.coordinator
+    context.coordinator.textView = textView
     textView.backgroundColor = .clear
     textView.text = text
     textView.font = UIFont.preferredFont(forTextStyle: .body)
@@ -455,17 +456,33 @@ private struct BBCodeTextView: UIViewRepresentable {
     return textView
   }
 
-  func updateUIView(_ textView: UITextView, context: Context) {
-    // Skip updating text while IME is composing to avoid breaking input flow
-    if textView.text != text, textView.markedTextRange == nil {
+  func updateUIView(_ textView: CursorTrailTextView, context: Context) {
+    // Only sync text from binding when it's a genuine external change (like BBCode toolbar)
+    // NOT when it's just echoing back user's input
+    let currentText = textView.text ?? ""
+    let isExternalChange = text != context.coordinator.lastPushedText
+    let shouldUpdateText = currentText != text && isExternalChange && textView.markedTextRange == nil
+
+    if shouldUpdateText {
+      let savedRange = textView.selectedRange
       context.coordinator.updatingText = true
+      context.coordinator.updatingSelection = true
       textView.text = text
+      context.coordinator.lastPushedText = text
+      // Restore cursor position immediately, clamped to valid range
+      let maxLocation = (textView.text as NSString?)?.length ?? 0
+      let clampedLocation = min(savedRange.location, maxLocation)
+      let clampedLength = min(savedRange.length, maxLocation - clampedLocation)
+      textView.selectedRange = NSRange(location: clampedLocation, length: clampedLength)
       context.coordinator.updatingText = false
+      context.coordinator.updatingSelection = false
     }
 
     if let selection {
       let nsRange = text.nsRange(from: selection)
-      if textView.selectedRange != nsRange, textView.markedTextRange == nil {
+      if textView.selectedRange != nsRange, textView.markedTextRange == nil,
+        !context.coordinator.updatingText
+      {
         context.coordinator.updatingSelection = true
         textView.selectedRange = nsRange
         context.coordinator.updatingSelection = false
@@ -488,27 +505,139 @@ private struct BBCodeTextView: UIViewRepresentable {
     var selection: Binding<EditorSelection?>
     var updatingText = false
     var updatingSelection = false
+    /// Tracks the last text value we pushed to the binding, so we can detect external changes
+    var lastPushedText: String = ""
+    weak var textView: CursorTrailTextView?
 
     init(text: Binding<String>, selection: Binding<EditorSelection?>) {
       self.text = text
       self.selection = selection
+      self.lastPushedText = text.wrappedValue
     }
 
     func textViewDidChange(_ textView: UITextView) {
       guard !updatingText else { return }
       let newText = textView.text ?? ""
-      DispatchQueue.main.async {
-        self.text.wrappedValue = newText
-      }
+      let range = textView.selectedRange
+      // Update synchronously to prevent race conditions with updateUIView
+      lastPushedText = newText
+      text.wrappedValue = newText
+      selection.wrappedValue = EditorSelection(nsRange: range)
     }
 
     func textViewDidChangeSelection(_ textView: UITextView) {
-      guard !updatingSelection else { return }
+      guard !updatingSelection, !updatingText else { return }
       guard textView.markedTextRange == nil else { return }
       let range = textView.selectedRange
+      if let trailTextView = textView as? CursorTrailTextView {
+        trailTextView.handleCursorMove()
+      }
       DispatchQueue.main.async {
         self.selection.wrappedValue = EditorSelection(nsRange: range)
       }
+    }
+  }
+}
+
+/// Custom UITextView subclass that adds cursor trail animation
+private class CursorTrailTextView: UITextView {
+  private var lastCursorRect: CGRect?
+  private var trailLayers: [CAShapeLayer] = []
+  private let trailCount = 6
+  private let trailDuration: CGFloat = 0.25
+  private let cursorWidth: CGFloat = 2
+
+  func handleCursorMove() {
+    guard markedTextRange == nil else { return }
+
+    let newCursorRect = caretRect(for: selectedTextRange?.start ?? beginningOfDocument)
+
+    // Create trail between old and new position if cursor moved
+    if let lastRect = lastCursorRect,
+      abs(lastRect.origin.x - newCursorRect.origin.x) > 1
+        || abs(lastRect.origin.y - newCursorRect.origin.y) > 1
+    {
+      createCursorTrail(from: lastRect, to: newCursorRect)
+    }
+
+    lastCursorRect = newCursorRect
+  }
+
+  private func createCursorTrail(from startRect: CGRect, to endRect: CGRect) {
+    // Create multiple ghost cursors between start and end positions
+    for i in 0..<trailCount {
+      let progress = CGFloat(i) / CGFloat(trailCount)
+      let x = startRect.origin.x + (endRect.origin.x - startRect.origin.x) * progress
+      let y = startRect.origin.y + (endRect.origin.y - startRect.origin.y) * progress
+
+      let interpolatedRect = CGRect(
+        x: x,
+        y: y,
+        width: startRect.width,
+        height: startRect.height
+      )
+
+      // Stagger the creation for smoother effect
+      let delay = Double(i) * 0.01
+      createGhostCursor(at: interpolatedRect, initialOpacity: 0.5 - progress * 0.3, delay: delay)
+    }
+  }
+
+  private func createGhostCursor(at rect: CGRect, initialOpacity: CGFloat, delay: Double) {
+    let ghostLayer = CAShapeLayer()
+    // Use the actual caret rect dimensions directly
+    let cursorPath = UIBezierPath(
+      roundedRect: CGRect(
+        x: rect.origin.x,
+        y: rect.origin.y,
+        width: cursorWidth,
+        height: rect.height
+      ),
+      cornerRadius: cursorWidth / 2
+    )
+    ghostLayer.path = cursorPath.cgPath
+    ghostLayer.fillColor = tintColor.cgColor
+    ghostLayer.opacity = 0
+
+    layer.addSublayer(ghostLayer)
+    trailLayers.append(ghostLayer)
+
+    // Fade in then fade out animation
+    let fadeIn = CABasicAnimation(keyPath: "opacity")
+    fadeIn.fromValue = 0
+    fadeIn.toValue = initialOpacity
+    fadeIn.duration = 0.02
+    fadeIn.beginTime = delay
+
+    let fadeOut = CABasicAnimation(keyPath: "opacity")
+    fadeOut.fromValue = initialOpacity
+    fadeOut.toValue = 0
+    fadeOut.duration = trailDuration
+    fadeOut.beginTime = delay + 0.02
+    fadeOut.timingFunction = CAMediaTimingFunction(name: .easeOut)
+
+    let group = CAAnimationGroup()
+    group.animations = [fadeIn, fadeOut]
+    group.duration = delay + 0.02 + trailDuration
+    group.fillMode = .forwards
+    group.isRemovedOnCompletion = false
+
+    CATransaction.begin()
+    CATransaction.setCompletionBlock { [weak self, weak ghostLayer] in
+      ghostLayer?.removeFromSuperlayer()
+      if let layer = ghostLayer {
+        self?.trailLayers.removeAll { $0 === layer }
+      }
+    }
+    ghostLayer.add(group, forKey: "trailFade")
+    CATransaction.commit()
+  }
+
+  override func layoutSubviews() {
+    super.layoutSubviews()
+    // Update last cursor rect on layout changes
+    if markedTextRange == nil {
+      lastCursorRect = caretRect(for: selectedTextRange?.start ?? beginningOfDocument)
     }
   }
 }
