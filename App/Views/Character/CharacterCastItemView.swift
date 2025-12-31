@@ -14,7 +14,7 @@ struct CharacterCastItemView: View {
           .imageCaption {
             Text(item.type.description)
           }
-          .imageLink(item.subject.link)
+          .imageNavLink(item.subject.link)
 
         VStack(alignment: .leading) {
           Text(item.subject.title(with: titlePreference).withLink(item.subject.link))
@@ -48,7 +48,7 @@ struct CharacterCastItemView: View {
               ImageView(img: person.images?.grid)
                 .imageStyle(width: 40, height: 40, alignment: .top)
                 .imageType(.person)
-                .imageLink(person.link)
+                .imageNavLink(person.link)
             }
           }
         }

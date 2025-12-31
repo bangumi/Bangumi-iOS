@@ -139,6 +139,7 @@ struct CharacterView: View {
       }
     }
     .handoff(url: shareLink, title: title)
+    .modifier(ZoomTransitionModifier(zoomID: ZoomNavigationID(type: .character, id: characterId)))
   }
 }
 

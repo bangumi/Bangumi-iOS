@@ -11,7 +11,7 @@ struct PersonCastItemView: View {
         ImageView(img: item.character.images?.medium)
           .imageStyle(width: 60, height: 60, alignment: .top)
           .imageType(.person)
-          .imageLink(item.character.link)
+          .imageNavLink(item.character.link)
 
         VStack(alignment: .leading) {
           Text(item.character.title(with: titlePreference).withLink(item.character.link))
@@ -55,7 +55,7 @@ struct PersonCastItemView: View {
               ImageView(img: relation.subject.images?.small)
                 .imageStyle(width: 40, height: 40, alignment: .top)
                 .imageType(.subject)
-                .imageLink(relation.subject.link)
+                .imageNavLink(relation.subject.link)
             }.frame(minHeight: 40)
           }
         }

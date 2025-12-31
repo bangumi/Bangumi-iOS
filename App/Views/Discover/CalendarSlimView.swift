@@ -98,7 +98,7 @@ struct CalendarWeekdaySlimView: View {
         ImageView(img: item.subject.images?.resize(.r100))
           .imageStyle(width: 60, height: 60, cornerRadius: 0)
           .imageType(.subject)
-          .imageLink(item.subject.link)
+          .imageNavLink(item.subject.link)
           .subjectPreview(item.subject)
       }
     }

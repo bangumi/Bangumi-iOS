@@ -12,7 +12,7 @@ struct PersonLargeRowView: View {
         .imageStyle(width: 90, height: 90)
         .imageType(.person)
         .imageNSFW(person.nsfw)
-        .imageLink(person.link)
+        .imageNavLink(person.link)
       VStack(alignment: .leading, spacing: 4) {
         Text(person.title(with: titlePreference))
           .font(.headline)

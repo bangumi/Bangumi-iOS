@@ -13,7 +13,7 @@ struct CollectionRowView: View {
       ImageView(img: subject.images?.resize(.r200))
         .imageStyle(width: 60, height: 60)
         .imageType(.subject)
-        .imageLink(subject.link)
+        .imageNavLink(subject.link)
       VStack(alignment: .leading) {
         Text(subject.title(with: titlePreference).withLink(subject.link))
           .lineLimit(1)

@@ -15,7 +15,7 @@ struct SubjectLargeRowView: View {
         .imageStyle(width: 90, height: subject.typeEnum.coverHeight(for: 90))
         .imageType(.subject)
         .imageNSFW(subject.nsfw)
-        .imageLink(subject.link)
+        .imageNavLink(subject.link)
       VStack(alignment: .leading) {
         // title
         HStack {

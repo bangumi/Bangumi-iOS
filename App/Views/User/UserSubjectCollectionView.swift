@@ -100,7 +100,7 @@ struct UserSubjectCollectionView: View {
                   ImageView(img: subject.images?.resize(.r200))
                     .imageStyle(width: 60, height: imageHeight)
                     .imageType(.subject)
-                    .imageLink(subject.link)
+                    .imageNavLink(subject.link)
                     .subjectPreview(subject)
                     .shadow(radius: 2)
                   Text(subject.title(with: titlePreference))

@@ -58,7 +58,7 @@ struct SubjectRecsView: View {
                 Label(ctype.description(rec.subject.type), systemImage: ctype.icon)
                   .labelStyle(.compact)
               }
-              .imageLink(rec.subject.link)
+              .imageNavLink(rec.subject.link)
               .padding(2)
               .shadow(radius: 2)
             Text(rec.subject.title(with: titlePreference))

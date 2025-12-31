@@ -58,7 +58,7 @@ struct CharacterCard: View {
       ImageView(img: item.character.images?.medium)
         .imageStyle(width: 72, height: 108, alignment: .top)
         .imageType(.person)
-        .imageLink(item.character.link)
+        .imageNavLink(item.character.link)
         .clipShape(RoundedRectangle(cornerRadius: 8))
         .shadow(radius: 2)
 

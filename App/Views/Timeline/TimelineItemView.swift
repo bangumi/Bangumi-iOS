@@ -112,7 +112,7 @@ struct TimelineItemView: View {
                     .imageStyle(width: 60, height: 72)
                     .imageType(.subject)
                     .imageNSFW(subject.nsfw)
-                    .imageLink(subject.link)
+                    .imageNavLink(subject.link)
                     .subjectPreview(subject)
                 }
               }
@@ -175,13 +175,13 @@ struct TimelineItemView: View {
                   ImageView(img: character.images?.grid)
                     .imageStyle(width: 60, height: 60)
                     .imageType(.person)
-                    .imageLink(character.link)
+                    .imageNavLink(character.link)
                 }
                 ForEach(mono.persons.prefix(5)) { person in
                   ImageView(img: person.images?.grid)
                     .imageStyle(width: 60, height: 60)
                     .imageType(.person)
-                    .imageLink(person.link)
+                    .imageNavLink(person.link)
                 }
               }
             }

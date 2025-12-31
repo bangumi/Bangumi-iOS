@@ -12,7 +12,7 @@ struct PersonWorksItemView: View {
         ImageView(img: item.subject.images?.resize(.r200))
           .imageStyle(width: 60, height: 60)
           .imageType(.subject)
-          .imageLink(item.subject.link)
+          .imageNavLink(item.subject.link)
         VStack(alignment: .leading) {
           VStack(alignment: .leading) {
             Text(item.subject.title(with: titlePreference).withLink(item.subject.link))

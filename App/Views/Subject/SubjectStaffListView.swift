@@ -24,7 +24,7 @@ struct SubjectStaffListView: View {
             ImageView(img: item.staff.images?.medium)
               .imageStyle(width: 60, height: 60, alignment: .top)
               .imageType(.person)
-              .imageLink(item.staff.link)
+              .imageNavLink(item.staff.link)
             VStack(alignment: .leading) {
               Text(item.staff.name.withLink(item.staff.link))
                 .font(.callout)

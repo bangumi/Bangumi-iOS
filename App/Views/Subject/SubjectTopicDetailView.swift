@@ -118,7 +118,7 @@ struct SubjectTopicDetailView: View {
                 ImageView(img: topic.subject.images?.small)
                   .imageStyle(width: 20, height: 20)
                   .imageType(.subject)
-                  .imageLink(topic.subject.link)
+                  .imageNavLink(topic.subject.link)
                 Text(topic.subject.title(with: titlePreference).withLink(topic.subject.link))
                   .font(.subheadline)
                 Spacer()

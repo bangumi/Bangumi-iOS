@@ -43,7 +43,7 @@ struct SubjectCharacterListView: View {
               .imageCaption {
                 Text(item.type.description)
               }
-              .imageLink(item.character.link)
+              .imageNavLink(item.character.link)
             VStack(alignment: .leading) {
               VStack(alignment: .leading) {
                 HStack {
@@ -70,7 +70,7 @@ struct SubjectCharacterListView: View {
                     ImageView(img: person.images?.grid)
                       .imageStyle(width: 40, height: 40, alignment: .top)
                       .imageType(.person)
-                      .imageLink(person.link)
+                      .imageNavLink(person.link)
                     VStack(alignment: .leading) {
                       Text(person.title(with: titlePreference).withLink(person.link))
                         .foregroundStyle(.linkText)

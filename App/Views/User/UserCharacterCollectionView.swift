@@ -55,7 +55,7 @@ struct UserCharacterCollectionView: View {
                 ImageView(img: character.images?.resize(.r200))
                   .imageStyle(width: 60, height: 60)
                   .imageType(.person)
-                  .imageLink(character.link)
+                  .imageNavLink(character.link)
                   .shadow(radius: 2)
                 Text(character.title(with: titlePreference))
                   .font(.caption2)

@@ -207,7 +207,7 @@ struct CalendarWeekdayView: View {
                   Spacer(minLength: 0)
                 }.padding(4)
               }
-              .imageLink(item.subject.link)
+              .imageNavLink(item.subject.link)
               .subjectPreview(item.subject)
           }
         }

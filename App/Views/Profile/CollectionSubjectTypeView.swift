@@ -85,7 +85,7 @@ struct CollectionSubjectTypeView: View {
           ImageView(img: subject.images?.resize(.r200))
             .imageStyle(width: 80, height: 80)
             .imageType(.subject)
-            .imageLink(subject.link)
+            .imageNavLink(subject.link)
         }
       }
     }.animation(.default, value: subjects)

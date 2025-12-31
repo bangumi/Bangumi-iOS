@@ -109,7 +109,7 @@ struct TrendingSubjectTypeView: View {
                   Spacer(minLength: 0)
                 }.padding(8)
               }
-              .imageLink(item.subject.link)
+              .imageNavLink(item.subject.link)
               .subjectPreview(item.subject)
           }
         }
@@ -136,7 +136,7 @@ struct TrendingSubjectTypeView: View {
                     Spacer(minLength: 0)
                   }.padding(4)
                 }
-                .imageLink(item.subject.link)
+                .imageNavLink(item.subject.link)
                 .subjectPreview(item.subject)
             }
           }

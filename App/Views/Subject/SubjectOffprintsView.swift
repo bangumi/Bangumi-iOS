@@ -43,7 +43,7 @@ struct SubjectOffprintsView: View {
               Label(ctype.description(offprint.subject.type), systemImage: ctype.icon)
                 .labelStyle(.compact)
             }
-            .imageLink(offprint.subject.link)
+            .imageNavLink(offprint.subject.link)
             .padding(2)
             .shadow(radius: 2)
         }

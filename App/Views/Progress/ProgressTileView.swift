@@ -101,7 +101,7 @@ struct ProgressTileItemView: View {
         .imageBadge(show: subject.interest?.private ?? false) {
           Image(systemName: "lock")
         }
-        .imageLink(subject.link)
+        .imageNavLink(subject.link)
 
       VStack(alignment: .leading, spacing: 4) {
         VStack(alignment: .leading, spacing: 4) {

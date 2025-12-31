@@ -16,9 +16,11 @@ struct MainView: View {
   var body: some View {
     TabView(selection: $mainTab) {
       Tab(ChiiViewTab.timeline.title, systemImage: ChiiViewTab.timeline.icon, value: .timeline) {
-        NavigationStack(path: $timelineNav) {
-          ChiiTimelineView()
-            .navigationDestination(for: NavDestination.self) { $0 }
+        ZoomTransitionContainer {
+          NavigationStack(path: $timelineNav) {
+            ChiiTimelineView()
+              .navigationDestination(for: NavDestination.self) { $0 }
+          }
         }
         .environment(
           \.openURL,
@@ -34,9 +36,11 @@ struct MainView: View {
 
       if isAuthenticated {
         Tab(ChiiViewTab.progress.title, systemImage: ChiiViewTab.progress.icon, value: .progress) {
-          NavigationStack(path: $progressNav) {
-            ChiiProgressView()
-              .navigationDestination(for: NavDestination.self) { $0 }
+          ZoomTransitionContainer {
+            NavigationStack(path: $progressNav) {
+              ChiiProgressView()
+                .navigationDestination(for: NavDestination.self) { $0 }
+            }
           }
           .environment(
             \.openURL,
@@ -53,9 +57,11 @@ struct MainView: View {
 
       if !isolationMode {
         Tab(ChiiViewTab.rakuen.title, systemImage: ChiiViewTab.rakuen.icon, value: .rakuen) {
-          NavigationStack(path: $rakuenNav) {
-            ChiiRakuenView()
-              .navigationDestination(for: NavDestination.self) { $0 }
+          ZoomTransitionContainer {
+            NavigationStack(path: $rakuenNav) {
+              ChiiRakuenView()
+                .navigationDestination(for: NavDestination.self) { $0 }
+            }
           }
           .environment(
             \.openURL,
@@ -80,9 +86,11 @@ struct MainView: View {
         ChiiViewTab.discover.title, systemImage: ChiiViewTab.discover.icon,
         value: ChiiViewTab.discover, role: .search
       ) {
-        NavigationStack(path: $discoverNav) {
-          ChiiDiscoverView()
-            .navigationDestination(for: NavDestination.self) { $0 }
+        ZoomTransitionContainer {
+          NavigationStack(path: $discoverNav) {
+            ChiiDiscoverView()
+              .navigationDestination(for: NavDestination.self) { $0 }
+          }
         }
         .environment(
           \.openURL,

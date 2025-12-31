@@ -38,7 +38,7 @@ struct SubjectRelationListView: View {
             ImageView(img: item.subject.images?.resize(.r200))
               .imageStyle(width: 60, height: 60)
               .imageType(.subject)
-              .imageLink(item.subject.link)
+              .imageNavLink(item.subject.link)
             VStack(alignment: .leading) {
               HStack {
                 VStack(alignment: .leading) {

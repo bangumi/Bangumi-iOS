@@ -31,7 +31,7 @@ struct IndexRelatedItemView: View {
                 .imageStyle(width: 80, height: 100)
                 .imageType(.subject)
                 .imageNSFW(subject.nsfw)
-                .imageLink(subject.link)
+                .imageNavLink(subject.link)
               VStack(alignment: .leading) {
                 HStack {
                   Image(systemName: subject.type.icon)
@@ -76,7 +76,7 @@ struct IndexRelatedItemView: View {
               ImageView(img: character.images?.resize(.r200))
                 .imageStyle(width: 72, height: 72)
                 .imageType(.person)
-                .imageLink(character.link)
+                .imageNavLink(character.link)
               VStack(alignment: .leading) {
                 HStack {
                   Image(systemName: item.cat.icon)
@@ -122,7 +122,7 @@ struct IndexRelatedItemView: View {
               ImageView(img: person.images?.resize(.r200))
                 .imageStyle(width: 72, height: 72)
                 .imageType(.person)
-                .imageLink(person.link)
+                .imageNavLink(person.link)
               VStack(alignment: .leading) {
                 HStack {
                   Image(systemName: item.cat.icon)

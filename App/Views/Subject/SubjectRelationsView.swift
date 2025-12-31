@@ -74,7 +74,7 @@ struct SubjectRelationsView: View {
                 Label(ctype.description(relation.subject.type), systemImage: ctype.icon)
                   .labelStyle(.compact)
               }
-              .imageLink(relation.subject.link)
+              .imageNavLink(relation.subject.link)
               .padding(2)
               .shadow(radius: 2)
             Text(relation.subject.title(with: titlePreference))
