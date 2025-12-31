@@ -8,6 +8,7 @@ struct MainPostActionButtons: View {
   let reactionType: ReactionType
   @Binding var reactions: [ReactionDTO]
   let maxReplyCount: Int
+  var allowReply: Bool = true
 
   var body: some View {
     HStack {
@@ -27,7 +28,7 @@ struct MainPostActionButtons: View {
         }
         .labelStyle(.compact)
       }
-      .disabled(!isAuthenticated)
+      .disabled(!isAuthenticated || !allowReply)
 
       Button {
         onIndex()

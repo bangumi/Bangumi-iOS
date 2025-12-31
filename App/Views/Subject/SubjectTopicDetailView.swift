@@ -149,7 +149,8 @@ struct SubjectTopicDetailView: View {
                   onIndex: { showIndexPicker = true },
                   reactionType: .subjectReply(mainPost.id),
                   reactions: $mainPostReactions,
-                  maxReplyCount: maxReplyCount
+                  maxReplyCount: maxReplyCount,
+                  allowReply: topic.state.allowReply
                 )
               }
             }
@@ -290,7 +291,7 @@ struct SubjectTopicDetailView: View {
           } label: {
             Label("回复", systemImage: "plus.bubble")
           }
-          .disabled(!isAuthenticated)
+          .disabled(!isAuthenticated || !(topic?.state.allowReply ?? true))
           Button {
             showIndexPicker = true
           } label: {

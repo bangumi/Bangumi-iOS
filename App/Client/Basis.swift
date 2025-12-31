@@ -912,6 +912,52 @@ enum EpisodeCollectionType: Int, Codable, Identifiable, CaseIterable {
   }
 }
 
+enum TopicDisplay: Int, Codable, CaseIterable {
+  case ban = 0
+  case normal = 1
+  case review = 2
+
+  var description: String {
+    switch self {
+    case .ban:
+      return "已隐藏"
+    case .normal:
+      return "正常"
+    case .review:
+      return "审核中"
+    }
+  }
+}
+
+enum TopicState: Int, Codable, CaseIterable {
+  case normal = 0
+  case closed = 1
+  case reopen = 2
+  case silent = 5
+
+  var allowReply: Bool {
+    switch self {
+    case .normal, .reopen:
+      return true
+    case .closed, .silent:
+      return false
+    }
+  }
+
+  var description: String {
+    switch self {
+    case .normal:
+      return "正常"
+    case .closed:
+      return "已关闭"
+    case .reopen:
+      return "已重开"
+    case .silent:
+      return "已下沉"
+    }
+  }
+}
+
 enum PostState: Int, Codable, CaseIterable {
   case normal = 0
   case adminCloseTopic = 1
