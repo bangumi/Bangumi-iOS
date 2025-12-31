@@ -1,4 +1,11 @@
-.PHONY: update_preview_date
+.PHONY: build update_preview_date
+
+SCHEME = Bangumi
+PROJECT = Bangumi.xcodeproj
+
+build: ## Build for iOS (CI, uses simulator, no code signing)
+	@echo "Building for iOS..."
+	@xcodebuild -project $(PROJECT) -scheme $(SCHEME) -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' build -quiet CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
 
 UID ?= 873244
 PREVIEW_PATH ?= App/Preview Content
