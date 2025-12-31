@@ -103,10 +103,9 @@ struct CommentItemView: View {
     case .normal:
       CommentItemNormalView(type: type, comment: comment, idx: idx)
         .blocklistFilter(comment.creatorID)
-    case .userDelete:
-      PostUserDeleteStateView(type.parentId, comment.creatorID, comment.user, comment.createdAt)
-    case .adminOffTopic:
-      PostAdminOffTopicStateView(type.parentId, comment.creatorID, comment.user, comment.createdAt)
+    case .userDelete, .adminOffTopic, .adminCloseTopic, .adminReopen, .adminSilentTopic:
+      PostTopicActionStateView(
+        type.parentId, comment.state, comment.creatorID, comment.user, comment.createdAt)
     default:
       PostStateView(comment.state)
     }
@@ -211,11 +210,9 @@ struct CommentItemNormalView: View {
                 CommentSubReplyNormalView(
                   type: type, comment: comment,
                   reply: reply, idx: idx, subidx: subidx)
-              case .userDelete:
-                PostUserDeleteStateView(type.parentId, reply.creatorID, reply.user, reply.createdAt)
-              case .adminOffTopic:
-                PostAdminOffTopicStateView(
-                  type.parentId, reply.creatorID, reply.user, reply.createdAt)
+              case .userDelete, .adminOffTopic, .adminCloseTopic, .adminReopen, .adminSilentTopic:
+                PostTopicActionStateView(
+                  type.parentId, reply.state, reply.creatorID, reply.user, reply.createdAt)
               default:
                 PostStateView(reply.state)
               }

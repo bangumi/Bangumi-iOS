@@ -951,7 +951,7 @@ enum PostState: Int, Codable, CaseIterable {
     case .normal:
       return .primary
     case .adminCloseTopic:
-      return .red
+      return .accent
     case .adminReopen:
       return .green
     case .adminPin:
@@ -966,6 +966,42 @@ enum PostState: Int, Codable, CaseIterable {
       return .secondary
     case .adminOffTopic:
       return .secondary
+    }
+  }
+
+  /// Short name for the action badge (e.g., "关闭", "重开", "下沉")
+  var actionName: String? {
+    switch self {
+    case .adminCloseTopic:
+      return "关闭"
+    case .adminReopen:
+      return "重开"
+    case .adminSilentTopic:
+      return "下沉"
+    case .adminOffTopic:
+      return "折叠"
+    case .userDelete:
+      return "删除"
+    default:
+      return nil
+    }
+  }
+
+  /// Description of the action performed (e.g., "关闭了主题")
+  var actionDescription: String? {
+    switch self {
+    case .adminCloseTopic:
+      return "关闭了主题"
+    case .adminReopen:
+      return "重新开启了主题"
+    case .adminSilentTopic:
+      return "下沉了主题"
+    case .adminOffTopic:
+      return "回复被折叠"
+    case .userDelete:
+      return "删除了回复"
+    default:
+      return nil
     }
   }
 }

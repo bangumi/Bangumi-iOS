@@ -68,10 +68,9 @@ struct ReplyItemView: View {
     case .normal:
       ReplyItemNormalView(type: type, topicId: topicId, idx: idx, reply: reply, author: author)
         .blocklistFilter(reply.creatorID)
-    case .userDelete:
-      PostUserDeleteStateView(topicId, reply.creatorID, reply.creator, reply.createdAt, author)
-    case .adminOffTopic:
-      PostAdminOffTopicStateView(topicId, reply.creatorID, reply.creator, reply.createdAt, author)
+    case .userDelete, .adminOffTopic, .adminCloseTopic, .adminReopen, .adminSilentTopic:
+      PostTopicActionStateView(
+        topicId, reply.state, reply.creatorID, reply.creator, reply.createdAt, author)
     default:
       PostStateView(reply.state)
     }
@@ -204,12 +203,9 @@ struct ReplyItemNormalView: View {
                 SubReplyNormalView(
                   type: type, idx: idx, reply: reply, subidx: subidx, subreply: subreply,
                   author: author, topicId: topicId)
-              case .userDelete:
-                PostUserDeleteStateView(
-                  topicId, subreply.creatorID, subreply.creator, subreply.createdAt, author)
-              case .adminOffTopic:
-                PostAdminOffTopicStateView(
-                  topicId, subreply.creatorID, subreply.creator, subreply.createdAt, author)
+              case .userDelete, .adminOffTopic, .adminCloseTopic, .adminReopen, .adminSilentTopic:
+                PostTopicActionStateView(
+                  topicId, subreply.state, subreply.creatorID, subreply.creator, subreply.createdAt, author)
               default:
                 PostStateView(subreply.state)
               }
@@ -925,12 +921,9 @@ struct MainPostContentView: View {
                 SubReplyNormalView(
                   type: type, idx: idx, reply: reply, subidx: subidx, subreply: subreply,
                   author: author, topicId: topicId)
-              case .userDelete:
-                PostUserDeleteStateView(
-                  topicId, subreply.creatorID, subreply.creator, subreply.createdAt, author)
-              case .adminOffTopic:
-                PostAdminOffTopicStateView(
-                  topicId, subreply.creatorID, subreply.creator, subreply.createdAt, author)
+              case .userDelete, .adminOffTopic, .adminCloseTopic, .adminReopen, .adminSilentTopic:
+                PostTopicActionStateView(
+                  topicId, subreply.state, subreply.creatorID, subreply.creator, subreply.createdAt, author)
               default:
                 PostStateView(subreply.state)
               }
