@@ -1,3 +1,4 @@
+import SwiftData
 import SwiftUI
 
 struct RakuenGroupTopicView: View {
@@ -77,6 +78,146 @@ struct RakuenGroupTopicItemView: View {
           }
         }
         Spacer()
+      }
+    }
+  }
+}
+
+struct CachedGroupTopicListView: View {
+  let mode: GroupTopicFilterMode
+  @Binding var reloader: Bool
+
+  @Environment(\.modelContext) private var modelContext
+  @Query private var caches: [RakuenGroupTopicCache]
+
+  @AppStorage("hideBlocklist") var hideBlocklist: Bool = false
+  @AppStorage("blocklist") var blocklist: [Int] = []
+
+  @State private var items: [GroupTopicDTO] = []
+  @State private var loading = false
+  @State private var offset = 0
+  @State private var exhausted = false
+  @State private var initialized = false
+
+  private var cachedItems: [GroupTopicDTO] {
+    caches.first { $0.mode == mode.rawValue }?.items ?? []
+  }
+
+  private var displayItems: [GroupTopicDTO] {
+    items.isEmpty ? cachedItems : items
+  }
+
+  private var filteredItems: [GroupTopicDTO] {
+    if hideBlocklist {
+      return displayItems.filter { !blocklist.contains($0.creator?.id ?? 0) }
+    }
+    return displayItems
+  }
+
+  private func shouldLoadMore(after item: GroupTopicDTO, threshold: Int = 5) -> Bool {
+    displayItems.suffix(threshold).contains(item)
+  }
+
+  private func loadFirstPage() async {
+    if loading { return }
+    loading = true
+    defer { loading = false }
+
+    do {
+      let resp = try await Chii.shared.getRecentGroupTopics(mode: mode, limit: 20, offset: 0)
+      items = resp.data
+      offset = 20
+      exhausted = resp.data.count == 0 || offset >= resp.total
+
+      // Save to cache
+      let descriptor = FetchDescriptor<RakuenGroupTopicCache>(
+        predicate: #Predicate { $0.mode == mode.rawValue }
+      )
+      if let existing = try? modelContext.fetch(descriptor).first {
+        existing.items = resp.data
+        existing.updatedAt = Date()
+      } else {
+        let cache = RakuenGroupTopicCache(mode: mode.rawValue, items: resp.data)
+        modelContext.insert(cache)
+      }
+      try? modelContext.save()
+    } catch {
+      Notifier.shared.alert(error: error)
+    }
+  }
+
+  private func loadNextPage() async {
+    if loading || exhausted { return }
+    loading = true
+    defer { loading = false }
+
+    do {
+      let resp = try await Chii.shared.getRecentGroupTopics(mode: mode, limit: 20, offset: offset)
+      items.append(contentsOf: resp.data)
+      offset += 20
+      if resp.data.count == 0 || offset >= resp.total {
+        exhausted = true
+      }
+    } catch {
+      Notifier.shared.alert(error: error)
+    }
+  }
+
+  var body: some View {
+    LazyVStack(alignment: .leading) {
+      ForEach(filteredItems) { topic in
+        RakuenGroupTopicItemView(topic: topic)
+          .onAppear {
+            if shouldLoadMore(after: topic) {
+              Task {
+                await loadNextPage()
+              }
+            }
+          }
+      }
+
+      if loading {
+        HStack {
+          Spacer()
+          ProgressView()
+          Spacer()
+        }
+      }
+
+      if exhausted && !displayItems.isEmpty {
+        HStack {
+          Spacer()
+          Text("没有更多了")
+            .font(.footnote)
+            .foregroundStyle(.secondary)
+          Spacer()
+        }
+      }
+    }
+    .animation(.default, value: items)
+    .onAppear {
+      if !initialized {
+        initialized = true
+        Task {
+          await loadFirstPage()
+        }
+      }
+    }
+    .onChange(of: mode) { _, _ in
+      items = []
+      offset = 0
+      exhausted = false
+      loading = false
+      Task {
+        await loadFirstPage()
+      }
+    }
+    .onChange(of: reloader) { _, _ in
+      exhausted = false
+      offset = 0
+      initialized = false
+      Task {
+        await loadFirstPage()
       }
     }
   }

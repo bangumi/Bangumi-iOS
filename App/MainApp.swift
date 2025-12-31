@@ -19,6 +19,9 @@ struct MainApp: App {
       Person.self,
       Group.self,
       Draft.self,
+      RakuenSubjectTopicCache.self,
+      RakuenGroupTopicCache.self,
+      HotGroupCache.self,
     ])
     let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
     do {
