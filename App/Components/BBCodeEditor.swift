@@ -217,6 +217,21 @@ struct BBCodeEditor: View {
     }
   }
 
+  private func handleClearStyles() {
+    let bbcode = BBCode()
+    if let selection = textSelection, let range = selection.range(in: text) {
+      if range.lowerBound != range.upperBound {
+        let selectedText = String(text[range])
+        let strippedText = bbcode.strip(bbcode: selectedText)
+        text.replaceSubrange(range, with: strippedText)
+        newSelection(range.lowerBound, strippedText.count)
+        return
+      }
+    }
+    text = bbcode.strip(bbcode: text)
+    newSelection(text.startIndex, 0)
+  }
+
   private func setupKeyboardToolbar() {
     guard keyboardToolbarHostingController == nil else { return }
     let toolbarView = ScrollView(.horizontal, showsIndicators: false) {
@@ -226,7 +241,8 @@ struct BBCodeEditor: View {
         onShowImageInput: { showingImageInput = true },
         onShowURLInput: { showingURLInput = true },
         onShowSizeInput: { showingSizeInput = true },
-        onShowColorInput: { showingColorInput = true }
+        onShowColorInput: { showingColorInput = true },
+        onClearStyles: handleClearStyles
       )
     }
     .frame(maxWidth: .infinity)
@@ -348,6 +364,7 @@ private struct BBCodeToolbarContent: View {
   let onShowURLInput: () -> Void
   let onShowSizeInput: () -> Void
   let onShowColorInput: () -> Void
+  let onClearStyles: () -> Void
 
   var body: some View {
     HStack(spacing: 8) {
@@ -412,6 +429,11 @@ private struct BBCodeToolbarContent: View {
           Image(systemName: code.icon)
             .frame(width: 12, height: 12)
         }
+      }
+      Divider()
+      Button(action: onClearStyles) {
+        Image(systemName: "eraser")
+          .frame(width: 12, height: 12)
       }
     }
     .padding(.horizontal)
