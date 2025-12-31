@@ -55,11 +55,18 @@ struct ChiiTimelineView: View {
               NavigationLink(value: NavDestination.friends) {
                 Label("好友", systemImage: "person.2")
               }
+
               Divider()
+
+              NavigationLink(value: NavDestination.export) {
+                Label("导出收藏", systemImage: "square.and.arrow.up")
+              }
+              Divider()
+
               Button(role: .destructive) {
                 logoutConfirm = true
               } label: {
-                Text("退出登录")
+                Label("退出登录", systemImage: "rectangle.portrait.and.arrow.right")
               }
             } label: {
               ImageView(img: profile.avatar?.large)
