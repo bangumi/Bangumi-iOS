@@ -205,7 +205,8 @@ struct ReplyItemNormalView: View {
                   author: author, topicId: topicId)
               case .userDelete, .adminOffTopic, .adminCloseTopic, .adminReopen, .adminSilentTopic:
                 PostTopicActionStateView(
-                  topicId, subreply.state, subreply.creatorID, subreply.creator, subreply.createdAt, author)
+                  topicId, subreply.state, subreply.creatorID, subreply.creator, subreply.createdAt,
+                  author)
               default:
                 PostStateView(subreply.state)
               }
@@ -923,7 +924,8 @@ struct MainPostContentView: View {
                   author: author, topicId: topicId)
               case .userDelete, .adminOffTopic, .adminCloseTopic, .adminReopen, .adminSilentTopic:
                 PostTopicActionStateView(
-                  topicId, subreply.state, subreply.creatorID, subreply.creator, subreply.createdAt, author)
+                  topicId, subreply.state, subreply.creatorID, subreply.creator, subreply.createdAt,
+                  author)
               default:
                 PostStateView(subreply.state)
               }

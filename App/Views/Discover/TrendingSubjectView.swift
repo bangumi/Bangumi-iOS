@@ -90,7 +90,7 @@ struct TrendingSubjectTypeView: View {
         HStack {
           ForEach(largeItems) { item in
             ImageView(img: item.subject.images?.resize(subjectImageQuality.largeSize))
-              .imageStyle(width: largeCardWidth, height: largeCardWidth * 1.2)
+              .imageStyle(width: largeCardWidth, height: type.coverHeight(for: largeCardWidth))
               .imageType(.subject)
               .imageCaption {
                 HStack {
@@ -117,7 +117,7 @@ struct TrendingSubjectTypeView: View {
           LazyHStack {
             ForEach(smallItems) { item in
               ImageView(img: item.subject.images?.resize(subjectImageQuality.mediumSize))
-                .imageStyle(width: smallCardWidth, height: smallCardWidth * 1.3)
+                .imageStyle(width: smallCardWidth, height: type.coverHeight(for: smallCardWidth))
                 .imageType(.subject)
                 .imageCaption {
                   HStack {

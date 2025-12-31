@@ -90,7 +90,7 @@ struct ProgressTileItemView: View {
   @Environment(\.modelContext) var modelContext
 
   var imageHeight: CGFloat {
-    width * 1.4
+    subject.typeEnum.coverHeight(for: width)
   }
 
   var body: some View {

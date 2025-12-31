@@ -29,7 +29,7 @@ struct SubjectHeaderView: View {
       .textSelection(.enabled)
     HStack {
       ImageView(img: subject.images?.resize(.r400))
-        .imageStyle(width: 120, height: 160)
+        .imageStyle(width: 120, height: type.coverHeight(for: 120))
         .imageType(.subject)
         .imageNSFW(subject.nsfw)
         .enableSave(subject.images?.large)

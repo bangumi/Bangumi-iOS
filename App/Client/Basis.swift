@@ -518,6 +518,22 @@ enum SubjectType: Int, Codable, Identifiable, CaseIterable {
       return "play.tv"
     }
   }
+
+  /// Height/Width ratio for cover images
+  /// Music uses 1:1 (album art), others use 1.414 (√2, A4 paper ratio)
+  var coverAspectRatio: CGFloat {
+    switch self {
+    case .music:
+      return 1.0
+    default:
+      return 1.414
+    }
+  }
+
+  /// Calculate cover height for a given width
+  func coverHeight(for width: CGFloat) -> CGFloat {
+    return width * coverAspectRatio
+  }
 }
 
 enum PersonCareer: String, Codable, CaseIterable {

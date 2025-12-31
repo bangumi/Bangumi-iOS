@@ -25,12 +25,7 @@ struct UserSubjectCollectionView: View {
   }
 
   var imageHeight: CGFloat {
-    switch stype {
-    case .music:
-      return 60
-    default:
-      return 80
-    }
+    stype.coverHeight(for: 60)
   }
 
   func refresh() async {

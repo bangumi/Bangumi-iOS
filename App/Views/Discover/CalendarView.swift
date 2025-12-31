@@ -190,7 +190,7 @@ struct CalendarWeekdayView: View {
         ForEach(calendar.items) { item in
           VStack {
             ImageView(img: item.subject.images?.resize(.r200))
-              .imageStyle(width: 110, height: 140)
+              .imageStyle(width: 110, height: item.subject.type.coverHeight(for: 110))
               .imageType(.subject)
               .imageCaption {
                 HStack {

@@ -12,7 +12,7 @@ struct SubjectLargeRowView: View {
   var body: some View {
     HStack {
       ImageView(img: subject.images?.resize(.r200))
-        .imageStyle(width: 90, height: 120)
+        .imageStyle(width: 90, height: subject.typeEnum.coverHeight(for: 90))
         .imageType(.subject)
         .imageNSFW(subject.nsfw)
         .imageLink(subject.link)
@@ -107,7 +107,7 @@ struct SubjectLargeRowView: View {
         .font(.footnote)
       }.padding(.leading, 2)
     }
-    .frame(height: 120)
+    .frame(minHeight: subject.typeEnum.coverHeight(for: 90))
     .padding(2)
     .clipShape(RoundedRectangle(cornerRadius: 10))
   }

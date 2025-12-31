@@ -9,7 +9,7 @@ struct UserSubjectCollectionRowView: View {
   var body: some View {
     HStack(alignment: .top) {
       ImageView(img: subject.images?.resize(.r200))
-        .imageStyle(width: 60, height: 80)
+        .imageStyle(width: 60, height: subject.type.coverHeight(for: 60))
         .imageType(.subject)
         .imageLink(subject.link)
       VStack(alignment: .leading) {
