@@ -32,14 +32,10 @@ extension EnvironmentValues {
 /// Provides a shared namespace for zoom transitions within a NavigationStack
 struct ZoomTransitionContainer<Content: View>: View {
   @Namespace private var namespace
-  let content: Content
-
-  init(@ViewBuilder content: () -> Content) {
-    self.content = content()
-  }
+  @ViewBuilder let content: () -> Content
 
   var body: some View {
-    content
+    content()
       .environment(\.zoomNamespace, namespace)
   }
 }
