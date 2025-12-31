@@ -59,6 +59,15 @@ enum RakuenListMode: String, CaseIterable {
       return nil
     }
   }
+
+  var requiresLogin: Bool {
+    switch self {
+    case .groupJoined, .groupCreated, .groupReplied:
+      return true
+    default:
+      return false
+    }
+  }
 }
 
 enum RakuenCategory: String, CaseIterable {
@@ -86,6 +95,7 @@ enum RakuenCategory: String, CaseIterable {
 
 struct ChiiRakuenView: View {
   @AppStorage("rakuenListMode") var rakuenListMode: RakuenListMode = .subjectTrending
+  @AppStorage("isAuthenticated") var isAuthenticated = false
 
   @State private var reloader = false
 
@@ -121,8 +131,10 @@ struct ChiiRakuenView: View {
 
           Menu {
             ForEach(GroupTopicFilterMode.allCases, id: \.self) { mode in
-              NavigationLink(value: NavDestination.rakuenGroupTopics(mode)) {
-                Text(mode.description)
+              if isAuthenticated || mode == .all {
+                NavigationLink(value: NavDestination.rakuenGroupTopics(mode)) {
+                  Text(mode.description)
+                }
               }
             }
           } label: {
@@ -132,8 +144,10 @@ struct ChiiRakuenView: View {
 
           Menu {
             ForEach(GroupFilterMode.allCases, id: \.self) { mode in
-              NavigationLink(value: NavDestination.groupList(mode)) {
-                Text(mode.description)
+              if isAuthenticated || mode == .all {
+                NavigationLink(value: NavDestination.groupList(mode)) {
+                  Text(mode.description)
+                }
               }
             }
           } label: {
@@ -144,29 +158,43 @@ struct ChiiRakuenView: View {
         }
       }
     }
+    .onAppear {
+      if !isAuthenticated && rakuenListMode.requiresLogin {
+        rakuenListMode = .subjectTrending
+      }
+    }
   }
 
   private var modeSelectorView: some View {
     ScrollView(.horizontal, showsIndicators: false) {
       HStack(spacing: 16) {
         ForEach(RakuenCategory.allCases, id: \.self) { category in
-          HStack(spacing: 8) {
-            Text(category.description)
-              .font(.footnote)
-              .foregroundStyle(.secondary)
-              .padding(.trailing, 4)
-
-            ForEach(category.modes, id: \.self) { mode in
-              Button {
-                rakuenListMode = mode
-              } label: {
-                Text(mode.description)
-              }.adaptiveButtonStyle(rakuenListMode == mode ? .borderedProminent : .bordered)
-            }
-          }
+          categorySection(category)
         }
       }
     }.scrollClipDisabled()
+  }
+
+  private func categorySection(_ category: RakuenCategory) -> some View {
+    let availableModes = category.modes.filter { isAuthenticated || !$0.requiresLogin }
+    if availableModes.isEmpty {
+      return AnyView(EmptyView())
+    }
+    return AnyView(
+      HStack(spacing: 8) {
+        Text(category.description)
+          .font(.footnote)
+          .foregroundStyle(.secondary)
+          .padding(.trailing, 4)
+
+        ForEach(availableModes, id: \.self) { mode in
+          Button {
+            rakuenListMode = mode
+          } label: {
+            Text(mode.description)
+          }.adaptiveButtonStyle(rakuenListMode == mode ? .borderedProminent : .bordered)
+        }
+      })
   }
 
   @ViewBuilder

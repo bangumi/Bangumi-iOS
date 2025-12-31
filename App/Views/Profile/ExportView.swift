@@ -52,18 +52,20 @@ struct ExportView: View {
 
       Section(header: Text("导出字段（\(selectedFields.count)/\(ExportableField.allCases.count)）")) {
         ForEach(ExportableField.allCases) { field in
-          Toggle(field.label, isOn: Binding(
-            get: { selectedFields.contains(field) },
-            set: { isSelected in
-              withAnimation {
-                if isSelected {
-                  selectedFields.insert(field)
-                } else {
-                  selectedFields.remove(field)
+          Toggle(
+            field.label,
+            isOn: Binding(
+              get: { selectedFields.contains(field) },
+              set: { isSelected in
+                withAnimation {
+                  if isSelected {
+                    selectedFields.insert(field)
+                  } else {
+                    selectedFields.remove(field)
+                  }
                 }
               }
-            }
-          ))
+            ))
         }
       }
 

@@ -483,7 +483,8 @@ private struct BBCodeTextView: UIViewRepresentable {
     // NOT when it's just echoing back user's input
     let currentText = textView.text ?? ""
     let isExternalChange = text != context.coordinator.lastPushedText
-    let shouldUpdateText = currentText != text && isExternalChange && textView.markedTextRange == nil
+    let shouldUpdateText =
+      currentText != text && isExternalChange && textView.markedTextRange == nil
 
     if shouldUpdateText {
       let savedRange = textView.selectedRange

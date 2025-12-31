@@ -81,9 +81,9 @@ struct ChiiTimelineView: View {
               .imageType(.avatar)
           }
         }
-        ToolbarItem(placement: .topBarTrailing) {
-          HStack {
-            if isAuthenticated, !isolationMode {
+        if isAuthenticated, !isolationMode {
+          ToolbarItem(placement: .topBarTrailing) {
+            HStack {
               NavigationLink(value: NavDestination.notice) {
                 Image(systemName: hasUnreadNotice ? "bell.badge.fill" : "bell")
                   .task(checkNotice)
