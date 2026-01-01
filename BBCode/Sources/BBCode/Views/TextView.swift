@@ -3,6 +3,7 @@ import SwiftUI
 public struct BBCodeView: View {
   let code: String
   let textSize: Int
+  @State private var rendered: TextView?
 
   public init(_ code: String, textSize: Int = 16) {
     self.code = code
@@ -10,16 +11,28 @@ public struct BBCodeView: View {
   }
 
   public var body: some View {
-    switch BBCode().text(code, args: ["textSize": textSize]) {
-    case .string(let content):
-      Text(content)
-        .font(.system(size: CGFloat(textSize)))
-    case .text(let content):
-      content
-        .font(.system(size: CGFloat(textSize)))
-    case .view(let content):
-      content
-        .font(.system(size: CGFloat(textSize)))
+    let font = Font.system(size: CGFloat(textSize))
+
+    Group {
+      if let rendered = rendered {
+        switch rendered {
+        case .string(let content):
+          Text(content)
+            .font(font)
+        case .text(let content):
+          content
+            .font(font)
+        case .view(let content):
+          content
+            .font(font)
+        }
+      } else {
+        Text(code)
+          .font(font)
+      }
+    }
+    .task(id: "\(textSize)|\(code)") {
+      rendered = BBCode().text(code, args: ["textSize": textSize])
     }
   }
 }

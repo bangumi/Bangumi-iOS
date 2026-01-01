@@ -75,7 +75,7 @@ struct SubjectDetailView: View {
 
   var body: some View {
     ScrollView(showsIndicators: false) {
-      VStack(alignment: .leading) {
+      LazyVStack(alignment: .leading) {
         SubjectHeaderView(subject: subject)
 
         if isAuthenticated {

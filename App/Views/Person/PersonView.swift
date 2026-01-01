@@ -62,7 +62,7 @@ struct PersonView: View {
     Section {
       if let person = person {
         ScrollView {
-          VStack(alignment: .leading) {
+          LazyVStack(alignment: .leading) {
             PersonDetailView(person: person)
 
             /// comments
