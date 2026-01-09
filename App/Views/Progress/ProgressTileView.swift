@@ -94,7 +94,7 @@ struct ProgressTileItemView: View {
   }
 
   var body: some View {
-    VStack(alignment: .leading, spacing: 8) {
+    VStack(alignment: .leading, spacing: 4) {
       ImageView(img: subject.images?.resize(subjectImageQuality.mediumSize))
         .imageStyle(width: width, height: imageHeight)
         .imageType(.subject)
@@ -112,7 +112,7 @@ struct ProgressTileItemView: View {
           ProgressSecondLineView(subject: subject)
         }
 
-        Spacer()
+        Spacer(minLength: 0)
 
         switch subject.typeEnum {
         case .anime, .real:

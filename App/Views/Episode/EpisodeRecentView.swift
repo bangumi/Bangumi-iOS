@@ -28,22 +28,26 @@ struct EpisodeRecentView: View {
     return "square.grid.2x2.fill"
   }
 
+  var recentCount: Int {
+    return 5
+  }
+
   var recentEpisodes: [Episode] {
     let idx = episodes.firstIndex { $0.status == EpisodeCollectionType.none.rawValue }
     if let idx = idx {
       if idx < 3 {
-        return Array(episodes.prefix(5))
+        return Array(episodes.prefix(recentCount))
       } else if idx < episodes.count - 3 {
         return Array(episodes[idx - 2..<min(idx + 3, episodes.count)])
       } else {
-        return Array(episodes.suffix(5))
+        return Array(episodes.suffix(recentCount))
       }
     } else {
       if let first = episodes.first {
         if first.status == EpisodeCollectionType.none.rawValue {
-          return Array(episodes.prefix(5))
+          return Array(episodes.prefix(recentCount))
         } else {
-          return Array(episodes.suffix(5))
+          return Array(episodes.suffix(recentCount))
         }
       } else {
         return []
@@ -67,24 +71,26 @@ struct EpisodeRecentView: View {
   var body: some View {
     switch mode {
     case .tile:
-      VStack(alignment: .leading) {
-        if !recentEpisodes.isEmpty {
-          HStack(spacing: 2) {
-            ForEach(recentEpisodes) { episode in
-              EpisodeItemView(episode: episode)
+      HStack {
+        Spacer(minLength: 0)
+        VStack(alignment: .trailing, spacing: 4) {
+          if !recentEpisodes.isEmpty {
+            HStack(spacing: 2) {
+              ForEach(recentEpisodes) { episode in
+                EpisodeItemView(episode: episode)
+              }
+            }.font(.footnote)
+          }
+          HStack {
+            if let episode = nextEpisode {
+              EpisodeNextView(episode: episode)
+            } else {
+              NavigationLink(value: NavDestination.subject(subject.subjectId)) {
+                Label(progressText, systemImage: progressIcon)
+                  .labelStyle(.compact)
+                  .foregroundStyle(.secondary)
+              }.buttonStyle(.scale)
             }
-          }.font(.footnote)
-        }
-        HStack {
-          Spacer()
-          if let episode = nextEpisode {
-            EpisodeNextView(episode: episode)
-          } else {
-            NavigationLink(value: NavDestination.subject(subject.subjectId)) {
-              Label(progressText, systemImage: progressIcon)
-                .labelStyle(.compact)
-                .foregroundStyle(.secondary)
-            }.buttonStyle(.scale)
           }
         }
       }

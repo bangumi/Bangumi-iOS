@@ -39,7 +39,7 @@ struct ProgressSecondLineView: View {
     case .category:
       switch progressViewMode {
       case .tile:
-        VStack(spacing: 4) {
+        VStack(alignment: .leading, spacing: 4) {
           Label(subject.category, systemImage: subject.typeEnum.icon)
           if !subject.airtime.date.isEmpty {
             Label(subject.airtime.date, systemImage: "calendar")
@@ -108,6 +108,7 @@ struct ProgressSecondLineView: View {
           .foregroundStyle(.secondary)
           .font(.caption)
           .lineLimit(infoLine)
+          .fixedSize(horizontal: false, vertical: true)
       }
 
     case .metaTag:
