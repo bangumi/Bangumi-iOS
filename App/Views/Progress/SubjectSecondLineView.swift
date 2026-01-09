@@ -1,8 +1,7 @@
 import SwiftUI
 
 struct ProgressSecondLineView: View {
-  @AppStorage("progressSecondLineMode") var progressSecondLineMode: ProgressSecondLineMode =
-    .subtitle
+  @AppStorage("progressSecondLineMode") var secondLineMode: ProgressSecondLineMode = .info
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
   @AppStorage("progressViewMode") var progressViewMode: ProgressViewMode = .tile
 
@@ -27,7 +26,7 @@ struct ProgressSecondLineView: View {
   }
 
   var body: some View {
-    switch progressSecondLineMode {
+    switch secondLineMode {
     case .subtitle:
       if let subtitle = subject.subtitle(with: titlePreference) {
         Text(subtitle)

@@ -7,7 +7,7 @@ struct ChiiProgressView: View {
   @AppStorage("collectionsUpdatedAt") var collectionsUpdatedAt: Int = 0
   @AppStorage("progressViewMode") var progressViewMode: ProgressViewMode = .tile
   @AppStorage("progressLimit") var progressLimit: Int = 50
-  @AppStorage("progressSecondLineMode") var secondLineMode: ProgressSecondLineMode = .subtitle
+  @AppStorage("progressSecondLineMode") var secondLineMode: ProgressSecondLineMode = .info
   @AppStorage("progressTab") var progressTab: SubjectType = .none
 
   @Environment(\.modelContext) var modelContext
