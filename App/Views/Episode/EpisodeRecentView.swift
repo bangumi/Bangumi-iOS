@@ -12,6 +12,8 @@ struct EpisodeRecentView: View {
   @Bindable var subject: Subject
   let mode: EpisodeRecentMode
 
+  @State private var showCollectionBox: Bool = false
+
   @Environment(\.modelContext) var modelContext
 
   @Query private var episodes: [Episode] = []
@@ -85,11 +87,18 @@ struct EpisodeRecentView: View {
             if let episode = nextEpisode {
               EpisodeNextView(episode: episode)
             } else {
-              NavigationLink(value: NavDestination.subject(subject.subjectId)) {
-                Label(progressText, systemImage: progressIcon)
-                  .labelStyle(.compact)
-                  .foregroundStyle(.secondary)
-              }.buttonStyle(.scale)
+              Button {
+                showCollectionBox = true
+              } label: {
+                HStack(spacing: 4) {
+                  Text(progressText)
+                  Image(systemName: progressIcon)
+                }.foregroundStyle(.secondary)
+              }
+              .buttonStyle(.scale)
+              .sheet(isPresented: $showCollectionBox) {
+                SubjectCollectionBoxView(subject: subject)
+              }
             }
           }
         }
@@ -108,16 +117,25 @@ struct EpisodeRecentView: View {
           if let episode = nextEpisode {
             EpisodeNextView(episode: episode)
           } else {
-            NavigationLink(value: NavDestination.subject(subject.subjectId)) {
-              Label(progressText, systemImage: progressIcon)
-                .labelStyle(.compact)
-                .foregroundStyle(.secondary)
-            }.buttonStyle(.scale)
+            Button {
+              showCollectionBox = true
+            } label: {
+              HStack(spacing: 4) {
+                Text(progressText)
+                Image(systemName: progressIcon)
+              }.foregroundStyle(.secondary)
+            }
+            .buttonStyle(.scale)
+            .sheet(isPresented: $showCollectionBox) {
+              SubjectCollectionBoxView(subject: subject)
+            }
           }
         } else {
           NavigationLink(value: NavDestination.subject(subject.subjectId)) {
-            Label(progressText, systemImage: progressIcon)
-              .foregroundStyle(.secondary)
+            HStack(spacing: 4) {
+              Text(progressText)
+              Image(systemName: progressIcon)
+            }.foregroundStyle(.secondary)
           }.buttonStyle(.scale)
         }
       }

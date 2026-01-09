@@ -155,7 +155,9 @@ struct SettingsView: View {
               .font(.caption)
           }
         }
-        Link(destination: URL(string: "https://apps.apple.com/app/id6499502714?action=write-review")!) {
+        Link(
+          destination: URL(string: "https://apps.apple.com/app/id6499502714?action=write-review")!
+        ) {
           HStack {
             Label("评价此应用", systemImage: "star")
             Spacer()

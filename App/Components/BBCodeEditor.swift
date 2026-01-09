@@ -570,8 +570,6 @@ private struct BBCodeTextView: UIViewRepresentable {
   }
 }
 
-
-
 extension String {
   fileprivate func nsRange(from selection: EditorSelection) -> NSRange {
     let utf16Count = utf16.count

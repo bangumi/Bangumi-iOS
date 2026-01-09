@@ -3,11 +3,12 @@ import SwiftData
 import SwiftUI
 
 struct SubjectCollectionBoxView: View {
+  @Bindable var subject: Subject
+
   @AppStorage("autoCompleteProgress") var autoCompleteProgress: Bool = false
 
   @Environment(\.modelContext) var modelContext
   @Environment(\.dismiss) private var dismiss
-  @Bindable var subject: Subject
 
   @State private var ctype: CollectionType = .none
   @State private var rate: Int = 0
@@ -15,7 +16,6 @@ struct SubjectCollectionBoxView: View {
   @State private var priv: Bool = false
   @State private var tags: Set<String> = Set()
   @State private var tagsInput: String = ""
-
   @State private var updating: Bool = false
 
   var recommendedTags: [String] {
