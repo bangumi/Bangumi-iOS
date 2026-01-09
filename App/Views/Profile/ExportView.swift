@@ -1,9 +1,6 @@
-import SwiftData
 import SwiftUI
 
 struct ExportView: View {
-  @Environment(\.modelContext) var modelContext
-
   @State private var selectedFields: Set<ExportableField> = ExportableField.defaultFields
   @State private var subjectType: SubjectType? = nil
   @State private var collectionType: CollectionType? = nil
@@ -11,15 +8,7 @@ struct ExportView: View {
   @State private var isExporting: Bool = false
   @State private var exportURL: URL? = nil
   @State private var showShareSheet: Bool = false
-
-  private var subjectCount: Int {
-    let subjects = ExportManager.fetchSubjects(
-      context: modelContext,
-      subjectType: subjectType,
-      collectionType: collectionType
-    )
-    return subjects.count
-  }
+  @State private var subjectCount: Int = 0
 
   private var showCoverSizePicker: Bool {
     selectedFields.contains(.cover)
@@ -116,29 +105,60 @@ struct ExportView: View {
         ShareSheet(items: [url])
       }
     }
+    .task {
+      refreshCount()
+    }
+    .onChange(of: subjectType) {
+      refreshCount()
+    }
+    .onChange(of: collectionType) {
+      refreshCount()
+    }
+  }
+
+  private func refreshCount() {
+    Task {
+      do {
+        let db = try await Chii.shared.getDB()
+        let count = try await db.countSubjects(
+          subjectType: subjectType,
+          collectionType: collectionType
+        )
+        await MainActor.run {
+          subjectCount = count
+        }
+      } catch {
+        await MainActor.run {
+          subjectCount = 0
+        }
+      }
+    }
   }
 
   private func exportToCSV() {
     isExporting = true
 
     Task {
-      let subjects = ExportManager.fetchSubjects(
-        context: modelContext,
-        subjectType: subjectType,
-        collectionType: collectionType
-      )
-
-      if let url = ExportManager.exportSubjects(
-        subjects: subjects,
-        fields: selectedFields,
-        coverSize: coverSize
-      ) {
-        await MainActor.run {
-          exportURL = url
-          showShareSheet = true
-          isExporting = false
+      do {
+        let db = try await Chii.shared.getDB()
+        if let url = try await db.exportSubjectsToCSV(
+          subjectType: subjectType,
+          collectionType: collectionType,
+          fields: selectedFields,
+          coverSize: coverSize
+        ) {
+          await MainActor.run {
+            exportURL = url
+            showShareSheet = true
+            isExporting = false
+          }
+        } else {
+          await MainActor.run {
+            isExporting = false
+            Notifier.shared.alert(message: "导出失败")
+          }
         }
-      } else {
+      } catch {
         await MainActor.run {
           isExporting = false
           Notifier.shared.alert(message: "导出失败")

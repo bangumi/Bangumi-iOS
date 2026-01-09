@@ -129,6 +129,77 @@ extension DatabaseOperator {
       total: total
     )
   }
+
+  private func makeSubjectDescriptor(
+    subjectType: SubjectType?,
+    collectionType: CollectionType?,
+    sortBy: [SortDescriptor<Subject>] = []
+  ) -> FetchDescriptor<Subject> {
+    if let stype = subjectType, let ctype = collectionType {
+      let stypeRaw = stype.rawValue
+      let ctypeRaw = ctype.rawValue
+      return FetchDescriptor<Subject>(
+        predicate: #Predicate<Subject> {
+          $0.type == stypeRaw && $0.ctype == ctypeRaw
+        },
+        sortBy: sortBy
+      )
+    }
+    if let stype = subjectType {
+      let stypeRaw = stype.rawValue
+      return FetchDescriptor<Subject>(
+        predicate: #Predicate<Subject> {
+          $0.type == stypeRaw && $0.ctype != 0
+        },
+        sortBy: sortBy
+      )
+    }
+    if let ctype = collectionType {
+      let ctypeRaw = ctype.rawValue
+      return FetchDescriptor<Subject>(
+        predicate: #Predicate<Subject> {
+          $0.ctype == ctypeRaw
+        },
+        sortBy: sortBy
+      )
+    }
+    return FetchDescriptor<Subject>(
+      predicate: #Predicate<Subject> {
+        $0.ctype != 0
+      },
+      sortBy: sortBy
+    )
+  }
+
+  public func countSubjects(
+    subjectType: SubjectType?,
+    collectionType: CollectionType?
+  ) throws -> Int {
+    let descriptor = makeSubjectDescriptor(
+      subjectType: subjectType,
+      collectionType: collectionType
+    )
+    return try modelContext.fetchCount(descriptor)
+  }
+
+  public func exportSubjectsToCSV(
+    subjectType: SubjectType?,
+    collectionType: CollectionType?,
+    fields: Set<ExportableField>,
+    coverSize: CoverExportSize = .r400
+  ) throws -> URL? {
+    let descriptor = makeSubjectDescriptor(
+      subjectType: subjectType,
+      collectionType: collectionType,
+      sortBy: [SortDescriptor(\.collectedAt, order: .reverse)]
+    )
+    let subjects = try modelContext.fetch(descriptor)
+    return ExportManager.exportSubjects(
+      subjects: subjects,
+      fields: fields,
+      coverSize: coverSize
+    )
+  }
 }
 
 // MARK: - update user collection
