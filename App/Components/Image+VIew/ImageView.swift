@@ -38,6 +38,7 @@ struct ImageView: View {
             .scaledToFill()
             .frame(width: style.width, height: style.height, alignment: style.alignment)
             .clipShape(clipShape)
+            .shadow(radius: 2)
         } else {
           KFImage(imageURL)
             .fade(duration: 0.25)
@@ -45,6 +46,7 @@ struct ImageView: View {
             .scaledToFit()
             .frame(width: style.width, height: style.height, alignment: style.alignment)
             .clipShape(clipShape)
+            .shadow(radius: 2)
         }
       } else {
         if style.width != nil, style.height != nil {

@@ -59,10 +59,45 @@ struct GroupDetailView: View {
   @AppStorage("shareDomain") var shareDomain: ShareDomain = .chii
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
 
+  @Environment(\.modelContext) private var modelContext
+
+  @Query(filter: #Predicate<RakuenGroupCache> { $0.id == "pin" })
+  private var pinCaches: [RakuenGroupCache]
+
   @State private var showCreateTopic: Bool = false
+
+  private var pinCache: RakuenGroupCache? {
+    pinCaches.first
+  }
+
+  private var isPinned: Bool {
+    pinCache?.items.contains { $0.id == group.groupId } ?? false
+  }
 
   var shareLink: URL {
     URL(string: "\(shareDomain.url)/group/\(group.name)")!
+  }
+
+  private func togglePin() {
+    if isPinned {
+      // Unpin
+      if let cache = pinCache {
+        cache.items.removeAll { $0.id == group.groupId }
+        cache.updatedAt = Date()
+        try? modelContext.save()
+      }
+    } else {
+      // Pin
+      let slimGroup = group.slim
+      if let cache = pinCache {
+        cache.items.insert(slimGroup, at: 0)
+        cache.updatedAt = Date()
+      } else {
+        let cache = RakuenGroupCache(id: "pin", items: [slimGroup])
+        modelContext.insert(cache)
+      }
+      try? modelContext.save()
+    }
   }
 
   func joinGroup() {
@@ -181,6 +216,15 @@ struct GroupDetailView: View {
             }.disabled(true)
           }
           Divider()
+          Button {
+            togglePin()
+          } label: {
+            if isPinned {
+              Label("取消置顶", systemImage: "pin.slash")
+            } else {
+              Label("置顶到首页", systemImage: "pin")
+            }
+          }
           ShareLink(item: shareLink) {
             Label("分享", systemImage: "square.and.arrow.up")
           }

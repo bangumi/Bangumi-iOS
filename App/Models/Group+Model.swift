@@ -37,6 +37,20 @@ final class GroupV2: Linkable {
     return "chii://group/\(name)"
   }
 
+  var slim: SlimGroupDTO {
+    SlimGroupDTO(
+      id: groupId,
+      name: name,
+      nsfw: nsfw,
+      title: title,
+      icon: icon,
+      creatorID: creatorID,
+      members: members,
+      createdAt: createdAt,
+      accessible: accessible
+    )
+  }
+
   var memberRole: GroupMemberRole {
     return GroupMemberRole(rawValue: role) ?? .guest
   }

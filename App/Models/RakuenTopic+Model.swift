@@ -36,17 +36,18 @@ final class RakuenGroupTopicCacheV1 {
   }
 }
 
-typealias HotGroupCache = HotGroupCacheV1
+typealias RakuenGroupCache = RakuenGroupCacheV1
 
 @Model
-final class HotGroupCacheV1 {
+final class RakuenGroupCacheV1 {
   @Attribute(.unique)
-  var id: String = "hot_groups"
+  var id: String
 
   var items: [SlimGroupDTO]
   var updatedAt: Date
 
-  init(items: [SlimGroupDTO]) {
+  init(id: String, items: [SlimGroupDTO]) {
+    self.id = id
     self.items = items
     self.updatedAt = Date()
   }
