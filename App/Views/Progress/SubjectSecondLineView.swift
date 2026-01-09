@@ -17,6 +17,15 @@ struct ProgressSecondLineView: View {
     }
   }
 
+  var infoLine: Int {
+    switch progressViewMode {
+    case .tile:
+      return 2
+    case .list:
+      return 1
+    }
+  }
+
   var body: some View {
     switch progressSecondLineMode {
     case .subtitle:
@@ -26,10 +35,38 @@ struct ProgressSecondLineView: View {
           .font(.footnote)
           .lineLimit(1)
       }
+
     case .category:
-      Text(subject.category)
+      switch progressViewMode {
+      case .tile:
+        VStack(spacing: 4) {
+          Label(subject.category, systemImage: subject.typeEnum.icon)
+          if !subject.airtime.date.isEmpty {
+            Label(subject.airtime.date, systemImage: "calendar")
+              .font(.caption)
+              .foregroundStyle(.secondary)
+              .lineLimit(1)
+          }
+        }
+        .labelStyle(.compact)
+        .font(.caption)
         .foregroundStyle(.secondary)
-        .font(.footnote)
+      case .list:
+        HStack(spacing: 4) {
+          Label(subject.category, systemImage: subject.typeEnum.icon)
+          if !subject.airtime.date.isEmpty {
+            Label(subject.airtime.date, systemImage: "calendar")
+              .font(.caption)
+              .foregroundStyle(.secondary)
+              .lineLimit(1)
+          }
+          Spacer()
+        }
+        .labelStyle(.compact)
+        .font(.caption)
+        .foregroundStyle(.secondary)
+      }
+
     case .watching:
       let doing = subject.collection.doing
       let collect = subject.collection.collect
@@ -38,6 +75,7 @@ struct ProgressSecondLineView: View {
           .foregroundStyle(.secondary)
           .font(.footnote)
       }
+
     case .ratingRank:
       let rank = subject.rating.rank
       let score = subject.rating.score
@@ -63,19 +101,15 @@ struct ProgressSecondLineView: View {
           }
         }
       }
-    case .airTime:
-      if !subject.airtime.date.isEmpty {
-        Text(subject.airtime.date)
-          .foregroundStyle(.secondary)
-          .font(.footnote)
-      }
+
     case .info:
       if !subject.info.isEmpty {
         Text(subject.info)
           .foregroundStyle(.secondary)
           .font(.caption)
-          .lineLimit(2)
+          .lineLimit(infoLine)
       }
+
     case .metaTag:
       let tags = subject.metaTags.prefix(tagsCount)
       if !tags.isEmpty {

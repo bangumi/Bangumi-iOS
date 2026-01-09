@@ -148,7 +148,7 @@ struct ProgressTileItemView: View {
         default:
           ProgressView(value: 0, total: 0).progressViewStyle(.linear)
         }
-      }.frame(height: 120)
+      }.frame(height: 128)
     }
   }
 }

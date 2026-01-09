@@ -209,7 +209,6 @@ enum ProgressSecondLineMode: String, CaseIterable {
   case category = "category"
   case watching = "watching"
   case ratingRank = "ratingRank"
-  case airTime = "airTime"
   case info = "info"
   case metaTag = "metaTag"
 
@@ -223,8 +222,6 @@ enum ProgressSecondLineMode: String, CaseIterable {
       self = .watching
     case "ratingRank":
       self = .ratingRank
-    case "airTime":
-      self = .airTime
     case "info":
       self = .info
     case "metaTag":
@@ -244,8 +241,6 @@ enum ProgressSecondLineMode: String, CaseIterable {
       "关注人数"
     case .ratingRank:
       "评分排名"
-    case .airTime:
-      "放送时间"
     case .info:
       "制作信息"
     case .metaTag:
@@ -263,8 +258,6 @@ enum ProgressSecondLineMode: String, CaseIterable {
       "eyes"
     case .ratingRank:
       "chart.bar.xaxis"
-    case .airTime:
-      "calendar"
     case .info:
       "info.circle"
     case .metaTag:
