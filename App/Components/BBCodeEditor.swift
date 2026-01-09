@@ -530,6 +530,8 @@ private struct BBCodeTextView: UIViewRepresentable {
     var updatingSelection = false
     /// Tracks the last text value we pushed to the binding, so we can detect external changes
     var lastPushedText: String = ""
+    /// Suppresses the next selection update after textViewDidChange to prevent race conditions
+    var suppressNextSelectionUpdate = false
     weak var textView: CursorTrailTextView?
 
     init(text: Binding<String>, selection: Binding<EditorSelection?>) {
@@ -542,6 +544,8 @@ private struct BBCodeTextView: UIViewRepresentable {
       guard !updatingText else { return }
       let newText = textView.text ?? ""
       let range = textView.selectedRange
+      // Suppress next selection update to prevent cursor position being overwritten
+      suppressNextSelectionUpdate = true
       // Update synchronously to prevent race conditions with updateUIView
       lastPushedText = newText
       text.wrappedValue = newText
@@ -551,13 +555,16 @@ private struct BBCodeTextView: UIViewRepresentable {
     func textViewDidChangeSelection(_ textView: UITextView) {
       guard !updatingSelection, !updatingText else { return }
       guard textView.markedTextRange == nil else { return }
+      // Skip if textViewDidChange already updated the selection
+      if suppressNextSelectionUpdate {
+        suppressNextSelectionUpdate = false
+        return
+      }
       let range = textView.selectedRange
       if let trailTextView = textView as? CursorTrailTextView {
         trailTextView.handleCursorMove()
       }
-      DispatchQueue.main.async {
-        self.selection.wrappedValue = EditorSelection(nsRange: range)
-      }
+      selection.wrappedValue = EditorSelection(nsRange: range)
     }
   }
 }
