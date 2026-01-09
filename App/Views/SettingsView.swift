@@ -155,6 +155,15 @@ struct SettingsView: View {
               .font(.caption)
           }
         }
+        Link(destination: URL(string: "https://apps.apple.com/app/id6499502714?action=write-review")!) {
+          HStack {
+            Label("评价此应用", systemImage: "star")
+            Spacer()
+            Image(systemName: "arrow.up.right.square")
+              .foregroundColor(.secondary)
+              .font(.caption)
+          }
+        }
         Link(destination: URL(string: "https://discord.gg/nZPTwzXxAX")!) {
           HStack {
             Label("问题反馈", systemImage: "exclamationmark.bubble")
