@@ -1,3 +1,4 @@
+import OSLog
 import SwiftData
 import SwiftUI
 
@@ -41,23 +42,13 @@ struct HotGroupsView: View {
   }
 
   private func togglePin(_ group: SlimGroupDTO) {
-    if isPinned(group) {
-      // Unpin
-      if let cache = pinCache {
-        cache.items.removeAll { $0.id == group.id }
-        cache.updatedAt = Date()
-        try? modelContext.save()
+    Task {
+      do {
+        let db = try await Chii.shared.getDB()
+        try await db.togglePinRakuenGroupCache(group: group)
+      } catch {
+        Logger.app.error("Failed to toggle pin: \(error)")
       }
-    } else {
-      // Pin
-      if let cache = pinCache {
-        cache.items.insert(group, at: 0)
-        cache.updatedAt = Date()
-      } else {
-        let cache = RakuenGroupCache(id: "pin", items: [group])
-        modelContext.insert(cache)
-      }
-      try? modelContext.save()
     }
   }
 
@@ -71,14 +62,9 @@ struct HotGroupsView: View {
       hotItems.shuffle()
 
       // Save to hot cache
-      if let existing = hotCache {
-        existing.items = hotItems
-        existing.updatedAt = Date()
-      } else {
-        let cache = RakuenGroupCache(id: "hot", items: hotItems)
-        modelContext.insert(cache)
+      if let db = try? await Chii.shared.getDB() {
+        try await db.saveRakuenGroupCache(id: "hot", items: hotItems)
       }
-      try? modelContext.save()
     } catch {
       Notifier.shared.alert(error: error)
     }

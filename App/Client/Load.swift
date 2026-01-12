@@ -8,7 +8,7 @@ extension Chii {
     let db = try self.getDB()
     let item = try await self.getUser(username)
     try await db.saveUser(item)
-    try await db.commit()
+    await db.commit()
     return item
   }
 
@@ -22,7 +22,7 @@ extension Chii {
       }
       try await db.saveCalendarItem(weekday: weekday, items: items)
     }
-    try await db.commit()
+    await db.commit()
   }
 
   func loadTrendingSubjects() async throws {
@@ -30,7 +30,7 @@ extension Chii {
     for type in SubjectType.allTypes {
       let response = try await self.getTrendingSubjects(type: type)
       try await db.saveTrendingSubjects(type: type.rawValue, items: response.data)
-      try await db.commit()
+      await db.commit()
     }
   }
 
@@ -50,7 +50,7 @@ extension Chii {
     if item.interest != nil {
       await self.index([item.searchable()])
     }
-    try await db.commit()
+    await db.commit()
     return item
   }
 
@@ -95,7 +95,7 @@ extension Chii {
     try await db.saveSubjectRecs(subjectId: subjectId, items: recsVal.data)
     try await db.saveSubjectIndexes(subjectId: subjectId, items: indexesVal.data)
 
-    try await db.commit()
+    await db.commit()
   }
 
   func loadSubjectPositions(_ subjectId: Int) async throws {
@@ -116,7 +116,7 @@ extension Chii {
       }
     }
     try await db.saveSubjectPositions(subjectId: subjectId, items: items)
-    try await db.commit()
+    await db.commit()
   }
 
   func loadEpisodes(_ subjectId: Int) async throws {
@@ -143,20 +143,20 @@ extension Chii {
     for item in items {
       try await db.saveEpisode(item)
     }
-    try await db.commit()
+    await db.commit()
   }
 
   func loadEpisode(_ episodeId: Int) async throws {
     let db = try self.getDB()
     let item = try await self.getEpisode(episodeId)
     try await db.saveEpisode(item)
-    try await db.commit()
+    await db.commit()
   }
 
   func deleteEpisode(_ episodeId: Int) async throws {
     let db = try self.getDB()
     try await db.deleteEpisode(episodeId)
-    try await db.commit()
+    await db.commit()
   }
 }
 
@@ -172,7 +172,7 @@ extension Chii {
     if item.collectedAt != nil {
       await self.index([item.searchable()])
     }
-    try await db.commit()
+    await db.commit()
   }
 
   func loadCharacterDetails(_ characterId: Int) async throws {
@@ -184,7 +184,7 @@ extension Chii {
 
     try await db.saveCharacterCasts(characterId: characterId, items: castsVal.data)
     try await db.saveCharacterIndexes(characterId: characterId, items: indexesVal.data)
-    try await db.commit()
+    await db.commit()
   }
 
   func loadPerson(_ pid: Int) async throws {
@@ -198,7 +198,7 @@ extension Chii {
     if item.collectedAt != nil {
       await self.index([item.searchable()])
     }
-    try await db.commit()
+    await db.commit()
   }
 
   func loadPersonDetails(_ personId: Int) async throws {
@@ -212,7 +212,7 @@ extension Chii {
     try await db.savePersonCasts(personId: personId, items: castsVal.data)
     try await db.savePersonWorks(personId: personId, items: worksVal.data)
     try await db.savePersonIndexes(personId: personId, items: indexesVal.data)
-    try await db.commit()
+    await db.commit()
   }
 }
 
@@ -221,7 +221,7 @@ extension Chii {
     let db = try self.getDB()
     let item = try await self.getGroup(name)
     try await db.saveGroup(item)
-    try await db.commit()
+    await db.commit()
   }
 
   func loadGroupDetails(_ name: String) async throws {
@@ -237,6 +237,6 @@ extension Chii {
     try await db.saveGroupModerators(groupName: name, items: moderatorsVal.data)
     try await db.saveGroupRecentTopics(groupName: name, items: topicsVal.data)
 
-    try await db.commit()
+    await db.commit()
   }
 }

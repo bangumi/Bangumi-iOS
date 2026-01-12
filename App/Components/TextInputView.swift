@@ -1,4 +1,5 @@
 import BBCode
+import OSLog
 import SwiftData
 import SwiftUI
 
@@ -42,7 +43,7 @@ struct TextInputView: View {
   @FocusState private var isEditing: Bool
   @State private var showingBBCodeMenu = false
   @State private var showingDrafts = false
-  @State private var currentDraft: Draft?
+  @State private var currentDraftID: PersistentIdentifier?
 
   init(type: String, text: Binding<String>) {
     self.type = type
@@ -62,17 +63,21 @@ struct TextInputView: View {
   }
 
   private func saveDraft() {
-    if let draft = currentDraft {
-      draft.update(content: text)
-    } else {
-      let newDraft = Draft(type: type, content: text)
-      modelContext.insert(newDraft)
-      currentDraft = newDraft
+    Task {
+      do {
+        let db = try await Chii.shared.getDB()
+        let id = try await db.saveDraft(type: type, content: text, id: currentDraftID)
+        await MainActor.run {
+          self.currentDraftID = id
+        }
+      } catch {
+        Logger.app.error("Failed to save draft: \(error)")
+      }
     }
   }
 
   private func loadDraft(_ draft: Draft) {
-    currentDraft = draft
+    currentDraftID = draft.persistentModelID
     text = draft.content
     showingDrafts = false
   }
@@ -93,7 +98,7 @@ struct TextInputView: View {
         }
         .sheet(isPresented: $showingDrafts) {
           DraftBoxView(
-            current: currentDraft,
+            currentID: currentDraftID,
             drafts: drafts,
             onLoad: loadDraft,
             isPresented: $showingDrafts
@@ -146,7 +151,7 @@ private struct PlainTextEditor: View {
 }
 
 private struct DraftBoxView: View {
-  let current: Draft?
+  let currentID: PersistentIdentifier?
   let drafts: [Draft]
   let onLoad: (Draft) -> Void
   @Binding var isPresented: Bool
@@ -157,7 +162,7 @@ private struct DraftBoxView: View {
     NavigationStack {
       List {
         ForEach(drafts) { draft in
-          if draft == current {
+          if draft.persistentModelID == currentID {
             VStack(alignment: .leading, spacing: 4) {
               Text(draft.content)
                 .lineLimit(3)
@@ -182,8 +187,10 @@ private struct DraftBoxView: View {
             }
             .swipeActions {
               Button(role: .destructive) {
-                withAnimation {
-                  modelContext.delete(draft)
+                Task {
+                  if let db = try? await Chii.shared.getDB() {
+                    await db.deleteDraft(draft)
+                  }
                 }
               } label: {
                 Label("删除", systemImage: "trash")

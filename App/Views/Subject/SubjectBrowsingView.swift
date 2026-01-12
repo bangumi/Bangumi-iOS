@@ -47,7 +47,7 @@ struct SubjectBrowsingView: View {
       for item in resp.data {
         try await db.saveSubject(item)
       }
-      try await db.commit()
+      await db.commit()
       return resp
     } catch {
       Notifier.shared.alert(error: error)

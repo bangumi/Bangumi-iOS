@@ -146,17 +146,9 @@ struct CachedSubjectTopicListView: View {
         exhausted = resp.data.count == 0 || offset >= resp.total
 
         // Save to cache
-        let descriptor = FetchDescriptor<RakuenSubjectTopicCache>(
-          predicate: #Predicate { $0.mode == mode.rawValue }
-        )
-        if let existing = try? modelContext.fetch(descriptor).first {
-          existing.items = resp.data
-          existing.updatedAt = Date()
-        } else {
-          let cache = RakuenSubjectTopicCache(mode: mode.rawValue, items: resp.data)
-          modelContext.insert(cache)
+        if let db = try? await Chii.shared.getDB() {
+          try await db.saveRakuenSubjectTopicCache(mode: mode.rawValue, items: resp.data)
         }
-        try? modelContext.save()
       }
     } catch {
       Notifier.shared.alert(error: error)

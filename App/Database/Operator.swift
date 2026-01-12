@@ -4,11 +4,27 @@ import SwiftData
 
 @ModelActor
 actor DatabaseOperator {
+  private var pendingCommitTask: Task<Void, Never>?
 }
 
 // MARK: - basic
 extension DatabaseOperator {
-  public func commit() throws {
+  public func commit() {
+    pendingCommitTask?.cancel()
+    pendingCommitTask = Task {
+      try? await Task.sleep(for: .milliseconds(500))
+      guard !Task.isCancelled else { return }
+      do {
+        try modelContext.save()
+      } catch {
+        Logger.app.error("Failed to commit: \(error)")
+      }
+    }
+  }
+
+  public func commitImmediately() throws {
+    pendingCommitTask?.cancel()
+    pendingCommitTask = nil
     try modelContext.save()
   }
 
@@ -296,7 +312,7 @@ extension DatabaseOperator {
       break
     }
 
-    try self.commit()
+    self.commit()
   }
 
   public func updateSubjectCollection(
@@ -356,7 +372,7 @@ extension DatabaseOperator {
     }
     subject.interest?.updatedAt = now - 1
     subject.collectedAt = now - 1
-    try self.commit()
+    self.commit()
   }
 
   public func updateEpisodeCollection(
@@ -392,7 +408,7 @@ extension DatabaseOperator {
     }
     episode.subject?.interest?.updatedAt = now - 1
     episode.subject?.collectedAt = now - 1
-    try self.commit()
+    self.commit()
   }
 
   public func updateCharacterCollection(characterId: Int, collectedAt: Int) throws {
@@ -405,7 +421,7 @@ extension DatabaseOperator {
       return
     }
     character.collectedAt = collectedAt
-    try self.commit()
+    self.commit()
   }
 
   public func updatePersonCollection(personId: Int, collectedAt: Int) throws {
@@ -418,7 +434,7 @@ extension DatabaseOperator {
       return
     }
     person.collectedAt = collectedAt
-    try self.commit()
+    self.commit()
   }
 }
 
@@ -807,6 +823,110 @@ extension DatabaseOperator {
     let group = try self.getGroup(groupName)
     if group?.recentTopics != items {
       group?.recentTopics = items
+    }
+  }
+}
+
+// MARK: - Draft & Cache
+extension DatabaseOperator {
+  public func saveDraft(type: String, content: String, id: PersistentIdentifier? = nil) throws
+    -> PersistentIdentifier
+  {
+    if let id = id, let draft = modelContext.model(for: id) as? Draft {
+      draft.update(content: content)
+      self.commit()
+      return id
+    }
+
+    let fetched = try self.fetchOne(
+      predicate: #Predicate<Draft> {
+        $0.type == type && $0.content == content
+      })
+    if let draft = fetched {
+      return draft.id
+    }
+
+    let draft = Draft(type: type, content: content)
+    modelContext.insert(draft)
+    self.commit()
+    return draft.persistentModelID
+  }
+
+  public func deleteDraft(_ draft: Draft) {
+    modelContext.delete(draft)
+    self.commit()
+  }
+
+  public func clearDrafts() throws {
+    try modelContext.delete(model: Draft.self)
+    self.commit()
+  }
+
+  public func saveRakuenSubjectTopicCache(mode: String, items: [SubjectTopicDTO]) throws {
+    let fetched = try self.fetchOne(
+      predicate: #Predicate<RakuenSubjectTopicCache> { $0.mode == mode }
+    )
+    if let cache = fetched {
+      cache.items = items
+      cache.updatedAt = Date()
+    } else {
+      let cache = RakuenSubjectTopicCache(mode: mode, items: items)
+      modelContext.insert(cache)
+    }
+    self.commit()
+  }
+
+  public func saveRakuenGroupTopicCache(mode: String, items: [GroupTopicDTO]) throws {
+    let fetched = try self.fetchOne(
+      predicate: #Predicate<RakuenGroupTopicCache> { $0.mode == mode }
+    )
+    if let cache = fetched {
+      cache.items = items
+      cache.updatedAt = Date()
+    } else {
+      let cache = RakuenGroupTopicCache(mode: mode, items: items)
+      modelContext.insert(cache)
+    }
+    self.commit()
+  }
+
+  public func saveRakuenGroupCache(id: String, items: [SlimGroupDTO]) throws {
+    let fetched = try self.fetchOne(
+      predicate: #Predicate<RakuenGroupCache> { $0.id == id }
+    )
+    if let cache = fetched {
+      cache.items = items
+      cache.updatedAt = Date()
+    } else {
+      let cache = RakuenGroupCache(id: id, items: items)
+      modelContext.insert(cache)
+    }
+    self.commit()
+  }
+
+  public func togglePinRakuenGroupCache(group: SlimGroupDTO) throws {
+    let fetched = try self.fetchOne(
+      predicate: #Predicate<RakuenGroupCache> { $0.id == "pin" }
+    )
+    if let cache = fetched {
+      if cache.items.contains(where: { $0.id == group.id }) {
+        cache.items.removeAll { $0.id == group.id }
+      } else {
+        cache.items.insert(group, at: 0)
+      }
+      cache.updatedAt = Date()
+    } else {
+      let cache = RakuenGroupCache(id: "pin", items: [group])
+      modelContext.insert(cache)
+    }
+    self.commit()
+  }
+
+  public func updateGroupJoinStatus(name: String, joinedAt: Int) throws {
+    let group = try self.getGroup(name)
+    if let group = group {
+      group.joinedAt = joinedAt
+      self.commit()
     }
   }
 }
