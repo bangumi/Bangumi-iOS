@@ -57,12 +57,12 @@ struct ChiiProgressView: View {
       let count = try await refreshCollections(since: collectionsUpdatedAt)
       if count > 0 {
         Notifier.shared.notify(message: "更新了 \(count) 条收藏")
+        await updateSubjectIds()
+        await loadCounts()
       } else {
         Notifier.shared.notify(message: "没有收藏更新")
       }
       collectionsUpdatedAt = Int(now.timeIntervalSince1970)
-      await updateSubjectIds()
-      await loadCounts()
     } catch {
       Notifier.shared.notify(message: "更新失败: \(error)")
       Notifier.shared.alert(error: error)
@@ -170,8 +170,8 @@ struct ChiiProgressView: View {
       .task {
         guard subjectIds.isEmpty else { return }
         refreshing = true
-        await loadCounts()
         await updateSubjectIds()
+        await loadCounts()
         await refresh()
       }
       .searchable(
