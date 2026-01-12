@@ -17,7 +17,7 @@ struct MainApp: App {
       Subject.self,
       Character.self,
       Person.self,
-      Group.self,
+      ChiiGroup.self,
       Draft.self,
       RakuenSubjectTopicCache.self,
       RakuenGroupTopicCache.self,

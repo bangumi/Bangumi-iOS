@@ -107,7 +107,6 @@ struct ProgressSecondLineView: View {
           .foregroundStyle(.secondary)
           .font(.caption)
           .lineLimit(infoLine)
-          .fixedSize(horizontal: false, vertical: true)
       }
 
     case .metaTag:

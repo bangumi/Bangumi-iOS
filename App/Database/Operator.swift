@@ -95,9 +95,9 @@ extension DatabaseOperator {
     return person
   }
 
-  public func getGroup(_ name: String) throws -> Group? {
+  public func getGroup(_ name: String) throws -> ChiiGroup? {
     let group = try self.fetchOne(
-      predicate: #Predicate<Group> {
+      predicate: #Predicate<ChiiGroup> {
         $0.name == name
       }
     )
@@ -558,17 +558,17 @@ extension DatabaseOperator {
     return person
   }
 
-  public func ensureGroup(_ item: GroupDTO) throws -> Group {
+  public func ensureGroup(_ item: GroupDTO) throws -> ChiiGroup {
     let gid = item.id
     let fetched = try self.fetchOne(
-      predicate: #Predicate<Group> {
+      predicate: #Predicate<ChiiGroup> {
         $0.groupId == gid
       })
     if let group = fetched {
       group.update(item)
       return group
     }
-    let group = Group(item)
+    let group = ChiiGroup(item)
     modelContext.insert(group)
     return group
   }

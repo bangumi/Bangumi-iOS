@@ -1,73 +1,46 @@
-import OSLog
 import SwiftData
 import SwiftUI
 
 struct ProgressListView: View {
-  let subjectType: SubjectType
-  let search: String
-
-  @AppStorage("progressLimit") var progressLimit: Int = 50
-  @AppStorage("progressSortMode") var progressSortMode: ProgressSortMode = .collectedAt
-
-  @Environment(\.modelContext) var modelContext
-
-  @Query var subjects: [Subject]
-
-  init(subjectType: SubjectType, search: String) {
-    self.subjectType = subjectType
-    self.search = search
-
-    let stype = subjectType.rawValue
-    let doingType = CollectionType.doing.rawValue
-    var descriptor = FetchDescriptor<Subject>(
-      predicate: #Predicate<Subject> {
-        (stype == 0 || $0.type == stype) && $0.ctype == doingType
-          && (search == "" || $0.name.localizedStandardContains(search)
-            || $0.alias.localizedStandardContains(search))
-      },
-      sortBy: [
-        SortDescriptor(\.collectedAt, order: .reverse)
-      ])
-    if progressLimit > 0 {
-      descriptor.fetchLimit = progressLimit
-    }
-    self._subjects = Query(descriptor)
-  }
-
-  var sortedSubjects: [Subject] {
-    switch progressSortMode {
-    case .airTime:
-      return subjects.sorted { subject1, subject2 in
-        let days1 = subject1.nextEpisodeDays(context: modelContext)
-        let days2 = subject2.nextEpisodeDays(context: modelContext)
-        return Subject.compareDays(days1, days2, subject1, subject2)
-      }
-    case .collectedAt:
-      return subjects
-    }
-  }
+  let subjectIds: [Int]
 
   var body: some View {
     LazyVStack(alignment: .leading) {
-      ForEach(sortedSubjects) { subject in
+      ForEach(subjectIds, id: \.self) { subjectId in
         CardView {
-          ProgressListItemView(subject: subject, subjectId: subject.subjectId)
+          ProgressListItemView(subjectId: subjectId)
         }
       }
     }
+    .animation(.default, value: subjectIds)
     .padding(.horizontal, 8)
-    .animation(.default, value: sortedSubjects.map(\.subjectId))
-    .animation(.default, value: progressSortMode)
   }
 }
 
 struct ProgressListItemView: View {
-  @Bindable var subject: Subject
   let subjectId: Int
+
+  @Query var subjects: [Subject]
+
+  init(subjectId: Int) {
+    self.subjectId = subjectId
+    self._subjects = Query(filter: #Predicate<Subject> { $0.subjectId == subjectId })
+  }
+
+  var body: some View {
+    if let subject = subjects.first {
+      ProgressListItemContentView(subject: subject)
+    }
+  }
+}
+
+struct ProgressListItemContentView: View {
+  @Bindable var subject: Subject
 
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
 
   var body: some View {
+    let subjectId = subject.subjectId
     VStack(alignment: .leading, spacing: 4) {
       HStack {
         ImageView(img: subject.images?.resize(.r200))
@@ -147,7 +120,7 @@ struct ProgressListItemView: View {
 
   return ScrollView {
     LazyVStack(alignment: .leading) {
-      ProgressListItemView(subject: subject, subjectId: subject.subjectId)
+      ProgressListItemView(subjectId: subject.subjectId)
         .modelContainer(container)
     }.padding()
   }

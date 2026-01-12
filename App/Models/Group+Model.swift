@@ -3,7 +3,7 @@ import OSLog
 import SwiftData
 import SwiftUI
 
-typealias Group = GroupV2
+typealias ChiiGroup = GroupV2
 
 @Model
 final class GroupV2: Linkable {

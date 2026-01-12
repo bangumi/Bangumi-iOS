@@ -234,7 +234,7 @@ enum ProgressSecondLineMode: String, CaseIterable {
   var desc: String {
     switch self {
     case .subtitle:
-      "副标题"
+      "别名"
     case .category:
       "分类信息"
     case .watching:

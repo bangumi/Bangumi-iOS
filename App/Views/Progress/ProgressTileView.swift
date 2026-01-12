@@ -2,111 +2,67 @@ import SwiftData
 import SwiftUI
 
 struct ProgressTileView: View {
-  let subjectType: SubjectType
-  let search: String
-  let width: CGFloat
-
-  @AppStorage("progressLimit") var progressLimit: Int = 50
-  @AppStorage("progressSortMode") var progressSortMode: ProgressSortMode = .collectedAt
-
-  @Environment(\.modelContext) var modelContext
-
-  @Query var subjects: [Subject]
-
-  init(subjectType: SubjectType, search: String, width: CGFloat) {
-    self.subjectType = subjectType
-    self.search = search
-    self.width = width
-
-    let stype = subjectType.rawValue
-    let doingType = CollectionType.doing.rawValue
-    var descriptor = FetchDescriptor<Subject>(
-      predicate: #Predicate<Subject> {
-        (stype == 0 || $0.type == stype) && $0.ctype == doingType
-          && (search == "" || $0.name.localizedStandardContains(search)
-            || $0.alias.localizedStandardContains(search))
-      },
-      sortBy: [
-        SortDescriptor(\.collectedAt, order: .reverse)
-      ])
-    if progressLimit > 0 {
-      descriptor.fetchLimit = progressLimit
-    }
-    self._subjects = Query(descriptor)
-  }
-
-  var cols: Int {
-    let cols = Int((width - 8) / (150 + 24))
-    return max(cols, 1)
-  }
-
-  var cardWidth: CGFloat {
-    let cols = CGFloat(self.cols)
-    let cw = (width - 8) / cols - 24
-    return max(cw, 150)
-  }
-
-  var columns: [GridItem] {
-    Array(repeating: .init(.flexible()), count: cols)
-  }
-
-  var sortedSubjects: [Subject] {
-    switch progressSortMode {
-    case .airTime:
-      return subjects.sorted { subject1, subject2 in
-        let days1 = subject1.nextEpisodeDays(context: modelContext)
-        let days2 = subject2.nextEpisodeDays(context: modelContext)
-        return Subject.compareDays(days1, days2, subject1, subject2)
-      }
-    case .collectedAt:
-      return subjects
-    }
-  }
+  let subjectIds: [Int]
 
   var body: some View {
-    LazyVGrid(columns: columns) {
-      ForEach(sortedSubjects) { subject in
+    LazyVGrid(columns: [GridItem(.adaptive(minimum: 150))]) {
+      ForEach(subjectIds, id: \.self) { subjectId in
         CardView(padding: 8) {
-          ProgressTileItemView(subject: subject, subjectId: subject.subjectId, width: cardWidth)
-            .frame(width: cardWidth)
-        }.frame(width: cardWidth + 16)
+          ProgressTileItemView(subjectId: subjectId)
+        }
       }
     }
-    .animation(.default, value: sortedSubjects.map(\.subjectId))
-    .animation(.default, value: progressSortMode)
+    .animation(.default, value: subjectIds)
     .padding(.horizontal, 8)
-    .frame(width: width)
   }
 }
 
 struct ProgressTileItemView: View {
-  @Bindable var subject: Subject
   let subjectId: Int
-  let width: CGFloat
+
+  @Query var subjects: [Subject]
+
+  init(subjectId: Int) {
+    self.subjectId = subjectId
+    self._subjects = Query(filter: #Predicate<Subject> { $0.subjectId == subjectId })
+  }
+
+  var body: some View {
+    if let subject = subjects.first {
+      ProgressTileItemContentView(subject: subject)
+    }
+  }
+}
+
+struct ProgressTileItemContentView: View {
+  @Bindable var subject: Subject
 
   @AppStorage("subjectImageQuality") var subjectImageQuality: ImageQuality = .high
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
 
   @Environment(\.modelContext) var modelContext
 
-  var imageHeight: CGFloat {
-    subject.typeEnum.coverHeight(for: width)
-  }
-
   var body: some View {
+    let subjectId = subject.subjectId
     VStack(alignment: .leading, spacing: 4) {
-      ImageView(img: subject.images?.resize(subjectImageQuality.mediumSize))
-        .imageStyle(width: width, height: imageHeight)
-        .imageType(.subject)
-        .imageBadge(show: subject.interest?.private ?? false) {
-          Image(systemName: "lock")
-        }
-        .imageNavLink(subject.link)
+      Color.clear
+        .aspectRatio(0.707, contentMode: .fit)
+        .overlay(
+          ImageView(img: subject.images?.resize(subjectImageQuality.mediumSize))
+            .imageType(.subject)
+            .imageBadge(show: subject.interest?.private ?? false) {
+              Image(systemName: "lock")
+            }
+            .imageNavLink(subject.link)
+        )
 
       VStack(alignment: .leading, spacing: 4) {
         VStack(alignment: .leading, spacing: 4) {
           NavigationLink(value: NavDestination.subject(subjectId)) {
-            Text(subject.title(with: titlePreference)).font(.headline)
+            Text(subject.title(with: titlePreference))
+              .font(.headline)
+              .lineLimit(2)
+              .fixedSize(horizontal: false, vertical: true)
           }.buttonStyle(.scale)
 
           ProgressSecondLineView(subject: subject)
@@ -166,7 +122,7 @@ struct ProgressTileItemView: View {
   return ScrollView {
     LazyVStack(alignment: .leading) {
       CardView(padding: 8) {
-        ProgressTileItemView(subject: subject, subjectId: subject.subjectId, width: 320)
+        ProgressTileItemView(subjectId: subject.subjectId)
           .modelContainer(container)
       }
     }.padding()

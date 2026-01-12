@@ -7,15 +7,15 @@ struct GroupView: View {
 
   @State private var refreshed: Bool = false
 
-  @Query private var groups: [Group]
-  var group: Group? { groups.first }
+  @Query private var groups: [ChiiGroup]
+  var group: ChiiGroup? { groups.first }
 
   init(name: String) {
     self.name = name
-    let predicate = #Predicate<Group> {
+    let predicate = #Predicate<ChiiGroup> {
       $0.name == name
     }
-    _groups = Query(filter: predicate, sort: \Group.groupId)
+    _groups = Query(filter: predicate, sort: \ChiiGroup.groupId)
   }
 
   func refresh() async {
@@ -53,7 +53,7 @@ struct GroupView: View {
 }
 
 struct GroupDetailView: View {
-  @Bindable var group: Group
+  @Bindable var group: ChiiGroup
   let width: CGFloat
 
   @AppStorage("shareDomain") var shareDomain: ShareDomain = .chii
@@ -238,10 +238,10 @@ struct GroupDetailView: View {
 }
 
 struct GroupRecentMemberView: View {
-  @Bindable var group: Group
+  @Bindable var group: ChiiGroup
   let width: CGFloat
 
-  init(group: Group, width: CGFloat) {
+  init(group: ChiiGroup, width: CGFloat) {
     self.group = group
     self.width = width
   }
@@ -297,7 +297,7 @@ struct GroupRecentMemberView: View {
 }
 
 struct GroupRecentTopicView: View {
-  @Bindable var group: Group
+  @Bindable var group: ChiiGroup
 
   @AppStorage("hideBlocklist") var hideBlocklist: Bool = false
   @AppStorage("blocklist") var blocklist: [Int] = []

@@ -39,12 +39,20 @@ struct ImageView: View {
             .frame(width: style.width, height: style.height, alignment: style.alignment)
             .clipShape(clipShape)
             .shadow(radius: 2)
+        } else if style.aspectRatio != nil {
+          KFImage(imageURL)
+            .fade(duration: 0.25)
+            .resizable()
+            .aspectRatio(style.aspectRatio, contentMode: .fill)
+            .frame(alignment: style.alignment)
+            .clipShape(clipShape)
+            .shadow(radius: 2)
         } else {
           KFImage(imageURL)
             .fade(duration: 0.25)
             .resizable()
             .scaledToFit()
-            .frame(width: style.width, height: style.height, alignment: style.alignment)
+            .frame(alignment: style.alignment)
             .clipShape(clipShape)
             .shadow(radius: 2)
         }
@@ -84,6 +92,7 @@ struct ImageView: View {
           .clipShape(clipShape)
         } else {
           Color.secondary.opacity(0.2)
+            .aspectRatio(style.aspectRatio, contentMode: .fit)
             .frame(alignment: style.alignment)
             .clipShape(clipShape)
         }

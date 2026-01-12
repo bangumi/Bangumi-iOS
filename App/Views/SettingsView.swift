@@ -7,7 +7,6 @@ struct SettingsView: View {
   @AppStorage("appearance") var appearance: AppearanceType = .system
   @AppStorage("shareDomain") var shareDomain: ShareDomain = .chii
   @AppStorage("authDomain") var authDomain: AuthDomain = .next
-  @AppStorage("progressSortMode") var progressSortMode: ProgressSortMode = .collectedAt
   @AppStorage("subjectImageQuality") var subjectImageQuality: ImageQuality = .high
   @AppStorage("isolationMode") var isolationMode: Bool = false
   @AppStorage("showNSFWBadge") var showNSFWBadge: Bool = true
@@ -94,11 +93,6 @@ struct SettingsView: View {
         Picker(selection: $titlePreference, label: Text("条目标题显示")) {
           ForEach(TitlePreference.allCases, id: \.self) { preference in
             Text(preference.desc).tag(preference)
-          }
-        }
-        Picker(selection: $progressSortMode, label: Text("进度管理排序")) {
-          ForEach(ProgressSortMode.allCases, id: \.self) { mode in
-            Text(mode.desc).tag(mode)
           }
         }
         Picker(selection: $subjectImageQuality, label: Text("条目封面图片质量")) {
