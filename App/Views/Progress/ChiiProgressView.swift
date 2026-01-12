@@ -118,13 +118,22 @@ struct ChiiProgressView: View {
     }
   }
 
+  func typeDesc(stype: SubjectType) -> String {
+    let count = counts[stype, default: 0]
+    if count == 0 {
+      return stype.description
+    } else {
+      return "\(stype.description)(\(count))"
+    }
+  }
+
   var body: some View {
     if isAuthenticated {
       ScrollView {
         VStack {
           Picker("SubjectType", selection: $progressTab) {
             ForEach(SubjectType.progressTypes) { type in
-              Text("\(type.description)(\(counts[type, default: 0]))").tag(type)
+              Text(typeDesc(stype: type)).tag(type)
             }
           }
           .padding(.horizontal, 8)
@@ -132,32 +141,35 @@ struct ChiiProgressView: View {
 
           Group {
             if !subjectIds.isEmpty {
-              if progressViewMode == .list {
+              switch progressViewMode {
+              case .list:
                 ProgressListView(subjectIds: subjectIds)
-              } else {
+              case .tile:
                 ProgressTileView(subjectIds: subjectIds)
               }
-            } else if refreshing {
-              if collectionsUpdatedAt > 0 {
+            } else if collectionsUpdatedAt > 0 {
+              if refreshing {
                 ProgressView()
                   .padding()
               } else {
+                ContentUnavailableView {
+                  Label("没有条目", systemImage: "tray")
+                } description: {
+                  Text("当前列表为空，或是搜索无结果")
+                }
+              }
+            } else {
+              if refreshing {
                 HStack {
                   ProgressView(value: refreshProgress)
                     .progressViewStyle(.linear)
                 }.padding()
-              }
-            } else if collectionsUpdatedAt > 0 {
-              ContentUnavailableView {
-                Label("没有条目", systemImage: "tray")
-              } description: {
-                Text("当前列表为空，或是搜索无结果")
-              }
-            } else {
-              ContentUnavailableView {
-                Label("没有收藏数据", systemImage: "tray")
-              } description: {
-                Text("下拉刷新以获取正在观看的条目")
+              } else {
+                ContentUnavailableView {
+                  Label("没有收藏数据", systemImage: "tray")
+                } description: {
+                  Text("下拉刷新以获取正在观看的条目")
+                }
               }
             }
           }
