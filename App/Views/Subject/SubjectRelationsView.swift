@@ -77,7 +77,9 @@ struct SubjectRelationsView: View {
             }.frame(width: 80, height: 150)
           }
         }.padding(.horizontal, 2)
-      }.animation(.default, value: relations)
+      }
+      .scrollClipDisabled()
+      .animation(.default, value: relations)
     }.task {
       await loadCollections()
     }

@@ -111,6 +111,7 @@ struct UserSubjectCollectionView: View {
               }
             }.padding(2)
           }
+          .scrollClipDisabled()
         }
       }
       .animation(.default, value: ctype)

@@ -41,6 +41,7 @@ struct SubjectCharactersView: View {
             }
           }
         }
+        .scrollClipDisabled()
       }
     }
     .animation(.default, value: characters)

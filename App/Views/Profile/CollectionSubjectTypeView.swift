@@ -75,6 +75,7 @@ struct CollectionSubjectTypeView: View {
           }
         }
       }
+      .scrollClipDisabled()
     }.animation(.default, value: subjects)
   }
 }

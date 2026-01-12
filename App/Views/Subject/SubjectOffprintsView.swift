@@ -39,7 +39,9 @@ struct SubjectOffprintsView: View {
               .shadow(radius: 2)
           }
         }.padding(.horizontal, 2)
-      }.animation(.default, value: offprints)
+      }
+      .scrollClipDisabled()
+      .animation(.default, value: offprints)
     }.task {
       await loadCollections()
     }

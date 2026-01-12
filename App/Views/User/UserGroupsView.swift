@@ -70,6 +70,7 @@ struct UserGroupsView: View {
             }
           }.padding(2)
         }
+        .scrollClipDisabled()
       }
     }
     .animation(.default, value: refreshing)

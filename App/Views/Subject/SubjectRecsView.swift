@@ -62,7 +62,9 @@ struct SubjectRecsView: View {
             .frame(width: 72, height: 120)
           }
         }.padding(.horizontal, 2)
-      }.animation(.default, value: recs)
+      }
+      .scrollClipDisabled()
+      .animation(.default, value: recs)
     }.task {
       await loadCollections()
     }

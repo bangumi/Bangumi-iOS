@@ -62,6 +62,7 @@ struct UserFriendsView: View {
             }
           }.padding(2)
         }
+        .scrollClipDisabled()
       }
     }
     .animation(.default, value: refreshing)

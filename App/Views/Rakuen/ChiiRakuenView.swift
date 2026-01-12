@@ -172,7 +172,8 @@ struct ChiiRakuenView: View {
           categorySection(category)
         }
       }
-    }.scrollClipDisabled()
+    }
+    .scrollClipDisabled()
   }
 
   private func categorySection(_ category: RakuenCategory) -> some View {

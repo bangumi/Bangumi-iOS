@@ -137,7 +137,7 @@ struct SubjectCollectsView: View {
             }
           }.padding(.horizontal, 2)
         }
-
+        .scrollClipDisabled()
       }
     }
     .animation(.default, value: subject.collects)

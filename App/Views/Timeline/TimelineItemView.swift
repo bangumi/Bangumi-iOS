@@ -77,6 +77,7 @@ struct TimelineItemView: View {
                   }
                 }
               }
+              .scrollClipDisabled()
             }
           case 3, 4:
             if let groups = item.memo.daily?.groups, groups.count > 0 {
@@ -90,6 +91,7 @@ struct TimelineItemView: View {
                   }
                 }
               }
+              .scrollClipDisabled()
             }
           default:
             EmptyView()
@@ -117,6 +119,7 @@ struct TimelineItemView: View {
                 }
               }
             }
+            .scrollClipDisabled()
           } else {
             if let collect = item.memo.subject?.first {
               if collect.rate > 0 {
@@ -185,6 +188,7 @@ struct TimelineItemView: View {
                 }
               }
             }
+            .scrollClipDisabled()
           }
 
         default:

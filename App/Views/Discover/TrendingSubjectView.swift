@@ -141,7 +141,9 @@ struct TrendingSubjectTypeView: View {
                 .subjectPreview(item.subject)
             }
           }.scrollTargetLayout()
-        }.scrollTargetBehavior(.viewAligned)
+        }
+        .scrollClipDisabled()
+        .scrollTargetBehavior(.viewAligned)
       }
     }.animation(.default, value: items)
   }

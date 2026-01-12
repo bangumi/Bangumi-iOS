@@ -247,6 +247,7 @@ struct IndexView: View {
               .font(.footnote)
               .padding(2)
             }
+            .scrollClipDisabled()
             PageView<IndexRelatedDTO, _>(reloader: reloader, nextPageFunc: loadRelated) { item in
               IndexRelatedItemView(
                 reloader: $reloader,
