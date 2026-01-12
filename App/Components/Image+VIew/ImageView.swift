@@ -31,27 +31,33 @@ struct ImageView: View {
   var body: some View {
     ZStack {
       if let imageURL = imageURL {
-        if style.width != nil, style.height != nil {
-          KFImage(imageURL)
-            .fade(duration: 0.25)
-            .resizable()
-            .scaledToFill()
-            .frame(width: style.width, height: style.height, alignment: style.alignment)
-            .clipShape(clipShape)
-        } else if style.aspectRatio != nil {
-          KFImage(imageURL)
-            .fade(duration: 0.25)
-            .resizable()
-            .aspectRatio(style.aspectRatio, contentMode: .fill)
-            .frame(alignment: style.alignment)
-            .clipShape(clipShape)
-        } else {
-          KFImage(imageURL)
-            .fade(duration: 0.25)
-            .resizable()
-            .scaledToFit()
-            .frame(alignment: style.alignment)
-            .clipShape(clipShape)
+        Group {
+          if style.width != nil, style.height != nil {
+            KFImage(imageURL)
+              .fade(duration: 0.25)
+              .resizable()
+              .scaledToFill()
+              .frame(width: style.width, height: style.height, alignment: style.alignment)
+              .clipShape(clipShape)
+          } else if style.aspectRatio != nil {
+            KFImage(imageURL)
+              .fade(duration: 0.25)
+              .resizable()
+              .aspectRatio(style.aspectRatio, contentMode: .fill)
+              .frame(alignment: style.alignment)
+              .clipShape(clipShape)
+          } else {
+            KFImage(imageURL)
+              .fade(duration: 0.25)
+              .resizable()
+              .scaledToFit()
+              .frame(alignment: style.alignment)
+              .clipShape(clipShape)
+          }
+        }
+        .overlay {
+          clipShape
+            .stroke(Color.primary.opacity(0.15), lineWidth: 0.5)
         }
       } else {
         if style.width != nil, style.height != nil {
