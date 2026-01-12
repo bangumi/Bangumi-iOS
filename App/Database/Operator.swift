@@ -182,6 +182,51 @@ extension DatabaseOperator {
     return try modelContext.fetchCount(descriptor)
   }
 
+  public func fetchProgressCounts() throws -> [SubjectType: Int] {
+    var counts: [SubjectType: Int] = [:]
+    let doingType = CollectionType.doing.rawValue
+    for type in SubjectType.progressTypes {
+      let tvalue = type.rawValue
+      let desc = FetchDescriptor<Subject>(
+        predicate: #Predicate<Subject> {
+          (tvalue == 0 || $0.type == tvalue) && $0.ctype == doingType
+        })
+      counts[type] = try modelContext.fetchCount(desc)
+    }
+    return counts
+  }
+
+  public func fetchProgressSubjectIds(
+    progressTab: SubjectType,
+    progressSortMode: ProgressSortMode,
+    search: String
+  ) throws -> [Int] {
+    let stype = progressTab.rawValue
+    let doingType = CollectionType.doing.rawValue
+    let descriptor = FetchDescriptor<Subject>(
+      predicate: #Predicate<Subject> {
+        (stype == 0 || $0.type == stype) && $0.ctype == doingType
+          && (search == "" || $0.name.localizedStandardContains(search)
+            || $0.alias.localizedStandardContains(search))
+      },
+      sortBy: [
+        SortDescriptor(\.collectedAt, order: .reverse)
+      ])
+
+    let subjects = try modelContext.fetch(descriptor)
+
+    switch progressSortMode {
+    case .airTime:
+      return subjects.sorted { subject1, subject2 in
+        let days1 = subject1.nextEpisodeDays(context: modelContext)
+        let days2 = subject2.nextEpisodeDays(context: modelContext)
+        return Subject.compareDays(days1, days2, subject1, subject2)
+      }.map(\.subjectId)
+    case .collectedAt:
+      return subjects.map(\.subjectId)
+    }
+  }
+
   public func exportSubjectsToCSV(
     subjectType: SubjectType?,
     collectionType: CollectionType?,

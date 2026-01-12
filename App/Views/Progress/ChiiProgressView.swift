@@ -1,3 +1,4 @@
+import OSLog
 import SwiftData
 import SwiftUI
 
@@ -19,44 +20,29 @@ struct ChiiProgressView: View {
   @State private var subjectIds: [Int] = []
   @State private var counts: [SubjectType: Int] = [:]
 
-  private func loadCounts() {
-    let doingType = CollectionType.doing.rawValue
-    for type in SubjectType.progressTypes {
-      let tvalue = type.rawValue
-      let desc = FetchDescriptor<Subject>(
-        predicate: #Predicate<Subject> {
-          (tvalue == 0 || $0.type == tvalue) && $0.ctype == doingType
-        })
-      if let count = try? modelContext.fetchCount(desc) {
-        counts[type] = count
-      }
+  @MainActor
+  private func loadCounts() async {
+    do {
+      let db = try await Chii.shared.getDB()
+      let result = try await db.fetchProgressCounts()
+      self.counts = result
+    } catch {
+      Logger.app.error("Failed to load counts: \(error)")
     }
   }
 
-  private func updateSubjectIds() {
-    let stype = progressTab.rawValue
-    let doingType = CollectionType.doing.rawValue
-    let descriptor = FetchDescriptor<Subject>(
-      predicate: #Predicate<Subject> {
-        (stype == 0 || $0.type == stype) && $0.ctype == doingType
-          && (search == "" || $0.name.localizedStandardContains(search)
-            || $0.alias.localizedStandardContains(search))
-      },
-      sortBy: [
-        SortDescriptor(\.collectedAt, order: .reverse)
-      ])
-
-    guard let subjects = try? modelContext.fetch(descriptor) else { return }
-
-    switch progressSortMode {
-    case .airTime:
-      self.subjectIds = subjects.sorted { subject1, subject2 in
-        let days1 = subject1.nextEpisodeDays(context: modelContext)
-        let days2 = subject2.nextEpisodeDays(context: modelContext)
-        return Subject.compareDays(days1, days2, subject1, subject2)
-      }.map(\.subjectId)
-    case .collectedAt:
-      self.subjectIds = subjects.map(\.subjectId)
+  @MainActor
+  private func updateSubjectIds() async {
+    do {
+      let db = try await Chii.shared.getDB()
+      let result = try await db.fetchProgressSubjectIds(
+        progressTab: progressTab,
+        progressSortMode: progressSortMode,
+        search: search
+      )
+      self.subjectIds = result
+    } catch {
+      Logger.app.error("Failed to update subject IDs: \(error)")
     }
   }
 
@@ -77,8 +63,8 @@ struct ChiiProgressView: View {
         Notifier.shared.notify(message: "没有收藏更新")
       }
       collectionsUpdatedAt = Int(now.timeIntervalSince1970)
-      updateSubjectIds()
-      loadCounts()
+      await updateSubjectIds()
+      await loadCounts()
     } catch {
       Notifier.shared.notify(message: "更新失败: \(error)")
       Notifier.shared.alert(error: error)
@@ -147,17 +133,28 @@ struct ChiiProgressView: View {
           .pickerStyle(.segmented)
 
           Group {
-            if collectionsUpdatedAt > 0 {
+            if !subjectIds.isEmpty {
               if progressViewMode == .list {
                 ProgressListView(subjectIds: subjectIds)
               } else {
                 ProgressTileView(subjectIds: subjectIds)
               }
             } else if refreshing {
-              HStack {
-                ProgressView(value: refreshProgress)
-                  .progressViewStyle(.linear)
-              }.padding()
+              if collectionsUpdatedAt > 0 {
+                ProgressView()
+                  .padding()
+              } else {
+                HStack {
+                  ProgressView(value: refreshProgress)
+                    .progressViewStyle(.linear)
+                }.padding()
+              }
+            } else if collectionsUpdatedAt > 0 {
+              ContentUnavailableView {
+                Label("没有条目", systemImage: "tray")
+              } description: {
+                Text("当前列表为空，或是搜索无结果")
+              }
             } else {
               ContentUnavailableView {
                 Label("没有收藏数据", systemImage: "tray")
@@ -174,11 +171,7 @@ struct ChiiProgressView: View {
       }
       .task {
         guard subjectIds.isEmpty else { return }
-        updateSubjectIds()
-        loadCounts()
         await refresh()
-        updateSubjectIds()
-        loadCounts()
       }
       .searchable(
         text: $search,
@@ -222,9 +215,9 @@ struct ChiiProgressView: View {
           }
         }
       }
-      .onChange(of: progressTab) { updateSubjectIds() }
-      .onChange(of: search) { updateSubjectIds() }
-      .onChange(of: progressSortMode) { updateSubjectIds() }
+      .onChange(of: progressTab) { Task { await updateSubjectIds() } }
+      .onChange(of: search) { Task { await updateSubjectIds() } }
+      .onChange(of: progressSortMode) { Task { await updateSubjectIds() } }
       .alert("刷新所有收藏", isPresented: $showRefreshAll) {
         Button("取消", role: .cancel) {}
         Button("确定", role: .destructive) {
