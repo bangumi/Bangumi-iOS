@@ -3,7 +3,6 @@ import SwiftUI
 
 struct CollectionSubjectTypeView: View {
   let stype: SubjectType
-  let width: CGFloat
 
   @Environment(\.modelContext) var modelContext
 
@@ -11,17 +10,7 @@ struct CollectionSubjectTypeView: View {
   @State private var counts: [CollectionType: Int] = [:]
   @State private var subjects: [Subject] = []
 
-  var columnCount: Int {
-    let columns = Int((width - 8) / 88)
-    return columns > 0 ? columns : 1
-  }
-
-  var columns: [GridItem] {
-    Array(repeating: .init(.flexible()), count: columnCount)
-  }
-
   func load() async {
-    if width == 0 { return }
     let stypeVal = stype.rawValue
     let ctypeVal = ctype.rawValue
     var descriptor = FetchDescriptor<Subject>(
@@ -31,7 +20,7 @@ struct CollectionSubjectTypeView: View {
       sortBy: [
         SortDescriptor<Subject>(\.collectedAt, order: .reverse)
       ])
-    descriptor.fetchLimit = columnCount * 2
+    descriptor.fetchLimit = 20
     do {
       subjects = try modelContext.fetch(descriptor)
     } catch {
@@ -69,23 +58,21 @@ struct CollectionSubjectTypeView: View {
           await load()
         }
       }
-      .onChange(of: width) { _, _ in
-        Task {
-          await load()
-        }
-      }
       .onAppear {
         Task {
           await load()
           await loadCounts()
         }
       }
-      LazyVGrid(columns: columns) {
-        ForEach(subjects) { subject in
-          ImageView(img: subject.images?.resize(.r200))
-            .imageStyle(width: 80, height: 80)
-            .imageType(.subject)
-            .imageNavLink(subject.link)
+      ScrollView(.horizontal, showsIndicators: false) {
+        LazyHStack {
+          ForEach(subjects) { subject in
+            ImageView(img: subject.images?.resize(.r200))
+              .imageStyle(width: 80, height: subject.typeEnum.coverHeight(for: 80))
+              .imageType(.subject)
+              .imageNavLink(subject.link)
+              .shadow(radius: 2)
+          }
         }
       }
     }.animation(.default, value: subjects)
