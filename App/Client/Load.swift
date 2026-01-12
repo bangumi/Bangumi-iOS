@@ -30,11 +30,18 @@ extension Chii {
   }
 
   func loadTrendingSubjects() async throws {
-    let db = try self.getDB()
+    var tasks: [Task<Void, any Error>] = []
     for type in SubjectType.allTypes {
-      let response = try await self.getTrendingSubjects(type: type)
-      try await db.saveTrendingSubjects(type: type.rawValue, items: response.data)
-      await db.commit()
+      tasks.append(
+        Task {
+          let db = try self.getDB()
+          let response = try await self.getTrendingSubjects(type: type)
+          try await db.saveTrendingSubjects(type: type.rawValue, items: response.data)
+          await db.commit()
+        })
+    }
+    for task in tasks {
+      try await task.value
     }
   }
 
