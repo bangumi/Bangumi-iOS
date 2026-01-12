@@ -7,8 +7,12 @@ extension Chii {
   func loadUser(_ username: String) async throws -> UserDTO {
     let db = try self.getDB()
     let item = try await self.getUser(username)
-    try await db.saveUser(item)
-    try await db.commitImmediately()
+    let created = try await db.saveUser(item)
+    if created {
+      try await db.commitImmediately()
+    } else {
+      await db.commit()
+    }
     return item
   }
 
@@ -21,8 +25,8 @@ extension Chii {
         continue
       }
       try await db.saveCalendarItem(weekday: weekday, items: items)
+      await db.commit()
     }
-    await db.commit()
   }
 
   func loadTrendingSubjects() async throws {
@@ -46,8 +50,12 @@ extension Chii {
       throw ChiiError(message: "这是一个被合并的条目")
     }
 
-    try await db.saveSubject(item)
-    try await db.commitImmediately()
+    let created = try await db.saveSubject(item)
+    if created {
+      try await db.commitImmediately()
+    } else {
+      await db.commit()
+    }
     if item.interest != nil {
       await self.index([item.searchable()])
     }
@@ -55,46 +63,90 @@ extension Chii {
   }
 
   func loadSubjectDetails(_ subjectId: Int, offprints: Bool, social: Bool) async throws {
-    let collectsModeDefaults = UserDefaults.standard.string(forKey: "subjectCollectsFilterMode")
-    let collectsMode = FilterMode(collectsModeDefaults)
+    var tasks: [Task<Void, any Error>] = []
 
-    let db = try self.getDB()
+    tasks.append(
+      Task {
+        let db = try self.getDB()
+        let val = try await self.getSubjectCharacters(subjectId, limit: 12)
+        try await db.saveSubjectCharacters(subjectId: subjectId, items: val.data)
+        await db.commit()
+      })
 
-    // 并发获取数据，随后顺序保存到数据库，避免 TaskGroup 触发的隔离检查问题
-    async let charactersResp = self.getSubjectCharacters(subjectId, limit: 12)
-    async let relationsResp = self.getSubjectRelations(subjectId, limit: 10)
-    async let recsResp = self.getSubjectRecs(subjectId, limit: 10)
-    async let indexesResp = self.getSubjectIndexes(subjectId: subjectId, limit: 5)
+    tasks.append(
+      Task {
+        let db = try self.getDB()
+        let val = try await self.getSubjectRelations(subjectId, limit: 10)
+        try await db.saveSubjectRelations(subjectId: subjectId, items: val.data)
+        await db.commit()
+      })
+
+    tasks.append(
+      Task {
+        let db = try self.getDB()
+        let val = try await self.getSubjectRecs(subjectId, limit: 10)
+        try await db.saveSubjectRecs(subjectId: subjectId, items: val.data)
+        await db.commit()
+      })
+
+    tasks.append(
+      Task {
+        let db = try self.getDB()
+        let val = try await self.getSubjectIndexes(subjectId: subjectId, limit: 5)
+        try await db.saveSubjectIndexes(subjectId: subjectId, items: val.data)
+        await db.commit()
+      })
 
     if offprints {
-      async let offprintsResp = self.getSubjectRelations(subjectId, offprint: true, limit: 100)
-      let offprintsVal = try await offprintsResp
-      try await db.saveSubjectOffprints(subjectId: subjectId, items: offprintsVal.data)
+      tasks.append(
+        Task {
+          let db = try self.getDB()
+          let val = try await self.getSubjectRelations(subjectId, offprint: true, limit: 100)
+          try await db.saveSubjectOffprints(subjectId: subjectId, items: val.data)
+          await db.commit()
+        })
     }
 
     if social {
-      async let collectsResp = self.getSubjectCollects(subjectId, mode: collectsMode, limit: 10)
-      async let reviewsResp = self.getSubjectReviews(subjectId, limit: 5)
-      async let topicsResp = self.getSubjectTopics(subjectId, limit: 5)
-      async let commentsResp = self.getSubjectComments(subjectId, limit: 10)
+      tasks.append(
+        Task {
+          let collectsModeDefaults = UserDefaults.standard.string(
+            forKey: "subjectCollectsFilterMode")
+          let collectsMode = FilterMode(collectsModeDefaults)
+          let db = try self.getDB()
+          let val = try await self.getSubjectCollects(subjectId, mode: collectsMode, limit: 10)
+          try await db.saveSubjectCollects(subjectId: subjectId, items: val.data)
+          await db.commit()
+        })
 
-      let (collectsVal, reviewsVal, topicsVal, commentsVal) = try await (
-        collectsResp, reviewsResp, topicsResp, commentsResp
-      )
-      try await db.saveSubjectCollects(subjectId: subjectId, items: collectsVal.data)
-      try await db.saveSubjectReviews(subjectId: subjectId, items: reviewsVal.data)
-      try await db.saveSubjectTopics(subjectId: subjectId, items: topicsVal.data)
-      try await db.saveSubjectComments(subjectId: subjectId, items: commentsVal.data)
+      tasks.append(
+        Task {
+          let db = try self.getDB()
+          let val = try await self.getSubjectReviews(subjectId, limit: 5)
+          try await db.saveSubjectReviews(subjectId: subjectId, items: val.data)
+          await db.commit()
+        })
+
+      tasks.append(
+        Task {
+          let db = try self.getDB()
+          let val = try await self.getSubjectTopics(subjectId, limit: 5)
+          try await db.saveSubjectTopics(subjectId: subjectId, items: val.data)
+          await db.commit()
+        })
+
+      tasks.append(
+        Task {
+          let db = try self.getDB()
+          let val = try await self.getSubjectComments(subjectId, limit: 10)
+          try await db.saveSubjectComments(subjectId: subjectId, items: val.data)
+          await db.commit()
+        })
     }
 
-    let (charactersVal, relationsVal, recsVal, indexesVal) = try await (
-      charactersResp, relationsResp, recsResp, indexesResp
-    )
-    try await db.saveSubjectCharacters(subjectId: subjectId, items: charactersVal.data)
-    try await db.saveSubjectRelations(subjectId: subjectId, items: relationsVal.data)
-    try await db.saveSubjectRecs(subjectId: subjectId, items: recsVal.data)
-    try await db.saveSubjectIndexes(subjectId: subjectId, items: indexesVal.data)
-    try await db.commitImmediately()
+    for task in tasks {
+      try await task.value
+    }
   }
 
   func loadSubjectPositions(_ subjectId: Int) async throws {
@@ -115,7 +167,7 @@ extension Chii {
       }
     }
     try await db.saveSubjectPositions(subjectId: subjectId, items: items)
-    try await db.commitImmediately()
+    await db.commit()
   }
 
   func loadEpisodes(_ subjectId: Int) async throws {
@@ -148,8 +200,12 @@ extension Chii {
   func loadEpisode(_ episodeId: Int) async throws {
     let db = try self.getDB()
     let item = try await self.getEpisode(episodeId)
-    try await db.saveEpisode(item)
-    await db.commit()
+    let created = try await db.saveEpisode(item)
+    if created {
+      try await db.commitImmediately()
+    } else {
+      await db.commit()
+    }
   }
 
   func deleteEpisode(_ episodeId: Int) async throws {
@@ -167,23 +223,39 @@ extension Chii {
       Logger.api.warning("character id mismatch: \(cid) != \(item.id)")
       throw ChiiError(message: "这是一个被合并的角色")
     }
-    try await db.saveCharacter(item)
-    try await db.commitImmediately()
+    let created = try await db.saveCharacter(item)
+    if created {
+      try await db.commitImmediately()
+    } else {
+      await db.commit()
+    }
     if item.collectedAt != nil {
       await self.index([item.searchable()])
     }
   }
 
   func loadCharacterDetails(_ characterId: Int) async throws {
-    let db = try self.getDB()
+    var tasks: [Task<Void, any Error>] = []
 
-    async let castsResp = self.getCharacterCasts(characterId, limit: 5)
-    async let indexesResp = self.getCharacterIndexes(characterId: characterId, limit: 5)
-    let (castsVal, indexesVal) = try await (castsResp, indexesResp)
+    tasks.append(
+      Task {
+        let db = try self.getDB()
+        let val = try await self.getCharacterCasts(characterId, limit: 5)
+        try await db.saveCharacterCasts(characterId: characterId, items: val.data)
+        await db.commit()
+      })
 
-    try await db.saveCharacterCasts(characterId: characterId, items: castsVal.data)
-    try await db.saveCharacterIndexes(characterId: characterId, items: indexesVal.data)
-    try await db.commitImmediately()
+    tasks.append(
+      Task {
+        let db = try self.getDB()
+        let val = try await self.getCharacterIndexes(characterId: characterId, limit: 5)
+        try await db.saveCharacterIndexes(characterId: characterId, items: val.data)
+        await db.commit()
+      })
+
+    for task in tasks {
+      try await task.value
+    }
   }
 
   func loadPerson(_ pid: Int) async throws {
@@ -193,25 +265,47 @@ extension Chii {
       Logger.api.warning("person id mismatch: \(pid) != \(item.id)")
       throw ChiiError(message: "这是一个被合并的人物")
     }
-    try await db.savePerson(item)
-    try await db.commitImmediately()
+    let created = try await db.savePerson(item)
+    if created {
+      try await db.commitImmediately()
+    } else {
+      await db.commit()
+    }
     if item.collectedAt != nil {
       await self.index([item.searchable()])
     }
   }
 
   func loadPersonDetails(_ personId: Int) async throws {
-    let db = try self.getDB()
+    var tasks: [Task<Void, any Error>] = []
 
-    async let castsResp = self.getPersonCasts(personId, limit: 5)
-    async let worksResp = self.getPersonWorks(personId, limit: 5)
-    async let indexesResp = self.getPersonIndexes(personId: personId, limit: 5)
-    let (castsVal, worksVal, indexesVal) = try await (castsResp, worksResp, indexesResp)
+    tasks.append(
+      Task {
+        let db = try self.getDB()
+        let val = try await self.getPersonCasts(personId, limit: 5)
+        try await db.savePersonCasts(personId: personId, items: val.data)
+        await db.commit()
+      })
 
-    try await db.savePersonCasts(personId: personId, items: castsVal.data)
-    try await db.savePersonWorks(personId: personId, items: worksVal.data)
-    try await db.savePersonIndexes(personId: personId, items: indexesVal.data)
-    try await db.commitImmediately()
+    tasks.append(
+      Task {
+        let db = try self.getDB()
+        let val = try await self.getPersonWorks(personId, limit: 5)
+        try await db.savePersonWorks(personId: personId, items: val.data)
+        await db.commit()
+      })
+
+    tasks.append(
+      Task {
+        let db = try self.getDB()
+        let val = try await self.getPersonIndexes(personId: personId, limit: 5)
+        try await db.savePersonIndexes(personId: personId, items: val.data)
+        await db.commit()
+      })
+
+    for task in tasks {
+      try await task.value
+    }
   }
 }
 
@@ -219,23 +313,43 @@ extension Chii {
   func loadGroup(_ name: String) async throws {
     let db = try self.getDB()
     let item = try await self.getGroup(name)
-    try await db.saveGroup(item)
-    try await db.commitImmediately()
+    let created = try await db.saveGroup(item)
+    if created {
+      try await db.commitImmediately()
+    } else {
+      await db.commit()
+    }
   }
 
   func loadGroupDetails(_ name: String) async throws {
-    let db = try self.getDB()
+    var tasks: [Task<Void, any Error>] = []
 
-    async let membersResp = self.getGroupMembers(name, role: .member, limit: 10)
-    async let moderatorsResp = self.getGroupMembers(name, role: .moderator, limit: 10)
-    async let topicsResp = self.getGroupTopics(name, limit: 10)
+    tasks.append(
+      Task {
+        let db = try self.getDB()
+        let val = try await self.getGroupMembers(name, role: .member, limit: 10)
+        try await db.saveGroupRecentMembers(groupName: name, items: val.data)
+        await db.commit()
+      })
 
-    let (membersVal, moderatorsVal, topicsVal) = try await (membersResp, moderatorsResp, topicsResp)
+    tasks.append(
+      Task {
+        let db = try self.getDB()
+        let val = try await self.getGroupMembers(name, role: .moderator, limit: 10)
+        try await db.saveGroupModerators(groupName: name, items: val.data)
+        await db.commit()
+      })
 
-    try await db.saveGroupRecentMembers(groupName: name, items: membersVal.data)
-    try await db.saveGroupModerators(groupName: name, items: moderatorsVal.data)
-    try await db.saveGroupRecentTopics(groupName: name, items: topicsVal.data)
+    tasks.append(
+      Task {
+        let db = try self.getDB()
+        let val = try await self.getGroupTopics(name, limit: 10)
+        try await db.saveGroupRecentTopics(groupName: name, items: val.data)
+        await db.commit()
+      })
 
-    try await db.commitImmediately()
+    for task in tasks {
+      try await task.value
+    }
   }
 }

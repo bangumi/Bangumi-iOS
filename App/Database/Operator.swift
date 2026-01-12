@@ -440,7 +440,7 @@ extension DatabaseOperator {
 
 // MARK: - ensure
 extension DatabaseOperator {
-  public func ensureUser(_ item: UserDTO) throws -> User {
+  public func ensureUser(_ item: UserDTO) throws -> (User, Bool) {
     let uid = item.id
     let fetched = try self.fetchOne(
       predicate: #Predicate<User> {
@@ -448,11 +448,11 @@ extension DatabaseOperator {
       })
     if let user = fetched {
       user.update(item)
-      return user
+      return (user, false)
     }
     let user = User(item)
     modelContext.insert(user)
-    return user
+    return (user, true)
   }
 
   public func ensureCalendarItem(_ weekday: Int, items: [BangumiCalendarItemDTO])
@@ -491,7 +491,7 @@ extension DatabaseOperator {
     return trending
   }
 
-  public func ensureSubject(_ item: SubjectDTO) throws -> Subject {
+  public func ensureSubject(_ item: SubjectDTO) throws -> (Subject, Bool) {
     let sid = item.id
     let fetched = try self.fetchOne(
       predicate: #Predicate<Subject> {
@@ -499,14 +499,14 @@ extension DatabaseOperator {
       })
     if let subject = fetched {
       subject.update(item)
-      return subject
+      return (subject, false)
     }
     let subject = Subject(item)
     modelContext.insert(subject)
-    return subject
+    return (subject, true)
   }
 
-  public func ensureSubject(_ item: SlimSubjectDTO) throws -> Subject {
+  public func ensureSubject(_ item: SlimSubjectDTO) throws -> (Subject, Bool) {
     let sid = item.id
     let fetched = try self.fetchOne(
       predicate: #Predicate<Subject> {
@@ -514,14 +514,14 @@ extension DatabaseOperator {
       })
     if let subject = fetched {
       subject.update(item)
-      return subject
+      return (subject, false)
     }
     let subject = Subject(item)
     modelContext.insert(subject)
-    return subject
+    return (subject, true)
   }
 
-  public func ensureEpisode(_ item: EpisodeDTO) throws -> Episode {
+  public func ensureEpisode(_ item: EpisodeDTO) throws -> (Episode, Bool) {
     let eid = item.id
     let fetched = try self.fetchOne(
       predicate: #Predicate<Episode> {
@@ -531,35 +531,35 @@ extension DatabaseOperator {
       episode.update(item)
       if let slim = item.subject {
         if let old = episode.subject, old.subjectId == slim.id {
-          return episode
+          return (episode, false)
         }
-        let subject = try self.ensureSubject(slim)
+        let (subject, _) = try self.ensureSubject(slim)
         episode.subject = subject
       } else {
         let subject = try self.getSubject(item.subjectID)
         if let new = subject {
           if let old = episode.subject, old.subjectId == new.subjectId {
-            return episode
+            return (episode, false)
           }
           episode.subject = new
         }
       }
-      return episode
+      return (episode, false)
     } else {
       let episode = Episode(item)
       modelContext.insert(episode)
       if let slim = item.subject {
-        let subject = try self.ensureSubject(slim)
+        let (subject, _) = try self.ensureSubject(slim)
         episode.subject = subject
       } else {
         let subject = try self.getSubject(item.subjectID)
         episode.subject = subject
       }
-      return episode
+      return (episode, true)
     }
   }
 
-  public func ensureCharacter(_ item: CharacterDTO) throws -> Character {
+  public func ensureCharacter(_ item: CharacterDTO) throws -> (Character, Bool) {
     let cid = item.id
     let fetched = try self.fetchOne(
       predicate: #Predicate<Character> {
@@ -567,14 +567,14 @@ extension DatabaseOperator {
       })
     if let character = fetched {
       character.update(item)
-      return character
+      return (character, false)
     }
     let character = Character(item)
     modelContext.insert(character)
-    return character
+    return (character, true)
   }
 
-  public func ensureCharacter(_ item: SlimCharacterDTO) throws -> Character {
+  public func ensureCharacter(_ item: SlimCharacterDTO) throws -> (Character, Bool) {
     let cid = item.id
     let fetched = try self.fetchOne(
       predicate: #Predicate<Character> {
@@ -582,14 +582,14 @@ extension DatabaseOperator {
       })
     if let character = fetched {
       character.update(item)
-      return character
+      return (character, false)
     }
     let character = Character(item)
     modelContext.insert(character)
-    return character
+    return (character, true)
   }
 
-  public func ensurePerson(_ item: PersonDTO) throws -> Person {
+  public func ensurePerson(_ item: PersonDTO) throws -> (Person, Bool) {
     let pid = item.id
     let fetched = try self.fetchOne(
       predicate: #Predicate<Person> {
@@ -597,14 +597,14 @@ extension DatabaseOperator {
       })
     if let person = fetched {
       person.update(item)
-      return person
+      return (person, false)
     }
     let person = Person(item)
     modelContext.insert(person)
-    return person
+    return (person, true)
   }
 
-  public func ensurePerson(_ item: SlimPersonDTO) throws -> Person {
+  public func ensurePerson(_ item: SlimPersonDTO) throws -> (Person, Bool) {
     let pid = item.id
     let fetched = try self.fetchOne(
       predicate: #Predicate<Person> {
@@ -612,14 +612,14 @@ extension DatabaseOperator {
       })
     if let person = fetched {
       person.update(item)
-      return person
+      return (person, false)
     }
     let person = Person(item)
     modelContext.insert(person)
-    return person
+    return (person, true)
   }
 
-  public func ensureGroup(_ item: GroupDTO) throws -> ChiiGroup {
+  public func ensureGroup(_ item: GroupDTO) throws -> (ChiiGroup, Bool) {
     let gid = item.id
     let fetched = try self.fetchOne(
       predicate: #Predicate<ChiiGroup> {
@@ -627,18 +627,20 @@ extension DatabaseOperator {
       })
     if let group = fetched {
       group.update(item)
-      return group
+      return (group, false)
     }
     let group = ChiiGroup(item)
     modelContext.insert(group)
-    return group
+    return (group, true)
   }
 }
 
 // MARK: - save
 extension DatabaseOperator {
-  public func saveUser(_ item: UserDTO) throws {
-    let _ = try self.ensureUser(item)
+  @discardableResult
+  public func saveUser(_ item: UserDTO) throws -> Bool {
+    let (_, created) = try self.ensureUser(item)
+    return created
   }
 
   public func saveCalendarItem(weekday: Int, items: [BangumiCalendarItemDTO]) throws {
@@ -649,8 +651,10 @@ extension DatabaseOperator {
     _ = try self.ensureTrendingSubject(type, items: items)
   }
 
-  public func saveEpisode(_ item: EpisodeDTO) throws {
-    let _ = try self.ensureEpisode(item)
+  @discardableResult
+  public func saveEpisode(_ item: EpisodeDTO) throws -> Bool {
+    let (_, created) = try self.ensureEpisode(item)
+    return created
   }
 
   public func deleteEpisode(_ episodeId: Int) throws {
@@ -663,12 +667,16 @@ extension DatabaseOperator {
 
 // MARK: - save subject
 extension DatabaseOperator {
-  public func saveSubject(_ item: SubjectDTO) throws {
-    let _ = try self.ensureSubject(item)
+  @discardableResult
+  public func saveSubject(_ item: SubjectDTO) throws -> Bool {
+    let (_, created) = try self.ensureSubject(item)
+    return created
   }
 
-  public func saveSubject(_ item: SlimSubjectDTO) throws {
-    let _ = try self.ensureSubject(item)
+  @discardableResult
+  public func saveSubject(_ item: SlimSubjectDTO) throws -> Bool {
+    let (_, created) = try self.ensureSubject(item)
+    return created
   }
 
   public func saveSubjectCharacters(subjectId: Int, items: [SubjectCharacterDTO]) throws {
@@ -744,12 +752,16 @@ extension DatabaseOperator {
 
 // MARK: - save character
 extension DatabaseOperator {
-  public func saveCharacter(_ item: CharacterDTO) throws {
-    let _ = try self.ensureCharacter(item)
+  @discardableResult
+  public func saveCharacter(_ item: CharacterDTO) throws -> Bool {
+    let (_, created) = try self.ensureCharacter(item)
+    return created
   }
 
-  public func saveCharacter(_ item: SlimCharacterDTO) throws {
-    let _ = try self.ensureCharacter(item)
+  @discardableResult
+  public func saveCharacter(_ item: SlimCharacterDTO) throws -> Bool {
+    let (_, created) = try self.ensureCharacter(item)
+    return created
   }
 
   public func saveCharacterCasts(characterId: Int, items: [CharacterCastDTO]) throws {
@@ -769,12 +781,16 @@ extension DatabaseOperator {
 
 // MARK: - save person
 extension DatabaseOperator {
-  public func savePerson(_ item: PersonDTO) throws {
-    let _ = try self.ensurePerson(item)
+  @discardableResult
+  public func savePerson(_ item: PersonDTO) throws -> Bool {
+    let (_, created) = try self.ensurePerson(item)
+    return created
   }
 
-  public func savePerson(_ item: SlimPersonDTO) throws {
-    let _ = try self.ensurePerson(item)
+  @discardableResult
+  public func savePerson(_ item: SlimPersonDTO) throws -> Bool {
+    let (_, created) = try self.ensurePerson(item)
+    return created
   }
 
   public func savePersonCasts(personId: Int, items: [PersonCastDTO]) throws {
@@ -801,8 +817,10 @@ extension DatabaseOperator {
 
 // MARK: - save group
 extension DatabaseOperator {
-  public func saveGroup(_ item: GroupDTO) throws {
-    let _ = try self.ensureGroup(item)
+  @discardableResult
+  public func saveGroup(_ item: GroupDTO) throws -> Bool {
+    let (_, created) = try self.ensureGroup(item)
+    return created
   }
 
   public func saveGroupRecentMembers(groupName: String, items: [GroupMemberDTO]) throws {

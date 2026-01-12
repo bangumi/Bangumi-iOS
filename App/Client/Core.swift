@@ -111,6 +111,7 @@ extension Chii {
   func request(url: URL, method: String, body: Any? = nil, auth: AuthMode = .auto) async throws
     -> Data
   {
+    let startTime = ContinuousClock.now
     var authed: Bool
     switch auth {
     case .auto:
@@ -120,7 +121,7 @@ extension Chii {
     case .disabled:
       authed = false
     }
-    Logger.api.info("\(method)(\(authed)): \(url.absoluteString)")
+    Logger.api.info("--> \(method) \(url.absoluteString)")
     let session = try await self.getSession(authroized: authed)
     var request = URLRequest(url: url)
     request.addValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -136,7 +137,8 @@ extension Chii {
       data = sdata
       response = sresponse
     } catch let error as NSError where error.domain == NSURLErrorDomain {
-      Logger.api.error("request NSURLErrorDomain: \(error)")
+      let duration = startTime.duration(to: .now).logFormatted
+      Logger.api.error("[\(duration)] \(method) \(url.absoluteString) NSURLErrorDomain: \(error)")
       switch error.code {
       case NSURLErrorNotConnectedToInternet:
         throw ChiiError(notice: "没有网络连接，请检查网络设置或权限后重试")
@@ -148,25 +150,33 @@ extension Chii {
         throw ChiiError(request: "\(error)")
       }
     } catch {
-      Logger.api.error("request error: \(error)")
+      let duration = startTime.duration(to: .now).logFormatted
+      Logger.api.error("[\(duration)] \(method) \(url.absoluteString) error: \(error)")
       throw ChiiError(request: "\(error)")
     }
     guard let response = response as? HTTPURLResponse else {
-      Logger.api.error("response error: \(response)")
+      let duration = startTime.duration(to: .now).logFormatted
+      Logger.api.error("[\(duration)] \(method) \(url.absoluteString) response error")
       throw ChiiError(message: "api response nil")
     }
+    let duration = startTime.duration(to: .now).logFormatted
     let requestID = response.allHeaderFields["x-request-id"] as? String
     if response.statusCode < 400 {
+      Logger.api.info("[\(duration)] \(method) \(response.statusCode) \(url.absoluteString)")
       return data
     } else if response.statusCode == 429 {
+      Logger.api.error("[\(duration)] \(method) \(response.statusCode) \(url.absoluteString)")
       throw ChiiError(notice: "请求过于频繁，请稍后再试")
     } else if response.statusCode == 401 {
+      Logger.api.error("[\(duration)] \(method) \(response.statusCode) \(url.absoluteString)")
       throw ChiiError(notice: "请求未授权，请重新登录")
     } else if response.statusCode == 403 {
+      Logger.api.error("[\(duration)] \(method) \(response.statusCode) \(url.absoluteString)")
       throw ChiiError(notice: "请求被拒绝，请检查权限")
     } else {
       let error = String(data: data, encoding: .utf8) ?? ""
-      Logger.api.error("response: \(response.statusCode): \(url.absoluteString): \(error)")
+      Logger.api.error(
+        "[\(duration)] \(method) \(response.statusCode) \(url.absoluteString): \(error)")
       throw ChiiError(code: response.statusCode, response: error, requestID: requestID)
     }
   }
@@ -260,5 +270,11 @@ extension Chii {
     } catch {
       Logger.app.error("Failed to index: \(error)")
     }
+  }
+}
+
+extension Duration {
+  var logFormatted: String {
+    self.formatted(.units(allowed: [.seconds], width: .narrow, fractionalPart: .show(length: 2)))
   }
 }

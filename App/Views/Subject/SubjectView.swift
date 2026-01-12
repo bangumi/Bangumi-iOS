@@ -27,6 +27,7 @@ struct SubjectView: View {
     do {
       let item = try await Chii.shared.loadSubject(subjectId)
       refreshed = true
+      Logger.app.debug("subject refreshed: \(subjectId)")
 
       try await Chii.shared.loadSubjectDetails(
         subjectId,
