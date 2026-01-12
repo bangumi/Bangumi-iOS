@@ -84,7 +84,7 @@ struct SubjectCollectionView: View {
       }
     }
     .sheet(isPresented: $edit) {
-      SubjectCollectionBoxView(subject: subject)
+      SubjectCollectionBoxView(subjectId: subject.subjectId)
         .presentationDragIndicator(.visible)
     }
   }

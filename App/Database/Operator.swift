@@ -338,6 +338,10 @@ extension DatabaseOperator {
       return
     }
     let now = Int(Date().timeIntervalSince1970)
+    subject.collectedAt = now - 1
+    if let ctype = type {
+      subject.ctype = ctype.rawValue
+    }
     if subject.interest == nil {
       subject.interest = SubjectInterest(
         comment: comment ?? "",

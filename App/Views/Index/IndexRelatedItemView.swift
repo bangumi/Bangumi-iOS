@@ -4,6 +4,7 @@ struct IndexRelatedItemView: View {
   @Binding var reloader: Bool
   let item: IndexRelatedDTO
   let isOwner: Bool
+  var indexAwardYear: Int? = nil
 
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
 
@@ -25,50 +26,12 @@ struct IndexRelatedItemView: View {
       VStack(alignment: .leading) {
         switch item.cat {
         case .subject:
-          HStack(alignment: .top) {
-            if let subject = item.subject {
-              ImageView(img: subject.images?.resize(.r200))
-                .imageStyle(width: 80, height: 100)
-                .imageType(.subject)
-                .imageNSFW(subject.nsfw)
-                .imageNavLink(subject.link)
-              VStack(alignment: .leading) {
-                HStack {
-                  Image(systemName: subject.type.icon)
-                    .foregroundStyle(.secondary)
-                    .font(.footnote)
-                  Text(subject.title(with: titlePreference).withLink(subject.link))
-                    .lineLimit(1)
-                  Spacer(minLength: 0)
-                }
-                if let subtitle = subject.subtitle(with: titlePreference) {
-                  Text(subtitle)
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
-                }
-                Text(subject.info ?? "")
-                  .font(.footnote)
-                  .foregroundStyle(.secondary)
-                  .lineLimit(2)
-                if !item.comment.isEmpty {
-                  BorderView(color: .secondary.opacity(0.2), padding: 4) {
-                    HStack {
-                      Text(item.comment)
-                        .font(.footnote)
-                        .textSelection(.enabled)
-                      Spacer(minLength: 0)
-                    }
-                  }
-                }
-              }
-            } else {
-              Text("神秘的条目")
-                .font(.footnote)
-                .foregroundStyle(.secondary)
-            }
-            Spacer(minLength: 0)
-          }
+          IndexRelatedSubjectItemView(
+            reloader: $reloader,
+            item: item,
+            isOwner: isOwner,
+            indexAwardYear: indexAwardYear
+          )
 
         case .character:
           HStack(alignment: .top) {

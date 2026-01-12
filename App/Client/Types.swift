@@ -1117,7 +1117,7 @@ struct IndexStats: Codable, Hashable {
 struct IndexDTO: Codable, Identifiable, Hashable, Linkable {
   var id: Int
   var uid: Int
-  var type: Int
+  var type: IndexType
   var title: String
   var desc: String
   var `private`: Bool
@@ -1148,7 +1148,7 @@ struct SlimIndexDTO: Codable, Identifiable, Hashable, Linkable {
   var id: Int
   var uid: Int
   var user: SlimUserDTO? = nil
-  var type: Int
+  var type: IndexType
   var title: String
   var `private`: Bool
   var total: Int
@@ -1212,6 +1212,12 @@ enum IndexRelatedCategory: Int, Codable, CaseIterable {
   }
 }
 
+enum IndexType: Int, Codable {
+  case user = 0
+  case `public` = 1
+  case award = 2
+}
+
 struct IndexRelatedDTO: Codable, Identifiable, Hashable {
   var id: Int
   var cat: IndexRelatedCategory
@@ -1229,6 +1235,11 @@ struct IndexRelatedDTO: Codable, Identifiable, Hashable {
   var blog: SlimBlogEntryDTO?
   var groupTopic: GroupTopicDTO?
   var subjectTopic: SubjectTopicDTO?
+
+  func awardName(year: Int) -> String? {
+    if award.isEmpty { return nil }
+    return SubjectAward(rawValue: award)?.name(year: year, type: subject?.type ?? .none)
+  }
 }
 
 enum TimelineCat: Int, Codable {

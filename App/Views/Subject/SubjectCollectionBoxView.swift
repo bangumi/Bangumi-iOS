@@ -3,12 +3,14 @@ import SwiftData
 import SwiftUI
 
 struct SubjectCollectionBoxView: View {
-  @Bindable var subject: Subject
+  let subjectId: Int
 
   @AppStorage("autoCompleteProgress") var autoCompleteProgress: Bool = false
 
+  @Environment(\.modelContext) private var modelContext
   @Environment(\.dismiss) private var dismiss
 
+  @State private var subject: Subject? = nil
   @State private var ctype: CollectionType = .none
   @State private var rate: Int = 0
   @State private var comment: String = ""
@@ -18,11 +20,11 @@ struct SubjectCollectionBoxView: View {
   @State private var updating: Bool = false
 
   var recommendedTags: [String] {
-    return subject.tags.sorted(by: { $0.count > $1.count }).prefix(15).map { $0.name }
+    return subject?.tags.sorted(by: { $0.count > $1.count }).prefix(15).map { $0.name } ?? []
   }
 
   var buttonText: String {
-    if subject.ctype != 0 {
+    if (subject?.ctype ?? 0) != 0 {
       return priv ? "悄悄地更新" : "更新"
     } else {
       return priv ? "悄悄地添加" : "添加"
@@ -43,8 +45,26 @@ struct SubjectCollectionBoxView: View {
     return ctype == .none || comment.count > 380
   }
 
-  func load() {
-    if let interest = subject.interest {
+  func load() async {
+    updating = true
+    defer {
+      updating = false
+    }
+
+    let id = subjectId
+    let predicate = #Predicate<Subject> { $0.subjectId == id }
+    let descriptor = FetchDescriptor<Subject>(predicate: predicate)
+    subject = try? modelContext.fetch(descriptor).first
+    if subject == nil {
+      do {
+        _ = try await Chii.shared.loadSubject(subjectId)
+      } catch {
+        Notifier.shared.alert(error: error)
+      }
+      subject = try? modelContext.fetch(descriptor).first
+    }
+
+    if let interest = subject?.interest {
       self.ctype = interest.type
       self.rate = interest.rate
       self.comment = interest.comment
@@ -64,7 +84,7 @@ struct SubjectCollectionBoxView: View {
     Task {
       do {
         try await Chii.shared.updateSubjectCollection(
-          subjectId: subject.subjectId,
+          subjectId: subjectId,
           type: ctype,
           rate: rate,
           comment: comment,
@@ -100,7 +120,7 @@ struct SubjectCollectionBoxView: View {
         }
         .disabled(submitDisabled)
         .padding(.vertical, 5)
-        if let interest = subject.interest, interest.updatedAt > 0 {
+        if let interest = subject?.interest, interest.updatedAt > 0 {
           Section {
             Text("上次更新：\(interest.updatedAt.datetimeDisplay)")
               + Text(" / \(interest.updatedAt.date, style: .relative)前")
@@ -112,7 +132,7 @@ struct SubjectCollectionBoxView: View {
 
         Picker("CollectionType", selection: $ctype) {
           ForEach(CollectionType.allTypes()) { ct in
-            Text("\(ct.description(subject.typeEnum))").tag(ct)
+            Text("\(ct.description(subject?.typeEnum ?? .anime))").tag(ct)
           }
         }
         .pickerStyle(.segmented)
@@ -212,12 +232,13 @@ struct SubjectCollectionBoxView: View {
         }
         Spacer()
       }
-      .onAppear(perform: load)
       .disabled(updating)
       .animation(.default, value: priv)
       .animation(.default, value: rate)
       .padding()
-    }.presentationDetents(.init([.medium, .large]))
+    }
+    .task(load)
+    .presentationDetents(.init([.medium, .large]))
   }
 }
 
@@ -227,6 +248,6 @@ struct SubjectCollectionBoxView: View {
   let subject = Subject.previewBook
   container.mainContext.insert(subject)
 
-  return SubjectCollectionBoxView(subject: subject)
+  return SubjectCollectionBoxView(subjectId: subject.subjectId)
     .modelContainer(container)
 }

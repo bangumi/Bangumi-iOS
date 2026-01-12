@@ -248,7 +248,12 @@ struct IndexView: View {
               .padding(2)
             }
             PageView<IndexRelatedDTO, _>(reloader: reloader, nextPageFunc: loadRelated) { item in
-              IndexRelatedItemView(reloader: $reloader, item: item, isOwner: isOwner)
+              IndexRelatedItemView(
+                reloader: $reloader,
+                item: item,
+                isOwner: isOwner,
+                indexAwardYear: index.award,
+              )
             }
           }
         }.padding(8)

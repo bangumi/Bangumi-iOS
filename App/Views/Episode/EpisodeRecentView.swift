@@ -95,7 +95,7 @@ struct EpisodeRecentView: View {
               }
               .buttonStyle(.scale)
               .sheet(isPresented: $showCollectionBox) {
-                SubjectCollectionBoxView(subject: subject)
+                SubjectCollectionBoxView(subjectId: subject.subjectId)
               }
             }
           }
@@ -125,7 +125,7 @@ struct EpisodeRecentView: View {
             }
             .buttonStyle(.scale)
             .sheet(isPresented: $showCollectionBox) {
-              SubjectCollectionBoxView(subject: subject)
+              SubjectCollectionBoxView(subjectId: subject.subjectId)
             }
           }
         } else {
