@@ -20,7 +20,6 @@ struct ChiiProgressView: View {
   @State private var subjectIds: [Int] = []
   @State private var counts: [SubjectType: Int] = [:]
 
-  @MainActor
   private func loadCounts() async {
     do {
       let db = try await Chii.shared.getDB()
@@ -31,7 +30,6 @@ struct ChiiProgressView: View {
     }
   }
 
-  @MainActor
   private func updateSubjectIds() async {
     do {
       let db = try await Chii.shared.getDB()
@@ -171,6 +169,9 @@ struct ChiiProgressView: View {
       }
       .task {
         guard subjectIds.isEmpty else { return }
+        refreshing = true
+        await loadCounts()
+        await updateSubjectIds()
         await refresh()
       }
       .searchable(
