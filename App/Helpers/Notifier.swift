@@ -5,11 +5,16 @@ import SwiftUI
 @MainActor
 @Observable
 class Notifier {
+  struct Notification: Identifiable, Equatable {
+    let id = UUID()
+    let message: String
+  }
+
   static let shared = Notifier()
 
   var hasAlert: Bool = false
   var currentError: ChiiError? = nil
-  var notifications: [String] = []
+  var notifications: [Notification] = []
 
   func alert(error: ChiiError) {
     switch error {
@@ -46,9 +51,10 @@ class Notifier {
 
   func notify(message: String, duration: TimeInterval = 2) {
     Logger.app.info("notify: \(message)")
-    self.notifications.append(message)
+    let notification = Notification(message: message)
+    self.notifications.append(notification)
     DispatchQueue.main.asyncAfter(deadline: .now() + duration) { [weak self] in
-      self?.notifications.removeFirst()
+      self?.notifications.removeAll(where: { $0.id == notification.id })
     }
   }
 }

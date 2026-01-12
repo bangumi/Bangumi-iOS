@@ -61,21 +61,7 @@ struct ContentView: View {
       }
     }
     .overlay {
-      VStack(alignment: .center) {
-        Spacer()
-        ForEach($notifier.notifications, id: \.self) { $notification in
-          Text(notification)
-            .padding(8)
-            .foregroundStyle(.white)
-            .background(.accent)
-            .shadow(color: .black.opacity(0.2), radius: 10, x: 0, y: 10)
-            .clipShape(RoundedRectangle(cornerRadius: 16))
-        }
-      }
-      .padding(.horizontal, 8)
-      .padding(.bottom, 64)
-      .animation(.default, value: notifier.notifications)
-      .allowsHitTesting(false)
+      NotificationOverlayView()
     }
     .alert("ERROR", isPresented: $notifier.hasAlert) {
       Button("OK") {
