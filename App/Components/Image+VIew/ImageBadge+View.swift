@@ -55,3 +55,28 @@ extension View {
     }
   }
 }
+
+struct ImageCollectionStatus: View {
+  let ctype: CollectionType?
+
+  @Environment(\.imageStyle) var style
+
+  var body: some View {
+    if let ctype, ctype != .none {
+      Image(systemName: ctype.icon)
+        .font(.system(size: 8, weight: .heavy))
+        .foregroundStyle(.white)
+        .frame(width: 16, height: 16)
+        .background(ctype.color.opacity(0.9))
+        .clipShape(RoundedRectangle(cornerRadius: style.cornerRadius))
+    }
+  }
+}
+
+extension View {
+  func imageCollectionStatus(ctype: CollectionType? = nil) -> some View {
+    self.overlay(alignment: .topLeading) {
+      ImageCollectionStatus(ctype: ctype)
+    }
+  }
+}

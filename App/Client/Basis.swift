@@ -380,6 +380,23 @@ enum CollectionType: Int, Codable, Identifiable, CaseIterable {
     }
   }
 
+  var color: Color {
+    switch self {
+    case .none:
+      return .clear
+    case .wish:
+      return .pink
+    case .collect:
+      return .green
+    case .doing:
+      return .blue
+    case .onHold:
+      return .orange
+    case .dropped:
+      return .gray
+    }
+  }
+
   func description(_ type: SubjectType?) -> String {
     var action: String
     let type = type ?? .none

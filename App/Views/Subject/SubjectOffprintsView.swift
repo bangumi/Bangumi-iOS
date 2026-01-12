@@ -30,14 +30,10 @@ struct SubjectOffprintsView: View {
       ScrollView(.horizontal, showsIndicators: false) {
         LazyHStack(alignment: .top) {
           ForEach(offprints) { offprint in
-            let ctype = collections[offprint.subject.id] ?? .none
             ImageView(img: offprint.subject.images?.resize(.r200))
+              .imageCollectionStatus(ctype: collections[offprint.subject.id])
               .imageStyle(width: 60, height: 80)
               .imageType(.subject)
-              .imageBadge(show: ctype != .none) {
-                Label(ctype.description(offprint.subject.type), systemImage: ctype.icon)
-                  .labelStyle(.compact)
-              }
               .imageNavLink(offprint.subject.link)
               .padding(2)
               .shadow(radius: 2)
