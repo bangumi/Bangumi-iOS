@@ -92,6 +92,26 @@ struct IndexView: View {
     }
   }
 
+  func collectIndex() async {
+    do {
+      try await Chii.shared.collectIndex(indexId)
+      Notifier.shared.notify(message: "已收藏")
+      await refresh()
+    } catch {
+      Notifier.shared.alert(error: error)
+    }
+  }
+
+  func uncollectIndex() async {
+    do {
+      try await Chii.shared.uncollectIndex(indexId)
+      Notifier.shared.notify(message: "已取消收藏")
+      await refresh()
+    } catch {
+      Notifier.shared.alert(error: error)
+    }
+  }
+
   var isOwner: Bool {
     if !isAuthenticated {
       return false
@@ -278,9 +298,25 @@ struct IndexView: View {
             } label: {
               Label("删除", systemImage: "trash")
             }
+          }
+          if isAuthenticated, let index = index {
             Divider()
+            if index.collectedAt ?? 0 > 0 {
+              Button {
+                Task { await uncollectIndex() }
+              } label: {
+                Label("取消收藏", systemImage: "star.slash")
+              }
+            } else {
+              Button {
+                Task { await collectIndex() }
+              } label: {
+                Label("收藏目录", systemImage: "star")
+              }
+            }
           }
           if !isolationMode {
+            Divider()
             Button {
               showCommentBox = true
             } label: {

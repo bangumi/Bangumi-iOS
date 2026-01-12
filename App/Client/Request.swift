@@ -1558,6 +1558,18 @@ extension Chii {
     _ = try await self.request(url: url, method: "DELETE", body: body)
   }
 
+  func collectIndex(_ indexId: Int) async throws {
+    let url = BangumiAPI.priv.build("p1/collections/indexes/\(indexId)")
+    let body: [String: Any] = [:]
+    _ = try await self.request(url: url, method: "PUT", body: body, auth: .required)
+  }
+
+  func uncollectIndex(_ indexId: Int) async throws {
+    let url = BangumiAPI.priv.build("p1/collections/indexes/\(indexId)")
+    let body: [String: Any] = [:]
+    _ = try await self.request(url: url, method: "DELETE", body: body, auth: .required)
+  }
+
   func getIndexRelated(
     indexId: Int, cat: IndexRelatedCategory? = nil, type: SubjectType? = nil,
     limit: Int = 20, offset: Int = 0
