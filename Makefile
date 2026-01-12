@@ -3,7 +3,15 @@
 SCHEME = Bangumi
 PROJECT = Bangumi.xcodeproj
 
-build: ## Build for iOS (CI, uses simulator, no code signing)
+format: ## Format Swift files with swift-format
+	@echo "$(GREEN)Formatting Swift files...$(NC)"
+	@find . -name "*.swift" -not -path "./DerivedData/*" -not -path "./.build/*" | xargs swift-format -i
+
+build: ## Build for iOS
+	@echo "Building for iOS..."
+	@xcodebuild -project $(PROJECT) -scheme $(SCHEME) -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' build -quiet
+
+build-ci: ## Build for iOS (CI, uses simulator, no code signing)
 	@echo "Building for iOS..."
 	@xcodebuild -project $(PROJECT) -scheme $(SCHEME) -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' build -quiet CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
 

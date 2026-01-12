@@ -25,4 +25,4 @@ jobs:
         run: xcodebuild -version
 
       - name: Build iOS
-        run: make build
+        run: make build-ci
