@@ -139,8 +139,8 @@ struct TrendingSubjectTypeView: View {
                 .imageNavLink(item.subject.link)
                 .subjectPreview(item.subject)
             }
-          }
-        }
+          }.scrollTargetLayout()
+        }.scrollTargetBehavior(.viewAligned)
       }
     }.animation(.default, value: items)
   }
