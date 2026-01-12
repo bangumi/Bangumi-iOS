@@ -2,6 +2,7 @@ import SwiftUI
 
 struct NoticeView: View {
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
+  @AppStorage("hasUnreadNotice") var hasUnreadNotice: Bool = false
 
   @State private var fetched: Bool = false
   @State private var updating: Bool = false
@@ -12,6 +13,7 @@ struct NoticeView: View {
     let resp = try await Chii.shared.listNotice(limit: 20)
     notices = resp.data
     unreadCount = notices.count(where: { $0.unread })
+    hasUnreadNotice = unreadCount > 0
   }
 
   func refreshNotice() async {
@@ -39,6 +41,8 @@ struct NoticeView: View {
       for i in 0..<notices.count {
         notices[i].unread = false
       }
+      unreadCount = 0
+      hasUnreadNotice = false
       updating = false
     }
   }
@@ -51,12 +55,13 @@ struct NoticeView: View {
         if let index = notices.firstIndex(where: { $0.id == id }) {
           notices[index].unread = false
           unreadCount = notices.count(where: { $0.unread })
+          hasUnreadNotice = unreadCount > 0
         }
       } catch {
         Notifier.shared.alert(error: error)
       }
+      updating = false
     }
-    updating = false
   }
 
   var body: some View {

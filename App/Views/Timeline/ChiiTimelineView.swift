@@ -86,12 +86,12 @@ struct ChiiTimelineView: View {
             HStack {
               NavigationLink(value: NavDestination.notice) {
                 Image(systemName: hasUnreadNotice ? "bell.badge.fill" : "bell")
-                  .task(checkNotice)
               }
             }
           }
         }
       }
+      .task(checkNotice)
       .alert("退出登录", isPresented: $logoutConfirm) {
         Button("确定", role: .destructive) {
           Task {
