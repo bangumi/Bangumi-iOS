@@ -47,10 +47,10 @@ extension Chii {
     }
 
     try await db.saveSubject(item)
+    await db.commit()
     if item.interest != nil {
       await self.index([item.searchable()])
     }
-    await db.commit()
     return item
   }
 
@@ -169,10 +169,10 @@ extension Chii {
       throw ChiiError(message: "这是一个被合并的角色")
     }
     try await db.saveCharacter(item)
+    await db.commit()
     if item.collectedAt != nil {
       await self.index([item.searchable()])
     }
-    await db.commit()
   }
 
   func loadCharacterDetails(_ characterId: Int) async throws {
@@ -195,10 +195,10 @@ extension Chii {
       throw ChiiError(message: "这是一个被合并的人物")
     }
     try await db.savePerson(item)
+    await db.commit()
     if item.collectedAt != nil {
       await self.index([item.searchable()])
     }
-    await db.commit()
   }
 
   func loadPersonDetails(_ personId: Int) async throws {
