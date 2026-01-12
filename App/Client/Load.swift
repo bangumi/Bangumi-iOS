@@ -8,7 +8,7 @@ extension Chii {
     let db = try self.getDB()
     let item = try await self.getUser(username)
     try await db.saveUser(item)
-    await db.commit()
+    try await db.commitImmediately()
     return item
   }
 
@@ -47,7 +47,7 @@ extension Chii {
     }
 
     try await db.saveSubject(item)
-    await db.commit()
+    try await db.commitImmediately()
     if item.interest != nil {
       await self.index([item.searchable()])
     }
@@ -94,8 +94,7 @@ extension Chii {
     try await db.saveSubjectRelations(subjectId: subjectId, items: relationsVal.data)
     try await db.saveSubjectRecs(subjectId: subjectId, items: recsVal.data)
     try await db.saveSubjectIndexes(subjectId: subjectId, items: indexesVal.data)
-
-    await db.commit()
+    try await db.commitImmediately()
   }
 
   func loadSubjectPositions(_ subjectId: Int) async throws {
@@ -116,7 +115,7 @@ extension Chii {
       }
     }
     try await db.saveSubjectPositions(subjectId: subjectId, items: items)
-    await db.commit()
+    try await db.commitImmediately()
   }
 
   func loadEpisodes(_ subjectId: Int) async throws {
@@ -169,7 +168,7 @@ extension Chii {
       throw ChiiError(message: "这是一个被合并的角色")
     }
     try await db.saveCharacter(item)
-    await db.commit()
+    try await db.commitImmediately()
     if item.collectedAt != nil {
       await self.index([item.searchable()])
     }
@@ -184,7 +183,7 @@ extension Chii {
 
     try await db.saveCharacterCasts(characterId: characterId, items: castsVal.data)
     try await db.saveCharacterIndexes(characterId: characterId, items: indexesVal.data)
-    await db.commit()
+    try await db.commitImmediately()
   }
 
   func loadPerson(_ pid: Int) async throws {
@@ -195,7 +194,7 @@ extension Chii {
       throw ChiiError(message: "这是一个被合并的人物")
     }
     try await db.savePerson(item)
-    await db.commit()
+    try await db.commitImmediately()
     if item.collectedAt != nil {
       await self.index([item.searchable()])
     }
@@ -212,7 +211,7 @@ extension Chii {
     try await db.savePersonCasts(personId: personId, items: castsVal.data)
     try await db.savePersonWorks(personId: personId, items: worksVal.data)
     try await db.savePersonIndexes(personId: personId, items: indexesVal.data)
-    await db.commit()
+    try await db.commitImmediately()
   }
 }
 
@@ -221,7 +220,7 @@ extension Chii {
     let db = try self.getDB()
     let item = try await self.getGroup(name)
     try await db.saveGroup(item)
-    await db.commit()
+    try await db.commitImmediately()
   }
 
   func loadGroupDetails(_ name: String) async throws {
@@ -237,6 +236,6 @@ extension Chii {
     try await db.saveGroupModerators(groupName: name, items: moderatorsVal.data)
     try await db.saveGroupRecentTopics(groupName: name, items: topicsVal.data)
 
-    await db.commit()
+    try await db.commitImmediately()
   }
 }
