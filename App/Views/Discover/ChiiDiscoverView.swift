@@ -16,25 +16,25 @@ struct ChiiDiscoverView: View {
   }
 
   var body: some View {
-    VStack {
-      if searching {
-        SearchView(text: $query, searching: $searching, remote: $remote)
-      } else {
-        GeometryReader { geometry in
+    GeometryReader { geometry in
+      VStack {
+        if searching {
+          SearchView(text: $query, searching: $searching, remote: $remote)
+        } else {
           ScrollView {
             VStack {
               CalendarSlimView()
-              TrendingSubjectView(width: geometry.size.width - 16)
-            }.padding(.horizontal, 8)
+              TrendingSubjectView(width: geometry.size.width)
+            }
           }
         }
-        .refreshable {
-          await refresh()
-        }
-        .navigationTitle("发现")
-        .toolbarTitleDisplayMode(.inline)
       }
     }
+    .refreshable {
+      await refresh()
+    }
+    .navigationTitle("发现")
+    .toolbarTitleDisplayMode(.inline)
     .searchable(
       text: $query, isPresented: $searching,
       placement: .navigationBarDrawer(displayMode: .always),

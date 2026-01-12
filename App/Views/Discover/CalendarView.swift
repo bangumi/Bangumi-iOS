@@ -68,7 +68,6 @@ struct CalendarView: View {
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
 
   @State private var refreshed: Bool = false
-  @State private var width: CGFloat = 0
 
   @Query(sort: \BangumiCalendar.weekday)
   private var calendars: [BangumiCalendar]
@@ -118,56 +117,44 @@ struct CalendarView: View {
         await refreshCalendar()
       }
     } else {
-      GeometryReader { geometry in
-        ScrollView {
+      ScrollView {
+        VStack {
+          Text("每日放送")
+            .font(.title)
+            .padding(.top, 10)
           VStack {
-            Text("每日放送")
-              .font(.title)
-              .padding(.top, 10)
-            VStack {
-              Text("\(today.formatted(date: .complete, time: .omitted))")
-              Text("本季度共 \(total) 部番组，今日上映 \(todayTotal) 部。")
-              Text("共 \(todayWatchers) 人收看今日番组。")
-            }
-            .font(.footnote)
-            .foregroundStyle(.secondary)
-          }.padding(.horizontal, 8)
-          LazyVStack {
-            ForEach(sortedCalendars) { calendar in
-              CalendarWeekdayView(width: geometry.size.width - 16, calendar: calendar)
-                .padding(.vertical, 10)
-            }
-          }.padding(.horizontal, 8)
-        }
-        .navigationTitle("每日放送")
-        .navigationBarTitleDisplayMode(.inline)
-        .refreshable {
-          refreshed = false
-          UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-          await refreshCalendar()
-        }
+            Text("\(today.formatted(date: .complete, time: .omitted))")
+            Text("本季度共 \(total) 部番组，今日上映 \(todayTotal) 部。")
+            Text("共 \(todayWatchers) 人收看今日番组。")
+          }
+          .font(.footnote)
+          .foregroundStyle(.secondary)
+        }.padding(.horizontal, 8)
+        LazyVStack {
+          ForEach(sortedCalendars) { calendar in
+            CalendarWeekdayView(calendar: calendar)
+              .padding(.vertical, 10)
+          }
+        }.padding(.horizontal, 8)
+      }
+      .navigationTitle("每日放送")
+      .navigationBarTitleDisplayMode(.inline)
+      .refreshable {
+        refreshed = false
+        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+        await refreshCalendar()
       }
     }
   }
 }
 
 struct CalendarWeekdayView: View {
-  let width: CGFloat
   @Bindable var calendar: BangumiCalendar
 
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
 
   var weekday: WeekDay {
     WeekDay(calendar.weekday)
-  }
-
-  var columnCount: Int {
-    let columns = Int((width - 8) / 118)
-    return columns > 0 ? columns : 1
-  }
-
-  var columns: [GridItem] {
-    Array(repeating: GridItem(.flexible()), count: columnCount)
   }
 
   var body: some View {
@@ -186,11 +173,11 @@ struct CalendarWeekdayView: View {
       .cornerRadius(10)
       .shadow(radius: 5)
 
-      LazyVGrid(columns: columns) {
+      LazyVGrid(columns: [GridItem(.adaptive(minimum: 110))]) {
         ForEach(calendar.items) { item in
           VStack {
             ImageView(img: item.subject.images?.resize(.r200))
-              .imageStyle(width: 110, height: item.subject.type.coverHeight(for: 110))
+              .imageStyle(aspectRatio: 0.707)
               .imageType(.subject)
               .imageCaption {
                 HStack {

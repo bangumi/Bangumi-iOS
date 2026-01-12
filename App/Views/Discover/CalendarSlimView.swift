@@ -85,7 +85,7 @@ struct CalendarSlimView: View {
           Divider()
         }
       }
-    }
+    }.padding(.horizontal, 8)
   }
 }
 
