@@ -14,10 +14,11 @@ struct NotificationOverlayView: View {
             .background(.accent)
             .clipShape(Capsule())
             .shadow(color: .black.opacity(0.15), radius: 8, x: 0, y: 4)
-            .transition(.asymmetric(
-              insertion: .move(edge: .bottom).combined(with: .opacity),
-              removal: .opacity.combined(with: .scale(scale: 0.9))
-            ))
+            .transition(
+              .asymmetric(
+                insertion: .move(edge: .bottom).combined(with: .opacity),
+                removal: .opacity.combined(with: .scale(scale: 0.9))
+              ))
         }
       }
       .padding(.bottom, 64)
