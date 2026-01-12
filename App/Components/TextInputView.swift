@@ -36,7 +36,6 @@ struct TextInputView: View {
   @Binding var text: String
 
   @Environment(\.textInputStyle) var style
-  @Environment(\.modelContext) var modelContext
 
   @Query private var drafts: [Draft]
 
@@ -155,8 +154,6 @@ private struct DraftBoxView: View {
   let drafts: [Draft]
   let onLoad: (Draft) -> Void
   @Binding var isPresented: Bool
-
-  @Environment(\.modelContext) var modelContext
 
   var body: some View {
     NavigationStack {

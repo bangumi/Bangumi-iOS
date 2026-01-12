@@ -60,8 +60,6 @@ struct GroupDetailView: View {
   @AppStorage("shareDomain") var shareDomain: ShareDomain = .chii
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
 
-  @Environment(\.modelContext) private var modelContext
-
   @Query(filter: #Predicate<RakuenGroupCache> { $0.id == "pin" })
   private var pinCaches: [RakuenGroupCache]
 

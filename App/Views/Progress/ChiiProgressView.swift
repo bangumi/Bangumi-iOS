@@ -10,8 +10,6 @@ struct ChiiProgressView: View {
   @AppStorage("progressSecondLineMode") var secondLineMode: ProgressSecondLineMode = .info
   @AppStorage("progressTab") var progressTab: SubjectType = .none
 
-  @Environment(\.modelContext) var modelContext
-
   @State private var refreshing: Bool = false
   @State private var refreshProgress: CGFloat = 0
   @State private var showRefreshAll: Bool = false

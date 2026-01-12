@@ -9,8 +9,6 @@ struct EpisodeGridView: View {
   @AppStorage("isolationMode") var isolationMode: Bool = false
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
 
-  @Environment(\.modelContext) var modelContext
-
   @State private var refreshed: Bool = false
 
   @Query private var subjects: [Subject] = []

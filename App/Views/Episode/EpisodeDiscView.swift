@@ -6,8 +6,6 @@ import SwiftUI
 struct EpisodeDiscView: View {
   let subjectId: Int
 
-  @Environment(\.modelContext) var modelContext
-
   @State private var refreshed: Bool = false
 
   @Query private var episodes: [Episode]

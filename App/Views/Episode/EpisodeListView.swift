@@ -98,8 +98,6 @@ struct EpisodeListDetailView: View {
   let main: Bool
   let filterCollection: Bool
 
-  @Environment(\.modelContext) var modelContext
-
   @Query private var episodes: [Episode]
 
   init(subjectId: Int, sortDesc: Bool, main: Bool, filterCollection: Bool) {

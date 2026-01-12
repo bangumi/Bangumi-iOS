@@ -3,7 +3,6 @@ import SwiftData
 import SwiftUI
 
 struct HotGroupsView: View {
-  @Environment(\.modelContext) private var modelContext
   @Query private var caches: [RakuenGroupCache]
 
   @State private var hotItems: [SlimGroupDTO] = []

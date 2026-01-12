@@ -19,8 +19,6 @@ struct SettingsView: View {
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
   @AppStorage("anonymizeTopicUsers") var anonymizeTopicUsers: Bool = false
 
-  @Environment(\.modelContext) var modelContext
-
   @State private var spotlightRefreshing: Bool = false
   @State private var spotlightProgress: CGFloat = 0
   @State private var logoutConfirm: Bool = false

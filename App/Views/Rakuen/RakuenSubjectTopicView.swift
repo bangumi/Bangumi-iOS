@@ -96,7 +96,6 @@ struct CachedSubjectTopicListView: View {
   let mode: SubjectTopicFilterMode
   @Binding var reloader: Bool
 
-  @Environment(\.modelContext) private var modelContext
   @Query private var caches: [RakuenSubjectTopicCache]
 
   @AppStorage("hideBlocklist") var hideBlocklist: Bool = false

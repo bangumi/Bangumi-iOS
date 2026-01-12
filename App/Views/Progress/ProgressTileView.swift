@@ -40,8 +40,6 @@ struct ProgressTileItemContentView: View {
   @AppStorage("subjectImageQuality") var subjectImageQuality: ImageQuality = .high
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
 
-  @Environment(\.modelContext) var modelContext
-
   var body: some View {
     let subjectId = subject.subjectId
     VStack(alignment: .leading, spacing: 4) {

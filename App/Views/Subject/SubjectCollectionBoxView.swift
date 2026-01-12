@@ -7,7 +7,6 @@ struct SubjectCollectionBoxView: View {
 
   @AppStorage("autoCompleteProgress") var autoCompleteProgress: Bool = false
 
-  @Environment(\.modelContext) var modelContext
   @Environment(\.dismiss) private var dismiss
 
   @State private var ctype: CollectionType = .none

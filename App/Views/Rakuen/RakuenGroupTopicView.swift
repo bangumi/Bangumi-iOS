@@ -87,7 +87,6 @@ struct CachedGroupTopicListView: View {
   let mode: GroupTopicFilterMode
   @Binding var reloader: Bool
 
-  @Environment(\.modelContext) private var modelContext
   @Query private var caches: [RakuenGroupTopicCache]
 
   @AppStorage("hideBlocklist") var hideBlocklist: Bool = false

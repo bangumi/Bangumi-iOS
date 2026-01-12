@@ -14,8 +14,6 @@ struct EpisodeRecentView: View {
 
   @State private var showCollectionBox: Bool = false
 
-  @Environment(\.modelContext) var modelContext
-
   @Query private var episodes: [Episode] = []
 
   var nextEpisode: Episode? {

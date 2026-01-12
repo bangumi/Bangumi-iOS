@@ -6,8 +6,6 @@ struct CollectionRowView: View {
 
   @Bindable var subject: Subject
 
-  @Environment(\.modelContext) var modelContext
-
   var body: some View {
     HStack(alignment: .top) {
       ImageView(img: subject.images?.resize(.r200))

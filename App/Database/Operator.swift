@@ -129,6 +129,16 @@ extension DatabaseOperator {
     return episodes.map { $0.episodeId }
   }
 
+  public func getCollectionTypes(subjectIds: [Int]) throws -> [Int: CollectionType] {
+    guard !subjectIds.isEmpty else { return [:] }
+    let descriptor = FetchDescriptor<Subject>(
+      predicate: #Predicate<Subject> {
+        subjectIds.contains($0.subjectId)
+      })
+    let subjects = try modelContext.fetch(descriptor)
+    return subjects.reduce(into: [:]) { $0[$1.subjectId] = $1.ctypeEnum }
+  }
+
   public func getSearchable<T: PersistentModel & Searchable>(
     _ type: T.Type,
     descriptor: FetchDescriptor<T>,
