@@ -61,8 +61,7 @@ struct ProgressTileItemContentView: View {
           NavigationLink(value: NavDestination.subject(subjectId)) {
             Text(subject.title(with: titlePreference))
               .font(.headline)
-              .lineLimit(2)
-              .fixedSize(horizontal: false, vertical: true)
+              .lineLimit(1)
           }.buttonStyle(.scale)
 
           ProgressSecondLineView(subject: subject)
