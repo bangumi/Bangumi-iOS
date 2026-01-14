@@ -1,11 +1,30 @@
-.PHONY: build update_preview_date
+.PHONY: help build update_preview_date bump major minor format
 
 SCHEME = Bangumi
 PROJECT = Bangumi.xcodeproj
+MISC_DIR = misc
 
-format: ## Format Swift files with swift-format
+# Colors
+GREEN = \033[0;32m
+YELLOW = \033[1;33m
+RED = \033[0;31m
+NC = \033[0m # No Color
+
+help: ## Show this help message
+	@echo "Bangumi Build Commands"
+	@echo ""
+	@echo "Version commands:"
+	@echo "  make bump             - Increment CURRENT_PROJECT_VERSION in project.pbxproj"
+	@echo "  make major            - Increment major version (MARKETING_VERSION)"
+	@echo "  make minor            - Increment minor version (MARKETING_VERSION)"
+	@echo ""
+	@echo "Format commands:"
+	@echo "  make format           - Format Swift files with swift-format"
+	@echo ""
+
 	@echo "$(GREEN)Formatting Swift files...$(NC)"
 	@find . -name "*.swift" -not -path "./DerivedData/*" -not -path "./.build/*" | xargs swift-format -i
+
 
 build: ## Build for iOS
 	@echo "Building for iOS..."
@@ -85,3 +104,12 @@ update_trending:
 update_index:
 	curl -sSfLo "$(PREVIEW_PATH)/index.json" https://next.bgm.tv/p1/indexes/83001
 	curl -sSfLo "$(PREVIEW_PATH)/index_related.json" https://next.bgm.tv/p1/indexes/83001/related
+
+bump: ## Increment CURRENT_PROJECT_VERSION in project.pbxproj
+	@$(MISC_DIR)/bump.sh
+
+major: ## Increment major version (MARKETING_VERSION)
+	@$(MISC_DIR)/bump-version.sh major
+
+minor: ## Increment minor version (MARKETING_VERSION)
+	@$(MISC_DIR)/bump-version.sh minor
