@@ -12,7 +12,6 @@ struct ProgressTileView: View {
         }
       }
     }
-    .animation(.default, value: subjectIds)
     .padding(.horizontal, 8)
   }
 }

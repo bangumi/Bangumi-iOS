@@ -10,7 +10,7 @@ struct ChiiProgressView: View {
   @AppStorage("progressSecondLineMode") var secondLineMode: ProgressSecondLineMode = .info
   @AppStorage("progressTab") var progressTab: SubjectType = .none
 
-  @State private var refreshing: Bool = false
+  @State private var refreshing: Bool = true
   @State private var refreshProgress: CGFloat = 0
   @State private var showRefreshAll: Bool = false
 
@@ -173,6 +173,7 @@ struct ChiiProgressView: View {
           }
         }
       }
+      .animation(.default, value: subjectIds)
       .refreshable {
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
         await refresh(showProgress: false)
@@ -183,6 +184,7 @@ struct ChiiProgressView: View {
         await updateSubjectIds()
         await loadCounts()
         await refresh()
+        refreshing = false
       }
       .searchable(
         text: $search,
