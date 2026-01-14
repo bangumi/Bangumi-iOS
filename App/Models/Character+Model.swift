@@ -49,6 +49,20 @@ final class CharacterV2: Searchable, Linkable {
     return "chii://character/\(characterId)"
   }
 
+  var slim: SlimCharacterDTO {
+    SlimCharacterDTO(
+      id: characterId,
+      images: images,
+      lock: lock,
+      name: name,
+      nameCN: nameCN,
+      nsfw: nsfw,
+      role: roleEnum,
+      info: info,
+      comment: comment
+    )
+  }
+
   init(_ item: CharacterDTO) {
     self.characterId = item.id
     self.collects = item.collects

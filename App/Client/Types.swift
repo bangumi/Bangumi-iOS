@@ -546,6 +546,28 @@ struct SlimCharacterDTO: Codable, Identifiable, Hashable, Linkable {
     self.info = character.info
   }
 
+  init(
+    id: Int,
+    images: Images?,
+    lock: Bool,
+    name: String,
+    nameCN: String,
+    nsfw: Bool,
+    role: CharacterType,
+    info: String?,
+    comment: Int?
+  ) {
+    self.id = id
+    self.images = images
+    self.lock = lock
+    self.name = name
+    self.nameCN = nameCN
+    self.nsfw = nsfw
+    self.role = role
+    self.info = info
+    self.comment = comment
+  }
+
   func title(with preference: TitlePreference) -> String {
     preference.title(name: name, nameCN: nameCN)
   }
@@ -781,6 +803,30 @@ struct SlimPersonDTO: Codable, Identifiable, Hashable, Linkable {
     self.nsfw = person.nsfw
     self.comment = person.comment
     self.info = person.info
+  }
+
+  init(
+    id: Int,
+    name: String,
+    nameCN: String,
+    type: PersonType,
+    career: [PersonCareer]?,
+    images: Images?,
+    lock: Bool,
+    nsfw: Bool,
+    comment: Int?,
+    info: String?
+  ) {
+    self.id = id
+    self.name = name
+    self.nameCN = nameCN
+    self.type = type
+    self.career = career
+    self.images = images
+    self.lock = lock
+    self.nsfw = nsfw
+    self.comment = comment
+    self.info = info
   }
 
   func title(with preference: TitlePreference) -> String {

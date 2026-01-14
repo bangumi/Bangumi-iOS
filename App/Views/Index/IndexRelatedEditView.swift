@@ -86,6 +86,14 @@ struct IndexRelatedAddSheet: View {
         } header: {
           Text("可选")
         }
+
+        if let rid = Int(relatedId), !relatedId.isEmpty {
+          Section {
+            IndexRelatedPreviewView(category: selectedCategory, relatedId: rid)
+          } header: {
+            Text("预览")
+          }
+        }
       }
       .navigationTitle("添加关联内容")
       .navigationBarTitleDisplayMode(.inline)

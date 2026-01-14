@@ -51,6 +51,21 @@ final class PersonV2: Searchable, Linkable {
     return "chii://person/\(personId)"
   }
 
+  var slim: SlimPersonDTO {
+    SlimPersonDTO(
+      id: personId,
+      name: name,
+      nameCN: nameCN,
+      type: typeEnum,
+      career: career.compactMap { PersonCareer(rawValue: $0) },
+      images: images,
+      lock: lock,
+      nsfw: nsfw,
+      comment: comment,
+      info: info
+    )
+  }
+
   init(_ item: PersonDTO) {
     self.personId = item.id
     self.career = item.career.map(\.rawValue)
