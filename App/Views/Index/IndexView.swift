@@ -125,7 +125,7 @@ struct IndexView: View {
           Text(index.title)
             .font(.title2)
             .bold()
-          CardView {
+          CardView(background: .secondary.opacity(0.05)) {
             VStack(alignment: .leading, spacing: 4) {
               HStack(alignment: .top, spacing: 8) {
                 ImageView(img: index.user.avatar?.large)
@@ -199,7 +199,8 @@ struct IndexView: View {
                     showAddRelated = true
                   } label: {
                     Label("添加新关联", systemImage: "plus")
-                  }.adaptiveButtonStyle(.borderedProminent)
+                  }
+                  .adaptiveButtonStyle(.borderedProminent)
                 }
 
                 HStack {
@@ -254,15 +255,15 @@ struct IndexView: View {
                     }
                   }
                 }
-                .padding(4)
-                .background(
-                  RoundedRectangle(cornerRadius: 20)
-                    .fill(.secondary.opacity(0.03))
-                    .stroke(.white, lineWidth: 1)
-                    .shadow(radius: 1)
-                )
+                .padding(2)
+                .background {
+                  Capsule()
+                    .fill(.ultraThinMaterial)
+                    .shadow(color: .primary.opacity(0.3), radius: 2)
+                }
               }
               .font(.footnote)
+              .controlSize(.mini)
               .padding(2)
             }
             .scrollClipDisabled()

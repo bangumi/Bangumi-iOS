@@ -80,9 +80,9 @@ struct IndexRelatedSubjectItemView: View {
                   Text("收藏")
                 }
               }
-              .adaptiveButtonStyle(.bordered)
               .font(.caption)
               .controlSize(.mini)
+              .adaptiveButtonStyle(.bordered)
             }
           }
 

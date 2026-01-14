@@ -331,16 +331,16 @@ struct IndexRelatedItemView: View {
         if isOwner {
           Divider()
           HStack {
-            Button(role: .destructive) {
-              showDeleteRelated = true
-            } label: {
-              Text("删除关联")
-            }
-            Spacer()
             Button {
               showEditRelated = true
             } label: {
               Text("修改评价")
+            }
+            Spacer()
+            Button(role: .destructive) {
+              showDeleteRelated = true
+            } label: {
+              Text("删除关联")
             }
           }.font(.footnote)
         }

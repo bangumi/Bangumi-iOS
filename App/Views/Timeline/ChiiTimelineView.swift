@@ -83,10 +83,8 @@ struct ChiiTimelineView: View {
         }
         if isAuthenticated, !isolationMode {
           ToolbarItem(placement: .topBarTrailing) {
-            HStack {
-              NavigationLink(value: NavDestination.notice) {
-                Image(systemName: hasUnreadNotice ? "bell.badge.fill" : "bell")
-              }
+            NavigationLink(value: NavDestination.notice) {
+              Image(systemName: hasUnreadNotice ? "bell.badge.fill" : "bell")
             }
           }
         }
