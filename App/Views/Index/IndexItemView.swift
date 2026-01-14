@@ -22,6 +22,10 @@ struct IndexItemView: View {
               Text(user.nickname.withLink(user.link))
                 .lineLimit(1)
             }.font(.footnote)
+          } else if index.private {
+            Label("私有", systemImage: "lock")
+              .font(.caption2)
+              .foregroundStyle(.secondary)
           }
           HStack(spacing: 5) {
             if let count = index.stats.subject.book, count > 0 {

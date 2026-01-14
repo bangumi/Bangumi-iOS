@@ -29,6 +29,7 @@ enum ChiiError: Error, CustomStringConvertible {
   case notAuthorized(String)
   case forbidden(String)
   case notFound(String)
+  case conflict(String)
   case generic(String)
   case notice(String)
   case ignore(String)
@@ -59,6 +60,8 @@ enum ChiiError: Error, CustomStringConvertible {
       self = .forbidden(response)
     case 404:
       self = .notFound(response)
+    case 409:
+      self = .conflict(response)
     default:
       var text = "code: \(code)\n"
       text += "response: \(response)\n"
@@ -85,6 +88,8 @@ enum ChiiError: Error, CustomStringConvertible {
       return "Forbidden!\n\(error)"
     case .notFound(let error):
       return "Not Found!\n\(error)"
+    case .conflict(let error):
+      return "Conflict!\n\(error)"
     case .generic(let message):
       return message
     case .notice(let message):

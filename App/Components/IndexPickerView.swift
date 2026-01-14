@@ -36,6 +36,9 @@ struct IndexPickerSheet: View {
       )
       Notifier.shared.notify(message: "已添加到「\(index.title)」")
       dismiss()
+    } catch ChiiError.conflict {
+      Notifier.shared.notify(message: "目录「\(index.title)」里已存在")
+      dismiss()
     } catch {
       Notifier.shared.alert(error: error)
     }
@@ -63,32 +66,14 @@ struct IndexPickerSheet: View {
           .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else {
           ScrollView {
-            LazyVStack(spacing: 8) {
+            LazyVStack {
               ForEach(indexes, id: \.self) { item in
                 Button {
                   Task {
                     await addToIndex(item)
                   }
                 } label: {
-                  CardView {
-                    VStack(alignment: .leading, spacing: 4) {
-                      Text(item.title)
-                        .font(.headline)
-                        .foregroundStyle(.primary)
-                      HStack {
-                        Label("\(item.total)项", systemImage: "list.bullet")
-                          .font(.caption2)
-                          .foregroundStyle(.secondary)
-                        Spacer()
-                        if item.private {
-                          Label("私有", systemImage: "lock")
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
-                        }
-                      }
-                    }
-                  }
-                  .padding(.vertical, 4)
+                  IndexItemView(index: item)
                 }
                 .disabled(adding)
                 .buttonStyle(.plain)
