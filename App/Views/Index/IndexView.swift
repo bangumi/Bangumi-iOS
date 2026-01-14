@@ -113,9 +113,7 @@ struct IndexView: View {
   }
 
   var isOwner: Bool {
-    if !isAuthenticated {
-      return false
-    }
+    guard isAuthenticated else { return false }
     guard let index = index else { return false }
     return index.user.username == profile.username
   }

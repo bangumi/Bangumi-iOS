@@ -7,6 +7,7 @@ struct IndexRelatedSubjectItemView: View {
   let isOwner: Bool
   var indexAwardYear: Int? = nil
 
+  @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
   @Query private var subjects: [Subject]
   @State private var showCollectionBox = false
@@ -34,33 +35,57 @@ struct IndexRelatedSubjectItemView: View {
           .imageNSFW(itemSubject.nsfw)
           .imageNavLink(itemSubject.link)
         VStack(alignment: .leading) {
-          HStack(spacing: 4) {
-            Image(systemName: itemSubject.type.icon)
-              .foregroundStyle(.secondary)
-              .font(.footnote)
-            if let year = indexAwardYear, let awardName = item.awardName(year: year) {
-              BadgeView(background: .blue) {
-                Text(awardName)
-                  .font(.caption2)
-                  .bold()
-                  .foregroundStyle(.white)
+          VStack(alignment: .leading) {
+            HStack(spacing: 4) {
+              Image(systemName: itemSubject.type.icon)
+                .foregroundStyle(.secondary)
+                .font(.footnote)
+              if let year = indexAwardYear, let awardName = item.awardName(year: year) {
+                BadgeView(background: .blue) {
+                  Text(awardName)
+                    .font(.caption2)
+                    .bold()
+                    .foregroundStyle(.white)
+                }
+                .shadow(radius: 1)
               }
-              .shadow(radius: 1)
+              Text(itemSubject.title(with: titlePreference).withLink(itemSubject.link))
+                .lineLimit(1)
+              Spacer(minLength: 0)
             }
-            Text(itemSubject.title(with: titlePreference).withLink(itemSubject.link))
-              .lineLimit(1)
-            Spacer(minLength: 0)
-          }
-          if let subtitle = itemSubject.subtitle(with: titlePreference) {
-            Text(subtitle)
+            if let subtitle = itemSubject.subtitle(with: titlePreference) {
+              Text(subtitle)
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+                .lineLimit(1)
+            }
+            Text(itemSubject.info ?? "")
               .font(.footnote)
               .foregroundStyle(.secondary)
-              .lineLimit(1)
+              .lineLimit(2)
           }
-          Text(itemSubject.info ?? "")
-            .font(.footnote)
-            .foregroundStyle(.secondary)
-            .lineLimit(2)
+          .overlay(alignment: .trailing) {
+            if isAuthenticated {
+              Button {
+                showCollectionBox = true
+              } label: {
+                if let ctype = subject?.ctypeEnum, ctype != .none {
+                  HStack(spacing: 4) {
+                    Image(systemName: ctype.icon)
+                      .font(.caption2)
+                    Text(ctype.description(itemSubject.type))
+                  }
+                  .foregroundStyle(ctype.color)
+                } else {
+                  Text("收藏")
+                }
+              }
+              .adaptiveButtonStyle(.bordered)
+              .font(.caption)
+              .controlSize(.mini)
+            }
+          }
+
           if !item.comment.isEmpty {
             BorderView(color: .secondary.opacity(0.2), padding: 4) {
               HStack {
@@ -71,26 +96,6 @@ struct IndexRelatedSubjectItemView: View {
               }
             }
           }
-          Spacer(minLength: 0)
-        }
-        .overlay(alignment: .bottomTrailing) {
-          Button {
-            showCollectionBox = true
-          } label: {
-            if let ctype = subject?.ctypeEnum, ctype != .none {
-              HStack(spacing: 4) {
-                Image(systemName: ctype.icon)
-                  .font(.caption2)
-                Text(ctype.description(itemSubject.type))
-              }
-              .foregroundStyle(ctype.color)
-            } else {
-              Text("收藏")
-            }
-          }
-          .adaptiveButtonStyle(.bordered)
-          .font(.caption)
-          .controlSize(.mini)
         }
       } else {
         Text("神秘的条目")
