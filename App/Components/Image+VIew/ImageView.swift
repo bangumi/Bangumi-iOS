@@ -1,30 +1,19 @@
-import Kingfisher
+import SDWebImage
+import SDWebImageSwiftUI
 import SwiftUI
 
 struct ImageView: View {
-  let img: String?
+  private let imageURL: URL?
 
   @Environment(\.imageStyle) var style
   @Environment(\.imageType) var type
 
   init(img: String?) {
-    self.img = img
-  }
-
-  var imageURL: URL? {
-    guard let img = img else { return nil }
-    if img.isEmpty {
-      return nil
-    }
-    let url = img.replacing("http://", with: "https://")
-    return URL(string: url)
-  }
-
-  var clipShape: AnyShape {
-    if type == .avatar {
-      return AnyShape(Circle())
+    if let img = img, !img.isEmpty {
+      let urlString = img.replacing("http://", with: "https://")
+      self.imageURL = URL(string: urlString)
     } else {
-      return AnyShape(RoundedRectangle(cornerRadius: style.cornerRadius))
+      self.imageURL = nil
     }
   }
 
@@ -32,33 +21,36 @@ struct ImageView: View {
     ZStack {
       if let imageURL = imageURL {
         Group {
-          if style.width != nil, style.height != nil {
-            KFImage(imageURL)
-              .fade(duration: 0.25)
+          if let width = style.width, let height = style.height {
+            AnimatedImage(
+              url: imageURL,
+              context: [
+                .imageThumbnailPixelSize: CGSize(width: width * 2, height: height * 2)
+              ]
+            )
+            .resizable()
+            .transition(.fade(duration: 0.25))
+            .scaledToFill()
+            .geometryGroup()
+            .frame(width: width, height: height, alignment: style.alignment)
+            .applyClipShape(type: type, cornerRadius: style.cornerRadius)
+          } else if let aspectRatio = style.aspectRatio {
+            AnimatedImage(url: imageURL)
               .resizable()
-              .scaledToFill()
-              .frame(width: style.width, height: style.height, alignment: style.alignment)
-              .clipShape(clipShape)
-          } else if style.aspectRatio != nil {
-            KFImage(imageURL)
-              .fade(duration: 0.25)
-              .resizable()
-              .aspectRatio(style.aspectRatio, contentMode: .fill)
+              .transition(.fade(duration: 0.25))
+              .aspectRatio(aspectRatio, contentMode: .fill)
               .frame(alignment: style.alignment)
-              .clipShape(clipShape)
+              .applyClipShape(type: type, cornerRadius: style.cornerRadius)
           } else {
-            KFImage(imageURL)
-              .fade(duration: 0.25)
+            AnimatedImage(url: imageURL)
               .resizable()
+              .transition(.fade(duration: 0.25))
               .scaledToFit()
               .frame(alignment: style.alignment)
-              .clipShape(clipShape)
+              .applyClipShape(type: type, cornerRadius: style.cornerRadius)
           }
         }
-        .overlay {
-          clipShape
-            .stroke(Color.primary.opacity(0.15), lineWidth: 0.5)
-        }
+        .applyBorder(type: type, cornerRadius: style.cornerRadius)
       } else {
         if style.width != nil, style.height != nil {
           ZStack {
@@ -92,13 +84,37 @@ struct ImageView: View {
             }
           }
           .frame(width: style.width, height: style.height, alignment: style.alignment)
-          .clipShape(clipShape)
+          .applyClipShape(type: type, cornerRadius: style.cornerRadius)
         } else {
           Color.secondary.opacity(0.2)
             .aspectRatio(style.aspectRatio, contentMode: .fit)
             .frame(alignment: style.alignment)
-            .clipShape(clipShape)
+            .applyClipShape(type: type, cornerRadius: style.cornerRadius)
         }
+      }
+    }
+  }
+}
+
+extension View {
+  @ViewBuilder
+  fileprivate func applyClipShape(type: ImageType, cornerRadius: CGFloat) -> some View {
+    if type == .avatar {
+      self.clipShape(Circle())
+    } else {
+      self.clipShape(RoundedRectangle(cornerRadius: cornerRadius))
+    }
+  }
+
+  @ViewBuilder
+  fileprivate func applyBorder(type: ImageType, cornerRadius: CGFloat) -> some View {
+    self.overlay {
+      if type == .avatar {
+        Circle()
+          .stroke(Color.primary.opacity(0.15), lineWidth: 0.5)
+      } else {
+        RoundedRectangle(cornerRadius: cornerRadius)
+          .stroke(Color.primary.opacity(0.15), lineWidth: 0.5)
       }
     }
   }

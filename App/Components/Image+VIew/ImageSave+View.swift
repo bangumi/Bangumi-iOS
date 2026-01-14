@@ -1,4 +1,4 @@
-import Kingfisher
+import SDWebImageSwiftUI
 import SwiftUI
 
 extension View {
@@ -17,12 +17,9 @@ extension View {
         }
         ShareLink(item: imageURL)
       } preview: {
-        KFImage(URL(string: large))
-          .fade(duration: 0.25)
-          .placeholder {
-            ProgressView()
-          }
+        AnimatedImage(url: imageURL)
           .resizable()
+          .transition(.fade(duration: 0.25))
           .scaledToFit()
       }
     } else {

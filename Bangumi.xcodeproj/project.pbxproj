@@ -10,7 +10,10 @@
 		19671C732BDEB8B1000B4D99 /* KeychainSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 19671C722BDEB8B1000B4D99 /* KeychainSwift */; };
 		1968C5DD2CD5010C00242103 /* Flow in Frameworks */ = {isa = PBXBuildFile; productRef = 1968C5DC2CD5010C00242103 /* Flow */; };
 		19B9E2D62EAC955A00934E31 /* BBCode in Frameworks */ = {isa = PBXBuildFile; productRef = 19B9E2D52EAC955A00934E31 /* BBCode */; };
-		19BD24262BE9C53800595973 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 19BD24252BE9C53800595973 /* Kingfisher */; };
+		19DAAA742F176AF60070BFAE /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 19DAAA732F176AF60070BFAE /* SDWebImageSwiftUI */; };
+		19DAAA772F176B840070BFAE /* SDWebImageSVGCoder in Frameworks */ = {isa = PBXBuildFile; productRef = 19DAAA762F176B840070BFAE /* SDWebImageSVGCoder */; };
+		19DAAA7A2F176BAB0070BFAE /* SDWebImageWebPCoder in Frameworks */ = {isa = PBXBuildFile; productRef = 19DAAA792F176BAB0070BFAE /* SDWebImageWebPCoder */; };
+		19DAAA7D2F176BB60070BFAE /* SDWebImageAVIFCoder in Frameworks */ = {isa = PBXBuildFile; productRef = 19DAAA7C2F176BB60070BFAE /* SDWebImageAVIFCoder */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -37,9 +40,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				19BD24262BE9C53800595973 /* Kingfisher in Frameworks */,
+				19DAAA742F176AF60070BFAE /* SDWebImageSwiftUI in Frameworks */,
 				19B9E2D62EAC955A00934E31 /* BBCode in Frameworks */,
+				19DAAA7A2F176BAB0070BFAE /* SDWebImageWebPCoder in Frameworks */,
 				19671C732BDEB8B1000B4D99 /* KeychainSwift in Frameworks */,
+				19DAAA772F176B840070BFAE /* SDWebImageSVGCoder in Frameworks */,
+				19DAAA7D2F176BB60070BFAE /* SDWebImageAVIFCoder in Frameworks */,
 				1968C5DD2CD5010C00242103 /* Flow in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -84,9 +90,12 @@
 			name = Bangumi;
 			packageProductDependencies = (
 				19671C722BDEB8B1000B4D99 /* KeychainSwift */,
-				19BD24252BE9C53800595973 /* Kingfisher */,
 				1968C5DC2CD5010C00242103 /* Flow */,
 				19B9E2D52EAC955A00934E31 /* BBCode */,
+				19DAAA732F176AF60070BFAE /* SDWebImageSwiftUI */,
+				19DAAA762F176B840070BFAE /* SDWebImageSVGCoder */,
+				19DAAA792F176BAB0070BFAE /* SDWebImageWebPCoder */,
+				19DAAA7C2F176BB60070BFAE /* SDWebImageAVIFCoder */,
 			);
 			productName = Bangumi;
 			productReference = 19BB342B2BD239AB00E5C295 /* Bangumi.app */;
@@ -118,9 +127,12 @@
 			mainGroup = 19BB34222BD239AB00E5C295;
 			packageReferences = (
 				191FEF252BDCF59B0047162A /* XCRemoteSwiftPackageReference "keychain-swift" */,
-				19BD24242BE9C53800595973 /* XCRemoteSwiftPackageReference "Kingfisher" */,
 				1968C5DB2CD5010C00242103 /* XCRemoteSwiftPackageReference "SwiftUI-Flow" */,
 				19B9E2D42EAC955A00934E31 /* XCLocalSwiftPackageReference "BBCode" */,
+				19DAAA722F176AF60070BFAE /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */,
+				19DAAA752F176B840070BFAE /* XCRemoteSwiftPackageReference "SDWebImageSVGCoder" */,
+				19DAAA782F176BAB0070BFAE /* XCRemoteSwiftPackageReference "SDWebImageWebPCoder" */,
+				19DAAA7B2F176BB50070BFAE /* XCRemoteSwiftPackageReference "SDWebImageAVIFCoder" */,
 			);
 			productRefGroup = 19BB342C2BD239AB00E5C295 /* Products */;
 			projectDirPath = "";
@@ -394,12 +406,36 @@
 				minimumVersion = 3.0.2;
 			};
 		};
-		19BD24242BE9C53800595973 /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
+		19DAAA722F176AF60070BFAE /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/onevcat/Kingfisher.git";
+			repositoryURL = "https://github.com/SDWebImage/SDWebImageSwiftUI";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 8.1.3;
+				minimumVersion = 3.1.4;
+			};
+		};
+		19DAAA752F176B840070BFAE /* XCRemoteSwiftPackageReference "SDWebImageSVGCoder" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SDWebImage/SDWebImageSVGCoder.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.8.0;
+			};
+		};
+		19DAAA782F176BAB0070BFAE /* XCRemoteSwiftPackageReference "SDWebImageWebPCoder" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SDWebImage/SDWebImageWebPCoder.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.15.0;
+			};
+		};
+		19DAAA7B2F176BB50070BFAE /* XCRemoteSwiftPackageReference "SDWebImageAVIFCoder" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SDWebImage/SDWebImageAVIFCoder.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.11.1;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -419,10 +455,25 @@
 			isa = XCSwiftPackageProductDependency;
 			productName = BBCode;
 		};
-		19BD24252BE9C53800595973 /* Kingfisher */ = {
+		19DAAA732F176AF60070BFAE /* SDWebImageSwiftUI */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 19BD24242BE9C53800595973 /* XCRemoteSwiftPackageReference "Kingfisher" */;
-			productName = Kingfisher;
+			package = 19DAAA722F176AF60070BFAE /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */;
+			productName = SDWebImageSwiftUI;
+		};
+		19DAAA762F176B840070BFAE /* SDWebImageSVGCoder */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 19DAAA752F176B840070BFAE /* XCRemoteSwiftPackageReference "SDWebImageSVGCoder" */;
+			productName = SDWebImageSVGCoder;
+		};
+		19DAAA792F176BAB0070BFAE /* SDWebImageWebPCoder */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 19DAAA782F176BAB0070BFAE /* XCRemoteSwiftPackageReference "SDWebImageWebPCoder" */;
+			productName = SDWebImageWebPCoder;
+		};
+		19DAAA7C2F176BB60070BFAE /* SDWebImageAVIFCoder */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 19DAAA7B2F176BB50070BFAE /* XCRemoteSwiftPackageReference "SDWebImageAVIFCoder" */;
+			productName = SDWebImageAVIFCoder;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

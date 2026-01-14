@@ -63,46 +63,37 @@ struct ImageView: View {
   #endif
 
   var body: some View {
-    let webImage = WebImage(url: url) { image in
-      image.resizable()
-    } placeholder: {
-      if failed {
-        Image(systemName: "exclamationmark.triangle")
-          .font(.system(size: 40))
-          .foregroundColor(.red)
-      } else {
-        ProgressView()
+    let webImage = AnimatedImage(url: url)
+      .onFailure { error in
+        failed = true
       }
-    }
-    .onFailure { error in
-      failed = true
-    }
-    .onSuccess { image, data, cacheType in
-      DispatchQueue.main.async {
-        self.width = image.size.width
-      }
-    }
-    .indicator(.activity)
-    .transition(.fade(duration: 0.25))
-    .scaledToFit()
-    .frame(maxWidth: width)
-    .contextMenu {
-      Button {
-        #if canImport(UIKit)
-          saveImage()
-        #endif
-      } label: {
-        Label("保存", systemImage: "square.and.arrow.down")
-      }
-      if !isInLink {
-        Button {
-          showPreview = true
-        } label: {
-          Label("预览", systemImage: "eye")
+      .onSuccess { image, data, cacheType in
+        DispatchQueue.main.async {
+          self.width = image.size.width
         }
       }
-      ShareLink(item: url)
-    }
+      .resizable()
+      .indicator(.activity)
+      .transition(.fade(duration: 0.5))
+      .scaledToFit()
+      .frame(maxWidth: width)
+      .contextMenu {
+        Button {
+          #if canImport(UIKit)
+            saveImage()
+          #endif
+        } label: {
+          Label("保存", systemImage: "square.and.arrow.down")
+        }
+        if !isInLink {
+          Button {
+            showPreview = true
+          } label: {
+            Label("预览", systemImage: "eye")
+          }
+        }
+        ShareLink(item: url)
+      }
 
     if isInLink {
       webImage

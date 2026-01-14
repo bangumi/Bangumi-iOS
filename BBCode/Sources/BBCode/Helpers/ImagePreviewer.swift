@@ -29,42 +29,31 @@ public struct ImagePreviewer: View {
           .ignoresSafeArea()
 
         // Image
-        WebImage(url: url) { image in
-          image
-            .resizable()
-            .aspectRatio(contentMode: .fit)
-        } placeholder: {
-          if failed {
-            Image(systemName: "exclamationmark.triangle")
-              .font(.system(size: 40))
-              .foregroundColor(.red)
-          } else {
-            ProgressView()
-              .tint(.white)
+        AnimatedImage(url: url)
+          .onFailure { error in
+            failed = true
           }
-        }
-        .onFailure { error in
-          failed = true
-        }
-        .indicator(.activity)
-        .transition(.fade(duration: 0.25))
-        .scaleEffect(scale)
-        .offset(x: offset.x + dragOffset.width, y: offset.y + dragOffset.height)
-        .opacity(dragOffset.height > 0 ? max(0.3, 1 - abs(dragOffset.height) / 300.0) : 1)
-        .gesture(
-          SimultaneousGesture(
+          .resizable()
+          .indicator(.activity)
+          .transition(.fade(duration: 0.25))
+          .scaledToFit()
+          .scaleEffect(scale)
+          .offset(x: offset.x + dragOffset.width, y: offset.y + dragOffset.height)
+          .opacity(dragOffset.height > 0 ? max(0.3, 1 - abs(dragOffset.height) / 300.0) : 1)
+          .gesture(
             SimultaneousGesture(
-              makeMagnificationGesture(size: proxy.size),
-              makeDragGesture(size: proxy.size)
-            ),
-            makeSwipeDownGesture()
+              SimultaneousGesture(
+                makeMagnificationGesture(size: proxy.size),
+                makeDragGesture(size: proxy.size)
+              ),
+              makeSwipeDownGesture()
+            )
           )
-        )
-        .onTapGesture {
-          withAnimation {
-            showControls.toggle()
+          .onTapGesture {
+            withAnimation {
+              showControls.toggle()
+            }
           }
-        }
 
         // Top Control Bar
         VStack {
