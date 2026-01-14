@@ -6,6 +6,7 @@ struct SubjectCollectionBoxView: View {
   let subjectId: Int
 
   @AppStorage("autoCompleteProgress") var autoCompleteProgress: Bool = false
+  @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
 
   @Environment(\.modelContext) private var modelContext
   @Environment(\.dismiss) private var dismiss
@@ -18,6 +19,10 @@ struct SubjectCollectionBoxView: View {
   @State private var tags: Set<String> = Set()
   @State private var tagsInput: String = ""
   @State private var updating: Bool = false
+
+  var subjectTitle: String {
+    subject?.title(with: titlePreference) ?? ""
+  }
 
   var recommendedTags: [String] {
     return subject?.tags.sorted(by: { $0.count > $1.count }).prefix(15).map { $0.name } ?? []
@@ -102,142 +107,159 @@ struct SubjectCollectionBoxView: View {
   }
 
   var body: some View {
-    ScrollView {
-      VStack {
-        HStack {
-          Button(action: update) {
-            Spacer()
-            Text(buttonText)
-            Spacer()
-          }.adaptiveButtonStyle(.borderedProminent)
-          Toggle(isOn: $priv) {
-            Image(systemName: priv ? "lock" : "lock.open")
-          }
-          .toggleStyle(.button)
-          .adaptiveButtonStyle(.borderedProminent)
-          .frame(width: 40)
-          .sensoryFeedback(.selection, trigger: priv)
-        }
-        .disabled(submitDisabled)
-        .padding(.vertical, 5)
-        if let interest = subject?.interest, interest.updatedAt > 0 {
-          Section {
-            Text("上次更新：\(interest.updatedAt.datetimeDisplay)")
-              + Text(" / \(interest.updatedAt.date, style: .relative)前")
-              .foregroundStyle(.secondary)
-          }
-          .monospacedDigit()
-          .font(.caption)
-        }
-
-        Picker("CollectionType", selection: $ctype) {
-          ForEach(CollectionType.allTypes()) { ct in
-            Text("\(ct.description(subject?.typeEnum ?? .anime))").tag(ct)
-          }
-        }
-        .pickerStyle(.segmented)
-
-        VStack(alignment: .leading) {
-          HStack(alignment: .top) {
-            Text("我的评价:")
-            Text(ratingComment)
-              .foregroundStyle(rate > 0 ? .red : .secondary)
-          }
-          .padding(.top, 10)
+    NavigationStack {
+      ScrollView {
+        VStack {
           HStack {
-            Image(systemName: "star.slash")
-              .resizable()
-              .foregroundStyle(.secondary)
-              .frame(width: 20, height: 20)
-              .onTapGesture {
-                rate = 0
-              }
-            ForEach(1..<11) { idx in
-              Image(systemName: rate >= idx ? "star.fill" : "star")
+            Button(action: update) {
+              Spacer()
+              Text(buttonText)
+              Spacer()
+            }
+            .buttonStyle(.borderedProminent)
+            .disabled(submitDisabled)
+          }
+
+          if let interest = subject?.interest, interest.updatedAt > 0 {
+            Section {
+              Text("上次更新：\(interest.updatedAt.datetimeDisplay)")
+                + Text(" / \(interest.updatedAt.date, style: .relative)前")
+                .foregroundStyle(.secondary)
+            }
+            .monospacedDigit()
+            .font(.caption)
+          }
+
+          Picker("CollectionType", selection: $ctype) {
+            ForEach(CollectionType.allTypes()) { ct in
+              Text("\(ct.description(subject?.typeEnum ?? .anime))").tag(ct)
+            }
+          }
+          .pickerStyle(.segmented)
+
+          VStack(alignment: .leading) {
+            HStack(alignment: .top) {
+              Text("我的评价:")
+              Text(ratingComment)
+                .foregroundStyle(rate > 0 ? .red : .secondary)
+            }
+            HStack {
+              Image(systemName: "star.slash")
                 .resizable()
-                .foregroundStyle(.orange)
+                .foregroundStyle(.secondary)
                 .frame(width: 20, height: 20)
                 .onTapGesture {
-                  rate = Int(idx)
+                  rate = 0
                 }
-            }
-          }
-
-          Text("标签 (使用半角空格或逗号隔开，至多10个)")
-            .font(.footnote)
-            .padding(.top, 10)
-
-          HFlow(alignment: .center, spacing: 4) {
-            ForEach(Array(tags.sorted().prefix(10)), id: \.self) { tag in
-              BorderView(padding: 2) {
-                Button {
-                  tags.remove(tag)
-                } label: {
-                  Label(tag, systemImage: "xmark.circle")
-                    .labelStyle(.compact)
-                }
+              ForEach(1..<11) { idx in
+                Image(systemName: rate >= idx ? "star.fill" : "star")
+                  .resizable()
+                  .foregroundStyle(.orange)
+                  .frame(width: 20, height: 20)
+                  .onTapGesture {
+                    rate = Int(idx)
+                  }
               }
-              .font(.caption)
-              .foregroundStyle(.secondary)
             }
-          }.padding(.top, 2)
 
-          BorderView(color: .secondary.opacity(0.2), padding: 4) {
-            HStack {
-              TextField("标签", text: $tagsInput)
-                .autocorrectionDisabled()
-                .textInputAutocapitalization(.never)
-                .onSubmit {
-                  updateTags()
-                }
-              Button {
-                updateTags()
-              } label: {
-                Image(systemName: "plus.circle")
-              }.disabled(tagsInput.isEmpty)
-            }
-          }
+            Text("标签 (使用半角空格或逗号隔开，至多10个)")
+              .font(.footnote)
 
-          VStack(alignment: .leading, spacing: 2) {
-            Text("常用标签:").font(.footnote).foregroundStyle(.secondary)
-            HFlow(alignment: .center, spacing: 2) {
-              ForEach(recommendedTags, id: \.self) { tag in
-                Button {
-                  tags.insert(tag)
-                } label: {
-                  if tags.contains(tag) {
-                    Label(tag, systemImage: "checkmark.circle")
-                      .labelStyle(.compact)
-                  } else {
-                    Label(tag, systemImage: "plus.circle")
+            HFlow(alignment: .center, spacing: 4) {
+              ForEach(Array(tags.sorted().prefix(10)), id: \.self) { tag in
+                BorderView(padding: 2) {
+                  Button {
+                    tags.remove(tag)
+                  } label: {
+                    Label(tag, systemImage: "xmark.circle")
                       .labelStyle(.compact)
                   }
                 }
-                .disabled(tags.contains(tag))
                 .font(.caption)
-                .lineLimit(1)
-                .padding(.vertical, 2)
-                .padding(.horizontal, 4)
-                .foregroundStyle(.secondary.opacity(tags.contains(tag) ? 0.6 : 1))
-                .background(.secondary.opacity(tags.contains(tag) ? 0.3 : 0.1))
-                .cornerRadius(5)
-                .padding(1)
+                .foregroundStyle(.secondary)
+              }
+            }.padding(.top, 2)
+
+            BorderView(color: .secondary.opacity(0.2), padding: 4) {
+              HStack {
+                TextField("标签", text: $tagsInput)
+                  .autocorrectionDisabled()
+                  .textInputAutocapitalization(.never)
+                  .onSubmit {
+                    updateTags()
+                  }
+                Button {
+                  updateTags()
+                } label: {
+                  Image(systemName: "plus.circle")
+                }.disabled(tagsInput.isEmpty)
               }
             }
-          }
 
-          Text("吐槽")
-          TextInputView(type: "吐槽", text: $comment)
-            .textInputStyle(wordLimit: 380)
+            VStack(alignment: .leading, spacing: 2) {
+              Text("常用标签:").font(.footnote).foregroundStyle(.secondary)
+              HFlow(alignment: .center, spacing: 2) {
+                ForEach(recommendedTags, id: \.self) { tag in
+                  Button {
+                    tags.insert(tag)
+                  } label: {
+                    if tags.contains(tag) {
+                      Label(tag, systemImage: "checkmark.circle")
+                        .labelStyle(.compact)
+                    } else {
+                      Label(tag, systemImage: "plus.circle")
+                        .labelStyle(.compact)
+                    }
+                  }
+                  .disabled(tags.contains(tag))
+                  .font(.caption)
+                  .lineLimit(1)
+                  .padding(.vertical, 2)
+                  .padding(.horizontal, 4)
+                  .foregroundStyle(.secondary.opacity(tags.contains(tag) ? 0.6 : 1))
+                  .background(.secondary.opacity(tags.contains(tag) ? 0.3 : 0.1))
+                  .cornerRadius(5)
+                  .padding(1)
+                }
+              }
+            }
+
+            Text("吐槽")
+            TextInputView(type: "吐槽", text: $comment)
+              .textInputStyle(wordLimit: 380)
+          }
+          Spacer()
         }
-        Spacer()
+        .disabled(updating)
+        .animation(.default, value: subject != nil)
+        .animation(.default, value: priv)
+        .animation(.default, value: rate)
+        .padding(.horizontal)
       }
-      .disabled(updating)
-      .animation(.default, value: priv)
-      .animation(.default, value: rate)
-      .padding()
+      .navigationTitle(subjectTitle)
+      .navigationBarTitleDisplayMode(.inline)
+      .toolbar {
+        ToolbarItem(placement: .cancellationAction) {
+          Button {
+            dismiss()
+          } label: {
+            Image(systemName: "xmark")
+          }
+          .disabled(updating)
+        }
+        ToolbarItem(placement: .primaryAction) {
+          Button {
+            priv.toggle()
+          } label: {
+            Image(systemName: priv ? "lock.fill" : "lock.circle.dotted")
+          }
+          .adaptiveButtonStyle(priv ? .borderedProminent : .plain)
+          .disabled(updating)
+          .sensoryFeedback(.selection, trigger: priv)
+        }
+      }
+      .task(load)
     }
-    .task(load)
     .presentationDetents(.init([.medium, .large]))
   }
 }

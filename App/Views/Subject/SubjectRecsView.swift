@@ -10,6 +10,7 @@ struct SubjectRecsView: View {
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
 
   @State private var collections: [Int: CollectionType] = [:]
+  @State private var activeSubject: SlimSubjectDTO? = nil
 
   private func loadCollections() async {
     do {
@@ -50,6 +51,17 @@ struct SubjectRecsView: View {
                 .imageStyle(width: 72, height: 72)
                 .imageType(.subject)
                 .imageNavLink(rec.subject.link)
+                .contextMenu {
+                  Button {
+                    activeSubject = rec.subject
+                  } label: {
+                    Label("管理收藏", systemImage: "square.and.pencil")
+                  }
+                } preview: {
+                  SubjectCardView(subject: rec.subject)
+                    .padding()
+                    .frame(idealWidth: 360)
+                }
                 .padding(2)
                 .shadow(radius: 2)
               Text(rec.subject.title(with: titlePreference))
@@ -67,6 +79,16 @@ struct SubjectRecsView: View {
       .animation(.default, value: recs)
     }.task {
       await loadCollections()
+    }
+    .onChange(of: activeSubject) { _, newValue in
+      if newValue == nil {
+        Task {
+          await loadCollections()
+        }
+      }
+    }
+    .sheet(item: $activeSubject) { item in
+      SubjectCollectionBoxView(subjectId: item.id)
     }
   }
 }

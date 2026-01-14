@@ -8,6 +8,7 @@ struct SubjectOffprintsView: View {
   let offprints: [SubjectRelationDTO]
 
   @State private var collections: [Int: CollectionType] = [:]
+  @State private var activeSubject: SlimSubjectDTO? = nil
 
   private func loadCollections() async {
     do {
@@ -20,7 +21,7 @@ struct SubjectOffprintsView: View {
   }
 
   var body: some View {
-    Group {
+    VStack {
       VStack(alignment: .leading, spacing: 2) {
         Text("单行本")
           .foregroundStyle(offprints.count > 0 ? .primary : .secondary)
@@ -35,6 +36,17 @@ struct SubjectOffprintsView: View {
               .imageStyle(width: 60, height: 80)
               .imageType(.subject)
               .imageNavLink(offprint.subject.link)
+              .contextMenu {
+                Button {
+                  activeSubject = offprint.subject
+                } label: {
+                  Label("管理收藏", systemImage: "square.and.pencil")
+                }
+              } preview: {
+                SubjectCardView(subject: offprint.subject)
+                  .padding()
+                  .frame(idealWidth: 360)
+              }
               .padding(2)
               .shadow(radius: 2)
           }
@@ -42,8 +54,19 @@ struct SubjectOffprintsView: View {
       }
       .scrollClipDisabled()
       .animation(.default, value: offprints)
-    }.task {
+    }
+    .task {
       await loadCollections()
+    }
+    .onChange(of: activeSubject) { _, newValue in
+      if newValue == nil {
+        Task {
+          await loadCollections()
+        }
+      }
+    }
+    .sheet(item: $activeSubject) { item in
+      SubjectCollectionBoxView(subjectId: item.id)
     }
   }
 }
