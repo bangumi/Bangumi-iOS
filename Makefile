@@ -113,3 +113,7 @@ major: ## Increment major version (MARKETING_VERSION)
 
 minor: ## Increment minor version (MARKETING_VERSION)
 	@$(MISC_DIR)/bump-version.sh minor
+
+format: ## Format Swift files with swift-format
+	@echo "$(GREEN)Formatting Swift files...$(NC)"
+	@find . -name "*.swift" -not -path "./DerivedData/*" -not -path "./.build/*" | xargs swift-format -i
