@@ -20,9 +20,7 @@ final class DraftV1 {
   }
 
   func update(content: String) {
-    if self.content != content {
-      self.content = content
-      self.updatedAt = Int(Date().timeIntervalSince1970)
-    }
+    self.content = content
+    self.updatedAt = Int(Date().timeIntervalSince1970)
   }
 }

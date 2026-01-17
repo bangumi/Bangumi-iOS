@@ -864,10 +864,15 @@ extension DatabaseOperator {
   public func saveDraft(type: String, content: String, id: PersistentIdentifier? = nil) throws
     -> PersistentIdentifier
   {
-    if let id = id, let draft = modelContext.model(for: id) as? Draft {
-      draft.update(content: content)
-      self.commit()
-      return id
+    if let id = id {
+      let fetched = try self.fetchOne(
+        predicate: #Predicate<Draft> { $0.persistentModelID == id }
+      )
+      if let draft = fetched {
+        draft.update(content: content)
+        self.commit()
+        return draft.id
+      }
     }
 
     let fetched = try self.fetchOne(
@@ -884,9 +889,18 @@ extension DatabaseOperator {
     return draft.persistentModelID
   }
 
-  public func deleteDraft(_ draft: Draft) {
-    modelContext.delete(draft)
-    self.commit()
+  public func deleteDraft(id: PersistentIdentifier) {
+    do {
+      let fetched = try self.fetchOne(
+        predicate: #Predicate<Draft> { $0.persistentModelID == id }
+      )
+      if let draft = fetched {
+        modelContext.delete(draft)
+        self.commit()
+      }
+    } catch {
+      Logger.app.error("Failed to delete draft: \(error)")
+    }
   }
 
   public func clearDrafts() throws {

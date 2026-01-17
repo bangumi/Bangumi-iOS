@@ -43,6 +43,7 @@ struct TextInputView: View {
   @State private var showingBBCodeMenu = false
   @State private var showingDrafts = false
   @State private var currentDraftID: PersistentIdentifier?
+  @State private var pendingSaveTask: Task<Void, Never>?
 
   init(type: String, text: Binding<String>) {
     self.type = type
@@ -61,17 +62,15 @@ struct TextInputView: View {
     }
   }
 
-  private func saveDraft() {
-    Task {
-      do {
-        let db = try await Chii.shared.getDB()
-        let id = try await db.saveDraft(type: type, content: text, id: currentDraftID)
-        await MainActor.run {
-          self.currentDraftID = id
-        }
-      } catch {
-        Logger.app.error("Failed to save draft: \(error)")
+  private func saveDraft() async {
+    do {
+      let db = try await Chii.shared.getDB()
+      let id = try await db.saveDraft(type: type, content: text, id: currentDraftID)
+      await MainActor.run {
+        self.currentDraftID = id
       }
+    } catch {
+      Logger.app.error("Failed to save draft: \(error)")
     }
   }
 
@@ -112,8 +111,12 @@ struct TextInputView: View {
       }
     }
     .onChange(of: text) { _, newValue in
-      if !newValue.isEmpty {
-        saveDraft()
+      pendingSaveTask?.cancel()
+      guard !newValue.isEmpty else { return }
+      pendingSaveTask = Task {
+        try? await Task.sleep(for: .milliseconds(400))
+        guard !Task.isCancelled else { return }
+        await saveDraft()
       }
     }
   }
@@ -186,7 +189,7 @@ private struct DraftBoxView: View {
               Button(role: .destructive) {
                 Task {
                   if let db = try? await Chii.shared.getDB() {
-                    await db.deleteDraft(draft)
+                    await db.deleteDraft(id: draft.persistentModelID)
                   }
                 }
               } label: {
