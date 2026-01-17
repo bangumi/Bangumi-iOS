@@ -22,6 +22,7 @@ struct SettingsView: View {
   @State private var spotlightRefreshing: Bool = false
   @State private var spotlightProgress: CGFloat = 0
   @State private var logoutConfirm: Bool = false
+  @State private var clearDraftsConfirm: Bool = false
   @State private var showEULA: Bool = false
 
   private var privacyPolicyURL: String {
@@ -195,17 +196,24 @@ struct SettingsView: View {
       if isAuthenticated {
         Section {
           Button(role: .destructive) {
-            Task {
-              do {
-                let db = try await Chii.shared.getDB()
-                try await db.clearDrafts()
-                Notifier.shared.notify(message: "草稿箱已清空")
-              } catch {
-                Notifier.shared.alert(error: error)
-              }
-            }
+            clearDraftsConfirm = true
           } label: {
             Text("清空草稿箱")
+          }
+          .alert("清空草稿箱", isPresented: $clearDraftsConfirm) {
+            Button("确定", role: .destructive) {
+              Task {
+                do {
+                  let db = try await Chii.shared.getDB()
+                  try await db.clearDrafts()
+                  Notifier.shared.notify(message: "草稿箱已清空")
+                } catch {
+                  Notifier.shared.alert(error: error)
+                }
+              }
+            }
+          } message: {
+            Text("确定要清空所有草稿吗？")
           }
 
           if spotlightRefreshing {
