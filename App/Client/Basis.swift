@@ -966,13 +966,18 @@ enum TopicState: Int, Codable, CaseIterable {
   case normal = 0
   case closed = 1
   case reopen = 2
+  case adminPin = 3
+  case adminMerge = 4
   case silent = 5
+  case userDelete = 6
+  case adminDelete = 7
+  case adminOffTopic = 8
 
   var allowReply: Bool {
     switch self {
     case .normal, .reopen:
       return true
-    case .closed, .silent:
+    default:
       return false
     }
   }
@@ -985,8 +990,18 @@ enum TopicState: Int, Codable, CaseIterable {
       return "已关闭"
     case .reopen:
       return "已重开"
+    case .adminPin:
+      return "已置顶"
+    case .adminMerge:
+      return "已合并"
     case .silent:
       return "已下沉"
+    case .userDelete:
+      return "用户删除"
+    case .adminDelete:
+      return "管理员删除"
+    case .adminOffTopic:
+      return "折叠"
     }
   }
 }
