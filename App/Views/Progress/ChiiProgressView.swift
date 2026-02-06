@@ -223,7 +223,7 @@ struct ChiiProgressView: View {
                 showRefreshAll = true
               }
             } label: {
-              Image(systemName: "ellipsis.circle")
+              Image(systemName: "ellipsis")
             }.pickerStyle(.menu)
           }
         }

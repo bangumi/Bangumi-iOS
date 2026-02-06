@@ -220,7 +220,7 @@ struct GroupDetailView: View {
             Label("分享", systemImage: "square.and.arrow.up")
           }
         } label: {
-          Image(systemName: "ellipsis.circle")
+          Image(systemName: "ellipsis")
         }
       }
     }

@@ -154,7 +154,7 @@ struct ChiiRakuenView: View {
             Text("浏览小组")
           }
         } label: {
-          Image(systemName: "ellipsis.circle")
+          Image(systemName: "ellipsis")
         }
       }
     }

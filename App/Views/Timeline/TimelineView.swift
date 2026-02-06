@@ -84,7 +84,7 @@ struct TimelineView: View {
             Label("报告疑虑", systemImage: "exclamationmark.triangle")
           }
         } label: {
-          Image(systemName: "ellipsis.circle")
+          Image(systemName: "ellipsis")
         }
       }
     }
