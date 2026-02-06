@@ -25,6 +25,25 @@ struct SubjectSummaryView: View {
     return Array(result)
   }
 
+  private func tagLink(_ tag: Tag, color: Color) -> some View {
+    NavigationLink(value: NavDestination.subjectTagBrowsing(subject.typeEnum, tag.name)) {
+      BorderView(color: color, padding: 3, cornerRadius: 16) {
+        HStack(spacing: 2) {
+          Text(tag.name)
+            .font(.footnote)
+            .foregroundStyle(.linkText)
+            .lineLimit(1)
+          Text("\(tag.count)")
+            .font(.caption)
+            .foregroundStyle(.secondary)
+            .monospacedDigit()
+        }
+      }
+    }
+    .buttonStyle(.scale)
+    .padding(1)
+  }
+
   var body: some View {
     VStack(alignment: .leading) {
       BBCodeView(subject.summary, textSize: 14)
@@ -35,32 +54,10 @@ struct SubjectSummaryView: View {
         HStack {
           HFlow(alignment: .center, spacing: 3) {
             ForEach(metaTags, id: \.name) { tag in
-              BorderView(color: .linkText, padding: 3, cornerRadius: 16) {
-                HStack(spacing: 2) {
-                  Text(tag.name)
-                    .font(.footnote)
-                    .foregroundStyle(.linkText)
-                    .lineLimit(1)
-                  Text("\(tag.count)")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .monospacedDigit()
-                }
-              }.padding(1)
+              tagLink(tag, color: .linkText)
             }
             ForEach(tags, id: \.name) { tag in
-              BorderView(color: .secondary.opacity(0.2), padding: 3, cornerRadius: 16) {
-                HStack(spacing: 2) {
-                  Text(tag.name)
-                    .font(.footnote)
-                    .foregroundStyle(.linkText)
-                    .lineLimit(1)
-                  Text("\(tag.count)")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .monospacedDigit()
-                }
-              }.padding(1)
+              tagLink(tag, color: .secondary.opacity(0.2))
             }
           }
           Spacer(minLength: 0)

@@ -517,6 +517,117 @@ struct SubjectBrowsingFilterTagView: View {
   }
 }
 
+struct SubjectTagBrowsingView: View {
+  let type: SubjectType
+  let tag: String
+
+  @State private var tagsCat: SubjectTagsCategory = .subject
+  @State private var sort: SubjectSortMode = .rank
+  @State private var reloader: Bool = false
+
+  init(type: SubjectType, tag: String) {
+    self.type = type
+    self.tag = tag
+  }
+
+  var title: String {
+    let prefix = type == .none ? "标签" : "\(type.description)标签"
+    return "\(prefix): \(tag)"
+  }
+
+  func fetchPage(page: Int) async -> PagedDTO<SlimSubjectDTO>? {
+    do {
+      guard let db = await Chii.shared.db else {
+        throw ChiiError.uninitialized
+      }
+      var filter = SubjectsBrowseFilter()
+      filter.tags = [tag]
+      filter.tagsCat = tagsCat
+      let resp = try await Chii.shared.getSubjects(
+        type: type, sort: sort, filter: filter, page: page)
+      for item in resp.data {
+        try await db.saveSubject(item)
+      }
+      await db.commit()
+      return resp
+    } catch {
+      Notifier.shared.alert(error: error)
+    }
+    return nil
+  }
+
+  var body: some View {
+    ScrollView {
+      VStack(alignment: .leading, spacing: 12) {
+        HStack(alignment: .center, spacing: 6) {
+          Label("标签", systemImage: "tag")
+            .font(.footnote)
+            .foregroundStyle(.secondary)
+          BadgeView(background: .accent, padding: 3) {
+            Text(tag)
+              .lineLimit(1)
+          }
+        }
+
+        HStack {
+          Image(systemName: "arrow.up.arrow.down.circle")
+          Text("按")
+          BadgeView(background: .accent) {
+            Label(sort.description, systemImage: sort.icon)
+          }
+          Text("排序")
+          Spacer()
+        }
+
+        Divider()
+
+        SimplePageView(reloader: reloader, nextPageFunc: fetchPage) { subject in
+          SubjectItemView(subjectId: subject.id)
+        }
+      }.padding(.horizontal, 8)
+    }
+    .onChange(of: tagsCat) { _, _ in
+      reloader.toggle()
+    }
+    .animation(.default, value: tagsCat)
+    .animation(.default, value: sort)
+    .navigationTitle(title)
+    .navigationBarTitleDisplayMode(.inline)
+    .toolbar {
+      ToolbarItemGroup(placement: .topBarTrailing) {
+        Menu {
+          ForEach(SubjectTagsCategory.allCases, id: \.self) { cat in
+            Button {
+              tagsCat = cat
+            } label: {
+              if tagsCat == cat {
+                Label(cat.description, systemImage: "checkmark")
+              } else {
+                Text(cat.description)
+              }
+            }
+          }
+        } label: {
+          Label(tagsCat.description, systemImage: "tag")
+        }
+
+        Menu {
+          ForEach(SubjectSortMode.allCases, id: \.self) { sortMode in
+            Button {
+              sort = sortMode
+              reloader.toggle()
+            } label: {
+              Label(sortMode.description, systemImage: sortMode.icon)
+            }.disabled(sort == sortMode)
+          }
+        } label: {
+          Image(systemName: "arrow.up.arrow.down")
+        }
+      }
+    }
+  }
+}
+
 #Preview {
   let container = mockContainer()
 

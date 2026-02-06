@@ -1472,19 +1472,33 @@ struct ReplyDTO: Codable, Identifiable, Hashable {
   }
 }
 
+enum SubjectTagsCategory: String, CaseIterable, Codable, Hashable {
+  case meta = "meta"
+  case subject = "subject"
+
+  var description: String {
+    switch self {
+    case .meta:
+      return "维基标签"
+    case .subject:
+      return "用户标签"
+    }
+  }
+}
+
 struct SubjectsBrowseFilter: Codable, Hashable {
   var cat: PlatformInfo? = nil
   var series: Bool? = nil
   var year: Int? = nil
   var month: Int? = nil
   var tags: [String]? = nil
+  var tagsCat: SubjectTagsCategory? = nil
 }
 
 enum SubjectSortMode: String, CaseIterable {
   case rank = "rank"
   case trends = "trends"
   case collects = "collects"
-  case comments = "comments"
   case date = "date"
   case title = "title"
 
@@ -1493,7 +1507,6 @@ enum SubjectSortMode: String, CaseIterable {
     case .rank: return "排名"
     case .trends: return "热度"
     case .collects: return "收藏"
-    case .comments: return "评论"
     case .date: return "日期"
     case .title: return "名称"
     }
@@ -1504,7 +1517,6 @@ enum SubjectSortMode: String, CaseIterable {
     case .rank: return "chart.bar"
     case .trends: return "flame"
     case .collects: return "heart"
-    case .comments: return "bubble"
     case .date: return "calendar"
     case .title: return "character.textbox"
     }

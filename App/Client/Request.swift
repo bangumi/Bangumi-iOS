@@ -990,6 +990,9 @@ extension Chii {
         queryItems.append(URLQueryItem(name: "tags", value: tag))
       }
     }
+    if let tagsCat = filter.tagsCat {
+      queryItems.append(URLQueryItem(name: "tagsCat", value: tagsCat.rawValue))
+    }
     let pageURL = url.appending(queryItems: queryItems)
     let data = try await self.request(url: pageURL, method: "GET")
     let resp: PagedDTO<SlimSubjectDTO> = try self.decodeResponse(data)
