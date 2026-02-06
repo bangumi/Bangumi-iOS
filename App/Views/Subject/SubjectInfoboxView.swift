@@ -174,7 +174,9 @@ struct SubjectInfoboxDetailView: View {
         }
       }
     }
-    let missing = entries.filter { !appeared.contains($0.id) }.map { $0.display }.filter { !$0.isEmpty }
+    let missing = entries.filter { !appeared.contains($0.id) }.map { $0.display }.filter {
+      !$0.isEmpty
+    }
     let keyedValues = wikiValues.filter { $0.k != nil }
     let noKeyValues = wikiValues.filter { $0.k == nil }.map { $0.v }.filter { !$0.isEmpty }
     var base = noKeyValues.joined(separator: "、")

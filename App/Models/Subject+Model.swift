@@ -34,18 +34,8 @@ final class SubjectV2: Searchable, Linkable {
   var collectedAt: Int = 0
   var interest: SubjectInterest?
 
-  var positions: [SubjectPositionDTO] = []
-
-  var characters: [SubjectCharacterDTO] = []
-  var offprints: [SubjectRelationDTO] = []
-  var relations: [SubjectRelationDTO] = []
-  var recs: [SubjectRecDTO] = []
-
-  var collects: [SubjectCollectDTO] = []
-  var reviews: [SubjectReviewDTO] = []
-  var topics: [TopicDTO] = []
-  var comments: [SubjectCommentDTO] = []
-  var indexes: [SlimIndexDTO] = []
+  @Relationship(deleteRule: .cascade)
+  var detail: SubjectDetail?
 
   var typeEnum: SubjectType {
     return SubjectType(type)
@@ -53,6 +43,65 @@ final class SubjectV2: Searchable, Linkable {
 
   var ctypeEnum: CollectionType {
     return CollectionType(ctype)
+  }
+
+  private func ensureDetail() -> SubjectDetail {
+    if let detail {
+      return detail
+    }
+    let detail = SubjectDetail(subjectId: subjectId)
+    self.detail = detail
+    return detail
+  }
+
+  var positions: [SubjectPositionDTO] {
+    get { detail?.positions ?? [] }
+    set { ensureDetail().positions = newValue }
+  }
+
+  var characters: [SubjectCharacterDTO] {
+    get { detail?.characters ?? [] }
+    set { ensureDetail().characters = newValue }
+  }
+
+  var offprints: [SubjectRelationDTO] {
+    get { detail?.offprints ?? [] }
+    set { ensureDetail().offprints = newValue }
+  }
+
+  var relations: [SubjectRelationDTO] {
+    get { detail?.relations ?? [] }
+    set { ensureDetail().relations = newValue }
+  }
+
+  var recs: [SubjectRecDTO] {
+    get { detail?.recs ?? [] }
+    set { ensureDetail().recs = newValue }
+  }
+
+  var collects: [SubjectCollectDTO] {
+    get { detail?.collects ?? [] }
+    set { ensureDetail().collects = newValue }
+  }
+
+  var reviews: [SubjectReviewDTO] {
+    get { detail?.reviews ?? [] }
+    set { ensureDetail().reviews = newValue }
+  }
+
+  var topics: [TopicDTO] {
+    get { detail?.topics ?? [] }
+    set { ensureDetail().topics = newValue }
+  }
+
+  var comments: [SubjectCommentDTO] {
+    get { detail?.comments ?? [] }
+    set { ensureDetail().comments = newValue }
+  }
+
+  var indexes: [SlimIndexDTO] {
+    get { detail?.indexes ?? [] }
+    set { ensureDetail().indexes = newValue }
   }
 
   func title(with preference: TitlePreference) -> String {

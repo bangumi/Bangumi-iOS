@@ -15,6 +15,7 @@ struct MainApp: App {
       TrendingSubject.self,
       Episode.self,
       Subject.self,
+      SubjectDetail.self,
       Character.self,
       Person.self,
       ChiiGroup.self,

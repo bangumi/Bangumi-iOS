@@ -243,9 +243,55 @@ extension DatabaseOperator {
 
     switch progressSortMode {
     case .airTime:
+      let subjectIds = subjects.map(\.subjectId)
+      if subjectIds.isEmpty {
+        return []
+      }
+      let mainType = EpisodeType.main.rawValue
+      let episodeDescriptor = FetchDescriptor<Episode>(
+        predicate: #Predicate<Episode> {
+          subjectIds.contains($0.subjectId) && $0.type == mainType && $0.status == 0
+        },
+        sortBy: [
+          SortDescriptor<Episode>(\.subjectId, order: .forward),
+          SortDescriptor<Episode>(\.sort, order: .forward),
+        ]
+      )
+      let episodes = try modelContext.fetch(episodeDescriptor)
+      var nextEpisodes: [Int: Episode] = [:]
+      for episode in episodes where nextEpisodes[episode.subjectId] == nil {
+        nextEpisodes[episode.subjectId] = episode
+      }
+
+      func nextEpisodeDays(subject: Subject, episode: Episode?) -> Int {
+        guard subject.typeEnum == .anime || subject.typeEnum == .real else {
+          return Int.max
+        }
+        guard let episode else {
+          return Int.max
+        }
+        if episode.air.timeIntervalSince1970 == 0 {
+          return Int.max - 1
+        }
+        let calendar = Calendar.current
+        let now = Date()
+        let nowDate = calendar.startOfDay(for: now)
+        let airDate = calendar.startOfDay(for: episode.air)
+        let components = calendar.dateComponents([.day], from: nowDate, to: airDate)
+        return components.day ?? Int.max
+      }
+
+      var daysMap: [Int: Int] = [:]
+      for subject in subjects {
+        daysMap[subject.subjectId] = nextEpisodeDays(
+          subject: subject,
+          episode: nextEpisodes[subject.subjectId]
+        )
+      }
+
       return subjects.sorted { subject1, subject2 in
-        let days1 = subject1.nextEpisodeDays(context: modelContext)
-        let days2 = subject2.nextEpisodeDays(context: modelContext)
+        let days1 = daysMap[subject1.subjectId] ?? Int.max
+        let days2 = daysMap[subject2.subjectId] ?? Int.max
         return Subject.compareDays(days1, days2, subject1, subject2)
       }.map(\.subjectId)
     case .collectedAt:
@@ -669,6 +715,35 @@ extension DatabaseOperator {
   public func saveEpisode(_ item: EpisodeDTO) throws -> Bool {
     let (_, created) = try self.ensureEpisode(item)
     return created
+  }
+
+  public func saveEpisodes(subjectId: Int, items: [EpisodeDTO]) throws {
+    guard !items.isEmpty else { return }
+    let descriptor = FetchDescriptor<Episode>(
+      predicate: #Predicate<Episode> {
+        $0.subjectId == subjectId
+      }
+    )
+    let existing = try modelContext.fetch(descriptor)
+    var existingMap = Dictionary(uniqueKeysWithValues: existing.map { ($0.episodeId, $0) })
+    var subjectRef = try getSubject(subjectId)
+    if subjectRef == nil, let slim = items.first?.subject {
+      subjectRef = try ensureSubject(slim).0
+    }
+
+    for item in items {
+      if let episode = existingMap[item.id] {
+        episode.update(item)
+        if episode.subject == nil {
+          episode.subject = subjectRef
+        }
+      } else {
+        let episode = Episode(item)
+        episode.subject = subjectRef
+        modelContext.insert(episode)
+        existingMap[item.id] = episode
+      }
+    }
   }
 
   public func deleteEpisode(_ episodeId: Int) throws {

@@ -8,6 +8,7 @@ func mockContainer() -> ModelContainer {
     TrendingSubject.self,
     Episode.self,
     Subject.self,
+    SubjectDetail.self,
     Character.self,
     Person.self,
     configurations: config)

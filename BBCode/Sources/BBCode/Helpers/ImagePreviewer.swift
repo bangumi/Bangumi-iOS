@@ -305,7 +305,8 @@ public struct ImagePreviewer: View {
       scrollView.minimumZoomScale = minScale
       scrollView.maximumZoomScale = maxScale
 
-      let targetScale = reset
+      let targetScale =
+        reset
         ? minScale
         : min(max(scrollView.zoomScale, minScale), maxScale)
       scrollView.zoomScale = targetScale
@@ -317,7 +318,8 @@ public struct ImagePreviewer: View {
       let contentSize = scrollView.contentSize
       let insetX = max((boundsSize.width - contentSize.width) * 0.5, 0)
       let insetY = max((boundsSize.height - contentSize.height) * 0.5, 0)
-      scrollView.contentInset = UIEdgeInsets(top: insetY, left: insetX, bottom: insetY, right: insetX)
+      scrollView.contentInset = UIEdgeInsets(
+        top: insetY, left: insetX, bottom: insetY, right: insetX)
     }
 
     @objc private func handleDoubleTap(_ recognizer: UITapGestureRecognizer) {
@@ -338,7 +340,9 @@ public struct ImagePreviewer: View {
       parent.onSingleTap()
     }
 
-    private func zoomRect(for scale: CGFloat, center: CGPoint, in scrollView: UIScrollView) -> CGRect {
+    private func zoomRect(for scale: CGFloat, center: CGPoint, in scrollView: UIScrollView)
+      -> CGRect
+    {
       let size = scrollView.bounds.size
       let width = size.width / scale
       let height = size.height / scale

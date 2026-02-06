@@ -21,7 +21,7 @@ struct ResponseDetailedError: Codable, CustomStringConvertible {
   }
 }
 
-enum ChiiError: Error, CustomStringConvertible {
+enum ChiiError: Error, CustomStringConvertible, Sendable {
   case uninitialized
   case requireLogin
   case request(String)

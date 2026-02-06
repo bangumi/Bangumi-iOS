@@ -4,11 +4,39 @@ import SwiftUI
 struct ProgressListView: View {
   let subjectIds: [Int]
 
+  @Query private var subjects: [Subject]
+  @Query private var episodes: [Episode]
+
+  init(subjectIds: [Int]) {
+    self.subjectIds = subjectIds
+    let ids = subjectIds
+    let subjectDescriptor = FetchDescriptor<Subject>(
+      predicate: #Predicate<Subject> { ids.contains($0.subjectId) }
+    )
+    _subjects = Query(subjectDescriptor)
+    let mainType = EpisodeType.main.rawValue
+    let episodeDescriptor = FetchDescriptor<Episode>(
+      predicate: #Predicate<Episode> { ids.contains($0.subjectId) && $0.type == mainType },
+      sortBy: [
+        SortDescriptor<Episode>(\.subjectId, order: .forward),
+        SortDescriptor<Episode>(\.sort, order: .forward),
+      ]
+    )
+    _episodes = Query(episodeDescriptor)
+  }
+
   var body: some View {
+    let subjectMap = Dictionary(uniqueKeysWithValues: subjects.map { ($0.subjectId, $0) })
+    let episodeMap = Dictionary(grouping: episodes, by: \.subjectId)
     LazyVStack(alignment: .leading) {
       ForEach(subjectIds, id: \.self) { subjectId in
-        CardView {
-          ProgressListItemView(subjectId: subjectId)
+        if let subject = subjectMap[subjectId] {
+          CardView {
+            ProgressListItemContentView(
+              subject: subject,
+              episodes: episodeMap[subjectId] ?? []
+            )
+          }
         }
       }
     }
@@ -16,25 +44,9 @@ struct ProgressListView: View {
   }
 }
 
-struct ProgressListItemView: View {
-  let subjectId: Int
-
-  @Query var subjects: [Subject]
-
-  init(subjectId: Int) {
-    self.subjectId = subjectId
-    self._subjects = Query(filter: #Predicate<Subject> { $0.subjectId == subjectId })
-  }
-
-  var body: some View {
-    if let subject = subjects.first {
-      ProgressListItemContentView(subject: subject)
-    }
-  }
-}
-
 struct ProgressListItemContentView: View {
   @Bindable var subject: Subject
+  let episodes: [Episode]
 
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
 
@@ -63,7 +75,7 @@ struct ProgressListItemContentView: View {
 
           switch subject.typeEnum {
           case .anime, .real:
-            EpisodeRecentView(subject: subject, mode: .list)
+            EpisodeRecentView(subject: subject, mode: .list, episodes: episodes)
 
           case .book:
             SubjectBookChaptersView(subject: subject, mode: .row)
@@ -119,7 +131,7 @@ struct ProgressListItemContentView: View {
 
   return ScrollView {
     LazyVStack(alignment: .leading) {
-      ProgressListItemView(subjectId: subject.subjectId)
+      ProgressListView(subjectIds: [subject.subjectId])
         .modelContainer(container)
     }.padding()
   }

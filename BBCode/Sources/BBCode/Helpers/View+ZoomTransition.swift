@@ -3,7 +3,9 @@ import SwiftUI
 extension View {
   /// Applies matchedTransitionSource on iOS 18+, returns self on earlier versions.
   @ViewBuilder
-  func matchedTransitionSourceIfAvailable(id: some Hashable, in namespace: Namespace.ID) -> some View {
+  func matchedTransitionSourceIfAvailable(id: some Hashable, in namespace: Namespace.ID)
+    -> some View
+  {
     #if os(iOS)
       if #available(iOS 18.0, *) {
         self.matchedTransitionSource(id: id, in: namespace)

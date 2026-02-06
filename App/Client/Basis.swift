@@ -1143,7 +1143,7 @@ enum GroupMemberRole: Int, Codable, CaseIterable {
   }
 }
 
-enum FilterMode: String, Codable, CaseIterable {
+enum FilterMode: String, Codable, CaseIterable, Sendable {
   case all = "all"
   case friends = "friends"
 

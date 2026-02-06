@@ -4,11 +4,39 @@ import SwiftUI
 struct ProgressTileView: View {
   let subjectIds: [Int]
 
+  @Query private var subjects: [Subject]
+  @Query private var episodes: [Episode]
+
+  init(subjectIds: [Int]) {
+    self.subjectIds = subjectIds
+    let ids = subjectIds
+    let subjectDescriptor = FetchDescriptor<Subject>(
+      predicate: #Predicate<Subject> { ids.contains($0.subjectId) }
+    )
+    _subjects = Query(subjectDescriptor)
+    let mainType = EpisodeType.main.rawValue
+    let episodeDescriptor = FetchDescriptor<Episode>(
+      predicate: #Predicate<Episode> { ids.contains($0.subjectId) && $0.type == mainType },
+      sortBy: [
+        SortDescriptor<Episode>(\.subjectId, order: .forward),
+        SortDescriptor<Episode>(\.sort, order: .forward),
+      ]
+    )
+    _episodes = Query(episodeDescriptor)
+  }
+
   var body: some View {
+    let subjectMap = Dictionary(uniqueKeysWithValues: subjects.map { ($0.subjectId, $0) })
+    let episodeMap = Dictionary(grouping: episodes, by: \.subjectId)
     LazyVGrid(columns: [GridItem(.adaptive(minimum: 150))]) {
       ForEach(subjectIds, id: \.self) { subjectId in
-        CardView(padding: 8) {
-          ProgressTileItemView(subjectId: subjectId)
+        if let subject = subjectMap[subjectId] {
+          CardView(padding: 8) {
+            ProgressTileItemContentView(
+              subject: subject,
+              episodes: episodeMap[subjectId] ?? []
+            )
+          }
         }
       }
     }
@@ -16,25 +44,9 @@ struct ProgressTileView: View {
   }
 }
 
-struct ProgressTileItemView: View {
-  let subjectId: Int
-
-  @Query var subjects: [Subject]
-
-  init(subjectId: Int) {
-    self.subjectId = subjectId
-    self._subjects = Query(filter: #Predicate<Subject> { $0.subjectId == subjectId })
-  }
-
-  var body: some View {
-    if let subject = subjects.first {
-      ProgressTileItemContentView(subject: subject)
-    }
-  }
-}
-
 struct ProgressTileItemContentView: View {
   @Bindable var subject: Subject
+  let episodes: [Episode]
 
   @AppStorage("subjectImageQuality") var subjectImageQuality: ImageQuality = .high
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
@@ -68,7 +80,7 @@ struct ProgressTileItemContentView: View {
 
         switch subject.typeEnum {
         case .anime, .real:
-          EpisodeRecentView(subject: subject, mode: .tile)
+          EpisodeRecentView(subject: subject, mode: .tile, episodes: episodes)
         case .book:
           SubjectBookChaptersView(subject: subject, mode: .tile)
 
@@ -118,7 +130,7 @@ struct ProgressTileItemContentView: View {
   return ScrollView {
     LazyVStack(alignment: .leading) {
       CardView(padding: 8) {
-        ProgressTileItemView(subjectId: subject.subjectId)
+        ProgressTileView(subjectIds: [subject.subjectId])
           .modelContainer(container)
       }
     }.padding()

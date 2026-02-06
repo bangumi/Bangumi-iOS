@@ -30,7 +30,7 @@ extension Chii {
   }
 
   func loadTrendingSubjects() async throws {
-    var tasks: [Task<Void, any Error>] = []
+    var tasks: [Task<Void, Error>] = []
     for type in SubjectType.allTypes {
       tasks.append(
         Task {
@@ -70,89 +70,108 @@ extension Chii {
   }
 
   func loadSubjectDetails(_ subjectId: Int, offprints: Bool, social: Bool) async throws {
-    var tasks: [Task<Void, any Error>] = []
+    let db = try self.getDB()
+    let collectsMode: FilterMode? = {
+      guard social else { return nil }
+      let collectsModeDefaults = UserDefaults.standard.string(
+        forKey: "subjectCollectsFilterMode")
+      return FilterMode(collectsModeDefaults)
+    }()
 
-    tasks.append(
-      Task {
-        let db = try self.getDB()
-        let val = try await self.getSubjectCharacters(subjectId, limit: 12)
-        try await db.saveSubjectCharacters(subjectId: subjectId, items: val.data)
-        await db.commit()
-      })
+    var tasks: [Task<Void, Never>] = []
 
-    tasks.append(
-      Task {
-        let db = try self.getDB()
-        let val = try await self.getSubjectRelations(subjectId, limit: 10)
-        try await db.saveSubjectRelations(subjectId: subjectId, items: val.data)
-        await db.commit()
-      })
-
-    tasks.append(
-      Task {
-        let db = try self.getDB()
-        let val = try await self.getSubjectRecs(subjectId, limit: 10)
-        try await db.saveSubjectRecs(subjectId: subjectId, items: val.data)
-        await db.commit()
-      })
-
-    tasks.append(
-      Task {
-        let db = try self.getDB()
-        let val = try await self.getSubjectIndexes(subjectId: subjectId, limit: 5)
-        try await db.saveSubjectIndexes(subjectId: subjectId, items: val.data)
-        await db.commit()
-      })
-
-    if offprints {
+    func addTask<T>(
+      label: String,
+      work: @Sendable @escaping () async throws -> PagedDTO<T>,
+      save: @Sendable @escaping (PagedDTO<T>) async throws -> Void
+    ) {
       tasks.append(
-        Task {
-          let db = try self.getDB()
-          let val = try await self.getSubjectRelations(subjectId, offprint: true, limit: 100)
-          try await db.saveSubjectOffprints(subjectId: subjectId, items: val.data)
-          await db.commit()
+        Task { @Sendable in
+          do {
+            let value = try await work()
+            try await save(value)
+            await db.commit()
+          } catch {
+            Logger.api.error("Failed to load subject detail (\(label)): \(error)")
+            await MainActor.run {
+              Notifier.shared.notify(message: "加载\(label)失败")
+            }
+          }
         })
     }
 
-    if social {
-      tasks.append(
-        Task {
-          let collectsModeDefaults = UserDefaults.standard.string(
-            forKey: "subjectCollectsFilterMode")
-          let collectsMode = FilterMode(collectsModeDefaults)
-          let db = try self.getDB()
-          let val = try await self.getSubjectCollects(subjectId, mode: collectsMode, limit: 10)
-          try await db.saveSubjectCollects(subjectId: subjectId, items: val.data)
-          await db.commit()
-        })
+    addTask(
+      label: "条目角色",
+      work: { try await self.getSubjectCharacters(subjectId, limit: 12) },
+      save: { value in
+        try await db.saveSubjectCharacters(subjectId: subjectId, items: value.data)
+      }
+    )
+    addTask(
+      label: "关联条目",
+      work: { try await self.getSubjectRelations(subjectId, limit: 10) },
+      save: { value in
+        try await db.saveSubjectRelations(subjectId: subjectId, items: value.data)
+      }
+    )
+    addTask(
+      label: "推荐条目",
+      work: { try await self.getSubjectRecs(subjectId, limit: 10) },
+      save: { value in
+        try await db.saveSubjectRecs(subjectId: subjectId, items: value.data)
+      }
+    )
+    addTask(
+      label: "条目目录",
+      work: { try await self.getSubjectIndexes(subjectId: subjectId, limit: 5) },
+      save: { value in
+        try await db.saveSubjectIndexes(subjectId: subjectId, items: value.data)
+      }
+    )
 
-      tasks.append(
-        Task {
-          let db = try self.getDB()
-          let val = try await self.getSubjectReviews(subjectId, limit: 5)
-          try await db.saveSubjectReviews(subjectId: subjectId, items: val.data)
-          await db.commit()
-        })
+    if offprints {
+      addTask(
+        label: "条目衍生",
+        work: { try await self.getSubjectRelations(subjectId, offprint: true, limit: 100) },
+        save: { value in
+          try await db.saveSubjectOffprints(subjectId: subjectId, items: value.data)
+        }
+      )
+    }
 
-      tasks.append(
-        Task {
-          let db = try self.getDB()
-          let val = try await self.getSubjectTopics(subjectId, limit: 5)
-          try await db.saveSubjectTopics(subjectId: subjectId, items: val.data)
-          await db.commit()
-        })
-
-      tasks.append(
-        Task {
-          let db = try self.getDB()
-          let val = try await self.getSubjectComments(subjectId, limit: 10)
-          try await db.saveSubjectComments(subjectId: subjectId, items: val.data)
-          await db.commit()
-        })
+    if let collectsMode {
+      addTask(
+        label: "收藏用户",
+        work: { try await self.getSubjectCollects(subjectId, mode: collectsMode, limit: 10) },
+        save: { value in
+          try await db.saveSubjectCollects(subjectId: subjectId, items: value.data)
+        }
+      )
+      addTask(
+        label: "评论",
+        work: { try await self.getSubjectReviews(subjectId, limit: 5) },
+        save: { value in
+          try await db.saveSubjectReviews(subjectId: subjectId, items: value.data)
+        }
+      )
+      addTask(
+        label: "讨论",
+        work: { try await self.getSubjectTopics(subjectId, limit: 5) },
+        save: { value in
+          try await db.saveSubjectTopics(subjectId: subjectId, items: value.data)
+        }
+      )
+      addTask(
+        label: "吐槽",
+        work: { try await self.getSubjectComments(subjectId, limit: 10) },
+        save: { value in
+          try await db.saveSubjectComments(subjectId: subjectId, items: value.data)
+        }
+      )
     }
 
     for task in tasks {
-      try await task.value
+      await task.value
     }
   }
 
@@ -200,9 +219,7 @@ extension Chii {
         break
       }
     }
-    for item in items {
-      try await db.saveEpisode(item)
-    }
+    try await db.saveEpisodes(subjectId: subjectId, items: items)
     try await db.deleteEpisodesNotIn(subjectId: subjectId, episodeIds: episodeIds)
     await db.commit()
   }
@@ -245,26 +262,36 @@ extension Chii {
   }
 
   func loadCharacterDetails(_ characterId: Int) async throws {
-    var tasks: [Task<Void, any Error>] = []
-
+    let db = try self.getDB()
+    var tasks: [Task<Void, Never>] = []
     tasks.append(
-      Task {
-        let db = try self.getDB()
-        let val = try await self.getCharacterCasts(characterId, limit: 5)
-        try await db.saveCharacterCasts(characterId: characterId, items: val.data)
-        await db.commit()
+      Task { @Sendable in
+        do {
+          let response = try await self.getCharacterCasts(characterId, limit: 5)
+          try await db.saveCharacterCasts(characterId: characterId, items: response.data)
+          await db.commit()
+        } catch {
+          Logger.api.error("Failed to load character casts: \(error)")
+          await MainActor.run {
+            Notifier.shared.notify(message: "加载角色参演失败")
+          }
+        }
       })
-
     tasks.append(
-      Task {
-        let db = try self.getDB()
-        let val = try await self.getCharacterIndexes(characterId: characterId, limit: 5)
-        try await db.saveCharacterIndexes(characterId: characterId, items: val.data)
-        await db.commit()
+      Task { @Sendable in
+        do {
+          let response = try await self.getCharacterIndexes(characterId: characterId, limit: 5)
+          try await db.saveCharacterIndexes(characterId: characterId, items: response.data)
+          await db.commit()
+        } catch {
+          Logger.api.error("Failed to load character indexes: \(error)")
+          await MainActor.run {
+            Notifier.shared.notify(message: "加载角色目录失败")
+          }
+        }
       })
-
     for task in tasks {
-      try await task.value
+      await task.value
     }
   }
 
@@ -287,34 +314,49 @@ extension Chii {
   }
 
   func loadPersonDetails(_ personId: Int) async throws {
-    var tasks: [Task<Void, any Error>] = []
-
+    let db = try self.getDB()
+    var tasks: [Task<Void, Never>] = []
     tasks.append(
-      Task {
-        let db = try self.getDB()
-        let val = try await self.getPersonCasts(personId, limit: 5)
-        try await db.savePersonCasts(personId: personId, items: val.data)
-        await db.commit()
+      Task { @Sendable in
+        do {
+          let response = try await self.getPersonCasts(personId, limit: 5)
+          try await db.savePersonCasts(personId: personId, items: response.data)
+          await db.commit()
+        } catch {
+          Logger.api.error("Failed to load person casts: \(error)")
+          await MainActor.run {
+            Notifier.shared.notify(message: "加载人物参演失败")
+          }
+        }
       })
-
     tasks.append(
-      Task {
-        let db = try self.getDB()
-        let val = try await self.getPersonWorks(personId, limit: 5)
-        try await db.savePersonWorks(personId: personId, items: val.data)
-        await db.commit()
+      Task { @Sendable in
+        do {
+          let response = try await self.getPersonWorks(personId, limit: 5)
+          try await db.savePersonWorks(personId: personId, items: response.data)
+          await db.commit()
+        } catch {
+          Logger.api.error("Failed to load person works: \(error)")
+          await MainActor.run {
+            Notifier.shared.notify(message: "加载人物作品失败")
+          }
+        }
       })
-
     tasks.append(
-      Task {
-        let db = try self.getDB()
-        let val = try await self.getPersonIndexes(personId: personId, limit: 5)
-        try await db.savePersonIndexes(personId: personId, items: val.data)
-        await db.commit()
+      Task { @Sendable in
+        do {
+          let response = try await self.getPersonIndexes(personId: personId, limit: 5)
+          try await db.savePersonIndexes(personId: personId, items: response.data)
+          await db.commit()
+        } catch {
+          Logger.api.error("Failed to load person indexes: \(error)")
+          await MainActor.run {
+            Notifier.shared.notify(message: "加载人物目录失败")
+          }
+        }
       })
-
     for task in tasks {
-      try await task.value
+      await task.value
     }
   }
 }
@@ -332,34 +374,49 @@ extension Chii {
   }
 
   func loadGroupDetails(_ name: String) async throws {
-    var tasks: [Task<Void, any Error>] = []
-
+    let db = try self.getDB()
+    var tasks: [Task<Void, Never>] = []
     tasks.append(
-      Task {
-        let db = try self.getDB()
-        let val = try await self.getGroupMembers(name, role: .member, limit: 10)
-        try await db.saveGroupRecentMembers(groupName: name, items: val.data)
-        await db.commit()
+      Task { @Sendable in
+        do {
+          let response = try await self.getGroupMembers(name, role: .member, limit: 10)
+          try await db.saveGroupRecentMembers(groupName: name, items: response.data)
+          await db.commit()
+        } catch {
+          Logger.api.error("Failed to load group members: \(error)")
+          await MainActor.run {
+            Notifier.shared.notify(message: "加载小组成员失败")
+          }
+        }
       })
-
     tasks.append(
-      Task {
-        let db = try self.getDB()
-        let val = try await self.getGroupMembers(name, role: .moderator, limit: 10)
-        try await db.saveGroupModerators(groupName: name, items: val.data)
-        await db.commit()
+      Task { @Sendable in
+        do {
+          let response = try await self.getGroupMembers(name, role: .moderator, limit: 10)
+          try await db.saveGroupModerators(groupName: name, items: response.data)
+          await db.commit()
+        } catch {
+          Logger.api.error("Failed to load group moderators: \(error)")
+          await MainActor.run {
+            Notifier.shared.notify(message: "加载小组管理失败")
+          }
+        }
       })
-
     tasks.append(
-      Task {
-        let db = try self.getDB()
-        let val = try await self.getGroupTopics(name, limit: 10)
-        try await db.saveGroupRecentTopics(groupName: name, items: val.data)
-        await db.commit()
+      Task { @Sendable in
+        do {
+          let response = try await self.getGroupTopics(name, limit: 10)
+          try await db.saveGroupRecentTopics(groupName: name, items: response.data)
+          await db.commit()
+        } catch {
+          Logger.api.error("Failed to load group topics: \(error)")
+          await MainActor.run {
+            Notifier.shared.notify(message: "加载小组话题失败")
+          }
+        }
       })
-
     for task in tasks {
-      try await task.value
+      await task.value
     }
   }
 }

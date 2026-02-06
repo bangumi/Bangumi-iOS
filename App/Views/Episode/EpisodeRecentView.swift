@@ -11,10 +11,9 @@ enum EpisodeRecentMode {
 struct EpisodeRecentView: View {
   @Bindable var subject: Subject
   let mode: EpisodeRecentMode
+  let episodes: [Episode]
 
   @State private var showCollectionBox: Bool = false
-
-  @Query private var episodes: [Episode] = []
 
   var nextEpisode: Episode? {
     episodes.first { $0.status == EpisodeCollectionType.none.rawValue }
@@ -55,17 +54,10 @@ struct EpisodeRecentView: View {
     }
   }
 
-  init(subject: Subject, mode: EpisodeRecentMode) {
+  init(subject: Subject, mode: EpisodeRecentMode, episodes: [Episode]) {
     self.subject = subject
     self.mode = mode
-    let subjectId = subject.subjectId
-
-    let descriptor = FetchDescriptor<Episode>(
-      predicate: #Predicate<Episode> {
-        $0.subjectId == subjectId && $0.type == 0
-      }, sortBy: [SortDescriptor<Episode>(\.sort, order: .forward)])
-
-    _episodes = Query(descriptor)
+    self.episodes = episodes
   }
 
   var body: some View {
