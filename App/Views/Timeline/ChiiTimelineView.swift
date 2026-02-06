@@ -70,15 +70,18 @@ struct ChiiTimelineView: View {
               }
             } label: {
               ImageView(img: profile.avatar?.large)
-                .imageStyle(width: 32, height: 32)
                 .imageType(.avatar)
+                .glassEffectIfAvailable(shape: Circle())
             }
+            .buttonStyle(.plain)
+            .menuStyle(.button)
+            .menuIndicator(.hidden)
           }
         } else {
           ToolbarItem(placement: .topBarLeading) {
             ImageView(img: nil)
-              .imageStyle(width: 32, height: 32)
               .imageType(.avatar)
+              .glassEffectIfAvailable(shape: Circle())
           }
         }
         if isAuthenticated, !isolationMode {
