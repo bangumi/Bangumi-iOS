@@ -65,23 +65,34 @@ struct SubjectCharacterListView: View {
                 }
               }
               HFlow {
-                ForEach(item.actors) { person in
-                  HStack {
-                    ImageView(img: person.images?.grid)
+                let sortedCasts = item.casts.sorted {
+                  if $0.relation != $1.relation {
+                    return $0.relation.rawValue < $1.relation.rawValue
+                  }
+                  return $0.person.id < $1.person.id
+                }
+                ForEach(sortedCasts) { cast in
+                  HStack(alignment: .top) {
+                    ImageView(img: cast.person.images?.grid)
                       .imageStyle(width: 40, height: 40, alignment: .top)
                       .imageType(.person)
-                      .imageNavLink(person.link)
-                    VStack(alignment: .leading) {
-                      Text(person.title(with: titlePreference).withLink(person.link))
+                      .imageNavLink(cast.person.link)
+                    VStack(alignment: .leading, spacing: 2) {
+                      Text(cast.person.title(with: titlePreference).withLink(cast.person.link))
                         .foregroundStyle(.linkText)
                         .font(.footnote)
                         .lineLimit(1)
-                      if let subtitle = person.subtitle(with: titlePreference) {
-                        Text(subtitle)
-                          .font(.footnote)
-                          .foregroundStyle(.secondary)
-                          .lineLimit(1)
+                      HStack(spacing: 4) {
+                        BorderView {
+                          Text(cast.relation.description).font(.caption)
+                        }
+                        if !cast.summary.isEmpty {
+                          Text(cast.summary)
+                            .font(.caption)
+                            .lineLimit(1)
+                        }
                       }
+                      .foregroundStyle(.secondary)
                     }
                   }
                 }

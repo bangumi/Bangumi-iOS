@@ -80,8 +80,10 @@ struct CharacterCard: View {
         }
       }.font(.caption)
 
-      if let actor = item.actors.first {
-        Text("CV \(actor.name.withLink(actor.link))")
+      if let cast = item.casts.first {
+        Text(
+          "\(cast.relation.description) \(cast.person.title(with: titlePreference).withLink(cast.person.link))"
+        )
           .font(.caption)
           .foregroundStyle(.secondary)
           .lineLimit(1)

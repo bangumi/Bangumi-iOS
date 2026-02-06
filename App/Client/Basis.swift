@@ -800,6 +800,56 @@ enum CastType: Int, Codable, Identifiable, CaseIterable {
   }
 }
 
+/// 角色配音关系
+/// 0 = CV
+/// 1 = 配音
+/// 2 = 演员
+/// 3 = 中配
+/// 4 = 日配
+/// 5 = 英配
+/// 6 = 韩配
+enum CharacterCastType: Int, Codable, Identifiable, CaseIterable {
+  case cv = 0
+  case dub = 1
+  case actor = 2
+  case chineseDub = 3
+  case japaneseDub = 4
+  case englishDub = 5
+  case koreanDub = 6
+
+  var id: Self {
+    self
+  }
+
+  init(_ value: Int = 0) {
+    let tmp = Self(rawValue: value)
+    if let out = tmp {
+      self = out
+      return
+    }
+    self = Self.cv
+  }
+
+  var description: String {
+    switch self {
+    case .cv:
+      return "CV"
+    case .dub:
+      return "配音"
+    case .actor:
+      return "演员"
+    case .chineseDub:
+      return "中配"
+    case .japaneseDub:
+      return "日配"
+    case .englishDub:
+      return "英配"
+    case .koreanDub:
+      return "韩配"
+    }
+  }
+}
+
 /// 章节类型
 /// 0 = 本篇
 /// 1 = 特别篇

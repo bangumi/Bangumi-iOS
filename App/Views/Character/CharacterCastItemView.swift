@@ -34,21 +34,32 @@ struct CharacterCastItemView: View {
         Spacer()
 
         VStack(alignment: .trailing) {
-          ForEach(item.actors) { person in
+          ForEach(item.casts) { cast in
             HStack(alignment: .top) {
-              VStack(alignment: .trailing) {
-                Text(person.title(with: titlePreference).withLink(person.link))
-                if let subtitle = person.subtitle(with: titlePreference) {
+              VStack(alignment: .trailing, spacing: 2) {
+                Text(cast.person.title(with: titlePreference).withLink(cast.person.link))
+                if let subtitle = cast.person.subtitle(with: titlePreference) {
                   Text(subtitle)
                     .foregroundStyle(.secondary)
                 }
+                HStack(spacing: 4) {
+                  BorderView {
+                    Text(cast.relation.description).font(.caption)
+                  }
+                  if !cast.summary.isEmpty {
+                    Text(cast.summary)
+                      .font(.caption)
+                      .lineLimit(1)
+                  }
+                }
+                .foregroundStyle(.secondary)
               }
               .lineLimit(1)
               .font(.footnote)
-              ImageView(img: person.images?.grid)
+              ImageView(img: cast.person.images?.grid)
                 .imageStyle(width: 40, height: 40, alignment: .top)
                 .imageType(.person)
-                .imageNavLink(person.link)
+                .imageNavLink(cast.person.link)
             }
           }
         }

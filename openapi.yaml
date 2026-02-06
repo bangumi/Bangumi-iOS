@@ -156,6 +156,49 @@ components:
         - nsfw
       title: Character
       type: object
+    CharacterCast:
+      properties:
+        person:
+          $ref: '#/components/schemas/SlimPerson'
+        relation:
+          $ref: '#/components/schemas/CharacterCastType'
+        summary:
+          type: string
+      required:
+        - person
+        - relation
+        - summary
+      type: object
+    CharacterCastType:
+      description: |-
+        Character cast relation type
+          - 0 = CV
+          - 1 = Dub
+          - 2 = Actor
+          - 3 = Chinese dub
+          - 4 = Japanese dub
+          - 5 = English dub
+          - 6 = Korean dub
+      enum:
+        - 0
+        - 2
+        - 1
+        - 3
+        - 4
+        - 5
+        - 6
+      type: integer
+      x-enum-varnames:
+        - CV
+        - Actor
+        - Dub
+        - ChineseDub
+        - JapaneseDub
+        - EnglishDub
+        - KoreanDub
+      x-ms-enum:
+        modelAsString: false
+        name: CharacterCastType
     CharacterRelation:
       properties:
         character:
@@ -197,9 +240,9 @@ components:
       type: object
     CharacterSubject:
       properties:
-        actors:
+        casts:
           items:
-            $ref: '#/components/schemas/SlimPerson'
+            $ref: '#/components/schemas/CharacterCast'
           type: array
         subject:
           $ref: '#/components/schemas/SlimSubject'
@@ -207,7 +250,7 @@ components:
           type: integer
       required:
         - subject
-        - actors
+        - casts
         - type
       type: object
     CharacterSubjectRelation:
@@ -1266,6 +1309,43 @@ components:
         - person
         - relation
       type: object
+    PersonRevisionWikiInfo:
+      properties:
+        extra:
+          properties:
+            img:
+              type: string
+          type: object
+        infobox:
+          type: string
+        name:
+          type: string
+        profession:
+          properties:
+            actor:
+              type: boolean
+            artist:
+              type: boolean
+            illustrator:
+              type: boolean
+            mangaka:
+              type: boolean
+            producer:
+              type: boolean
+            seiyu:
+              type: boolean
+            writer:
+              type: boolean
+          type: object
+        summary:
+          type: string
+      required:
+        - name
+        - infobox
+        - summary
+        - profession
+        - extra
+      type: object
     PersonSearchFilter:
       properties:
         career:
@@ -1284,6 +1364,24 @@ components:
             type: string
           type: array
       type: object
+    PersonType:
+      description: |-
+        人物类型
+          - 1 = 个人
+          - 2 = 公司
+          - 3 = 组合
+      enum:
+        - 1
+        - 2
+        - 3
+      type: integer
+      x-enum-varnames:
+        - Individual
+        - Company
+        - Group
+      x-ms-enum:
+        modelAsString: false
+        name: PersonType
     PersonWikiInfo:
       properties:
         id:
@@ -1292,16 +1390,34 @@ components:
           type: string
         name:
           type: string
+        profession:
+          properties:
+            actor:
+              type: boolean
+            artist:
+              type: boolean
+            illustrator:
+              type: boolean
+            mangaka:
+              type: boolean
+            producer:
+              type: boolean
+            seiyu:
+              type: boolean
+            writer:
+              type: boolean
+          type: object
         summary:
           type: string
         typeID:
-          $ref: '#/components/schemas/SubjectType'
+          $ref: '#/components/schemas/PersonType'
       required:
         - id
         - name
         - typeID
         - infobox
         - summary
+        - profession
       type: object
     PersonWork:
       properties:
@@ -2199,9 +2315,9 @@ components:
         name: SubjectBrowseSort
     SubjectCharacter:
       properties:
-        actors:
+        casts:
           items:
-            $ref: '#/components/schemas/SlimPerson'
+            $ref: '#/components/schemas/CharacterCast'
           type: array
         character:
           $ref: '#/components/schemas/SlimCharacter'
@@ -2211,7 +2327,7 @@ components:
           type: integer
       required:
         - character
-        - actors
+        - casts
         - type
         - order
       type: object
@@ -2379,6 +2495,10 @@ components:
       type: object
     SubjectNew:
       properties:
+        date:
+          example: '0000-00-00'
+          pattern: ^\d{4}-\d{2}-\d{2}$
+          type: string
         infobox:
           minLength: 1
           type: string
@@ -3245,6 +3365,30 @@ components:
         - account
       title: UserNetworkService
       type: object
+    UserPersonContribution:
+      properties:
+        commitMessage:
+          type: string
+        createdAt:
+          description: unix timestamp seconds
+          type: integer
+        id:
+          type: integer
+        name:
+          type: string
+        personID:
+          type: integer
+        type:
+          description: 3 = 人物编辑，15 = 合并，16 = 删除
+          type: integer
+      required:
+        - id
+        - type
+        - personID
+        - name
+        - commitMessage
+        - createdAt
+      type: object
     UserStats:
       properties:
         blog:
@@ -3326,7 +3470,7 @@ info:
     关于订阅通知的 socket.io 相关的文档在
     <https://github.com/bangumi/GraphQL/blob/master/docs/socket.io.md>
   title: bangumi private api
-  version: v0.41.6
+  version: v0.47.0
 openapi: 3.0.3
 paths:
   /p1/blocklist:
@@ -7205,9 +7349,21 @@ paths:
           required: false
           schema:
             items:
-              description: wiki 标签，包括 分类/来源/类型/题材/地区/受众 等
+              description: 标签。默认按 wiki/meta 标签查询，结合 tagsCat 可切换为用户标签。
               type: string
             type: array
+        - description: tags 过滤类别：meta=wiki 标签（默认），subject=用户标签
+          in: query
+          name: tagsCat
+          required: false
+          schema:
+            anyOf:
+              - enum:
+                  - meta
+                type: string
+              - enum:
+                  - subject
+                type: string
       responses:
         '200':
           content:
@@ -7760,6 +7916,7 @@ paths:
           required: false
           schema:
             default: 0
+            maximum: 500
             minimum: 0
             type: integer
         - in: path
@@ -9524,9 +9681,90 @@ paths:
       summary: 获取角色当前的 wiki 信息
       tags:
         - wiki
+    patch:
+      operationId: patchCharacterInfo
+      parameters:
+        - in: path
+          name: characterID
+          required: true
+          schema:
+            minimum: 1
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              additionalProperties: false
+              properties:
+                character:
+                  additionalProperties: false
+                  properties:
+                    infobox:
+                      minLength: 1
+                      type: string
+                    name:
+                      minLength: 1
+                      type: string
+                    summary:
+                      type: string
+                  type: object
+                commitMessage:
+                  minLength: 1
+                  type: string
+                expectedRevision:
+                  additionalProperties: false
+                  default: {}
+                  properties:
+                    infobox:
+                      minLength: 1
+                      type: string
+                    name:
+                      minLength: 1
+                      type: string
+                    summary:
+                      type: string
+                  type: object
+              required:
+                - commitMessage
+                - expectedRevision
+                - character
+              type: object
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties: {}
+                type: object
+          description: Default Response
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: default error response type
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: default error response type
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: 意料之外的服务器错误
+      security:
+        - CookiesSession: []
+          HTTPBearer: []
+      summary: 编辑角色
+      tags:
+        - wiki
   /p1/wiki/characters/{characterID}/history-summary:
     get:
-      operationId: subjectEditHistorySummary
+      operationId: characterEditHistorySummary
       parameters:
         - description: max 100
           in: query
@@ -9752,9 +9990,43 @@ paths:
           description: 意料之外的服务器错误
       tags:
         - wiki
+  /p1/wiki/persons/-/revisions/{revisionID}:
+    get:
+      operationId: getPersonRevisionInfo
+      parameters:
+        - in: path
+          name: revisionID
+          required: true
+          schema:
+            minimum: 1
+            type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonRevisionWikiInfo'
+          description: Default Response
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: default error response type
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: 意料之外的服务器错误
+      security:
+        - CookiesSession: []
+          HTTPBearer: []
+      summary: 获取人物历史版本 wiki 信息
+      tags:
+        - wiki
   /p1/wiki/persons/{personID}:
     get:
-      description: 获取当前的 wiki 信息
       operationId: getPersonWikiInfo
       parameters:
         - in: path
@@ -9781,7 +10053,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-          description: 角色不存在
+          description: 人物不存在
         '500':
           content:
             application/json:
@@ -9791,6 +10063,7 @@ paths:
       security:
         - CookiesSession: []
           HTTPBearer: []
+      summary: 获取人物当前的 wiki 信息
       tags:
         - wiki
     patch:
@@ -9871,6 +10144,64 @@ paths:
       security:
         - CookiesSession: []
           HTTPBearer: []
+      summary: 编辑人物
+      tags:
+        - wiki
+  /p1/wiki/persons/{personID}/history-summary:
+    get:
+      operationId: personEditHistorySummary
+      parameters:
+        - description: max 100
+          in: query
+          name: limit
+          required: false
+          schema:
+            default: 20
+            maximum: 100
+            minimum: 1
+            type: integer
+        - description: min 0
+          in: query
+          name: offset
+          required: false
+          schema:
+            default: 0
+            minimum: 0
+            type: integer
+        - in: path
+          name: personID
+          required: true
+          schema:
+            minimum: 1
+            type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  data:
+                    items:
+                      $ref: '#/components/schemas/RevisionHistory'
+                    type: array
+                  total:
+                    description: limit+offset 为参数的请求表示总条数，page 为参数的请求表示总页数
+                    type: integer
+                required:
+                  - data
+                  - total
+                type: object
+          description: Default Response
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: 意料之外的服务器错误
+      security:
+        - CookiesSession: []
+          HTTPBearer: []
+      summary: 获取人物 wiki 历史编辑摘要
       tags:
         - wiki
   /p1/wiki/recent:
@@ -9911,13 +10242,16 @@ paths:
         - wiki
   /p1/wiki/subjects:
     post:
-      description: 创建新条目
       operationId: createNewSubject
       requestBody:
         content:
           application/json:
             schema:
               properties:
+                date:
+                  example: '0000-00-00'
+                  pattern: ^\d{4}-\d{2}-\d{2}$
+                  type: string
                 infobox:
                   minLength: 1
                   type: string
@@ -9981,6 +10315,7 @@ paths:
       security:
         - CookiesSession: []
           HTTPBearer: []
+      summary: 创建新条目
       tags:
         - wiki
   /p1/wiki/subjects/-/revisions/{revisionID}:
@@ -10740,7 +11075,7 @@ paths:
         - wiki
   /p1/wiki/users/{username}/contributions/characters:
     get:
-      operationId: getUserContributedcharacters
+      operationId: getUserContributedCharacters
       parameters:
         - description: max 100
           in: query
@@ -10798,6 +11133,68 @@ paths:
         - CookiesSession: []
           HTTPBearer: []
       summary: 获取用户 wiki 角色编辑记录
+      tags:
+        - wiki
+  /p1/wiki/users/{username}/contributions/persons:
+    get:
+      operationId: getUserContributedPersons
+      parameters:
+        - description: max 100
+          in: query
+          name: limit
+          required: false
+          schema:
+            default: 20
+            maximum: 100
+            minimum: 1
+            type: integer
+        - description: min 0
+          in: query
+          name: offset
+          required: false
+          schema:
+            default: 0
+            minimum: 0
+            type: integer
+        - in: path
+          name: username
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  data:
+                    items:
+                      $ref: '#/components/schemas/UserPersonContribution'
+                    type: array
+                  total:
+                    description: limit+offset 为参数的请求表示总条数，page 为参数的请求表示总页数
+                    type: integer
+                required:
+                  - data
+                  - total
+                type: object
+          description: Default Response
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: default error response type
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: 意料之外的服务器错误
+      security:
+        - CookiesSession: []
+          HTTPBearer: []
+      summary: 获取用户 wiki 人物编辑记录
       tags:
         - wiki
   /p1/wiki/users/{username}/contributions/subjects:

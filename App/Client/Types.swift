@@ -612,13 +612,43 @@ struct PersonDTO: Codable, Identifiable, Searchable, Linkable {
   }
 }
 
+struct CharacterCastPersonDTO: Codable, Identifiable, Hashable {
+  var person: SlimPersonDTO
+  var relation: CharacterCastType
+  var summary: String
+
+  var id: Int {
+    person.id
+  }
+}
+
 struct CharacterCastDTO: Codable, Identifiable, Hashable {
-  var actors: [SlimPersonDTO]
+  var casts: [CharacterCastPersonDTO]
   var subject: SlimSubjectDTO
   var type: CastType
 
   var id: Int {
     subject.id
+  }
+
+  enum CodingKeys: String, CodingKey {
+    case casts
+    case subject
+    case type
+  }
+
+  init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    subject = try container.decode(SlimSubjectDTO.self, forKey: .subject)
+    type = try container.decode(CastType.self, forKey: .type)
+    casts = try container.decodeIfPresent([CharacterCastPersonDTO].self, forKey: .casts) ?? []
+  }
+
+  func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(casts, forKey: .casts)
+    try container.encode(subject, forKey: .subject)
+    try container.encode(type, forKey: .type)
   }
 }
 
@@ -753,12 +783,35 @@ struct SubjectRelationDTO: Codable, Identifiable, Hashable {
 
 struct SubjectCharacterDTO: Codable, Identifiable, Hashable {
   var character: SlimCharacterDTO
-  var actors: [SlimPersonDTO]
+  var casts: [CharacterCastPersonDTO]
   var type: CastType
   var order: Int
 
   var id: Int {
     character.id
+  }
+
+  enum CodingKeys: String, CodingKey {
+    case character
+    case casts
+    case type
+    case order
+  }
+
+  init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    character = try container.decode(SlimCharacterDTO.self, forKey: .character)
+    type = try container.decode(CastType.self, forKey: .type)
+    order = try container.decode(Int.self, forKey: .order)
+    casts = try container.decodeIfPresent([CharacterCastPersonDTO].self, forKey: .casts) ?? []
+  }
+
+  func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(character, forKey: .character)
+    try container.encode(casts, forKey: .casts)
+    try container.encode(type, forKey: .type)
+    try container.encode(order, forKey: .order)
   }
 }
 
