@@ -30,7 +30,7 @@ struct ImageView: View {
               ]
             )
             .onSuccess { _, _, _ in
-              isLoaded = true
+              markLoaded()
             }
             .resizable()
             .transition(.fade(duration: 0.25))
@@ -41,7 +41,7 @@ struct ImageView: View {
           } else if let aspectRatio = style.aspectRatio {
             AnimatedImage(url: imageURL)
               .onSuccess { _, _, _ in
-                isLoaded = true
+                markLoaded()
               }
               .resizable()
               .transition(.fade(duration: 0.25))
@@ -51,7 +51,7 @@ struct ImageView: View {
           } else {
             AnimatedImage(url: imageURL)
               .onSuccess { _, _, _ in
-                isLoaded = true
+                markLoaded()
               }
               .resizable()
               .transition(.fade(duration: 0.25))
@@ -101,6 +101,15 @@ struct ImageView: View {
             .frame(alignment: style.alignment)
             .applyClipShape(type: type, cornerRadius: style.cornerRadius)
         }
+      }
+    }
+  }
+
+  private func markLoaded() {
+    guard !isLoaded else { return }
+    DispatchQueue.main.async {
+      if !isLoaded {
+        isLoaded = true
       }
     }
   }
