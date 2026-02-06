@@ -1,4 +1,5 @@
 import Foundation
+import SDWebImage
 import SDWebImageSwiftUI
 import SwiftUI
 
@@ -35,11 +36,14 @@ struct ImageView: View {
   @State private var width: CGFloat?
   @State private var showPreview = false
   @State private var failed = false
+  @State private var reloadID = UUID()
+  @State private var shouldRefresh = false
 
   @State private var currentZoom = 0.0
   @State private var totalZoom = 1.0
 
   @Environment(\.isInLink) private var isInLink
+  @Namespace private var zoomNamespace
 
   init(url: URL) {
     if url.scheme == "http",
@@ -63,42 +67,10 @@ struct ImageView: View {
   #endif
 
   var body: some View {
-    let webImage = AnimatedImage(url: url)
-      .onFailure { error in
-        failed = true
-      }
-      .onSuccess { image, data, cacheType in
-        DispatchQueue.main.async {
-          self.width = image.size.width
-        }
-      }
-      .resizable()
-      .indicator(.activity)
-      .transition(.fade(duration: 0.5))
-      .scaledToFit()
-      .frame(maxWidth: width)
-      .contextMenu {
-        Button {
-          #if canImport(UIKit)
-            saveImage()
-          #endif
-        } label: {
-          Label("保存", systemImage: "square.and.arrow.down")
-        }
-        if !isInLink {
-          Button {
-            showPreview = true
-          } label: {
-            Label("预览", systemImage: "eye")
-          }
-        }
-        ShareLink(item: url)
-      }
-
     if isInLink {
-      webImage
+      imageContent()
     } else {
-      webImage
+      imageContent()
         .onTapGesture {
           if failed {
             return
@@ -107,13 +79,87 @@ struct ImageView: View {
         }
         #if os(iOS)
           .fullScreenCover(isPresented: $showPreview) {
-            ImagePreviewer(url: url)
+            ImagePreviewer(url: url, zoomID: zoomID, zoomNamespace: zoomNamespace)
           }
         #else
           .sheet(isPresented: $showPreview) {
-            ImagePreviewer(url: url)
+            ImagePreviewer(url: url, zoomID: zoomID, zoomNamespace: zoomNamespace)
           }
         #endif
     }
+  }
+
+  @ViewBuilder
+  private func imageContent() -> some View {
+    ZStack {
+      AnimatedImage(url: url, options: imageOptions)
+        .onFailure { _ in
+          DispatchQueue.main.async {
+            failed = true
+          }
+        }
+        .onSuccess { image, _, _ in
+          DispatchQueue.main.async {
+            self.width = image.size.width
+            failed = false
+            shouldRefresh = false
+          }
+        }
+        .resizable()
+        .indicator(.activity)
+        .transition(.fade(duration: 0.5))
+        .scaledToFit()
+        .id(reloadID)
+
+      if failed {
+        Color.black.opacity(0.35)
+        VStack(spacing: 12) {
+          Button {
+            reloadImage()
+          } label: {
+            Label("Reload", systemImage: "arrow.clockwise")
+          }
+          .adaptiveButtonStyle(.borderedProminent)
+        }
+        .foregroundColor(.white)
+      }
+    }
+    .frame(maxWidth: width)
+    .contextMenu {
+      Button {
+        #if canImport(UIKit)
+          saveImage()
+        #endif
+      } label: {
+        Label("保存", systemImage: "square.and.arrow.down")
+      }
+      if !isInLink {
+        Button {
+          showPreview = true
+        } label: {
+          Label("预览", systemImage: "eye")
+        }
+      }
+      ShareLink(item: url)
+    }
+    .matchedTransitionSourceIfAvailable(id: zoomID, in: zoomNamespace)
+  }
+
+  private var zoomID: String {
+    url.absoluteString
+  }
+
+  private var imageOptions: SDWebImageOptions {
+    var options: SDWebImageOptions = [.retryFailed]
+    if shouldRefresh {
+      options.insert(.refreshCached)
+    }
+    return options
+  }
+
+  private func reloadImage() {
+    failed = false
+    shouldRefresh = true
+    reloadID = UUID()
   }
 }
