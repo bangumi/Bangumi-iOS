@@ -183,6 +183,7 @@ extension Chii {
     let limit: Int = 1000
     var total: Int = 0
     var items: [EpisodeDTO] = []
+    var episodeIds = Set<Int>()
     while true {
       let response = try await self.getSubjectEpisodes(
         subjectId, limit: limit, offset: offset)
@@ -192,6 +193,7 @@ extension Chii {
       }
       for item in response.data {
         items.append(item)
+        episodeIds.insert(item.id)
       }
       offset += limit
       if offset > total {
@@ -201,6 +203,7 @@ extension Chii {
     for item in items {
       try await db.saveEpisode(item)
     }
+    try await db.deleteEpisodesNotIn(subjectId: subjectId, episodeIds: episodeIds)
     await db.commit()
   }
 

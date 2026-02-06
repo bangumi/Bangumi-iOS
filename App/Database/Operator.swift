@@ -677,6 +677,18 @@ extension DatabaseOperator {
       modelContext.delete(episode)
     }
   }
+
+  public func deleteEpisodesNotIn(subjectId: Int, episodeIds: Set<Int>) throws {
+    let descriptor = FetchDescriptor<Episode>(
+      predicate: #Predicate<Episode> {
+        $0.subjectId == subjectId
+      }
+    )
+    let episodes = try modelContext.fetch(descriptor)
+    for episode in episodes where !episodeIds.contains(episode.episodeId) {
+      modelContext.delete(episode)
+    }
+  }
 }
 
 // MARK: - save subject
