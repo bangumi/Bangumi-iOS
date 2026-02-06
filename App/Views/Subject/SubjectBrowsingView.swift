@@ -451,64 +451,40 @@ struct SubjectBrowsingFilterTagView: View {
   @Binding var filter: SubjectsBrowseFilter
   let title: String
   let tags: [String]
+  private let tagsSet: Set<String>
 
-  @State private var tagTextColors: [String: Color] = [:]
-  @State private var tagBackgroundColors: [String: Color] = [:]
-  @State private var allTagsBackgroundColor: Color = .accent
-  @State private var allTagsTextColor: Color = .white
-
-  @State private var lastFilterTags: [String]? = nil
-
-  private func updateColors() {
-    if lastFilterTags == filter.tags { return }
-
-    lastFilterTags = filter.tags
-
-    if let ftags = filter.tags {
-      allTagsBackgroundColor = ftags.contains(where: { tags.contains($0) }) ? .clear : .accent
-      allTagsTextColor = ftags.contains(where: { tags.contains($0) }) ? .linkText : .white
-    } else {
-      allTagsBackgroundColor = .accent
-      allTagsTextColor = .white
-    }
-
-    for tag in tags {
-      if let ftags = filter.tags {
-        tagTextColors[tag] = ftags.contains(tag) ? .white : .linkText
-        tagBackgroundColors[tag] = ftags.contains(tag) ? .accent : .clear
-      } else {
-        tagTextColors[tag] = .linkText
-        tagBackgroundColors[tag] = .clear
-      }
-    }
+  init(filter: Binding<SubjectsBrowseFilter>, title: String, tags: [String]) {
+    self._filter = filter
+    self.title = title
+    self.tags = tags
+    self.tagsSet = Set(tags)
   }
 
-  func appendTag(_ tag: String, tags: [String]) {
-    removeTags(tags)
-    if var ftags = filter.tags {
-      if ftags.contains(tag) {
-        return
-      } else {
-        ftags.append(tag)
-      }
-      filter.tags = ftags
-    } else {
-      filter.tags = [tag]
-    }
+  private func updateFilterTags(_ updated: [String]) {
+    filter.tags = updated.isEmpty ? nil : updated
   }
 
-  func removeTags(_ tags: [String]) {
-    if var ftags = filter.tags {
-      ftags.removeAll(where: tags.contains)
-      if ftags.isEmpty {
-        filter.tags = nil
-      } else {
-        filter.tags = ftags
-      }
+  private func selectTag(_ tag: String) {
+    var ftags = filter.tags ?? []
+    ftags.removeAll(where: tagsSet.contains)
+    if !ftags.contains(tag) {
+      ftags.append(tag)
     }
+    updateFilterTags(ftags)
+  }
+
+  private func clearTags() {
+    guard var ftags = filter.tags else { return }
+    ftags.removeAll(where: tagsSet.contains)
+    updateFilterTags(ftags)
   }
 
   var body: some View {
+    let selectedTags = Set(filter.tags ?? [])
+    let hasSelectionInGroup = !selectedTags.isDisjoint(with: tagsSet)
+    let allTagsBackgroundColor: Color = hasSelectionInGroup ? .clear : .accent
+    let allTagsTextColor: Color = hasSelectionInGroup ? .linkText : .white
+
     VStack(alignment: .leading) {
       CardView {
         HStack {
@@ -518,7 +494,7 @@ struct SubjectBrowsingFilterTagView: View {
       }
       HFlow {
         Button {
-          removeTags(tags)
+          clearTags()
         } label: {
           BadgeView(background: allTagsBackgroundColor, padding: 5) {
             Text("全部")
@@ -526,23 +502,17 @@ struct SubjectBrowsingFilterTagView: View {
           }
         }
         ForEach(tags, id: \.self) { tag in
+          let isSelected = selectedTags.contains(tag)
           Button {
-            appendTag(tag, tags: tags)
+            selectTag(tag)
           } label: {
-            BadgeView(background: tagBackgroundColors[tag, default: .clear], padding: 5) {
+            BadgeView(background: isSelected ? .accent : .clear, padding: 5) {
               Text(tag)
-                .foregroundStyle(tagTextColors[tag, default: .linkText])
+                .foregroundStyle(isSelected ? .white : .linkText)
             }
           }.buttonStyle(.scale)
         }
       }
-    }
-    .onAppear {
-      lastFilterTags = nil
-      updateColors()
-    }
-    .onChange(of: filter.tags) { _, _ in
-      updateColors()
     }
   }
 }
