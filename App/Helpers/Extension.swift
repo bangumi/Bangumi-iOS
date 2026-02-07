@@ -63,6 +63,30 @@ extension Array: @retroactive RawRepresentable where Element: Codable {
   }
 }
 
+extension Array where Element: Identifiable {
+  func mergedById(with newData: [Element]) -> [Element] {
+    if newData.isEmpty {
+      return self
+    }
+    var result = self
+    result.reserveCapacity(result.count + newData.count)
+    var indexById: [Element.ID: Int] = [:]
+    indexById.reserveCapacity(result.count + newData.count)
+    for (idx, item) in result.enumerated() {
+      indexById[item.id] = idx
+    }
+    for item in newData {
+      if let idx = indexById[item.id] {
+        result[idx] = item
+      } else {
+        indexById[item.id] = result.count
+        result.append(item)
+      }
+    }
+    return result
+  }
+}
+
 extension Color {
   init(hex: Int, opacity: Double = 1) {
     self.init(

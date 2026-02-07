@@ -124,7 +124,7 @@ struct CachedGroupTopicListView: View {
 
     do {
       let resp = try await Chii.shared.getRecentGroupTopics(mode: mode, limit: 20, offset: 0)
-      items = resp.data
+      items = [GroupTopicDTO]().mergedById(with: resp.data)
       offset = 20
       exhausted = resp.data.count == 0 || offset >= resp.total
 
@@ -144,7 +144,7 @@ struct CachedGroupTopicListView: View {
 
     do {
       let resp = try await Chii.shared.getRecentGroupTopics(mode: mode, limit: 20, offset: offset)
-      items.append(contentsOf: resp.data)
+      items = items.mergedById(with: resp.data)
       offset += 20
       if resp.data.count == 0 || offset >= resp.total {
         exhausted = true

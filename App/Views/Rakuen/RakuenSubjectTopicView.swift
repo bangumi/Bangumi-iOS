@@ -140,7 +140,7 @@ struct CachedSubjectTopicListView: View {
         resp = try await Chii.shared.getRecentSubjectTopics(limit: 20, offset: 0)
       }
       if let resp = resp {
-        items = resp.data
+        items = [SubjectTopicDTO]().mergedById(with: resp.data)
         offset = 20
         exhausted = resp.data.count == 0 || offset >= resp.total
 
@@ -168,7 +168,7 @@ struct CachedSubjectTopicListView: View {
         resp = try await Chii.shared.getRecentSubjectTopics(limit: 20, offset: offset)
       }
       if let resp = resp {
-        items.append(contentsOf: resp.data)
+        items = items.mergedById(with: resp.data)
         offset += 20
         if resp.data.count == 0 || offset >= resp.total {
           exhausted = true

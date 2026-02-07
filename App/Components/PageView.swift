@@ -29,7 +29,7 @@ where C: View, T: Identifiable & Hashable & Codable & Sendable {
       defer { loading = false }
       let result = await loadPage(currentOffset: 0)
       if let newData = result {
-        items = newData
+        items = [Item]().mergedById(with: newData)
       }
     }
   }
@@ -41,7 +41,7 @@ where C: View, T: Identifiable & Hashable & Codable & Sendable {
     defer { loading = false }
     let result = await loadPage(currentOffset: offset)
     if let newData = result {
-      items.append(contentsOf: newData)
+      items = items.mergedById(with: newData)
     }
   }
 
@@ -138,7 +138,7 @@ where C: View, T: Identifiable & Hashable & Codable & Sendable {
       defer { loading = false }
       let result = await loadPage(currentPage: 1)
       if let newData = result {
-        items = newData
+        items = [Item]().mergedById(with: newData)
       }
     }
   }
@@ -150,7 +150,7 @@ where C: View, T: Identifiable & Hashable & Codable & Sendable {
     defer { loading = false }
     let result = await loadPage(currentPage: page)
     if let newData = result {
-      items.append(contentsOf: newData)
+      items = items.mergedById(with: newData)
     }
   }
 
