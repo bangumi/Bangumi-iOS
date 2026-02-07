@@ -33,7 +33,7 @@ struct PersonWorksItemView: View {
               .lineLimit(1)
               .foregroundStyle(.secondary)
             Divider()
-          }.frame(height: 60)
+          }
           HFlow {
             ForEach(item.positions) { position in
               HStack {

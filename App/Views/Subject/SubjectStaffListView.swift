@@ -57,11 +57,6 @@ struct SubjectStaffListView: View {
     .buttonStyle(.navigation)
     .navigationTitle("制作人员")
     .navigationBarTitleDisplayMode(.inline)
-    .toolbar {
-      ToolbarItem(placement: .automatic) {
-        Image(systemName: "person.2").foregroundStyle(.secondary)
-      }
-    }
   }
 }
 

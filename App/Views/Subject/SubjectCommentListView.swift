@@ -40,11 +40,6 @@ struct SubjectCommentListView: View {
     .buttonStyle(.navigation)
     .navigationTitle("吐槽")
     .navigationBarTitleDisplayMode(.inline)
-    .toolbar {
-      ToolbarItem(placement: .automatic) {
-        Image(systemName: "list.bullet.circle").foregroundStyle(.secondary)
-      }
-    }
   }
 }
 

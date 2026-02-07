@@ -63,11 +63,6 @@ struct SubjectRelationListView: View {
     }
     .navigationTitle("关联条目")
     .navigationBarTitleDisplayMode(.inline)
-    .toolbar {
-      ToolbarItem(placement: .automatic) {
-        Image(systemName: "list.bullet.circle").foregroundStyle(.secondary)
-      }
-    }
   }
 }
 

@@ -39,11 +39,6 @@ struct CharacterCastListView: View {
     .buttonStyle(.navigation)
     .navigationTitle("出演作品")
     .navigationBarTitleDisplayMode(.inline)
-    .toolbar {
-      ToolbarItem(placement: .automatic) {
-        Image(systemName: "list.bullet.circle").foregroundStyle(.secondary)
-      }
-    }
   }
 }
 

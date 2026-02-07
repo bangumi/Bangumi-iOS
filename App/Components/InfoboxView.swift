@@ -31,11 +31,6 @@ struct InfoboxView: View {
     }
     .navigationTitle(title)
     .navigationBarTitleDisplayMode(.inline)
-    .toolbar {
-      ToolbarItem(placement: .automatic) {
-        Image(systemName: "info.circle").foregroundStyle(.secondary)
-      }
-    }
   }
 }
 

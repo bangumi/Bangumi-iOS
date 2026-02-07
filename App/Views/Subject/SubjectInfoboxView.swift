@@ -80,11 +80,6 @@ struct SubjectInfoboxView: View {
     }
     .navigationTitle("条目信息")
     .navigationBarTitleDisplayMode(.inline)
-    .toolbar {
-      ToolbarItem(placement: .automatic) {
-        Image(systemName: "info.circle").foregroundStyle(.secondary)
-      }
-    }
   }
 }
 
