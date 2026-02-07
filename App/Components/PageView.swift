@@ -22,9 +22,11 @@ where C: View, T: Identifiable & Hashable & Codable & Sendable {
   }
 
   func reload() {
+    loading = true
     exhausted = false
     offset = 0
     Task {
+      defer { loading = false }
       let result = await loadPage(currentOffset: 0)
       if let newData = result {
         items = newData
@@ -129,8 +131,11 @@ where C: View, T: Identifiable & Hashable & Codable & Sendable {
   @State private var items: [Item] = []
 
   func reload() {
+    loading = true
     exhausted = false
+    page = 1
     Task {
+      defer { loading = false }
       let result = await loadPage(currentPage: 1)
       if let newData = result {
         items = newData

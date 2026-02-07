@@ -55,6 +55,22 @@ struct SubjectBrowsingView: View {
     return nil
   }
 
+  private func filterBadge(_ text: String) -> some View {
+    BadgeView(background: .accent, padding: 4) {
+      Text(text)
+        .font(.caption)
+        .lineLimit(1)
+    }
+  }
+
+  private func sortBadge() -> some View {
+    BadgeView(background: .accent, padding: 4) {
+      Label(sort.description, systemImage: sort.icon)
+        .font(.caption)
+        .labelStyle(.compact)
+    }
+  }
+
   var body: some View {
     ScrollView {
       VStack(alignment: .leading) {
@@ -62,37 +78,27 @@ struct SubjectBrowsingView: View {
           Label("筛选", systemImage: "line.3.horizontal.decrease.circle")
           // cat
           if let cat = filter.cat {
-            BadgeView(background: .accent) {
-              Text(cat.typeCN)
-            }
+            filterBadge(cat.typeCN)
           }
 
           // series
           if let series = filter.series {
-            BadgeView(background: .accent) {
-              Text(series ? "系列" : "单行本")
-            }
+            filterBadge(series ? "系列" : "单行本")
           }
 
           // tags
           if let tags = filter.tags {
             ForEach(tags, id: \.self) { tag in
-              BadgeView(background: .accent) {
-                Text(tag)
-              }
+              filterBadge(tag)
             }
           }
 
           // date
           if let year = filter.year {
             if let month = filter.month {
-              BadgeView(background: .accent) {
-                Text("\(String(year))年\(String(month))月")
-              }
+              filterBadge("\(String(year))年\(String(month))月")
             } else {
-              BadgeView(background: .accent) {
-                Text("\(String(year))年")
-              }
+              filterBadge("\(String(year))年")
             }
           }
         }
@@ -100,9 +106,7 @@ struct SubjectBrowsingView: View {
         HStack {
           Image(systemName: "arrow.up.arrow.down.circle")
           Text("按")
-          BadgeView(background: .accent) {
-            Label(sort.description, systemImage: sort.icon)
-          }
+          sortBadge()
           Text("排序")
           Spacer()
         }
@@ -118,6 +122,9 @@ struct SubjectBrowsingView: View {
     .animation(.default, value: reloader)
     .animation(.default, value: filter)
     .animation(.default, value: sort)
+    .onChange(of: sort) { _, _ in
+      reloader.toggle()
+    }
     .navigationTitle("全部\(type.description)")
     .navigationBarTitleDisplayMode(.inline)
     .sheet(isPresented: $showFilter) {
@@ -129,25 +136,22 @@ struct SubjectBrowsingView: View {
       }
     }
     .toolbar {
-      ToolbarItem(placement: .topBarTrailing) {
-        HStack {
-          Button {
-            showFilter = true
-          } label: {
-            Image(systemName: "line.3.horizontal.decrease")
-          }
-          Menu {
+      ToolbarItemGroup(placement: .topBarTrailing) {
+        Button {
+          showFilter = true
+        } label: {
+          Image(systemName: "line.3.horizontal.decrease")
+        }
+        Menu {
+          Picker("排序", selection: $sort) {
             ForEach(SubjectSortMode.allCases, id: \.self) { sortMode in
-              Button {
-                sort = sortMode
-                reloader.toggle()
-              } label: {
-                Label(sortMode.description, systemImage: sortMode.icon)
-              }.disabled(sort == sortMode)
+              Label(sortMode.description, systemImage: sortMode.icon).tag(sortMode)
             }
-          } label: {
-            Image(systemName: "arrow.up.arrow.down")
           }
+          .labelsHidden()
+        } label: {
+          Image(systemName: "arrow.up.arrow.down")
+            .accessibilityLabel("排序")
         }
       }
     }
@@ -317,31 +321,31 @@ struct SubjectBrowsingFilterView: View {
           /// anime tag
           if type == .anime {
             SubjectBrowsingFilterTagView(
-              filter: $filter, title: "来源", tags: SubjectAnimeTagSources)
+              selectedTags: $filter.tags, title: "来源", tags: SubjectAnimeTagSources)
             SubjectBrowsingFilterTagView(
-              filter: $filter, title: "类型", tags: SubjectAnimeTagGenres)
+              selectedTags: $filter.tags, title: "类型", tags: SubjectAnimeTagGenres)
             SubjectBrowsingFilterTagView(
-              filter: $filter, title: "地区", tags: SubjectAnimeTagAreas)
+              selectedTags: $filter.tags, title: "地区", tags: SubjectAnimeTagAreas)
             SubjectBrowsingFilterTagView(
-              filter: $filter, title: "受众", tags: SubjectAnimeTagTargets)
+              selectedTags: $filter.tags, title: "受众", tags: SubjectAnimeTagTargets)
           }
 
           /// game tag
           if type == .game {
             SubjectBrowsingFilterTagView(
-              filter: $filter, title: "类型", tags: SubjectGameTagGenres)
+              selectedTags: $filter.tags, title: "类型", tags: SubjectGameTagGenres)
             SubjectBrowsingFilterTagView(
-              filter: $filter, title: "受众", tags: SubjectGameTagTargets)
+              selectedTags: $filter.tags, title: "受众", tags: SubjectGameTagTargets)
             SubjectBrowsingFilterTagView(
-              filter: $filter, title: "分级", tags: SubjectGameTagRatings)
+              selectedTags: $filter.tags, title: "分级", tags: SubjectGameTagRatings)
           }
 
           /// real tag
           if type == .real {
             SubjectBrowsingFilterTagView(
-              filter: $filter, title: "题材", tags: SubjectRealTagThemes)
+              selectedTags: $filter.tags, title: "题材", tags: SubjectRealTagThemes)
             SubjectBrowsingFilterTagView(
-              filter: $filter, title: "地区", tags: SubjectRealTagAreas)
+              selectedTags: $filter.tags, title: "地区", tags: SubjectRealTagAreas)
           }
 
           /// date
@@ -431,7 +435,6 @@ struct SubjectBrowsingFilterView: View {
 
         }.padding()
       }
-      .animation(.default, value: filter)
       .navigationTitle("筛选")
       .navigationBarTitleDisplayMode(.inline)
       .toolbar {
@@ -448,24 +451,24 @@ struct SubjectBrowsingFilterView: View {
 }
 
 struct SubjectBrowsingFilterTagView: View {
-  @Binding var filter: SubjectsBrowseFilter
+  @Binding var selectedTags: [String]?
   let title: String
   let tags: [String]
   private let tagsSet: Set<String>
 
-  init(filter: Binding<SubjectsBrowseFilter>, title: String, tags: [String]) {
-    self._filter = filter
+  init(selectedTags: Binding<[String]?>, title: String, tags: [String]) {
+    self._selectedTags = selectedTags
     self.title = title
     self.tags = tags
     self.tagsSet = Set(tags)
   }
 
   private func updateFilterTags(_ updated: [String]) {
-    filter.tags = updated.isEmpty ? nil : updated
+    selectedTags = updated.isEmpty ? nil : updated
   }
 
   private func selectTag(_ tag: String) {
-    var ftags = filter.tags ?? []
+    var ftags = selectedTags ?? []
     ftags.removeAll(where: tagsSet.contains)
     if !ftags.contains(tag) {
       ftags.append(tag)
@@ -474,14 +477,14 @@ struct SubjectBrowsingFilterTagView: View {
   }
 
   private func clearTags() {
-    guard var ftags = filter.tags else { return }
+    guard var ftags = selectedTags else { return }
     ftags.removeAll(where: tagsSet.contains)
     updateFilterTags(ftags)
   }
 
   var body: some View {
-    let selectedTags = Set(filter.tags ?? [])
-    let hasSelectionInGroup = !selectedTags.isDisjoint(with: tagsSet)
+    let selectedTagsSet = Set(selectedTags ?? [])
+    let hasSelectionInGroup = !selectedTagsSet.isDisjoint(with: tagsSet)
     let allTagsBackgroundColor: Color = hasSelectionInGroup ? .clear : .accent
     let allTagsTextColor: Color = hasSelectionInGroup ? .linkText : .white
 
@@ -502,7 +505,7 @@ struct SubjectBrowsingFilterTagView: View {
           }
         }
         ForEach(tags, id: \.self) { tag in
-          let isSelected = selectedTags.contains(tag)
+          let isSelected = selectedTagsSet.contains(tag)
           Button {
             selectTag(tag)
           } label: {
@@ -521,13 +524,14 @@ struct SubjectTagBrowsingView: View {
   let type: SubjectType
   let tag: String
 
-  @State private var tagsCat: SubjectTagsCategory = .subject
+  @State private var tagsCat: SubjectTagsCategory
   @State private var sort: SubjectSortMode = .rank
   @State private var reloader: Bool = false
 
-  init(type: SubjectType, tag: String) {
+  init(type: SubjectType, tag: String, tagsCat: SubjectTagsCategory = .subject) {
     self.type = type
     self.tag = tag
+    self._tagsCat = State(initialValue: tagsCat)
   }
 
   var title: String {
@@ -556,27 +560,41 @@ struct SubjectTagBrowsingView: View {
     return nil
   }
 
+  private func headerBadge(_ text: String) -> some View {
+    BadgeView(background: .accent, padding: 4) {
+      Text(text)
+        .font(.caption)
+        .lineLimit(1)
+    }
+  }
+
+  private func sortBadge() -> some View {
+    BadgeView(background: .accent, padding: 4) {
+      Label(sort.description, systemImage: sort.icon)
+        .font(.caption)
+        .labelStyle(.compact)
+    }
+  }
+
   var body: some View {
     ScrollView {
       VStack(alignment: .leading, spacing: 12) {
-        HStack(alignment: .center, spacing: 6) {
-          Label("标签", systemImage: "tag")
-            .font(.footnote)
-            .foregroundStyle(.secondary)
-          BadgeView(background: .accent, padding: 3) {
-            Text(tag)
-              .lineLimit(1)
+        HStack(spacing: 8) {
+          HStack(alignment: .center, spacing: 6) {
+            Label("标签", systemImage: "tag")
+              .font(.footnote)
+              .foregroundStyle(.secondary)
+            headerBadge(tag)
           }
-        }
 
-        HStack {
-          Image(systemName: "arrow.up.arrow.down.circle")
-          Text("按")
-          BadgeView(background: .accent) {
-            Label(sort.description, systemImage: sort.icon)
-          }
-          Text("排序")
           Spacer()
+
+          HStack(spacing: 4) {
+            Image(systemName: "arrow.up.arrow.down.circle")
+            Text("按")
+            sortBadge()
+            Text("排序")
+          }
         }
 
         Divider()
@@ -589,6 +607,9 @@ struct SubjectTagBrowsingView: View {
     .onChange(of: tagsCat) { _, _ in
       reloader.toggle()
     }
+    .onChange(of: sort) { _, _ in
+      reloader.toggle()
+    }
     .animation(.default, value: tagsCat)
     .animation(.default, value: sort)
     .navigationTitle(title)
@@ -596,32 +617,27 @@ struct SubjectTagBrowsingView: View {
     .toolbar {
       ToolbarItemGroup(placement: .topBarTrailing) {
         Menu {
-          ForEach(SubjectTagsCategory.allCases, id: \.self) { cat in
-            Button {
-              tagsCat = cat
-            } label: {
-              if tagsCat == cat {
-                Label(cat.description, systemImage: "checkmark")
-              } else {
-                Text(cat.description)
-              }
+          Picker("标签", selection: $tagsCat) {
+            ForEach(SubjectTagsCategory.allCases, id: \.self) { cat in
+              Text(cat.description).tag(cat)
             }
           }
+          .labelsHidden()
         } label: {
-          Label(tagsCat.description, systemImage: "tag")
+          Image(systemName: tagsCat.icon)
+            .accessibilityLabel(tagsCat.description)
         }
 
         Menu {
-          ForEach(SubjectSortMode.allCases, id: \.self) { sortMode in
-            Button {
-              sort = sortMode
-              reloader.toggle()
-            } label: {
-              Label(sortMode.description, systemImage: sortMode.icon)
-            }.disabled(sort == sortMode)
+          Picker("排序", selection: $sort) {
+            ForEach(SubjectSortMode.allCases, id: \.self) { sortMode in
+              Label(sortMode.description, systemImage: sortMode.icon).tag(sortMode)
+            }
           }
+          .labelsHidden()
         } label: {
           Image(systemName: "arrow.up.arrow.down")
+            .accessibilityLabel("排序")
         }
       }
     }

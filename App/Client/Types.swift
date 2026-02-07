@@ -1484,6 +1484,15 @@ enum SubjectTagsCategory: String, CaseIterable, Codable, Hashable {
       return "用户标签"
     }
   }
+
+  var icon: String {
+    switch self {
+    case .meta:
+      return "tag.fill"
+    case .subject:
+      return "tag"
+    }
+  }
 }
 
 struct SubjectsBrowseFilter: Codable, Hashable {

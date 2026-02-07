@@ -84,9 +84,9 @@ struct CharacterCard: View {
         Text(
           "\(cast.relation.description) \(cast.person.title(with: titlePreference).withLink(cast.person.link))"
         )
-          .font(.caption)
-          .foregroundStyle(.secondary)
-          .lineLimit(1)
+        .font(.caption)
+        .foregroundStyle(.secondary)
+        .lineLimit(1)
       }
 
       Spacer()

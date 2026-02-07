@@ -25,8 +25,12 @@ struct SubjectSummaryView: View {
     return Array(result)
   }
 
-  private func tagLink(_ tag: Tag, color: Color) -> some View {
-    NavigationLink(value: NavDestination.subjectTagBrowsing(subject.typeEnum, tag.name)) {
+  private func tagLink(
+    _ tag: Tag,
+    color: Color,
+    tagsCat: SubjectTagsCategory
+  ) -> some View {
+    NavigationLink(value: NavDestination.subjectTagBrowsing(subject.typeEnum, tag.name, tagsCat)) {
       BorderView(color: color, padding: 3, cornerRadius: 16) {
         HStack(spacing: 2) {
           Text(tag.name)
@@ -54,10 +58,10 @@ struct SubjectSummaryView: View {
         HStack {
           HFlow(alignment: .center, spacing: 3) {
             ForEach(metaTags, id: \.name) { tag in
-              tagLink(tag, color: .linkText)
+              tagLink(tag, color: .linkText, tagsCat: .meta)
             }
             ForEach(tags, id: \.name) { tag in
-              tagLink(tag, color: .secondary.opacity(0.2))
+              tagLink(tag, color: .secondary.opacity(0.2), tagsCat: .subject)
             }
           }
           Spacer(minLength: 0)
