@@ -102,83 +102,116 @@ extension Chii {
     return UserDefaults.standard.bool(forKey: "isAuthenticated")
   }
 
-  func decodeResponse<T: Codable>(_ data: Data) throws -> T {
+  private static let jsonDecoder: JSONDecoder = {
     let decoder = JSONDecoder()
     decoder.keyDecodingStrategy = .convertFromSnakeCase
-    return try decoder.decode(T.self, from: data)
+    return decoder
+  }()
+
+  func decodeResponse<T: Codable>(_ data: Data) throws -> T {
+    return try Self.jsonDecoder.decode(T.self, from: data)
   }
 
   func request(url: URL, method: String, body: Any? = nil, auth: AuthMode = .auto) async throws
     -> Data
   {
-    let startTime = ContinuousClock.now
-    var authed: Bool
-    switch auth {
-    case .auto:
-      authed = self.isAuthenticated()
-    case .required:
-      authed = true
-    case .disabled:
-      authed = false
-    }
-    Logger.api.info("--> \(method) \(url.absoluteString)")
-    let session = try await self.getSession(authroized: authed)
-    var request = URLRequest(url: url)
-    request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-    request.httpMethod = method
-    if let body = body {
-      let bodyData = try JSONSerialization.data(withJSONObject: body)
-      request.httpBody = bodyData
-    }
-    var data: Data
-    var response: URLResponse
-    do {
-      let (sdata, sresponse) = try await session.data(for: request)
-      data = sdata
-      response = sresponse
-    } catch let error as NSError where error.domain == NSURLErrorDomain {
-      let duration = startTime.duration(to: .now).logFormatted
-      Logger.api.error("[\(duration)] \(method) \(url.absoluteString) NSURLErrorDomain: \(error)")
-      switch error.code {
-      case NSURLErrorNotConnectedToInternet:
-        throw ChiiError(notice: "没有网络连接，请检查网络设置或权限后重试")
-      case NSURLErrorTimedOut:
-        throw ChiiError(notice: "请求超时，请稍后再试")
-      case NSURLErrorCancelled:
-        throw ChiiError(ignore: "请求已取消")
-      default:
+    let maxRetries = 2
+    var lastError: Error?
+
+    for attempt in 0...maxRetries {
+      if attempt > 0 {
+        let delay = UInt64(pow(2.0, Double(attempt - 1))) * 1_000_000_000
+        try await Task.sleep(nanoseconds: delay)
+        Logger.api.warning(
+          "Retrying \(method) \(url.absoluteString) (attempt \(attempt + 1)/\(maxRetries + 1))")
+      }
+
+      let startTime = ContinuousClock.now
+      var authed: Bool
+      switch auth {
+      case .auto:
+        authed = self.isAuthenticated()
+      case .required:
+        authed = true
+      case .disabled:
+        authed = false
+      }
+      Logger.api.info("--> \(method) \(url.absoluteString)")
+      let session = try await self.getSession(authroized: authed)
+      var request = URLRequest(url: url)
+      request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+      request.httpMethod = method
+      if let body = body {
+        let bodyData = try JSONSerialization.data(withJSONObject: body)
+        request.httpBody = bodyData
+      }
+      var data: Data
+      var response: URLResponse
+      do {
+        let (sdata, sresponse) = try await session.data(for: request)
+        data = sdata
+        response = sresponse
+      } catch let error as NSError where error.domain == NSURLErrorDomain {
+        let duration = startTime.duration(to: .now).logFormatted
+        Logger.api.error(
+          "[\(duration)] \(method) \(url.absoluteString) NSURLErrorDomain: \(error)")
+        switch error.code {
+        case NSURLErrorNotConnectedToInternet:
+          throw ChiiError(notice: "没有网络连接，请检查网络设置或权限后重试")
+        case NSURLErrorTimedOut:
+          let err = ChiiError(notice: "请求超时，请稍后再试")
+          if attempt < maxRetries {
+            lastError = err
+            continue
+          }
+          throw err
+        case NSURLErrorCancelled:
+          throw ChiiError(ignore: "请求已取消")
+        default:
+          throw ChiiError(request: "\(error)")
+        }
+      } catch {
+        let duration = startTime.duration(to: .now).logFormatted
+        Logger.api.error("[\(duration)] \(method) \(url.absoluteString) error: \(error)")
         throw ChiiError(request: "\(error)")
       }
-    } catch {
+      guard let response = response as? HTTPURLResponse else {
+        let duration = startTime.duration(to: .now).logFormatted
+        Logger.api.error("[\(duration)] \(method) \(url.absoluteString) response error")
+        throw ChiiError(message: "api response nil")
+      }
       let duration = startTime.duration(to: .now).logFormatted
-      Logger.api.error("[\(duration)] \(method) \(url.absoluteString) error: \(error)")
-      throw ChiiError(request: "\(error)")
+      let requestID = response.allHeaderFields["x-request-id"] as? String
+      if response.statusCode < 400 {
+        Logger.api.info("[\(duration)] \(method) \(response.statusCode) \(url.absoluteString)")
+        return data
+      } else if response.statusCode == 429 {
+        Logger.api.error("[\(duration)] \(method) \(response.statusCode) \(url.absoluteString)")
+        let err = ChiiError(notice: "请求过于频繁，请稍后再试")
+        if attempt < maxRetries {
+          lastError = err
+          continue
+        }
+        throw err
+      } else if response.statusCode == 401 {
+        Logger.api.error("[\(duration)] \(method) \(response.statusCode) \(url.absoluteString)")
+        throw ChiiError(notice: "请求未授权，请重新登录")
+      } else if response.statusCode == 403 {
+        Logger.api.error("[\(duration)] \(method) \(response.statusCode) \(url.absoluteString)")
+        throw ChiiError(notice: "请求被拒绝，请检查权限")
+      } else {
+        let error = String(data: data, encoding: .utf8) ?? ""
+        Logger.api.error(
+          "[\(duration)] \(method) \(response.statusCode) \(url.absoluteString): \(error)")
+        let err = ChiiError(code: response.statusCode, response: error, requestID: requestID)
+        if err.isRetryable && attempt < maxRetries {
+          lastError = err
+          continue
+        }
+        throw err
+      }
     }
-    guard let response = response as? HTTPURLResponse else {
-      let duration = startTime.duration(to: .now).logFormatted
-      Logger.api.error("[\(duration)] \(method) \(url.absoluteString) response error")
-      throw ChiiError(message: "api response nil")
-    }
-    let duration = startTime.duration(to: .now).logFormatted
-    let requestID = response.allHeaderFields["x-request-id"] as? String
-    if response.statusCode < 400 {
-      Logger.api.info("[\(duration)] \(method) \(response.statusCode) \(url.absoluteString)")
-      return data
-    } else if response.statusCode == 429 {
-      Logger.api.error("[\(duration)] \(method) \(response.statusCode) \(url.absoluteString)")
-      throw ChiiError(notice: "请求过于频繁，请稍后再试")
-    } else if response.statusCode == 401 {
-      Logger.api.error("[\(duration)] \(method) \(response.statusCode) \(url.absoluteString)")
-      throw ChiiError(notice: "请求未授权，请重新登录")
-    } else if response.statusCode == 403 {
-      Logger.api.error("[\(duration)] \(method) \(response.statusCode) \(url.absoluteString)")
-      throw ChiiError(notice: "请求被拒绝，请检查权限")
-    } else {
-      let error = String(data: data, encoding: .utf8) ?? ""
-      Logger.api.error(
-        "[\(duration)] \(method) \(response.statusCode) \(url.absoluteString): \(error)")
-      throw ChiiError(code: response.statusCode, response: error, requestID: requestID)
-    }
+    throw lastError!
   }
 
   func getSession(authroized: Bool) async throws -> URLSession {
@@ -258,7 +291,23 @@ extension Chii {
     }
 
     self.refreshTask = task
-    return try await task.value
+
+    // Create a timeout watchdog that cancels the refresh if it takes too long
+    let timeoutTask = Task {
+      try await Task.sleep(nanoseconds: 15_000_000_000)
+      task.cancel()
+    }
+
+    do {
+      let result = try await task.value
+      timeoutTask.cancel()
+      return result
+    } catch is CancellationError {
+      throw ChiiError(notice: "令牌刷新超时，请重新登录")
+    } catch {
+      timeoutTask.cancel()
+      throw error
+    }
   }
 }
 

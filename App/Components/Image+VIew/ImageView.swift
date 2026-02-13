@@ -108,9 +108,7 @@ struct ImageView: View {
   private func markLoaded() {
     guard !isLoaded else { return }
     DispatchQueue.main.async {
-      if !isLoaded {
-        isLoaded = true
-      }
+      isLoaded = true
     }
   }
 }

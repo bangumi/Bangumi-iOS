@@ -29,7 +29,7 @@ func parseTag(_ g: inout USIterator, _ worker: Worker) -> Parser? {
         if let allowedChildren = worker.currentNode.description?.allowedChildren,
           allowedChildren.contains(newNode.type)
         {
-          if (newNode.description?.allowAttr)! {
+          if newNode.description?.allowAttr ?? false {
             newNode.paired = false  //isSelfClosing tag has no attr, so its must be not paired
             worker.currentNode = newNode
             return .attr
@@ -45,7 +45,7 @@ func parseTag(_ g: inout USIterator, _ worker: Worker) -> Parser? {
         if let allowedChildren = worker.currentNode.description?.allowedChildren,
           allowedChildren.contains(newNode.type)
         {
-          if (newNode.description?.isSelfClosing)! {
+          if newNode.description?.isSelfClosing ?? false {
             //<opening_tag_1> ::= <tag_prefix> <tag_end>
             return .content
           } else {

@@ -98,4 +98,16 @@ enum ChiiError: Error, CustomStringConvertible, Sendable {
       return "Ignore Error: \(message)"
     }
   }
+
+  var isRetryable: Bool {
+    switch self {
+    case .notice(let msg):
+      return msg == "请求超时，请稍后再试" || msg == "请求过于频繁，请稍后再试"
+    case .generic(let msg):
+      return msg.hasPrefix("code: 502\n") || msg.hasPrefix("code: 503\n")
+        || msg.hasPrefix("code: 504\n")
+    default:
+      return false
+    }
+  }
 }

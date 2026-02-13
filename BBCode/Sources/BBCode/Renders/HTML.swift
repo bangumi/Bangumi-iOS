@@ -6,7 +6,7 @@ extension BBCode {
 
     if let domTree = worker.parse(bbcode) {
       handleNewlineAndParagraph(node: domTree, tagManager: tagManager)
-      let render = htmlRenders[domTree.type]!
+      guard let render = htmlRenders[domTree.type] else { return "" }
       return render(domTree, args)
     } else {
       throw worker.error!
@@ -528,15 +528,15 @@ func handleNewlineAndParagraph(node: Node, tagManager: TagManager) {
 func safeUrl(url: String, defaultScheme: String?, defaultHost: String?) -> String? {
   if var components = URLComponents(string: url) {
     if components.scheme == nil {
-      if defaultScheme != nil {
-        components.scheme = defaultScheme!
+      if let scheme = defaultScheme {
+        components.scheme = scheme
       } else {
         return nil
       }
     }
     if components.host == nil {
-      if defaultHost != nil {
-        components.host = defaultHost!
+      if let host = defaultHost {
+        components.host = host
       } else {
         return nil
       }

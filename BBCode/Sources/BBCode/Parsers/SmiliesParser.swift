@@ -1,6 +1,9 @@
 import Foundation
 import OSLog
 
+nonisolated(unsafe) let bgmRegex = try! Regex(
+  #"bgm(?<id>\d+)"#, as: (Substring, id: Substring).self)
+
 func parseSmilies(_ g: inout USIterator, _ worker: Worker) -> Parser? {
   let newNode = Node(
     type: .unknown, parent: worker.currentNode, tagManager: worker.tagManager)
@@ -8,7 +11,6 @@ func parseSmilies(_ g: inout USIterator, _ worker: Worker) -> Parser? {
 
   var index: Int = 0
   let maxLength: Int = 100
-  let bgmRegex = try! Regex(#"bgm(?<id>\d+)"#, as: (Substring, id: Substring).self)
   while let c = g.next() {
     // If we encounter a newline before closing ')', treat '(' as plain text
     if c == UnicodeScalar(10) || c == UnicodeScalar(13) {  // \n or \r

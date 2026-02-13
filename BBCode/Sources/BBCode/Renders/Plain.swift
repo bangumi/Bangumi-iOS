@@ -6,7 +6,7 @@ extension BBCode {
 
     if let tree = worker.parse(bbcode) {
       handleNewlineAndParagraph(node: tree, tagManager: tagManager)
-      let render = plainRenders[tree.type]!
+      guard let render = plainRenders[tree.type] else { return "" }
       return render(tree, args)
     } else {
       throw worker.error!
