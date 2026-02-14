@@ -53,21 +53,8 @@ echo "Project: $PROJECT"
 echo "SDK: $SDK"
 echo "Destination: $DESTINATION"
 echo "Archive path: $ARCHIVE_PATH"
-
-PROFILE_NAME="${IOS_PROVISIONING_PROFILE_NAME:-}"
-if [ -z "$PROFILE_NAME" ] && [ "${CI:-}" = "true" ]; then
-  PROFILE_NAME="Bangumi iOS"
-fi
-
-declare -a SIGNING_ARGS=()
-if [ -n "$PROFILE_NAME" ]; then
-  SIGNING_ARGS+=(
-    "CODE_SIGN_STYLE=Manual"
-    "CODE_SIGN_IDENTITY=Apple Distribution"
-    "PROVISIONING_PROFILE_SPECIFIER=$PROFILE_NAME"
-  )
-  echo -e "${GREEN}Using manual signing profile: $PROFILE_NAME${NC}"
-fi
+PROFILE_NAME="Bangumi iOS"
+echo -e "${GREEN}Using manual signing profile: $PROFILE_NAME${NC}"
 
 declare -a AUTH_ARGS=()
 if [ -n "${APP_STORE_CONNECT_API_KEY_PATH:-}" ] && [ -n "${APP_STORE_CONNECT_API_KEY_ID:-}" ] && [ -n "${APP_STORE_CONNECT_API_ISSUER_ID:-}" ]; then
@@ -85,8 +72,10 @@ xcodebuild clean \
   -scheme "$SCHEME" \
   -sdk "$SDK" \
   -configuration Release \
+  CODE_SIGN_STYLE=Manual \
+  "CODE_SIGN_IDENTITY=Apple Distribution" \
+  "PROVISIONING_PROFILE_SPECIFIER=$PROFILE_NAME" \
   -quiet \
-  "${SIGNING_ARGS[@]}" \
   "${AUTH_ARGS[@]}"
 
 echo -e "${YELLOW}Archiving...${NC}"
@@ -97,8 +86,10 @@ xcodebuild archive \
   -destination "$DESTINATION" \
   -configuration Release \
   -archivePath "$ARCHIVE_PATH" \
+  CODE_SIGN_STYLE=Manual \
+  "CODE_SIGN_IDENTITY=Apple Distribution" \
+  "PROVISIONING_PROFILE_SPECIFIER=$PROFILE_NAME" \
   -quiet \
-  "${SIGNING_ARGS[@]}" \
   "${AUTH_ARGS[@]}"
 
 echo -e "${GREEN}[OK] Archive created successfully${NC}"
