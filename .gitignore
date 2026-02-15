@@ -24,3 +24,4 @@ artifacts/
 AuthKey_*.p8
 .env
 .env.local
+.alma-snapshots
