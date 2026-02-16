@@ -159,6 +159,21 @@ jobs:
           echo "Available provisioning profiles:"
           ls -lh "$PROFILES_DIR" 2>/dev/null | tail -n +2 || echo "No profiles found"
 
+      - name: Prepare app config
+        env:
+          BANGUMI_APP_ID: ${{ secrets.BANGUMI_APP_ID }}
+          BANGUMI_APP_SECRET: ${{ secrets.BANGUMI_APP_SECRET }}
+        run: |
+          set -euo pipefail
+          if [ -z "${BANGUMI_APP_ID}" ] || [ -z "${BANGUMI_APP_SECRET}" ]; then
+            echo "BANGUMI_APP_ID or BANGUMI_APP_SECRET is not set." >&2
+            exit 1
+          fi
+          cat > App/Config.xcconfig <<EOF
+          BANGUMI_APP_ID = ${BANGUMI_APP_ID}
+          BANGUMI_APP_SECRET = ${BANGUMI_APP_SECRET}
+          EOF
+
       - name: Build and upload to App Store Connect
         env:
           APP_STORE_CONNECT_API_KEY_PATH: ${{ steps.prepare.outputs.APP_STORE_CONNECT_API_KEY_PATH }}
