@@ -34,7 +34,7 @@ help: ## Show this help message
 ensure-config: ## Create App/Config.xcconfig from the example when missing
 	@if [ ! -f App/Config.xcconfig ]; then \
 		echo "$(YELLOW)App/Config.xcconfig not found, creating placeholder config for local/CI builds.$(NC)"; \
-		cp App/Config.example.xcconfig App/Config.xcconfig; \
+		cp App/Config.xcconfig.example App/Config.xcconfig; \
 	fi
 
 

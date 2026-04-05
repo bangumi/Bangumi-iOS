@@ -1,5 +1,4 @@
 *.xcconfig
-!App/Config.example.xcconfig
 *.xcbkptlist
 
 *.xcuserdatad/
