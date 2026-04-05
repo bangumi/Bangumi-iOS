@@ -7,23 +7,22 @@ struct PersonRelationsView: View {
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
 
   var body: some View {
-    VStack(spacing: 0) {
-      VStack(spacing: 2) {
-        HStack(alignment: .bottom) {
-          Text("关联人物")
-            .foregroundStyle(relations.count > 0 ? .primary : .secondary)
-            .font(.title3)
-          Spacer()
-          if relations.count > 0 {
-            NavigationLink(value: NavDestination.personRelationList(personId)) {
-              Text("更多人物 »").font(.caption)
-            }
-            .buttonStyle(.navigation)
+    VStack(spacing: 2) {
+      HStack(alignment: .bottom) {
+        Text("关联人物")
+          .foregroundStyle(relations.count > 0 ? .primary : .secondary)
+          .font(.title3)
+        Spacer()
+        if relations.count > 0 {
+          NavigationLink(value: NavDestination.personRelationList(personId)) {
+            Text("更多人物 »").font(.caption)
           }
+          .buttonStyle(.navigation)
         }
-        Divider()
       }
       .padding(.top, 5)
+
+      Divider()
 
       if relations.isEmpty {
         HStack {
@@ -36,7 +35,7 @@ struct PersonRelationsView: View {
         .padding(.bottom, 5)
       } else {
         ScrollView(.horizontal, showsIndicators: false) {
-          LazyHStack(alignment: .top, spacing: 4) {
+          LazyHStack(alignment: .top, spacing: 6) {
             ForEach(relations) { item in
               PersonRelationCard(item: item)
             }
@@ -66,13 +65,15 @@ private struct PersonRelationCard: View {
           .lineLimit(1)
           .font(.caption)
           .foregroundStyle(.secondary)
+          .frame(maxWidth: .infinity, alignment: .center)
+          .multilineTextAlignment(.center)
 
         ImageView(img: item.person.images?.resize(.r200))
-          .imageStyle(width: 80, height: 80)
+          .imageStyle(width: 72, height: 72)
           .imageType(.person)
           .imageNSFW(item.person.nsfw)
           .imageNavLink(item.person.link)
-          .padding(2)
+          .clipShape(RoundedRectangle(cornerRadius: 8))
           .shadow(radius: 2)
 
         Text(item.person.title(with: titlePreference))
@@ -81,24 +82,20 @@ private struct PersonRelationCard: View {
           .truncationMode(.middle)
           .lineLimit(2)
 
-        if item.ended || item.spoiler {
+        if item.ended {
           HStack(spacing: 4) {
-            if item.ended {
-              Text("已结束")
-            }
-            if item.spoiler {
-              Text("剧透")
-            }
+            Spacer(minLength: 0)
+            Text("已结束")
+            Spacer(minLength: 0)
           }
           .font(.caption2)
           .foregroundStyle(.secondary)
           .lineLimit(1)
         }
-
-        Spacer()
       }
+      .padding(4)
     }
-    .frame(width: 80, height: 160)
+    .frame(width: 80)
   }
 }
 

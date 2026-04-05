@@ -35,15 +35,8 @@ struct PersonRelationItemView: View {
                 .foregroundStyle(.secondary)
                 .lineLimit(1)
               if item.ended {
-                BorderView(color: .secondary.opacity(0.5), padding: 1, cornerRadius: 8) {
+                BorderView(color: .secondary.opacity(0.3), padding: 2, cornerRadius: 8) {
                   Text("已结束")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                }
-              }
-              if item.spoiler {
-                BorderView(color: .secondary.opacity(0.5), padding: 1, cornerRadius: 8) {
-                  Text("剧透")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                 }

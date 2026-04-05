@@ -979,8 +979,8 @@ struct CharacterRelationDTO: Codable, Identifiable, Hashable {
   var ended: Bool
   var comment: String
 
-  var id: Int {
-    character.id
+  var id: String {
+    "\(character.id)-\(relation.id)"
   }
 
   enum CodingKeys: String, CodingKey {
@@ -1017,8 +1017,8 @@ struct PersonRelationDTO: Codable, Identifiable, Hashable {
   var ended: Bool
   var comment: String
 
-  var id: Int {
-    person.id
+  var id: String {
+    "\(person.id)-\(relation.id)"
   }
 
   enum CodingKeys: String, CodingKey {
