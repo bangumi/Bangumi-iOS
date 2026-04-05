@@ -656,36 +656,21 @@ var textRenders: [BBType: TextRender] {
       }
     },
     .bgm: { (n: Node, args: [String: Any]?) in
-      let bgmId = Int(n.attr) ?? 24
       let textSize = args?["textSize"] as? Int ?? 16
 
-      // Try to load image with fallback for different formats
-      let img: Image
-      if bgmId > 0 && bgmId < 24 {
-        // old range - try gif first, then png
-        let iconId = String(format: "%02d", bgmId)
-        if Bundle.module.path(forResource: "bgm\(iconId)", ofType: "gif") != nil {
-          img = Image(packageResource: "bgm\(iconId)", ofType: "gif")
-        } else {
-          img = Image(packageResource: "bgm\(iconId)", ofType: "png")
-        }
-      } else if bgmId >= 24 && bgmId <= 125 {
-        // Original range - try gif first
-        img = Image(packageResource: "bgm\(bgmId)", ofType: "gif")
-      } else if bgmId >= 200 && bgmId <= 238 {
-        // tv_vs range - use png format
-        img = Image(packageResource: "bgm\(bgmId)", ofType: "png")
-      } else if bgmId >= 500 && bgmId <= 529 {
-        // tv_500 range - try gif first, then png
-        if Bundle.module.path(forResource: "bgm\(bgmId)", ofType: "gif") != nil {
-          img = Image(packageResource: "bgm\(bgmId)", ofType: "gif")
-        } else {
-          img = Image(packageResource: "bgm\(bgmId)", ofType: "png")
-        }
-      } else {
-        // Fallback - try gif
-        img = Image(packageResource: "bgm\(bgmId)", ofType: "gif")
+      guard let smiley = SmileyCatalog.item(for: n.attr) else {
+        return .string(AttributedString("(\(n.attr))"))
       }
+
+      guard smiley.resourcePath() != nil else {
+        return .string(AttributedString(smiley.token))
+      }
+
+      let img = Image(
+        packageResource: smiley.resourceName,
+        ofType: smiley.fileExtension,
+        subdirectory: smiley.resourceSubdirectory
+      )
 
       return .text(Text(img).font(.system(size: CGFloat(textSize))))
     },

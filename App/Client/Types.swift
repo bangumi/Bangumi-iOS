@@ -795,7 +795,7 @@ struct ReactionDTO: Codable, Identifiable, Hashable {
     value
   }
 
-  var icon: String {
+  var smileyCode: String {
     REACTIONS[value] ?? "bgm125"
   }
 }

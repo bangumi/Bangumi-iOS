@@ -205,8 +205,8 @@ struct BBCodeEditor: View {
     return (r, g, b, a)
   }
 
-  private func handleEmojiInput(_ index: Int) {
-    let emoji = "(bgm\(index))"
+  private func handleEmojiInput(_ code: String) {
+    let emoji = "(\(code))"
     if let selection = textSelection, let range = selection.range(in: text) {
       text.replaceSubrange(range, with: emoji)
       newSelection(range.lowerBound, emoji.count)
@@ -359,7 +359,7 @@ struct BBCodeEditor: View {
 private struct BBCodeToolbarContent: View {
   @State private var showingEmojiInput = false
   let onBasicInput: (BBCodeType) -> Void
-  let onEmojiInput: (Int) -> Void
+  let onEmojiInput: (String) -> Void
   let onShowImageInput: () -> Void
   let onShowURLInput: () -> Void
   let onShowSizeInput: () -> Void
@@ -373,23 +373,10 @@ private struct BBCodeToolbarContent: View {
           .frame(width: 12, height: 12)
       }
       .sheet(isPresented: $showingEmojiInput) {
-        ScrollView {
-          LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 8)) {
-            ForEach(24..<126) { index in
-              Button {
-                onEmojiInput(index)
-                showingEmojiInput = false
-              } label: {
-                Image("bgm\(index)")
-                  .resizable()
-                  .aspectRatio(contentMode: .fit)
-                  .frame(width: 24, height: 24)
-              }
-            }
-          }
+        SmileyPicker { code in
+          onEmojiInput(code)
+          showingEmojiInput = false
         }
-        .padding()
-        .presentationDetents([.medium])
       }
       Divider()
       ForEach(BBCodeType.basic) { code in
@@ -438,6 +425,95 @@ private struct BBCodeToolbarContent: View {
     }
     .padding(.horizontal)
     .buttonStyle(.bordered)
+  }
+}
+
+private struct SmileyPicker: View {
+  let onSelect: (String) -> Void
+
+  @State private var selectedSectionKey = SmileyCatalog.sections.first?.key ?? ""
+
+  private var selectedSection: SmileySection? {
+    SmileyCatalog.sections.first(where: { $0.key == selectedSectionKey }) ?? SmileyCatalog.sections.first
+  }
+
+  private let columns = [GridItem(.adaptive(minimum: 36, maximum: 48), spacing: 10)]
+
+  var body: some View {
+    NavigationStack {
+      ScrollView {
+        VStack(alignment: .leading, spacing: 16) {
+          ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+              ForEach(SmileyCatalog.sections) { section in
+                if section.key == selectedSectionKey {
+                  Button(section.title) {
+                    selectedSectionKey = section.key
+                  }
+                  .buttonStyle(.borderedProminent)
+                } else {
+                  Button(section.title) {
+                    selectedSectionKey = section.key
+                  }
+                  .buttonStyle(.bordered)
+                }
+              }
+            }
+          }
+
+          if let selectedSection {
+            ForEach(selectedSection.groups) { group in
+              VStack(alignment: .leading, spacing: 8) {
+                if selectedSection.groups.count > 1 {
+                  Text(group.title)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                }
+
+                LazyVGrid(columns: columns, alignment: .leading, spacing: 10) {
+                  ForEach(group.items) { item in
+                    Button {
+                      onSelect(item.code)
+                    } label: {
+                      SmileyGridItem(item: item)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(item.token)
+                  }
+                }
+              }
+            }
+          }
+        }
+        .padding()
+      }
+      .navigationTitle("Smilies")
+    }
+    .presentationDetents([.medium, .large])
+  }
+}
+
+private struct SmileyGridItem: View {
+  let item: SmileyItem
+
+  var body: some View {
+    Group {
+      if item.resourcePath() != nil {
+        Image(
+          packageResource: item.resourceName,
+          ofType: item.fileExtension,
+          subdirectory: item.resourceSubdirectory
+        )
+        .resizable()
+        .interpolation(.none)
+        .aspectRatio(contentMode: .fit)
+      } else {
+        Text(item.token)
+          .font(.caption2)
+          .lineLimit(1)
+      }
+    }
+    .frame(width: 30, height: 30)
   }
 }
 

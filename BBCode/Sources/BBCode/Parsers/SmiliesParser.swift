@@ -1,8 +1,4 @@
 import Foundation
-import OSLog
-
-nonisolated(unsafe) let bgmRegex = try! Regex(
-  #"bgm(?<id>\d+)"#, as: (Substring, id: Substring).self)
 
 func parseSmilies(_ g: inout USIterator, _ worker: Worker) -> Parser? {
   let newNode = Node(
@@ -23,39 +19,25 @@ func parseSmilies(_ g: inout USIterator, _ worker: Worker) -> Parser? {
         return .content
       }
 
+      let token = newNode.value
+
       // Check if this is a BMO code first
-      if newNode.value.hasPrefix("bmo") {
-        let bmoNode = Node(
-          type: .bmo,
-          parent: worker.currentNode, tagManager: worker.tagManager)
-        worker.currentNode.children.append(bmoNode)
-        bmoNode.value = "bmo"
-        bmoNode.attr = newNode.value  // Store the full BMO code in attr
-        bmoNode.setTag(tag: worker.tagManager.getInfo(type: .bmo)!)
+      if token.hasPrefix("bmo") {
+        newNode.value = "bmo"
+        newNode.attr = token
+        newNode.setTag(tag: worker.tagManager.getInfo(type: .bmo)!)
         return .content
       }
 
-      // Check if this is a bgm code
-      if let match = newNode.value.wholeMatch(of: bgmRegex) {
-        let bgmId = Int(match.id) ?? 0
-        if (bgmId <= 0 || bgmId > 125) && (bgmId < 200 || bgmId > 238)
-          && (bgmId < 500 || bgmId > 529)
-        {
-          restoreSmiliesToPlain(node: newNode, c: c, worker: worker)
-          return .content
-        }
-        let bgmNode = Node(
-          type: .bgm,
-          parent: worker.currentNode, tagManager: worker.tagManager)
-        worker.currentNode.children.append(bgmNode)
-        bgmNode.value = "bgm"
-        bgmNode.attr = String(bgmId)
-        bgmNode.setTag(tag: worker.tagManager.getInfo(type: .bgm)!)
-        return .content
-      } else {
-        restoreSmiliesToPlain(node: newNode, c: c, worker: worker)
+      if let code = SmileyCatalog.canonicalCode(for: token) {
+        newNode.value = "bgm"
+        newNode.attr = code
+        newNode.setTag(tag: worker.tagManager.getInfo(type: .bgm)!)
         return .content
       }
+
+      restoreSmiliesToPlain(node: newNode, c: c, worker: worker)
+      return .content
     } else {
       if index < maxLength {
         newNode.value.append(Character(c))

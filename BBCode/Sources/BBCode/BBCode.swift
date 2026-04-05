@@ -64,11 +64,11 @@ public class BBCode {
       // For image tags, the content is the URL, skip it
       return ""
     case .bgm, .bmo:
-      // Keep emoji references as-is
-      if node.attr.isEmpty {
-        return "(bgm)"
+      let code = node.attr.isEmpty ? node.value : node.attr
+      guard !code.isEmpty else {
+        return ""
       }
-      return "(bgm\(node.attr))"
+      return "(\(code))"
     default:
       // Recursively extract text from children
       return node.children.map { extractPlainText(from: $0) }.joined()

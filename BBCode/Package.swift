@@ -18,7 +18,10 @@ let package = Package(
       dependencies: [
         "SDWebImageSwiftUI"
       ],
-      resources: [.process("Resources")]),
+      resources: [
+        .copy("Resources/Smilies"),
+        .process("Resources/Bmo"),
+      ]),
     .testTarget(name: "BBCodeTests", dependencies: ["BBCode"]),
   ]
 )

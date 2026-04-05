@@ -15,9 +15,16 @@ extension EnvironmentValues {
 }
 
 extension Image {
-  init(packageResource name: String, ofType type: String) {
+  public init(packageResource name: String, ofType type: String, subdirectory: String? = nil) {
     #if canImport(UIKit)
-      guard let path = Bundle.module.path(forResource: name, ofType: type),
+      let path: String?
+      if let subdirectory {
+        path = Bundle.module.path(forResource: name, ofType: type, inDirectory: subdirectory)
+      } else {
+        path = Bundle.module.path(forResource: name, ofType: type)
+      }
+
+      guard let path,
         let image = UIImage(contentsOfFile: path)
       else {
         self.init(name)
