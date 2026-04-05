@@ -110,8 +110,12 @@ private final class BBCodeTextBlockView: UITextView {
 
   init(attributedText: NSAttributedString) {
     self.baseAttributedText = attributedText
-    super.init(frame: .zero, textContainer: nil)
-    _ = layoutManager
+    let textStorage = NSTextStorage()
+    let layoutManager = NSLayoutManager()
+    let textContainer = NSTextContainer(size: .zero)
+    textStorage.addLayoutManager(layoutManager)
+    layoutManager.addTextContainer(textContainer)
+    super.init(frame: .zero, textContainer: textContainer)
     translatesAutoresizingMaskIntoConstraints = false
     backgroundColor = .clear
     isEditable = false

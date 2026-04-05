@@ -429,6 +429,7 @@ private struct BBCodeToolbarContent: View {
 }
 
 private struct SmileyPicker: View {
+  @Environment(\.dismiss) private var dismiss
   let onSelect: (String) -> Void
 
   @State private var selectedSectionKey = SmileyCatalog.sections.first?.key ?? ""
@@ -438,7 +439,22 @@ private struct SmileyPicker: View {
       ?? SmileyCatalog.sections.first
   }
 
-  private let columns = [GridItem(.adaptive(minimum: 36, maximum: 48), spacing: 10)]
+  private var gridItemSize: CGFloat {
+    guard let selectedSection else {
+      return 30
+    }
+
+    switch selectedSection.key {
+    case "musume", "blake":
+      return 44
+    default:
+      return 30
+    }
+  }
+
+  private var columns: [GridItem] {
+    [GridItem(.adaptive(minimum: gridItemSize + 6, maximum: gridItemSize + 18), spacing: 10)]
+  }
 
   var body: some View {
     NavigationStack {
@@ -476,7 +492,7 @@ private struct SmileyPicker: View {
                     Button {
                       onSelect(item.code)
                     } label: {
-                      SmileyGridItem(item: item)
+                      SmileyGridItem(item: item, size: gridItemSize)
                     }
                     .buttonStyle(.plain)
                     .accessibilityLabel(item.token)
@@ -488,7 +504,17 @@ private struct SmileyPicker: View {
         }
         .padding()
       }
-      .navigationTitle("Smilies")
+      .navigationTitle("")
+      .navigationBarTitleDisplayMode(.inline)
+      .toolbar {
+        ToolbarItem(placement: .cancellationAction) {
+          Button {
+            dismiss()
+          } label: {
+            Image(systemName: "xmark")
+          }
+        }
+      }
     }
     .presentationDetents([.medium, .large])
   }
@@ -496,18 +522,19 @@ private struct SmileyPicker: View {
 
 private struct SmileyGridItem: View {
   let item: SmileyItem
+  let size: CGFloat
 
   var body: some View {
     Group {
       if item.resourceURL() != nil {
-        SmileyImageView(item: item, size: 30)
+        SmileyImageView(item: item, size: size)
       } else {
         Text(item.token)
           .font(.caption2)
           .lineLimit(1)
       }
     }
-    .frame(width: 30, height: 30)
+    .frame(width: size, height: size)
   }
 }
 
