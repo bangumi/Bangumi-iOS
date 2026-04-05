@@ -348,13 +348,13 @@ var htmlRenders: [BBType: HTMLRender] {
       return html
     },
     .bgm: { (n: Node, args: [String: Any]?) in
-      let textSize = args?["textSize"] as? Int ?? 16
       guard let smiley = SmileyCatalog.item(for: n.attr) else {
         return "(\(n.attr))"
       }
 
+      let widthAttribute = smiley.preferredDisplayWidth.map { " width=\"\($0)\"" } ?? ""
       return
-        "<img src=\"\(smiley.remoteURLString)\" alt=\"\(smiley.token)\" style=\"width: \(textSize)px; height: \(textSize)px;\" />"
+        "<img src=\"\(smiley.remoteURLString)\" class=\"\(smiley.htmlClassString)\" alt=\"\(smiley.token)\"\(widthAttribute) />"
     },
     .bmo: { (n: Node, args: [String: Any]?) in
       let bmoCode = n.attr
@@ -399,6 +399,19 @@ func BBCodeToHTML(code: String, textSize: Int) -> String {
           body {
             font-size: \(textSize)px;
             font-family: sans-serif;
+          }
+          img.smile {
+            image-rendering: pixelated;
+          }
+          img.smile-dynamic {
+            image-rendering: auto;
+            max-width: 55px;
+            height: auto;
+            vertical-align: bottom;
+          }
+          img.smile-musume,
+          img.smile-blake {
+            image-rendering: auto;
           }
           li:last-child {
             margin-bottom: 1em;

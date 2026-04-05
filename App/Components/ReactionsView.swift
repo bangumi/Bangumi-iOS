@@ -212,15 +212,7 @@ private struct SmileyReactionImage: View {
 
   var body: some View {
     if let item = SmileyCatalog.item(for: code) {
-      Image(
-        packageResource: item.resourceName,
-        ofType: item.fileExtension,
-        subdirectory: item.resourceSubdirectory
-      )
-      .resizable()
-      .interpolation(.none)
-      .aspectRatio(contentMode: .fit)
-      .frame(width: size, height: size)
+      SmileyImageView(item: item, size: size)
     } else {
       Text("(\(code))")
         .font(.caption2)

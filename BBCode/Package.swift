@@ -5,7 +5,7 @@ import PackageDescription
 
 let package = Package(
   name: "BBCode",
-  platforms: [.macOS(.v14), .iOS(.v17), .tvOS(.v17), .watchOS(.v10), .visionOS(.v1)],
+  platforms: [.iOS(.v17)],
   products: [
     .library(name: "BBCode", targets: ["BBCode"])
   ],

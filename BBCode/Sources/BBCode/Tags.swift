@@ -1,15 +1,7 @@
 import Foundation
-import SwiftUI
 
 typealias HTMLRender = (Node, [String: Any]?) -> String
-typealias TextRender = (Node, [String: Any]?) -> TextView
 typealias PlainRender = (Node, [String: Any]?) -> String
-
-public enum TextView {
-  case view(AnyView)
-  case text(Text)
-  case string(AttributedString)
-}
 
 class TagManager {
   let tags: [TagInfo]

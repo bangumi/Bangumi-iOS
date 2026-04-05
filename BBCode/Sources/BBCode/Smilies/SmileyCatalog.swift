@@ -10,6 +10,30 @@ public struct SmileyItem: Identifiable, Hashable, Sendable {
   public var id: String { code }
   public var token: String { "(\(code))" }
   public var remoteURLString: String { "https://lain.bgm.tv\(remotePath)" }
+  public var isDynamic: Bool { code.hasPrefix("musume_") || code.hasPrefix("blake_") }
+  public var preferredDisplayWidth: Int? {
+    switch code {
+    case "bgm124", "bgm125":
+      return 21
+    default:
+      return nil
+    }
+  }
+  public var maxDisplayWidth: Int? { isDynamic ? 55 : nil }
+  public var htmlClassNames: [String] {
+    var classes = ["smile"]
+    guard isDynamic else {
+      return classes
+    }
+    classes.append("smile-dynamic")
+    if code.hasPrefix("musume_") {
+      classes.append("smile-musume")
+    } else if code.hasPrefix("blake_") {
+      classes.append("smile-blake")
+    }
+    return classes
+  }
+  public var htmlClassString: String { htmlClassNames.joined(separator: " ") }
 
   public func resourcePath() -> String? {
     Bundle.module.path(
@@ -62,7 +86,8 @@ public enum SmileyCatalog {
   }
 
   public static func canonicalCode(for rawCode: String) -> String? {
-    let normalized = rawCode
+    let normalized =
+      rawCode
       .trimmingCharacters(in: .whitespacesAndNewlines)
       .lowercased()
 
@@ -74,19 +99,11 @@ public enum SmileyCatalog {
       return code
     }
 
-    if let code = canonicalCharacterCode(
-      for: normalized,
-      prefix: "musume_",
-      validRange: 1...96
-    ) {
+    if let code = canonicalCharacterCode(for: normalized, prefix: "musume_") {
       return code
     }
 
-    if let code = canonicalCharacterCode(
-      for: normalized,
-      prefix: "blake_",
-      validRange: 1...98
-    ) {
+    if let code = canonicalCharacterCode(for: normalized, prefix: "blake_") {
       return code
     }
 
@@ -115,8 +132,7 @@ public enum SmileyCatalog {
 
   private static func canonicalCharacterCode(
     for code: String,
-    prefix: String,
-    validRange: ClosedRange<Int>
+    prefix: String
   ) -> String? {
     guard code.hasPrefix(prefix) else {
       return nil
@@ -127,18 +143,15 @@ public enum SmileyCatalog {
       return nil
     }
 
-    guard validRange.contains(id) else {
-      return nil
-    }
-
-    return "\(prefix)\(String(format: "%02d", id))"
+    let candidate = "\(prefix)\(String(format: "%02d", id))"
+    return itemLookup[candidate]?.code
   }
 }
 
-private extension SmileyCatalog {
-  static let resourceRoot = "Smilies"
+extension SmileyCatalog {
+  fileprivate static let resourceRoot = "Smilies"
 
-  static func makeSections() -> [SmileySection] {
+  fileprivate static func makeSections() -> [SmileySection] {
     [
       makeBangumiTVSection(),
       makeBangumiVSSection(),
@@ -149,7 +162,7 @@ private extension SmileyCatalog {
     ]
   }
 
-  static func makeBangumiClassicSection() -> SmileySection {
+  fileprivate static func makeBangumiClassicSection() -> SmileySection {
     let directory = "\(resourceRoot)/bgm"
     let items = (1...23).map { id in
       let resourceName = String(format: "%02d", id)
@@ -178,7 +191,7 @@ private extension SmileyCatalog {
     )
   }
 
-  static func makeBangumiTVSection() -> SmileySection {
+  fileprivate static func makeBangumiTVSection() -> SmileySection {
     let directory = "\(resourceRoot)/tv"
     let items = (24...125).map { id in
       let resourceName = String(format: "%02d", id - 23)
@@ -205,7 +218,7 @@ private extension SmileyCatalog {
     )
   }
 
-  static func makeBangumiVSSection() -> SmileySection {
+  fileprivate static func makeBangumiVSSection() -> SmileySection {
     let directory = "\(resourceRoot)/tv_vs"
     let items = (200...238).map { id in
       let resourceName = "bgm_\(id)"
@@ -232,7 +245,7 @@ private extension SmileyCatalog {
     )
   }
 
-  static func makeBangumi500Section() -> SmileySection {
+  fileprivate static func makeBangumi500Section() -> SmileySection {
     let directory = "\(resourceRoot)/tv_500"
     let items = (500...529).map { id in
       let resourceName = "bgm_\(id)"
@@ -260,37 +273,37 @@ private extension SmileyCatalog {
     )
   }
 
-  static func makeMusumeSection() -> SmileySection {
+  fileprivate static func makeMusumeSection() -> SmileySection {
     let directory = "\(resourceRoot)/musume"
     return SmileySection(
       key: "musume",
-      title: "Musume",
+      title: "Bangumi 娘",
       iconCode: "musume_06",
       groups: [
         characterGroup(
           key: "musume-reaction",
-          title: "Reaction",
+          title: "情绪反应",
           prefix: "musume",
-          ids: 6...42,
+          ids: flattenedCharacterIDs([6...42, 100...100, 106...106, 108...108, 118...118]),
           directory: directory
         ),
         characterGroup(
           key: "musume-props",
-          title: "Props",
+          title: "动作道具",
           prefix: "musume",
-          ids: 43...76,
+          ids: flattenedCharacterIDs([43...76, 99...99, 101...103, 107...107, 109...117]),
           directory: directory
         ),
         characterGroup(
           key: "musume-daily-life",
-          title: "Daily Life",
+          title: "日常状态",
           prefix: "musume",
-          ids: 77...96,
+          ids: flattenedCharacterIDs([77...96, 104...105]),
           directory: directory
         ),
         characterGroup(
           key: "musume-notifications",
-          title: "Notifications",
+          title: "提示反馈",
           prefix: "musume",
           ids: 1...5,
           directory: directory
@@ -299,44 +312,44 @@ private extension SmileyCatalog {
     )
   }
 
-  static func makeBlakeSection() -> SmileySection {
+  fileprivate static func makeBlakeSection() -> SmileySection {
     let directory = "\(resourceRoot)/blake"
     return SmileySection(
       key: "blake",
-      title: "Blake",
+      title: "Blake 娘",
       iconCode: "blake_06",
       groups: [
         characterGroup(
           key: "blake-reaction",
-          title: "Reaction",
+          title: "情绪反应",
           prefix: "blake",
-          ids: 6...42,
+          ids: flattenedCharacterIDs([6...42, 100...100, 106...106, 108...108, 118...118]),
           directory: directory
         ),
         characterGroup(
           key: "blake-props",
-          title: "Props",
+          title: "动作道具",
           prefix: "blake",
-          ids: 43...76,
+          ids: flattenedCharacterIDs([43...76, 99...99, 101...103, 107...107, 109...117]),
           directory: directory
         ),
         characterGroup(
           key: "blake-score",
-          title: "Score",
+          title: "",
           prefix: "blake",
-          ids: 97...98,
+          ids: flattenedCharacterIDs([97...98]),
           directory: directory
         ),
         characterGroup(
           key: "blake-daily-life",
-          title: "Daily Life",
+          title: "日常状态",
           prefix: "blake",
-          ids: 77...96,
+          ids: flattenedCharacterIDs([77...96, 104...105]),
           directory: directory
         ),
         characterGroup(
           key: "blake-notifications",
-          title: "Notifications",
+          title: "提示反馈",
           prefix: "blake",
           ids: 1...5,
           directory: directory
@@ -345,11 +358,11 @@ private extension SmileyCatalog {
     )
   }
 
-  static func characterGroup(
+  fileprivate static func characterGroup(
     key: String,
     title: String,
     prefix: String,
-    ids: ClosedRange<Int>,
+    ids: [Int],
     directory: String
   ) -> SmileyGroup {
     let items = ids.map { id in
@@ -371,7 +384,7 @@ private extension SmileyCatalog {
     )
   }
 
-  static func legacyBangumiFileExtension(for id: Int) -> String {
+  fileprivate static func legacyBangumiFileExtension(for id: Int) -> String {
     switch id {
     case 11, 23:
       return "gif"
@@ -380,12 +393,34 @@ private extension SmileyCatalog {
     }
   }
 
-  static func bangumi500FileExtension(for id: Int) -> String {
+  fileprivate static func bangumi500FileExtension(for id: Int) -> String {
     switch id {
     case 500, 501, 505, 515, 516, 517, 518, 519, 521, 522, 523:
       return "gif"
     default:
       return "png"
     }
+  }
+
+  fileprivate static func characterGroup(
+    key: String,
+    title: String,
+    prefix: String,
+    ids: ClosedRange<Int>,
+    directory: String
+  ) -> SmileyGroup {
+    characterGroup(
+      key: key,
+      title: title,
+      prefix: prefix,
+      ids: Array(ids),
+      directory: directory
+    )
+  }
+}
+
+extension SmileyCatalog {
+  fileprivate static func flattenedCharacterIDs(_ ranges: [ClosedRange<Int>]) -> [Int] {
+    ranges.flatMap(Array.init)
   }
 }

@@ -434,7 +434,8 @@ private struct SmileyPicker: View {
   @State private var selectedSectionKey = SmileyCatalog.sections.first?.key ?? ""
 
   private var selectedSection: SmileySection? {
-    SmileyCatalog.sections.first(where: { $0.key == selectedSectionKey }) ?? SmileyCatalog.sections.first
+    SmileyCatalog.sections.first(where: { $0.key == selectedSectionKey })
+      ?? SmileyCatalog.sections.first
   }
 
   private let columns = [GridItem(.adaptive(minimum: 36, maximum: 48), spacing: 10)]
@@ -464,7 +465,7 @@ private struct SmileyPicker: View {
           if let selectedSection {
             ForEach(selectedSection.groups) { group in
               VStack(alignment: .leading, spacing: 8) {
-                if selectedSection.groups.count > 1 {
+                if selectedSection.groups.count > 1, !group.title.isEmpty {
                   Text(group.title)
                     .font(.caption)
                     .foregroundStyle(.secondary)
@@ -498,15 +499,8 @@ private struct SmileyGridItem: View {
 
   var body: some View {
     Group {
-      if item.resourcePath() != nil {
-        Image(
-          packageResource: item.resourceName,
-          ofType: item.fileExtension,
-          subdirectory: item.resourceSubdirectory
-        )
-        .resizable()
-        .interpolation(.none)
-        .aspectRatio(contentMode: .fit)
+      if item.resourceURL() != nil {
+        SmileyImageView(item: item, size: 30)
       } else {
         Text(item.token)
           .font(.caption2)

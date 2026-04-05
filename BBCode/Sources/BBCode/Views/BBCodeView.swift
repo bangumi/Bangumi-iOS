@@ -3,7 +3,8 @@ import SwiftUI
 public struct BBCodeView: View {
   let code: String
   let textSize: Int
-  @State private var rendered: TextView?
+
+  @State private var document: BBCodePreparedDocument?
 
   public init(_ code: String, textSize: Int = 16) {
     self.code = code
@@ -11,29 +12,47 @@ public struct BBCodeView: View {
   }
 
   public var body: some View {
-    let font = Font.system(size: CGFloat(textSize))
-
     Group {
-      if let rendered = rendered {
-        switch rendered {
-        case .string(let content):
-          Text(content)
-            .font(font)
-        case .text(let content):
-          content
-            .font(font)
-        case .view(let content):
-          content
-            .font(font)
-        }
+      if let document {
+        BBCodeDocumentView(
+          document: document,
+          renderID: "\(textSize)|\(code)"
+        )
       } else {
         Text(code)
-          .font(font)
+          .font(.system(size: CGFloat(textSize)))
       }
     }
     .task(id: "\(textSize)|\(code)") {
-      rendered = BBCode().text(code, args: ["textSize": textSize])
+      document = BBCode().preparedDocument(code, textSize: textSize)
     }
+  }
+}
+
+struct BBCodeDocumentView: UIViewRepresentable {
+  let document: BBCodePreparedDocument
+  let renderID: String
+
+  func makeUIView(context: Context) -> BBCodeBlocksContainerView {
+    let view = BBCodeBlocksContainerView()
+    view.update(blocks: document.blocks, renderID: renderID)
+    return view
+  }
+
+  func updateUIView(_ uiView: BBCodeBlocksContainerView, context: Context) {
+    uiView.update(blocks: document.blocks, renderID: renderID)
+  }
+
+  func sizeThatFits(
+    _ proposal: ProposedViewSize, uiView: BBCodeBlocksContainerView, context: Context
+  )
+    -> CGSize?
+  {
+    guard let width = proposal.width, width.isFinite, width > 0 else {
+      return nil
+    }
+
+    return uiView.fittingSize(for: width)
   }
 }
 
@@ -71,7 +90,11 @@ public struct BBCodeView: View {
     (bmoCAoAEghP8A4BNgiKWBA) 紫色的
     绿色的 (bmoCArACghOkAoBNgiKGAg)
     [quote]引用的片段[/quote]
-    [photo=104569]4b/d1/873244_3p4I7.jpg[/photo]
+    [quote]引用里有图 [img]https://chii.in/img/ico/bgm88-31.gif[/img][/quote]
+    [list]
+    [*]文字项目
+    [*]图文项目 [photo=104569]4b/d1/873244_3p4I7.jpg[/photo]
+    [/list]
     [subject=12]ちぃでかける[/subject]
     [user=873244]五月雨[/user]
 
@@ -79,7 +102,6 @@ public struct BBCodeView: View {
 
     ruby测试1：[ruby=あさ]朝[/ruby]ruby测试2:[ruby=a i u e o]あいうえお[/ruby]
     「诶。那就[ruby=ナンジャモンジャ]怪物指名[/ruby]，[ruby=ゾンかまパ—ティ—]僵尸感染派对[/ruby]和UNO吧。」（注：这几个游戏的平均游戏时长都在10分钟之内。）
-
     """
   ScrollView {
     Divider()

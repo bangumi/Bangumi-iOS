@@ -2,6 +2,7 @@ import Foundation
 import SDWebImage
 import SDWebImageSwiftUI
 import SwiftUI
+import UIKit
 
 private struct IsInLinkKey: EnvironmentKey {
   static let defaultValue: Bool = false
@@ -16,24 +17,20 @@ extension EnvironmentValues {
 
 extension Image {
   public init(packageResource name: String, ofType type: String, subdirectory: String? = nil) {
-    #if canImport(UIKit)
-      let path: String?
-      if let subdirectory {
-        path = Bundle.module.path(forResource: name, ofType: type, inDirectory: subdirectory)
-      } else {
-        path = Bundle.module.path(forResource: name, ofType: type)
-      }
+    let path: String?
+    if let subdirectory {
+      path = Bundle.module.path(forResource: name, ofType: type, inDirectory: subdirectory)
+    } else {
+      path = Bundle.module.path(forResource: name, ofType: type)
+    }
 
-      guard let path,
-        let image = UIImage(contentsOfFile: path)
-      else {
-        self.init(name)
-        return
-      }
-      self.init(uiImage: image)
-    #else
+    guard let path,
+      let image = UIImage(contentsOfFile: path)
+    else {
       self.init(systemName: "photo")
-    #endif
+      return
+    }
+    self.init(uiImage: image)
   }
 }
 
@@ -63,15 +60,13 @@ struct ImageView: View {
     }
   }
 
-  #if canImport(UIKit)
-    func saveImage() {
-      Task {
-        guard let data = try? await URLSession.shared.data(from: url).0 else { return }
-        guard let img = UIImage(data: data) else { return }
-        UIImageWriteToSavedPhotosAlbum(img, nil, nil, nil)
-      }
+  func saveImage() {
+    Task {
+      guard let data = try? await URLSession.shared.data(from: url).0 else { return }
+      guard let img = UIImage(data: data) else { return }
+      UIImageWriteToSavedPhotosAlbum(img, nil, nil, nil)
     }
-  #endif
+  }
 
   var body: some View {
     if isInLink {
@@ -84,15 +79,9 @@ struct ImageView: View {
           }
           showPreview = true
         }
-        #if os(iOS)
-          .fullScreenCover(isPresented: $showPreview) {
-            ImagePreviewer(url: url, zoomID: zoomID, zoomNamespace: zoomNamespace)
-          }
-        #else
-          .sheet(isPresented: $showPreview) {
-            ImagePreviewer(url: url, zoomID: zoomID, zoomNamespace: zoomNamespace)
-          }
-        #endif
+        .fullScreenCover(isPresented: $showPreview) {
+          ImagePreviewer(url: url, zoomID: zoomID, zoomNamespace: zoomNamespace)
+        }
     }
   }
 
@@ -134,9 +123,7 @@ struct ImageView: View {
     .frame(maxWidth: width)
     .contextMenu {
       Button {
-        #if canImport(UIKit)
-          saveImage()
-        #endif
+        saveImage()
       } label: {
         Label("保存", systemImage: "square.and.arrow.down")
       }

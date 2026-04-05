@@ -14,4 +14,10 @@ class StripTests: XCTestCase {
     let stripped = BBCode().strip(bbcode: bbcode)
     XCTAssertEqual(stripped, "Smilies: (musume_06)(blake_97)")
   }
+
+  func testKeepsExtendedCharacterSmilies() {
+    let bbcode = "Smilies: (musume_102)(blake_110)"
+    let stripped = BBCode().strip(bbcode: bbcode)
+    XCTAssertEqual(stripped, "Smilies: (musume_102)(blake_110)")
+  }
 }

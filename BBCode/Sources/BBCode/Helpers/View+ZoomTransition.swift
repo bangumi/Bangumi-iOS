@@ -6,15 +6,11 @@ extension View {
   func matchedTransitionSourceIfAvailable(id: some Hashable, in namespace: Namespace.ID)
     -> some View
   {
-    #if os(iOS)
-      if #available(iOS 18.0, *) {
-        self.matchedTransitionSource(id: id, in: namespace)
-      } else {
-        self
-      }
-    #else
+    if #available(iOS 18.0, *) {
+      self.matchedTransitionSource(id: id, in: namespace)
+    } else {
       self
-    #endif
+    }
   }
 
   /// Applies navigationTransition zoom on iOS 18+, returns self on earlier versions.
@@ -22,14 +18,10 @@ extension View {
   func navigationTransitionZoomIfAvailable(sourceID: some Hashable, in namespace: Namespace.ID)
     -> some View
   {
-    #if os(iOS)
-      if #available(iOS 18.0, *) {
-        self.navigationTransition(.zoom(sourceID: sourceID, in: namespace))
-      } else {
-        self
-      }
-    #else
+    if #available(iOS 18.0, *) {
+      self.navigationTransition(.zoom(sourceID: sourceID, in: namespace))
+    } else {
       self
-    #endif
+    }
   }
 }
