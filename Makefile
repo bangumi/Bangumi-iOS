@@ -1,4 +1,4 @@
-.PHONY: help build build-ci release release-ios artifact-ios update_preview_date bump major minor format
+.PHONY: help ensure-config build build-ci release release-ios artifact-ios update_preview_date bump major minor format
 
 SCHEME = Bangumi
 PROJECT = Bangumi.xcodeproj
@@ -31,12 +31,18 @@ help: ## Show this help message
 	@echo "$(GREEN)Formatting Swift files...$(NC)"
 	@find . -name "*.swift" -not -path "./DerivedData/*" -not -path "./.build/*" | xargs swift-format -i
 
+ensure-config: ## Create App/Config.xcconfig from the example when missing
+	@if [ ! -f App/Config.xcconfig ]; then \
+		echo "$(YELLOW)App/Config.xcconfig not found, creating placeholder config for local/CI builds.$(NC)"; \
+		cp App/Config.example.xcconfig App/Config.xcconfig; \
+	fi
 
-build: ## Build for iOS
+
+build: ensure-config ## Build for iOS
 	@echo "Building for iOS..."
 	@xcodebuild -project $(PROJECT) -scheme $(SCHEME) -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' build -quiet
 
-build-ci: ## Build for iOS (CI, uses simulator, no code signing)
+build-ci: ensure-config ## Build for iOS (CI, uses simulator, no code signing)
 	@echo "Building for iOS..."
 	@xcodebuild -project $(PROJECT) -scheme $(SCHEME) -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' build -quiet CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
 
