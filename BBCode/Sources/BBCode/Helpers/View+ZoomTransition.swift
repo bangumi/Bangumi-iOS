@@ -15,10 +15,10 @@ extension View {
 
   /// Applies navigationTransition zoom on iOS 18+, returns self on earlier versions.
   @ViewBuilder
-  func navigationTransitionZoomIfAvailable(sourceID: some Hashable, in namespace: Namespace.ID)
+  func navigationTransitionZoomIfAvailable(sourceID: AnyHashable?, in namespace: Namespace.ID?)
     -> some View
   {
-    if #available(iOS 18.0, *) {
+    if #available(iOS 18.0, *), let sourceID, let namespace {
       self.navigationTransition(.zoom(sourceID: sourceID, in: namespace))
     } else {
       self

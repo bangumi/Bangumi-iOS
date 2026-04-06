@@ -6,8 +6,8 @@ import UIKit
 
 public struct ImagePreviewer: View {
   let url: URL
-  let zoomID: String
-  let zoomNamespace: Namespace.ID
+  let zoomID: AnyHashable?
+  let zoomNamespace: Namespace.ID?
 
   @State private var failed = false
   @State private var showControls = true
@@ -16,7 +16,7 @@ public struct ImagePreviewer: View {
 
   @Environment(\.dismiss) private var dismiss
 
-  public init(url: URL, zoomID: String, zoomNamespace: Namespace.ID) {
+  public init(url: URL, zoomID: AnyHashable? = nil, zoomNamespace: Namespace.ID? = nil) {
     self.url = url
     self.zoomID = zoomID
     self.zoomNamespace = zoomNamespace
@@ -100,7 +100,7 @@ public struct ImagePreviewer: View {
         .allowsHitTesting(showControls)
       }
       .frame(maxWidth: .infinity, maxHeight: .infinity)
-      .edgesIgnoringSafeArea(.all)
+      .ignoresSafeArea()
     }
     .navigationTransitionZoomIfAvailable(sourceID: zoomID, in: zoomNamespace)
   }

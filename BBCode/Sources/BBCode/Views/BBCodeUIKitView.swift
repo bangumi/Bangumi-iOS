@@ -1,4 +1,5 @@
 import SDWebImage
+import SwiftUI
 import UIKit
 
 final class BBCodeBlocksContainerView: UIView {
@@ -87,7 +88,7 @@ final class BBCodeBlocksContainerView: UIView {
   }
 }
 
-private final class BBCodeTextBlockView: UITextView {
+private final class BBCodeTextBlockView: UITextView, UITextViewDelegate {
   private struct MaskRangeKey: Hashable {
     let location: Int
     let length: Int
@@ -103,6 +104,8 @@ private final class BBCodeTextBlockView: UITextView {
   }
 
   private let hiddenMaskColor = UIColor(white: 0.35, alpha: 1)
+  private let revealedMaskTextColor = UIColor.white
+  private let maskLinkURL = URL(string: "bbcode-mask://toggle")!
   private let baseAttributedText: NSAttributedString
   private var lastMeasuredWidth: CGFloat = 0
   private var animatedSmileyViews: [Int: AnimatedSmileyImageView] = [:]
@@ -123,9 +126,8 @@ private final class BBCodeTextBlockView: UITextView {
     isScrollEnabled = false
     textContainerInset = .zero
     textContainer.lineFragmentPadding = 0
-    linkTextAttributes = [
-      .foregroundColor: UIColor(named: "LinkTextColor") ?? UIColor.systemBlue
-    ]
+    delegate = self
+    linkTextAttributes = [:]
     setContentCompressionResistancePriority(.required, for: .vertical)
     setContentHuggingPriority(.required, for: .vertical)
     applyRenderedText(forceReload: true)
@@ -164,29 +166,23 @@ private final class BBCodeTextBlockView: UITextView {
     }
   }
 
-  override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-    if let point = touches.first?.location(in: self),
-      let maskRange = maskRange(at: point)
-    {
-      revealMask(maskRange)
-      return
-    }
-
-    super.touchesEnded(touches, with: event)
-  }
-
   private func applyRenderedText(forceReload: Bool = false, animated: Bool = false) {
     let renderedText = NSMutableAttributedString(attributedString: baseAttributedText)
     renderedText.enumerateAttribute(
       .bbcodeMask,
       in: NSRange(location: 0, length: renderedText.length)
     ) { value, range, _ in
-      guard value != nil, !revealedMasks.contains(MaskRangeKey(range)) else {
+      guard value != nil else {
         return
       }
 
-      renderedText.addAttribute(.foregroundColor, value: hiddenMaskColor, range: range)
+      renderedText.addAttribute(.link, value: maskLinkURL, range: range)
       renderedText.addAttribute(.backgroundColor, value: hiddenMaskColor, range: range)
+      renderedText.addAttribute(
+        .foregroundColor,
+        value: revealedMasks.contains(MaskRangeKey(range)) ? revealedMaskTextColor : hiddenMaskColor,
+        range: range
+      )
     }
 
     if animated {
@@ -288,58 +284,28 @@ private final class BBCodeTextBlockView: UITextView {
     animatedSmileyViews.removeAll()
   }
 
-  private func revealMask(_ maskRange: MaskRangeKey) {
-    guard revealedMasks.insert(maskRange).inserted else {
-      return
+  private func toggleMask(_ maskRange: MaskRangeKey) {
+    if revealedMasks.contains(maskRange) {
+      revealedMasks.remove(maskRange)
+    } else {
+      revealedMasks.insert(maskRange)
     }
 
     applyRenderedText(animated: true)
   }
 
-  private func maskRange(at point: CGPoint) -> MaskRangeKey? {
-    guard attributedText.length > 0 else {
-      return nil
+  func textView(
+    _ textView: UITextView,
+    shouldInteractWith url: URL,
+    in characterRange: NSRange,
+    interaction: UITextItemInteraction
+  ) -> Bool {
+    guard url.scheme == maskLinkURL.scheme else {
+      return true
     }
 
-    let containerPoint = CGPoint(
-      x: point.x - textContainerInset.left + contentOffset.x,
-      y: point.y - textContainerInset.top + contentOffset.y
-    )
-
-    let glyphIndex = layoutManager.glyphIndex(
-      for: containerPoint,
-      in: textContainer,
-      fractionOfDistanceThroughGlyph: nil
-    )
-    guard glyphIndex < layoutManager.numberOfGlyphs else {
-      return nil
-    }
-
-    let glyphRect = layoutManager.boundingRect(
-      forGlyphRange: NSRange(location: glyphIndex, length: 1),
-      in: textContainer
-    )
-    guard glyphRect.insetBy(dx: -4, dy: -4).contains(containerPoint) else {
-      return nil
-    }
-
-    let characterIndex = layoutManager.characterIndexForGlyph(at: glyphIndex)
-    guard characterIndex < attributedText.length else {
-      return nil
-    }
-
-    var effectiveRange = NSRange(location: 0, length: 0)
-    let value = attributedText.attribute(
-      .bbcodeMask,
-      at: characterIndex,
-      longestEffectiveRange: &effectiveRange,
-      in: NSRange(location: 0, length: attributedText.length)
-    )
-    guard value != nil else {
-      return nil
-    }
-
-    return MaskRangeKey(effectiveRange)
+    toggleMask(MaskRangeKey(characterRange))
+    return false
   }
 }
 
@@ -374,6 +340,10 @@ private final class BBCodeMediaBlockView: UIView {
     translatesAutoresizingMaskIntoConstraints = false
     backgroundColor = .clear
     directionalLayoutMargins = NSDirectionalEdgeInsets(top: 4, leading: 0, bottom: 4, trailing: 0)
+    isUserInteractionEnabled = true
+    isAccessibilityElement = true
+    accessibilityTraits = [.image, .button]
+    accessibilityLabel = "Preview image"
     setContentCompressionResistancePriority(.required, for: .vertical)
     setContentHuggingPriority(.required, for: .vertical)
 
@@ -386,6 +356,8 @@ private final class BBCodeMediaBlockView: UIView {
       widthConstraint,
       heightConstraint,
     ])
+
+    addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handlePreviewTap)))
 
     sourceSize = constrainedSize
     loadImage()
@@ -473,6 +445,22 @@ private final class BBCodeMediaBlockView: UIView {
       currentView = view.superview
     }
   }
+
+  @objc private func handlePreviewTap() {
+    presentPreview()
+  }
+
+  private func presentPreview() {
+    guard let presenter = nearestViewController()?.topMostPresentedViewController else {
+      return
+    }
+
+    let controller = UIHostingController(rootView: ImagePreviewer(url: url))
+    controller.modalPresentationStyle = .overFullScreen
+    controller.modalTransitionStyle = .crossDissolve
+    controller.view.backgroundColor = .clear
+    presenter.present(controller, animated: true)
+  }
 }
 
 private final class BBCodeQuoteBlockView: UIView {
@@ -480,19 +468,55 @@ private final class BBCodeQuoteBlockView: UIView {
     super.init(frame: .zero)
     translatesAutoresizingMaskIntoConstraints = false
     backgroundColor = .clear
-    directionalLayoutMargins = NSDirectionalEdgeInsets(top: 4, leading: 0, bottom: 4, trailing: 0)
+    directionalLayoutMargins = NSDirectionalEdgeInsets(top: 6, leading: 0, bottom: 8, trailing: 0)
     setContentCompressionResistancePriority(.required, for: .vertical)
     setContentHuggingPriority(.required, for: .vertical)
 
     let contentView = BBCodeBlocksContainerView()
     contentView.update(blocks: blocks)
+    contentView.alpha = 0.56
+
+    let quoteContainer = UIView()
+    quoteContainer.translatesAutoresizingMaskIntoConstraints = false
+    quoteContainer.backgroundColor = .clear
+
+    let openingQuoteLabel = UILabel()
+    openingQuoteLabel.translatesAutoresizingMaskIntoConstraints = false
+    openingQuoteLabel.text = "\u{201C}"
+    openingQuoteLabel.textColor = UIColor.tertiaryLabel
+    openingQuoteLabel.font = .systemFont(ofSize: 18, weight: .medium)
+
+    let closingQuoteLabel = UILabel()
+    closingQuoteLabel.translatesAutoresizingMaskIntoConstraints = false
+    closingQuoteLabel.text = "\u{201D}"
+    closingQuoteLabel.textAlignment = .right
+    closingQuoteLabel.textColor = UIColor.tertiaryLabel
+    closingQuoteLabel.font = .systemFont(ofSize: 18, weight: .medium)
+
+    quoteContainer.addSubview(openingQuoteLabel)
+    quoteContainer.addSubview(contentView)
+    quoteContainer.addSubview(closingQuoteLabel)
+    NSLayoutConstraint.activate([
+      openingQuoteLabel.topAnchor.constraint(equalTo: quoteContainer.topAnchor, constant: -1),
+      openingQuoteLabel.leadingAnchor.constraint(equalTo: quoteContainer.leadingAnchor),
+      openingQuoteLabel.widthAnchor.constraint(equalToConstant: 10),
+
+      contentView.topAnchor.constraint(equalTo: quoteContainer.topAnchor),
+      contentView.leadingAnchor.constraint(equalTo: quoteContainer.leadingAnchor, constant: 10),
+      contentView.trailingAnchor.constraint(equalTo: quoteContainer.trailingAnchor, constant: -10),
+      contentView.bottomAnchor.constraint(equalTo: quoteContainer.bottomAnchor),
+
+      closingQuoteLabel.trailingAnchor.constraint(equalTo: quoteContainer.trailingAnchor),
+      closingQuoteLabel.bottomAnchor.constraint(equalTo: quoteContainer.bottomAnchor, constant: 1),
+      closingQuoteLabel.widthAnchor.constraint(equalToConstant: 10),
+    ])
 
     let barView = UIView()
     barView.translatesAutoresizingMaskIntoConstraints = false
     barView.backgroundColor = UIColor.secondaryLabel.withAlphaComponent(0.35)
     barView.layer.cornerRadius = 1.5
 
-    let stackView = UIStackView(arrangedSubviews: [barView, contentView])
+    let stackView = UIStackView(arrangedSubviews: [barView, quoteContainer])
     stackView.axis = .horizontal
     stackView.alignment = .top
     stackView.spacing = 8
@@ -593,5 +617,25 @@ extension UIStackView {
       removeArrangedSubview(view)
       view.removeFromSuperview()
     }
+  }
+}
+
+private extension UIView {
+  func nearestViewController() -> UIViewController? {
+    var responder: UIResponder? = self
+    while let current = responder {
+      if let viewController = current as? UIViewController {
+        return viewController
+      }
+      responder = current.next
+    }
+
+    return nil
+  }
+}
+
+private extension UIViewController {
+  var topMostPresentedViewController: UIViewController {
+    presentedViewController?.topMostPresentedViewController ?? self
   }
 }

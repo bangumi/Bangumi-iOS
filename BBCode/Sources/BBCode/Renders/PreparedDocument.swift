@@ -54,6 +54,7 @@ private struct BBCodeTextKitRenderer {
   private enum RenderedSegment {
     case text(NSMutableAttributedString)
     case block(BBCodePreparedBlock.Payload)
+    case separator
 
     var containsBlock: Bool {
       if case .block = self {
@@ -103,6 +104,8 @@ private struct BBCodeTextKitRenderer {
         }
       case .block(let payload):
         rawBlocks.append(payload)
+      case .separator:
+        continue
       }
     }
 
@@ -127,22 +130,21 @@ private struct BBCodeTextKitRenderer {
     switch node.type {
     case .quote:
       let childSegments = renderSegments(children: node.children)
-      guard childSegments.contains(where: \.containsBlock) else {
-        return [.text(renderNode(node))]
-      }
-
       return [.block(.quote(makeBlocks(from: childSegments)))]
     case .list:
       let itemSegments = collectListItemNodes(from: node.children).map {
         renderSegments(children: $0)
       }
-      guard itemSegments.contains(where: containsBlockSegment(in:)) else {
-        return [.text(renderNode(node))]
-      }
-
       return [.block(.list(makeListItems(from: itemSegments)))]
     case .root, .float:
       return renderSegments(children: node.children)
+    case .center, .left, .right, .align, .code:
+      let childSegments = renderSegments(children: node.children)
+      if childSegments.contains(where: \.containsBlock) {
+        return blockBoundaries(around: applyNodeWrapper(node, to: childSegments))
+      }
+
+      return blockBoundaries(around: [.text(renderNode(node))])
     default:
       let childSegments = renderSegments(children: node.children)
       guard childSegments.contains(where: \.containsBlock) else {
@@ -295,6 +297,8 @@ private struct BBCodeTextKitRenderer {
           return .text(transformed)
         case .block:
           return segment
+        case .separator:
+          return segment
         }
       }
     )
@@ -319,13 +323,19 @@ private struct BBCodeTextKitRenderer {
           return .text(prefixed)
         case .block:
           return segment
+        case .separator:
+          return segment
         }
       }
     )
   }
 
-  private func containsBlockSegment(in segments: [RenderedSegment]) -> Bool {
-    segments.contains(where: \.containsBlock)
+  private func blockBoundaries(around segments: [RenderedSegment]) -> [RenderedSegment] {
+    guard !segments.isEmpty else {
+      return []
+    }
+
+    return [.separator] + segments + [.separator]
   }
 
   private func normalizeSegments(_ segments: [RenderedSegment]) -> [RenderedSegment] {
@@ -347,6 +357,11 @@ private struct BBCodeTextKitRenderer {
         }
       case .block:
         normalized.append(segment)
+      case .separator:
+        guard case .separator? = normalized.last else {
+          normalized.append(.separator)
+          continue
+        }
       }
     }
 
