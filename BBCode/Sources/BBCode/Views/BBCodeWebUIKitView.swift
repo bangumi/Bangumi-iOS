@@ -1,14 +1,11 @@
 import WebKit
 
 final class InlineWebView: WKWebView {
-  static let pool = WKProcessPool()
-
   init(frame: CGRect) {
     let prefs = WKWebpagePreferences()
     prefs.allowsContentJavaScript = true
     let config = WKWebViewConfiguration()
     config.defaultWebpagePreferences = prefs
-    config.processPool = InlineWebView.pool
     super.init(frame: frame, configuration: config)
     scrollView.bounces = false
     navigationDelegate = self

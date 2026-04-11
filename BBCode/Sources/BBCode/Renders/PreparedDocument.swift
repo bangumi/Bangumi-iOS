@@ -793,8 +793,14 @@ private struct BBCodeTextKitRenderer {
       return
     }
 
-    attributed.addAttribute(.link, value: url, range: attributed.fullRange)
-    attributed.addAttribute(.foregroundColor, value: linkColor, range: attributed.fullRange)
+    attributed.enumerateAttribute(.attachment, in: attributed.fullRange) { value, range, _ in
+      guard value == nil else {
+        return
+      }
+
+      attributed.addAttribute(.link, value: url, range: range)
+      attributed.addAttribute(.foregroundColor, value: linkColor, range: range)
+    }
   }
 
   private func applyFontTransform(

@@ -6,6 +6,7 @@ final class BBCodeBlocksContainerView: UIView {
   private let stackView = UIStackView()
   private var widthConstraint: NSLayoutConstraint?
   private var lastRenderID: String?
+  private var openURLHandler: ((URL) -> Void)?
 
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -32,8 +33,15 @@ final class BBCodeBlocksContainerView: UIView {
     fatalError("init(coder:) has not been implemented")
   }
 
-  func update(blocks: [BBCodePreparedBlock], renderID: String? = nil) {
+  func update(
+    blocks: [BBCodePreparedBlock],
+    renderID: String? = nil,
+    openURLHandler: ((URL) -> Void)? = nil
+  ) {
+    self.openURLHandler = openURLHandler
+
     if let renderID, lastRenderID == renderID {
+      applyOpenURLHandlerToDescendants()
       return
     }
 
@@ -43,6 +51,7 @@ final class BBCodeBlocksContainerView: UIView {
       stackView.addArrangedSubview(makeView(for: block))
     }
 
+    applyOpenURLHandlerToDescendants()
     invalidateIntrinsicContentSize()
     setNeedsLayout()
   }
@@ -86,6 +95,22 @@ final class BBCodeBlocksContainerView: UIView {
       return BBCodeListBlockView(items: items)
     }
   }
+
+  private func applyOpenURLHandlerToDescendants() {
+    for arrangedSubview in stackView.arrangedSubviews {
+      applyOpenURLHandler(to: arrangedSubview)
+    }
+  }
+
+  private func applyOpenURLHandler(to view: UIView) {
+    if let textBlockView = view as? BBCodeTextBlockView {
+      textBlockView.openURLHandler = openURLHandler
+    }
+
+    for subview in view.subviews {
+      applyOpenURLHandler(to: subview)
+    }
+  }
 }
 
 private final class BBCodeTextBlockView: UITextView, UITextViewDelegate {
@@ -107,6 +132,7 @@ private final class BBCodeTextBlockView: UITextView, UITextViewDelegate {
   private let revealedMaskTextColor = UIColor.white
   private let maskLinkURL = URL(string: "bbcode-mask://toggle")!
   private let baseAttributedText: NSAttributedString
+  var openURLHandler: ((URL) -> Void)?
   private var lastMeasuredWidth: CGFloat = 0
   private var animatedSmileyViews: [Int: AnimatedSmileyImageView] = [:]
   private var revealedMasks = Set<MaskRangeKey>()
@@ -124,6 +150,7 @@ private final class BBCodeTextBlockView: UITextView, UITextViewDelegate {
     isEditable = false
     isSelectable = true
     isScrollEnabled = false
+    textDragInteraction?.isEnabled = false
     textContainerInset = .zero
     textContainer.lineFragmentPadding = 0
     delegate = self
@@ -180,7 +207,8 @@ private final class BBCodeTextBlockView: UITextView, UITextViewDelegate {
       renderedText.addAttribute(.backgroundColor, value: hiddenMaskColor, range: range)
       renderedText.addAttribute(
         .foregroundColor,
-        value: revealedMasks.contains(MaskRangeKey(range)) ? revealedMaskTextColor : hiddenMaskColor,
+        value: revealedMasks.contains(MaskRangeKey(range))
+          ? revealedMaskTextColor : hiddenMaskColor,
         range: range
       )
     }
@@ -296,16 +324,27 @@ private final class BBCodeTextBlockView: UITextView, UITextViewDelegate {
 
   func textView(
     _ textView: UITextView,
-    shouldInteractWith url: URL,
-    in characterRange: NSRange,
-    interaction: UITextItemInteraction
-  ) -> Bool {
-    guard url.scheme == maskLinkURL.scheme else {
-      return true
+    primaryActionFor textItem: UITextItem,
+    defaultAction: UIAction
+  ) -> UIAction? {
+    guard case .link(let url) = textItem.content else {
+      return defaultAction
     }
 
-    toggleMask(MaskRangeKey(characterRange))
-    return false
+    if url.scheme == maskLinkURL.scheme {
+      let maskRange = MaskRangeKey(textItem.range)
+      return UIAction { [weak self] _ in
+        self?.toggleMask(maskRange)
+      }
+    }
+
+    guard let openURLHandler else {
+      return defaultAction
+    }
+
+    return UIAction { _ in
+      openURLHandler(url)
+    }
   }
 }
 
@@ -620,8 +659,8 @@ extension UIStackView {
   }
 }
 
-private extension UIView {
-  func nearestViewController() -> UIViewController? {
+extension UIView {
+  fileprivate func nearestViewController() -> UIViewController? {
     var responder: UIResponder? = self
     while let current = responder {
       if let viewController = current as? UIViewController {
@@ -634,8 +673,8 @@ private extension UIView {
   }
 }
 
-private extension UIViewController {
-  var topMostPresentedViewController: UIViewController {
+extension UIViewController {
+  fileprivate var topMostPresentedViewController: UIViewController {
     presentedViewController?.topMostPresentedViewController ?? self
   }
 }

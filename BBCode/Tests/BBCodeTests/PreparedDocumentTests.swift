@@ -44,11 +44,12 @@ final class PreparedDocumentTests: XCTestCase {
     XCTAssertEqual(textString(for: document.blocks[1]), "middle")
     XCTAssertEqual(textString(for: document.blocks[2]), "after")
 
-    let paragraphStyle = textBlock(for: document.blocks[1])?.attribute(
-      .paragraphStyle,
-      at: 0,
-      effectiveRange: nil
-    ) as? NSParagraphStyle
+    let paragraphStyle =
+      textBlock(for: document.blocks[1])?.attribute(
+        .paragraphStyle,
+        at: 0,
+        effectiveRange: nil
+      ) as? NSParagraphStyle
     XCTAssertEqual(paragraphStyle?.alignment, .center)
   }
 
@@ -60,12 +61,42 @@ final class PreparedDocumentTests: XCTestCase {
     XCTAssertEqual(textString(for: document.blocks[1]), "let value = 1")
     XCTAssertEqual(textString(for: document.blocks[2]), "after")
 
-    let backgroundColor = textBlock(for: document.blocks[1])?.attribute(
-      .backgroundColor,
-      at: 0,
-      effectiveRange: nil
-    ) as? UIColor
+    let backgroundColor =
+      textBlock(for: document.blocks[1])?.attribute(
+        .backgroundColor,
+        at: 0,
+        effectiveRange: nil
+      ) as? UIColor
     XCTAssertNotNil(backgroundColor)
+  }
+
+  func testURLDoesNotApplyLinkAttributeToAttachments() {
+    let document = BBCode().preparedDocument(
+      "[url=https://example.com]before (bgm38) after[/url]",
+      textSize: 16
+    )
+
+    XCTAssertEqual(document.blocks.count, 1)
+
+    guard let attributedText = textBlock(for: document.blocks[0]) else {
+      return XCTFail("Expected text block")
+    }
+
+    let attachmentRange = attachmentRange(in: attributedText)
+    XCTAssertNotNil(attachmentRange)
+
+    let linkURL = URL(string: "https://example.com")
+    XCTAssertEqual(attributedText.attribute(.link, at: 0, effectiveRange: nil) as? URL, linkURL)
+
+    if let attachmentRange {
+      XCTAssertNil(
+        attributedText.attribute(.link, at: attachmentRange.location, effectiveRange: nil))
+    }
+
+    XCTAssertEqual(
+      attributedText.attribute(.link, at: attributedText.length - 1, effectiveRange: nil) as? URL,
+      linkURL
+    )
   }
 
   private func textBlock(for block: BBCodePreparedBlock) -> NSAttributedString? {
@@ -78,5 +109,21 @@ final class PreparedDocumentTests: XCTestCase {
 
   private func textString(for block: BBCodePreparedBlock) -> String? {
     textBlock(for: block)?.string
+  }
+
+  private func attachmentRange(in attributedText: NSAttributedString) -> NSRange? {
+    var foundRange: NSRange?
+    attributedText.enumerateAttribute(
+      .attachment, in: NSRange(location: 0, length: attributedText.length)
+    ) { value, range, stop in
+      guard value != nil else {
+        return
+      }
+
+      foundRange = range
+      stop.pointee = true
+    }
+
+    return foundRange
   }
 }

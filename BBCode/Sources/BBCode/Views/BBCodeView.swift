@@ -4,6 +4,7 @@ public struct BBCodeView: View {
   let code: String
   let textSize: Int
 
+  @Environment(\.openURL) private var openURL
   @State private var document: BBCodePreparedDocument?
 
   public init(_ code: String, textSize: Int = 16) {
@@ -16,7 +17,10 @@ public struct BBCodeView: View {
       if let document {
         BBCodeDocumentView(
           document: document,
-          renderID: "\(textSize)|\(code)"
+          renderID: "\(textSize)|\(code)",
+          openURLHandler: { url in
+            openURL(url)
+          }
         )
       } else {
         Text(code)
@@ -32,15 +36,16 @@ public struct BBCodeView: View {
 struct BBCodeDocumentView: UIViewRepresentable {
   let document: BBCodePreparedDocument
   let renderID: String
+  let openURLHandler: (URL) -> Void
 
   func makeUIView(context: Context) -> BBCodeBlocksContainerView {
     let view = BBCodeBlocksContainerView()
-    view.update(blocks: document.blocks, renderID: renderID)
+    view.update(blocks: document.blocks, renderID: renderID, openURLHandler: openURLHandler)
     return view
   }
 
   func updateUIView(_ uiView: BBCodeBlocksContainerView, context: Context) {
-    uiView.update(blocks: document.blocks, renderID: renderID)
+    uiView.update(blocks: document.blocks, renderID: renderID, openURLHandler: openURLHandler)
   }
 
   func sizeThatFits(
