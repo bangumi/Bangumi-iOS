@@ -140,7 +140,12 @@ struct CachedSubjectTopicListView: View {
         resp = try await Chii.shared.getRecentSubjectTopics(limit: 20, offset: 0)
       }
       if let resp = resp {
-        items = [SubjectTopicDTO]().mergedById(with: resp.data)
+        let updatedItems = [SubjectTopicDTO]().mergedById(with: resp.data)
+        if items != updatedItems {
+          withAnimation {
+            items = updatedItems
+          }
+        }
         offset = 20
         exhausted = resp.data.count == 0 || offset >= resp.total
 
@@ -168,7 +173,12 @@ struct CachedSubjectTopicListView: View {
         resp = try await Chii.shared.getRecentSubjectTopics(limit: 20, offset: offset)
       }
       if let resp = resp {
-        items = items.mergedById(with: resp.data)
+        let updatedItems = items.mergedById(with: resp.data)
+        if items != updatedItems {
+          withAnimation {
+            items = updatedItems
+          }
+        }
         offset += 20
         if resp.data.count == 0 || offset >= resp.total {
           exhausted = true
@@ -183,6 +193,7 @@ struct CachedSubjectTopicListView: View {
     LazyVStack(alignment: .leading) {
       ForEach(filteredItems) { topic in
         RakuenSubjectTopicItemView(topic: topic)
+          .transition(.opacity)
           .onAppear {
             if shouldLoadMore(after: topic) {
               Task {
@@ -211,7 +222,6 @@ struct CachedSubjectTopicListView: View {
         .padding(.vertical)
       }
     }
-    .animation(.default, value: items)
     .onAppear {
       if !initialized {
         initialized = true

@@ -4,39 +4,17 @@ import SwiftUI
 struct ProgressListView: View {
   let subjectIds: [Int]
 
-  @Query private var subjects: [Subject]
-  @Query private var episodes: [Episode]
-
-  init(subjectIds: [Int]) {
-    self.subjectIds = subjectIds
-    let ids = subjectIds
-    let subjectDescriptor = FetchDescriptor<Subject>(
-      predicate: #Predicate<Subject> { ids.contains($0.subjectId) }
-    )
-    _subjects = Query(subjectDescriptor)
-    let mainType = EpisodeType.main.rawValue
-    let episodeDescriptor = FetchDescriptor<Episode>(
-      predicate: #Predicate<Episode> { ids.contains($0.subjectId) && $0.type == mainType },
-      sortBy: [
-        SortDescriptor<Episode>(\.subjectId, order: .forward),
-        SortDescriptor<Episode>(\.sort, order: .forward),
-      ]
-    )
-    _episodes = Query(episodeDescriptor)
-  }
-
   var body: some View {
-    let subjectMap = Dictionary(uniqueKeysWithValues: subjects.map { ($0.subjectId, $0) })
-    let episodeMap = Dictionary(grouping: episodes, by: \.subjectId)
     LazyVStack(alignment: .leading) {
       ForEach(subjectIds, id: \.self) { subjectId in
-        if let subject = subjectMap[subjectId] {
+        ProgressSubjectContainerView(subjectId: subjectId) { subject, episodes in
           CardView {
             ProgressListItemContentView(
               subject: subject,
-              episodes: episodeMap[subjectId] ?? []
+              episodes: episodes
             )
           }
+          .transition(.opacity)
         }
       }
     }

@@ -29,7 +29,12 @@ where C: View, T: Identifiable & Hashable & Codable & Sendable {
       defer { loading = false }
       let result = await loadPage(currentOffset: 0)
       if let newData = result {
-        items = [Item]().mergedById(with: newData)
+        let updatedItems = [Item]().mergedById(with: newData)
+        if items != updatedItems {
+          withAnimation {
+            items = updatedItems
+          }
+        }
       }
     }
   }
@@ -41,7 +46,12 @@ where C: View, T: Identifiable & Hashable & Codable & Sendable {
     defer { loading = false }
     let result = await loadPage(currentOffset: offset)
     if let newData = result {
-      items = items.mergedById(with: newData)
+      let updatedItems = items.mergedById(with: newData)
+      if items != updatedItems {
+        withAnimation {
+          items = updatedItems
+        }
+      }
     }
   }
 
@@ -76,13 +86,15 @@ where C: View, T: Identifiable & Hashable & Codable & Sendable {
   public var body: some View {
     LazyVStack(alignment: .leading) {
       ForEach(items) { item in
-        content(item).onAppear {
-          if shouldLoadMore(after: item) {
-            Task {
-              await loadNextPage()
+        content(item)
+          .transition(.opacity)
+          .onAppear {
+            if shouldLoadMore(after: item) {
+              Task {
+                await loadNextPage()
+              }
             }
           }
-        }
       }
 
       if loading {
@@ -103,8 +115,6 @@ where C: View, T: Identifiable & Hashable & Codable & Sendable {
         }
       }
     }
-    .animation(.default, value: reloader)
-    .animation(.default, value: items)
     .onAppear {
       if items.isEmpty {
         reload()
@@ -138,7 +148,12 @@ where C: View, T: Identifiable & Hashable & Codable & Sendable {
       defer { loading = false }
       let result = await loadPage(currentPage: 1)
       if let newData = result {
-        items = [Item]().mergedById(with: newData)
+        let updatedItems = [Item]().mergedById(with: newData)
+        if items != updatedItems {
+          withAnimation {
+            items = updatedItems
+          }
+        }
       }
     }
   }
@@ -150,7 +165,12 @@ where C: View, T: Identifiable & Hashable & Codable & Sendable {
     defer { loading = false }
     let result = await loadPage(currentPage: page)
     if let newData = result {
-      items = items.mergedById(with: newData)
+      let updatedItems = items.mergedById(with: newData)
+      if items != updatedItems {
+        withAnimation {
+          items = updatedItems
+        }
+      }
     }
   }
 
@@ -185,6 +205,7 @@ where C: View, T: Identifiable & Hashable & Codable & Sendable {
     LazyVStack(alignment: .leading) {
       ForEach(items) { item in
         content(item)
+          .transition(.opacity)
           .onAppear {
             if item == items.last {
               Task {
@@ -212,8 +233,6 @@ where C: View, T: Identifiable & Hashable & Codable & Sendable {
         }
       }
     }
-    .animation(.default, value: reloader)
-    .animation(.default, value: items)
     .onAppear {
       if items.isEmpty {
         reload()

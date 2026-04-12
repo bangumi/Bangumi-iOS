@@ -22,7 +22,9 @@ struct ChiiProgressView: View {
     do {
       let db = try await Chii.shared.getDB()
       let result = try await db.fetchProgressCounts()
-      self.counts = result
+      if counts != result {
+        counts = result
+      }
     } catch {
       Logger.app.error("Failed to load counts: \(error)")
     }
@@ -36,7 +38,11 @@ struct ChiiProgressView: View {
         progressSortMode: progressSortMode,
         search: search
       )
-      self.subjectIds = result
+      if subjectIds != result {
+        withAnimation {
+          subjectIds = result
+        }
+      }
     } catch {
       Logger.app.error("Failed to update subject IDs: \(error)")
     }
@@ -173,7 +179,6 @@ struct ChiiProgressView: View {
           }
         }
       }
-      .animation(.default, value: subjectIds)
       .refreshable {
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
         await refresh(showProgress: false)

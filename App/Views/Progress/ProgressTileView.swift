@@ -4,39 +4,17 @@ import SwiftUI
 struct ProgressTileView: View {
   let subjectIds: [Int]
 
-  @Query private var subjects: [Subject]
-  @Query private var episodes: [Episode]
-
-  init(subjectIds: [Int]) {
-    self.subjectIds = subjectIds
-    let ids = subjectIds
-    let subjectDescriptor = FetchDescriptor<Subject>(
-      predicate: #Predicate<Subject> { ids.contains($0.subjectId) }
-    )
-    _subjects = Query(subjectDescriptor)
-    let mainType = EpisodeType.main.rawValue
-    let episodeDescriptor = FetchDescriptor<Episode>(
-      predicate: #Predicate<Episode> { ids.contains($0.subjectId) && $0.type == mainType },
-      sortBy: [
-        SortDescriptor<Episode>(\.subjectId, order: .forward),
-        SortDescriptor<Episode>(\.sort, order: .forward),
-      ]
-    )
-    _episodes = Query(episodeDescriptor)
-  }
-
   var body: some View {
-    let subjectMap = Dictionary(uniqueKeysWithValues: subjects.map { ($0.subjectId, $0) })
-    let episodeMap = Dictionary(grouping: episodes, by: \.subjectId)
     LazyVGrid(columns: [GridItem(.adaptive(minimum: 150))]) {
       ForEach(subjectIds, id: \.self) { subjectId in
-        if let subject = subjectMap[subjectId] {
+        ProgressSubjectContainerView(subjectId: subjectId) { subject, episodes in
           CardView(padding: 8) {
             ProgressTileItemContentView(
               subject: subject,
-              episodes: episodeMap[subjectId] ?? []
+              episodes: episodes
             )
           }
+          .transition(.opacity)
         }
       }
     }
