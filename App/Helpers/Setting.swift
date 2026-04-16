@@ -145,6 +145,31 @@ enum ProgressViewMode: String, CaseIterable {
   }
 }
 
+enum EpisodeGridInteractionMode: String, CaseIterable {
+  case contextMenu = "contextMenu"
+  case menu = "menu"
+
+  init(_ label: String? = nil) {
+    switch label {
+    case "contextMenu":
+      self = .contextMenu
+    case "menu":
+      self = .menu
+    default:
+      self = .menu
+    }
+  }
+
+  var desc: String {
+    switch self {
+    case .contextMenu:
+      "长按打开菜单"
+    case .menu:
+      "点击打开菜单"
+    }
+  }
+}
+
 enum ProgressSortMode: String, CaseIterable {
   case airTime = "airTime"
   case collectedAt = "collectedAt"

@@ -151,7 +151,8 @@ func safeParseDate(str: String?) -> Date {
   guard let str = str else {
     return Date(timeIntervalSince1970: 0)
   }
-  if str.isEmpty {
+  let trimmed = str.trimmingCharacters(in: .whitespacesAndNewlines)
+  if trimmed.isEmpty {
     return Date(timeIntervalSince1970: 0)
   }
 
@@ -160,12 +161,24 @@ func safeParseDate(str: String?) -> Date {
   dateFormatter.dateFormat = "yyyy-MM-dd"
   dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
 
-  if let date = dateFormatter.date(from: str) {
+  if let date = dateFormatter.date(from: trimmed) {
     return date
-  } else {
-    // fallback to 1970-01-01
-    return Date(timeIntervalSince1970: 0)
   }
+
+  // Bangumi occasionally stores placeholder future dates as a bare year like "2099".
+  if trimmed.count == 4 && trimmed.allSatisfy(\.isNumber) {
+    let yearFormatter = DateFormatter()
+    yearFormatter.locale = Locale(identifier: "en_US_POSIX")
+    yearFormatter.dateFormat = "yyyy"
+    yearFormatter.timeZone = TimeZone(secondsFromGMT: 0)
+
+    if let date = yearFormatter.date(from: trimmed) {
+      return date
+    }
+  }
+
+  // fallback to 1970-01-01
+  return Date(timeIntervalSince1970: 0)
 }
 
 func safeParseRFC3339Date(str: String?) -> Date {

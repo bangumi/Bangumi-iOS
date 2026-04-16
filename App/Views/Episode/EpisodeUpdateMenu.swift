@@ -4,8 +4,15 @@ import SwiftUI
 struct EpisodeUpdateMenu: View {
   @AppStorage("isolationMode") var isolationMode: Bool = false
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
+  @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
 
   @Bindable var episode: Episode
+  var showsTitle: Bool = false
+
+  var titleText: String {
+    let title = titlePreference.title(name: episode.name, nameCN: episode.nameCN)
+    return "\(episode.typeEnum.name).\(episode.sort.episodeDisplay) \(title)"
+  }
 
   func updateSingle(episode: Episode, type: EpisodeCollectionType) {
     Task {
@@ -32,6 +39,12 @@ struct EpisodeUpdateMenu: View {
   }
 
   var body: some View {
+    if showsTitle {
+      Section {
+        Text(titleText)
+          .lineLimit(2)
+      }
+    }
     if isAuthenticated, episode.subject?.ctype ?? 0 != 0 {
       ForEach(episode.collectionTypeEnum.otherTypes()) { type in
         Button {
