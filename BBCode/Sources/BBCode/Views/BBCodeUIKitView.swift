@@ -151,7 +151,12 @@ private final class BBCodeTextBlockView: UITextView, UITextViewDelegate {
     isSelectable = true
     isScrollEnabled = false
     textDragInteraction?.isEnabled = false
-    textContainerInset = .zero
+    textContainerInset = UIEdgeInsets(
+      top: BBCodeLayoutMetrics.textContainerVerticalInset,
+      left: 0,
+      bottom: BBCodeLayoutMetrics.textContainerVerticalInset,
+      right: 0
+    )
     textContainer.lineFragmentPadding = 0
     delegate = self
     linkTextAttributes = [:]

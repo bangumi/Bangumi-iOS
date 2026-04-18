@@ -99,6 +99,60 @@ final class PreparedDocumentTests: XCTestCase {
     )
   }
 
+  func testSmileyAttachmentCarriesFontAndParagraphStyle() {
+    let document = BBCode().preparedDocument("(bgm38)", textSize: 18)
+
+    XCTAssertEqual(document.blocks.count, 1)
+
+    guard let attributedText = textBlock(for: document.blocks[0]) else {
+      return XCTFail("Expected text block")
+    }
+
+    let attachmentRange = attachmentRange(in: attributedText)
+    guard let attachmentRange else {
+      return XCTFail("Expected attachment range")
+    }
+
+    guard
+      let font = attributedText.attribute(.font, at: attachmentRange.location, effectiveRange: nil)
+        as? UIFont
+    else {
+      return XCTFail("Expected font")
+    }
+    XCTAssertEqual(font.pointSize, 18, accuracy: 0.01)
+
+    guard
+      let paragraphStyle = attributedText.attribute(
+        .paragraphStyle,
+        at: attachmentRange.location,
+        effectiveRange: nil
+      ) as? NSParagraphStyle
+    else {
+      return XCTFail("Expected paragraph style")
+    }
+    XCTAssertEqual(
+      paragraphStyle.lineHeightMultiple,
+      BBCodeLayoutMetrics.lineHeightMultiple,
+      accuracy: 0.001
+    )
+
+    guard let attachment = attributedText.attribute(
+      .attachment,
+      at: attachmentRange.location,
+      effectiveRange: nil
+    ) as? SmileyTextAttachment else {
+      return XCTFail("Expected smiley attachment")
+    }
+
+    let offset = BBCodeLayoutMetrics.inlineAttachmentVerticalOffset(
+      for: attachment.renderedSize.height,
+      font: font
+    )
+
+    XCTAssertLessThan(offset, 0)
+    XCTAssertGreaterThan(offset, font.descender)
+  }
+
   private func textBlock(for block: BBCodePreparedBlock) -> NSAttributedString? {
     guard case .text(let attributedText) = block.payload else {
       return nil

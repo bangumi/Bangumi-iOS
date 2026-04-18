@@ -26,6 +26,16 @@ extension NSAttributedString.Key {
   static let bbcodeMask = NSAttributedString.Key("tv.bgm.bbcode.mask")
 }
 
+enum BBCodeLayoutMetrics {
+  static let lineHeightMultiple: CGFloat = 1.08
+  static let textContainerVerticalInset: CGFloat = 2
+
+  static func inlineAttachmentVerticalOffset(for height: CGFloat, font: UIFont) -> CGFloat {
+    let overflow = max(0, height - font.lineHeight)
+    return font.descender - overflow / 2
+  }
+}
+
 extension BBCode {
   @MainActor
   func preparedDocument(_ bbcode: String, textSize: Int) -> BBCodePreparedDocument {
@@ -69,12 +79,16 @@ private struct BBCodeTextKitRenderer {
   let baseFont: UIFont
   let linkColor: UIColor
   let secondaryColor: UIColor
+  let baseParagraphStyle: NSParagraphStyle
 
   init(textSize: Int) {
     self.textSize = CGFloat(textSize)
     self.baseFont = .systemFont(ofSize: CGFloat(textSize))
     self.linkColor = UIColor(named: "LinkTextColor") ?? .systemBlue
     self.secondaryColor = .secondaryLabel
+    let paragraphStyle = NSMutableParagraphStyle()
+    paragraphStyle.lineHeightMultiple = BBCodeLayoutMetrics.lineHeightMultiple
+    self.baseParagraphStyle = paragraphStyle.copy() as? NSParagraphStyle ?? paragraphStyle
   }
 
   func renderBlocks(root: Node) -> [BBCodePreparedBlock] {
@@ -383,6 +397,7 @@ private struct BBCodeTextKitRenderer {
     [
       .font: baseFont,
       .foregroundColor: UIColor.label,
+      .paragraphStyle: baseParagraphStyle,
     ]
   }
 
@@ -697,7 +712,7 @@ private struct BBCodeTextKitRenderer {
       placeholderImage: baseImage,
       displaySize: displaySize
     )
-    return NSMutableAttributedString(attributedString: NSAttributedString(attachment: attachment))
+    return makeInlineAttachmentText(attachment)
   }
 
   private func renderBmo(_ node: Node) -> NSMutableAttributedString {
@@ -708,11 +723,8 @@ private struct BBCodeTextKitRenderer {
       return makeText("(\(node.attr))")
     }
 
-    let attachment = NSTextAttachment()
-    attachment.image = UIImage(cgImage: cgImage)
-    attachment.bounds = inlineAttachmentBounds(
-      for: CGSize(width: textSize + 4, height: textSize + 4))
-    return NSMutableAttributedString(attributedString: NSAttributedString(attachment: attachment))
+    let attachment = InlineImageTextAttachment(image: UIImage(cgImage: cgImage), size: CGSize(width: textSize + 4, height: textSize + 4))
+    return makeInlineAttachmentText(attachment)
   }
 
   private func collectListItemNodes(from children: [Node]) -> [[Node]] {
@@ -762,8 +774,16 @@ private struct BBCodeTextKitRenderer {
     )
   }
 
-  private func inlineAttachmentBounds(for size: CGSize) -> CGRect {
-    CGRect(x: 0, y: baseFont.descender, width: size.width, height: size.height)
+  private func makeInlineAttachmentText(_ attachment: NSTextAttachment) -> NSMutableAttributedString {
+    let attributed = NSMutableAttributedString(attributedString: NSAttributedString(attachment: attachment))
+    attributed.addAttributes(
+      [
+        .font: baseFont,
+        .paragraphStyle: baseParagraphStyle,
+      ],
+      range: attributed.fullRange
+    )
+    return attributed
   }
 
   private func makeText(
@@ -776,6 +796,7 @@ private struct BBCodeTextKitRenderer {
       attributes: [
         .font: font ?? baseFont,
         .foregroundColor: color,
+        .paragraphStyle: baseParagraphStyle,
       ]
     )
   }
@@ -975,7 +996,7 @@ final class SmileyTextAttachment: NSTextAttachment {
     let font = (attributes[.font] as? UIFont) ?? .systemFont(ofSize: 16)
     return CGRect(
       x: 0,
-      y: font.descender,
+      y: BBCodeLayoutMetrics.inlineAttachmentVerticalOffset(for: renderedSize.height, font: font),
       width: renderedSize.width,
       height: renderedSize.height
     )
@@ -1002,5 +1023,38 @@ final class SmileyTextAttachment: NSTextAttachment {
     format.opaque = false
     let renderer = UIGraphicsImageRenderer(size: renderedSize, format: format)
     return renderer.image { _ in }
+  }
+}
+
+final class InlineImageTextAttachment: NSTextAttachment {
+  let renderedSize: CGSize
+
+  init(image: UIImage, size: CGSize) {
+    self.renderedSize = size
+    super.init(data: nil, ofType: nil)
+    self.image = image
+    self.bounds = CGRect(origin: .zero, size: size)
+    allowsTextAttachmentView = false
+  }
+
+  @available(*, unavailable)
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+
+  override func attachmentBounds(
+    for attributes: [NSAttributedString.Key: Any],
+    location: any NSTextLocation,
+    textContainer: NSTextContainer?,
+    proposedLineFragment: CGRect,
+    position: CGPoint
+  ) -> CGRect {
+    let font = (attributes[.font] as? UIFont) ?? .systemFont(ofSize: 16)
+    return CGRect(
+      x: 0,
+      y: BBCodeLayoutMetrics.inlineAttachmentVerticalOffset(for: renderedSize.height, font: font),
+      width: renderedSize.width,
+      height: renderedSize.height
+    )
   }
 }
