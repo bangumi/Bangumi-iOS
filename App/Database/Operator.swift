@@ -368,7 +368,7 @@ extension DatabaseOperator {
       break
     }
 
-    self.commit()
+    try self.commitImmediately()
   }
 
   public func updateSubjectCollection(
@@ -432,7 +432,7 @@ extension DatabaseOperator {
     }
     subject.interest?.updatedAt = now - 1
     subject.collectedAt = now - 1
-    self.commit()
+    try self.commitImmediately()
   }
 
   public func updateEpisodeCollection(
@@ -468,7 +468,7 @@ extension DatabaseOperator {
     }
     episode.subject?.interest?.updatedAt = now - 1
     episode.subject?.collectedAt = now - 1
-    self.commit()
+    try self.commitImmediately()
   }
 
   public func updateCharacterCollection(characterId: Int, collectedAt: Int) throws {
@@ -481,7 +481,7 @@ extension DatabaseOperator {
       return
     }
     character.collectedAt = collectedAt
-    self.commit()
+    try self.commitImmediately()
   }
 
   public func updatePersonCollection(personId: Int, collectedAt: Int) throws {
@@ -494,7 +494,7 @@ extension DatabaseOperator {
       return
     }
     person.collectedAt = collectedAt
-    self.commit()
+    try self.commitImmediately()
   }
 }
 
@@ -1073,7 +1073,7 @@ extension DatabaseOperator {
     let group = try self.getGroup(name)
     if let group = group {
       group.joinedAt = joinedAt
-      self.commit()
+      try self.commitImmediately()
     }
   }
 }
