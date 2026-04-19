@@ -152,7 +152,7 @@ struct CommentItemNormalView: View {
           Rectangle()
             .fill(anonymizedColor)
             .frame(width: 40, height: 40)
-            .clipShape(Circle())
+            .avatarClipShape()
             .imageLink(comment.user.link)
         } else {
           ImageView(img: comment.user.avatar?.large)
@@ -323,13 +323,13 @@ struct CommentSubReplyNormalView: View {
           Rectangle()
             .fill(anonymizedColor)
             .frame(width: 40, height: 40)
-            .clipShape(Circle())
+            .avatarClipShape()
             .imageLink(user.link)
         } else {
           Rectangle()
             .fill(anonymizedColor)
             .frame(width: 40, height: 40)
-            .clipShape(Circle())
+            .avatarClipShape()
         }
       } else if let user = reply.user {
         ImageView(img: user.avatar?.large)

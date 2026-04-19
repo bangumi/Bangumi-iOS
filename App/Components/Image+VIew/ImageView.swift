@@ -117,7 +117,7 @@ extension View {
   @ViewBuilder
   fileprivate func applyClipShape(type: ImageType, cornerRadius: CGFloat) -> some View {
     if type == .avatar {
-      self.clipShape(Circle())
+      self.avatarClipShape(cornerRadius: cornerRadius)
     } else {
       self.clipShape(RoundedRectangle(cornerRadius: cornerRadius))
     }
@@ -127,12 +127,11 @@ extension View {
   fileprivate func applyBorder(type: ImageType, cornerRadius: CGFloat, isLoaded: Bool = true)
     -> some View
   {
-    self.overlay {
-      if isLoaded {
-        if type == .avatar {
-          Circle()
-            .stroke(Color.primary.opacity(0.15), lineWidth: 0.5)
-        } else {
+    if type == .avatar {
+      self.avatarBorder(cornerRadius: cornerRadius, isLoaded: isLoaded)
+    } else {
+      self.overlay {
+        if isLoaded {
           RoundedRectangle(cornerRadius: cornerRadius)
             .stroke(Color.primary.opacity(0.15), lineWidth: 0.5)
         }

@@ -17,6 +17,7 @@ struct SettingsView: View {
   @AppStorage("enableShakeTitleToggle") var enableShakeTitleToggle: Bool = false
   @AppStorage("replySortOrder") var replySortOrder: ReplySortOrder = .ascending
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
+  @AppStorage("avatarStyle") var avatarStyle: AvatarStyle = .round
   @AppStorage("episodeGridInteractionMode") var episodeGridInteractionMode:
     EpisodeGridInteractionMode = .menu
   @AppStorage("anonymizeTopicUsers") var anonymizeTopicUsers: Bool = false
@@ -95,6 +96,11 @@ struct SettingsView: View {
         Picker(selection: $titlePreference, label: Text("条目标题显示")) {
           ForEach(TitlePreference.allCases, id: \.self) { preference in
             Text(preference.desc).tag(preference)
+          }
+        }
+        Picker(selection: $avatarStyle, label: Text("用户头像样式")) {
+          ForEach(AvatarStyle.allCases, id: \.self) { style in
+            Text(style.desc).tag(style)
           }
         }
         Picker(selection: $episodeGridInteractionMode, label: Text("章节菜单打开方式")) {

@@ -55,13 +55,13 @@ struct PostTopicActionStateView: View {
           Rectangle()
             .fill(anonymizedColor)
             .frame(width: 24, height: 24)
-            .clipShape(Circle())
+            .avatarClipShape()
             .imageLink(creator.link)
         } else {
           Rectangle()
             .fill(anonymizedColor)
             .frame(width: 24, height: 24)
-            .clipShape(Circle())
+            .avatarClipShape()
         }
       } else if let creator = creator {
         ImageView(img: creator.avatar?.large)

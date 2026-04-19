@@ -122,13 +122,13 @@ struct ReplyItemNormalView: View {
             Rectangle()
               .fill(anonymizedColor)
               .frame(width: 40, height: 40)
-              .clipShape(Circle())
+              .avatarClipShape()
               .imageLink(creator.link)
           } else {
             Rectangle()
               .fill(anonymizedColor)
               .frame(width: 40, height: 40)
-              .clipShape(Circle())
+              .avatarClipShape()
           }
         } else if let creator = reply.creator {
           ImageView(img: creator.avatar?.large)
@@ -308,13 +308,13 @@ struct SubReplyNormalView: View {
           Rectangle()
             .fill(anonymizedColor)
             .frame(width: 40, height: 40)
-            .clipShape(Circle())
+            .avatarClipShape()
             .imageLink(creator.link)
         } else {
           Rectangle()
             .fill(anonymizedColor)
             .frame(width: 40, height: 40)
-            .clipShape(Circle())
+            .avatarClipShape()
         }
       } else if let creator = subreply.creator {
         ImageView(img: creator.avatar?.large)
@@ -863,13 +863,13 @@ struct MainPostContentView: View {
             Rectangle()
               .fill(anonymizedColor)
               .frame(width: 40, height: 40)
-              .clipShape(Circle())
+              .avatarClipShape()
               .imageLink(creator.link)
           } else {
             Rectangle()
               .fill(anonymizedColor)
               .frame(width: 40, height: 40)
-              .clipShape(Circle())
+              .avatarClipShape()
           }
         } else if let creator = reply.creator {
           ImageView(img: creator.avatar?.large)

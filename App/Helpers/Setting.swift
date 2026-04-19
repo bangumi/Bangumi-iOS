@@ -229,6 +229,31 @@ enum TitlePreference: String, CaseIterable {
   }
 }
 
+enum AvatarStyle: String, CaseIterable, Sendable {
+  case round = "round"
+  case classic = "classic"
+
+  init(_ label: String? = nil) {
+    switch label {
+    case "round":
+      self = .round
+    case "classic":
+      self = .classic
+    default:
+      self = .round
+    }
+  }
+
+  var desc: String {
+    switch self {
+    case .round:
+      "默认（圆形）"
+    case .classic:
+      "经典"
+    }
+  }
+}
+
 enum ProgressSecondLineMode: String, CaseIterable {
   case subtitle = "subtitle"
   case category = "category"
