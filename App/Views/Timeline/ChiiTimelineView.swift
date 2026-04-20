@@ -2,6 +2,25 @@ import OSLog
 import SwiftData
 import SwiftUI
 
+private struct TimelineToolbarAvatarView: View {
+  let imageURL: String?
+
+  var body: some View {
+    Group {
+      if let imageURL, !imageURL.isEmpty {
+        ImageView(img: imageURL)
+          .imageType(.common)
+      } else {
+        Image("noIconAvatar")
+          .resizable()
+          .scaledToFit()
+      }
+    }
+    .clipShape(Circle())
+    .glassEffectIfAvailable(shape: Circle())
+  }
+}
+
 struct ChiiTimelineView: View {
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
   @AppStorage("profile") var profile: Profile = Profile()
@@ -69,9 +88,7 @@ struct ChiiTimelineView: View {
                 Label("退出登录", systemImage: "rectangle.portrait.and.arrow.right")
               }
             } label: {
-              ImageView(img: profile.avatar?.large)
-                .imageType(.avatar)
-                .glassEffectIfAvailable(shape: Circle())
+              TimelineToolbarAvatarView(imageURL: profile.avatar?.large)
             }
             .buttonStyle(.plain)
             .menuStyle(.button)
@@ -79,9 +96,7 @@ struct ChiiTimelineView: View {
           }
         } else {
           ToolbarItem(placement: .topBarLeading) {
-            ImageView(img: nil)
-              .imageType(.avatar)
-              .glassEffectIfAvailable(shape: Circle())
+            TimelineToolbarAvatarView(imageURL: nil)
           }
         }
         if isAuthenticated, !isolationMode {
