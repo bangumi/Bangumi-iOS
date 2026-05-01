@@ -972,7 +972,7 @@ extension DatabaseOperator {
       if let draft = fetched {
         draft.update(content: content)
         self.commit()
-        return draft.id
+        return draft.persistentModelID
       }
     }
 
@@ -981,12 +981,14 @@ extension DatabaseOperator {
         $0.type == type && $0.content == content
       })
     if let draft = fetched {
-      return draft.id
+      return draft.persistentModelID
     }
 
     let draft = Draft(type: type, content: content)
     modelContext.insert(draft)
-    self.commit()
+    // A newly inserted SwiftData model can have a temporary identifier until it is saved.
+    // Return only after persisting so callers can update the same draft on the next save.
+    try self.commitImmediately()
     return draft.persistentModelID
   }
 
