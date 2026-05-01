@@ -56,9 +56,10 @@ struct CharacterCard: View {
 
   var body: some View {
     VStack(alignment: .leading, spacing: 2) {
-      ImageView(img: item.character.images?.medium)
+      ImageView(img: item.character.images?.resize(.r200))
         .imageStyle(width: 72, height: 108, alignment: .top)
         .imageType(.person)
+        .imageNSFW(item.character.nsfw)
         .imageNavLink(item.character.link)
         .clipShape(RoundedRectangle(cornerRadius: 8))
         .shadow(radius: 2)

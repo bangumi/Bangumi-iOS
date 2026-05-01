@@ -472,14 +472,14 @@ private struct BBCodeToolbarContent: View {
         Image(systemName: BBCodeType.emoji.icon)
           .frame(width: 12, height: 12)
       }
-      Divider()
+      BBCodeToolbarSeparator()
       ForEach(BBCodeType.basic) { code in
         Button(action: { onBasicInput(code) }) {
           Image(systemName: code.icon)
             .frame(width: 12, height: 12)
         }
       }
-      Divider()
+      BBCodeToolbarSeparator()
       Button(action: onShowImageInput) {
         Image(systemName: BBCodeType.image.icon)
           .frame(width: 12, height: 12)
@@ -488,7 +488,7 @@ private struct BBCodeToolbarContent: View {
         Image(systemName: BBCodeType.url.icon)
           .frame(width: 12, height: 12)
       }
-      Divider()
+      BBCodeToolbarSeparator()
       Button(action: onShowSizeInput) {
         Image(systemName: BBCodeType.size.icon)
           .frame(width: 12, height: 12)
@@ -497,21 +497,21 @@ private struct BBCodeToolbarContent: View {
         Image(systemName: BBCodeType.color.icon)
           .frame(width: 12, height: 12)
       }
-      Divider()
+      BBCodeToolbarSeparator()
       ForEach(BBCodeType.block) { code in
         Button(action: { onBasicInput(code) }) {
           Image(systemName: code.icon)
             .frame(width: 12, height: 12)
         }
       }
-      Divider()
+      BBCodeToolbarSeparator()
       ForEach(BBCodeType.alignment) { code in
         Button(action: { onBasicInput(code) }) {
           Image(systemName: code.icon)
             .frame(width: 12, height: 12)
         }
       }
-      Divider()
+      BBCodeToolbarSeparator()
       Button(action: onClearStyles) {
         Image(systemName: "eraser")
           .frame(width: 12, height: 12)
@@ -519,6 +519,14 @@ private struct BBCodeToolbarContent: View {
     }
     .padding(.horizontal)
     .buttonStyle(.bordered)
+  }
+}
+
+private struct BBCodeToolbarSeparator: View {
+  var body: some View {
+    Rectangle()
+      .fill(Color(uiColor: .separator).opacity(0.7))
+      .frame(width: 1, height: 18)
   }
 }
 

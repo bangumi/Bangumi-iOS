@@ -59,24 +59,28 @@ extension View {
 struct ImageCollectionStatus: View {
   let ctype: CollectionType?
 
-  @Environment(\.imageStyle) var style
-
   var body: some View {
     if let ctype, ctype != .none {
       Image(systemName: ctype.icon)
-        .font(.system(size: 8, weight: .heavy))
+        .font(.system(size: 8, weight: .bold))
         .foregroundStyle(.white)
-        .frame(width: 16, height: 16)
+        .frame(width: 18, height: 18)
         .background(ctype.color.opacity(0.9))
-        .clipShape(RoundedRectangle(cornerRadius: style.cornerRadius))
+        .clipShape(Circle())
+        .overlay {
+          Circle()
+            .stroke(Color(uiColor: .systemBackground), lineWidth: 2.5)
+        }
+        .allowsHitTesting(false)
     }
   }
 }
 
 extension View {
   func imageCollectionStatus(ctype: CollectionType? = nil) -> some View {
-    self.overlay(alignment: .topLeading) {
+    self.overlay(alignment: .bottomTrailing) {
       ImageCollectionStatus(ctype: ctype)
+        .padding(-3)
     }
   }
 }

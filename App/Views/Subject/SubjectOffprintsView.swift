@@ -10,11 +10,14 @@ struct SubjectOffprintsView: View {
   @State private var collections: [Int: CollectionType] = [:]
   @State private var activeSubject: SlimSubjectDTO? = nil
 
+  private var collectionSubjectIds: [Int] {
+    offprints.map { $0.subject.id }
+  }
+
   private func loadCollections() async {
     do {
       let db = try await Chii.shared.getDB()
-      let ids = offprints.map { $0.subject.id }
-      collections = try await db.getCollectionTypes(subjectIds: ids)
+      collections = try await db.getCollectionTypes(subjectIds: collectionSubjectIds)
     } catch {
       Logger.app.error("Failed to load collections: \(error)")
     }
@@ -35,6 +38,7 @@ struct SubjectOffprintsView: View {
               .imageCollectionStatus(ctype: collections[offprint.subject.id])
               .imageStyle(width: 60, height: 80)
               .imageType(.subject)
+              .imageNSFW(offprint.subject.nsfw)
               .imageNavLink(offprint.subject.link)
               .contextMenu {
                 Button {
@@ -55,7 +59,7 @@ struct SubjectOffprintsView: View {
       .scrollClipDisabled()
       .animation(.default, value: offprints)
     }
-    .task {
+    .task(id: collectionSubjectIds) {
       await loadCollections()
     }
     .onChange(of: activeSubject) { _, newValue in

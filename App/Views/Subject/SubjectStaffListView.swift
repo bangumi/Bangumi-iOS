@@ -21,7 +21,7 @@ struct SubjectStaffListView: View {
       PageView<SubjectStaffDTO, _>(limit: 20, nextPageFunc: load) { item in
         CardView {
           HStack {
-            ImageView(img: item.staff.images?.medium)
+            ImageView(img: item.staff.images?.resize(.r200))
               .imageStyle(width: 60, height: 60, alignment: .top)
               .imageType(.person)
               .imageNavLink(item.staff.link)

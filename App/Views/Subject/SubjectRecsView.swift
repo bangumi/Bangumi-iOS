@@ -12,11 +12,14 @@ struct SubjectRecsView: View {
   @State private var collections: [Int: CollectionType] = [:]
   @State private var activeSubject: SlimSubjectDTO? = nil
 
+  private var collectionSubjectIds: [Int] {
+    recs.map { $0.subject.id }
+  }
+
   private func loadCollections() async {
     do {
       let db = try await Chii.shared.getDB()
-      let ids = recs.map { $0.subject.id }
-      collections = try await db.getCollectionTypes(subjectIds: ids)
+      collections = try await db.getCollectionTypes(subjectIds: collectionSubjectIds)
     } catch {
       Logger.app.error("Failed to load collections: \(error)")
     }
@@ -50,6 +53,7 @@ struct SubjectRecsView: View {
                 .imageCollectionStatus(ctype: collections[rec.subject.id])
                 .imageStyle(width: 72, height: 72)
                 .imageType(.subject)
+                .imageNSFW(rec.subject.nsfw)
                 .imageNavLink(rec.subject.link)
                 .contextMenu {
                   Button {
@@ -77,7 +81,7 @@ struct SubjectRecsView: View {
       }
       .scrollClipDisabled()
       .animation(.default, value: recs)
-    }.task {
+    }.task(id: collectionSubjectIds) {
       await loadCollections()
     }
     .onChange(of: activeSubject) { _, newValue in
