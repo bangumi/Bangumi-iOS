@@ -8,6 +8,7 @@ struct BBCodeEditor: View {
   @State private var height: CGFloat = 120
   @StateObject private var textViewBridge = BBCodeTextViewBridge()
   @State private var preview: Bool = false
+  @State private var showingEmojiInput = false
 
   @State private var inputSize: Int = 14
   @State private var showingSizeInput = false
@@ -68,13 +69,15 @@ struct BBCodeEditor: View {
           updatedText.replaceSubrange(range, with: replacement)
           applyEditorState(
             text: updatedText,
-            selection: EditorSelection(location: selection.location, length: replacement.utf16.count)
+            selection: EditorSelection(
+              location: selection.location, length: replacement.utf16.count)
           )
         } else {
           updatedText.replaceSubrange(range, with: wrappedText)
           applyEditorState(
             text: updatedText,
-            selection: EditorSelection(location: selection.location, length: wrappedText.utf16.count)
+            selection: EditorSelection(
+              location: selection.location, length: wrappedText.utf16.count)
           )
         }
       }
@@ -94,7 +97,8 @@ struct BBCodeEditor: View {
       updatedText.replaceSubrange(range, with: replacement)
       applyEditorState(
         text: updatedText,
-        selection: EditorSelection(location: selection.location + replacement.utf16.count, length: 0)
+        selection: EditorSelection(
+          location: selection.location + replacement.utf16.count, length: 0)
       )
     } else {
       insertTagToEnd("\(tagBefore)\(inputURL)\(tagAfter)", "")
@@ -137,7 +141,8 @@ struct BBCodeEditor: View {
       let updatedText = currentText + tagBefore + placeholder + tagAfter
       applyEditorState(
         text: updatedText,
-        selection: EditorSelection(location: endLocation + tagBefore.count, length: placeholder.utf16.count)
+        selection: EditorSelection(
+          location: endLocation + tagBefore.count, length: placeholder.utf16.count)
       )
     }
     inputURL = ""
@@ -327,7 +332,7 @@ struct BBCodeEditor: View {
     let toolbarView = ScrollView(.horizontal, showsIndicators: false) {
       BBCodeToolbarContent(
         onBasicInput: handleBasicInput,
-        onEmojiInput: handleEmojiInput,
+        onShowEmojiInput: { showingEmojiInput = true },
         onShowImageInput: { showingImageInput = true },
         onShowURLInput: { showingURLInput = true },
         onShowSizeInput: { showingSizeInput = true },
@@ -443,13 +448,18 @@ struct BBCodeEditor: View {
         handleGradientInput: handleGradientInput
       ).presentationDetents([.medium])
     }
+    .sheet(isPresented: $showingEmojiInput) {
+      SmileyPicker { code in
+        handleEmojiInput(code)
+        showingEmojiInput = false
+      }
+    }
   }
 }
 
 private struct BBCodeToolbarContent: View {
-  @State private var showingEmojiInput = false
   let onBasicInput: (BBCodeType) -> Void
-  let onEmojiInput: (String) -> Void
+  let onShowEmojiInput: () -> Void
   let onShowImageInput: () -> Void
   let onShowURLInput: () -> Void
   let onShowSizeInput: () -> Void
@@ -458,15 +468,9 @@ private struct BBCodeToolbarContent: View {
 
   var body: some View {
     HStack(spacing: 8) {
-      Button(action: { showingEmojiInput = true }) {
+      Button(action: onShowEmojiInput) {
         Image(systemName: BBCodeType.emoji.icon)
           .frame(width: 12, height: 12)
-      }
-      .sheet(isPresented: $showingEmojiInput) {
-        SmileyPicker { code in
-          onEmojiInput(code)
-          showingEmojiInput = false
-        }
       }
       Divider()
       ForEach(BBCodeType.basic) { code in
