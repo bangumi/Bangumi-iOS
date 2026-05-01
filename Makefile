@@ -16,7 +16,7 @@ help: ## Show this help message
 	@echo "Bangumi Build Commands"
 	@echo ""
 	@echo "Version commands:"
-	@echo "  make bump             - Increment CURRENT_PROJECT_VERSION in project.pbxproj"
+	@echo "  make bump             - Increment CURRENT_PROJECT_VERSION and commit only the version file"
 	@echo "  make major            - Increment major version (MARKETING_VERSION)"
 	@echo "  make minor            - Increment minor version (MARKETING_VERSION)"
 	@echo ""
@@ -127,7 +127,7 @@ update_index:
 	curl -sSfLo "$(PREVIEW_PATH)/index.json" https://next.bgm.tv/p1/indexes/83001
 	curl -sSfLo "$(PREVIEW_PATH)/index_related.json" https://next.bgm.tv/p1/indexes/83001/related
 
-bump: ## Increment CURRENT_PROJECT_VERSION in project.pbxproj
+bump: ## Increment CURRENT_PROJECT_VERSION and commit only the version file
 	@$(MISC_DIR)/bump.sh
 
 major: ## Increment major version (MARKETING_VERSION)
