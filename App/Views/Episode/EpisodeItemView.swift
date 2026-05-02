@@ -9,6 +9,10 @@ struct EpisodeItemView: View {
   var badge: some View {
     Text("\(episode.sort.episodeDisplay)")
       .monospacedDigit()
+      .lineLimit(1)
+      .minimumScaleFactor(0.7)
+      .allowsTightening(true)
+      .layoutPriority(1)
       .foregroundStyle(episode.textColor)
       .padding(2)
       .background(episode.backgroundColor)
@@ -25,6 +29,7 @@ struct EpisodeItemView: View {
   var menuLabel: some View {
     badge
       .padding(2)
+      .layoutPriority(1)
   }
 
   var body: some View {

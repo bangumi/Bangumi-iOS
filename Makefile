@@ -12,6 +12,17 @@ YELLOW = \033[1;33m
 RED = \033[0;31m
 NC = \033[0m # No Color
 
+define run_with_status
+	@printf "$(YELLOW)%s$(NC)\n" "$(1)"
+	@if $(2); then \
+		printf "$(GREEN)[OK] %s$(NC)\n" "$(3)"; \
+	else \
+		status=$$?; \
+		printf "$(RED)[FAIL] %s$(NC)\n" "$(4)"; \
+		exit $$status; \
+	fi
+endef
+
 help: ## Show this help message
 	@echo "Bangumi Build Commands"
 	@echo ""
@@ -39,22 +50,18 @@ ensure-config: ## Create App/Config.xcconfig from the example when missing
 
 
 build: ensure-config ## Build for iOS
-	@echo "Building for iOS..."
-	@xcodebuild -project $(PROJECT) -scheme $(SCHEME) -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' build -quiet
+	$(call run_with_status,Building for iOS...,xcodebuild -project $(PROJECT) -scheme $(SCHEME) -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' build -quiet,Build succeeded.,Build failed.)
 
 build-ci: ensure-config ## Build for iOS (CI, uses simulator, no code signing)
-	@echo "Building for iOS..."
-	@xcodebuild -project $(PROJECT) -scheme $(SCHEME) -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' build -quiet CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
+	$(call run_with_status,Building for iOS...,xcodebuild -project $(PROJECT) -scheme $(SCHEME) -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' build -quiet CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO,Build succeeded.,Build failed.)
 
 release: release-ios ## Release alias
 
 release-ios: ## Archive, export and upload iOS build to App Store Connect
-	@echo "Releasing iOS build..."
-	@$(MISC_DIR)/release.sh
+	$(call run_with_status,Releasing iOS build...,$(MISC_DIR)/release.sh,Release succeeded.,Release failed.)
 
 artifact-ios: ## Prepare iOS artifact for GitHub Release
-	@echo "Preparing iOS artifact for GitHub Release..."
-	@$(MISC_DIR)/artifacts.sh $(EXPORTS_DIR) artifacts ios
+	$(call run_with_status,Preparing iOS artifact for GitHub Release...,$(MISC_DIR)/artifacts.sh $(EXPORTS_DIR) artifacts ios,Artifact preparation succeeded.,Artifact preparation failed.)
 
 UID ?= 873244
 PREVIEW_PATH ?= App/Preview Content
@@ -137,5 +144,4 @@ minor: ## Increment minor version (MARKETING_VERSION)
 	@$(MISC_DIR)/bump-version.sh minor
 
 format: ## Format Swift files with swift-format
-	@echo "$(GREEN)Formatting Swift files...$(NC)"
-	@find . -name "*.swift" -not -path "./DerivedData/*" -not -path "./.build/*" | xargs swift-format -i
+	$(call run_with_status,Formatting Swift files...,find . -name "*.swift" -not -path "./DerivedData/*" -not -path "./.build/*" | xargs swift-format -i,Formatting succeeded.,Formatting failed.)

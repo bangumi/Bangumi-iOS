@@ -63,36 +63,36 @@ struct EpisodeRecentView: View {
   var body: some View {
     switch mode {
     case .tile:
-      HStack {
-        Spacer(minLength: 0)
-        VStack(alignment: .trailing, spacing: 4) {
-          if !recentEpisodes.isEmpty {
-            HStack(spacing: 2) {
-              ForEach(recentEpisodes) { episode in
-                EpisodeItemView(episode: episode)
-              }
-            }.font(.footnote)
+      VStack(alignment: .trailing, spacing: 4) {
+        if !recentEpisodes.isEmpty {
+          HStack(spacing: 2) {
+            ForEach(recentEpisodes) { episode in
+              EpisodeItemView(episode: episode)
+            }
           }
-          HStack {
-            if let episode = nextEpisode {
-              EpisodeNextView(episode: episode)
-            } else {
-              Button {
-                showCollectionBox = true
-              } label: {
-                HStack(spacing: 4) {
-                  Text(progressText)
-                  Image(systemName: progressIcon)
-                }.foregroundStyle(.secondary)
-              }
-              .buttonStyle(.scale)
-              .sheet(isPresented: $showCollectionBox) {
-                SubjectCollectionBoxView(subjectId: subject.subjectId)
-              }
+          .font(.footnote)
+          .layoutPriority(1)
+        }
+        HStack {
+          if let episode = nextEpisode {
+            EpisodeNextView(episode: episode)
+          } else {
+            Button {
+              showCollectionBox = true
+            } label: {
+              HStack(spacing: 4) {
+                Text(progressText)
+                Image(systemName: progressIcon)
+              }.foregroundStyle(.secondary)
+            }
+            .buttonStyle(.scale)
+            .sheet(isPresented: $showCollectionBox) {
+              SubjectCollectionBoxView(subjectId: subject.subjectId)
             }
           }
         }
       }
+      .frame(maxWidth: .infinity, alignment: .trailing)
       .animation(.default, value: nextEpisode)
       .animation(.default, value: recentEpisodes)
     case .list:
