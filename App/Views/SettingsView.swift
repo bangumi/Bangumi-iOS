@@ -203,6 +203,11 @@ struct SettingsView: View {
               .font(.caption)
           }
         }
+        NavigationLink {
+          OpenSourceLicensesView()
+        } label: {
+          Label("Open Source Licenses", systemImage: "doc.plaintext")
+        }
         HStack {
           Spacer()
           Text(Chii.shared.version).foregroundStyle(.secondary)
