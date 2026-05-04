@@ -136,11 +136,13 @@ final class PreparedDocumentTests: XCTestCase {
       accuracy: 0.001
     )
 
-    guard let attachment = attributedText.attribute(
-      .attachment,
-      at: attachmentRange.location,
-      effectiveRange: nil
-    ) as? SmileyTextAttachment else {
+    guard
+      let attachment = attributedText.attribute(
+        .attachment,
+        at: attachmentRange.location,
+        effectiveRange: nil
+      ) as? SmileyTextAttachment
+    else {
       return XCTFail("Expected smiley attachment")
     }
 

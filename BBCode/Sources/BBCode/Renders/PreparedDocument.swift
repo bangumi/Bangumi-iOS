@@ -723,7 +723,8 @@ private struct BBCodeTextKitRenderer {
       return makeText("(\(node.attr))")
     }
 
-    let attachment = InlineImageTextAttachment(image: UIImage(cgImage: cgImage), size: CGSize(width: textSize + 4, height: textSize + 4))
+    let attachment = InlineImageTextAttachment(
+      image: UIImage(cgImage: cgImage), size: CGSize(width: textSize + 4, height: textSize + 4))
     return makeInlineAttachmentText(attachment)
   }
 
@@ -774,8 +775,10 @@ private struct BBCodeTextKitRenderer {
     )
   }
 
-  private func makeInlineAttachmentText(_ attachment: NSTextAttachment) -> NSMutableAttributedString {
-    let attributed = NSMutableAttributedString(attributedString: NSAttributedString(attachment: attachment))
+  private func makeInlineAttachmentText(_ attachment: NSTextAttachment) -> NSMutableAttributedString
+  {
+    let attributed = NSMutableAttributedString(
+      attributedString: NSAttributedString(attachment: attachment))
     attributed.addAttributes(
       [
         .font: baseFont,
