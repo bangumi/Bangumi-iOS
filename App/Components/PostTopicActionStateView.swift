@@ -43,6 +43,8 @@ struct PostTopicActionStateView: View {
         Text(actionName)
           .font(.footnote.bold())
           .foregroundStyle(.white)
+          .lineLimit(1)
+          .fixedSize(horizontal: true, vertical: false)
           .padding(.horizontal, 10)
           .padding(.vertical, 5)
           .background(state.color)
@@ -81,17 +83,23 @@ struct PostTopicActionStateView: View {
             Text(anonymizedHash).lineLimit(1)
           }
         } else if let creator = creator {
-          Text(creator.nickname.withLink(creator.link)).lineLimit(1)
+          Text(creator.nickname.withLink(creator.link))
+            .lineLimit(1)
+            .truncationMode(.tail)
         } else {
           Text("用户 \(creatorID)")
             .lineLimit(1)
+            .truncationMode(.tail)
         }
         if let actionDescription = state.actionDescription {
           Text(actionDescription)
             .font(.footnote)
             .foregroundStyle(.secondary)
+            .lineLimit(1)
+            .fixedSize(horizontal: true, vertical: false)
         }
       }
+      .layoutPriority(1)
 
       Spacer()
 
@@ -99,6 +107,7 @@ struct PostTopicActionStateView: View {
         .lineLimit(1)
         .font(.caption)
         .foregroundStyle(.secondary)
+        .fixedSize(horizontal: true, vertical: false)
     }
   }
 }
