@@ -28,6 +28,7 @@ struct SettingsView: View {
   @State private var logoutConfirm: Bool = false
   @State private var clearDraftsConfirm: Bool = false
   @State private var showEULA: Bool = false
+  @State private var appIconController = AppIconController()
 
   private var privacyPolicyURL: String {
     let langCode = Locale.current.language.languageCode?.identifier ?? "zh"
@@ -72,6 +73,14 @@ struct SettingsView: View {
     }
   }
 
+  private var appIconSelection: Binding<AlternateAppIcon> {
+    Binding {
+      appIconController.selection
+    } set: { icon in
+      appIconController.setIcon(icon)
+    }
+  }
+
   var body: some View {
     Form {
       Section(header: Text("域名")) {
@@ -93,6 +102,12 @@ struct SettingsView: View {
             Text(appearance.desc).tag(appearance)
           }
         }
+        Picker(selection: appIconSelection, label: Text("应用图标")) {
+          ForEach(AlternateAppIcon.allCases, id: \.self) { icon in
+            Text(icon.title).tag(icon)
+          }
+        }
+        .disabled(!appIconController.isAvailable || appIconController.isUpdating)
         Picker(selection: $titlePreference, label: Text("条目标题显示")) {
           ForEach(TitlePreference.allCases, id: \.self) { preference in
             Text(preference.desc).tag(preference)
