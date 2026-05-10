@@ -5,6 +5,49 @@ struct BBCodePreparedDocument {
   let blocks: [BBCodePreparedBlock]
 }
 
+@MainActor
+private final class BBCodePreparedDocumentCache {
+  static let shared = BBCodePreparedDocumentCache()
+
+  private struct Key: Hashable {
+    let bbcode: String
+    let textSize: Int
+  }
+
+  private let limit = 256
+  private var documents: [Key: BBCodePreparedDocument] = [:]
+  private var accessOrder: [Key] = []
+
+  func document(for bbcode: String, textSize: Int) -> BBCodePreparedDocument? {
+    let key = Key(bbcode: bbcode, textSize: textSize)
+    guard let document = documents[key] else {
+      return nil
+    }
+
+    markRecentlyUsed(key)
+    return document
+  }
+
+  func store(_ document: BBCodePreparedDocument, for bbcode: String, textSize: Int) {
+    let key = Key(bbcode: bbcode, textSize: textSize)
+    documents[key] = document
+    markRecentlyUsed(key)
+    trimIfNeeded()
+  }
+
+  private func markRecentlyUsed(_ key: Key) {
+    accessOrder.removeAll { $0 == key }
+    accessOrder.append(key)
+  }
+
+  private func trimIfNeeded() {
+    while accessOrder.count > limit, let oldestKey = accessOrder.first {
+      accessOrder.removeFirst()
+      documents.removeValue(forKey: oldestKey)
+    }
+  }
+}
+
 struct BBCodePreparedListItem: Identifiable {
   let id: Int
   let blocks: [BBCodePreparedBlock]
@@ -38,21 +81,32 @@ enum BBCodeLayoutMetrics {
 
 extension BBCode {
   @MainActor
-  func preparedDocument(_ bbcode: String, textSize: Int) -> BBCodePreparedDocument {
+  func preparedDocument(_ bbcode: String, textSize: Int) async -> BBCodePreparedDocument {
+    if let cachedDocument = BBCodePreparedDocumentCache.shared.document(
+      for: bbcode,
+      textSize: textSize
+    ) {
+      return cachedDocument
+    }
+
     let worker = Worker(tagManager: tagManager)
 
     guard let tree = worker.parse(bbcode) else {
       let renderer = BBCodeTextKitRenderer(textSize: textSize)
-      return BBCodePreparedDocument(
+      let document = BBCodePreparedDocument(
         blocks: [
           BBCodePreparedBlock(id: 0, payload: .text(renderer.makePlainText(bbcode)))
         ]
       )
+      BBCodePreparedDocumentCache.shared.store(document, for: bbcode, textSize: textSize)
+      return document
     }
 
     handleNewlineAndParagraph(node: tree, tagManager: tagManager)
     let renderer = BBCodeTextKitRenderer(textSize: textSize)
-    return BBCodePreparedDocument(blocks: renderer.renderBlocks(root: tree))
+    let document = BBCodePreparedDocument(blocks: renderer.renderBlocks(root: tree))
+    BBCodePreparedDocumentCache.shared.store(document, for: bbcode, textSize: textSize)
+    return document
   }
 }
 

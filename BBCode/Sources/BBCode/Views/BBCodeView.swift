@@ -28,7 +28,7 @@ public struct BBCodeView: View {
       }
     }
     .task(id: "\(textSize)|\(code)") {
-      document = BBCode().preparedDocument(code, textSize: textSize)
+      document = await BBCode().preparedDocument(code, textSize: textSize)
     }
   }
 }

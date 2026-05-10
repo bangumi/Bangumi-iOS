@@ -111,6 +111,7 @@ struct SubjectTopicDetailView: View {
   var body: some View {
     ScrollView {
       if let topic = topic {
+        let replies = filteredReplies
         LazyVStack(alignment: .leading, spacing: 8, pinnedViews: [.sectionHeaders]) {
           CardView {
             VStack(alignment: .leading, spacing: 8) {
@@ -159,14 +160,14 @@ struct SubjectTopicDetailView: View {
           // Replies section with sticky slider header
           Section {
             // Filtered and sorted replies
-            if !filteredReplies.isEmpty {
-              ForEach(Array(filteredReplies.enumerated()), id: \.element) { displayIdx, reply in
+            if !replies.isEmpty {
+              ForEach(Array(replies.enumerated()), id: \.element.id) { displayIdx, reply in
                 let originalIdx =
                   topic.replies.firstIndex(where: { $0.id == reply.id }) ?? displayIdx
                 ReplyItemView(
                   type: .subject(topic.subject.id), topicId: topicId, idx: originalIdx,
                   reply: reply, author: topic.creator)
-                if reply.id != filteredReplies.last?.id {
+                if reply.id != replies.last?.id {
                   Divider()
                 }
               }
@@ -215,7 +216,6 @@ struct SubjectTopicDetailView: View {
         }
         .animation(.default, value: filterMode)
         .animation(.default, value: sortOrder)
-        .animation(.default, value: replyLimit)
         .padding(8)
         .refreshable {
           Task {
