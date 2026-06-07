@@ -48,9 +48,7 @@ where C: View, T: Identifiable & Hashable & Codable & Sendable {
     if let newData = result {
       let updatedItems = items.mergedById(with: newData)
       if items != updatedItems {
-        withAnimation {
-          items = updatedItems
-        }
+        items = updatedItems
       }
     }
   }
@@ -167,9 +165,7 @@ where C: View, T: Identifiable & Hashable & Codable & Sendable {
     if let newData = result {
       let updatedItems = items.mergedById(with: newData)
       if items != updatedItems {
-        withAnimation {
-          items = updatedItems
-        }
+        items = updatedItems
       }
     }
   }
