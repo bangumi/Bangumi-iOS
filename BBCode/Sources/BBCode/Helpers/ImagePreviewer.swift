@@ -1,4 +1,5 @@
 import Foundation
+import LinkPresentation
 import SDWebImage
 import SDWebImageSwiftUI
 import SwiftUI
@@ -127,8 +128,9 @@ public struct ImagePreviewer: View {
       return
     }
 
+    let activityItem = ImagePreviewActivityItemSource(image: loadedImage, url: url)
     let controller = UIActivityViewController(
-      activityItems: [loadedImage ?? url],
+      activityItems: [activityItem],
       applicationActivities: nil
     )
     controller.popoverPresentationController?.sourceView = presenter.view
@@ -146,6 +148,42 @@ public struct ImagePreviewer: View {
     Image(systemName: systemName)
       .foregroundColor(.white)
       .contentShape(Circle())
+  }
+}
+
+private final class ImagePreviewActivityItemSource: NSObject, UIActivityItemSource {
+  private let image: UIImage?
+  private let url: URL
+
+  init(image: UIImage?, url: URL) {
+    self.image = image
+    self.url = url
+  }
+
+  func activityViewControllerPlaceholderItem(_ activityViewController: UIActivityViewController)
+    -> Any
+  {
+    image ?? url
+  }
+
+  func activityViewController(
+    _ activityViewController: UIActivityViewController,
+    itemForActivityType activityType: UIActivity.ActivityType?
+  ) -> Any? {
+    image ?? url
+  }
+
+  func activityViewControllerLinkMetadata(_ activityViewController: UIActivityViewController)
+    -> LPLinkMetadata?
+  {
+    let metadata = LPLinkMetadata()
+    metadata.originalURL = url
+    metadata.url = url
+    metadata.title = url.lastPathComponent.isEmpty ? url.host : url.lastPathComponent
+    if let image {
+      metadata.imageProvider = NSItemProvider(object: image)
+    }
+    return metadata
   }
 }
 
