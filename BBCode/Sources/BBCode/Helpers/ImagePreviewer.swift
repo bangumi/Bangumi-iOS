@@ -75,6 +75,7 @@ public struct ImagePreviewer: View {
             }) {
               controlLabel(systemName: "xmark")
             }
+            .buttonBorderShape(.circle)
             .adaptiveButtonStyle(.borderless)
 
             Spacer()
@@ -82,6 +83,7 @@ public struct ImagePreviewer: View {
             ShareLink(item: url) {
               controlLabel(systemName: "square.and.arrow.up")
             }
+            .buttonBorderShape(.circle)
             .adaptiveButtonStyle(.borderless)
           }
           .padding(.horizontal, 16)
@@ -120,7 +122,7 @@ public struct ImagePreviewer: View {
       .font(.system(size: 14, weight: .semibold))
       .foregroundColor(.white)
       .frame(minWidth: 44, minHeight: 44)
-      .contentShape(Rectangle())
+      .contentShape(Circle())
   }
 }
 
