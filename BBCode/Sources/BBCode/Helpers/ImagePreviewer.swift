@@ -78,6 +78,7 @@ public struct ImagePreviewer: View {
               controlLabel(systemName: "xmark")
             }
             .buttonBorderShape(.circle)
+            .controlSize(.large)
             .adaptiveButtonStyle(.borderless)
 
             Spacer()
@@ -88,6 +89,7 @@ public struct ImagePreviewer: View {
               controlLabel(systemName: "square.and.arrow.up")
             }
             .buttonBorderShape(.circle)
+            .controlSize(.large)
             .adaptiveButtonStyle(.borderless)
           }
           .padding(.horizontal, 16)
