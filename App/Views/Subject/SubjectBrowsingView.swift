@@ -71,51 +71,61 @@ struct SubjectBrowsingView: View {
     }
   }
 
+  private var browseHeader: some View {
+    VStack(alignment: .leading, spacing: 6) {
+      HFlow {
+        Label("筛选", systemImage: "line.3.horizontal.decrease.circle")
+        // cat
+        if let cat = filter.cat {
+          filterBadge(cat.typeCN)
+        }
+
+        // series
+        if let series = filter.series {
+          filterBadge(series ? "系列" : "单行本")
+        }
+
+        // tags
+        if let tags = filter.tags {
+          ForEach(tags, id: \.self) { tag in
+            filterBadge(tag)
+          }
+        }
+
+        // date
+        if let year = filter.year {
+          if let month = filter.month {
+            filterBadge("\(String(year))年\(String(month))月")
+          } else {
+            filterBadge("\(String(year))年")
+          }
+        }
+      }
+
+      HStack(spacing: 4) {
+        Image(systemName: "arrow.up.arrow.down.circle")
+        Text("按")
+        sortBadge()
+        Text("排序")
+        Spacer(minLength: 0)
+      }
+
+      Divider()
+    }
+    .padding(.vertical, 4)
+    .background(Color(uiColor: .systemBackground))
+    .zIndex(1)
+  }
+
   var body: some View {
     ScrollView {
-      VStack(alignment: .leading) {
-        HFlow {
-          Label("筛选", systemImage: "line.3.horizontal.decrease.circle")
-          // cat
-          if let cat = filter.cat {
-            filterBadge(cat.typeCN)
-          }
-
-          // series
-          if let series = filter.series {
-            filterBadge(series ? "系列" : "单行本")
-          }
-
-          // tags
-          if let tags = filter.tags {
-            ForEach(tags, id: \.self) { tag in
-              filterBadge(tag)
-            }
-          }
-
-          // date
-          if let year = filter.year {
-            if let month = filter.month {
-              filterBadge("\(String(year))年\(String(month))月")
-            } else {
-              filterBadge("\(String(year))年")
-            }
-          }
-        }
-
-        HStack {
-          Image(systemName: "arrow.up.arrow.down.circle")
-          Text("按")
-          sortBadge()
-          Text("排序")
-          Spacer()
-        }
-
-        Divider()
+      VStack(alignment: .leading, spacing: 8) {
+        browseHeader
 
         SimplePageView(reloader: reloader, nextPageFunc: fetchPage) { subject in
           SubjectItemView(subjectId: subject.id)
         }
+        .zIndex(0)
 
       }.padding(.horizontal, 8)
     }
