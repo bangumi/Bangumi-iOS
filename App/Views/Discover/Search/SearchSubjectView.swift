@@ -62,6 +62,11 @@ struct SearchSubjectLocalView: View {
       ForEach(subjects) { subject in
         CardView {
           SubjectLargeRowView(subject: subject)
+            .subjectCollectionStatusOverlay(
+              subjectId: subject.subjectId,
+              subjectType: subject.typeEnum,
+              collectionType: subject.ctypeEnum
+            )
         }
       }
     }

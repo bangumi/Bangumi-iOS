@@ -10,6 +10,7 @@ struct SubjectLargeRowView: View {
   var body: some View {
     HStack {
       ImageView(img: subject.images?.resize(.r200))
+        .imageCollectionStatus(ctype: subject.ctypeEnum)
         .imageStyle(width: 90, height: subject.typeEnum.coverHeight(for: 90))
         .imageType(.subject)
         .imageNSFW(subject.nsfw)
@@ -94,13 +95,6 @@ struct SubjectLargeRowView: View {
               .foregroundStyle(.secondary)
           }
           Spacer()
-          if let interest = subject.interest {
-            Label(
-              interest.type.description(subject.typeEnum),
-              systemImage: interest.type.icon
-            )
-            .foregroundStyle(.accent)
-          }
         }
         .font(.footnote)
       }.padding(.leading, 2)
@@ -132,6 +126,11 @@ struct SubjectItemView: View {
     CardView {
       if let subject = subject {
         SubjectLargeRowView(subject: subject)
+          .subjectCollectionStatusOverlay(
+            subjectId: subject.subjectId,
+            subjectType: subject.typeEnum,
+            collectionType: subject.ctypeEnum
+          )
       }
     }
   }
