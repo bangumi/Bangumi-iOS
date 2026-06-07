@@ -15,11 +15,11 @@ struct SubjectLargeRowView: View {
         .imageType(.subject)
         .imageNSFW(subject.nsfw)
         .imageNavLink(subject.link)
-      VStack(alignment: .leading) {
+      VStack(alignment: .leading, spacing: 4) {
         // title
-        HStack {
+        HStack(spacing: 4) {
           VStack(alignment: .leading) {
-            HStack {
+            HStack(spacing: 4) {
               if subject.typeEnum != .none {
                 Image(systemName: subject.typeEnum.icon)
                   .foregroundStyle(.secondary)
@@ -30,7 +30,7 @@ struct SubjectLargeRowView: View {
                 .lineLimit(1)
             }
           }
-          Spacer()
+          Spacer(minLength: 0)
           if subject.rating.rank > 0 {
             Label(String(subject.rating.rank), systemImage: "chart.bar.xaxis")
               .foregroundStyle(.accent)
@@ -45,11 +45,8 @@ struct SubjectLargeRowView: View {
             .lineLimit(1)
         }
 
-        Spacer()
-
         // meta
         if !subject.info.isEmpty {
-          Spacer()
           Text(subject.info)
             .font(.footnote)
             .foregroundStyle(.secondary)
@@ -94,7 +91,7 @@ struct SubjectLargeRowView: View {
             Text("(少于10人评分)")
               .foregroundStyle(.secondary)
           }
-          Spacer()
+          Spacer(minLength: 0)
         }
         .font(.footnote)
       }.padding(.leading, 2)
