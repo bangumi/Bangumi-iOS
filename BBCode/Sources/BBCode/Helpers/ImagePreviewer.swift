@@ -75,20 +75,15 @@ public struct ImagePreviewer: View {
             }) {
               controlLabel(systemName: "xmark")
             }
+            .adaptiveButtonStyle(.borderless)
 
             Spacer()
 
             ShareLink(item: url) {
               controlLabel(systemName: "square.and.arrow.up")
             }
-
-            Button(action: {
-              saveImage()
-            }) {
-              controlLabel(systemName: "square.and.arrow.down")
-            }
+            .adaptiveButtonStyle(.borderless)
           }
-          .buttonStyle(.plain)
           .padding(.horizontal, 16)
           .padding(.vertical, 10)
           Spacer()
@@ -103,14 +98,6 @@ public struct ImagePreviewer: View {
       .ignoresSafeArea()
     }
     .navigationTransitionZoomIfAvailable(sourceID: zoomID, in: zoomNamespace)
-  }
-
-  private func saveImage() {
-    Task {
-      guard let data = try? await URLSession.shared.data(from: url).0 else { return }
-      guard let img = UIImage(data: data) else { return }
-      UIImageWriteToSavedPhotosAlbum(img, nil, nil, nil)
-    }
   }
 
   private var imageOptions: SDWebImageOptions {
@@ -132,13 +119,8 @@ public struct ImagePreviewer: View {
     Image(systemName: systemName)
       .font(.system(size: 14, weight: .semibold))
       .foregroundColor(.white)
-      .frame(width: 34, height: 34)
-      .background {
-        Circle()
-          .fill(.ultraThinMaterial)
-          .glassEffectIfAvailable(tint: .white.opacity(0.15), shape: Circle())
-      }
-      .contentShape(Circle())
+      .frame(minWidth: 44, minHeight: 44)
+      .contentShape(Rectangle())
   }
 }
 
