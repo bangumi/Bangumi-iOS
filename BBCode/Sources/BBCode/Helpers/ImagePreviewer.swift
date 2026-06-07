@@ -13,6 +13,8 @@ public struct ImagePreviewer: View {
   @State private var showControls = true
   @State private var reloadID = UUID()
   @State private var shouldRefresh = false
+  @State private var loadedImage: UIImage?
+  @State private var shareItem: ImagePreviewShareItem?
 
   @Environment(\.dismiss) private var dismiss
 
@@ -41,10 +43,11 @@ public struct ImagePreviewer: View {
               shouldRefresh = false
             }
           },
-          onSuccess: {
+          onSuccess: { image in
             DispatchQueue.main.async {
               failed = false
               shouldRefresh = false
+              loadedImage = image
             }
           },
           onSingleTap: {
@@ -80,7 +83,9 @@ public struct ImagePreviewer: View {
 
             Spacer()
 
-            ShareLink(item: url) {
+            Button {
+              shareItem = ImagePreviewShareItem(item: loadedImage ?? url)
+            } label: {
               controlLabel(systemName: "square.and.arrow.up")
             }
             .buttonBorderShape(.circle)
@@ -100,6 +105,9 @@ public struct ImagePreviewer: View {
       .ignoresSafeArea()
     }
     .navigationTransitionZoomIfAvailable(sourceID: zoomID, in: zoomNamespace)
+    .sheet(item: $shareItem) { shareItem in
+      ImagePreviewShareSheet(items: [shareItem.item])
+    }
   }
 
   private var imageOptions: SDWebImageOptions {
@@ -124,6 +132,21 @@ public struct ImagePreviewer: View {
   }
 }
 
+private struct ImagePreviewShareItem: Identifiable {
+  let id = UUID()
+  let item: Any
+}
+
+private struct ImagePreviewShareSheet: UIViewControllerRepresentable {
+  let items: [Any]
+
+  func makeUIViewController(context: Context) -> UIActivityViewController {
+    UIActivityViewController(activityItems: items, applicationActivities: nil)
+  }
+
+  func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
+}
+
 private struct ZoomableImageScrollView: UIViewRepresentable {
   let url: URL
   let reloadID: UUID
@@ -131,7 +154,7 @@ private struct ZoomableImageScrollView: UIViewRepresentable {
   let maxScale: CGFloat
   let doubleTapScale: CGFloat
   let onFailure: () -> Void
-  let onSuccess: () -> Void
+  let onSuccess: (UIImage) -> Void
   let onSingleTap: () -> Void
 
   func makeCoordinator() -> ZoomableImageScrollCoordinator {
@@ -209,7 +232,7 @@ private final class ZoomableImageScrollCoordinator: NSObject, UIScrollViewDelega
       DispatchQueue.main.async {
         if let image {
           self.updateImage(image)
-          self.parent.onSuccess()
+          self.parent.onSuccess(image)
         } else {
           self.parent.onFailure()
         }
