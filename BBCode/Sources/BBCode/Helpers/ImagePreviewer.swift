@@ -14,7 +14,6 @@ public struct ImagePreviewer: View {
   @State private var reloadID = UUID()
   @State private var shouldRefresh = false
   @State private var loadedImage: UIImage?
-  @State private var shareItem: ImagePreviewShareItem?
 
   @Environment(\.dismiss) private var dismiss
 
@@ -84,7 +83,7 @@ public struct ImagePreviewer: View {
             Spacer()
 
             Button {
-              shareItem = ImagePreviewShareItem(item: loadedImage ?? url)
+              presentShareSheet()
             } label: {
               controlLabel(systemName: "square.and.arrow.up")
             }
@@ -105,9 +104,6 @@ public struct ImagePreviewer: View {
       .ignoresSafeArea()
     }
     .navigationTransitionZoomIfAvailable(sourceID: zoomID, in: zoomNamespace)
-    .sheet(item: $shareItem) { shareItem in
-      ImagePreviewShareSheet(items: [shareItem.item])
-    }
   }
 
   private var imageOptions: SDWebImageOptions {
@@ -124,27 +120,31 @@ public struct ImagePreviewer: View {
     reloadID = UUID()
   }
 
+  private func presentShareSheet() {
+    guard let presenter = UIViewController.activeTopMostPresentedViewController else {
+      return
+    }
+
+    let controller = UIActivityViewController(
+      activityItems: [loadedImage ?? url],
+      applicationActivities: nil
+    )
+    controller.popoverPresentationController?.sourceView = presenter.view
+    controller.popoverPresentationController?.sourceRect = CGRect(
+      x: presenter.view.bounds.maxX - 44,
+      y: presenter.view.safeAreaInsets.top + 44,
+      width: 1,
+      height: 1
+    )
+    presenter.present(controller, animated: true)
+  }
+
   @ViewBuilder
   private func controlLabel(systemName: String) -> some View {
     Image(systemName: systemName)
       .foregroundColor(.white)
       .contentShape(Circle())
   }
-}
-
-private struct ImagePreviewShareItem: Identifiable {
-  let id = UUID()
-  let item: Any
-}
-
-private struct ImagePreviewShareSheet: UIViewControllerRepresentable {
-  let items: [Any]
-
-  func makeUIViewController(context: Context) -> UIActivityViewController {
-    UIActivityViewController(activityItems: items, applicationActivities: nil)
-  }
-
-  func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }
 
 private struct ZoomableImageScrollView: UIViewRepresentable {
@@ -322,5 +322,19 @@ private final class ZoomableImageScrollCoordinator: NSObject, UIScrollViewDelega
     let originX = center.x - (width / 2)
     let originY = center.y - (height / 2)
     return CGRect(x: originX, y: originY, width: width, height: height)
+  }
+}
+
+extension UIViewController {
+  fileprivate static var activeTopMostPresentedViewController: UIViewController? {
+    let activeScene = UIApplication.shared.connectedScenes
+      .compactMap { $0 as? UIWindowScene }
+      .first { $0.activationState == .foregroundActive }
+    let rootViewController = activeScene?.windows.first { $0.isKeyWindow }?.rootViewController
+    return rootViewController?.topMostPresentedViewController
+  }
+
+  fileprivate var topMostPresentedViewController: UIViewController {
+    presentedViewController?.topMostPresentedViewController ?? self
   }
 }
