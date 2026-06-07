@@ -119,9 +119,7 @@ public struct ImagePreviewer: View {
   @ViewBuilder
   private func controlLabel(systemName: String) -> some View {
     Image(systemName: systemName)
-      .font(.system(size: 14, weight: .semibold))
       .foregroundColor(.white)
-      .frame(minWidth: 44, minHeight: 44)
       .contentShape(Circle())
   }
 }
