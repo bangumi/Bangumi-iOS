@@ -53,10 +53,16 @@ struct BBCodePreparedListItem: Identifiable {
   let blocks: [BBCodePreparedBlock]
 }
 
+struct BBCodePreparedMedia {
+  let url: URL
+  let constrainedSize: CGSize?
+  let alignment: NSTextAlignment
+}
+
 struct BBCodePreparedBlock: Identifiable {
   enum Payload {
     case text(NSAttributedString)
-    case image(URL, CGSize?)
+    case image(BBCodePreparedMedia)
     case quote([BBCodePreparedBlock])
     case list([BBCodePreparedListItem])
   }
@@ -226,19 +232,19 @@ private struct BBCodeTextKitRenderer {
   private func applyNodeWrapper(_ node: Node, to segments: [RenderedSegment]) -> [RenderedSegment] {
     switch node.type {
     case .center:
-      return mapTextSegments(segments) { attributed in
+      return mapAlignedSegments(segments, alignment: .center) { attributed in
         applyParagraphStyle(to: attributed) { style in
           style.alignment = .center
         }
       }
     case .left:
-      return mapTextSegments(segments) { attributed in
+      return mapAlignedSegments(segments, alignment: .left) { attributed in
         applyParagraphStyle(to: attributed) { style in
           style.alignment = .left
         }
       }
     case .right:
-      return mapTextSegments(segments) { attributed in
+      return mapAlignedSegments(segments, alignment: .right) { attributed in
         applyParagraphStyle(to: attributed) { style in
           style.alignment = .right
         }
@@ -254,7 +260,7 @@ private struct BBCodeTextKitRenderer {
         alignment = .left
       }
 
-      return mapTextSegments(segments) { attributed in
+      return mapAlignedSegments(segments, alignment: alignment) { attributed in
         applyParagraphStyle(to: attributed) { style in
           style.alignment = alignment
         }
@@ -370,6 +376,45 @@ private struct BBCodeTextKitRenderer {
         }
       }
     )
+  }
+
+  private func mapAlignedSegments(
+    _ segments: [RenderedSegment],
+    alignment: NSTextAlignment,
+    transform: (NSMutableAttributedString) -> Void
+  ) -> [RenderedSegment] {
+    normalizeSegments(
+      segments.map { segment in
+        switch segment {
+        case .text(let attributed):
+          let transformed = NSMutableAttributedString(attributedString: attributed)
+          transform(transformed)
+          return .text(transformed)
+        case .block(let payload):
+          return .block(alignedPayload(payload, alignment: alignment))
+        case .separator:
+          return segment
+        }
+      }
+    )
+  }
+
+  private func alignedPayload(
+    _ payload: BBCodePreparedBlock.Payload,
+    alignment: NSTextAlignment
+  ) -> BBCodePreparedBlock.Payload {
+    switch payload {
+    case .image(let media):
+      return .image(
+        BBCodePreparedMedia(
+          url: media.url,
+          constrainedSize: media.constrainedSize,
+          alignment: alignment
+        )
+      )
+    case .quote, .list, .text:
+      return payload
+    }
   }
 
   private func prefixFirstTextSegment(with prefix: String, in segments: [RenderedSegment])
@@ -554,7 +599,13 @@ private struct BBCodeTextKitRenderer {
       else {
         return nil
       }
-      return .image(url, parsedMediaSize(from: node.attr))
+      return .image(
+        BBCodePreparedMedia(
+          url: url,
+          constrainedSize: parsedMediaSize(from: node.attr),
+          alignment: .left
+        )
+      )
     case .photo:
       let path = node.renderInnerHTML(nil).trimmingCharacters(in: .whitespacesAndNewlines)
       guard !path.isEmpty,
@@ -562,7 +613,13 @@ private struct BBCodeTextKitRenderer {
       else {
         return nil
       }
-      return .image(url, parsedMediaSize(from: node.attr))
+      return .image(
+        BBCodePreparedMedia(
+          url: url,
+          constrainedSize: parsedMediaSize(from: node.attr),
+          alignment: .left
+        )
+      )
     default:
       return nil
     }

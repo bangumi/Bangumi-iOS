@@ -87,8 +87,8 @@ final class BBCodeBlocksContainerView: UIView {
     switch block.payload {
     case .text(let attributedText):
       return BBCodeTextBlockView(attributedText: attributedText)
-    case .image(let url, let constrainedSize):
-      return BBCodeMediaBlockView(url: url, constrainedSize: constrainedSize)
+    case .image(let media):
+      return BBCodeMediaBlockView(media: media)
     case .quote(let blocks):
       return BBCodeQuoteBlockView(blocks: blocks)
     case .list(let items):
@@ -358,18 +358,18 @@ private final class AnimatedSmileyImageView: SDAnimatedImageView {
 }
 
 private final class BBCodeMediaBlockView: UIView {
-  private let url: URL
-  private let constrainedSize: CGSize?
+  private let media: BBCodePreparedMedia
   private let imageView = SDAnimatedImageView()
   private let widthConstraint: NSLayoutConstraint
   private let heightConstraint: NSLayoutConstraint
 
   private var sourceSize: CGSize?
   private var lastMeasuredWidth: CGFloat = 0
+  private var loadedThumbnailPixelSize: CGSize?
+  private var didLoadOriginalImage = false
 
-  init(url: URL, constrainedSize: CGSize?) {
-    self.url = url
-    self.constrainedSize = constrainedSize
+  init(media: BBCodePreparedMedia) {
+    self.media = media
 
     imageView.translatesAutoresizingMaskIntoConstraints = false
     imageView.contentMode = .scaleAspectFit
@@ -392,19 +392,16 @@ private final class BBCodeMediaBlockView: UIView {
     setContentHuggingPriority(.required, for: .vertical)
 
     addSubview(imageView)
-    NSLayoutConstraint.activate([
+    var constraints = [
       imageView.topAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor),
-      imageView.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor),
-      imageView.trailingAnchor.constraint(lessThanOrEqualTo: layoutMarginsGuide.trailingAnchor),
       imageView.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor),
       widthConstraint,
       heightConstraint,
-    ])
+    ]
+    constraints.append(contentsOf: horizontalConstraints(for: media.alignment))
+    NSLayoutConstraint.activate(constraints)
 
     addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handlePreviewTap)))
-
-    sourceSize = constrainedSize
-    loadImage()
   }
 
   @available(*, unavailable)
@@ -428,8 +425,43 @@ private final class BBCodeMediaBlockView: UIView {
     }
   }
 
-  private func loadImage() {
-    imageView.sd_setImage(with: url, placeholderImage: nil, options: [.retryFailed]) {
+  private func horizontalConstraints(for alignment: NSTextAlignment) -> [NSLayoutConstraint] {
+    switch alignment {
+    case .center:
+      return [
+        imageView.centerXAnchor.constraint(equalTo: layoutMarginsGuide.centerXAnchor),
+        imageView.leadingAnchor.constraint(greaterThanOrEqualTo: layoutMarginsGuide.leadingAnchor),
+        imageView.trailingAnchor.constraint(lessThanOrEqualTo: layoutMarginsGuide.trailingAnchor),
+      ]
+    case .right:
+      return [
+        imageView.leadingAnchor.constraint(greaterThanOrEqualTo: layoutMarginsGuide.leadingAnchor),
+        imageView.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor),
+      ]
+    default:
+      return [
+        imageView.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor),
+        imageView.trailingAnchor.constraint(lessThanOrEqualTo: layoutMarginsGuide.trailingAnchor),
+      ]
+    }
+  }
+
+  private func loadImage(thumbnailPixelSize: CGSize) {
+    guard shouldLoadImage(for: thumbnailPixelSize) else {
+      return
+    }
+
+    loadedThumbnailPixelSize = thumbnailPixelSize
+    imageView.sd_setImage(
+      with: media.url,
+      placeholderImage: nil,
+      options: [.retryFailed],
+      context: [
+        .imageThumbnailPixelSize: NSValue(cgSize: thumbnailPixelSize),
+        .imagePreserveAspectRatio: true,
+      ],
+      progress: nil
+    ) {
       [weak self] image, _, _, _ in
       guard let self else { return }
       DispatchQueue.main.async {
@@ -441,10 +473,46 @@ private final class BBCodeMediaBlockView: UIView {
     }
   }
 
+  private func loadOriginalImageIfNeeded() {
+    guard !didLoadOriginalImage else {
+      return
+    }
+
+    didLoadOriginalImage = true
+    imageView.sd_setImage(with: media.url, placeholderImage: nil, options: [.retryFailed]) {
+      [weak self] image, _, _, _ in
+      guard let self else { return }
+      DispatchQueue.main.async {
+        if let image {
+          self.sourceSize = image.size
+        }
+        self.updateDisplayedSize(forceLayout: true)
+      }
+    }
+  }
+
+  private func shouldLoadImage(for thumbnailPixelSize: CGSize) -> Bool {
+    guard thumbnailPixelSize.width > 1, thumbnailPixelSize.height > 1 else {
+      return false
+    }
+
+    guard let loadedThumbnailPixelSize else {
+      return true
+    }
+
+    return thumbnailPixelSize.width > loadedThumbnailPixelSize.width * 1.2
+      || thumbnailPixelSize.height > loadedThumbnailPixelSize.height * 1.2
+  }
+
   private func updateDisplayedSize(forceLayout: Bool = false) {
     let horizontalInsets = directionalLayoutMargins.leading + directionalLayoutMargins.trailing
     let availableWidth = max(bounds.width - horizontalInsets, 1)
     let size = resolvedDisplaySize(maxWidth: availableWidth)
+    if shouldUseThumbnailDecode {
+      loadImage(thumbnailPixelSize: thumbnailPixelSize(for: size, maxWidth: availableWidth))
+    } else {
+      loadOriginalImageIfNeeded()
+    }
 
     if abs(widthConstraint.constant - size.width) > 0.5
       || abs(heightConstraint.constant - size.height) > 0.5
@@ -461,11 +529,11 @@ private final class BBCodeMediaBlockView: UIView {
   }
 
   private func resolvedDisplaySize(maxWidth: CGFloat) -> CGSize {
-    let fallbackSide = min(maxWidth, 120)
+    let fallbackSide = min(maxWidth, 160)
     let sourceSize = sourceSize ?? CGSize(width: fallbackSide, height: fallbackSide)
 
-    let maxDisplayWidth = min(maxWidth, constrainedSize?.width ?? maxWidth)
-    let maxDisplayHeight = constrainedSize?.height ?? CGFloat.greatestFiniteMagnitude
+    let maxDisplayWidth = min(maxWidth, media.constrainedSize?.width ?? maxWidth)
+    let maxDisplayHeight = media.constrainedSize?.height ?? CGFloat.greatestFiniteMagnitude
 
     guard sourceSize.width > 0, sourceSize.height > 0 else {
       return CGSize(width: maxDisplayWidth, height: min(maxDisplayWidth, 120))
@@ -479,6 +547,29 @@ private final class BBCodeMediaBlockView: UIView {
       width: max(1, round(sourceSize.width * scale)),
       height: max(1, round(sourceSize.height * scale))
     )
+  }
+
+  private func thumbnailPixelSize(for displaySize: CGSize, maxWidth: CGFloat) -> CGSize {
+    let scale = window?.screen.scale ?? UIScreen.main.scale
+    let targetSize: CGSize
+    if sourceSize == nil {
+      let maxDisplayWidth = min(maxWidth, media.constrainedSize?.width ?? maxWidth)
+      targetSize = CGSize(
+        width: maxDisplayWidth,
+        height: media.constrainedSize?.height ?? maxDisplayWidth
+      )
+    } else {
+      targetSize = displaySize
+    }
+
+    return CGSize(
+      width: ceil(targetSize.width * scale),
+      height: ceil(targetSize.height * scale)
+    )
+  }
+
+  private var shouldUseThumbnailDecode: Bool {
+    media.constrainedSize != nil || media.url.pathExtension.lowercased() != "svg"
   }
 
   private func invalidateAncestorLayout() {
@@ -499,7 +590,7 @@ private final class BBCodeMediaBlockView: UIView {
       return
     }
 
-    let controller = UIHostingController(rootView: ImagePreviewer(url: url))
+    let controller = UIHostingController(rootView: ImagePreviewer(url: media.url))
     controller.modalPresentationStyle = .overFullScreen
     controller.modalTransitionStyle = .crossDissolve
     controller.view.backgroundColor = .clear
