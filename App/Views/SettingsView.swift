@@ -191,7 +191,7 @@ struct SettingsView: View {
               .font(.caption)
           }
         }
-        Link(destination: URL(string: "https://discord.gg/nZPTwzXxAX")!) {
+        Link(destination: URL(string: "https://discord.gg/prAUbRaWwE")!) {
           HStack {
             Label("问题反馈", systemImage: "exclamationmark.bubble")
             Spacer()

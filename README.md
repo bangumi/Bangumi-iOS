@@ -1,6 +1,6 @@
 # Bangumi iOS
 
-[![Discord](https://dcbadge.limes.pink/api/server/nZPTwzXxAX?style=flat)](https://discord.gg/nZPTwzXxAX)
+[![Discord](https://dcbadge.limes.pink/api/server/prAUbRaWwE?style=flat)](https://discord.gg/prAUbRaWwE)
 
 [![Download on the App Store](https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg)](https://apps.apple.com/app/id6499502714)
 
