@@ -76,7 +76,8 @@ public struct ImagePreviewer: View {
             Button(action: {
               dismiss()
             }) {
-              controlLabel(systemName: "xmark")
+              Image(systemName: "xmark")
+                .contentShape(Circle())
             }
             .buttonBorderShape(.circle)
             .controlSize(.large)
@@ -87,7 +88,8 @@ public struct ImagePreviewer: View {
             Button {
               presentShareSheet()
             } label: {
-              controlLabel(systemName: "square.and.arrow.up")
+              Image(systemName: "square.and.arrow.up")
+                .contentShape(Circle())
             }
             .buttonBorderShape(.circle)
             .controlSize(.large)
@@ -141,13 +143,6 @@ public struct ImagePreviewer: View {
       height: 1
     )
     presenter.present(controller, animated: true)
-  }
-
-  @ViewBuilder
-  private func controlLabel(systemName: String) -> some View {
-    Image(systemName: systemName)
-      .foregroundColor(.white)
-      .contentShape(Circle())
   }
 }
 
