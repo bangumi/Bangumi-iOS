@@ -7,7 +7,7 @@ struct OpenSourceLicenseDetailView: View {
     List {
       Section {
         HStack {
-          Text("License")
+          Text("许可")
           Spacer()
           Text(license.license)
             .foregroundStyle(.secondary)
@@ -15,7 +15,7 @@ struct OpenSourceLicenseDetailView: View {
 
         Link(destination: license.sourceURL) {
           HStack {
-            Label("Source Code", systemImage: "chevron.left.forwardslash.chevron.right")
+            Label("源代码", systemImage: "chevron.left.forwardslash.chevron.right")
             Spacer()
             Image(systemName: "arrow.up.right.square")
               .font(.caption)
@@ -24,7 +24,7 @@ struct OpenSourceLicenseDetailView: View {
         }
       }
 
-      Section(header: Text("Notice")) {
+      Section(header: Text("许可声明")) {
         Text(license.notice)
           .font(.footnote.monospaced())
           .textSelection(.enabled)

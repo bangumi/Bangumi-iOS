@@ -221,7 +221,7 @@ struct SettingsView: View {
         NavigationLink {
           OpenSourceLicensesView()
         } label: {
-          Label("Open Source Licenses", systemImage: "doc.plaintext")
+          Label("开源许可", systemImage: "doc.plaintext")
         }
         HStack {
           Spacer()

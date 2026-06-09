@@ -6,10 +6,10 @@ struct OpenSourceLicensesView: View {
   var body: some View {
     List {
       if licenses.isEmpty {
-        Text("No open source license data was found.")
+        Text("未找到开源许可数据。")
           .foregroundStyle(.secondary)
       } else {
-        Section(header: Text("Third-party components used by this app.")) {
+        Section(header: Text("本应用使用的第三方组件")) {
           ForEach(licenses) { license in
             NavigationLink {
               OpenSourceLicenseDetailView(license: license)
@@ -25,7 +25,7 @@ struct OpenSourceLicensesView: View {
         }
       }
     }
-    .navigationTitle("Open Source Licenses")
+    .navigationTitle("开源许可")
     .navigationBarTitleDisplayMode(.inline)
   }
 }
