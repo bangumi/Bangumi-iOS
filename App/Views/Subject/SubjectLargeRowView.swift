@@ -57,13 +57,13 @@ struct SubjectLargeRowView: View {
         HStack(spacing: 4) {
           if !subject.category.isEmpty {
             BorderView {
-              Text(subject.category).fixedSize()
+              Text(subject.category).lineLimit(1)
             }
           }
           if !subject.metaTags.isEmpty {
             ForEach(subject.metaTags, id: \.self) { tag in
               Text(tag)
-                .fixedSize()
+                .lineLimit(1)
                 .padding(2)
                 .background(.secondary.opacity(0.1))
                 .clipShape(RoundedRectangle(cornerRadius: 5))
