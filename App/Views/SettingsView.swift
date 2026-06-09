@@ -83,88 +83,141 @@ struct SettingsView: View {
 
   var body: some View {
     Form {
-      Section(header: Text("域名")) {
-        Picker(selection: $shareDomain, label: Text("分享域名")) {
-          ForEach(ShareDomain.allCases, id: \.self) { domain in
-            Text(domain.rawValue).tag(domain)
-          }
-        }
-        Picker(selection: $authDomain, label: Text("认证域名")) {
-          ForEach(AuthDomain.allCases, id: \.self) { domain in
-            Text(domain.rawValue).tag(domain)
-          }
-        }
-      }
-
-      Section(header: Text("显示")) {
-        Picker(selection: $appearance, label: Text("主题")) {
+      // MARK: - 外观
+      Section {
+        Picker(selection: $appearance) {
           ForEach(AppearanceType.allCases, id: \.self) { appearance in
             Text(appearance.desc).tag(appearance)
           }
+        } label: {
+          SettingLabel("主题", description: "选择浅色、深色或跟随系统外观")
         }
-        Picker(selection: appIconSelection, label: Text("应用图标")) {
+
+        Picker(selection: appIconSelection) {
           ForEach(AlternateAppIcon.allCases, id: \.self) { icon in
             Text(icon.title).tag(icon)
           }
+        } label: {
+          SettingLabel("应用图标", description: "更换应用主屏幕图标")
         }
         .disabled(!appIconController.isAvailable || appIconController.isUpdating)
-        Picker(selection: $titlePreference, label: Text("条目标题显示")) {
-          ForEach(TitlePreference.allCases, id: \.self) { preference in
-            Text(preference.desc).tag(preference)
-          }
-        }
-        Picker(selection: $avatarStyle, label: Text("用户头像样式")) {
+
+        Picker(selection: $avatarStyle) {
           ForEach(AvatarStyle.allCases, id: \.self) { style in
             Text(style.desc).tag(style)
           }
+        } label: {
+          SettingLabel("头像样式", description: "圆形或经典方形头像样式")
         }
-        Picker(selection: $episodeGridInteractionMode, label: Text("章节菜单打开方式")) {
-          ForEach(EpisodeGridInteractionMode.allCases, id: \.self) { mode in
-            Text(mode.desc).tag(mode)
+      } header: {
+        Text("外观")
+      }
+
+      // MARK: - 显示
+      Section {
+        Picker(selection: $titlePreference) {
+          ForEach(TitlePreference.allCases, id: \.self) { preference in
+            Text(preference.desc).tag(preference)
           }
+        } label: {
+          SettingLabel("标题显示", description: "在列表和详情页优先显示中文名或原名")
         }
-        Picker(selection: $subjectImageQuality, label: Text("条目封面图片质量")) {
+
+        Picker(selection: $subjectImageQuality) {
           ForEach(ImageQuality.allCases, id: \.self) { quality in
             Text(quality.desc).tag(quality)
           }
+        } label: {
+          SettingLabel("封面画质", description: "高质量图片更清晰，但消耗更多流量")
         }
-        Picker(selection: $replySortOrder, label: Text("话题回复排序")) {
+
+        Picker(selection: $replySortOrder) {
           ForEach(ReplySortOrder.allCases, id: \.self) { order in
             Text(order.description).tag(order)
           }
+        } label: {
+          SettingLabel("回复排序", description: "按发布时间排列话题回复的顺序")
         }
+
         Toggle(isOn: $showSpoilerRelations) {
-          Text("默认显示剧透关联")
+          SettingLabel("剧透关联", description: "直接展示被标记为剧透的角色/人物关联，不再模糊遮挡")
         }
-      }
 
-      Section(header: Text("超合金")) {
-        Toggle(isOn: $isolationMode) {
-          Text("单机模式")
-        }
-        Toggle(isOn: $anonymizeTopicUsers) {
-          Text("匿名化讨论")
-        }
-        Toggle(isOn: $hideBlocklist) {
-          Text("屏蔽绝交用户言论")
-        }
         Toggle(isOn: $showNSFWBadge) {
-          Text("显示 NSFW 标记")
+          SettingLabel("NSFW 标记", description: "在标记为 NSFW 的条目封面上显示 R18 角标")
         }
-        Toggle(isOn: $enableShakeTitleToggle) {
-          Text("摇一摇切换标题显示")
-        }
+
         Toggle(isOn: $showEpisodeTrends) {
-          Text("显示章节热度")
+          SettingLabel("章节热度", description: "在章节格子底部显示热度指示条")
         }
-        Toggle(isOn: $autoCompleteProgress) {
-          Text("标记看过时自动完成所有进度")
-        }
-        Toggle(isOn: $enableReactions) {
-          Text("启用贴贴")
-        }
+      } header: {
+        Text("显示")
       }
 
+      // MARK: - 交互
+      Section {
+        Picker(selection: $episodeGridInteractionMode) {
+          ForEach(EpisodeGridInteractionMode.allCases, id: \.self) { mode in
+            Text(mode.desc).tag(mode)
+          }
+        } label: {
+          SettingLabel("章节菜单", description: "长按或点击章节格子打开操作菜单")
+        }
+
+        Toggle(isOn: $enableShakeTitleToggle) {
+          SettingLabel("摇一摇切换标题", description: "摇动设备快速切换中文名和原名显示")
+        }
+
+        Toggle(isOn: $enableReactions) {
+          SettingLabel("启用贴贴", description: "在话题和讨论中启用表情贴贴功能")
+        }
+
+        Toggle(isOn: $autoCompleteProgress) {
+          SettingLabel("自动完成进度", description: "收藏条目为「看过」时，自动将所有章节标记为完成")
+        }
+      } header: {
+        Text("交互")
+      }
+
+      // MARK: - 隐私
+      Section {
+        Toggle(isOn: $isolationMode) {
+          SettingLabel("单机模式", description: "不加载讨论、评论、收藏等社交模块，仅展示条目内容")
+        }
+
+        Toggle(isOn: $anonymizeTopicUsers) {
+          SettingLabel("匿名讨论", description: "在讨论中隐藏其他用户的头像和昵称，以颜色和哈希值替代")
+        }
+
+        Toggle(isOn: $hideBlocklist) {
+          SettingLabel("屏蔽绝交用户", description: "隐藏已加入绝交列表用户的发言和评论")
+        }
+      } header: {
+        Text("隐私")
+      }
+
+      // MARK: - 网络
+      Section {
+        Picker(selection: $shareDomain) {
+          ForEach(ShareDomain.allCases, id: \.self) { domain in
+            Text(domain.rawValue).tag(domain)
+          }
+        } label: {
+          SettingLabel("分享域名", description: "分享链接时使用的域名")
+        }
+
+        Picker(selection: $authDomain) {
+          ForEach(AuthDomain.allCases, id: \.self) { domain in
+            Text(domain.rawValue).tag(domain)
+          }
+        } label: {
+          SettingLabel("认证域名", description: "OAuth 认证服务器域名")
+        }
+      } header: {
+        Text("网络")
+      }
+
+      // MARK: - 关于
       Section(header: Text("关于")) {
         Button {
           showEULA = true
@@ -230,6 +283,7 @@ struct SettingsView: View {
         }
       }
 
+      // MARK: - 已登录操作
       if isAuthenticated {
         Section {
           Button(role: .destructive) {

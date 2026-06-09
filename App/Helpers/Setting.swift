@@ -163,9 +163,9 @@ enum EpisodeGridInteractionMode: String, CaseIterable {
   var desc: String {
     switch self {
     case .contextMenu:
-      "长按打开菜单"
+      "长按"
     case .menu:
-      "点击打开菜单"
+      "点击"
     }
   }
 }
@@ -213,9 +213,9 @@ enum TitlePreference: String, CaseIterable {
   var desc: String {
     switch self {
     case .chinese:
-      "中文名优先"
+      "中文"
     case .original:
-      "原名优先"
+      "原名"
     }
   }
 
@@ -247,7 +247,7 @@ enum AvatarStyle: String, CaseIterable, Sendable {
   var desc: String {
     switch self {
     case .round:
-      "默认（圆形）"
+      "圆形"
     case .classic:
       "经典"
     }
