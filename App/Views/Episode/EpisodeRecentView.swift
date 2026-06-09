@@ -28,16 +28,23 @@ struct EpisodeRecentView: View {
   }
 
   var recentCount: Int {
-    return 5
+    switch mode {
+    case .tile: return 5
+    case .list: return 7
+    }
   }
 
   var recentEpisodes: [Episode] {
+    let halfBefore = (recentCount - 1) / 2
+    let halfAfter = recentCount - halfBefore - 1
     let idx = episodes.firstIndex { $0.status == EpisodeCollectionType.none.rawValue }
     if let idx = idx {
-      if idx < 3 {
+      if idx <= halfBefore {
         return Array(episodes.prefix(recentCount))
-      } else if idx < episodes.count - 3 {
-        return Array(episodes[idx - 2..<min(idx + 3, episodes.count)])
+      } else if idx < episodes.count - halfAfter {
+        let start = idx - halfBefore
+        let end = min(idx + halfAfter + 1, episodes.count)
+        return Array(episodes[start..<end])
       } else {
         return Array(episodes.suffix(recentCount))
       }
@@ -61,43 +68,40 @@ struct EpisodeRecentView: View {
   }
 
   var body: some View {
-    switch mode {
-    case .tile:
-      VStack(alignment: .trailing, spacing: 4) {
-        if !recentEpisodes.isEmpty {
+    if !recentEpisodes.isEmpty {
+      switch mode {
+      case .tile:
+        VStack {
           HStack(spacing: 2) {
             ForEach(recentEpisodes) { episode in
               EpisodeItemView(episode: episode)
             }
+            Spacer(minLength: 0)
           }
           .font(.footnote)
-          .layoutPriority(1)
-        }
-        HStack {
           if let episode = nextEpisode {
-            EpisodeNextView(episode: episode)
+            EpisodeNextView(episode: episode, fillWidth: true)
           } else {
             Button {
               showCollectionBox = true
             } label: {
               HStack(spacing: 4) {
+                Spacer()
                 Text(progressText)
                 Image(systemName: progressIcon)
-              }.foregroundStyle(.secondary)
+                Spacer()
+              }
             }
-            .buttonStyle(.scale)
+            .progressButtonStyle()
             .sheet(isPresented: $showCollectionBox) {
               SubjectCollectionBoxView(subjectId: subject.subjectId)
             }
           }
         }
-      }
-      .frame(maxWidth: .infinity, alignment: .trailing)
-      .animation(.default, value: nextEpisode)
-      .animation(.default, value: recentEpisodes)
-    case .list:
-      HStack {
-        if !recentEpisodes.isEmpty {
+        .animation(.default, value: nextEpisode)
+        .animation(.default, value: recentEpisodes)
+      case .list:
+        HStack {
           HStack(spacing: 2) {
             ForEach(recentEpisodes) { episode in
               EpisodeItemView(episode: episode)
@@ -105,7 +109,7 @@ struct EpisodeRecentView: View {
           }.font(.footnote)
           Spacer(minLength: 0)
           if let episode = nextEpisode {
-            EpisodeNextView(episode: episode)
+            EpisodeNextView(episode: episode, fillWidth: false)
           } else {
             Button {
               showCollectionBox = true
@@ -113,36 +117,37 @@ struct EpisodeRecentView: View {
               HStack(spacing: 4) {
                 Text(progressText)
                 Image(systemName: progressIcon)
-              }.foregroundStyle(.secondary)
+              }
             }
-            .buttonStyle(.scale)
+            .progressButtonStyle()
             .sheet(isPresented: $showCollectionBox) {
               SubjectCollectionBoxView(subjectId: subject.subjectId)
             }
           }
-        } else {
-          NavigationLink(value: NavDestination.subject(subject.subjectId)) {
-            HStack(spacing: 4) {
-              Text(progressText)
-              Image(systemName: progressIcon)
-            }.foregroundStyle(.secondary)
-          }.buttonStyle(.scale)
         }
+        .animation(.default, value: nextEpisode)
+        .animation(.default, value: recentEpisodes)
       }
-      .animation(.default, value: nextEpisode)
-      .animation(.default, value: recentEpisodes)
+    } else {
+      HStack {
+        Spacer()
+        NavigationLink(value: NavDestination.subject(subject.subjectId)) {
+          HStack(spacing: 4) {
+            Text(progressText)
+            Image(systemName: progressIcon)
+          }
+        }
+        .progressButtonStyle()
+      }
     }
   }
 }
 
 struct EpisodeNextView: View {
   @Bindable var episode: Episode
+  let fillWidth: Bool
 
   @State private var updating: Bool = false
-
-  var buttonText: String {
-    return "EP.\(episode.sort.episodeDisplay)"
-  }
 
   func updateSingle(episode: Episode, type: EpisodeCollectionType) {
     if updating { return }
@@ -159,26 +164,48 @@ struct EpisodeNextView: View {
     }
   }
 
-  var body: some View {
-    if !episode.aired {
-      Text("EP.\(episode.sort.episodeDisplay) ~ \(episode.waitDesc)")
-        .foregroundStyle(.secondary)
+  var buttonDisabled: Bool {
+    !episode.aired || updating
+  }
+
+  var episodeDesc: String {
+    if episode.aired {
+      "EP.\(episode.sort.episodeDisplay)"
     } else {
-      if updating {
-        ZStack {
-          Button(buttonText, action: {})
-            .disabled(true)
-            .hidden()
+      "EP.\(episode.sort.episodeDisplay) ~ \(episode.waitDesc)"
+    }
+  }
+
+  var episodeIcon: String {
+    episode.aired ? "checkmark.circle" : "hourglass"
+  }
+
+  var body: some View {
+    Button {
+      updateSingle(episode: episode, type: .collect)
+    } label: {
+      Group {
+        if updating {
           ProgressView()
-        }
-      } else {
-        Button {
-          updateSingle(episode: episode, type: .collect)
-        } label: {
-          Label(buttonText, systemImage: "checkmark.circle")
-            .labelStyle(.compact)
+        } else {
+          Label(episodeDesc, systemImage: episodeIcon)
         }
       }
+      .frame(maxWidth: fillWidth ? .infinity : nil)
     }
+    .progressButtonStyle()
+    .disabled(buttonDisabled)
+  }
+}
+
+extension View {
+  func progressButtonStyle() -> some View {
+    self
+      .labelStyle(.compact)
+      .font(.caption)
+      .tint(.accent)
+      .adaptiveButtonStyle(.bordered)
+      .buttonBorderShape(.roundedRectangle(radius: 8))
+      .controlSize(.mini)
   }
 }
