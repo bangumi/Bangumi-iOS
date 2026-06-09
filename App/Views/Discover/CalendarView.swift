@@ -77,16 +77,12 @@ struct CalendarView: View {
   }
 
   var sortedCalendars: [BangumiCalendar] {
-    let weekday = WeekDay(date: today)
-    return calendars.sorted { (cal1: BangumiCalendar, cal2: BangumiCalendar) -> Bool in
-      if cal1.weekday >= weekday.rawValue && cal2.weekday < weekday.rawValue {
-        return true
-      } else if cal1.weekday < weekday.rawValue && cal2.weekday >= weekday.rawValue {
-        return false
-      } else {
-        return cal1.weekday < cal2.weekday
-      }
+    let todayWeekday = WeekDay(date: today).rawValue
+    let sorted = calendars.sorted { $0.weekday < $1.weekday }
+    guard let pivot = sorted.firstIndex(where: { $0.weekday >= todayWeekday }) else {
+      return sorted
     }
+    return Array(sorted[pivot...] + sorted[..<pivot])
   }
 
   var total: Int {
@@ -154,7 +150,7 @@ struct CalendarWeekdayView: View {
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
 
   var weekday: WeekDay {
-    WeekDay(calendar.weekday)
+    WeekDay(rawValue: calendar.weekday) ?? .mon
   }
 
   var body: some View {

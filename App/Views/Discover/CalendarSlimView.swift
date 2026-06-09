@@ -1,4 +1,3 @@
-import Flow
 import OSLog
 import SwiftData
 import SwiftUI
@@ -10,20 +9,7 @@ struct CalendarSlimView: View {
   @Query(sort: \BangumiCalendar.weekday)
   private var calendars: [BangumiCalendar]
 
-  var today: BangumiCalendar? {
-    let weekday = WeekDay(date: Date())
-    return calendars.first { $0.weekday == weekday.rawValue }
-  }
-
-  var todayTotal: Int {
-    today?.items.count ?? 0
-  }
-
-  var todayWatchers: Int {
-    today?.items.reduce(0) { $0 + $1.watchers } ?? 0
-  }
-
-  var dates: [(weekday: WeekDay, desc: String, date: Date, calendar: BangumiCalendar)] {
+  var dates: [(weekday: WeekDay, desc: String, date: Date, calendar: BangumiCalendar, count: Int, watchers: Int)] {
     let today = Date()
     let tomorrow = today.addingTimeInterval(86400)
 
@@ -35,8 +21,14 @@ struct CalendarSlimView: View {
       ?? BangumiCalendar(weekday: WeekDay(date: tomorrow).rawValue, items: [])
 
     let result = [
-      (weekday: WeekDay(date: today), desc: "今天", date: today, calendar: todayCalendar),
-      (weekday: WeekDay(date: tomorrow), desc: "明天", date: tomorrow, calendar: tomorrowCalendar),
+      (weekday: WeekDay(date: today), desc: "今天", date: today,
+       calendar: todayCalendar,
+       count: todayCalendar.items.count,
+       watchers: todayCalendar.items.reduce(0) { $0 + $1.watchers }),
+      (weekday: WeekDay(date: tomorrow), desc: "明天", date: tomorrow,
+       calendar: tomorrowCalendar,
+       count: tomorrowCalendar.items.count,
+       watchers: tomorrowCalendar.items.reduce(0) { $0 + $1.watchers }),
     ]
     return result
   }
@@ -58,7 +50,7 @@ struct CalendarSlimView: View {
           await refreshCalendar()
         }
       } else {
-        VStack(alignment: .leading, spacing: 5) {
+        VStack(alignment: .leading, spacing: 8) {
           HStack(alignment: .bottom) {
             Text("每日放送: \(Date().formatted(date: .long, time: .omitted))")
             Spacer()
@@ -67,21 +59,27 @@ struct CalendarSlimView: View {
             }.buttonStyle(.navigation)
           }
           ForEach(dates, id: \.weekday) { item in
-            HStack(alignment: .top, spacing: 0) {
-              VStack {
+            VStack(alignment: .leading, spacing: 6) {
+              HStack(spacing: 4) {
                 Text(item.desc)
-                Text(item.weekday.short)
-                Spacer()
+                Text("·")
+                Text(item.weekday.cn)
+                if item.count > 0 {
+                  Text("·")
+                  Text("\(item.count)部")
+                  Text("·")
+                  Text("\(item.watchers)人收看")
+                }
               }
-              .padding(5)
-              .background(item.weekday.color)
+              .font(.caption)
               .foregroundStyle(.white)
+              .padding(.horizontal, 8)
+              .padding(.vertical, 3)
+              .background(item.weekday.color)
+              .cornerRadius(5)
               CalendarWeekdaySlimView(calendar: item.calendar)
             }
           }
-          Text("今日上映 \(todayTotal) 部。共 \(todayWatchers) 人收看今日番组。")
-            .font(.footnote)
-            .foregroundStyle(.secondary)
           Divider()
         }
       }
@@ -92,15 +90,40 @@ struct CalendarSlimView: View {
 struct CalendarWeekdaySlimView: View {
   @Bindable var calendar: BangumiCalendar
 
+  @AppStorage("subjectImageQuality") var subjectImageQuality: ImageQuality = .high
+  @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
+
+  static let cardWidth: CGFloat = 110
+  static let cardHeight: CGFloat = 110 / 0.707
+
   var body: some View {
-    HFlow(spacing: 0) {
-      ForEach(calendar.items) { item in
-        ImageView(img: item.subject.images?.resize(.r100))
-          .imageStyle(width: 60, height: 60, cornerRadius: 0)
-          .imageType(.subject)
-          .imageNavLink(item.subject.link)
-          .subjectPreview(item.subject)
-      }
+    ScrollView(.horizontal, showsIndicators: false) {
+      LazyHStack(spacing: 8) {
+        ForEach(calendar.items) { item in
+          ImageView(img: item.subject.images?.resize(subjectImageQuality.mediumSize))
+            .imageStyle(width: Self.cardWidth, height: Self.cardHeight)
+            .imageType(.subject)
+            .imageCaption {
+              HStack {
+                VStack(alignment: .leading, spacing: 2) {
+                  if item.watchers > 10 {
+                    Text("\(item.watchers)人追番")
+                      .font(.caption2)
+                  }
+                  Text(item.subject.title(with: titlePreference))
+                    .lineLimit(1)
+                    .font(.caption)
+                    .bold()
+                }
+                Spacer(minLength: 0)
+              }.padding(4)
+            }
+            .imageNavLink(item.subject.link)
+            .subjectPreview(item.subject)
+        }
+      }.scrollTargetLayout()
     }
+    .scrollClipDisabled()
+    .scrollTargetBehavior(.viewAligned)
   }
 }
