@@ -48,6 +48,20 @@ struct ImageView: View {
               .aspectRatio(aspectRatio, contentMode: .fill)
               .frame(alignment: style.alignment)
               .applyClipShape(type: type, cornerRadius: style.cornerRadius)
+          } else if style.contentMode == .fill {
+            GeometryReader { geometry in
+              AnimatedImage(url: imageURL)
+                .onSuccess { _, _, _ in
+                  markLoaded()
+                }
+                .resizable()
+                .transition(.fade(duration: 0.25))
+                .aspectRatio(contentMode: .fill)
+                .frame(width: geometry.size.width, height: geometry.size.height)
+                .clipped()
+            }
+            .frame(alignment: style.alignment)
+            .applyClipShape(type: type, cornerRadius: style.cornerRadius)
           } else {
             AnimatedImage(url: imageURL)
               .onSuccess { _, _, _ in
@@ -55,7 +69,7 @@ struct ImageView: View {
               }
               .resizable()
               .transition(.fade(duration: 0.25))
-              .scaledToFit()
+              .aspectRatio(contentMode: .fit)
               .frame(alignment: style.alignment)
               .applyClipShape(type: type, cornerRadius: style.cornerRadius)
           }

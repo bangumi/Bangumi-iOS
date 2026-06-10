@@ -6,11 +6,12 @@ struct ImageViewStyle {
   let aspectRatio: CGFloat?
   let cornerRadius: CGFloat
   let alignment: Alignment
+  let contentMode: ContentMode
 }
 
 struct ImageViewStyleKey: EnvironmentKey {
   static let defaultValue = ImageViewStyle(
-    width: nil, height: nil, aspectRatio: nil, cornerRadius: 5, alignment: .top)
+    width: nil, height: nil, aspectRatio: nil, cornerRadius: 5, alignment: .top, contentMode: .fit)
 }
 
 extension EnvironmentValues {
@@ -25,7 +26,8 @@ extension View {
     width: CGFloat? = nil, height: CGFloat? = nil,
     aspectRatio: CGFloat? = nil,
     cornerRadius: CGFloat = 5,
-    alignment: Alignment = .top
+    alignment: Alignment = .top,
+    contentMode: ContentMode = .fit
   )
     -> some View
   {
@@ -33,7 +35,8 @@ extension View {
       width: width, height: height,
       aspectRatio: aspectRatio,
       cornerRadius: cornerRadius,
-      alignment: alignment)
+      alignment: alignment,
+      contentMode: contentMode)
     return self.environment(\.imageStyle, style)
   }
 }

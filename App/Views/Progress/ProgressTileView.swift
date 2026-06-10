@@ -41,6 +41,7 @@ struct ProgressTileItemContentView: View {
               Image(systemName: "lock")
             }
             .imageNavLink(subject.link)
+            .imageStyle(contentMode: .fill)
         )
 
       VStack(alignment: .leading, spacing: 4) {
