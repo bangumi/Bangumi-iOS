@@ -88,7 +88,7 @@ public struct ImagePreviewer: View {
             Button {
               presentShareSheet()
             } label: {
-              Image(systemName: "square.and.arrow.up")
+              Image(systemName: "paperplane")
                 .contentShape(Circle())
             }
             .buttonBorderShape(.circle)

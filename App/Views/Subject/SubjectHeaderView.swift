@@ -32,7 +32,7 @@ struct SubjectHeaderView: View {
         .imageStyle(width: 120, height: type.coverHeight(for: 120))
         .imageType(.subject)
         .imageNSFW(subject.nsfw)
-        .enableSave(subject.images?.large)
+        .enableImagePreview(subject.images?.large, zoomID: ZoomNavigationID(type: .subject, id: subject.subjectId))
         .padding(4)
         .shadow(radius: 4)
       VStack(alignment: .leading) {

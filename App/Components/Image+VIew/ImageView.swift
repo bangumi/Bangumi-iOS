@@ -187,7 +187,7 @@ extension View {
       ).imageStyle(width: 60, height: 60, alignment: .top)
       ImageView(img: "https://lain.bgm.tv/pic/cover/m/5e/39/140534_cUj6H.jpg")
         .imageStyle(width: 60, height: 90)
-        .enableSave("https://lain.bgm.tv/pic/cover/l/5e/39/140534_cUj6H.jpg")
+        .enableImagePreview("https://lain.bgm.tv/pic/cover/l/5e/39/140534_cUj6H.jpg")
         .imageNSFW(true)
       ImageView(img: "https://lain.bgm.tv/pic/cover/c/5e/39/140534_cUj6H.jpg")
         .imageStyle(width: 90, height: 120)
