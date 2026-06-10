@@ -14,7 +14,7 @@ struct PersonSmallView: View {
   var body: some View {
     BorderView(color: .secondary.opacity(0.2), padding: 4, paddingRatio: 1, cornerRadius: 8) {
       HStack {
-        ImageView(img: person.images?.resize(.r200))
+        ImageView(img: person.images?.grid)
           .imageStyle(width: 50, height: 50)
           .imageType(.person)
           .imageNSFW(person.nsfw)

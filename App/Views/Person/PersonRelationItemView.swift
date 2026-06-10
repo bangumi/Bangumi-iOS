@@ -13,7 +13,7 @@ struct PersonRelationItemView: View {
     SpoilerRevealContainer(isSpoiler: item.spoiler) {
       CardView {
         HStack(alignment: .top) {
-          ImageView(img: item.person.images?.resize(.r200))
+          ImageView(img: item.person.images?.grid)
             .imageStyle(width: 60, height: 60, alignment: .top)
             .imageType(.person)
             .imageNSFW(item.person.nsfw)

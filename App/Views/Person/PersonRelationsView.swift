@@ -68,7 +68,7 @@ private struct PersonRelationCard: View {
           .frame(maxWidth: .infinity, alignment: .center)
           .multilineTextAlignment(.center)
 
-        ImageView(img: item.person.images?.resize(.r200))
+        ImageView(img: item.person.images?.grid)
           .imageStyle(width: 72, height: 72)
           .imageType(.person)
           .imageNSFW(item.person.nsfw)

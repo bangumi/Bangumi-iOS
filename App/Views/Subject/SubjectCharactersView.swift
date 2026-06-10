@@ -56,7 +56,7 @@ struct CharacterCard: View {
 
   var body: some View {
     VStack(alignment: .leading, spacing: 2) {
-      ImageView(img: item.character.images?.resize(.r200))
+      ImageView(img: item.character.images?.medium)
         .imageStyle(width: 72, height: 108, alignment: .top)
         .imageType(.person)
         .imageNSFW(item.character.nsfw)

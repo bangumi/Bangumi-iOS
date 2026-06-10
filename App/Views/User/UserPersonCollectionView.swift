@@ -52,7 +52,7 @@ struct UserPersonCollectionView: View {
           LazyHStack(alignment: .top) {
             ForEach(persons) { person in
               VStack {
-                ImageView(img: person.images?.resize(.r200))
+                ImageView(img: person.images?.grid)
                   .imageStyle(width: 60, height: 60)
                   .imageType(.person)
                   .imageNavLink(person.link)

@@ -8,7 +8,7 @@ struct PersonLargeRowView: View {
 
   var body: some View {
     HStack(spacing: 8) {
-      ImageView(img: person.images?.resize(.r200))
+      ImageView(img: person.images?.grid)
         .imageStyle(width: 90, height: 90)
         .imageType(.person)
         .imageNSFW(person.nsfw)

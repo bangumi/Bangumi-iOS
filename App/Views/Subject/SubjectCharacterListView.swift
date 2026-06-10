@@ -37,7 +37,7 @@ struct SubjectCharacterListView: View {
       PageView<SubjectCharacterDTO, _>(limit: 10, reloader: reloader, nextPageFunc: load) { item in
         CardView {
           HStack {
-            ImageView(img: item.character.images?.resize(.r200))
+            ImageView(img: item.character.images?.medium)
               .imageStyle(width: 60, height: 90, alignment: .top)
               .imageType(.person)
               .imageNSFW(item.character.nsfw)

@@ -8,7 +8,7 @@ struct PersonCastItemView: View {
   var body: some View {
     CardView {
       HStack(alignment: .top) {
-        ImageView(img: item.character.images?.resize(.r200))
+        ImageView(img: item.character.images?.grid)
           .imageStyle(width: 60, height: 60, alignment: .top)
           .imageType(.person)
           .imageNavLink(item.character.link)
