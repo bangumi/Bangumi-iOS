@@ -2,16 +2,13 @@ import Foundation
 import SwiftData
 
 func mockContainer() -> ModelContainer {
-  let config = ModelConfiguration(isStoredInMemoryOnly: true)
+  let schema = Schema(versionedSchema: BangumiSchemaV2.self)
+  let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
   let container = try! ModelContainer(
-    for: BangumiCalendar.self,
-    TrendingSubject.self,
-    Episode.self,
-    Subject.self,
-    SubjectDetail.self,
-    Character.self,
-    Person.self,
-    configurations: config)
+    for: schema,
+    migrationPlan: BangumiMigrationPlan.self,
+    configurations: [config]
+  )
   Task {
     await Chii.shared.setUp(container: container)
     await Chii.shared.setMock()

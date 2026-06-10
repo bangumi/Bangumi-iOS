@@ -10,24 +10,14 @@ struct MainApp: App {
   @AppStorage("appearance") var appearance: AppearanceType = .system
 
   init() {
-    let schema = Schema([
-      User.self,
-      BangumiCalendar.self,
-      TrendingSubject.self,
-      Episode.self,
-      Subject.self,
-      SubjectDetail.self,
-      Character.self,
-      Person.self,
-      ChiiGroup.self,
-      Draft.self,
-      RakuenSubjectTopicCache.self,
-      RakuenGroupTopicCache.self,
-      RakuenGroupCache.self,
-    ])
+    let schema = Schema(versionedSchema: BangumiSchemaV2.self)
     let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
     do {
-      let container = try ModelContainer(for: schema, configurations: [modelConfiguration])
+      let container = try ModelContainer(
+        for: schema,
+        migrationPlan: BangumiMigrationPlan.self,
+        configurations: [modelConfiguration]
+      )
       sharedModelContainer = container
       configureImageSupport()
     } catch {
