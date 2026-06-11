@@ -10,7 +10,7 @@ struct MainApp: App {
   @AppStorage("appearance") var appearance: AppearanceType = .system
 
   init() {
-    let schema = Schema(versionedSchema: BangumiSchemaV2.self)
+    let schema = Schema(versionedSchema: BangumiSchemaV3.self)
     let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
     do {
       let container = try ModelContainer(

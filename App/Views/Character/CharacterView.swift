@@ -175,7 +175,10 @@ struct CharacterDetailView: View {
         .imageStyle(width: 120, height: 120, alignment: .top)
         .imageType(.person)
         .imageNSFW(character.nsfw)
-        .enableImagePreview(character.images?.large, zoomID: ZoomNavigationID(type: .character, id: character.characterId))
+        .enableImagePreview(
+          character.images?.large,
+          zoomID: ZoomNavigationID(type: .character, id: character.characterId)
+        )
         .padding(4)
         .shadow(radius: 4)
       VStack(alignment: .leading) {

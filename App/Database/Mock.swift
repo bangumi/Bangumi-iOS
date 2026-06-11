@@ -2,7 +2,7 @@ import Foundation
 import SwiftData
 
 func mockContainer() -> ModelContainer {
-  let schema = Schema(versionedSchema: BangumiSchemaV2.self)
+  let schema = Schema(versionedSchema: BangumiSchemaV3.self)
   let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
   let container = try! ModelContainer(
     for: schema,

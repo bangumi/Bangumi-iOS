@@ -1,6 +1,6 @@
+import BBCode
 import SDWebImageSwiftUI
 import SwiftUI
-import BBCode
 
 // MARK: - Tap-to-Fullscreen Preview Modifier
 

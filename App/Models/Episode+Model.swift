@@ -3,149 +3,149 @@ import OSLog
 import SwiftData
 import SwiftUI
 
-typealias Episode = BangumiSchemaV2.EpisodeV2
+typealias Episode = BangumiSchemaV3.EpisodeV3
 
 extension Episode {
-    var typeEnum: EpisodeType {
-        return EpisodeType(type)
+  var typeEnum: EpisodeType {
+    return EpisodeType(type)
+  }
+
+  var collectionTypeEnum: EpisodeCollectionType {
+    return EpisodeCollectionType(status)
+  }
+
+  func title(with preference: TitlePreference) -> AttributedString {
+    var text = AttributedString("\(self.typeEnum.name).\(self.sort.episodeDisplay)")
+    text.foregroundColor = .secondary
+    text += AttributedString(" \(preference.title(name: name, nameCN: nameCN))")
+    return text
+  }
+
+  func titleLink(with preference: TitlePreference) -> AttributedString {
+    var text = AttributedString("\(self.typeEnum.name).\(self.sort.episodeDisplay) ")
+    text.foregroundColor = .secondary
+    text += preference.title(name: name, nameCN: nameCN).withLink(self.link)
+    return text
+  }
+
+  func subtitle(with preference: TitlePreference) -> String? {
+    switch preference {
+    case .chinese:
+      return nameCN.isEmpty ? nil : (name != nameCN ? name : nil)
+    case .original:
+      return name.isEmpty ? nil : (nameCN != name && !nameCN.isEmpty ? nameCN : nil)
+    }
+  }
+
+  var link: String {
+    return "chii://episode/\(episodeId)"
+  }
+
+  var air: Date {
+    return safeParseDate(str: airdate)
+  }
+
+  var aired: Bool {
+    return air < Date()
+  }
+
+  var waitDesc: String {
+    if air.timeIntervalSince1970 == 0 {
+      return "未知"
     }
 
-    var collectionTypeEnum: EpisodeCollectionType {
-        return EpisodeCollectionType(status)
+    let calendar = Calendar.current
+    let now = Date()
+    let components = calendar.dateComponents([.day], from: now, to: air)
+
+    if components.day == 0 {
+      return "明天"
+    } else {
+      return "\(components.day ?? 0) 天后"
     }
+  }
 
-    func title(with preference: TitlePreference) -> AttributedString {
-        var text = AttributedString("\(self.typeEnum.name).\(self.sort.episodeDisplay)")
-        text.foregroundColor = .secondary
-        text += AttributedString(" \(preference.title(name: name, nameCN: nameCN))")
-        return text
+  var borderColor: Color {
+    var hex = 0x666666
+    switch self.collectionTypeEnum {
+    case .none:
+      if aired {
+        hex = 0x00A8FF
+      } else {
+        hex = 0x909090
+      }
+    case .wish:
+      hex = 0xFF2293
+    case .collect:
+      hex = 0x1175a8
+    case .dropped:
+      hex = 0x666666
     }
+    return Color(hex: hex)
+  }
 
-    func titleLink(with preference: TitlePreference) -> AttributedString {
-        var text = AttributedString("\(self.typeEnum.name).\(self.sort.episodeDisplay) ")
-        text.foregroundColor = .secondary
-        text += preference.title(name: name, nameCN: nameCN).withLink(self.link)
-        return text
+  var backgroundColor: Color {
+    var hex = 0xCCCCCC
+    switch self.collectionTypeEnum {
+    case .none:
+      if aired {
+        hex = 0xDAEAFF
+      } else {
+        hex = 0xe0e0e0
+      }
+    case .wish:
+      hex = 0xFFADD1
+    case .collect:
+      hex = 0x4897ff
+    case .dropped:
+      hex = 0xCCCCCC
     }
+    return Color(hex: hex)
+  }
 
-    func subtitle(with preference: TitlePreference) -> String? {
-        switch preference {
-        case .chinese:
-            return nameCN.isEmpty ? nil : (name != nameCN ? name : nil)
-        case .original:
-            return name.isEmpty ? nil : (nameCN != name && !nameCN.isEmpty ? nameCN : nil)
-        }
+  var textColor: Color {
+    var hex = 0xFFFFFF
+    switch self.collectionTypeEnum {
+    case .none:
+      if aired {
+        hex = 0x0066CC
+      } else {
+        hex = 0x909090
+      }
+    case .wish:
+      hex = 0xFF2293
+    case .collect:
+      hex = 0xFFFFFF
+    case .dropped:
+      hex = 0xFFFFFF
     }
+    return Color(hex: hex)
+  }
 
-    var link: String {
-        return "chii://episode/\(episodeId)"
+  var trendColor: Color {
+    var opacity = 0.0
+    if comment > 0 {
+      opacity = 0.1 + 0.9 * (1.0 - exp(-Double(comment - 1) / 200.0))
     }
+    return Color(hex: 0xFF8040, opacity: opacity)
+  }
 
-    var air: Date {
-        return safeParseDate(str: airdate)
+  func update(_ item: EpisodeDTO) {
+    if self.subjectId != item.subjectID { self.subjectId = item.subjectID }
+    if self.type != item.type.rawValue { self.type = item.type.rawValue }
+    if self.sort != item.sort { self.sort = item.sort }
+    if self.name != item.name { self.name = item.name }
+    if self.nameCN != item.nameCN { self.nameCN = item.nameCN }
+    if self.duration != item.duration { self.duration = item.duration }
+    if self.airdate != item.airdate { self.airdate = item.airdate }
+    if self.comment != item.comment { self.comment = item.comment }
+    if let desc = item.desc, !desc.isEmpty && self.desc != desc { self.desc = desc }
+    if self.disc != item.disc { self.disc = item.disc }
+    if let collection = item.collection {
+      if self.status != collection.status { self.status = collection.status }
+      if let collectedAt = collection.updatedAt, self.collectedAt != collectedAt {
+        self.collectedAt = collectedAt
+      }
     }
-
-    var aired: Bool {
-        return air < Date()
-    }
-
-    var waitDesc: String {
-        if air.timeIntervalSince1970 == 0 {
-            return "未知"
-        }
-
-        let calendar = Calendar.current
-        let now = Date()
-        let components = calendar.dateComponents([.day], from: now, to: air)
-
-        if components.day == 0 {
-            return "明天"
-        } else {
-            return "\(components.day ?? 0) 天后"
-        }
-    }
-
-    var borderColor: Color {
-        var hex = 0x666666
-        switch self.collectionTypeEnum {
-        case .none:
-            if aired {
-                hex = 0x00A8FF
-            } else {
-                hex = 0x909090
-            }
-        case .wish:
-            hex = 0xFF2293
-        case .collect:
-            hex = 0x1175a8
-        case .dropped:
-            hex = 0x666666
-        }
-        return Color(hex: hex)
-    }
-
-    var backgroundColor: Color {
-        var hex = 0xCCCCCC
-        switch self.collectionTypeEnum {
-        case .none:
-            if aired {
-                hex = 0xDAEAFF
-            } else {
-                hex = 0xe0e0e0
-            }
-        case .wish:
-            hex = 0xFFADD1
-        case .collect:
-            hex = 0x4897ff
-        case .dropped:
-            hex = 0xCCCCCC
-        }
-        return Color(hex: hex)
-    }
-
-    var textColor: Color {
-        var hex = 0xFFFFFF
-        switch self.collectionTypeEnum {
-        case .none:
-            if aired {
-                hex = 0x0066CC
-            } else {
-                hex = 0x909090
-            }
-        case .wish:
-            hex = 0xFF2293
-        case .collect:
-            hex = 0xFFFFFF
-        case .dropped:
-            hex = 0xFFFFFF
-        }
-        return Color(hex: hex)
-    }
-
-    var trendColor: Color {
-        var opacity = 0.0
-        if comment > 0 {
-            opacity = 0.1 + 0.9 * (1.0 - exp(-Double(comment - 1) / 200.0))
-        }
-        return Color(hex: 0xFF8040, opacity: opacity)
-    }
-
-    func update(_ item: EpisodeDTO) {
-        if self.subjectId != item.subjectID { self.subjectId = item.subjectID }
-        if self.type != item.type.rawValue { self.type = item.type.rawValue }
-        if self.sort != item.sort { self.sort = item.sort }
-        if self.name != item.name { self.name = item.name }
-        if self.nameCN != item.nameCN { self.nameCN = item.nameCN }
-        if self.duration != item.duration { self.duration = item.duration }
-        if self.airdate != item.airdate { self.airdate = item.airdate }
-        if self.comment != item.comment { self.comment = item.comment }
-        if let desc = item.desc, !desc.isEmpty && self.desc != desc { self.desc = desc }
-        if self.disc != item.disc { self.disc = item.disc }
-        if let collection = item.collection {
-            if self.status != collection.status { self.status = collection.status }
-            if let collectedAt = collection.updatedAt, self.collectedAt != collectedAt {
-                self.collectedAt = collectedAt
-            }
-        }
-    }
+  }
 }

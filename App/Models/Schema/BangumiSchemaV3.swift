@@ -1,33 +1,33 @@
 import Foundation
 import SwiftData
 
-enum BangumiSchemaV2: VersionedSchema {
+enum BangumiSchemaV3: VersionedSchema {
   static var versionIdentifier: Schema.Version {
-    Schema.Version(2, 0, 0)
+    Schema.Version(3, 0, 0)
   }
 
   static var models: [any PersistentModel.Type] {
     [
-      BangumiSchemaV2.SubjectV2.self,
-      BangumiSchemaV2.EpisodeV2.self,
-      BangumiSchemaV2.CharacterV2.self,
-      BangumiSchemaV2.PersonV2.self,
-      BangumiSchemaV2.GroupV2.self,
-      BangumiSchemaV2.UserV1.self,
-      BangumiSchemaV2.DraftV1.self,
-      BangumiSchemaV2.TrendingSubjectV1.self,
-      BangumiSchemaV2.BangumiCalendarV1.self,
-      BangumiSchemaV2.SubjectDetailV1.self,
-      BangumiSchemaV2.RakuenSubjectTopicCacheV1.self,
-      BangumiSchemaV2.RakuenGroupTopicCacheV1.self,
-      BangumiSchemaV2.RakuenGroupCacheV1.self,
+      BangumiSchemaV3.SubjectV3.self,
+      BangumiSchemaV3.EpisodeV3.self,
+      BangumiSchemaV3.CharacterV3.self,
+      BangumiSchemaV3.PersonV3.self,
+      BangumiSchemaV3.GroupV3.self,
+      BangumiSchemaV3.UserV2.self,
+      BangumiSchemaV3.DraftV1.self,
+      BangumiSchemaV3.TrendingSubjectV2.self,
+      BangumiSchemaV3.BangumiCalendarV2.self,
+      BangumiSchemaV3.SubjectDetailV2.self,
+      BangumiSchemaV3.RakuenSubjectTopicCacheV2.self,
+      BangumiSchemaV3.RakuenGroupTopicCacheV2.self,
+      BangumiSchemaV3.RakuenGroupCacheV2.self,
     ]
   }
 
-  // MARK: - SubjectV2
+  // MARK: - SubjectV3
 
   @Model
-  final class SubjectV2 {
+  final class SubjectV3: Searchable, Linkable {
     @Attribute(.unique)
     var subjectId: Int
 
@@ -56,7 +56,7 @@ enum BangumiSchemaV2: VersionedSchema {
     var interest: SubjectInterest?
 
     @Relationship(deleteRule: .cascade)
-    var detail: BangumiSchemaV2.SubjectDetailV1?
+    var detail: BangumiSchemaV3.SubjectDetailV2?
 
     init(_ item: SubjectDTO) {
       self.subjectId = item.id
@@ -109,12 +109,38 @@ enum BangumiSchemaV2: VersionedSchema {
       self.alias = ""
       self.interest = nil
     }
+
+    init(_ snapshot: SubjectSnapshot) {
+      self.subjectId = snapshot.subjectId
+      self.airtime = snapshot.airtime
+      self.collection = snapshot.collection
+      self.eps = snapshot.eps
+      self.images = snapshot.images
+      self.infobox = snapshot.infobox
+      self.locked = snapshot.locked
+      self.metaTags = snapshot.metaTags
+      self.tags = snapshot.tags
+      self.name = snapshot.name
+      self.nameCN = snapshot.nameCN
+      self.nsfw = snapshot.nsfw
+      self.platform = snapshot.platform
+      self.rating = snapshot.rating
+      self.series = snapshot.series
+      self.summary = snapshot.summary
+      self.type = snapshot.type
+      self.volumes = snapshot.volumes
+      self.info = snapshot.info
+      self.alias = snapshot.alias
+      self.ctype = snapshot.ctype
+      self.collectedAt = snapshot.collectedAt
+      self.interest = snapshot.interest
+    }
   }
 
-  // MARK: - EpisodeV2
+  // MARK: - EpisodeV3
 
   @Model
-  final class EpisodeV2 {
+  final class EpisodeV3: Linkable {
     @Attribute(.unique)
     var episodeId: Int
 
@@ -132,7 +158,7 @@ enum BangumiSchemaV2: VersionedSchema {
     var status: Int = 0
     var collectedAt: Int = 0
 
-    var subject: BangumiSchemaV2.SubjectV2?
+    var subject: BangumiSchemaV3.SubjectV3?
 
     init(_ item: EpisodeDTO) {
       self.episodeId = item.id
@@ -151,12 +177,28 @@ enum BangumiSchemaV2: VersionedSchema {
         self.collectedAt = collection.updatedAt ?? 0
       }
     }
+
+    init(_ snapshot: EpisodeSnapshot) {
+      self.episodeId = snapshot.episodeId
+      self.subjectId = snapshot.subjectId
+      self.type = snapshot.type
+      self.sort = snapshot.sort
+      self.name = snapshot.name
+      self.nameCN = snapshot.nameCN
+      self.duration = snapshot.duration
+      self.airdate = snapshot.airdate
+      self.comment = snapshot.comment
+      self.desc = snapshot.desc
+      self.disc = snapshot.disc
+      self.status = snapshot.status
+      self.collectedAt = snapshot.collectedAt
+    }
   }
 
-  // MARK: - CharacterV2
+  // MARK: - CharacterV3
 
   @Model
-  final class CharacterV2 {
+  final class CharacterV3: Searchable, Linkable {
     @Attribute(.unique)
     var characterId: Int
 
@@ -175,9 +217,9 @@ enum BangumiSchemaV2: VersionedSchema {
 
     var collectedAt: Int = 0
 
-    var casts: [CharacterCastDTO] = []
-    var relations: [CharacterRelationDTO] = []
-    var indexes: [SlimIndexDTO] = []
+    var castsData: Data?
+    var relationsData: Data?
+    var indexesData: Data?
 
     init(_ item: CharacterDTO) {
       self.characterId = item.id
@@ -212,12 +254,29 @@ enum BangumiSchemaV2: VersionedSchema {
       self.alias = ""
       self.collectedAt = 0
     }
+
+    init(_ snapshot: CharacterSnapshot) {
+      self.characterId = snapshot.characterId
+      self.collects = snapshot.collects
+      self.comment = snapshot.comment
+      self.images = snapshot.images
+      self.infobox = snapshot.infobox
+      self.lock = snapshot.lock
+      self.name = snapshot.name
+      self.nameCN = snapshot.nameCN
+      self.nsfw = snapshot.nsfw
+      self.role = snapshot.role
+      self.summary = snapshot.summary
+      self.info = snapshot.info
+      self.alias = snapshot.alias
+      self.collectedAt = snapshot.collectedAt
+    }
   }
 
-  // MARK: - PersonV2
+  // MARK: - PersonV3
 
   @Model
-  final class PersonV2 {
+  final class PersonV3: Searchable, Linkable {
     @Attribute(.unique)
     var personId: Int
 
@@ -237,10 +296,10 @@ enum BangumiSchemaV2: VersionedSchema {
 
     var collectedAt: Int = 0
 
-    var casts: [PersonCastDTO] = []
-    var works: [PersonWorkDTO] = []
-    var relations: [PersonRelationDTO] = []
-    var indexes: [SlimIndexDTO] = []
+    var castsData: Data?
+    var worksData: Data?
+    var relationsData: Data?
+    var indexesData: Data?
 
     init(_ item: PersonDTO) {
       self.personId = item.id
@@ -277,12 +336,30 @@ enum BangumiSchemaV2: VersionedSchema {
       self.alias = ""
       self.collectedAt = 0
     }
+
+    init(_ snapshot: PersonSnapshot) {
+      self.personId = snapshot.personId
+      self.career = snapshot.career
+      self.collects = snapshot.collects
+      self.comment = snapshot.comment
+      self.images = snapshot.images
+      self.infobox = snapshot.infobox
+      self.lock = snapshot.lock
+      self.name = snapshot.name
+      self.nameCN = snapshot.nameCN
+      self.nsfw = snapshot.nsfw
+      self.summary = snapshot.summary
+      self.type = snapshot.type
+      self.info = snapshot.info
+      self.alias = snapshot.alias
+      self.collectedAt = snapshot.collectedAt
+    }
   }
 
-  // MARK: - GroupV2
+  // MARK: - GroupV3
 
   @Model
-  final class GroupV2 {
+  final class GroupV3: Linkable {
     @Attribute(.unique)
     var groupId: Int
 
@@ -290,7 +367,7 @@ enum BangumiSchemaV2: VersionedSchema {
     var nsfw: Bool
     var title: String
     var icon: Avatar?
-    var creator: SlimUserDTO?
+    var creatorData: Data?
     var creatorID: Int
     var desc: String
     var cat: Int
@@ -305,9 +382,9 @@ enum BangumiSchemaV2: VersionedSchema {
     var joinedAt: Int = 0
 
     /// details
-    var moderators: [GroupMemberDTO] = []
-    var recentMembers: [GroupMemberDTO] = []
-    var recentTopics: [TopicDTO] = []
+    var moderatorsData: Data?
+    var recentMembersData: Data?
+    var recentTopicsData: Data?
 
     init(_ item: GroupDTO) {
       self.groupId = item.id
@@ -315,7 +392,7 @@ enum BangumiSchemaV2: VersionedSchema {
       self.nsfw = item.nsfw
       self.title = item.title
       self.icon = item.icon
-      self.creator = item.creator
+      self.creatorData = PersistedJSON.encode(item.creator)
       self.creatorID = item.creatorID
       self.desc = item.description
       self.cat = item.cat
@@ -327,12 +404,31 @@ enum BangumiSchemaV2: VersionedSchema {
       self.role = item.membership?.role?.rawValue ?? -1
       self.joinedAt = item.membership?.joinedAt ?? 0
     }
+
+    init(_ snapshot: GroupSnapshot) {
+      self.groupId = snapshot.groupId
+      self.name = snapshot.name
+      self.nsfw = snapshot.nsfw
+      self.title = snapshot.title
+      self.icon = snapshot.icon
+      self.creatorData = nil
+      self.creatorID = snapshot.creatorID
+      self.desc = snapshot.desc
+      self.cat = snapshot.cat
+      self.accessible = snapshot.accessible
+      self.members = snapshot.members
+      self.posts = snapshot.posts
+      self.topics = snapshot.topics
+      self.createdAt = snapshot.createdAt
+      self.role = snapshot.role
+      self.joinedAt = snapshot.joinedAt
+    }
   }
 
-  // MARK: - UserV1
+  // MARK: - UserV2
 
   @Model
-  final class UserV1 {
+  final class UserV2 {
     @Attribute(.unique)
     var userId: Int
 
@@ -345,9 +441,9 @@ enum BangumiSchemaV2: VersionedSchema {
     var site: String
     var location: String
     var bio: String
-    var networkServices: [UserNetworkServiceDTO]
-    var homepage: UserHomepageDTO
-    var stats: UserStatsDTO?
+    var networkServicesData: Data?
+    var homepageData: Data?
+    var statsData: Data?
 
     init(_ item: UserDTO) {
       self.userId = item.id
@@ -360,9 +456,25 @@ enum BangumiSchemaV2: VersionedSchema {
       self.site = item.site
       self.location = item.location
       self.bio = item.bio
-      self.networkServices = item.networkServices
-      self.homepage = item.homepage
-      self.stats = item.stats
+      self.networkServicesData = PersistedJSON.encode(item.networkServices)
+      self.homepageData = PersistedJSON.encode(item.homepage)
+      self.statsData = PersistedJSON.encode(item.stats)
+    }
+
+    init(_ snapshot: UserSnapshot) {
+      self.userId = snapshot.userId
+      self.username = snapshot.username
+      self.nickname = snapshot.nickname
+      self.avatar = snapshot.avatar
+      self.group = snapshot.group
+      self.joinedAt = snapshot.joinedAt
+      self.sign = snapshot.sign
+      self.site = snapshot.site
+      self.location = snapshot.location
+      self.bio = snapshot.bio
+      self.networkServicesData = nil
+      self.homepageData = nil
+      self.statsData = nil
     }
   }
 
@@ -383,106 +495,106 @@ enum BangumiSchemaV2: VersionedSchema {
     }
   }
 
-  // MARK: - TrendingSubjectV1
+  // MARK: - TrendingSubjectV2
 
   @Model
-  final class TrendingSubjectV1 {
+  final class TrendingSubjectV2 {
     @Attribute(.unique)
     var type: Int
 
-    var items: [TrendingSubjectDTO]
+    var itemsData: Data?
 
     init(type: Int, items: [TrendingSubjectDTO]) {
       self.type = type
-      self.items = items
+      self.itemsData = PersistedJSON.encode(items)
     }
   }
 
-  // MARK: - BangumiCalendarV1
+  // MARK: - BangumiCalendarV2
 
   @Model
-  final class BangumiCalendarV1 {
+  final class BangumiCalendarV2 {
     @Attribute(.unique)
     var weekday: Int
 
-    var items: [BangumiCalendarItemDTO]
+    var itemsData: Data?
 
     init(weekday: Int, items: [BangumiCalendarItemDTO]) {
       self.weekday = weekday
-      self.items = items
+      self.itemsData = PersistedJSON.encode(items)
     }
   }
 
-  // MARK: - SubjectDetailV1
+  // MARK: - SubjectDetailV2
 
   @Model
-  final class SubjectDetailV1 {
+  final class SubjectDetailV2 {
     @Attribute(.unique)
     var subjectId: Int
 
-    var positions: [SubjectPositionDTO] = []
-    var characters: [SubjectCharacterDTO] = []
-    var offprints: [SubjectRelationDTO] = []
-    var relations: [SubjectRelationDTO] = []
-    var recs: [SubjectRecDTO] = []
-    var collects: [SubjectCollectDTO] = []
-    var reviews: [SubjectReviewDTO] = []
-    var topics: [TopicDTO] = []
-    var comments: [SubjectCommentDTO] = []
-    var indexes: [SlimIndexDTO] = []
+    var positionsData: Data?
+    var charactersData: Data?
+    var offprintsData: Data?
+    var relationsData: Data?
+    var recsData: Data?
+    var collectsData: Data?
+    var reviewsData: Data?
+    var topicsData: Data?
+    var commentsData: Data?
+    var indexesData: Data?
 
     init(subjectId: Int) {
       self.subjectId = subjectId
     }
   }
 
-  // MARK: - RakuenSubjectTopicCacheV1
+  // MARK: - RakuenSubjectTopicCacheV2
 
   @Model
-  final class RakuenSubjectTopicCacheV1 {
+  final class RakuenSubjectTopicCacheV2 {
     @Attribute(.unique)
     var mode: String
 
-    var items: [SubjectTopicDTO]
+    var itemsData: Data?
     var updatedAt: Date
 
     init(mode: String, items: [SubjectTopicDTO]) {
       self.mode = mode
-      self.items = items
+      self.itemsData = PersistedJSON.encode(items)
       self.updatedAt = Date()
     }
   }
 
-  // MARK: - RakuenGroupTopicCacheV1
+  // MARK: - RakuenGroupTopicCacheV2
 
   @Model
-  final class RakuenGroupTopicCacheV1 {
+  final class RakuenGroupTopicCacheV2 {
     @Attribute(.unique)
     var mode: String
 
-    var items: [GroupTopicDTO]
+    var itemsData: Data?
     var updatedAt: Date
 
     init(mode: String, items: [GroupTopicDTO]) {
       self.mode = mode
-      self.items = items
+      self.itemsData = PersistedJSON.encode(items)
       self.updatedAt = Date()
     }
   }
 
-  // MARK: - RakuenGroupCacheV1
+  // MARK: - RakuenGroupCacheV2
 
   @Model
-  final class RakuenGroupCacheV1 {
+  final class RakuenGroupCacheV2 {
     @Attribute(.unique)
     var id: String
 
-    var items: [SlimGroupDTO]
+    var itemsData: Data?
     var updatedAt: Date
 
     init(id: String, items: [SlimGroupDTO]) {
       self.id = id
-      self.items = items
+      self.itemsData = PersistedJSON.encode(items)
       self.updatedAt = Date()
     }
   }

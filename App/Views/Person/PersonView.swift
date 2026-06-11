@@ -180,7 +180,9 @@ struct PersonDetailView: View {
         .imageStyle(width: 120, height: 120, alignment: .top)
         .imageType(.person)
         .imageNSFW(person.nsfw)
-        .enableImagePreview(person.images?.large, zoomID: ZoomNavigationID(type: .person, id: person.personId))
+        .enableImagePreview(
+          person.images?.large, zoomID: ZoomNavigationID(type: .person, id: person.personId)
+        )
         .padding(4)
         .shadow(radius: 4)
       VStack(alignment: .leading) {
