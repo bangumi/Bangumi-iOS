@@ -1,14 +1,5 @@
 import Foundation
 
-struct BangumiV2MigrationSnapshot: Codable {
-  var subjects: [SubjectSnapshot]
-  var episodes: [EpisodeSnapshot]
-  var characters: [CharacterSnapshot]
-  var persons: [PersonSnapshot]
-  var groups: [GroupSnapshot]
-  var users: [UserSnapshot]
-}
-
 struct SubjectSnapshot: Codable {
   var subjectId: Int
   var airtime: SubjectAirtime
@@ -226,25 +217,59 @@ struct UserSnapshot: Codable {
 }
 
 enum BangumiMigrationSnapshotStore {
-  private static var url: URL {
-    FileManager.default.temporaryDirectory
-      .appendingPathComponent("BangumiMigration", isDirectory: true)
-      .appendingPathComponent("v2-to-v3.json")
+  private static var directoryURL: URL {
+    let baseURL =
+      FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
+      ?? FileManager.default.temporaryDirectory
+    return baseURL.appendingPathComponent("BangumiMigrationV2ToV3", isDirectory: true)
   }
 
-  static func save(_ snapshot: BangumiV2MigrationSnapshot) throws {
-    let directory = url.deletingLastPathComponent()
-    try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+  static func prepare() throws {
+    clear()
+    try FileManager.default.createDirectory(
+      at: directoryURL,
+      withIntermediateDirectories: true
+    )
+  }
+
+  static func writeChunk<Value: Encodable>(
+    _ values: [Value],
+    prefix: String,
+    index: Int
+  ) throws {
     let encoder = JSONEncoder()
     encoder.outputFormatting = [.sortedKeys]
-    try encoder.encode(snapshot).write(to: url, options: .atomic)
+    try encoder.encode(values).write(
+      to: chunkURL(prefix: prefix, index: index),
+      options: .atomic
+    )
   }
 
-  static func load() throws -> BangumiV2MigrationSnapshot {
-    try JSONDecoder().decode(BangumiV2MigrationSnapshot.self, from: Data(contentsOf: url))
+  static func readChunk<Value: Decodable>(_ type: Value.Type, at url: URL) throws -> [Value] {
+    try JSONDecoder().decode([Value].self, from: Data(contentsOf: url))
+  }
+
+  static func chunkURLs(prefix: String) -> [URL] {
+    guard
+      let urls = try? FileManager.default.contentsOfDirectory(
+        at: directoryURL,
+        includingPropertiesForKeys: nil
+      )
+    else {
+      return []
+    }
+    return urls
+      .filter { $0.lastPathComponent.hasPrefix("\(prefix)-") }
+      .sorted { $0.lastPathComponent < $1.lastPathComponent }
+  }
+
+  private static func chunkURL(prefix: String, index: Int) -> URL {
+    directoryURL.appendingPathComponent(
+      "\(prefix)-\(String(format: "%05d", index)).json"
+    )
   }
 
   static func clear() {
-    try? FileManager.default.removeItem(at: url.deletingLastPathComponent())
+    try? FileManager.default.removeItem(at: directoryURL)
   }
 }
