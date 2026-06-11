@@ -4,14 +4,35 @@ import SwiftUI
 
 struct CalendarSlimView: View {
 
+  private struct CalendarDay: Identifiable {
+    let weekday: WeekDay
+    let desc: String
+    let calendar: BangumiCalendar
+
+    var id: WeekDay {
+      weekday
+    }
+
+    var count: Int {
+      calendar.items.count
+    }
+
+    var watchers: Int {
+      calendar.items.reduce(0) { $0 + $1.watchers }
+    }
+  }
+
+  @Environment(\.scenePhase) private var scenePhase
+
+  @State private var currentDate = Calendar.current.startOfDay(for: Date())
   @State private var refreshed: Bool = false
 
   @Query(sort: \BangumiCalendar.weekday)
   private var calendars: [BangumiCalendar]
 
-  var dates: [(weekday: WeekDay, desc: String, date: Date, calendar: BangumiCalendar, count: Int, watchers: Int)] {
-    let today = Date()
-    let tomorrow = today.addingTimeInterval(86400)
+  private var dates: [CalendarDay] {
+    let today = currentDate
+    let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: today) ?? today
 
     let todayCalendar =
       calendars.first { $0.weekday == WeekDay(date: today).rawValue }
@@ -21,16 +42,17 @@ struct CalendarSlimView: View {
       ?? BangumiCalendar(weekday: WeekDay(date: tomorrow).rawValue, items: [])
 
     let result = [
-      (weekday: WeekDay(date: today), desc: "今天", date: today,
-       calendar: todayCalendar,
-       count: todayCalendar.items.count,
-       watchers: todayCalendar.items.reduce(0) { $0 + $1.watchers }),
-      (weekday: WeekDay(date: tomorrow), desc: "明天", date: tomorrow,
-       calendar: tomorrowCalendar,
-       count: tomorrowCalendar.items.count,
-       watchers: tomorrowCalendar.items.reduce(0) { $0 + $1.watchers }),
+      CalendarDay(weekday: WeekDay(date: today), desc: "今天", calendar: todayCalendar),
+      CalendarDay(weekday: WeekDay(date: tomorrow), desc: "明天", calendar: tomorrowCalendar),
     ]
     return result
+  }
+
+  func updateCurrentDate() {
+    let today = Calendar.current.startOfDay(for: Date())
+    if currentDate != today {
+      currentDate = today
+    }
   }
 
   func refreshCalendar() async {
@@ -52,13 +74,13 @@ struct CalendarSlimView: View {
       } else {
         VStack(alignment: .leading, spacing: 8) {
           HStack(alignment: .bottom) {
-            Text("每日放送: \(Date().formatted(date: .long, time: .omitted))")
+            Text("每日放送: \(currentDate.formatted(date: .long, time: .omitted))")
             Spacer()
             NavigationLink(value: NavDestination.calendar) {
               Text("更多 »").font(.caption)
             }.buttonStyle(.navigation)
           }
-          ForEach(dates, id: \.weekday) { item in
+          ForEach(dates) { item in
             VStack(alignment: .leading, spacing: 6) {
               HStack(spacing: 4) {
                 Text(item.desc)
@@ -83,7 +105,19 @@ struct CalendarSlimView: View {
           Divider()
         }
       }
-    }.padding(.horizontal, 8)
+    }
+    .padding(.horizontal, 8)
+    .onAppear {
+      updateCurrentDate()
+    }
+    .onChange(of: scenePhase) {
+      if scenePhase == .active {
+        updateCurrentDate()
+      }
+    }
+    .onReceive(NotificationCenter.default.publisher(for: .NSCalendarDayChanged)) { _ in
+      updateCurrentDate()
+    }
   }
 }
 

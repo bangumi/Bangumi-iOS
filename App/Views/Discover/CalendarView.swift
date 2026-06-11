@@ -65,19 +65,18 @@ enum WeekDay: Int, CaseIterable {
 
 struct CalendarView: View {
 
+  @Environment(\.scenePhase) private var scenePhase
+
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
 
+  @State private var currentDate = Calendar.current.startOfDay(for: Date())
   @State private var refreshed: Bool = false
 
   @Query(sort: \BangumiCalendar.weekday)
   private var calendars: [BangumiCalendar]
 
-  var today: Date {
-    Date()
-  }
-
   var sortedCalendars: [BangumiCalendar] {
-    let todayWeekday = WeekDay(date: today).rawValue
+    let todayWeekday = WeekDay(date: currentDate).rawValue
     let sorted = calendars.sorted { $0.weekday < $1.weekday }
     guard let pivot = sorted.firstIndex(where: { $0.weekday >= todayWeekday }) else {
       return sorted
@@ -97,6 +96,13 @@ struct CalendarView: View {
     sortedCalendars.first?.items.reduce(0) { $0 + $1.watchers } ?? 0
   }
 
+  func updateCurrentDate() {
+    let today = Calendar.current.startOfDay(for: Date())
+    if currentDate != today {
+      currentDate = today
+    }
+  }
+
   func refreshCalendar() async {
     if refreshed { return }
     refreshed = true
@@ -108,38 +114,51 @@ struct CalendarView: View {
   }
 
   var body: some View {
-    if calendars.isEmpty {
-      ProgressView().task {
-        await refreshCalendar()
-      }
-    } else {
-      ScrollView {
-        VStack {
-          Text("每日放送")
-            .font(.title)
-            .padding(.top, 10)
+    Group {
+      if calendars.isEmpty {
+        ProgressView().task {
+          await refreshCalendar()
+        }
+      } else {
+        ScrollView {
           VStack {
-            Text("\(today.formatted(date: .complete, time: .omitted))")
-            Text("本季度共 \(total) 部番组，今日上映 \(todayTotal) 部。")
-            Text("共 \(todayWatchers) 人收看今日番组。")
-          }
-          .font(.footnote)
-          .foregroundStyle(.secondary)
-        }.padding(.horizontal, 8)
-        LazyVStack {
-          ForEach(sortedCalendars) { calendar in
-            CalendarWeekdayView(calendar: calendar)
-              .padding(.vertical, 10)
-          }
-        }.padding(.horizontal, 8)
+            Text("每日放送")
+              .font(.title)
+              .padding(.top, 10)
+            VStack {
+              Text("\(currentDate.formatted(date: .complete, time: .omitted))")
+              Text("本季度共 \(total) 部番组，今日上映 \(todayTotal) 部。")
+              Text("共 \(todayWatchers) 人收看今日番组。")
+            }
+            .font(.footnote)
+            .foregroundStyle(.secondary)
+          }.padding(.horizontal, 8)
+          LazyVStack {
+            ForEach(sortedCalendars) { calendar in
+              CalendarWeekdayView(calendar: calendar)
+                .padding(.vertical, 10)
+            }
+          }.padding(.horizontal, 8)
+        }
+        .navigationTitle("每日放送")
+        .navigationBarTitleDisplayMode(.inline)
+        .refreshable {
+          refreshed = false
+          UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+          await refreshCalendar()
+        }
       }
-      .navigationTitle("每日放送")
-      .navigationBarTitleDisplayMode(.inline)
-      .refreshable {
-        refreshed = false
-        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-        await refreshCalendar()
+    }
+    .onAppear {
+      updateCurrentDate()
+    }
+    .onChange(of: scenePhase) {
+      if scenePhase == .active {
+        updateCurrentDate()
       }
+    }
+    .onReceive(NotificationCenter.default.publisher(for: .NSCalendarDayChanged)) { _ in
+      updateCurrentDate()
     }
   }
 }
