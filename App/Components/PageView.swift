@@ -1,5 +1,23 @@
 import SwiftUI
 
+struct NextPageTriggerRow<Item: Identifiable>: Identifiable {
+  let item: Item
+  let triggersNextPage: Bool
+
+  var id: Item.ID {
+    item.id
+  }
+}
+
+extension Array where Element: Identifiable {
+  func withNextPageTriggers(threshold: Int = 5) -> [NextPageTriggerRow<Element>] {
+    let triggerIndex = Swift.max(count - threshold, 0)
+    return enumerated().map { index, item in
+      NextPageTriggerRow(item: item, triggersNextPage: index >= triggerIndex)
+    }
+  }
+}
+
 /// A view that loads data continuously.
 ///
 struct PageView<T, C>: View
@@ -9,6 +27,7 @@ where C: View, T: Identifiable & Hashable & Codable & Sendable {
 
   let limit: Int
   let reloader: Bool
+  let isIncluded: (Item) -> Bool
   let nextPageFunc: (Int, Int) async -> PagedDTO<Item>?
   let content: (Item) -> Content
 
@@ -16,10 +35,6 @@ where C: View, T: Identifiable & Hashable & Codable & Sendable {
   @State private var offset: Int = 0
   @State private var exhausted: Bool = false
   @State private var items: [Item] = []
-
-  private func shouldLoadMore(after item: Item, threshold: Int = 5) -> Bool {
-    items.suffix(threshold).contains(item)
-  }
 
   func reload() {
     loading = true
@@ -72,22 +87,24 @@ where C: View, T: Identifiable & Hashable & Codable & Sendable {
   public init(
     limit: Int = 20,
     reloader: Bool = false,
+    isIncluded: @escaping (Item) -> Bool = { _ in true },
     nextPageFunc: @escaping (Int, Int) async -> PagedDTO<Item>?,
     @ViewBuilder content: @escaping (Item) -> Content
   ) {
     self.limit = limit
     self.nextPageFunc = nextPageFunc
     self.reloader = reloader
+    self.isIncluded = isIncluded
     self.content = content
   }
 
   public var body: some View {
     LazyVStack(alignment: .leading) {
-      ForEach(items) { item in
-        content(item)
+      ForEach(items.withNextPageTriggers().filter { isIncluded($0.item) }) { row in
+        content(row.item)
           .transition(.opacity)
           .onAppear {
-            if shouldLoadMore(after: item) {
+            if row.triggersNextPage {
               Task {
                 await loadNextPage()
               }
@@ -199,11 +216,11 @@ where C: View, T: Identifiable & Hashable & Codable & Sendable {
 
   public var body: some View {
     LazyVStack(alignment: .leading) {
-      ForEach(items) { item in
-        content(item)
+      ForEach(items.withNextPageTriggers(threshold: 1)) { row in
+        content(row.item)
           .transition(.opacity)
           .onAppear {
-            if item == items.last {
+            if row.triggersNextPage {
               Task {
                 await loadNextPage()
               }

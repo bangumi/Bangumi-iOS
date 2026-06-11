@@ -45,11 +45,17 @@ struct RakuenSubjectTopicListView: View {
   }
 
   var body: some View {
-    PageView<SubjectTopicDTO, _>(reloader: reloader, nextPageFunc: load) { topic in
-      if !hideBlocklist || !blocklist.contains(topic.creator?.id ?? 0) {
-        RakuenSubjectTopicItemView(topic: topic)
-      }
+    PageView<SubjectTopicDTO, _>(
+      reloader: reloader,
+      isIncluded: isVisible,
+      nextPageFunc: load
+    ) { topic in
+      RakuenSubjectTopicItemView(topic: topic)
     }
+  }
+
+  private func isVisible(_ topic: SubjectTopicDTO) -> Bool {
+    !hideBlocklist || !blocklist.contains(topic.creator?.id ?? 0)
   }
 }
 
@@ -113,17 +119,6 @@ struct CachedSubjectTopicListView: View {
 
   private var displayItems: [SubjectTopicDTO] {
     items.isEmpty ? cachedItems : items
-  }
-
-  private var filteredItems: [SubjectTopicDTO] {
-    if hideBlocklist {
-      return displayItems.filter { !blocklist.contains($0.creator?.id ?? 0) }
-    }
-    return displayItems
-  }
-
-  private func shouldLoadMore(after item: SubjectTopicDTO, threshold: Int = 5) -> Bool {
-    displayItems.suffix(threshold).contains(item)
   }
 
   private func loadFirstPage() async {
@@ -191,11 +186,11 @@ struct CachedSubjectTopicListView: View {
 
   var body: some View {
     LazyVStack(alignment: .leading) {
-      ForEach(filteredItems) { topic in
-        RakuenSubjectTopicItemView(topic: topic)
+      ForEach(displayItems.withNextPageTriggers().filter { isVisible($0.item) }) { row in
+        RakuenSubjectTopicItemView(topic: row.item)
           .transition(.opacity)
           .onAppear {
-            if shouldLoadMore(after: topic) {
+            if row.triggersNextPage {
               Task {
                 await loadNextPage()
               }
@@ -247,5 +242,9 @@ struct CachedSubjectTopicListView: View {
         await loadFirstPage()
       }
     }
+  }
+
+  private func isVisible(_ topic: SubjectTopicDTO) -> Bool {
+    !hideBlocklist || !blocklist.contains(topic.creator?.id ?? 0)
   }
 }

@@ -38,11 +38,17 @@ struct RakuenGroupTopicListView: View {
   }
 
   var body: some View {
-    PageView<GroupTopicDTO, _>(reloader: reloader, nextPageFunc: load) { topic in
-      if !hideBlocklist || !blocklist.contains(topic.creator?.id ?? 0) {
-        RakuenGroupTopicItemView(topic: topic)
-      }
+    PageView<GroupTopicDTO, _>(
+      reloader: reloader,
+      isIncluded: isVisible,
+      nextPageFunc: load
+    ) { topic in
+      RakuenGroupTopicItemView(topic: topic)
     }
+  }
+
+  private func isVisible(_ topic: GroupTopicDTO) -> Bool {
+    !hideBlocklist || !blocklist.contains(topic.creator?.id ?? 0)
   }
 }
 
@@ -106,17 +112,6 @@ struct CachedGroupTopicListView: View {
     items.isEmpty ? cachedItems : items
   }
 
-  private var filteredItems: [GroupTopicDTO] {
-    if hideBlocklist {
-      return displayItems.filter { !blocklist.contains($0.creator?.id ?? 0) }
-    }
-    return displayItems
-  }
-
-  private func shouldLoadMore(after item: GroupTopicDTO, threshold: Int = 5) -> Bool {
-    displayItems.suffix(threshold).contains(item)
-  }
-
   private func loadFirstPage() async {
     if loading { return }
     loading = true
@@ -166,11 +161,11 @@ struct CachedGroupTopicListView: View {
 
   var body: some View {
     LazyVStack(alignment: .leading) {
-      ForEach(filteredItems) { topic in
-        RakuenGroupTopicItemView(topic: topic)
+      ForEach(displayItems.withNextPageTriggers().filter { isVisible($0.item) }) { row in
+        RakuenGroupTopicItemView(topic: row.item)
           .transition(.opacity)
           .onAppear {
-            if shouldLoadMore(after: topic) {
+            if row.triggersNextPage {
               Task {
                 await loadNextPage()
               }
@@ -222,5 +217,9 @@ struct CachedGroupTopicListView: View {
         await loadFirstPage()
       }
     }
+  }
+
+  private func isVisible(_ topic: GroupTopicDTO) -> Bool {
+    !hideBlocklist || !blocklist.contains(topic.creator?.id ?? 0)
   }
 }

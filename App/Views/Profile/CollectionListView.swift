@@ -13,10 +13,6 @@ struct CollectionListView: View {
   @State private var counts: [CollectionType: Int] = [:]
   @State private var subjects: [Subject] = []
 
-  private func shouldLoadMore(after subject: Subject, threshold: Int = 5) -> Bool {
-    subjects.suffix(threshold).contains(subject)
-  }
-
   func loadCounts() async {
     let stype = subjectType.rawValue
     do {
@@ -102,10 +98,10 @@ struct CollectionListView: View {
           }
           ScrollView {
             LazyVStack(alignment: .leading, spacing: 10) {
-              ForEach(subjects) { subject in
-                CollectionRowView(subject: subject)
+              ForEach(subjects.withNextPageTriggers()) { row in
+                CollectionRowView(subject: row.item)
                   .onAppear {
-                    if shouldLoadMore(after: subject) {
+                    if row.triggersNextPage {
                       Task {
                         await loadNextPage()
                       }
