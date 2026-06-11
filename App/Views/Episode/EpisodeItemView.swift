@@ -10,8 +10,6 @@ struct EpisodeItemView: View {
     Text("\(episode.sort.episodeDisplay)")
       .monospacedDigit()
       .lineLimit(1)
-      .minimumScaleFactor(0.7)
-      .allowsTightening(true)
       .layoutPriority(1)
       .foregroundStyle(episode.textColor)
       .padding(2)
