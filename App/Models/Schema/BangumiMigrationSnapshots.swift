@@ -258,7 +258,8 @@ enum BangumiMigrationSnapshotStore {
     else {
       return []
     }
-    return urls
+    return
+      urls
       .filter { $0.lastPathComponent.hasPrefix("\(prefix)-") }
       .sorted { $0.lastPathComponent < $1.lastPathComponent }
   }

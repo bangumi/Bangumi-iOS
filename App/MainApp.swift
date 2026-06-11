@@ -19,7 +19,7 @@ struct MainApp: App {
         switch bootstrapState {
         case .migrating:
           MigrationLoadingView()
-        case let .ready(container):
+        case .ready(let container):
           ContentView()
             .modelContainer(container)
         case .failed:
@@ -56,9 +56,13 @@ private enum BootstrapState {
 }
 
 private struct MigrationLoadingView: View {
+  @State private var musumeIndex = Int.random(in: 0...6)
+
   var body: some View {
     VStack(spacing: 16) {
-      ProgressView()
+      MusumeView(index: musumeIndex, width: 80, height: 130)
+        .id(musumeIndex)
+        .transition(.opacity)
       Text("正在升级本地数据")
         .font(.headline)
       Text("数据较多时可能需要一些时间，请勿关闭应用。")
@@ -67,16 +71,36 @@ private struct MigrationLoadingView: View {
         .multilineTextAlignment(.center)
     }
     .padding()
+    .task {
+      while !Task.isCancelled {
+        do {
+          try await Task.sleep(for: .milliseconds(800))
+        } catch {
+          return
+        }
+        withAnimation(.easeInOut(duration: 0.2)) {
+          musumeIndex = (musumeIndex + 1) % 7
+        }
+      }
+    }
   }
 }
 
 private struct MigrationFailedView: View {
   var body: some View {
-    ContentUnavailableView {
-      Label("数据迁移失败", systemImage: "exclamationmark.triangle")
-    } description: {
+    VStack(spacing: 12) {
+      Image("404")
+        .resizable()
+        .scaledToFit()
+        .frame(width: 180, height: 180)
+      Text("数据迁移失败")
+        .font(.headline)
       Text("本地数据无法升级，请删除并重新安装应用。")
+        .font(.subheadline)
+        .foregroundStyle(.secondary)
+        .multilineTextAlignment(.center)
     }
+    .padding()
   }
 }
 
