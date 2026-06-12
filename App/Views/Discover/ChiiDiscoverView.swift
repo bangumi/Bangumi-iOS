@@ -18,15 +18,15 @@ struct ChiiDiscoverView: View {
   var body: some View {
     GeometryReader { geometry in
       VStack {
-        if searching {
-          SearchView(text: $query, searching: $searching, remote: $remote)
-        } else {
+        if query.isEmpty {
           ScrollView {
             VStack {
               CalendarSlimView()
               TrendingSubjectView(width: geometry.size.width)
             }
           }
+        } else {
+          SearchView(text: $query, remote: $remote)
         }
       }
     }
@@ -40,6 +40,7 @@ struct ChiiDiscoverView: View {
       placement: .navigationBarDrawer(displayMode: .always),
       prompt: "搜索条目，角色，人物"
     )
+    .searchInputTraits()
     .onChange(of: query) {
       remote = false
     }

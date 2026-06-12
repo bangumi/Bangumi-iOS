@@ -31,6 +31,7 @@ struct SearchCharacterPickerView: View {
       .navigationTitle("搜索角色")
       .navigationBarTitleDisplayMode(.inline)
       .searchable(text: $searchText, isPresented: $searching, prompt: "搜索角色")
+      .searchInputTraits()
       .searchPresentationToolbarBehavior(.avoidHidingContent)
       .onSubmit(of: .search) {
         remote = true

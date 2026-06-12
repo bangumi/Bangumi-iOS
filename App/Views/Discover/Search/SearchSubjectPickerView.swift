@@ -48,6 +48,7 @@ struct SearchSubjectPickerView: View {
       .navigationTitle("搜索条目")
       .navigationBarTitleDisplayMode(.inline)
       .searchable(text: $searchText, isPresented: $searching, prompt: "搜索条目")
+      .searchInputTraits()
       .searchPresentationToolbarBehavior(.avoidHidingContent)
       .onSubmit(of: .search) {
         remote = true

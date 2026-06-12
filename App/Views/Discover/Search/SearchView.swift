@@ -10,7 +10,6 @@ enum SearchType {
 
 struct SearchView: View {
   @Binding var text: String
-  @Binding var searching: Bool
   @Binding var remote: Bool
 
   @State private var searchType: SearchType = .subject

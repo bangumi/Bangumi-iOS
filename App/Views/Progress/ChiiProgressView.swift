@@ -514,11 +514,12 @@ struct ChiiProgressView: View {
         placement: .navigationBarDrawer(displayMode: .always),
         prompt: "搜索正在观看的条目"
       )
+      .searchInputTraits()
       .navigationTitle("进度管理")
       .navigationBarTitleDisplayMode(.inline)
       .toolbar { progressToolbar }
       .onChange(of: progressTab) { Task { await reloadProgressPages(animate: true) } }
-      .onChange(of: search) { Task { await reloadProgressPages() } }
+      .onChange(of: search) { Task { await reloadProgressPages(animate: true) } }
       .onChange(of: progressSortMode) { Task { await reloadProgressPages(animate: true) } }
       .onChange(of: progressViewMode) { Task { await reloadProgressPages(animate: true) } }
       .onReceive(
