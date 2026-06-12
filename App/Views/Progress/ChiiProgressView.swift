@@ -37,6 +37,43 @@ struct ChiiProgressView: View {
     progressOffset < progressTotal
   }
 
+  private func applyProgressSubjects(_ updatedSubjects: [ProgressSubjectDTO], total: Int) {
+    if progressSubjects != updatedSubjects {
+      withAnimation {
+        progressSubjects = updatedSubjects
+      }
+    }
+    progressTotal = total
+    progressOffset = min(updatedSubjects.count, total)
+  }
+
+  private func removeProgressSubject(_ subjectId: Int) {
+    let updatedSubjects = progressSubjects.filter { $0.id != subjectId }
+    let removedCount = progressSubjects.count - updatedSubjects.count
+    guard removedCount > 0 else {
+      return
+    }
+
+    let updatedTotal = max(updatedSubjects.count, progressTotal - removedCount)
+    withAnimation {
+      progressSubjects = updatedSubjects
+      progressTotal = updatedTotal
+      progressOffset = min(updatedSubjects.count, updatedTotal)
+    }
+  }
+
+  private func mergeProgressSubject(_ item: ProgressSubjectDTO) {
+    let updatedSubjects = progressSubjects.mergedById(with: [item])
+    guard progressSubjects != updatedSubjects else {
+      return
+    }
+
+    withAnimation {
+      progressSubjects = updatedSubjects
+      progressOffset = min(updatedSubjects.count, progressTotal)
+    }
+  }
+
   private func loadCounts() async {
     do {
       let db = try await AppContext.shared.getDB()
@@ -70,21 +107,11 @@ struct ChiiProgressView: View {
         return
       }
       if reset {
-        if progressSubjects != result.data {
-          withAnimation {
-            progressSubjects = result.data
-          }
-        }
+        applyProgressSubjects(result.data, total: result.total)
       } else {
         let updatedSubjects = progressSubjects.mergedById(with: result.data)
-        if progressSubjects != updatedSubjects {
-          withAnimation {
-            progressSubjects = updatedSubjects
-          }
-        }
+        applyProgressSubjects(updatedSubjects, total: result.total)
       }
-      progressTotal = result.total
-      progressOffset = min((reset ? 0 : progressOffset) + progressPageLimit, result.total)
     } catch {
       Logger.app.error("Failed to load progress page: \(error)")
       Notifier.shared.alert(error: error)
@@ -106,27 +133,35 @@ struct ChiiProgressView: View {
   }
 
   private func reloadProgressSubject(_ subjectId: Int) async {
+    let generation = progressLoadGeneration
+    let progressTabSnapshot = progressTab
+    let progressSortModeSnapshot = progressSortMode
+    let progressViewModeSnapshot = progressViewMode
+    let searchSnapshot = search
+    let episodeWindowSizeSnapshot = progressEpisodeWindowSize
+
     do {
       let db = try await AppContext.shared.getDB()
-      guard
-        let item = try await db.fetchProgressSubject(
-          subjectId: subjectId,
-          progressTab: progressTab,
-          search: search,
-          episodeWindowSize: progressEpisodeWindowSize
-        )
+      let item = try await db.fetchProgressSubject(
+        subjectId: subjectId,
+        progressTab: progressTabSnapshot,
+        search: searchSnapshot,
+        episodeWindowSize: episodeWindowSizeSnapshot
+      )
+      guard generation == progressLoadGeneration,
+        progressTabSnapshot == progressTab,
+        progressSortModeSnapshot == progressSortMode,
+        progressViewModeSnapshot == progressViewMode,
+        searchSnapshot == search
       else {
-        withAnimation {
-          progressSubjects.removeAll { $0.id == subjectId }
-        }
         return
       }
-      let updatedSubjects = progressSubjects.mergedById(with: [item])
-      if progressSubjects != updatedSubjects {
-        withAnimation {
-          progressSubjects = updatedSubjects
-        }
+
+      guard let item else {
+        removeProgressSubject(subjectId)
+        return
       }
+      mergeProgressSubject(item)
     } catch {
       Logger.app.error("Failed to reload progress subject: \(error)")
       Notifier.shared.alert(error: error)
