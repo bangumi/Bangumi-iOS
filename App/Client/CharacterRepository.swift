@@ -54,7 +54,8 @@ enum CharacterRepository {
         await db.commit()
       },
       loadDetail(label: "角色目录") {
-        let response = try await CharacterService.getCharacterIndexes(characterId: characterId, limit: 5)
+        let response = try await CharacterService.getCharacterIndexes(
+          characterId: characterId, limit: 5)
         try await db.saveCharacterIndexes(characterId: characterId, items: response.data)
         await db.commit()
       },

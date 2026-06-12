@@ -99,7 +99,9 @@ enum CharacterService {
     return resp
   }
 
-  static func createCharacterComment(characterId: Int, content: String, replyTo: Int?, token: String)
+  static func createCharacterComment(
+    characterId: Int, content: String, replyTo: Int?, token: String
+  )
     async throws
   {
     let url = BangumiAPI.priv.build("p1/characters/\(characterId)/comments")

@@ -19,7 +19,8 @@ enum UserService {
     }
     let url = BangumiAPI.priv.build("p1/users/\(username)/blogs")
     let queryItems = paginationQueryItems(limit: limit, offset: offset)
-    let data = try await APIClient.shared.request(url: url.appending(queryItems: queryItems), method: "GET")
+    let data = try await APIClient.shared.request(
+      url: url.appending(queryItems: queryItems), method: "GET")
     let resp: PagedDTO<SlimBlogEntryDTO> = try await APIClient.shared.decodeResponse(data)
     return resp
   }
@@ -94,7 +95,8 @@ enum UserService {
     if subjectType != .none {
       queryItems.append(URLQueryItem(name: "subjectType", value: String(subjectType.rawValue)))
     }
-    let data = try await APIClient.shared.request(url: url.appending(queryItems: queryItems), method: "GET")
+    let data = try await APIClient.shared.request(
+      url: url.appending(queryItems: queryItems), method: "GET")
     let response: PagedDTO<SlimSubjectDTO> = try await APIClient.shared.decodeResponse(data)
     return response
   }
@@ -166,7 +168,8 @@ enum UserService {
     if let until {
       queryItems.append(URLQueryItem(name: "until", value: String(until)))
     }
-    let data = try await APIClient.shared.request(url: url.appending(queryItems: queryItems), method: "GET")
+    let data = try await APIClient.shared.request(
+      url: url.appending(queryItems: queryItems), method: "GET")
     let resp: [TimelineDTO] = try await APIClient.shared.decodeResponse(data)
     return resp
   }

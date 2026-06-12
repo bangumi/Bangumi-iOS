@@ -21,8 +21,9 @@ enum AppMetadata {
   }()
 
   private static let versionNumber: String = {
-    guard let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString")
-      as? String
+    guard
+      let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString")
+        as? String
     else {
       fatalError("Could not find CFBundleShortVersionString in Info.plist")
     }

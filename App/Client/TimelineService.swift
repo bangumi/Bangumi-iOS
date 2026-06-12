@@ -15,7 +15,8 @@ enum TimelineService {
     if let until {
       queryItems.append(URLQueryItem(name: "until", value: String(until)))
     }
-    let data = try await APIClient.shared.request(url: url.appending(queryItems: queryItems), method: "GET")
+    let data = try await APIClient.shared.request(
+      url: url.appending(queryItems: queryItems), method: "GET")
     let resp: [TimelineDTO] = try await APIClient.shared.decodeResponse(data)
     return resp
   }

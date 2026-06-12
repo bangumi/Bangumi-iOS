@@ -78,7 +78,8 @@ enum IndexService {
     if let type {
       queryItems.append(URLQueryItem(name: "type", value: String(type.rawValue)))
     }
-    let data = try await APIClient.shared.request(url: url.appending(queryItems: queryItems), method: "GET")
+    let data = try await APIClient.shared.request(
+      url: url.appending(queryItems: queryItems), method: "GET")
     let resp: PagedDTO<IndexRelatedDTO> = try await APIClient.shared.decodeResponse(data)
     return resp
   }

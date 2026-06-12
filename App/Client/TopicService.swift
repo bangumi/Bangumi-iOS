@@ -88,7 +88,8 @@ enum TopicService {
       URLQueryItem(name: "limit", value: String(limit)),
       URLQueryItem(name: "offset", value: String(offset)),
     ]
-    let data = try await APIClient.shared.request(url: url.appending(queryItems: queryItems), method: "GET")
+    let data = try await APIClient.shared.request(
+      url: url.appending(queryItems: queryItems), method: "GET")
     let resp: PagedDTO<GroupTopicDTO> = try await APIClient.shared.decodeResponse(data)
     return resp
   }

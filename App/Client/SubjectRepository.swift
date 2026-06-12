@@ -97,7 +97,9 @@ enum SubjectRepository {
     if offprints {
       addTask(
         label: "条目衍生",
-        work: { try await SubjectService.getSubjectRelations(subjectId, offprint: true, limit: 100) },
+        work: {
+          try await SubjectService.getSubjectRelations(subjectId, offprint: true, limit: 100)
+        },
         save: { value in
           try await db.saveSubjectOffprints(subjectId: subjectId, items: value.data)
         }
@@ -107,7 +109,9 @@ enum SubjectRepository {
     if let collectsMode {
       addTask(
         label: "收藏用户",
-        work: { try await SubjectService.getSubjectCollects(subjectId, mode: collectsMode, limit: 10) },
+        work: {
+          try await SubjectService.getSubjectCollects(subjectId, mode: collectsMode, limit: 10)
+        },
         save: { value in
           try await db.saveSubjectCollects(subjectId: subjectId, items: value.data)
         }

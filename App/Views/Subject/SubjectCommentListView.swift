@@ -23,7 +23,8 @@ struct SubjectCommentListView: View {
 
   func load(limit: Int, offset: Int) async -> PagedDTO<SubjectCommentDTO>? {
     do {
-      let resp = try await SubjectService.getSubjectComments(subjectId, limit: limit, offset: offset)
+      let resp = try await SubjectService.getSubjectComments(
+        subjectId, limit: limit, offset: offset)
       return resp
     } catch {
       Notifier.shared.alert(error: error)

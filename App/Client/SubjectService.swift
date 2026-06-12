@@ -135,7 +135,8 @@ enum SubjectService {
         return loadFixture(
           fixture: "subject_offprints.json", target: PagedDTO<SubjectRelationDTO>.self)
       }
-      return loadFixture(fixture: "subject_relations.json", target: PagedDTO<SubjectRelationDTO>.self)
+      return loadFixture(
+        fixture: "subject_relations.json", target: PagedDTO<SubjectRelationDTO>.self)
     }
     let url = BangumiAPI.priv.build("p1/subjects/\(subjectId)/relations")
     var queryItems: [URLQueryItem] = [
