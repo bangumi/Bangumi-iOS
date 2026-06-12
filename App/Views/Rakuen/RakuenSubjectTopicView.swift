@@ -1,4 +1,3 @@
-import SwiftData
 import SwiftUI
 
 struct RakuenSubjectTopicView: View {
@@ -102,23 +101,27 @@ struct CachedSubjectTopicListView: View {
   let mode: SubjectTopicFilterMode
   @Binding var reloader: Bool
 
-  @Query private var caches: [RakuenSubjectTopicCache]
-
   @AppStorage("hideBlocklist") var hideBlocklist: Bool = false
   @AppStorage("blocklist") var blocklist: [Int] = []
 
   @State private var items: [SubjectTopicDTO] = []
+  @State private var cachedItems: [SubjectTopicDTO] = []
   @State private var loading = false
   @State private var offset = 0
   @State private var exhausted = false
   @State private var initialized = false
 
-  private var cachedItems: [SubjectTopicDTO] {
-    caches.first { $0.mode == mode.rawValue }?.items ?? []
-  }
-
   private var displayItems: [SubjectTopicDTO] {
     items.isEmpty ? cachedItems : items
+  }
+
+  private func loadCache() async {
+    do {
+      let db = try await AppContext.shared.getDB()
+      cachedItems = try await db.fetchRakuenSubjectTopicCache(mode: mode.rawValue)
+    } catch {
+      cachedItems = []
+    }
   }
 
   private func loadFirstPage() async {
@@ -147,6 +150,8 @@ struct CachedSubjectTopicListView: View {
         // Save to cache
         if let db = try? await AppContext.shared.getDB() {
           try await db.saveRakuenSubjectTopicCache(mode: mode.rawValue, items: resp.data)
+          await db.commit()
+          cachedItems = resp.data
         }
       }
     } catch {
@@ -221,6 +226,7 @@ struct CachedSubjectTopicListView: View {
       if !initialized {
         initialized = true
         Task {
+          await loadCache()
           await loadFirstPage()
         }
       }
@@ -231,6 +237,7 @@ struct CachedSubjectTopicListView: View {
       exhausted = false
       loading = false
       Task {
+        await loadCache()
         await loadFirstPage()
       }
     }
@@ -239,6 +246,7 @@ struct CachedSubjectTopicListView: View {
       offset = 0
       initialized = false
       Task {
+        await loadCache()
         await loadFirstPage()
       }
     }

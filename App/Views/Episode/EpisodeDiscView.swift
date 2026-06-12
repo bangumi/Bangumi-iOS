@@ -1,31 +1,28 @@
 import Flow
 import OSLog
-import SwiftData
 import SwiftUI
 
 struct EpisodeDiscView: View {
   let subjectId: Int
 
   @State private var refreshed: Bool = false
+  @State private var episodes: [EpisodeDTO] = []
 
-  @Query private var episodes: [Episode]
-
-  init(subjectId: Int) {
-    self.subjectId = subjectId
-
-    let descriptor = FetchDescriptor<Episode>(
-      predicate: #Predicate<Episode> {
-        $0.subjectId == subjectId
-      }, sortBy: [SortDescriptor(\.disc), SortDescriptor(\.sort)])
-    _episodes = Query(descriptor)
-  }
-
-  var discs: [Int: [Episode]] {
-    var discs: [Int: [Episode]] = [:]
+  var discs: [Int: [EpisodeDTO]] {
+    var discs: [Int: [EpisodeDTO]] = [:]
     for episode in episodes {
       discs[episode.disc, default: []].append(episode)
     }
     return discs
+  }
+
+  private func loadCached() async {
+    do {
+      let db = try await AppContext.shared.getDB()
+      episodes = try await db.fetchDiscEpisodes(subjectId: subjectId)
+    } catch {
+      Logger.app.error("Failed to load cached disc episodes: \(error)")
+    }
   }
 
   func refresh() {
@@ -35,13 +32,14 @@ struct EpisodeDiscView: View {
     Task {
       do {
         try await EpisodeRepository.loadEpisodes(subjectId)
+        await loadCached()
       } catch {
         Notifier.shared.alert(error: error)
       }
     }
   }
 
-  func episodeLine(_ episode: Episode) -> AttributedString {
+  func episodeLine(_ episode: EpisodeDTO) -> AttributedString {
     var line = "\(Int(episode.sort)) \(episode.name)".withLink(episode.link)
     line.font = .footnote
     if !episode.nameCN.isEmpty {
@@ -76,6 +74,10 @@ struct EpisodeDiscView: View {
         }
       }
     }.animation(.default, value: episodes)
+    .task {
+      await loadCached()
+      refresh()
+    }
   }
 }
 

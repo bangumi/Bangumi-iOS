@@ -1,4 +1,3 @@
-import SwiftData
 import SwiftUI
 
 struct ProgressTileView: View {
@@ -7,11 +6,12 @@ struct ProgressTileView: View {
   var body: some View {
     LazyVGrid(columns: [GridItem(.adaptive(minimum: 150))]) {
       ForEach(subjectIds, id: \.self) { subjectId in
-        ProgressSubjectContainerView(subjectId: subjectId) { subject, episodes in
+        ProgressSubjectContainerView(subjectId: subjectId) { item, reload in
           CardView(padding: 8) {
             ProgressTileItemContentView(
-              subject: subject,
-              episodes: episodes
+              subject: item.subject,
+              episodes: item.episodes,
+              reload: reload
             )
           }
           .transition(.opacity)
@@ -23,14 +23,15 @@ struct ProgressTileView: View {
 }
 
 struct ProgressTileItemContentView: View {
-  @Bindable var subject: Subject
-  let episodes: [Episode]
+  let subject: SubjectDTO
+  let episodes: [EpisodeDTO]
+  let reload: () async -> Void
 
   @AppStorage("subjectImageQuality") var subjectImageQuality: ImageQuality = .high
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
 
   var body: some View {
-    let subjectId = subject.subjectId
+    let subjectId = subject.id
     VStack(alignment: .leading, spacing: 4) {
       Color.clear
         .aspectRatio(0.707, contentMode: .fit)
@@ -57,21 +58,21 @@ struct ProgressTileItemContentView: View {
 
         Spacer(minLength: 0)
 
-        switch subject.typeEnum {
+        switch subject.type {
         case .anime, .real:
-          EpisodeRecentView(subject: subject, mode: .tile, episodes: episodes)
+          EpisodeRecentView(subject: subject, mode: .tile, episodes: episodes, reload: reload)
         case .book:
-          SubjectBookChaptersView(subject: subject, mode: .tile)
+          SubjectBookChaptersView(subject: subject, mode: .tile, reload: reload)
 
         default:
           Label(
-            subject.typeEnum.description,
-            systemImage: subject.typeEnum.icon
+            subject.type.description,
+            systemImage: subject.type.icon
           )
           .foregroundStyle(.accent)
         }
 
-        switch subject.typeEnum {
+        switch subject.type {
         case .book:
           VStack(spacing: 1) {
             ProgressView(
@@ -109,7 +110,11 @@ struct ProgressTileItemContentView: View {
   return ScrollView {
     LazyVStack(alignment: .leading) {
       CardView(padding: 8) {
-        ProgressTileView(subjectIds: [subject.subjectId])
+        ProgressTileItemContentView(
+          subject: SubjectDTO(subject),
+          episodes: episodes.map(EpisodeDTO.init),
+          reload: {}
+        )
           .modelContainer(container)
       }
     }.padding()

@@ -37,22 +37,11 @@ struct TextInputView: View {
 
   @Environment(\.textInputStyle) var style
 
-  @Query private var drafts: [Draft]
-
   @FocusState private var isEditing: Bool
   @State private var showingBBCodeMenu = false
   @State private var showingDrafts = false
   @State private var currentDraftID: PersistentIdentifier?
-  @State private var pendingSaveTask: Task<Void, Never>?
-
-  init(type: String, text: Binding<String>) {
-    self.type = type
-    self._text = text
-    let desc = FetchDescriptor<Draft>(
-      predicate: #Predicate<Draft> { $0.type == type },
-      sortBy: [SortDescriptor(\Draft.updatedAt, order: .reverse)])
-    self._drafts = Query(desc)
-  }
+  @State private var drafts: [DraftDTO] = []
 
   var draftDesc: String {
     if drafts.count == 0 {
@@ -66,18 +55,30 @@ struct TextInputView: View {
     do {
       let db = try await AppContext.shared.getDB()
       let id = try await db.saveDraft(type: type, content: text, id: currentDraftID)
+      await db.commit()
+      let drafts = try await db.fetchDrafts(type: type)
       await MainActor.run {
         self.currentDraftID = id
+        self.drafts = drafts
       }
     } catch {
       Logger.app.error("Failed to save draft: \(error)")
     }
   }
 
-  private func loadDraft(_ draft: Draft) {
-    currentDraftID = draft.persistentModelID
+  private func loadDraft(_ draft: DraftDTO) {
+    currentDraftID = draft.id
     text = draft.content
     showingDrafts = false
+  }
+
+  private func loadDrafts() async {
+    do {
+      let db = try await AppContext.shared.getDB()
+      drafts = try await db.fetchDrafts(type: type)
+    } catch {
+      Logger.app.error("Failed to load drafts: \(error)")
+    }
   }
 
   var body: some View {
@@ -99,6 +100,7 @@ struct TextInputView: View {
             currentID: currentDraftID,
             drafts: drafts,
             onLoad: loadDraft,
+            onDelete: loadDrafts,
             isPresented: $showingDrafts
           )
         }
@@ -111,13 +113,13 @@ struct TextInputView: View {
       }
     }
     .onChange(of: text) { _, newValue in
-      pendingSaveTask?.cancel()
       guard !newValue.isEmpty else { return }
-      pendingSaveTask = Task {
-        try? await Task.sleep(for: .milliseconds(400))
-        guard !Task.isCancelled else { return }
+      Task {
         await saveDraft()
       }
+    }
+    .task {
+      await loadDrafts()
     }
   }
 }
@@ -154,15 +156,16 @@ private struct PlainTextEditor: View {
 
 private struct DraftBoxView: View {
   let currentID: PersistentIdentifier?
-  let drafts: [Draft]
-  let onLoad: (Draft) -> Void
+  let drafts: [DraftDTO]
+  let onLoad: (DraftDTO) -> Void
+  let onDelete: () async -> Void
   @Binding var isPresented: Bool
 
   var body: some View {
     NavigationStack {
       List {
         ForEach(drafts) { draft in
-          if draft.persistentModelID == currentID {
+          if draft.id == currentID {
             VStack(alignment: .leading, spacing: 4) {
               Text(draft.content)
                 .lineLimit(3)
@@ -189,7 +192,9 @@ private struct DraftBoxView: View {
               Button(role: .destructive) {
                 Task {
                   if let db = try? await AppContext.shared.getDB() {
-                    await db.deleteDraft(id: draft.persistentModelID)
+                    await db.deleteDraft(id: draft.id)
+                    await db.commit()
+                    await onDelete()
                   }
                 }
               } label: {

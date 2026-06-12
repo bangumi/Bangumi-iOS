@@ -1,4 +1,3 @@
-import SwiftData
 import SwiftUI
 
 struct EpisodeInfoView: View {
@@ -6,7 +5,7 @@ struct EpisodeInfoView: View {
   @AppStorage("isolationMode") var isolationMode: Bool = false
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
 
-  @Bindable var episode: Episode
+  let episode: EpisodeDTO
 
   func field(name: String, value: String) -> AttributedString {
     var text = AttributedString(name + ": ")
@@ -85,7 +84,7 @@ struct EpisodeInfoView: View {
   }
 
   return ScrollView {
-    EpisodeInfoView(episode: episodes.first!)
+    EpisodeInfoView(episode: EpisodeDTO(episodes.first!))
       .modelContainer(container)
   }
 }

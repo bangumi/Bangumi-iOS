@@ -1,5 +1,4 @@
 import OSLog
-import SwiftData
 import SwiftUI
 
 struct CalendarSlimView: View {
@@ -7,7 +6,7 @@ struct CalendarSlimView: View {
   private struct CalendarDay: Identifiable {
     let weekday: WeekDay
     let desc: String
-    let calendar: BangumiCalendar
+    let calendar: CalendarEntryDTO
 
     var id: WeekDay {
       weekday
@@ -26,9 +25,7 @@ struct CalendarSlimView: View {
 
   @State private var currentDate = Calendar.current.startOfDay(for: Date())
   @State private var refreshed: Bool = false
-
-  @Query(sort: \BangumiCalendar.weekday)
-  private var calendars: [BangumiCalendar]
+  @State private var calendars: [CalendarEntryDTO] = []
 
   private var dates: [CalendarDay] {
     let today = currentDate
@@ -36,10 +33,10 @@ struct CalendarSlimView: View {
 
     let todayCalendar =
       calendars.first { $0.weekday == WeekDay(date: today).rawValue }
-      ?? BangumiCalendar(weekday: WeekDay(date: today).rawValue, items: [])
+      ?? CalendarEntryDTO(weekday: WeekDay(date: today).rawValue, items: [])
     let tomorrowCalendar =
       calendars.first { $0.weekday == WeekDay(date: tomorrow).rawValue }
-      ?? BangumiCalendar(weekday: WeekDay(date: tomorrow).rawValue, items: [])
+      ?? CalendarEntryDTO(weekday: WeekDay(date: tomorrow).rawValue, items: [])
 
     let result = [
       CalendarDay(weekday: WeekDay(date: today), desc: "今天", calendar: todayCalendar),
@@ -55,11 +52,21 @@ struct CalendarSlimView: View {
     }
   }
 
+  func loadCachedCalendar() async {
+    do {
+      let db = try await AppContext.shared.getDB()
+      calendars = try await db.fetchCalendarEntries()
+    } catch {
+      Logger.app.error("Failed to load cached calendar: \(error)")
+    }
+  }
+
   func refreshCalendar() async {
     if refreshed { return }
     refreshed = true
     do {
       try await DiscoveryRepository.loadCalendar()
+      await loadCachedCalendar()
     } catch {
       Notifier.shared.alert(error: error)
     }
@@ -69,6 +76,7 @@ struct CalendarSlimView: View {
     VStack {
       if calendars.isEmpty {
         ProgressView().task {
+          await loadCachedCalendar()
           await refreshCalendar()
         }
       } else {
@@ -122,7 +130,7 @@ struct CalendarSlimView: View {
 }
 
 struct CalendarWeekdaySlimView: View {
-  @Bindable var calendar: BangumiCalendar
+  let calendar: CalendarEntryDTO
 
   @AppStorage("subjectImageQuality") var subjectImageQuality: ImageQuality = .high
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original

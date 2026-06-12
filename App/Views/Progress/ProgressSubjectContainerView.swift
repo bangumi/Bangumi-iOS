@@ -1,37 +1,43 @@
-import SwiftData
 import SwiftUI
 
-/// Narrow observation scope to a single subject so one model update does not
-/// invalidate the whole progress list.
 struct ProgressSubjectContainerView<Content: View>: View {
   let subjectId: Int
-  let content: (Subject, [Episode]) -> Content
+  let content: (ProgressSubjectDTO, @escaping () async -> Void) -> Content
 
-  @Query private var subjects: [Subject]
-  @Query private var episodes: [Episode]
+  @State private var item: ProgressSubjectDTO?
+  @State private var loaded = false
 
-  private var subject: Subject? { subjects.first }
-
-  init(subjectId: Int, @ViewBuilder content: @escaping (Subject, [Episode]) -> Content) {
+  init(
+    subjectId: Int,
+    @ViewBuilder content: @escaping (ProgressSubjectDTO, @escaping () async -> Void) -> Content
+  ) {
     self.subjectId = subjectId
     self.content = content
+  }
 
-    let sid = subjectId
-    _subjects = Query(filter: #Predicate<Subject> { $0.subjectId == sid })
-
-    let mainType = EpisodeType.main.rawValue
-    let episodeDescriptor = FetchDescriptor<Episode>(
-      predicate: #Predicate<Episode> { $0.subjectId == sid && $0.type == mainType },
-      sortBy: [
-        SortDescriptor<Episode>(\.sort, order: .forward)
-      ]
-    )
-    _episodes = Query(episodeDescriptor)
+  private func load() async {
+    loaded = false
+    do {
+      let db = try await AppContext.shared.getDB()
+      item = try await db.fetchProgressSubject(subjectId: subjectId)
+    } catch {
+      Notifier.shared.alert(error: error)
+    }
+    loaded = true
   }
 
   var body: some View {
-    if let subject = subject {
-      content(subject, episodes)
+    Group {
+      if let item {
+        content(item, load)
+      } else if !loaded {
+        ProgressView()
+          .frame(maxWidth: .infinity)
+          .padding()
+      }
+    }
+    .task(id: subjectId) {
+      await load()
     }
   }
 }

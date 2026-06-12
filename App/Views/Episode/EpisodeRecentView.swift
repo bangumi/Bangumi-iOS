@@ -1,6 +1,5 @@
 import Flow
 import OSLog
-import SwiftData
 import SwiftUI
 
 enum EpisodeRecentMode {
@@ -9,13 +8,14 @@ enum EpisodeRecentMode {
 }
 
 struct EpisodeRecentView: View {
-  @Bindable var subject: Subject
+  let subject: SubjectDTO
   let mode: EpisodeRecentMode
-  let episodes: [Episode]
+  let episodes: [EpisodeDTO]
+  var reload: (() async -> Void)? = nil
 
   @State private var showCollectionBox: Bool = false
 
-  var nextEpisode: Episode? {
+  var nextEpisode: EpisodeDTO? {
     episodes.first { $0.status == EpisodeCollectionType.none.rawValue }
   }
 
@@ -34,7 +34,7 @@ struct EpisodeRecentView: View {
     }
   }
 
-  var recentEpisodes: [Episode] {
+  var recentEpisodes: [EpisodeDTO] {
     let halfBefore = (recentCount - 1) / 2
     let halfAfter = recentCount - halfBefore - 1
     let idx = episodes.firstIndex { $0.status == EpisodeCollectionType.none.rawValue }
@@ -61,12 +61,6 @@ struct EpisodeRecentView: View {
     }
   }
 
-  init(subject: Subject, mode: EpisodeRecentMode, episodes: [Episode]) {
-    self.subject = subject
-    self.mode = mode
-    self.episodes = episodes
-  }
-
   var body: some View {
     if !recentEpisodes.isEmpty {
       switch mode {
@@ -74,13 +68,13 @@ struct EpisodeRecentView: View {
         VStack {
           HStack(spacing: 2) {
             ForEach(recentEpisodes) { episode in
-              EpisodeItemView(episode: episode)
+              EpisodeItemView(episode: episode, reload: reload)
             }
             Spacer(minLength: 0)
           }
           .font(.footnote)
           if let episode = nextEpisode {
-            EpisodeNextView(episode: episode, fillWidth: true)
+            EpisodeNextView(episode: episode, fillWidth: true, reload: reload)
           } else {
             Button {
               showCollectionBox = true
@@ -94,7 +88,12 @@ struct EpisodeRecentView: View {
             }
             .progressButtonStyle()
             .sheet(isPresented: $showCollectionBox) {
-              SubjectCollectionBoxView(subjectId: subject.subjectId)
+              SubjectCollectionBoxView(subjectId: subject.id)
+                .onDisappear {
+                  Task {
+                    await reload?()
+                  }
+                }
             }
           }
         }
@@ -104,12 +103,12 @@ struct EpisodeRecentView: View {
         HStack {
           HStack(spacing: 2) {
             ForEach(recentEpisodes) { episode in
-              EpisodeItemView(episode: episode)
+              EpisodeItemView(episode: episode, reload: reload)
             }
           }.font(.footnote)
           Spacer(minLength: 0)
           if let episode = nextEpisode {
-            EpisodeNextView(episode: episode, fillWidth: false)
+            EpisodeNextView(episode: episode, fillWidth: false, reload: reload)
           } else {
             Button {
               showCollectionBox = true
@@ -121,7 +120,12 @@ struct EpisodeRecentView: View {
             }
             .progressButtonStyle()
             .sheet(isPresented: $showCollectionBox) {
-              SubjectCollectionBoxView(subjectId: subject.subjectId)
+              SubjectCollectionBoxView(subjectId: subject.id)
+                .onDisappear {
+                  Task {
+                    await reload?()
+                  }
+                }
             }
           }
         }
@@ -131,7 +135,7 @@ struct EpisodeRecentView: View {
     } else {
       HStack {
         Spacer()
-        NavigationLink(value: NavDestination.subject(subject.subjectId)) {
+        NavigationLink(value: NavDestination.subject(subject.id)) {
           HStack(spacing: 4) {
             Text(progressText)
             Image(systemName: progressIcon)
@@ -144,19 +148,21 @@ struct EpisodeRecentView: View {
 }
 
 struct EpisodeNextView: View {
-  @Bindable var episode: Episode
+  let episode: EpisodeDTO
   let fillWidth: Bool
+  var reload: (() async -> Void)? = nil
 
   @State private var updating: Bool = false
 
-  func updateSingle(episode: Episode, type: EpisodeCollectionType) {
+  func updateSingle(episode: EpisodeDTO, type: EpisodeCollectionType) {
     if updating { return }
     Task {
       updating = true
       defer { updating = false }
       do {
         try await EpisodeRepository.updateEpisodeCollection(
-          episodeId: episode.episodeId, type: type)
+          episodeId: episode.id, type: type)
+        await reload?()
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
       } catch {
         Notifier.shared.alert(error: error)

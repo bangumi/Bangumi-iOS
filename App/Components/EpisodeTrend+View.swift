@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct EpisodeTrend: ViewModifier {
-  let episode: Episode
+  let episode: EpisodeDTO
 
   @AppStorage("showEpisodeTrends") var showEpisodeTrends: Bool = true
 
@@ -21,7 +21,7 @@ struct EpisodeTrend: ViewModifier {
 }
 
 extension View {
-  func episodeTrend(_ episode: Episode) -> some View {
+  func episodeTrend(_ episode: EpisodeDTO) -> some View {
     modifier(EpisodeTrend(episode: episode))
   }
 }

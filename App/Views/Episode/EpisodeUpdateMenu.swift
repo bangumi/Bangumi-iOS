@@ -1,4 +1,3 @@
-import SwiftData
 import SwiftUI
 
 struct EpisodeUpdateMenu: View {
@@ -6,7 +5,8 @@ struct EpisodeUpdateMenu: View {
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
 
-  @Bindable var episode: Episode
+  let episode: EpisodeDTO
+  var reload: (() async -> Void)? = nil
   var showsTitle: Bool = false
 
   var titleText: String {
@@ -14,11 +14,12 @@ struct EpisodeUpdateMenu: View {
     return "\(episode.typeEnum.name).\(episode.sort.episodeDisplay) \(title)"
   }
 
-  func updateSingle(episode: Episode, type: EpisodeCollectionType) {
+  func updateSingle(episode: EpisodeDTO, type: EpisodeCollectionType) {
     Task {
       do {
         try await EpisodeRepository.updateEpisodeCollection(
-          episodeId: episode.episodeId, type: type)
+          episodeId: episode.id, type: type)
+        await reload?()
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
       } catch {
         Notifier.shared.alert(error: error)
@@ -26,11 +27,12 @@ struct EpisodeUpdateMenu: View {
     }
   }
 
-  func updateBatch(episode: Episode) {
+  func updateBatch(episode: EpisodeDTO) {
     Task {
       do {
         try await EpisodeRepository.updateEpisodeCollection(
-          episodeId: episode.episodeId, type: .collect, batch: true)
+          episodeId: episode.id, type: .collect, batch: true)
+        await reload?()
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
       } catch {
         Notifier.shared.alert(error: error)
@@ -45,7 +47,7 @@ struct EpisodeUpdateMenu: View {
           .lineLimit(2)
       }
     }
-    if isAuthenticated, episode.subject?.ctype ?? 0 != 0 {
+    if isAuthenticated, (episode.subject?.ctypeEnum ?? .none) != .none {
       ForEach(episode.collectionTypeEnum.otherTypes()) { type in
         Button {
           updateSingle(episode: episode, type: type)
@@ -63,7 +65,7 @@ struct EpisodeUpdateMenu: View {
       }
     }
     Divider()
-    NavigationLink(value: NavDestination.episode(episode.episodeId)) {
+    NavigationLink(value: NavDestination.episode(episode.id)) {
       if isolationMode {
         Label("详情...", systemImage: "info")
       } else {

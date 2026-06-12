@@ -1,10 +1,10 @@
 import Flow
 import OSLog
-import SwiftData
 import SwiftUI
 
 struct SubjectCollectionView: View {
-  @Bindable var subject: Subject
+  let subject: SubjectDTO
+  let reload: () async -> Void
 
   @State private var edit: Bool = false
 
@@ -19,7 +19,7 @@ struct SubjectCollectionView: View {
                 Image(systemName: "lock")
               }
               Label(
-                interest.type.message(type: subject.typeEnum),
+                interest.type.message(type: subject.type),
                 systemImage: interest.type.icon
               )
               StarsView(score: Float(interest.rate), size: 16)
@@ -62,8 +62,8 @@ struct SubjectCollectionView: View {
             }
           }
 
-          if subject.typeEnum == .book {
-            SubjectBookChaptersView(subject: subject, mode: .large)
+          if subject.type == .book {
+            SubjectBookChaptersView(subject: subject, mode: .large, reload: reload)
           }
         }
       } else {
@@ -84,21 +84,23 @@ struct SubjectCollectionView: View {
       }
     }
     .sheet(isPresented: $edit) {
-      SubjectCollectionBoxView(subjectId: subject.subjectId)
+      SubjectCollectionBoxView(subjectId: subject.id)
         .presentationDragIndicator(.visible)
+        .onDisappear {
+          Task {
+            await reload()
+          }
+        }
     }
   }
 }
 
 #Preview {
-  let container = mockContainer()
-
   let subject = Subject.previewBook
-  container.mainContext.insert(subject)
 
-  return ScrollView {
+  ScrollView {
     LazyVStack(alignment: .leading) {
-      SubjectCollectionView(subject: subject)
+      SubjectCollectionView(subject: SubjectDTO(subject), reload: {})
     }.padding()
-  }.modelContainer(container)
+  }
 }

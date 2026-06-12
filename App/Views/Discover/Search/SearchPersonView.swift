@@ -1,5 +1,4 @@
 import OSLog
-import SwiftData
 import SwiftUI
 
 struct SearchPersonView: View {
@@ -33,18 +32,15 @@ struct SearchPersonView: View {
 struct SearchPersonItemView: View {
   let personId: Int
 
-  @Query private var persons: [Person]
-  private var person: Person? { persons.first }
+  @State private var person: PersonDTO?
 
-  init(personId: Int) {
-    self.personId = personId
-
-    let desc = FetchDescriptor<Person>(
-      predicate: #Predicate<Person> {
-        return $0.personId == personId
-      }
-    )
-    _persons = Query(desc)
+  private func load() async {
+    do {
+      let db = try await AppContext.shared.getDB()
+      person = try await db.getPersonDTO(personId)
+    } catch {
+      Notifier.shared.alert(error: error)
+    }
   }
 
   var body: some View {
@@ -53,24 +49,24 @@ struct SearchPersonItemView: View {
         PersonLargeRowView(person: person)
       }
     }
+    .task(id: personId) {
+      await load()
+    }
   }
 }
 
 struct SearchPersonLocalView: View {
   let text: String
 
-  @Query private var persons: [Person]
+  @State private var persons: [PersonDTO] = []
 
-  init(text: String) {
-    self.text = text.gb
-
-    var desc = FetchDescriptor<Person>(
-      predicate: #Predicate<Person> {
-        return $0.name.localizedStandardContains(text)
-          || $0.alias.localizedStandardContains(text)
-      })
-    desc.fetchLimit = 20
-    _persons = Query(desc)
+  private func load() async {
+    do {
+      let db = try await AppContext.shared.getDB()
+      persons = try await db.fetchLocalPersons(search: text.gb)
+    } catch {
+      Notifier.shared.alert(error: error)
+    }
   }
 
   var body: some View {
@@ -80,6 +76,9 @@ struct SearchPersonLocalView: View {
           PersonLargeRowView(person: person)
         }
       }
+    }
+    .task(id: text) {
+      await load()
     }
   }
 }

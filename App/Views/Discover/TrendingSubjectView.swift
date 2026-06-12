@@ -1,4 +1,3 @@
-import SwiftData
 import SwiftUI
 
 struct TrendingSubjectView: View {
@@ -7,6 +6,7 @@ struct TrendingSubjectView: View {
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
 
   @State private var loaded: Bool = false
+  @State private var reloader: Bool = false
 
   func load() async {
     if loaded {
@@ -15,6 +15,7 @@ struct TrendingSubjectView: View {
     do {
       try await DiscoveryRepository.loadTrendingSubjects()
       loaded = true
+      reloader.toggle()
     } catch {
       Notifier.shared.alert(error: error)
     }
@@ -23,7 +24,7 @@ struct TrendingSubjectView: View {
   var body: some View {
     LazyVStack(spacing: 24) {
       ForEach(SubjectType.allTypes) { st in
-        TrendingSubjectTypeView(type: st, width: width - 16)
+        TrendingSubjectTypeView(type: st, width: width - 16, reloader: reloader)
       }
     }
     .padding(.horizontal, 8)
@@ -34,21 +35,12 @@ struct TrendingSubjectView: View {
 struct TrendingSubjectTypeView: View {
   let type: SubjectType
   let width: CGFloat
+  let reloader: Bool
 
   @AppStorage("subjectImageQuality") var subjectImageQuality: ImageQuality = .high
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
 
-  @Query private var trending: [TrendingSubject]
-  var items: [TrendingSubjectDTO] { trending.first?.items ?? [] }
-
-  init(type: SubjectType, width: CGFloat) {
-    self.type = type
-    self.width = width
-    let descriptor = FetchDescriptor<TrendingSubject>(
-      predicate: #Predicate { $0.type == type.rawValue }
-    )
-    self._trending = Query(descriptor)
-  }
+  @State private var items: [TrendingSubjectDTO] = []
 
   var columnCount: Int {
     let count = Int(width / 320)
@@ -145,6 +137,18 @@ struct TrendingSubjectTypeView: View {
         .scrollClipDisabled()
         .scrollTargetBehavior(.viewAligned)
       }
+    }
+    .task(id: "\(type.rawValue)-\(reloader)") {
+      await loadCached()
+    }
+  }
+
+  private func loadCached() async {
+    do {
+      let db = try await AppContext.shared.getDB()
+      items = try await db.fetchTrendingSubjects(type: type)
+    } catch {
+      Notifier.shared.alert(error: error)
     }
   }
 }

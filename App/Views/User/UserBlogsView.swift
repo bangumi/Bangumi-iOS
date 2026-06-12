@@ -2,7 +2,7 @@ import SwiftUI
 
 struct UserBlogsView: View {
 
-  @Bindable var user: User
+  let user: UserDTO
 
   @State private var blogs: [SlimBlogEntryDTO] = []
 

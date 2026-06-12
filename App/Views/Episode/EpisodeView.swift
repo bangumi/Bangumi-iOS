@@ -1,4 +1,3 @@
-import SwiftData
 import SwiftUI
 
 struct EpisodeView: View {
@@ -10,23 +9,25 @@ struct EpisodeView: View {
 
   @Environment(\.dismiss) private var dismiss
 
-  @Query private var episodes: [Episode]
-  private var episode: Episode? { episodes.first }
-
+  @State private var episode: EpisodeDTO?
   @State private var comments: [CommentDTO] = []
   @State private var loadingComments: Bool = false
   @State private var showCommentBox: Bool = false
   @State private var showIndexPicker: Bool = false
 
-  init(episodeId: Int) {
-    self.episodeId = episodeId
-
-    _episodes = Query(filter: #Predicate<Episode> { $0.episodeId == episodeId })
+  private func loadCached() async {
+    do {
+      let db = try await AppContext.shared.getDB()
+      episode = try await db.getEpisodeDTO(episodeId)
+    } catch {
+      Notifier.shared.alert(error: error)
+    }
   }
 
   func load() async {
     do {
       try await EpisodeRepository.loadEpisode(episodeId)
+      await loadCached()
       if !isolationMode {
         loadingComments = true
         comments = try await EpisodeService.getEpisodeComments(episodeId)
@@ -55,7 +56,7 @@ struct EpisodeView: View {
       VStack(alignment: .leading) {
         if let episode = episode {
           if let subject = episode.subject {
-            SubjectTinyView(subject: subject.slim)
+            SubjectTinyView(subject: subject)
               .padding(.vertical, 8)
           }
           EpisodeInfoView(episode: episode)
@@ -93,7 +94,10 @@ struct EpisodeView: View {
         await load()
       }
     }
-    .task(load)
+    .task {
+      await loadCached()
+      await load()
+    }
     .animation(.default, value: comments)
     .navigationTitle("章节详情")
     .navigationBarTitleDisplayMode(.inline)

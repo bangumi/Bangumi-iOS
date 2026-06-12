@@ -1,4 +1,3 @@
-import SwiftData
 import SwiftUI
 
 struct SearchSubjectPickerView: View {
@@ -118,22 +117,15 @@ struct SearchSubjectPickerLocalView: View {
   let onSelect: (Int) -> Void
 
   @Environment(\.dismiss) var dismiss
-  @Query private var subjects: [Subject]
+  @State private var subjects: [SubjectDTO] = []
 
-  init(text: String, subjectType: SubjectType, onSelect: @escaping (Int) -> Void) {
-    self.text = text.gb
-    self.subjectType = subjectType
-    self.onSelect = onSelect
-
-    let stype = subjectType.rawValue
-    var desc = FetchDescriptor<Subject>(
-      predicate: #Predicate<Subject> {
-        return (stype == 0 || stype == $0.type)
-          && ($0.name.localizedStandardContains(text)
-            || $0.alias.localizedStandardContains(text))
-      })
-    desc.fetchLimit = 20
-    _subjects = Query(desc)
+  private func load() async {
+    do {
+      let db = try await AppContext.shared.getDB()
+      subjects = try await db.fetchLocalSubjects(search: text.gb, subjectType: subjectType)
+    } catch {
+      Notifier.shared.alert(error: error)
+    }
   }
 
   var body: some View {
@@ -143,10 +135,13 @@ struct SearchSubjectPickerLocalView: View {
           SubjectLargeRowView(subject: subject)
         }
         .onTapGesture {
-          onSelect(subject.subjectId)
+          onSelect(subject.id)
           dismiss()
         }
       }
+    }
+    .task(id: "\(text)-\(subjectType.rawValue)") {
+      await load()
     }
   }
 }
@@ -155,19 +150,15 @@ struct SearchSubjectPickerItemView: View {
   let subjectId: Int
   let onSelect: (Int) -> Void
 
-  @Query private var subjects: [Subject]
-  private var subject: Subject? { subjects.first }
+  @State private var subject: SubjectDTO?
 
-  init(subjectId: Int, onSelect: @escaping (Int) -> Void) {
-    self.subjectId = subjectId
-    self.onSelect = onSelect
-
-    let desc = FetchDescriptor<Subject>(
-      predicate: #Predicate<Subject> {
-        return $0.subjectId == subjectId
-      }
-    )
-    _subjects = Query(desc)
+  private func load() async {
+    do {
+      let db = try await AppContext.shared.getDB()
+      subject = try await db.getSubjectDTO(subjectId)
+    } catch {
+      Notifier.shared.alert(error: error)
+    }
   }
 
   var body: some View {
@@ -178,6 +169,9 @@ struct SearchSubjectPickerItemView: View {
     }
     .onTapGesture {
       onSelect(subjectId)
+    }
+    .task(id: subjectId) {
+      await load()
     }
   }
 }

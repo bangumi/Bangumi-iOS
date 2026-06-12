@@ -1,4 +1,3 @@
-import SwiftData
 import SwiftUI
 
 struct SubjectCollectsListView: View {
@@ -7,17 +6,11 @@ struct SubjectCollectsListView: View {
   @State private var reloader = false
   @State private var selectedType: CollectionType
   @State private var selectedMode: FilterMode = .all
-
-  @Query private var subjects: [Subject]
-  private var subject: Subject? { subjects.first }
+  @State private var subjectType: SubjectType = .none
 
   init(subjectId: Int) {
     self.subjectId = subjectId
     self._selectedType = State(initialValue: .none)
-    _subjects = Query(
-      filter: #Predicate<Subject> {
-        $0.subjectId == subjectId
-      })
   }
 
   var title: String {
@@ -29,8 +22,9 @@ struct SubjectCollectsListView: View {
     }
   }
 
-  var subjectType: SubjectType {
-    subject?.typeEnum ?? .none
+  func loadCachedSubjectType() async {
+    guard let db = await AppContext.shared.databaseIfAvailable() else { return }
+    subjectType = (try? await db.getSubjectDTO(subjectId)?.type) ?? .none
   }
 
   func load(limit: Int, offset: Int) async -> PagedDTO<SubjectCollectDTO>? {
@@ -82,6 +76,9 @@ struct SubjectCollectsListView: View {
     }
     .navigationTitle(title)
     .navigationBarTitleDisplayMode(.inline)
+    .task(id: subjectId) {
+      await loadCachedSubjectType()
+    }
   }
 }
 

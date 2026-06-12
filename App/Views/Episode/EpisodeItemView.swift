@@ -1,10 +1,10 @@
-import SwiftData
 import SwiftUI
 
 struct EpisodeItemView: View {
   @AppStorage("episodeGridInteractionMode") var interactionMode: EpisodeGridInteractionMode =
     .menu
-  @Bindable var episode: Episode
+  let episode: EpisodeDTO
+  var reload: (() async -> Void)? = nil
 
   var badge: some View {
     Text("\(episode.sort.episodeDisplay)")
@@ -37,7 +37,7 @@ struct EpisodeItemView: View {
         menuLabel
           .contentShape(.contextMenuPreview, RoundedRectangle(cornerRadius: 4))
           .contextMenu {
-            EpisodeUpdateMenu(episode: episode)
+            EpisodeUpdateMenu(episode: episode, reload: reload)
           } preview: {
             EpisodeInfoView(episode: episode)
               .padding()
@@ -45,7 +45,7 @@ struct EpisodeItemView: View {
           }
       case .menu:
         Menu {
-          EpisodeUpdateMenu(episode: episode, showsTitle: true)
+          EpisodeUpdateMenu(episode: episode, reload: reload, showsTitle: true)
         } label: {
           menuLabel
         }
@@ -68,7 +68,7 @@ struct EpisodeItemView: View {
 
   return ScrollView {
     LazyVStack {
-      EpisodeItemView(episode: episodes.first!)
+      EpisodeItemView(episode: EpisodeDTO(episodes.first!))
         .modelContainer(container)
     }.padding()
   }

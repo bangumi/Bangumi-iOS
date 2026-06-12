@@ -1,5 +1,4 @@
 import Flow
-import SwiftData
 import SwiftUI
 
 struct SubjectCollectionBoxView: View {
@@ -8,10 +7,9 @@ struct SubjectCollectionBoxView: View {
   @AppStorage("autoCompleteProgress") var autoCompleteProgress: Bool = false
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
 
-  @Environment(\.modelContext) private var modelContext
   @Environment(\.dismiss) private var dismiss
 
-  @State private var subject: Subject? = nil
+  @State private var subject: SubjectDTO? = nil
   @State private var ctype: CollectionType = .none
   @State private var rate: Int = 0
   @State private var comment: String = ""
@@ -29,7 +27,7 @@ struct SubjectCollectionBoxView: View {
   }
 
   var buttonText: String {
-    if (subject?.ctype ?? 0) != 0 {
+    if (subject?.ctypeEnum ?? .none) != .none {
       return priv ? "悄悄地更新" : "更新"
     } else {
       return priv ? "悄悄地添加" : "添加"
@@ -56,17 +54,24 @@ struct SubjectCollectionBoxView: View {
       updating = false
     }
 
-    let id = subjectId
-    let predicate = #Predicate<Subject> { $0.subjectId == id }
-    let descriptor = FetchDescriptor<Subject>(predicate: predicate)
-    subject = try? modelContext.fetch(descriptor).first
+    do {
+      let db = try await AppContext.shared.getDB()
+      subject = try await db.getSubjectDTO(subjectId)
+    } catch {
+      Notifier.shared.alert(error: error)
+    }
     if subject == nil {
       do {
         _ = try await SubjectRepository.loadSubject(subjectId)
       } catch {
         Notifier.shared.alert(error: error)
       }
-      subject = try? modelContext.fetch(descriptor).first
+      do {
+        let db = try await AppContext.shared.getDB()
+        subject = try await db.getSubjectDTO(subjectId)
+      } catch {
+        Notifier.shared.alert(error: error)
+      }
     }
 
     if let interest = subject?.interest {
@@ -132,7 +137,7 @@ struct SubjectCollectionBoxView: View {
 
           Picker("CollectionType", selection: $ctype) {
             ForEach(CollectionType.allTypes()) { ct in
-              Text("\(ct.description(subject?.typeEnum ?? .anime))").tag(ct)
+              Text("\(ct.description(subject?.type ?? .anime))").tag(ct)
             }
           }
           .pickerStyle(.segmented)
@@ -265,11 +270,7 @@ struct SubjectCollectionBoxView: View {
 }
 
 #Preview {
-  let container = mockContainer()
-
   let subject = Subject.previewBook
-  container.mainContext.insert(subject)
 
   return SubjectCollectionBoxView(subjectId: subject.subjectId)
-    .modelContainer(container)
 }

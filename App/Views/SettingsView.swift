@@ -1,5 +1,4 @@
 import CoreSpotlight
-import SwiftData
 import SwiftUI
 
 struct SettingsView: View {
@@ -42,19 +41,15 @@ struct SettingsView: View {
     let limit: Int = 50
     var offset: Int = 0
     Task {
-      let db = try await AppContext.shared.getDB()
+      defer {
+        spotlightRefreshing = false
+      }
       do {
+        let db = try await AppContext.shared.getDB()
         try await CSSearchableIndex.default().deleteAllSearchableItems()
         Notifier.shared.notify(message: "Spotlight 索引清除成功")
         while true {
-          let resp = try await db.getSearchable(
-            Subject.self,
-            descriptor: FetchDescriptor<Subject>(
-              predicate: #Predicate<Subject> {
-                $0.ctype != 0
-              }
-            ),
-            limit: limit, offset: offset)
+          let resp = try await db.fetchCollectedSubjectSearchable(limit: limit, offset: offset)
           if resp.data.isEmpty {
             break
           }
@@ -66,7 +61,6 @@ struct SettingsView: View {
           }
         }
         Notifier.shared.notify(message: "Spotlight 索引重建完成")
-        spotlightRefreshing = false
       } catch {
         Notifier.shared.alert(error: error)
       }
@@ -297,6 +291,7 @@ struct SettingsView: View {
                 do {
                   let db = try await AppContext.shared.getDB()
                   try await db.clearDrafts()
+                  await db.commit()
                   Notifier.shared.notify(message: "草稿箱已清空")
                 } catch {
                   Notifier.shared.alert(error: error)

@@ -1,10 +1,9 @@
 import BBCode
 import Flow
-import SwiftData
 import SwiftUI
 
 struct SubjectSummaryView: View {
-  @Bindable var subject: Subject
+  let subject: SubjectDTO
 
   var metaTags: [Tag] {
     var result: [Tag] = []
@@ -30,7 +29,7 @@ struct SubjectSummaryView: View {
     color: Color,
     tagsCat: SubjectTagsCategory
   ) -> some View {
-    NavigationLink(value: NavDestination.subjectTagBrowsing(subject.typeEnum, tag.name, tagsCat)) {
+    NavigationLink(value: NavDestination.subjectTagBrowsing(subject.type, tag.name, tagsCat)) {
       BorderView(color: color, padding: 3, cornerRadius: 16) {
         HStack(spacing: 2) {
           Text(tag.name)

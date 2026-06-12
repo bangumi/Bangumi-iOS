@@ -1,5 +1,4 @@
 import OSLog
-import SwiftData
 import SwiftUI
 
 enum WeekDay: Int, CaseIterable {
@@ -71,11 +70,9 @@ struct CalendarView: View {
 
   @State private var currentDate = Calendar.current.startOfDay(for: Date())
   @State private var refreshed: Bool = false
+  @State private var calendars: [CalendarEntryDTO] = []
 
-  @Query(sort: \BangumiCalendar.weekday)
-  private var calendars: [BangumiCalendar]
-
-  var sortedCalendars: [BangumiCalendar] {
+  var sortedCalendars: [CalendarEntryDTO] {
     let todayWeekday = WeekDay(date: currentDate).rawValue
     let sorted = calendars.sorted { $0.weekday < $1.weekday }
     guard let pivot = sorted.firstIndex(where: { $0.weekday >= todayWeekday }) else {
@@ -96,6 +93,15 @@ struct CalendarView: View {
     sortedCalendars.first?.items.reduce(0) { $0 + $1.watchers } ?? 0
   }
 
+  func loadCachedCalendar() async {
+    do {
+      let db = try await AppContext.shared.getDB()
+      calendars = try await db.fetchCalendarEntries()
+    } catch {
+      Logger.app.error("Failed to load cached calendar: \(error)")
+    }
+  }
+
   func updateCurrentDate() {
     let today = Calendar.current.startOfDay(for: Date())
     if currentDate != today {
@@ -108,6 +114,7 @@ struct CalendarView: View {
     refreshed = true
     do {
       try await DiscoveryRepository.loadCalendar()
+      await loadCachedCalendar()
     } catch {
       Notifier.shared.alert(error: error)
     }
@@ -117,6 +124,7 @@ struct CalendarView: View {
     Group {
       if calendars.isEmpty {
         ProgressView().task {
+          await loadCachedCalendar()
           await refreshCalendar()
         }
       } else {
@@ -164,7 +172,7 @@ struct CalendarView: View {
 }
 
 struct CalendarWeekdayView: View {
-  @Bindable var calendar: BangumiCalendar
+  let calendar: CalendarEntryDTO
 
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
 

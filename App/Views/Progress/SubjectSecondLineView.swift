@@ -5,7 +5,7 @@ struct ProgressSecondLineView: View {
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
   @AppStorage("progressViewMode") var progressViewMode: ProgressViewMode = .tile
 
-  @Bindable var subject: Subject
+  let subject: SubjectDTO
 
   var tagsCount: Int {
     switch progressViewMode {
@@ -39,7 +39,7 @@ struct ProgressSecondLineView: View {
       switch progressViewMode {
       case .tile:
         VStack(alignment: .leading, spacing: 4) {
-          Label(subject.category, systemImage: subject.typeEnum.icon)
+          Label(subject.category, systemImage: subject.type.icon)
           if !subject.airtime.date.isEmpty {
             Label(subject.airtime.date, systemImage: "calendar")
               .font(.caption)
@@ -52,7 +52,7 @@ struct ProgressSecondLineView: View {
         .foregroundStyle(.secondary)
       case .list:
         HStack(spacing: 4) {
-          Label(subject.category, systemImage: subject.typeEnum.icon)
+          Label(subject.category, systemImage: subject.type.icon)
           if !subject.airtime.date.isEmpty {
             Label(subject.airtime.date, systemImage: "calendar")
               .font(.caption)

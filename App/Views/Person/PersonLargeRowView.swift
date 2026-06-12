@@ -1,10 +1,9 @@
-import SwiftData
 import SwiftUI
 
 struct PersonLargeRowView: View {
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
 
-  @Bindable var person: Person
+  let person: PersonDTO
 
   var body: some View {
     HStack(spacing: 8) {

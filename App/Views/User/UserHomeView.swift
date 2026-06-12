@@ -1,12 +1,12 @@
 import SwiftUI
 
 struct UserHomeView: View {
-  @Bindable var user: User
+  let user: UserDTO
 
   func ctypes(_ stype: SubjectType) -> [CollectionType: Int] {
     var result: [CollectionType: Int] = [:]
     for ct in CollectionType.allTypes() {
-      guard let count = user.stats?.subject.stats[stype]?[ct] else { continue }
+      guard let count = user.stats.subject.stats[stype]?[ct] else { continue }
       if count > 0 {
         result[ct] = count
       }
@@ -26,7 +26,7 @@ struct UserHomeView: View {
             UserSubjectCollectionView(user: user, stype: .anime, ctypes: ctypes(.anime))
 
           case .blog:
-            if let count = user.stats?.blog, count > 0 {
+            if user.stats.blog > 0 {
               UserBlogsView(user: user)
             }
 
@@ -34,7 +34,7 @@ struct UserHomeView: View {
             UserSubjectCollectionView(user: user, stype: .book, ctypes: ctypes(.book))
 
           case .friend:
-            if let count = user.stats?.friend, count > 0 {
+            if user.stats.friend > 0 {
               UserFriendsView(user: user)
             }
 
@@ -42,20 +42,20 @@ struct UserHomeView: View {
             UserSubjectCollectionView(user: user, stype: .game, ctypes: ctypes(.game))
 
           case .group:
-            if let count = user.stats?.group, count > 0 {
+            if user.stats.group > 0 {
               UserGroupsView(user: user)
             }
 
           case .index:
-            if let count = user.stats?.index.create, count > 0 {
+            if user.stats.index.create > 0 {
               UserIndexesView(user: user)
             }
 
           case .mono:
-            if let count = user.stats?.mono.character, count > 0 {
+            if user.stats.mono.character > 0 {
               UserCharacterCollectionView(user: user)
             }
-            if let count = user.stats?.mono.person, count > 0 {
+            if user.stats.mono.person > 0 {
               UserPersonCollectionView(user: user)
             }
 

@@ -1,6 +1,5 @@
 import BBCode
 import OSLog
-import SwiftData
 import SwiftUI
 
 struct CharacterView: View {
@@ -12,22 +11,12 @@ struct CharacterView: View {
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
 
   @State private var refreshed: Bool = false
-
-  @Query private var characters: [Character]
-  private var character: Character? { characters.first }
-
+  @State private var character: CharacterDTO?
+  @State private var detail: CharacterDetailDTO = CharacterDetailDTO()
   @State private var comments: [CommentDTO] = []
   @State private var loadingComments: Bool = false
   @State private var showCommentBox: Bool = false
   @State private var showIndexPicker: Bool = false
-
-  init(characterId: Int) {
-    self.characterId = characterId
-    let predicate = #Predicate<Character> {
-      $0.characterId == characterId
-    }
-    _characters = Query(filter: predicate, sort: \Character.characterId)
-  }
 
   var shareLink: URL {
     URL(string: "\(shareDomain.url)/character/\(characterId)")!
@@ -40,9 +29,20 @@ struct CharacterView: View {
     return character.title(with: titlePreference)
   }
 
+  private func loadCached() async {
+    do {
+      let db = try await AppContext.shared.getDB()
+      character = try await db.getCharacterDTO(characterId)
+      detail = try await db.getCharacterDetailDTO(characterId)
+    } catch {
+      Logger.app.error("Failed to load cached character: \(error)")
+    }
+  }
+
   func refresh() async {
     do {
       try await CharacterRepository.loadCharacter(characterId)
+      await loadCached()
       refreshed = true
 
       if !isolationMode {
@@ -52,6 +52,7 @@ struct CharacterView: View {
       }
 
       try await CharacterRepository.loadCharacterDetails(characterId)
+      await loadCached()
     } catch {
       Notifier.shared.alert(error: error)
       return
@@ -63,7 +64,9 @@ struct CharacterView: View {
       if let character = character {
         ScrollView {
           LazyVStack(alignment: .leading) {
-            CharacterDetailView(character: character)
+            CharacterDetailView(character: character, detail: detail) {
+              await loadCached()
+            }
 
             /// comments
             if !isolationMode {
@@ -111,7 +114,10 @@ struct CharacterView: View {
         ProgressView()
       }
     }
-    .task(refresh)
+    .task {
+      await loadCached()
+      await refresh()
+    }
     .navigationTitle(title)
     .navigationBarTitleDisplayMode(.inline)
     .toolbar {
@@ -144,7 +150,9 @@ struct CharacterView: View {
 }
 
 struct CharacterDetailView: View {
-  @Bindable var character: Character
+  let character: CharacterDTO
+  let detail: CharacterDetailDTO
+  let reload: () async -> Void
 
   @State private var updating: Bool = false
 
@@ -152,11 +160,12 @@ struct CharacterDetailView: View {
     updating = true
     defer { updating = false }
     do {
-      if character.collectedAt == 0 {
-        try await CharacterRepository.collectCharacter(character.characterId)
+      if character.collectedAt ?? 0 == 0 {
+        try await CharacterRepository.collectCharacter(character.id)
       } else {
-        try await CharacterRepository.uncollectCharacter(character.characterId)
+        try await CharacterRepository.uncollectCharacter(character.id)
       }
+      await reload()
       UIImpactFeedbackGenerator(style: .medium).impactOccurred()
     } catch {
       Notifier.shared.alert(error: error)
@@ -177,13 +186,13 @@ struct CharacterDetailView: View {
         .imageNSFW(character.nsfw)
         .enableImagePreview(
           character.images?.large,
-          zoomID: ZoomNavigationID(type: .character, id: character.characterId)
+          zoomID: ZoomNavigationID(type: .character, id: character.id)
         )
         .padding(4)
         .shadow(radius: 4)
       VStack(alignment: .leading) {
         HStack {
-          Label(character.roleEnum.description, systemImage: character.roleEnum.icon)
+          Label(character.role.description, systemImage: character.role.icon)
             .font(.footnote)
             .foregroundStyle(.secondary)
           Spacer()
@@ -192,7 +201,7 @@ struct CharacterDetailView: View {
               await collect()
             }
           } label: {
-            HeartView(collected: character.collectedAt != 0, updating: updating)
+            HeartView(collected: (character.collectedAt ?? 0) != 0, updating: updating)
           }
         }
         .buttonStyle(.explode)
@@ -246,13 +255,13 @@ struct CharacterDetailView: View {
       .tint(.linkText)
 
     /// casts
-    CharacterCastsView(characterId: character.characterId, casts: character.casts)
+    CharacterCastsView(characterId: character.id, casts: detail.casts)
 
     /// relations
-    CharacterRelationsView(characterId: character.characterId, relations: character.relations)
+    CharacterRelationsView(characterId: character.id, relations: detail.relations)
 
     /// indexes
-    CharacterIndexsView(characterId: character.characterId, indexes: character.indexes)
+    CharacterIndexsView(characterId: character.id, indexes: detail.indexes)
   }
 }
 

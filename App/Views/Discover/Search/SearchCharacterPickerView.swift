@@ -1,4 +1,3 @@
-import SwiftData
 import SwiftUI
 
 struct SearchCharacterPickerView: View {
@@ -95,19 +94,15 @@ struct SearchCharacterPickerLocalView: View {
   let onSelect: (Int) -> Void
 
   @Environment(\.dismiss) var dismiss
-  @Query private var characters: [Character]
+  @State private var characters: [CharacterDTO] = []
 
-  init(text: String, onSelect: @escaping (Int) -> Void) {
-    self.text = text.gb
-    self.onSelect = onSelect
-
-    var desc = FetchDescriptor<Character>(
-      predicate: #Predicate<Character> {
-        return $0.name.localizedStandardContains(text)
-          || $0.alias.localizedStandardContains(text)
-      })
-    desc.fetchLimit = 20
-    _characters = Query(desc)
+  private func load() async {
+    do {
+      let db = try await AppContext.shared.getDB()
+      characters = try await db.fetchLocalCharacters(search: text.gb)
+    } catch {
+      Notifier.shared.alert(error: error)
+    }
   }
 
   var body: some View {
@@ -117,10 +112,13 @@ struct SearchCharacterPickerLocalView: View {
           CharacterLargeRowView(character: character)
         }
         .onTapGesture {
-          onSelect(character.characterId)
+          onSelect(character.id)
           dismiss()
         }
       }
+    }
+    .task(id: text) {
+      await load()
     }
   }
 }
@@ -129,19 +127,15 @@ struct SearchCharacterPickerItemView: View {
   let characterId: Int
   let onSelect: (Int) -> Void
 
-  @Query private var characters: [Character]
-  private var character: Character? { characters.first }
+  @State private var character: CharacterDTO?
 
-  init(characterId: Int, onSelect: @escaping (Int) -> Void) {
-    self.characterId = characterId
-    self.onSelect = onSelect
-
-    let desc = FetchDescriptor<Character>(
-      predicate: #Predicate<Character> {
-        return $0.characterId == characterId
-      }
-    )
-    _characters = Query(desc)
+  private func load() async {
+    do {
+      let db = try await AppContext.shared.getDB()
+      character = try await db.getCharacterDTO(characterId)
+    } catch {
+      Notifier.shared.alert(error: error)
+    }
   }
 
   var body: some View {
@@ -152,6 +146,9 @@ struct SearchCharacterPickerItemView: View {
     }
     .onTapGesture {
       onSelect(characterId)
+    }
+    .task(id: characterId) {
+      await load()
     }
   }
 }

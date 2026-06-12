@@ -1,6 +1,5 @@
 import BBCode
 import Flow
-import SwiftData
 import SwiftUI
 
 struct UserView: View {
@@ -15,16 +14,7 @@ struct UserView: View {
 
   @State private var showReportView: Bool = false
 
-  @Query private var users: [User]
-  var user: User? { users.first }
-
-  init(username: String) {
-    self.username = username
-    let predicate = #Predicate<User> {
-      $0.username == username
-    }
-    _users = Query(filter: predicate, sort: \User.username)
-  }
+  @State private var user: UserDTO?
 
   var shareLink: URL {
     URL(string: "\(shareDomain.url)/user/\(username)")!
@@ -45,10 +35,20 @@ struct UserView: View {
     if refreshed { return }
     do {
       let _ = try await UserRepository.loadUser(username)
+      await loadCached()
     } catch {
       Notifier.shared.alert(error: error)
     }
     refreshed = true
+  }
+
+  func loadCached() async {
+    guard let db = await AppContext.shared.databaseIfAvailable() else { return }
+    do {
+      user = try await db.getUserDTO(username)
+    } catch {
+      Notifier.shared.alert(error: error)
+    }
   }
 
   func addFriend() {
@@ -56,7 +56,7 @@ struct UserView: View {
     Task {
       do {
         try await FriendService.addFriend(username)
-        friendlist.append(user.userId)
+        friendlist.append(user.id)
         Notifier.shared.notify(message: "添加好友成功")
       } catch {
         Notifier.shared.alert(error: error)
@@ -69,7 +69,7 @@ struct UserView: View {
     Task {
       do {
         try await FriendService.removeFriend(username)
-        friendlist = friendlist.filter { $0 != user.userId }
+        friendlist = friendlist.filter { $0 != user.id }
         Notifier.shared.notify(message: "解除好友成功")
       } catch {
         Notifier.shared.alert(error: error)
@@ -82,7 +82,7 @@ struct UserView: View {
     Task {
       do {
         try await FriendService.blockUser(username)
-        blocklist.append(user.userId)
+        blocklist.append(user.id)
         Notifier.shared.notify(message: "已绝交")
       } catch {
         Notifier.shared.alert(error: error)
@@ -95,7 +95,7 @@ struct UserView: View {
     Task {
       do {
         try await FriendService.unblockUser(username)
-        blocklist = blocklist.filter { $0 != user.userId }
+        blocklist = blocklist.filter { $0 != user.id }
         Notifier.shared.notify(message: "取消绝交")
       } catch {
         Notifier.shared.alert(error: error)
@@ -118,7 +118,7 @@ struct UserView: View {
     .sheet(isPresented: $showReportView) {
       if let user = user {
         ReportSheet(
-          reportType: .user, itemId: user.userId, itemTitle: user.nickname, user: user.slim
+          reportType: .user, itemId: user.id, itemTitle: user.nickname, user: user.slim
         )
       }
     }
@@ -193,6 +193,7 @@ struct UserView: View {
     }
     .onAppear {
       Task {
+        await loadCached()
         await refresh()
       }
     }
@@ -205,7 +206,7 @@ struct UserDetailView: View {
   @AppStorage("friendlist") var friendlist: [Int] = []
   @AppStorage("blocklist") var blocklist: [Int] = []
 
-  @Bindable var user: User
+  let user: UserDTO
 
   var body: some View {
     ScrollView {
@@ -221,19 +222,19 @@ struct UserDetailView: View {
               .padding(.top, 8)
             HStack(spacing: 5) {
               BadgeView {
-                Text(user.groupEnum.description).font(.caption)
+                Text(user.group.description).font(.caption)
               }
               if profile.username == user.username {
                 BadgeView {
                   Text("我自己").font(.caption)
                 }
               }
-              if friendlist.contains(user.userId) {
+              if friendlist.contains(user.id) {
                 BadgeView {
                   Text("好友").font(.caption)
                 }
               }
-              if blocklist.contains(user.userId) {
+              if blocklist.contains(user.id) {
                 BadgeView(background: .secondary) {
                   Text("已绝交").font(.caption)
                 }
@@ -308,8 +309,5 @@ struct UserDetailView: View {
 }
 
 #Preview {
-  let container = mockContainer()
-
-  return UserView(username: "873244")
-    .modelContainer(container)
+  UserView(username: "873244")
 }

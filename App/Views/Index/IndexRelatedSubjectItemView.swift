@@ -1,4 +1,3 @@
-import SwiftData
 import SwiftUI
 
 struct IndexRelatedSubjectItemView: View {
@@ -8,20 +7,23 @@ struct IndexRelatedSubjectItemView: View {
   var indexAwardYear: Int? = nil
 
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
-  @Query private var subjects: [Subject]
+  @State private var collectionType: CollectionType = .none
 
   init(reloader: Binding<Bool>, item: IndexRelatedDTO, isOwner: Bool, indexAwardYear: Int? = nil) {
     self._reloader = reloader
     self.item = item
     self.isOwner = isOwner
     self.indexAwardYear = indexAwardYear
-    let subjectId = item.subject?.id ?? 0
-    let predicate = #Predicate<Subject> { $0.subjectId == subjectId }
-    _subjects = Query(filter: predicate)
   }
 
-  private var subject: Subject? {
-    subjects.first
+  private func loadCollectionType() async {
+    guard let subjectId = item.subject?.id,
+      let db = await AppContext.shared.databaseIfAvailable()
+    else {
+      collectionType = .none
+      return
+    }
+    collectionType = (try? await db.getSubjectDTO(subjectId)?.ctypeEnum) ?? .none
   }
 
   private func subjectSummary(_ itemSubject: SlimSubjectDTO) -> some View {
@@ -61,7 +63,7 @@ struct IndexRelatedSubjectItemView: View {
       if let itemSubject = item.subject {
         ImageView(img: itemSubject.images?.resize(.r200))
           .imageStyle(width: 80, height: 100)
-          .imageCollectionStatus(ctype: subject?.ctypeEnum)
+          .imageCollectionStatus(ctype: collectionType)
           .imageType(.subject)
           .imageNSFW(itemSubject.nsfw)
           .imageNavLink(itemSubject.link)
@@ -70,7 +72,7 @@ struct IndexRelatedSubjectItemView: View {
             .subjectCollectionStatusOverlay(
               subjectId: itemSubject.id,
               subjectType: itemSubject.type,
-              collectionType: subject?.ctypeEnum ?? .none
+              collectionType: collectionType
             )
 
           if !item.comment.isEmpty {
@@ -90,6 +92,9 @@ struct IndexRelatedSubjectItemView: View {
           .foregroundStyle(.secondary)
       }
       Spacer(minLength: 0)
+    }
+    .task(id: "\(item.subject?.id ?? 0)-\(reloader)") {
+      await loadCollectionType()
     }
   }
 }

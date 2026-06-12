@@ -1,5 +1,4 @@
 import OSLog
-import SwiftData
 import SwiftUI
 
 struct SearchCharacterView: View {
@@ -33,18 +32,15 @@ struct SearchCharacterView: View {
 struct SearchCharacterItemView: View {
   let characterId: Int
 
-  @Query private var characters: [Character]
-  private var character: Character? { characters.first }
+  @State private var character: CharacterDTO?
 
-  init(characterId: Int) {
-    self.characterId = characterId
-
-    let desc = FetchDescriptor<Character>(
-      predicate: #Predicate<Character> {
-        return $0.characterId == characterId
-      }
-    )
-    _characters = Query(desc)
+  private func load() async {
+    do {
+      let db = try await AppContext.shared.getDB()
+      character = try await db.getCharacterDTO(characterId)
+    } catch {
+      Notifier.shared.alert(error: error)
+    }
   }
 
   var body: some View {
@@ -53,24 +49,24 @@ struct SearchCharacterItemView: View {
         CharacterLargeRowView(character: character)
       }
     }
+    .task(id: characterId) {
+      await load()
+    }
   }
 }
 
 struct SearchCharacterLocalView: View {
   let text: String
 
-  @Query private var characters: [Character]
+  @State private var characters: [CharacterDTO] = []
 
-  init(text: String) {
-    self.text = text.gb
-
-    var desc = FetchDescriptor<Character>(
-      predicate: #Predicate<Character> {
-        return $0.name.localizedStandardContains(text)
-          || $0.alias.localizedStandardContains(text)
-      })
-    desc.fetchLimit = 20
-    _characters = Query(desc)
+  private func load() async {
+    do {
+      let db = try await AppContext.shared.getDB()
+      characters = try await db.fetchLocalCharacters(search: text.gb)
+    } catch {
+      Notifier.shared.alert(error: error)
+    }
   }
 
   var body: some View {
@@ -80,6 +76,9 @@ struct SearchCharacterLocalView: View {
           CharacterLargeRowView(character: character)
         }
       }
+    }
+    .task(id: text) {
+      await load()
     }
   }
 }

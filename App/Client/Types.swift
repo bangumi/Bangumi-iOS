@@ -391,7 +391,7 @@ struct SubjectCollectDTO: Codable, Identifiable, Hashable {
   }
 }
 
-struct SubjectDTO: Codable, Identifiable, Searchable {
+struct SubjectDTO: Codable, Identifiable, Hashable, Searchable {
   var id: Int
   var airtime: SubjectAirtime
   var collection: SubjectCollection
@@ -455,6 +455,7 @@ struct SlimSubjectDTO: Codable, Identifiable, Hashable, Linkable {
     self.nameCN = subject.nameCN
     self.nsfw = subject.nsfw
     self.type = subject.typeEnum
+    self.interest = subject.interest?.slim
   }
 
   init(_ subject: SubjectDTO) {
@@ -467,6 +468,7 @@ struct SlimSubjectDTO: Codable, Identifiable, Hashable, Linkable {
     self.nameCN = subject.nameCN
     self.nsfw = subject.nsfw
     self.type = subject.type
+    self.interest = subject.interest?.slim
   }
 
   var link: String {

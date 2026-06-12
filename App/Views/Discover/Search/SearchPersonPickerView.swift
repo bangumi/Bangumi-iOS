@@ -1,4 +1,3 @@
-import SwiftData
 import SwiftUI
 
 struct SearchPersonPickerView: View {
@@ -95,19 +94,15 @@ struct SearchPersonPickerLocalView: View {
   let onSelect: (Int) -> Void
 
   @Environment(\.dismiss) var dismiss
-  @Query private var persons: [Person]
+  @State private var persons: [PersonDTO] = []
 
-  init(text: String, onSelect: @escaping (Int) -> Void) {
-    self.text = text.gb
-    self.onSelect = onSelect
-
-    var desc = FetchDescriptor<Person>(
-      predicate: #Predicate<Person> {
-        return $0.name.localizedStandardContains(text)
-          || $0.alias.localizedStandardContains(text)
-      })
-    desc.fetchLimit = 20
-    _persons = Query(desc)
+  private func load() async {
+    do {
+      let db = try await AppContext.shared.getDB()
+      persons = try await db.fetchLocalPersons(search: text.gb)
+    } catch {
+      Notifier.shared.alert(error: error)
+    }
   }
 
   var body: some View {
@@ -117,10 +112,13 @@ struct SearchPersonPickerLocalView: View {
           PersonLargeRowView(person: person)
         }
         .onTapGesture {
-          onSelect(person.personId)
+          onSelect(person.id)
           dismiss()
         }
       }
+    }
+    .task(id: text) {
+      await load()
     }
   }
 }
@@ -129,19 +127,15 @@ struct SearchPersonPickerItemView: View {
   let personId: Int
   let onSelect: (Int) -> Void
 
-  @Query private var persons: [Person]
-  private var person: Person? { persons.first }
+  @State private var person: PersonDTO?
 
-  init(personId: Int, onSelect: @escaping (Int) -> Void) {
-    self.personId = personId
-    self.onSelect = onSelect
-
-    let desc = FetchDescriptor<Person>(
-      predicate: #Predicate<Person> {
-        return $0.personId == personId
-      }
-    )
-    _persons = Query(desc)
+  private func load() async {
+    do {
+      let db = try await AppContext.shared.getDB()
+      person = try await db.getPersonDTO(personId)
+    } catch {
+      Notifier.shared.alert(error: error)
+    }
   }
 
   var body: some View {
@@ -152,6 +146,9 @@ struct SearchPersonPickerItemView: View {
     }
     .onTapGesture {
       onSelect(personId)
+    }
+    .task(id: personId) {
+      await load()
     }
   }
 }

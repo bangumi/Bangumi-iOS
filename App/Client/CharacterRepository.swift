@@ -10,18 +10,19 @@ enum CharacterRepository {
     }
   }
 
-  private static func loadDetail(
+  private static func loadDetailValue<T>(
     label: String,
-    work: @Sendable @escaping () async throws -> Void
-  ) -> Task<Void, Never> {
+    work: @Sendable @escaping () async throws -> PagedDTO<T>
+  ) -> Task<PagedDTO<T>?, Never> {
     Task { @Sendable in
       do {
-        try await work()
+        return try await work()
       } catch {
         Logger.api.error("Failed to load \(label): \(error)")
         await MainActor.run {
           Notifier.shared.notify(message: "加载\(label)失败")
         }
+        return nil
       }
     }
   }
@@ -42,27 +43,22 @@ enum CharacterRepository {
 
   static func loadCharacterDetails(_ characterId: Int) async throws {
     let db = try await AppContext.shared.getDB()
-    let tasks: [Task<Void, Never>] = [
-      loadDetail(label: "角色参演") {
-        let response = try await CharacterService.getCharacterCasts(characterId, limit: 5)
-        try await db.saveCharacterCasts(characterId: characterId, items: response.data)
-        await db.commit()
-      },
-      loadDetail(label: "关联角色") {
-        let response = try await CharacterService.getCharacterRelations(characterId, limit: 10)
-        try await db.saveCharacterRelations(characterId: characterId, items: response.data)
-        await db.commit()
-      },
-      loadDetail(label: "角色目录") {
-        let response = try await CharacterService.getCharacterIndexes(
-          characterId: characterId, limit: 5)
-        try await db.saveCharacterIndexes(characterId: characterId, items: response.data)
-        await db.commit()
-      },
-    ]
-    for task in tasks {
-      await task.value
+    let castsTask = loadDetailValue(label: "角色参演") {
+      try await CharacterService.getCharacterCasts(characterId, limit: 5)
     }
+    let relationsTask = loadDetailValue(label: "关联角色") {
+      try await CharacterService.getCharacterRelations(characterId, limit: 10)
+    }
+    let indexesTask = loadDetailValue(label: "角色目录") {
+      try await CharacterService.getCharacterIndexes(characterId: characterId, limit: 5)
+    }
+    try await db.saveCharacterDetails(
+      characterId: characterId,
+      casts: await castsTask.value?.data,
+      relations: await relationsTask.value?.data,
+      indexes: await indexesTask.value?.data
+    )
+    await db.commit()
   }
 
   static func collectCharacter(_ characterId: Int) async throws {
@@ -70,11 +66,13 @@ enum CharacterRepository {
     let db = try await AppContext.shared.getDB()
     let now = Int(Date().timeIntervalSince1970)
     try await db.updateCharacterCollection(characterId: characterId, collectedAt: now - 1)
+    try await db.commitImmediately()
   }
 
   static func uncollectCharacter(_ characterId: Int) async throws {
     try await CharacterService.uncollectCharacter(characterId)
     let db = try await AppContext.shared.getDB()
     try await db.updateCharacterCollection(characterId: characterId, collectedAt: 0)
+    try await db.commitImmediately()
   }
 }

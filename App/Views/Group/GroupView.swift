@@ -1,30 +1,32 @@
 import BBCode
 import OSLog
-import SwiftData
 import SwiftUI
 
 struct GroupView: View {
   let name: String
 
   @State private var refreshed: Bool = false
+  @State private var group: GroupDTO?
+  @State private var detail: GroupDetailDTO = GroupDetailDTO()
 
-  @Query private var groups: [ChiiGroup]
-  var group: ChiiGroup? { groups.first }
-
-  init(name: String) {
-    self.name = name
-    let predicate = #Predicate<ChiiGroup> {
-      $0.name == name
+  private func loadCached() async {
+    do {
+      let db = try await AppContext.shared.getDB()
+      group = try await db.getGroupDTO(name)
+      detail = try await db.getGroupDetailDTO(name)
+    } catch {
+      Logger.app.error("Failed to load cached group: \(error)")
     }
-    _groups = Query(filter: predicate, sort: \ChiiGroup.groupId)
   }
 
   func refresh() async {
     if refreshed { return }
     do {
       try await GroupRepository.loadGroup(name)
+      await loadCached()
       refreshed = true
       try await GroupRepository.loadGroupDetails(name)
+      await loadCached()
     } catch {
       Notifier.shared.alert(error: error)
       return
@@ -36,7 +38,9 @@ struct GroupView: View {
       if let group = group {
         GeometryReader { geometry in
           ScrollView {
-            GroupDetailView(group: group, width: geometry.size.width)
+            GroupDetailView(group: group, detail: detail, width: geometry.size.width) {
+              await loadCached()
+            }
           }
         }
       } else if refreshed {
@@ -45,32 +49,27 @@ struct GroupView: View {
         ProgressView()
       }
     }
-    .onAppear {
-      Task {
-        await refresh()
-      }
+    .task {
+      await loadCached()
+      await refresh()
     }
   }
 }
 
 struct GroupDetailView: View {
-  @Bindable var group: ChiiGroup
+  let group: GroupDTO
+  let detail: GroupDetailDTO
   let width: CGFloat
+  let reload: () async -> Void
 
   @AppStorage("shareDomain") var shareDomain: ShareDomain = .chii
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
 
-  @Query(filter: #Predicate<RakuenGroupCache> { $0.id == "pin" })
-  private var pinCaches: [RakuenGroupCache]
-
   @State private var showCreateTopic: Bool = false
-
-  private var pinCache: RakuenGroupCache? {
-    pinCaches.first
-  }
+  @State private var pinnedItems: [SlimGroupDTO] = []
 
   private var isPinned: Bool {
-    pinCache?.items.contains { $0.id == group.groupId } ?? false
+    pinnedItems.contains { $0.id == group.id }
   }
 
   var shareLink: URL {
@@ -82,9 +81,20 @@ struct GroupDetailView: View {
       do {
         let db = try await AppContext.shared.getDB()
         try await db.togglePinRakuenGroupCache(group: group.slim)
+        await db.commit()
+        pinnedItems = try await db.fetchRakuenGroupCache(id: "pin")
       } catch {
         Logger.app.error("Failed to toggle pin: \(error)")
       }
+    }
+  }
+
+  private func loadPinnedItems() async {
+    do {
+      let db = try await AppContext.shared.getDB()
+      pinnedItems = try await db.fetchRakuenGroupCache(id: "pin")
+    } catch {
+      Logger.app.error("Failed to load pinned groups: \(error)")
     }
   }
 
@@ -95,6 +105,8 @@ struct GroupDetailView: View {
         let joinedAt = Int(Date().timeIntervalSince1970)
         let db = try await AppContext.shared.getDB()
         try await db.updateGroupJoinStatus(name: group.name, joinedAt: joinedAt)
+        try await db.commitImmediately()
+        await reload()
       } catch {
         Notifier.shared.alert(error: error)
       }
@@ -107,6 +119,8 @@ struct GroupDetailView: View {
         try await GroupService.leaveGroup(group.name)
         let db = try await AppContext.shared.getDB()
         try await db.updateGroupJoinStatus(name: group.name, joinedAt: 0)
+        try await db.commitImmediately()
+        await reload()
       } catch {
         Notifier.shared.alert(error: error)
       }
@@ -139,10 +153,10 @@ struct GroupDetailView: View {
               Spacer(minLength: 0)
             }
           }
-          if !group.desc.isEmpty {
+          if !group.description.isEmpty {
             Divider()
             HStack {
-              BBCodeView(group.desc)
+              BBCodeView(group.description)
                 .tint(.linkText)
                 .fixedSize(horizontal: false, vertical: true)
               Spacer(minLength: 0)
@@ -162,8 +176,8 @@ struct GroupDetailView: View {
           }
         }
       }
-      GroupRecentMemberView(group: group, width: width)
-      GroupRecentTopicView(group: group)
+      GroupRecentMemberView(group: group, members: detail.recentMembers, width: width)
+      GroupRecentTopicView(group: group, topics: detail.recentTopics, reload: reload)
     }
     .padding(.horizontal, 8)
     .navigationTitle(group.title)
@@ -172,6 +186,7 @@ struct GroupDetailView: View {
       CreateTopicBoxSheet(type: .group(group.name)) {
         Task {
           try? await GroupRepository.loadGroupDetails(group.name)
+          await reload()
         }
       }
     }
@@ -225,17 +240,16 @@ struct GroupDetailView: View {
       }
     }
     .handoff(url: shareLink, title: group.title)
+    .task {
+      await loadPinnedItems()
+    }
   }
 }
 
 struct GroupRecentMemberView: View {
-  @Bindable var group: ChiiGroup
+  let group: GroupDTO
+  let members: [GroupMemberDTO]
   let width: CGFloat
-
-  init(group: ChiiGroup, width: CGFloat) {
-    self.group = group
-    self.width = width
-  }
 
   var columnCount: Int {
     let columns = Int((width - 8) / 68)
@@ -271,7 +285,7 @@ struct GroupRecentMemberView: View {
         Divider()
       }
       LazyVGrid(columns: columns) {
-        ForEach(group.recentMembers.prefix(limit)) { member in
+        ForEach(members.prefix(limit)) { member in
           VStack {
             ImageView(img: member.user?.avatar?.large)
               .imageStyle(width: 60, height: 60)
@@ -283,12 +297,14 @@ struct GroupRecentMemberView: View {
           }
         }
       }
-    }.animation(.default, value: group.recentMembers)
+    }.animation(.default, value: members)
   }
 }
 
 struct GroupRecentTopicView: View {
-  @Bindable var group: ChiiGroup
+  let group: GroupDTO
+  let topics: [TopicDTO]
+  let reload: () async -> Void
 
   @AppStorage("hideBlocklist") var hideBlocklist: Bool = false
   @AppStorage("blocklist") var blocklist: [Int] = []
@@ -321,11 +337,12 @@ struct GroupRecentTopicView: View {
         CreateTopicBoxSheet(type: .group(group.name)) {
           Task {
             try? await GroupRepository.loadGroupDetails(group.name)
+            await reload()
           }
         }
       }
       VStack {
-        ForEach(group.recentTopics) { topic in
+        ForEach(topics) { topic in
           if !hideBlocklist || !blocklist.contains(topic.creator?.id ?? 0) {
             VStack {
               HStack {
@@ -356,6 +373,6 @@ struct GroupRecentTopicView: View {
           }
         }
       }
-    }.animation(.default, value: group.recentTopics)
+    }.animation(.default, value: topics)
   }
 }

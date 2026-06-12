@@ -1,11 +1,10 @@
-import SwiftData
 import SwiftUI
 
 struct SubjectHeaderView: View {
-  @Bindable var subject: Subject
+  let subject: SubjectDTO
 
   var type: SubjectType {
-    subject.typeEnum
+    subject.type
   }
 
   var collectStats: String {
@@ -33,7 +32,7 @@ struct SubjectHeaderView: View {
         .imageType(.subject)
         .imageNSFW(subject.nsfw)
         .enableImagePreview(
-          subject.images?.large, zoomID: ZoomNavigationID(type: .subject, id: subject.subjectId)
+          subject.images?.large, zoomID: ZoomNavigationID(type: .subject, id: subject.id)
         )
         .padding(4)
         .shadow(radius: 4)
@@ -69,7 +68,7 @@ struct SubjectHeaderView: View {
         }
         Spacer()
 
-        NavigationLink(value: NavDestination.subjectInfobox(subject.subjectId)) {
+        NavigationLink(value: NavDestination.subjectInfobox(subject.id)) {
           HStack {
             Text(subject.info)
               .font(.caption)
@@ -161,7 +160,7 @@ struct SubjectRankView: View {
 #Preview {
   ScrollView {
     LazyVStack(alignment: .leading) {
-      SubjectHeaderView(subject: Subject.previewBook)
+      SubjectHeaderView(subject: SubjectDTO(Subject.previewBook))
     }.padding()
   }
 }

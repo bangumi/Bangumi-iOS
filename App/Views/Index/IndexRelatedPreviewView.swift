@@ -1,4 +1,3 @@
-import SwiftData
 import SwiftUI
 
 struct IndexRelatedPreviewView: View {
@@ -23,19 +22,15 @@ struct IndexRelatedPreviewView: View {
 struct IndexRelatedSubjectPreview: View {
   let subjectId: Int
 
-  @Query private var subjects: [Subject]
-  private var subject: Subject? { subjects.first }
+  @State private var subject: SubjectDTO?
   @State private var isLoading = false
 
-  init(subjectId: Int) {
-    self.subjectId = subjectId
-    let desc = FetchDescriptor<Subject>(
-      predicate: #Predicate<Subject> { $0.subjectId == subjectId }
-    )
-    _subjects = Query(desc)
+  private func loadCached() async {
+    guard let db = await AppContext.shared.databaseIfAvailable() else { return }
+    subject = try? await db.getSubjectDTO(subjectId)
   }
 
-  private func load() async {
+  private func refresh() async {
     isLoading = true
     do {
       guard let db = await AppContext.shared.databaseIfAvailable() else {
@@ -44,6 +39,7 @@ struct IndexRelatedSubjectPreview: View {
       let resp = try await SubjectService.getSubject(subjectId)
       try await db.saveSubject(resp)
       await db.commit()
+      await loadCached()
     } catch {
       Notifier.shared.alert(error: error)
     }
@@ -51,25 +47,30 @@ struct IndexRelatedSubjectPreview: View {
   }
 
   var body: some View {
-    if let subject = subject {
-      SubjectSmallView(subject: subject.slim)
-        .allowsHitTesting(false)
-    } else {
-      HStack {
-        Text("条目 #\(subjectId)")
-          .foregroundStyle(.secondary)
-        Spacer()
-        Button {
-          Task { await load() }
-        } label: {
-          if isLoading {
-            ProgressView()
-          } else {
-            Image(systemName: "arrow.clockwise")
+    Group {
+      if let subject = subject {
+        SubjectSmallView(subject: subject.slim)
+          .allowsHitTesting(false)
+      } else {
+        HStack {
+          Text("条目 #\(subjectId)")
+            .foregroundStyle(.secondary)
+          Spacer()
+          Button {
+            Task { await refresh() }
+          } label: {
+            if isLoading {
+              ProgressView()
+            } else {
+              Image(systemName: "arrow.clockwise")
+            }
           }
+          .disabled(isLoading)
         }
-        .disabled(isLoading)
       }
+    }
+    .task(id: subjectId) {
+      await loadCached()
     }
   }
 }
@@ -77,19 +78,15 @@ struct IndexRelatedSubjectPreview: View {
 struct IndexRelatedCharacterPreview: View {
   let characterId: Int
 
-  @Query private var characters: [Character]
-  private var character: Character? { characters.first }
+  @State private var character: CharacterDTO?
   @State private var isLoading = false
 
-  init(characterId: Int) {
-    self.characterId = characterId
-    let desc = FetchDescriptor<Character>(
-      predicate: #Predicate<Character> { $0.characterId == characterId }
-    )
-    _characters = Query(desc)
+  private func loadCached() async {
+    guard let db = await AppContext.shared.databaseIfAvailable() else { return }
+    character = try? await db.getCharacterDTO(characterId)
   }
 
-  private func load() async {
+  private func refresh() async {
     isLoading = true
     do {
       guard let db = await AppContext.shared.databaseIfAvailable() else {
@@ -98,6 +95,7 @@ struct IndexRelatedCharacterPreview: View {
       let resp = try await CharacterService.getCharacter(characterId)
       try await db.saveCharacter(resp)
       await db.commit()
+      await loadCached()
     } catch {
       Notifier.shared.alert(error: error)
     }
@@ -105,25 +103,30 @@ struct IndexRelatedCharacterPreview: View {
   }
 
   var body: some View {
-    if let character = character {
-      CharacterSmallView(character: character.slim)
-        .allowsHitTesting(false)
-    } else {
-      HStack {
-        Text("角色 #\(characterId)")
-          .foregroundStyle(.secondary)
-        Spacer()
-        Button {
-          Task { await load() }
-        } label: {
-          if isLoading {
-            ProgressView()
-          } else {
-            Image(systemName: "arrow.clockwise")
+    Group {
+      if let character = character {
+        CharacterSmallView(character: character.slim)
+          .allowsHitTesting(false)
+      } else {
+        HStack {
+          Text("角色 #\(characterId)")
+            .foregroundStyle(.secondary)
+          Spacer()
+          Button {
+            Task { await refresh() }
+          } label: {
+            if isLoading {
+              ProgressView()
+            } else {
+              Image(systemName: "arrow.clockwise")
+            }
           }
+          .disabled(isLoading)
         }
-        .disabled(isLoading)
       }
+    }
+    .task(id: characterId) {
+      await loadCached()
     }
   }
 }
@@ -131,19 +134,15 @@ struct IndexRelatedCharacterPreview: View {
 struct IndexRelatedPersonPreview: View {
   let personId: Int
 
-  @Query private var persons: [Person]
-  private var person: Person? { persons.first }
+  @State private var person: PersonDTO?
   @State private var isLoading = false
 
-  init(personId: Int) {
-    self.personId = personId
-    let desc = FetchDescriptor<Person>(
-      predicate: #Predicate<Person> { $0.personId == personId }
-    )
-    _persons = Query(desc)
+  private func loadCached() async {
+    guard let db = await AppContext.shared.databaseIfAvailable() else { return }
+    person = try? await db.getPersonDTO(personId)
   }
 
-  private func load() async {
+  private func refresh() async {
     isLoading = true
     do {
       guard let db = await AppContext.shared.databaseIfAvailable() else {
@@ -152,6 +151,7 @@ struct IndexRelatedPersonPreview: View {
       let resp = try await PersonService.getPerson(personId)
       try await db.savePerson(resp)
       await db.commit()
+      await loadCached()
     } catch {
       Notifier.shared.alert(error: error)
     }
@@ -159,25 +159,30 @@ struct IndexRelatedPersonPreview: View {
   }
 
   var body: some View {
-    if let person = person {
-      PersonSmallView(person: person.slim)
-        .allowsHitTesting(false)
-    } else {
-      HStack {
-        Text("人物 #\(personId)")
-          .foregroundStyle(.secondary)
-        Spacer()
-        Button {
-          Task { await load() }
-        } label: {
-          if isLoading {
-            ProgressView()
-          } else {
-            Image(systemName: "arrow.clockwise")
+    Group {
+      if let person = person {
+        PersonSmallView(person: person.slim)
+          .allowsHitTesting(false)
+      } else {
+        HStack {
+          Text("人物 #\(personId)")
+            .foregroundStyle(.secondary)
+          Spacer()
+          Button {
+            Task { await refresh() }
+          } label: {
+            if isLoading {
+              ProgressView()
+            } else {
+              Image(systemName: "arrow.clockwise")
+            }
           }
+          .disabled(isLoading)
         }
-        .disabled(isLoading)
       }
+    }
+    .task(id: personId) {
+      await loadCached()
     }
   }
 }

@@ -1,10 +1,9 @@
-import SwiftData
 import SwiftUI
 
 struct CollectionRowView: View {
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
 
-  @Bindable var subject: Subject
+  let subject: SubjectDTO
 
   var body: some View {
     HStack(alignment: .top) {
@@ -56,14 +55,11 @@ struct CollectionRowView: View {
 }
 
 #Preview {
-  let container = mockContainer()
-
   let subject = Subject.previewAnime
-  container.mainContext.insert(subject)
 
   return ScrollView {
     LazyVStack(alignment: .leading) {
-      CollectionRowView(subject: subject)
-    }.padding().modelContainer(container)
+      CollectionRowView(subject: SubjectDTO(subject))
+    }.padding()
   }
 }

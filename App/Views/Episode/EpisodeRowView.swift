@@ -1,4 +1,3 @@
-import SwiftData
 import SwiftUI
 
 struct EpisodeRowView: View {
@@ -6,7 +5,8 @@ struct EpisodeRowView: View {
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
 
-  @Bindable var episode: Episode
+  let episode: EpisodeDTO
+  var reload: (() async -> Void)? = nil
 
   var body: some View {
     VStack(alignment: .leading) {
@@ -27,7 +27,7 @@ struct EpisodeRowView: View {
           }
         } else {
           Menu {
-            EpisodeUpdateMenu(episode: episode)
+            EpisodeUpdateMenu(episode: episode, reload: reload)
           } label: {
             if episode.typeEnum == .main {
               if episode.aired {
@@ -89,7 +89,7 @@ struct EpisodeRowView: View {
 
   return ScrollView {
     LazyVStack {
-      EpisodeRowView(episode: episodes.first!)
+      EpisodeRowView(episode: EpisodeDTO(episodes.first!))
         .modelContainer(container)
     }.padding()
   }

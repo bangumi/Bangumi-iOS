@@ -1,5 +1,4 @@
 import OSLog
-import SwiftData
 import SwiftUI
 
 struct ChiiProgressView: View {
@@ -13,6 +12,7 @@ struct ChiiProgressView: View {
   @State private var refreshing: Bool = true
   @State private var refreshProgress: CGFloat = 0
   @State private var showRefreshAll: Bool = false
+  @State private var didInitialLoad: Bool = false
 
   @State private var search: String = ""
   @State private var subjectIds: [Int] = []
@@ -48,6 +48,11 @@ struct ChiiProgressView: View {
     }
   }
 
+  private func loadLocalProgress() async {
+    await updateSubjectIds()
+    await loadCounts()
+  }
+
   func refresh(force: Bool = false, showProgress: Bool = true) async {
     let now = Date()
     if force {
@@ -61,11 +66,10 @@ struct ChiiProgressView: View {
       let count = try await refreshCollections(since: collectionsUpdatedAt)
       if count > 0 {
         Notifier.shared.notify(message: "更新了 \(count) 条收藏")
-        await updateSubjectIds()
-        await loadCounts()
       } else {
         Notifier.shared.notify(message: "没有收藏更新")
       }
+      await loadLocalProgress()
       collectionsUpdatedAt = Int(now.timeIntervalSince1970)
     } catch {
       Notifier.shared.notify(message: "更新失败: \(error)")
@@ -184,12 +188,12 @@ struct ChiiProgressView: View {
         await refresh(showProgress: false)
       }
       .task {
-        guard subjectIds.isEmpty else { return }
+        guard !didInitialLoad else { return }
+        didInitialLoad = true
         refreshing = true
-        await updateSubjectIds()
-        await loadCounts()
-        await refresh()
+        await loadLocalProgress()
         refreshing = false
+        await refresh(showProgress: false)
       }
       .searchable(
         text: $search,

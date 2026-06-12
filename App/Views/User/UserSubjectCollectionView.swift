@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct UserSubjectCollectionView: View {
-  @Bindable var user: User
+  let user: UserDTO
   let stype: SubjectType
   let ctypes: [CollectionType: Int]
 
@@ -11,7 +11,7 @@ struct UserSubjectCollectionView: View {
   @State private var refreshing = false
   @State private var subjects: [SlimSubjectDTO] = []
 
-  init(user: User, stype: SubjectType, ctypes: [CollectionType: Int]) {
+  init(user: UserDTO, stype: SubjectType, ctypes: [CollectionType: Int]) {
     self.user = user
     self.stype = stype
     self.ctypes = ctypes

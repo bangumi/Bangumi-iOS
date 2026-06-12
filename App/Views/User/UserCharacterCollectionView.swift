@@ -3,7 +3,7 @@ import SwiftUI
 struct UserCharacterCollectionView: View {
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
 
-  @Bindable var user: User
+  let user: UserDTO
 
   @State private var refreshing = false
   @State private var characters: [SlimCharacterDTO] = []

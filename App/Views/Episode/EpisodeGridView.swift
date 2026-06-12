@@ -1,6 +1,5 @@
 import Flow
 import OSLog
-import SwiftData
 import SwiftUI
 
 struct EpisodeGridView: View {
@@ -10,33 +9,21 @@ struct EpisodeGridView: View {
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
 
   @State private var refreshed: Bool = false
+  @State private var episodeMains: [EpisodeDTO] = []
+  @State private var episodeSps: [EpisodeDTO] = []
 
-  @Query private var subjects: [Subject] = []
-  private var subject: Subject? { subjects.first }
-
-  @Query private var episodeMains: [Episode] = []
-  @Query private var episodeSps: [Episode] = []
-
-  init(subjectId: Int) {
-    self.subjectId = subjectId
-
-    let mainType = EpisodeType.main.rawValue
-    var mainDescriptor = FetchDescriptor<Episode>(
-      predicate: #Predicate<Episode> {
-        $0.type == mainType && $0.subjectId == subjectId
-      }, sortBy: [SortDescriptor(\.sort)])
-    mainDescriptor.fetchLimit = 50
-
-    let spType = EpisodeType.sp.rawValue
-    var spDescriptor = FetchDescriptor<Episode>(
-      predicate: #Predicate<Episode> {
-        $0.type == spType && $0.subjectId == subjectId
-      }, sortBy: [SortDescriptor(\.sort)])
-    spDescriptor.fetchLimit = 10
-
-    _episodeMains = Query(mainDescriptor)
-    _episodeSps = Query(spDescriptor)
-    _subjects = Query(filter: #Predicate<Subject> { $0.subjectId == subjectId })
+  private func loadCached() async {
+    do {
+      let db = try await AppContext.shared.getDB()
+      episodeMains = try await db.fetchEpisodes(subjectId: subjectId, main: true, limit: 50)
+      episodeSps = Array(
+        try await db.fetchEpisodes(subjectId: subjectId)
+          .filter { $0.type == .sp }
+          .prefix(10)
+      )
+    } catch {
+      Logger.app.error("Failed to load cached episodes: \(error)")
+    }
   }
 
   func refresh() {
@@ -46,6 +33,7 @@ struct EpisodeGridView: View {
     Task {
       do {
         try await EpisodeRepository.loadEpisodes(subjectId)
+        await loadCached()
       } catch {
         Notifier.shared.alert(error: error)
       }
@@ -69,7 +57,9 @@ struct EpisodeGridView: View {
     }.padding(.top, 5)
     HFlow(alignment: .center, spacing: 2) {
       ForEach(episodeMains) { episode in
-        EpisodeItemView(episode: episode)
+        EpisodeItemView(episode: episode) {
+          await loadCached()
+        }
       }
       if !episodeSps.isEmpty {
         Text("SP")
@@ -86,7 +76,9 @@ struct EpisodeGridView: View {
           .padding(2)
           .bold()
         ForEach(episodeSps) { episode in
-          EpisodeItemView(episode: episode)
+          EpisodeItemView(episode: episode) {
+            await loadCached()
+          }
         }
       }
     }
@@ -102,6 +94,10 @@ struct EpisodeGridView: View {
     )
     .animation(.default, value: episodeMains)
     .animation(.default, value: episodeSps)
+    .task {
+      await loadCached()
+      refresh()
+    }
   }
 }
 

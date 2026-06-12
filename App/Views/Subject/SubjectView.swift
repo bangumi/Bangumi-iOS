@@ -1,5 +1,4 @@
 import OSLog
-import SwiftData
 import SwiftUI
 
 struct SubjectView: View {
@@ -11,21 +10,28 @@ struct SubjectView: View {
 
   @State private var refreshed: Bool = false
   @State private var refreshing: Bool = false
+  @State private var subject: SubjectDTO?
+  @State private var detail: SubjectDetailDTO = SubjectDetailDTO()
 
-  @Query private var subjects: [Subject]
-  var subject: Subject? { subjects.first }
-
-  init(subjectId: Int) {
-    self.subjectId = subjectId
-    _subjects = Query(filter: #Predicate<Subject> { $0.subjectId == subjectId })
+  private func loadCached() async {
+    do {
+      let db = try await AppContext.shared.getDB()
+      let cachedSubject = try await db.getSubjectDTO(subjectId)
+      let cachedDetail = try await db.getSubjectDetailDTO(subjectId)
+      subject = cachedSubject
+      detail = cachedDetail
+    } catch {
+      Logger.app.error("Failed to load cached subject: \(error)")
+    }
   }
 
-  func refresh() async {
-    if refreshed { return }
+  func refresh(force: Bool = false) async {
+    if refreshed && !force { return }
     if refreshing { return }
     refreshing = true
     do {
       let item = try await SubjectRepository.loadSubject(subjectId)
+      subject = item
       refreshed = true
       Logger.app.debug("subject refreshed: \(subjectId)")
 
@@ -34,6 +40,7 @@ struct SubjectView: View {
         offprints: item.type == .book && item.series,
         social: !isolationMode
       )
+      await loadCached()
     } catch {
       Notifier.shared.alert(error: error)
       refreshed = true
@@ -44,18 +51,20 @@ struct SubjectView: View {
   var body: some View {
     Section {
       if let subject = subject {
-        SubjectDetailView(subject: subject)
+        SubjectDetailView(subject: subject, detail: detail) {
+          await loadCached()
+        }
       } else if refreshed {
         NotFoundView()
       } else {
         ProgressView()
       }
     }
-    .onAppear {
-      Task {
-        await refresh()
-      }
+    .task {
+      await loadCached()
+      await refresh()
     }
+    .modifier(ZoomTransitionModifier(zoomID: ZoomNavigationID(type: .subject, id: subjectId)))
   }
 }
 
@@ -65,13 +74,15 @@ struct SubjectDetailView: View {
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
 
-  @Bindable var subject: Subject
+  let subject: SubjectDTO
+  let detail: SubjectDetailDTO
+  let reload: () async -> Void
 
   @State private var showCreateTopic: Bool = false
   @State private var showIndexPicker: Bool = false
 
   var shareLink: URL {
-    URL(string: "\(shareDomain.url)/subject/\(subject.subjectId)")!
+    URL(string: "\(shareDomain.url)/subject/\(subject.id)")!
   }
 
   var body: some View {
@@ -80,54 +91,55 @@ struct SubjectDetailView: View {
         SubjectHeaderView(subject: subject)
 
         if isAuthenticated {
-          SubjectCollectionView(subject: subject)
+          SubjectCollectionView(subject: subject, reload: reload)
         }
 
-        if subject.typeEnum == .anime || subject.typeEnum == .real {
-          EpisodeGridView(subjectId: subject.subjectId)
+        if subject.type == .anime || subject.type == .real {
+          EpisodeGridView(subjectId: subject.id)
         }
 
         SubjectSummaryView(subject: subject)
 
-        if subject.typeEnum == .music {
-          EpisodeDiscView(subjectId: subject.subjectId)
+        if subject.type == .music {
+          EpisodeDiscView(subjectId: subject.id)
         } else {
-          SubjectCharactersView(subjectId: subject.subjectId, characters: subject.characters)
+          SubjectCharactersView(subjectId: subject.id, characters: detail.characters)
         }
 
-        if subject.typeEnum == .book, subject.series {
-          SubjectOffprintsView(subjectId: subject.subjectId, offprints: subject.offprints)
+        if subject.type == .book, subject.series {
+          SubjectOffprintsView(subjectId: subject.id, offprints: detail.offprints)
         }
 
-        SubjectRelationsView(subjectId: subject.subjectId, relations: subject.relations)
+        SubjectRelationsView(subjectId: subject.id, relations: detail.relations)
 
-        SubjectRecsView(subjectId: subject.subjectId, recs: subject.recs)
+        SubjectRecsView(subjectId: subject.id, recs: detail.recs)
 
-        SubjectIndexsView(subjectId: subject.subjectId, indexes: subject.indexes)
+        SubjectIndexsView(subjectId: subject.id, indexes: detail.indexes)
 
         if !isolationMode {
-          SubjectCollectsView(subject: subject)
-          SubjectReviewsView(subjectId: subject.subjectId, reviews: subject.reviews)
-          SubjectTopicsView(subjectId: subject.subjectId, topics: subject.topics)
+          SubjectCollectsView(subject: subject, collects: detail.collects)
+          SubjectReviewsView(subjectId: subject.id, reviews: detail.reviews)
+          SubjectTopicsView(subjectId: subject.id, topics: detail.topics)
           SubjectCommentsView(
-            subjectId: subject.subjectId, subjectType: subject.typeEnum, comments: subject.comments)
+            subjectId: subject.id, subjectType: subject.type, comments: detail.comments)
         }
 
         Spacer()
       }.padding(.horizontal, 8)
     }
     .sheet(isPresented: $showCreateTopic) {
-      CreateTopicBoxSheet(type: .subject(subject.subjectId)) {
+      CreateTopicBoxSheet(type: .subject(subject.id)) {
         Task {
           try? await SubjectRepository.loadSubjectDetails(
-            subject.subjectId, offprints: false, social: true)
+            subject.id, offprints: false, social: true)
+          await reload()
         }
       }
     }
     .sheet(isPresented: $showIndexPicker) {
       IndexPickerSheet(
         category: .subject,
-        itemId: subject.subjectId,
+        itemId: subject.id,
         itemTitle: subject.title(with: titlePreference)
       )
     }
@@ -136,7 +148,7 @@ struct SubjectDetailView: View {
     .toolbar {
       ToolbarItem(placement: .topBarTrailing) {
         Menu {
-          NavigationLink(value: NavDestination.subjectStaffList(subject.subjectId)) {
+          NavigationLink(value: NavDestination.subjectStaffList(subject.id)) {
             Label("制作人员", systemImage: "person.3")
           }
           NavigationLink(value: NavDestination.subjectRating(subject)) {
@@ -167,8 +179,6 @@ struct SubjectDetailView: View {
       }
     }
     .handoff(url: shareLink, title: subject.name)
-    .modifier(
-      ZoomTransitionModifier(zoomID: ZoomNavigationID(type: .subject, id: subject.subjectId)))
   }
 }
 

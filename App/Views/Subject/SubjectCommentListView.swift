@@ -1,5 +1,4 @@
 import OSLog
-import SwiftData
 import SwiftUI
 
 struct SubjectCommentListView: View {
@@ -9,16 +8,15 @@ struct SubjectCommentListView: View {
   @AppStorage("profile") var profile: Profile = Profile()
 
   @State private var reloader = false
-
-  @Query private var subjects: [Subject]
-  private var subject: Subject? { subjects.first }
+  @State private var subjectType: SubjectType = .none
 
   init(subjectId: Int) {
     self.subjectId = subjectId
-    _subjects = Query(
-      filter: #Predicate<Subject> {
-        $0.subjectId == subjectId
-      })
+  }
+
+  func loadCachedSubjectType() async {
+    guard let db = await AppContext.shared.databaseIfAvailable() else { return }
+    subjectType = (try? await db.getSubjectDTO(subjectId)?.type) ?? .none
   }
 
   func load(limit: Int, offset: Int) async -> PagedDTO<SubjectCommentDTO>? {
@@ -35,12 +33,15 @@ struct SubjectCommentListView: View {
   var body: some View {
     ScrollView {
       PageView<SubjectCommentDTO, _>(reloader: reloader, nextPageFunc: load) { comment in
-        SubjectCommentItemView(subjectType: subject?.typeEnum ?? .none, comment: comment)
+        SubjectCommentItemView(subjectType: subjectType, comment: comment)
       }.padding(.horizontal, 8)
     }
     .buttonStyle(.navigation)
     .navigationTitle("吐槽")
     .navigationBarTitleDisplayMode(.inline)
+    .task(id: subjectId) {
+      await loadCachedSubjectType()
+    }
   }
 }
 

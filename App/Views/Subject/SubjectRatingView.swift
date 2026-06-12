@@ -7,7 +7,7 @@ struct ScoreInfo {
 }
 
 struct SubjectRatingView: View {
-  var subject: Subject
+  var subject: SubjectDTO
 
   var scoreInfo: ScoreInfo {
     let score = Int(subject.rating.score.rounded())
@@ -43,7 +43,7 @@ struct SubjectRatingView: View {
               }
               if subject.rating.rank > 0 {
                 HStack {
-                  Text("Bangumi \(subject.typeEnum.name.capitalized) Ranked:").foregroundStyle(
+                  Text("Bangumi \(subject.type.name.capitalized) Ranked:").foregroundStyle(
                     .secondary)
                   Text("#\(subject.rating.rank)")
                 }
@@ -60,27 +60,27 @@ struct SubjectRatingView: View {
           HFlow(alignment: .center, spacing: 2) {
             Section {
               Text("\(subject.collection.wish)人")
-              Text(CollectionType.wish.description(subject.typeEnum))
+              Text(CollectionType.wish.description(subject.type))
             }
             Text("/").foregroundStyle(.secondary).padding(.horizontal, 2)
             Section {
               Text("\(subject.collection.collect)人")
-              Text(CollectionType.collect.description(subject.typeEnum))
+              Text(CollectionType.collect.description(subject.type))
             }
             Text("/").foregroundStyle(.secondary).padding(.horizontal, 2)
             Section {
               Text("\(subject.collection.doing)人")
-              Text(CollectionType.doing.description(subject.typeEnum))
+              Text(CollectionType.doing.description(subject.type))
             }
             Text("/").foregroundStyle(.secondary).padding(.horizontal, 2)
             Section {
               Text("\(subject.collection.onHold)人")
-              Text(CollectionType.onHold.description(subject.typeEnum))
+              Text(CollectionType.onHold.description(subject.type))
             }
             Text("/").foregroundStyle(.secondary).padding(.horizontal, 2)
             Section {
               Text("\(subject.collection.dropped)人")
-              Text(CollectionType.dropped.description(subject.typeEnum))
+              Text(CollectionType.dropped.description(subject.type))
             }
           }.font(.footnote)
           Spacer()
@@ -91,5 +91,5 @@ struct SubjectRatingView: View {
 }
 
 #Preview {
-  SubjectRatingView(subject: Subject.previewAnime)
+  SubjectRatingView(subject: SubjectDTO(Subject.previewAnime))
 }

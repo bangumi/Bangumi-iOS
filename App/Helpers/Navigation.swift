@@ -34,7 +34,7 @@ enum NavDestination: Hashable, View {
   case infobox(_ title: String, _ infobox: Infobox)
 
   case subject(_ subjectId: Int)
-  case subjectRating(_ subject: Subject)
+  case subjectRating(_ subject: SubjectDTO)
   case subjectRelationList(_ subjectId: Int)
   case subjectCharacterList(_ subjectId: Int)
   case subjectStaffList(_ subjectId: Int)

@@ -1,4 +1,4 @@
-import SwiftData
+import OSLog
 import SwiftUI
 
 let WIKI_PINS: [String] = ["中文名", "册数", "话数", "放送开始", "放送星期"]
@@ -38,21 +38,25 @@ let WIKI_LINK_SET: Set<String> = Set(WIKI_LINK_ORDER)
 struct SubjectInfoboxView: View {
   let subjectId: Int
 
-  @Query private var subjects: [Subject]
-  var subject: Subject? { subjects.first }
-
   @State private var loaded: Bool = false
+  @State private var subject: SubjectDTO?
+  @State private var detail: SubjectDetailDTO = SubjectDetailDTO()
 
-  init(subjectId: Int) {
-    self.subjectId = subjectId
-    _subjects = Query(filter: #Predicate<Subject> { $0.subjectId == subjectId })
+  private func loadCached() async {
+    do {
+      let db = try await AppContext.shared.getDB()
+      subject = try await db.getSubjectDTO(subjectId)
+      detail = try await db.getSubjectDetailDTO(subjectId)
+    } catch {
+      Logger.app.error("Failed to load cached subject infobox: \(error)")
+    }
   }
 
   func load() async {
     if loaded { return }
     loaded = true
-    guard let subject = subject else { return }
-    if !subject.positions.isEmpty {
+    await loadCached()
+    if !detail.positions.isEmpty {
       return
     }
     await refresh()
@@ -61,6 +65,7 @@ struct SubjectInfoboxView: View {
   func refresh() async {
     do {
       try await SubjectRepository.loadSubjectPositions(subjectId)
+      await loadCached()
     } catch {
       Notifier.shared.alert(error: error)
     }
@@ -69,7 +74,7 @@ struct SubjectInfoboxView: View {
   var body: some View {
     ScrollView {
       if let subject = subject {
-        SubjectInfoboxDetailView(subject: subject)
+        SubjectInfoboxDetailView(subject: subject, positions: detail.positions)
       }
     }
     .task {
@@ -84,7 +89,8 @@ struct SubjectInfoboxView: View {
 }
 
 struct SubjectInfoboxDetailView: View {
-  @Bindable var subject: Subject
+  let subject: SubjectDTO
+  let positions: [SubjectPositionDTO]
 
   @AppStorage("titlePreference") private var titlePreference: TitlePreference = .original
 
@@ -200,7 +206,7 @@ struct SubjectInfoboxDetailView: View {
     let infoboxKeys = subject.infobox.map { $0.key }
     let infoboxKeySet = Set(infoboxKeys)
     var seen = Set<String>()
-    for position in subject.positions {
+    for position in positions {
       let key = positionKey(for: position.position, infoboxKeys: infoboxKeySet)
       if key.isEmpty || seen.contains(key) {
         continue
@@ -238,19 +244,19 @@ struct SubjectInfoboxDetailView: View {
   }
 
   var positionsByKey: [String: [SubjectPositionStaffDTO]] {
-    var positions: [String: [SubjectPositionStaffDTO]] = [:]
+    var grouped: [String: [SubjectPositionStaffDTO]] = [:]
     let infoboxKeySet = Set(subject.infobox.map { $0.key })
-    for position in subject.positions {
+    for position in positions {
       let key = positionKey(for: position.position, infoboxKeys: infoboxKeySet)
-      positions[key, default: []].append(contentsOf: position.staffs)
+      grouped[key, default: []].append(contentsOf: position.staffs)
     }
-    return positions
+    return grouped
   }
 
   var mergedInfobox: [String: [InfoboxValue]] {
     var merged = infobox
     let infoboxKeySet = Set(subject.infobox.map { $0.key })
-    for position in subject.positions {
+    for position in positions {
       let key = positionKey(for: position.position, infoboxKeys: infoboxKeySet)
       let wikiValues = merged[key] ?? []
       merged[key] = mergeValues(wikiValues, staffValues: position.staffs)
@@ -480,7 +486,7 @@ struct SubjectInfoboxDetailView: View {
         }
       }
     }
-    .animation(.default, value: subject.positions)
+    .animation(.default, value: positions)
     .animation(.default, value: showFolded)
     .animation(.default, value: showVersion)
     .padding(8)

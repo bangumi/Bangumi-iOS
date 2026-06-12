@@ -10,18 +10,19 @@ enum SubjectRepository {
     }
   }
 
-  private static func loadDetail(
+  private static func loadDetailValue<T>(
     label: String,
-    work: @Sendable @escaping () async throws -> Void
-  ) -> Task<Void, Never> {
+    work: @Sendable @escaping () async throws -> PagedDTO<T>
+  ) -> Task<PagedDTO<T>?, Never> {
     Task { @Sendable in
       do {
-        try await work()
+        return try await work()
       } catch {
         Logger.api.error("Failed to load \(label): \(error)")
         await MainActor.run {
           Notifier.shared.notify(message: "加载\(label)失败")
         }
+        return nil
       }
     }
   }
@@ -50,98 +51,87 @@ enum SubjectRepository {
       return AppConfig.subjectCollectsFilterMode
     }()
 
-    var tasks: [Task<Void, Never>] = []
-
-    func addTask<T>(
-      label: String,
-      work: @Sendable @escaping () async throws -> PagedDTO<T>,
-      save: @Sendable @escaping (PagedDTO<T>) async throws -> Void
-    ) {
-      tasks.append(
-        loadDetail(label: label) {
-          let value = try await work()
-          try await save(value)
-          await db.commit()
-        })
-    }
-
-    addTask(
+    let charactersTask = loadDetailValue(
       label: "条目角色",
-      work: { try await SubjectService.getSubjectCharacters(subjectId, limit: 12) },
-      save: { value in
-        try await db.saveSubjectCharacters(subjectId: subjectId, items: value.data)
-      }
+      work: { try await SubjectService.getSubjectCharacters(subjectId, limit: 12) }
     )
-    addTask(
+    let relationsTask = loadDetailValue(
       label: "关联条目",
-      work: { try await SubjectService.getSubjectRelations(subjectId, limit: 10) },
-      save: { value in
-        try await db.saveSubjectRelations(subjectId: subjectId, items: value.data)
-      }
+      work: { try await SubjectService.getSubjectRelations(subjectId, limit: 10) }
     )
-    addTask(
+    let recsTask = loadDetailValue(
       label: "推荐条目",
-      work: { try await SubjectService.getSubjectRecs(subjectId, limit: 10) },
-      save: { value in
-        try await db.saveSubjectRecs(subjectId: subjectId, items: value.data)
-      }
+      work: { try await SubjectService.getSubjectRecs(subjectId, limit: 10) }
     )
-    addTask(
+    let indexesTask = loadDetailValue(
       label: "条目目录",
-      work: { try await SubjectService.getSubjectIndexes(subjectId: subjectId, limit: 5) },
-      save: { value in
-        try await db.saveSubjectIndexes(subjectId: subjectId, items: value.data)
-      }
+      work: { try await SubjectService.getSubjectIndexes(subjectId: subjectId, limit: 5) }
     )
 
-    if offprints {
-      addTask(
-        label: "条目衍生",
-        work: {
-          try await SubjectService.getSubjectRelations(subjectId, offprint: true, limit: 100)
-        },
-        save: { value in
-          try await db.saveSubjectOffprints(subjectId: subjectId, items: value.data)
-        }
-      )
-    }
+    let offprintsTask: Task<PagedDTO<SubjectRelationDTO>?, Never>? =
+      if offprints {
+        loadDetailValue(
+          label: "条目衍生",
+          work: {
+            try await SubjectService.getSubjectRelations(subjectId, offprint: true, limit: 100)
+          }
+        )
+      } else {
+        nil
+      }
 
-    if let collectsMode {
-      addTask(
-        label: "收藏用户",
-        work: {
-          try await SubjectService.getSubjectCollects(subjectId, mode: collectsMode, limit: 10)
-        },
-        save: { value in
-          try await db.saveSubjectCollects(subjectId: subjectId, items: value.data)
-        }
-      )
-      addTask(
-        label: "评论",
-        work: { try await SubjectService.getSubjectReviews(subjectId, limit: 5) },
-        save: { value in
-          try await db.saveSubjectReviews(subjectId: subjectId, items: value.data)
-        }
-      )
-      addTask(
-        label: "讨论",
-        work: { try await SubjectService.getSubjectTopics(subjectId, limit: 5) },
-        save: { value in
-          try await db.saveSubjectTopics(subjectId: subjectId, items: value.data)
-        }
-      )
-      addTask(
-        label: "吐槽",
-        work: { try await SubjectService.getSubjectComments(subjectId, limit: 10) },
-        save: { value in
-          try await db.saveSubjectComments(subjectId: subjectId, items: value.data)
-        }
-      )
-    }
+    let collectsTask: Task<PagedDTO<SubjectCollectDTO>?, Never>? =
+      if let collectsMode {
+        loadDetailValue(
+          label: "收藏用户",
+          work: {
+            try await SubjectService.getSubjectCollects(subjectId, mode: collectsMode, limit: 10)
+          }
+        )
+      } else {
+        nil
+      }
+    let reviewsTask: Task<PagedDTO<SubjectReviewDTO>?, Never>? =
+      if collectsMode != nil {
+        loadDetailValue(
+          label: "评论",
+          work: { try await SubjectService.getSubjectReviews(subjectId, limit: 5) }
+        )
+      } else {
+        nil
+      }
+    let topicsTask: Task<PagedDTO<TopicDTO>?, Never>? =
+      if collectsMode != nil {
+        loadDetailValue(
+          label: "讨论",
+          work: { try await SubjectService.getSubjectTopics(subjectId, limit: 5) }
+        )
+      } else {
+        nil
+      }
+    let commentsTask: Task<PagedDTO<SubjectCommentDTO>?, Never>? =
+      if collectsMode != nil {
+        loadDetailValue(
+          label: "吐槽",
+          work: { try await SubjectService.getSubjectComments(subjectId, limit: 10) }
+        )
+      } else {
+        nil
+      }
 
-    for task in tasks {
-      await task.value
-    }
+    try await db.saveSubjectDetails(
+      subjectId: subjectId,
+      characters: await charactersTask.value?.data,
+      offprints: await offprintsTask?.value?.data,
+      relations: await relationsTask.value?.data,
+      recs: await recsTask.value?.data,
+      collects: await collectsTask?.value?.data,
+      reviews: await reviewsTask?.value?.data,
+      topics: await topicsTask?.value?.data,
+      comments: await commentsTask?.value?.data,
+      indexes: await indexesTask.value?.data
+    )
+    await db.commit()
   }
 
   static func loadSubjectPositions(_ subjectId: Int) async throws {
@@ -169,6 +159,7 @@ enum SubjectRepository {
     try await SubjectService.updateSubjectProgress(subjectId: subjectId, eps: eps, vols: vols)
     let db = try await AppContext.shared.getDB()
     try await db.updateSubjectProgress(subjectId: subjectId, eps: eps, vols: vols)
+    try await db.commitImmediately()
   }
 
   static func updateSubjectCollection(
@@ -199,5 +190,6 @@ enum SubjectRepository {
       tags: tags,
       progress: progress
     )
+    try await db.commitImmediately()
   }
 }

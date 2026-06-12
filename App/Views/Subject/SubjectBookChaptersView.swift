@@ -1,5 +1,4 @@
 import Foundation
-import SwiftData
 import SwiftUI
 
 enum BookChapterMode {
@@ -32,8 +31,9 @@ struct ChapterActions {
 }
 
 struct SubjectBookChaptersView: View {
-  @Bindable var subject: Subject
+  let subject: SubjectDTO
   let mode: BookChapterMode
+  var reload: (() async -> Void)? = nil
 
   @State private var inputEps: String = ""
   @State private var eps: Int? = nil
@@ -103,7 +103,8 @@ struct SubjectBookChaptersView: View {
     Task {
       do {
         try await SubjectRepository.updateSubjectProgress(
-          subjectId: subject.subjectId, eps: eps, vols: vols)
+          subjectId: subject.id, eps: eps, vols: vols)
+        await reload?()
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
       } catch {
         Notifier.shared.alert(error: error)
@@ -391,20 +392,17 @@ struct TileChapterView: View {
 }
 
 #Preview {
-  let container = mockContainer()
-
   let subject = Subject.previewBook
-  container.mainContext.insert(subject)
 
-  return ScrollView {
+  ScrollView {
     LazyVStack(alignment: .leading) {
-      SubjectBookChaptersView(subject: subject, mode: .large)
-      SubjectBookChaptersView(subject: subject, mode: .row)
+      SubjectBookChaptersView(subject: SubjectDTO(subject), mode: .large)
+      SubjectBookChaptersView(subject: SubjectDTO(subject), mode: .row)
       HStack(spacing: 8) {
-        SubjectBookChaptersView(subject: subject, mode: .tile)
+        SubjectBookChaptersView(subject: SubjectDTO(subject), mode: .tile)
         Spacer()
-        SubjectBookChaptersView(subject: subject, mode: .tile)
+        SubjectBookChaptersView(subject: SubjectDTO(subject), mode: .tile)
       }
     }.padding()
-  }.modelContainer(container)
+  }
 }

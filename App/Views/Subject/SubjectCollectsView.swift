@@ -4,12 +4,18 @@ struct SubjectCollectsView: View {
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
   @AppStorage("subjectCollectsFilterMode") var subjectCollectsFilterMode: FilterMode = .all
 
-  @Bindable var subject: Subject
+  let subject: SubjectDTO
 
   @State private var isLoading: Bool = false
+  @State private var collects: [SubjectCollectDTO]
+
+  init(subject: SubjectDTO, collects: [SubjectCollectDTO]) {
+    self.subject = subject
+    _collects = State(initialValue: collects)
+  }
 
   var title: String {
-    switch subject.typeEnum {
+    switch subject.type {
     case .book:
       if subject.series {
         return "谁读这本书?"
@@ -54,11 +60,11 @@ struct SubjectCollectsView: View {
     Task {
       do {
         let resp = try await SubjectService.getSubjectCollects(
-          subject.subjectId,
+          subject.id,
           mode: subjectCollectsFilterMode,
           limit: 10
         )
-        subject.collects = resp.data
+        collects = resp.data
         isLoading = false
       } catch {
         Notifier.shared.alert(error: error)
@@ -72,7 +78,7 @@ struct SubjectCollectsView: View {
       VStack(spacing: 2) {
         HStack(alignment: .bottom) {
           Text(title)
-            .foregroundStyle(subject.collects.count > 0 ? .primary : .secondary)
+            .foregroundStyle(collects.count > 0 ? .primary : .secondary)
             .font(.title3)
           if isAuthenticated {
             Picker("", selection: $subjectCollectsFilterMode) {
@@ -86,8 +92,8 @@ struct SubjectCollectsView: View {
             .scaleEffect(0.8)
           }
           Spacer()
-          if subject.collects.count > 0 {
-            NavigationLink(value: NavDestination.subjectCollectsList(subject.subjectId)) {
+          if collects.count > 0 {
+            NavigationLink(value: NavDestination.subjectCollectsList(subject.id)) {
               Text(moreText).font(.caption)
             }.buttonStyle(.navigation)
           }
@@ -95,7 +101,7 @@ struct SubjectCollectsView: View {
         Divider()
       }.padding(.top, 5)
 
-      if subject.collects.isEmpty {
+      if collects.isEmpty {
         HStack {
           Spacer()
           Text(emptyText)
@@ -106,7 +112,7 @@ struct SubjectCollectsView: View {
       } else {
         ScrollView(.horizontal, showsIndicators: false) {
           LazyHStack(alignment: .top, spacing: 8) {
-            ForEach(subject.collects.prefix(10)) { collect in
+            ForEach(collects.prefix(10)) { collect in
               VStack(spacing: 4) {
                 ImageView(img: collect.user.avatar?.large)
                   .imageStyle(width: 60, height: 60)
@@ -116,7 +122,7 @@ struct SubjectCollectsView: View {
                       Label("查看用户主页", systemImage: "person.circle")
                     }
                   } preview: {
-                    SubjectCollectRowView(collect: collect, subjectType: subject.typeEnum)
+                    SubjectCollectRowView(collect: collect, subjectType: subject.type)
                       .padding()
                       .frame(idealWidth: 360)
                   }
@@ -125,7 +131,7 @@ struct SubjectCollectsView: View {
                     .lineLimit(1)
                   StarsView(score: Float(collect.interest.rate), size: 8)
                   Label(
-                    collect.interest.type.description(subject.typeEnum),
+                    collect.interest.type.description(subject.type),
                     systemImage: collect.interest.type.icon
                   )
                   .labelStyle(.compact)
@@ -140,7 +146,7 @@ struct SubjectCollectsView: View {
         .scrollClipDisabled()
       }
     }
-    .animation(.default, value: subject.collects)
+    .animation(.default, value: collects)
     .animation(.default, value: subjectCollectsFilterMode)
     .onChange(of: subjectCollectsFilterMode) { _, _ in
       updateCollects()
@@ -151,7 +157,7 @@ struct SubjectCollectsView: View {
 #Preview {
   ScrollView {
     LazyVStack(alignment: .leading) {
-      SubjectCollectsView(subject: Subject.previewAnime)
+      SubjectCollectsView(subject: SubjectDTO(Subject.previewAnime), collects: [])
     }.padding()
   }
 }

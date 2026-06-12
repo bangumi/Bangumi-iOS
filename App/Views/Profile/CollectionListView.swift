@@ -1,49 +1,33 @@
-import SwiftData
 import SwiftUI
 
 struct CollectionListView: View {
   let subjectType: SubjectType
-
-  @Environment(\.modelContext) var modelContext
 
   @State private var loaded: Bool = false
   @State private var collectionType = CollectionType.collect
   @State private var offset: Int = 0
   @State private var exhausted: Bool = false
   @State private var counts: [CollectionType: Int] = [:]
-  @State private var subjects: [Subject] = []
+  @State private var subjects: [SubjectDTO] = []
 
   func loadCounts() async {
-    let stype = subjectType.rawValue
     do {
-      for type in CollectionType.allTypes() {
-        let ctype = type.rawValue
-        let desc = FetchDescriptor<Subject>(
-          predicate: #Predicate<Subject> {
-            $0.ctype == ctype && $0.type == stype
-          })
-        let count = try modelContext.fetchCount(desc)
-        counts[type] = count
-      }
+      let db = try await AppContext.shared.getDB()
+      counts = try await db.fetchCollectionCounts(subjectType: subjectType)
     } catch {
       Notifier.shared.alert(error: error)
     }
   }
 
-  func fetch(limit: Int = 20) async -> [Subject] {
-    let stype = subjectType.rawValue
-    let ctype = collectionType.rawValue
-    var descriptor = FetchDescriptor<Subject>(
-      predicate: #Predicate<Subject> {
-        $0.ctype == ctype && $0.type == stype
-      },
-      sortBy: [
-        SortDescriptor(\.collectedAt, order: .reverse)
-      ])
-    descriptor.fetchLimit = limit
-    descriptor.fetchOffset = offset
+  func fetch(limit: Int = 20) async -> [SubjectDTO] {
     do {
-      let fetched = try modelContext.fetch(descriptor)
+      let db = try await AppContext.shared.getDB()
+      let fetched = try await db.fetchCollectionSubjects(
+        subjectType: subjectType,
+        collectionType: collectionType,
+        limit: limit,
+        offset: offset
+      )
       if fetched.count < limit {
         exhausted = true
       }
@@ -133,11 +117,5 @@ struct CollectionListView: View {
 }
 
 #Preview {
-  let container = mockContainer()
-
-  let subject = Subject.previewAnime
-  container.mainContext.insert(subject)
-
-  return CollectionListView(subjectType: SubjectType.anime)
-    .modelContainer(container)
+  CollectionListView(subjectType: SubjectType.anime)
 }

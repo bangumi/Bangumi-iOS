@@ -56,5 +56,6 @@ enum EpisodeRepository {
     try await EpisodeService.updateEpisodeCollection(episodeId: episodeId, type: type, batch: batch)
     let db = try await AppContext.shared.getDB()
     try await db.updateEpisodeCollection(episodeId: episodeId, type: type, batch: batch)
+    try await db.commitImmediately()
   }
 }

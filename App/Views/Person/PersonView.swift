@@ -1,6 +1,5 @@
 import BBCode
 import OSLog
-import SwiftData
 import SwiftUI
 
 struct PersonView: View {
@@ -12,22 +11,12 @@ struct PersonView: View {
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
 
   @State private var refreshed: Bool = false
-
-  @Query private var persons: [Person]
-  var person: Person? { persons.first }
-
+  @State private var person: PersonDTO?
+  @State private var detail: PersonDetailDTO = PersonDetailDTO()
   @State private var comments: [CommentDTO] = []
   @State private var loadingComments: Bool = false
   @State private var showCommentBox: Bool = false
   @State private var showIndexPicker: Bool = false
-
-  init(personId: Int) {
-    self.personId = personId
-    let predicate = #Predicate<Person> {
-      $0.personId == personId
-    }
-    _persons = Query(filter: predicate, sort: \Person.personId)
-  }
 
   var shareLink: URL {
     URL(string: "\(shareDomain.url)/person/\(personId)")!
@@ -40,9 +29,20 @@ struct PersonView: View {
     return person.title(with: titlePreference)
   }
 
+  private func loadCached() async {
+    do {
+      let db = try await AppContext.shared.getDB()
+      person = try await db.getPersonDTO(personId)
+      detail = try await db.getPersonDetailDTO(personId)
+    } catch {
+      Logger.app.error("Failed to load cached person: \(error)")
+    }
+  }
+
   func refresh() async {
     do {
       try await PersonRepository.loadPerson(personId)
+      await loadCached()
       refreshed = true
 
       if !isolationMode {
@@ -52,6 +52,7 @@ struct PersonView: View {
       }
 
       try await PersonRepository.loadPersonDetails(personId)
+      await loadCached()
     } catch {
       Notifier.shared.alert(error: error)
       return
@@ -63,7 +64,9 @@ struct PersonView: View {
       if let person = person {
         ScrollView {
           LazyVStack(alignment: .leading) {
-            PersonDetailView(person: person)
+            PersonDetailView(person: person, detail: detail) {
+              await loadCached()
+            }
 
             /// comments
             if !isolationMode {
@@ -111,7 +114,10 @@ struct PersonView: View {
         ProgressView()
       }
     }
-    .task(refresh)
+    .task {
+      await loadCached()
+      await refresh()
+    }
     .navigationTitle(title)
     .navigationBarTitleDisplayMode(.inline)
     .toolbar {
@@ -144,12 +150,14 @@ struct PersonView: View {
 }
 
 struct PersonDetailView: View {
-  @Bindable var person: Person
+  let person: PersonDTO
+  let detail: PersonDetailDTO
+  let reload: () async -> Void
 
   @State private var updating: Bool = false
 
   var careers: String {
-    let vals = Set(person.career).sorted().map { PersonCareer($0).description }
+    let vals = Set(person.career).sorted { $0.rawValue < $1.rawValue }.map(\.description)
     return vals.joined(separator: " / ")
   }
 
@@ -157,11 +165,12 @@ struct PersonDetailView: View {
     updating = true
     defer { updating = false }
     do {
-      if person.collectedAt == 0 {
-        try await PersonRepository.collectPerson(person.personId)
+      if person.collectedAt ?? 0 == 0 {
+        try await PersonRepository.collectPerson(person.id)
       } else {
-        try await PersonRepository.uncollectPerson(person.personId)
+        try await PersonRepository.uncollectPerson(person.id)
       }
+      await reload()
       UIImpactFeedbackGenerator(style: .medium).impactOccurred()
     } catch {
       Notifier.shared.alert(error: error)
@@ -181,13 +190,13 @@ struct PersonDetailView: View {
         .imageType(.person)
         .imageNSFW(person.nsfw)
         .enableImagePreview(
-          person.images?.large, zoomID: ZoomNavigationID(type: .person, id: person.personId)
+          person.images?.large, zoomID: ZoomNavigationID(type: .person, id: person.id)
         )
         .padding(4)
         .shadow(radius: 4)
       VStack(alignment: .leading) {
         HStack {
-          Label(person.typeEnum.description, systemImage: person.typeEnum.icon)
+          Label(person.type.description, systemImage: person.type.icon)
             .font(.footnote)
             .foregroundStyle(.secondary)
           Spacer()
@@ -196,7 +205,7 @@ struct PersonDetailView: View {
               await collect()
             }
           } label: {
-            HeartView(collected: person.collectedAt != 0, updating: updating)
+            HeartView(collected: (person.collectedAt ?? 0) != 0, updating: updating)
           }
         }
         .buttonStyle(.explode)
@@ -257,16 +266,16 @@ struct PersonDetailView: View {
       .tint(.linkText)
 
     /// casts
-    PersonCastsView(personId: person.personId, casts: person.casts)
+    PersonCastsView(personId: person.id, casts: detail.casts)
 
     /// works
-    PersonWorksView(personId: person.personId, works: person.works)
+    PersonWorksView(personId: person.id, works: detail.works)
 
     /// relations
-    PersonRelationsView(personId: person.personId, relations: person.relations)
+    PersonRelationsView(personId: person.id, relations: detail.relations)
 
     /// indexes
-    PersonIndexsView(personId: person.personId, indexes: person.indexes)
+    PersonIndexsView(personId: person.id, indexes: detail.indexes)
   }
 }
 

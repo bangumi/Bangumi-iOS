@@ -1,29 +1,12 @@
 import OSLog
-import SwiftData
 import SwiftUI
 
 struct HotGroupsView: View {
-  @Query private var caches: [RakuenGroupCache]
-
   @State private var hotItems: [SlimGroupDTO] = []
+  @State private var cachedHotItems: [SlimGroupDTO] = []
+  @State private var pinnedItems: [SlimGroupDTO] = []
   @State private var loading = false
   @State private var initialized = false
-
-  private var hotCache: RakuenGroupCache? {
-    caches.first { $0.id == "hot" }
-  }
-
-  private var pinCache: RakuenGroupCache? {
-    caches.first { $0.id == "pin" }
-  }
-
-  private var pinnedItems: [SlimGroupDTO] {
-    pinCache?.items ?? []
-  }
-
-  private var cachedHotItems: [SlimGroupDTO] {
-    hotCache?.items ?? []
-  }
 
   private var hotDisplayItems: [SlimGroupDTO] {
     hotItems.isEmpty ? cachedHotItems : hotItems
@@ -45,9 +28,21 @@ struct HotGroupsView: View {
       do {
         let db = try await AppContext.shared.getDB()
         try await db.togglePinRakuenGroupCache(group: group)
+        await db.commit()
+        pinnedItems = try await db.fetchRakuenGroupCache(id: "pin")
       } catch {
         Logger.app.error("Failed to toggle pin: \(error)")
       }
+    }
+  }
+
+  private func loadCache() async {
+    do {
+      let db = try await AppContext.shared.getDB()
+      cachedHotItems = try await db.fetchRakuenGroupCache(id: "hot")
+      pinnedItems = try await db.fetchRakuenGroupCache(id: "pin")
+    } catch {
+      Logger.app.error("Failed to load group cache: \(error)")
     }
   }
 
@@ -63,6 +58,8 @@ struct HotGroupsView: View {
       // Save to hot cache
       if let db = try? await AppContext.shared.getDB() {
         try await db.saveRakuenGroupCache(id: "hot", items: hotItems)
+        await db.commit()
+        cachedHotItems = hotItems
       }
     } catch {
       Notifier.shared.alert(error: error)
@@ -127,6 +124,7 @@ struct HotGroupsView: View {
       if !initialized {
         initialized = true
         Task {
+          await loadCache()
           await load()
         }
       }
