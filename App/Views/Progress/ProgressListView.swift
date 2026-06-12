@@ -1,29 +1,56 @@
 import SwiftUI
 
 struct ProgressListView: View {
-  let subjectIds: [Int]
-  let reloadToken: Int
+  let items: [ProgressSubjectDTO]
+  let isLoadingPage: Bool
+  let hasMore: Bool
+  let loadNextPage: () async -> Void
+  let reloadSubject: (Int) async -> Void
 
   var body: some View {
     LazyVStack(alignment: .leading) {
-      ForEach(subjectIds, id: \.self) { subjectId in
-        ProgressSubjectContainerView(
-          subjectId: subjectId,
-          reloadToken: reloadToken,
-          episodeWindowSize: 7
-        ) { item, reload in
-          CardView {
-            ProgressListItemContentView(
-              subject: item.subject,
-              episodes: item.episodes,
-              reload: reload
-            )
+      ForEach(items.withNextPageTriggers()) { row in
+        CardView {
+          ProgressListItemContentView(
+            subject: row.item.subject,
+            episodes: row.item.episodes,
+            reload: {
+              await reloadSubject(row.item.id)
+            }
+          )
+        }
+        .onAppear {
+          if row.triggersNextPage {
+            Task {
+              await loadNextPage()
+            }
           }
-          .transition(.opacity)
         }
       }
+
+      ProgressPageFooterView(isLoading: isLoadingPage, hasMore: hasMore)
     }
     .padding(.horizontal, 8)
+  }
+}
+
+struct ProgressPageFooterView: View {
+  let isLoading: Bool
+  let hasMore: Bool
+
+  var body: some View {
+    HStack {
+      Spacer()
+      if isLoading {
+        ProgressView()
+      } else if !hasMore {
+        Text("没有更多了")
+          .font(.footnote)
+          .foregroundStyle(.secondary)
+      }
+      Spacer()
+    }
+    .padding(.vertical, 8)
   }
 }
 

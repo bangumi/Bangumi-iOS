@@ -115,8 +115,6 @@ struct EpisodeRecentView: View {
             }
           }
         }
-        .animation(.default, value: recent.nextEpisode)
-        .animation(.default, value: recent.episodes)
       case .list:
         HStack {
           HStack(spacing: 2) {
@@ -147,8 +145,6 @@ struct EpisodeRecentView: View {
             }
           }
         }
-        .animation(.default, value: recent.nextEpisode)
-        .animation(.default, value: recent.episodes)
       }
     } else {
       HStack {

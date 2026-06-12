@@ -33,6 +33,7 @@ enum SubjectRepository {
     if item.interest != nil {
       await SearchIndexing.index([item.searchable()])
     }
+    await ProgressSubjectInvalidation.post(subjectId: subjectId)
     return item
   }
 
@@ -152,6 +153,7 @@ enum SubjectRepository {
     let db = try await AppContext.shared.getDB()
     try await db.updateSubjectProgress(subjectId: subjectId, eps: eps, vols: vols)
     try await db.commit()
+    await ProgressSubjectInvalidation.post(subjectId: subjectId)
   }
 
   static func updateSubjectCollection(
@@ -183,5 +185,6 @@ enum SubjectRepository {
       progress: progress
     )
     try await db.commit()
+    await ProgressSubjectInvalidation.post(subjectId: subjectId)
   }
 }

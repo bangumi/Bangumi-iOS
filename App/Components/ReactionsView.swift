@@ -60,7 +60,7 @@ struct ReactionsView: View {
       updatedReactions.append(ReactionDTO(users: [profile.simple], value: value))
     }
     updatedReactions = updatedReactions.filter { !$0.users.isEmpty }
-    withAnimation(.default) {
+    withAnimation {
       reactions = updatedReactions
     }
   }
@@ -71,7 +71,7 @@ struct ReactionsView: View {
       updatedReactions[i].users.removeAll(where: { $0.id == profile.id })
     }
     updatedReactions = updatedReactions.filter { !$0.users.isEmpty }
-    withAnimation(.default) {
+    withAnimation {
       reactions = updatedReactions
     }
   }
@@ -157,7 +157,7 @@ struct ReactionButton: View {
       updatedReactions.append(ReactionDTO(users: [profile.simple], value: value))
     }
     updatedReactions = updatedReactions.filter { !$0.users.isEmpty }
-    withAnimation(.default) {
+    withAnimation {
       reactions = updatedReactions
     }
   }

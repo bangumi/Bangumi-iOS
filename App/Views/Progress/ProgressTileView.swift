@@ -1,27 +1,36 @@
 import SwiftUI
 
 struct ProgressTileView: View {
-  let subjectIds: [Int]
-  let reloadToken: Int
+  let items: [ProgressSubjectDTO]
+  let isLoadingPage: Bool
+  let hasMore: Bool
+  let loadNextPage: () async -> Void
+  let reloadSubject: (Int) async -> Void
 
   var body: some View {
-    LazyVGrid(columns: [GridItem(.adaptive(minimum: 150))]) {
-      ForEach(subjectIds, id: \.self) { subjectId in
-        ProgressSubjectContainerView(
-          subjectId: subjectId,
-          reloadToken: reloadToken,
-          episodeWindowSize: 5
-        ) { item, reload in
+    VStack(spacing: 8) {
+      LazyVGrid(columns: [GridItem(.adaptive(minimum: 150))]) {
+        ForEach(items.withNextPageTriggers()) { row in
           CardView(padding: 8) {
             ProgressTileItemContentView(
-              subject: item.subject,
-              episodes: item.episodes,
-              reload: reload
+              subject: row.item.subject,
+              episodes: row.item.episodes,
+              reload: {
+                await reloadSubject(row.item.id)
+              }
             )
           }
-          .transition(.opacity)
+          .onAppear {
+            if row.triggersNextPage {
+              Task {
+                await loadNextPage()
+              }
+            }
+          }
         }
       }
+
+      ProgressPageFooterView(isLoading: isLoadingPage, hasMore: hasMore)
     }
     .padding(.horizontal, 8)
   }

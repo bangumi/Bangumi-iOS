@@ -30,7 +30,7 @@ struct SpoilerRevealContainer<Content: View>: View {
 
       if shouldMask {
         Button {
-          withAnimation(.easeInOut(duration: 0.2)) {
+          withAnimation {
             revealed = true
           }
         } label: {

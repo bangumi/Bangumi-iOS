@@ -51,12 +51,48 @@ struct DraftDTO: Identifiable, Hashable {
   var updatedAt: Int
 }
 
-struct ProgressSubjectDTO: Identifiable, Hashable {
+struct ProgressSubjectDTO: Codable, Identifiable, Hashable, Sendable {
   var subject: SubjectDTO
   var episodes: [EpisodeDTO]
 
   var id: Int {
     subject.id
+  }
+}
+
+enum ProgressSubjectInvalidation {
+  static let notificationName = Notification.Name("ProgressSubjectInvalidated")
+
+  private static let subjectIdKey = "subjectId"
+
+  @MainActor
+  static func post(subjectId: Int) async {
+    await ProgressSubjectInvalidationStore.shared.insert(subjectId)
+    NotificationCenter.default.post(
+      name: notificationName,
+      object: nil,
+      userInfo: [subjectIdKey: subjectId]
+    )
+  }
+
+  static func subjectId(from notification: Notification) -> Int? {
+    notification.userInfo?[subjectIdKey] as? Int
+  }
+}
+
+actor ProgressSubjectInvalidationStore {
+  static let shared = ProgressSubjectInvalidationStore()
+
+  private var subjectIds: Set<Int> = []
+
+  func insert(_ subjectId: Int) {
+    subjectIds.insert(subjectId)
+  }
+
+  func takeLoadedSubjectIds(_ loadedSubjectIds: Set<Int>) -> [Int] {
+    let matchedSubjectIds = subjectIds.intersection(loadedSubjectIds)
+    subjectIds.subtract(matchedSubjectIds)
+    return Array(matchedSubjectIds)
   }
 }
 

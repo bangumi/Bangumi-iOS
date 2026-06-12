@@ -79,7 +79,7 @@ private struct MigrationLoadingView: View {
         } catch {
           return
         }
-        withAnimation(.easeInOut(duration: 0.2)) {
+        withAnimation {
           musumeIndex = (musumeIndex + 1) % 7
         }
       }

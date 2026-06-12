@@ -15,9 +15,27 @@ struct ChiiProgressView: View {
   @State private var didInitialLoad: Bool = false
 
   @State private var search: String = ""
-  @State private var subjectIds: [Int] = []
+  @State private var progressSubjects: [ProgressSubjectDTO] = []
   @State private var counts: [SubjectType: Int] = [:]
-  @State private var progressReloadToken = 0
+  @State private var progressTotal: Int = 0
+  @State private var progressOffset: Int = 0
+  @State private var progressPageLoading: Bool = false
+  @State private var progressLoadGeneration: Int = 0
+
+  private let progressPageLimit = 20
+
+  private var progressEpisodeWindowSize: Int {
+    switch progressViewMode {
+    case .list:
+      7
+    case .tile:
+      5
+    }
+  }
+
+  private var hasMoreProgress: Bool {
+    progressOffset < progressTotal
+  }
 
   private func loadCounts() async {
     do {
@@ -31,28 +49,104 @@ struct ChiiProgressView: View {
     }
   }
 
-  private func updateSubjectIds() async {
+  private func loadProgressPage(reset: Bool, generation: Int) async {
+    if !reset {
+      guard !progressPageLoading, hasMoreProgress else {
+        return
+      }
+    }
+    progressPageLoading = true
     do {
       let db = try await AppContext.shared.getDB()
-      let result = try await db.fetchProgressSubjectIds(
+      let result = try await db.fetchProgressSubjects(
         progressTab: progressTab,
         progressSortMode: progressSortMode,
-        search: search
+        search: search,
+        episodeWindowSize: progressEpisodeWindowSize,
+        limit: progressPageLimit,
+        offset: reset ? 0 : progressOffset
       )
-      if subjectIds != result {
+      guard generation == progressLoadGeneration else {
+        return
+      }
+      if reset {
+        if progressSubjects != result.data {
+          withAnimation {
+            progressSubjects = result.data
+          }
+        }
+      } else {
+        let updatedSubjects = progressSubjects.mergedById(with: result.data)
+        if progressSubjects != updatedSubjects {
+          withAnimation {
+            progressSubjects = updatedSubjects
+          }
+        }
+      }
+      progressTotal = result.total
+      progressOffset = min((reset ? 0 : progressOffset) + progressPageLimit, result.total)
+    } catch {
+      Logger.app.error("Failed to load progress page: \(error)")
+      Notifier.shared.alert(error: error)
+    }
+    guard generation == progressLoadGeneration else {
+      return
+    }
+    progressPageLoading = false
+  }
+
+  private func reloadProgressPages() async {
+    progressLoadGeneration += 1
+    let generation = progressLoadGeneration
+    await loadProgressPage(reset: true, generation: generation)
+  }
+
+  private func loadNextProgressPage() async {
+    await loadProgressPage(reset: false, generation: progressLoadGeneration)
+  }
+
+  private func reloadProgressSubject(_ subjectId: Int) async {
+    do {
+      let db = try await AppContext.shared.getDB()
+      guard
+        let item = try await db.fetchProgressSubject(
+          subjectId: subjectId,
+          episodeWindowSize: progressEpisodeWindowSize
+        )
+      else {
         withAnimation {
-          subjectIds = result
+          progressSubjects.removeAll { $0.id == subjectId }
+        }
+        return
+      }
+      let updatedSubjects = progressSubjects.mergedById(with: [item])
+      if progressSubjects != updatedSubjects {
+        withAnimation {
+          progressSubjects = updatedSubjects
         }
       }
     } catch {
-      Logger.app.error("Failed to update subject IDs: \(error)")
+      Logger.app.error("Failed to reload progress subject: \(error)")
+      Notifier.shared.alert(error: error)
+    }
+  }
+
+  private func reloadPendingProgressSubjects() async {
+    let loadedSubjectIds = Set(progressSubjects.map(\.id))
+    guard !loadedSubjectIds.isEmpty else {
+      return
+    }
+    let subjectIds = await ProgressSubjectInvalidationStore.shared.takeLoadedSubjectIds(
+      loadedSubjectIds
+    )
+    for subjectId in subjectIds {
+      await reloadProgressSubject(subjectId)
     }
   }
 
   private func loadLocalProgress() async {
-    await updateSubjectIds()
+    await reloadProgressPages()
     await loadCounts()
-    progressReloadToken += 1
   }
 
   func refresh(force: Bool = false, showProgress: Bool = true) async {
@@ -150,15 +244,27 @@ struct ChiiProgressView: View {
           .pickerStyle(.segmented)
 
           Group {
-            if !subjectIds.isEmpty {
+            if !progressSubjects.isEmpty {
               switch progressViewMode {
               case .list:
-                ProgressListView(subjectIds: subjectIds, reloadToken: progressReloadToken)
+                ProgressListView(
+                  items: progressSubjects,
+                  isLoadingPage: progressPageLoading,
+                  hasMore: hasMoreProgress,
+                  loadNextPage: loadNextProgressPage,
+                  reloadSubject: reloadProgressSubject
+                )
               case .tile:
-                ProgressTileView(subjectIds: subjectIds, reloadToken: progressReloadToken)
+                ProgressTileView(
+                  items: progressSubjects,
+                  isLoadingPage: progressPageLoading,
+                  hasMore: hasMoreProgress,
+                  loadNextPage: loadNextProgressPage,
+                  reloadSubject: reloadProgressSubject
+                )
               }
             } else if collectionsUpdatedAt > 0 {
-              if refreshing {
+              if refreshing || progressPageLoading {
                 ProgressView()
                   .padding()
               } else {
@@ -239,9 +345,29 @@ struct ChiiProgressView: View {
           }
         }
       }
-      .onChange(of: progressTab) { Task { await updateSubjectIds() } }
-      .onChange(of: search) { Task { await updateSubjectIds() } }
-      .onChange(of: progressSortMode) { Task { await updateSubjectIds() } }
+      .onChange(of: progressTab) { Task { await reloadProgressPages() } }
+      .onChange(of: search) { Task { await reloadProgressPages() } }
+      .onChange(of: progressSortMode) { Task { await reloadProgressPages() } }
+      .onChange(of: progressViewMode) { Task { await reloadProgressPages() } }
+      .onReceive(
+        NotificationCenter.default.publisher(for: ProgressSubjectInvalidation.notificationName)
+      ) { notification in
+        guard let subjectId = ProgressSubjectInvalidation.subjectId(from: notification) else {
+          return
+        }
+        guard progressSubjects.contains(where: { $0.id == subjectId }) else {
+          return
+        }
+        Task {
+          _ = await ProgressSubjectInvalidationStore.shared.takeLoadedSubjectIds(Set([subjectId]))
+          await reloadProgressSubject(subjectId)
+        }
+      }
+      .onAppear {
+        Task {
+          await reloadPendingProgressSubjects()
+        }
+      }
       .alert("刷新所有收藏", isPresented: $showRefreshAll) {
         Button("取消", role: .cancel) {}
         Button("确定", role: .destructive) {

@@ -413,6 +413,26 @@ extension DatabaseOperator {
     )
   }
 
+  public func fetchProgressSubjects(
+    progressTab: SubjectType,
+    progressSortMode: ProgressSortMode,
+    search: String,
+    episodeWindowSize: Int,
+    limit: Int,
+    offset: Int
+  ) throws -> PagedDTO<ProgressSubjectDTO> {
+    let subjectIds = try fetchProgressSubjectIds(
+      progressTab: progressTab,
+      progressSortMode: progressSortMode,
+      search: search
+    )
+    let pageIds = subjectIds.dropFirst(offset).prefix(limit)
+    let items = try pageIds.compactMap {
+      try fetchProgressSubject(subjectId: $0, episodeWindowSize: episodeWindowSize)
+    }
+    return PagedDTO(data: items, total: subjectIds.count)
+  }
+
   private func fetchProgressEpisodes(subjectId: Int, windowSize: Int) throws -> [EpisodeDTO] {
     let windowSize = max(1, windowSize)
     let mainType = EpisodeType.main.rawValue
@@ -795,9 +815,10 @@ extension DatabaseOperator {
     subject.collectedAt = now - 1
   }
 
+  @discardableResult
   public func updateEpisodeCollection(
     episodeId: Int, type: EpisodeCollectionType, batch: Bool = false
-  ) throws {
+  ) throws -> Int? {
     let now = Int(Date().timeIntervalSince1970)
     let episode = try self.fetchOne(
       predicate: #Predicate<Episode> {
@@ -805,10 +826,10 @@ extension DatabaseOperator {
       }
     )
     guard let episode = episode else {
-      return
+      return nil
     }
+    let subjectId = episode.subjectId
     if batch {
-      let subjectId = episode.subjectId
       let sort = episode.sort
       let descriptor = FetchDescriptor<Episode>(
         predicate: #Predicate<Episode> {
@@ -828,6 +849,7 @@ extension DatabaseOperator {
     }
     episode.subject?.interest?.updatedAt = now - 1
     episode.subject?.collectedAt = now - 1
+    return subjectId
   }
 
   public func updateCharacterCollection(characterId: Int, collectedAt: Int) throws {
