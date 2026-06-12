@@ -83,10 +83,10 @@ struct SearchSubjectPickerRemoteView: View {
 
   private func fetch(limit: Int, offset: Int) async -> PagedDTO<SlimSubjectDTO>? {
     do {
-      guard let db = await Chii.shared.db else {
+      guard let db = await AppContext.shared.databaseIfAvailable() else {
         throw ChiiError.uninitialized
       }
-      let resp = try await Chii.shared.searchSubjects(
+      let resp = try await SearchService.searchSubjects(
         keyword: text.gb, type: subjectType, limit: limit, offset: offset)
       for item in resp.data {
         try await db.saveSubject(item)

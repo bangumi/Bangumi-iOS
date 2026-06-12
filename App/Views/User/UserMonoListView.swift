@@ -31,7 +31,7 @@ struct UserMonoListView: View {
 
   func loadCharacters(limit: Int, offset: Int) async -> PagedDTO<SlimCharacterDTO>? {
     do {
-      let resp = try await Chii.shared.getUserCharacterCollections(
+      let resp = try await UserService.getUserCharacterCollections(
         username: user.username, limit: limit, offset: offset)
       return resp
     } catch {
@@ -42,7 +42,7 @@ struct UserMonoListView: View {
 
   func loadPersons(limit: Int, offset: Int) async -> PagedDTO<SlimPersonDTO>? {
     do {
-      let resp = try await Chii.shared.getUserPersonCollections(
+      let resp = try await UserService.getUserPersonCollections(
         username: user.username, limit: limit, offset: offset)
       return resp
     } catch {

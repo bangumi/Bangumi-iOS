@@ -44,7 +44,7 @@ struct UserView: View {
   func refresh() async {
     if refreshed { return }
     do {
-      let _ = try await Chii.shared.loadUser(username)
+      let _ = try await UserRepository.loadUser(username)
     } catch {
       Notifier.shared.alert(error: error)
     }
@@ -55,7 +55,7 @@ struct UserView: View {
     guard let user = user else { return }
     Task {
       do {
-        try await Chii.shared.addFriend(username)
+        try await FriendService.addFriend(username)
         friendlist.append(user.userId)
         Notifier.shared.notify(message: "添加好友成功")
       } catch {
@@ -68,7 +68,7 @@ struct UserView: View {
     guard let user = user else { return }
     Task {
       do {
-        try await Chii.shared.removeFriend(username)
+        try await FriendService.removeFriend(username)
         friendlist = friendlist.filter { $0 != user.userId }
         Notifier.shared.notify(message: "解除好友成功")
       } catch {
@@ -81,7 +81,7 @@ struct UserView: View {
     guard let user = user else { return }
     Task {
       do {
-        try await Chii.shared.blockUser(username)
+        try await FriendService.blockUser(username)
         blocklist.append(user.userId)
         Notifier.shared.notify(message: "已绝交")
       } catch {
@@ -94,7 +94,7 @@ struct UserView: View {
     guard let user = user else { return }
     Task {
       do {
-        try await Chii.shared.unblockUser(username)
+        try await FriendService.unblockUser(username)
         blocklist = blocklist.filter { $0 != user.userId }
         Notifier.shared.notify(message: "取消绝交")
       } catch {

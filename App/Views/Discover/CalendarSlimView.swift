@@ -59,7 +59,7 @@ struct CalendarSlimView: View {
     if refreshed { return }
     refreshed = true
     do {
-      try await Chii.shared.loadCalendar()
+      try await DiscoveryRepository.loadCalendar()
     } catch {
       Notifier.shared.alert(error: error)
     }

@@ -32,7 +32,7 @@ struct UserSubjectCollectionView: View {
     if refreshing { return }
     refreshing = true
     do {
-      let resp = try await Chii.shared.getUserSubjectCollections(
+      let resp = try await UserService.getUserSubjectCollections(
         username: user.username, type: ctype, subjectType: stype, limit: 20)
       subjects = resp.data
     } catch {

@@ -32,12 +32,12 @@ struct BlogView: View {
 
   func load() async {
     do {
-      blog = try await Chii.shared.getBlogEntry(blogId)
+      blog = try await BlogService.getBlogEntry(blogId)
       refreshed = true
-      subjects = try await Chii.shared.getBlogSubjects(blogId)
+      subjects = try await BlogService.getBlogSubjects(blogId)
       if !isolationMode {
         loadingComments = true
-        comments = try await Chii.shared.getBlogComments(blogId)
+        comments = try await BlogService.getBlogComments(blogId)
         loadingComments = false
       }
     } catch {

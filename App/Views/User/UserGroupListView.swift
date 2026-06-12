@@ -15,7 +15,7 @@ struct UserGroupListView: View {
 
   func load(limit: Int, offset: Int) async -> PagedDTO<SlimGroupDTO>? {
     do {
-      let resp = try await Chii.shared.getUserGroups(
+      let resp = try await UserService.getUserGroups(
         username: user.username, limit: limit, offset: offset)
       return resp
     } catch {

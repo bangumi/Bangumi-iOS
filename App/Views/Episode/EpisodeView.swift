@@ -26,17 +26,17 @@ struct EpisodeView: View {
 
   func load() async {
     do {
-      try await Chii.shared.loadEpisode(episodeId)
+      try await EpisodeRepository.loadEpisode(episodeId)
       if !isolationMode {
         loadingComments = true
-        comments = try await Chii.shared.getEpisodeComments(episodeId)
+        comments = try await EpisodeService.getEpisodeComments(episodeId)
         loadingComments = false
       }
     } catch let error as ChiiError {
       switch error {
       case .notFound:
         // 404 错误，删除当前 episode
-        try? await Chii.shared.deleteEpisode(episodeId)
+        try? await EpisodeRepository.deleteEpisode(episodeId)
         dismiss()
       default:
         Notifier.shared.alert(error: error)

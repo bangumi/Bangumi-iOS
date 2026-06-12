@@ -10,6 +10,7 @@ struct MainApp: App {
   @AppStorage("appearance") var appearance: AppearanceType = .system
 
   init() {
+    AppMetadata.setup()
     configureImageSupport()
   }
 
@@ -40,7 +41,7 @@ struct MainApp: App {
       let container = try await Task.detached(priority: .userInitiated) {
         try ModelContainerFactory.make()
       }.value
-      await Chii.shared.setUp(container: container)
+      await AppContext.shared.setUp(container: container)
       bootstrapState = .ready(container)
     } catch {
       Logger.app.error("Failed to create ModelContainer: \(error)")

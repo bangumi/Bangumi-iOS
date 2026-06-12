@@ -13,7 +13,7 @@ struct TrendingSubjectView: View {
       return
     }
     do {
-      try await Chii.shared.loadTrendingSubjects()
+      try await DiscoveryRepository.loadTrendingSubjects()
       loaded = true
     } catch {
       Notifier.shared.alert(error: error)

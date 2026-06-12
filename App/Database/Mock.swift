@@ -10,8 +10,8 @@ func mockContainer() -> ModelContainer {
     configurations: [config]
   )
   Task {
-    await Chii.shared.setUp(container: container)
-    await Chii.shared.setMock()
+    await AppContext.shared.setUp(container: container)
+    await AppContext.shared.setMock()
   }
   return container
 }

@@ -7,7 +7,7 @@ struct CharacterRelationListView: View {
 
   func load(limit: Int, offset: Int) async -> PagedDTO<CharacterRelationDTO>? {
     do {
-      let resp = try await Chii.shared.getCharacterRelations(
+      let resp = try await CharacterService.getCharacterRelations(
         characterId, limit: limit, offset: offset)
       return resp
     } catch {

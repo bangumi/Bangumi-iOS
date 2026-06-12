@@ -34,7 +34,7 @@ struct EpisodeDiscView: View {
 
     Task {
       do {
-        try await Chii.shared.loadEpisodes(subjectId)
+        try await EpisodeRepository.loadEpisodes(subjectId)
       } catch {
         Notifier.shared.alert(error: error)
       }

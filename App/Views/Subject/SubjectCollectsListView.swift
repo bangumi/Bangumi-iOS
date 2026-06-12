@@ -35,7 +35,7 @@ struct SubjectCollectsListView: View {
 
   func load(limit: Int, offset: Int) async -> PagedDTO<SubjectCollectDTO>? {
     do {
-      let resp = try await Chii.shared.getSubjectCollects(
+      let resp = try await SubjectService.getSubjectCollects(
         subjectId,
         type: selectedType,
         mode: selectedMode,

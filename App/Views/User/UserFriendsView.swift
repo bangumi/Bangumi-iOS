@@ -10,7 +10,7 @@ struct UserFriendsView: View {
     if refreshing { return }
     refreshing = true
     do {
-      let resp = try await Chii.shared.getUserFriends(
+      let resp = try await UserService.getUserFriends(
         username: user.username, limit: 20)
       users = resp.data
     } catch {

@@ -31,10 +31,10 @@ struct ReactionsView: View {
       updating = true
       do {
         if reaction.users.contains(where: { $0.id == profile.id }) {
-          try await Chii.shared.unlike(path: type.path)
+          try await AccountService.unlike(path: type.path)
           onDelete()
         } else {
-          try await Chii.shared.like(path: type.path, value: reaction.value)
+          try await AccountService.like(path: type.path, value: reaction.value)
           onAdd(reaction.value)
         }
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
@@ -131,7 +131,7 @@ struct ReactionButton: View {
     Task {
       updating = true
       do {
-        try await Chii.shared.like(path: type.path, value: value)
+        try await AccountService.like(path: type.path, value: value)
         showPopover = false
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
         onAdd(value)

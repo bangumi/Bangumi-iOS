@@ -23,9 +23,9 @@ struct FriendsView: View {
       let resp = try await {
         switch type {
         case .friends:
-          return try await Chii.shared.getFriends(limit: limit, offset: offset)
+          return try await FriendService.getFriends(limit: limit, offset: offset)
         case .followers:
-          return try await Chii.shared.getFollowers(limit: limit, offset: offset)
+          return try await FriendService.getFollowers(limit: limit, offset: offset)
         }
       }()
       return resp

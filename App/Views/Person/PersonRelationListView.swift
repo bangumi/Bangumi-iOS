@@ -7,7 +7,7 @@ struct PersonRelationListView: View {
 
   func load(limit: Int, offset: Int) async -> PagedDTO<PersonRelationDTO>? {
     do {
-      let resp = try await Chii.shared.getPersonRelations(
+      let resp = try await PersonService.getPersonRelations(
         personId, limit: limit, offset: offset)
       return resp
     } catch {

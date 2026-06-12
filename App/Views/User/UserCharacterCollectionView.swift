@@ -12,7 +12,7 @@ struct UserCharacterCollectionView: View {
     if refreshing { return }
     refreshing = true
     do {
-      let resp = try await Chii.shared.getUserCharacterCollections(
+      let resp = try await UserService.getUserCharacterCollections(
         username: user.username, limit: 20)
       characters = resp.data
     } catch {

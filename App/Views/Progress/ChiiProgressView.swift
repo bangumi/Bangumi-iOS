@@ -20,7 +20,7 @@ struct ChiiProgressView: View {
 
   private func loadCounts() async {
     do {
-      let db = try await Chii.shared.getDB()
+      let db = try await AppContext.shared.getDB()
       let result = try await db.fetchProgressCounts()
       if counts != result {
         counts = result
@@ -32,7 +32,7 @@ struct ChiiProgressView: View {
 
   private func updateSubjectIds() async {
     do {
-      let db = try await Chii.shared.getDB()
+      let db = try await AppContext.shared.getDB()
       let result = try await db.fetchProgressSubjectIds(
         progressTab: progressTab,
         progressSortMode: progressSortMode,
@@ -75,14 +75,14 @@ struct ChiiProgressView: View {
   }
 
   func refreshCollections(since: Int = 0) async throws -> Int {
-    let db = try await Chii.shared.getDB()
+    let db = try await AppContext.shared.getDB()
     refreshProgress = 0
     let limit: Int = 100
     var offset: Int = 0
     var count: Int = 0
     var loaded: [Int: SubjectType] = [:]
     while true {
-      let resp = try await Chii.shared.getSubjectCollections(
+      let resp = try await CollectionService.getSubjectCollections(
         since: since, limit: limit, offset: offset)
       if resp.data.isEmpty {
         break
@@ -94,7 +94,7 @@ struct ChiiProgressView: View {
         refreshProgress = CGFloat(count) / CGFloat(resp.total)
       }
       await db.commit()
-      await Chii.shared.index(resp.data.map { $0.searchable() })
+      await SearchIndexing.index(resp.data.map { $0.searchable() })
       offset += limit
       if offset >= resp.total {
         break
@@ -114,7 +114,7 @@ struct ChiiProgressView: View {
       }.map { $0.key }
       for subjectId in subjectIds {
         do {
-          try await Chii.shared.loadEpisodes(subjectId)
+          try await EpisodeRepository.loadEpisodes(subjectId)
         } catch {
           await Notifier.shared.alert(error: error)
         }

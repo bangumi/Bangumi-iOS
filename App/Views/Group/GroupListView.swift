@@ -8,7 +8,7 @@ struct GroupListView: View {
 
   private func load(limit: Int, offset: Int) async -> PagedDTO<SlimGroupDTO>? {
     do {
-      let resp = try await Chii.shared.getGroups(
+      let resp = try await GroupService.getGroups(
         mode: mode,
         sort: sortMode,
         limit: limit,

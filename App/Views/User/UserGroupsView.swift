@@ -10,7 +10,7 @@ struct UserGroupsView: View {
     if refreshing { return }
     refreshing = true
     do {
-      let resp = try await Chii.shared.getUserGroups(
+      let resp = try await UserService.getUserGroups(
         username: user.username, limit: 20)
       groups = resp.data
     } catch {

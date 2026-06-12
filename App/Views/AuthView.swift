@@ -57,7 +57,7 @@ class SignInViewModel: NSObject, ASWebAuthenticationPresentationContextProviding
         Notifier.shared.alert(message: "failed to get oauth token")
       }
       do {
-        try await Chii.shared.exchangeForAccessToken(code: authorizationCode)
+        try await AuthService.exchangeForAccessToken(code: authorizationCode)
       } catch {
         Notifier.shared.alert(message: "failed to exchange for access token: \(error)")
       }
@@ -65,7 +65,7 @@ class SignInViewModel: NSObject, ASWebAuthenticationPresentationContextProviding
   }
 
   func signIn() async {
-    let authURL = await Chii.shared.buildOAuthURL()
+    let authURL = await AuthService.buildOAuthURL()
     let session = ASWebAuthenticationSession(url: authURL, callbackURLScheme: "bangumi") {
       callback, error in
       self.handleAuthCallback(callback: callback, error: error)

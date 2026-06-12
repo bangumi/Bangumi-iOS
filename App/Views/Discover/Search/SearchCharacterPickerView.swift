@@ -64,10 +64,10 @@ struct SearchCharacterPickerRemoteView: View {
 
   private func fetch(limit: Int, offset: Int) async -> PagedDTO<SlimCharacterDTO>? {
     do {
-      guard let db = await Chii.shared.db else {
+      guard let db = await AppContext.shared.databaseIfAvailable() else {
         throw ChiiError.uninitialized
       }
-      let resp = try await Chii.shared.searchCharacters(
+      let resp = try await SearchService.searchCharacters(
         keyword: text.gb, limit: limit, offset: offset)
       for item in resp.data {
         try await db.saveCharacter(item)

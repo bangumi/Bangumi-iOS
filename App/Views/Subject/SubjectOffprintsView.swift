@@ -16,7 +16,7 @@ struct SubjectOffprintsView: View {
 
   private func loadCollections() async {
     do {
-      let db = try await Chii.shared.getDB()
+      let db = try await AppContext.shared.getDB()
       collections = try await db.getCollectionTypes(subjectIds: collectionSubjectIds)
     } catch {
       Logger.app.error("Failed to load collections: \(error)")

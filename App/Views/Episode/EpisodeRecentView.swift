@@ -155,7 +155,7 @@ struct EpisodeNextView: View {
       updating = true
       defer { updating = false }
       do {
-        try await Chii.shared.updateEpisodeCollection(
+        try await EpisodeRepository.updateEpisodeCollection(
           episodeId: episode.episodeId, type: type)
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
       } catch {

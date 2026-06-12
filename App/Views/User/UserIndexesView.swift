@@ -8,7 +8,7 @@ struct UserIndexesView: View {
 
   func refresh() async {
     do {
-      let resp = try await Chii.shared.getUserIndexes(
+      let resp = try await UserService.getUserIndexes(
         username: user.username, limit: 5)
       indexes = resp.data
     } catch {

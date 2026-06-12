@@ -12,7 +12,7 @@ struct UserPersonCollectionView: View {
     if refreshing { return }
     refreshing = true
     do {
-      let resp = try await Chii.shared.getUserPersonCollections(
+      let resp = try await UserService.getUserPersonCollections(
         username: user.username, limit: 20)
       persons = resp.data
     } catch {

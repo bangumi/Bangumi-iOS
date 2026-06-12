@@ -12,7 +12,7 @@ struct GroupTopicListView: View {
 
   func loadTopics(limit: Int, offset: Int) async -> PagedDTO<TopicDTO>? {
     do {
-      let resp = try await Chii.shared.getGroupTopics(name, limit: limit, offset: offset)
+      let resp = try await GroupService.getGroupTopics(name, limit: limit, offset: offset)
       return resp
     } catch {
       Notifier.shared.alert(error: error)

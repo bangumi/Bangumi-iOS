@@ -42,16 +42,16 @@ struct CharacterView: View {
 
   func refresh() async {
     do {
-      try await Chii.shared.loadCharacter(characterId)
+      try await CharacterRepository.loadCharacter(characterId)
       refreshed = true
 
       if !isolationMode {
         loadingComments = true
-        comments = try await Chii.shared.getCharacterComments(characterId)
+        comments = try await CharacterService.getCharacterComments(characterId)
         loadingComments = false
       }
 
-      try await Chii.shared.loadCharacterDetails(characterId)
+      try await CharacterRepository.loadCharacterDetails(characterId)
     } catch {
       Notifier.shared.alert(error: error)
       return
@@ -153,9 +153,9 @@ struct CharacterDetailView: View {
     defer { updating = false }
     do {
       if character.collectedAt == 0 {
-        try await Chii.shared.collectCharacter(character.characterId)
+        try await CharacterRepository.collectCharacter(character.characterId)
       } else {
-        try await Chii.shared.uncollectCharacter(character.characterId)
+        try await CharacterRepository.uncollectCharacter(character.characterId)
       }
       UIImpactFeedbackGenerator(style: .medium).impactOccurred()
     } catch {

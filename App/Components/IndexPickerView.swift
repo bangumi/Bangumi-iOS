@@ -15,7 +15,7 @@ struct IndexPickerSheet: View {
   func loadUserIndexes() async {
     loading = true
     do {
-      let resp = try await Chii.shared.getUserIndexes(
+      let resp = try await UserService.getUserIndexes(
         username: profile.username,
         limit: 100
       )
@@ -29,7 +29,7 @@ struct IndexPickerSheet: View {
   func addToIndex(_ index: SlimIndexDTO) async {
     adding = true
     do {
-      _ = try await Chii.shared.putIndexRelated(
+      _ = try await IndexService.putIndexRelated(
         indexId: index.id,
         cat: category,
         sid: itemId

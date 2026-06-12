@@ -64,32 +64,32 @@ enum CommentParentType {
   func reply(commentId: Int?, content: String, token: String) async throws {
     switch self {
     case .blog(let id):
-      try await Chii.shared.createBlogComment(
+      try await BlogService.createBlogComment(
         blogId: id, content: content, replyTo: commentId, token: token)
     case .character(let id):
-      try await Chii.shared.createCharacterComment(
+      try await CharacterService.createCharacterComment(
         characterId: id, content: content, replyTo: commentId, token: token)
     case .person(let id):
-      try await Chii.shared.createPersonComment(
+      try await PersonService.createPersonComment(
         personId: id, content: content, replyTo: commentId, token: token)
     case .episode(let id):
-      try await Chii.shared.createEpisodeComment(
+      try await EpisodeService.createEpisodeComment(
         episodeId: id, content: content, replyTo: commentId, token: token)
     case .timeline(let id):
-      try await Chii.shared.createTimelineReply(
+      try await CommentService.createTimelineReply(
         timelineId: id, content: content, replyTo: commentId, token: token)
     case .index(let id):
-      try await Chii.shared.createIndexComment(
+      try await IndexService.createIndexComment(
         indexId: id, content: content, replyTo: commentId, token: token)
     }
   }
 
   func edit(commentId: Int, content: String) async throws {
-    try await Chii.shared.updateComment(type: self, commentId: commentId, content: content)
+    try await CommentService.updateComment(type: self, commentId: commentId, content: content)
   }
 
   func delete(commentId: Int) async throws {
-    try await Chii.shared.deleteComment(type: self, commentId: commentId)
+    try await CommentService.deleteComment(type: self, commentId: commentId)
   }
 }
 

@@ -36,11 +36,11 @@ struct UserIndexListView: View {
       let resp = try await {
         switch type {
         case .collect:
-          let data = try await Chii.shared.getUserIndexCollections(
+          let data = try await UserService.getUserIndexCollections(
             username: user.username, limit: limit, offset: offset)
           return data
         case .created:
-          return try await Chii.shared.getUserIndexes(
+          return try await UserService.getUserIndexes(
             username: user.username, limit: limit, offset: offset)
         }
       }()

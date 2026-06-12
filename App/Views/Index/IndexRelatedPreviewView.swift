@@ -38,10 +38,10 @@ struct IndexRelatedSubjectPreview: View {
   private func load() async {
     isLoading = true
     do {
-      guard let db = await Chii.shared.db else {
+      guard let db = await AppContext.shared.databaseIfAvailable() else {
         throw ChiiError.uninitialized
       }
-      let resp = try await Chii.shared.getSubject(subjectId)
+      let resp = try await SubjectService.getSubject(subjectId)
       try await db.saveSubject(resp)
       await db.commit()
     } catch {
@@ -92,10 +92,10 @@ struct IndexRelatedCharacterPreview: View {
   private func load() async {
     isLoading = true
     do {
-      guard let db = await Chii.shared.db else {
+      guard let db = await AppContext.shared.databaseIfAvailable() else {
         throw ChiiError.uninitialized
       }
-      let resp = try await Chii.shared.getCharacter(characterId)
+      let resp = try await CharacterService.getCharacter(characterId)
       try await db.saveCharacter(resp)
       await db.commit()
     } catch {
@@ -146,10 +146,10 @@ struct IndexRelatedPersonPreview: View {
   private func load() async {
     isLoading = true
     do {
-      guard let db = await Chii.shared.db else {
+      guard let db = await AppContext.shared.databaseIfAvailable() else {
         throw ChiiError.uninitialized
       }
-      let resp = try await Chii.shared.getPerson(personId)
+      let resp = try await PersonService.getPerson(personId)
       try await db.savePerson(resp)
       await db.commit()
     } catch {

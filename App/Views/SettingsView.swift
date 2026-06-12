@@ -42,7 +42,7 @@ struct SettingsView: View {
     let limit: Int = 50
     var offset: Int = 0
     Task {
-      let db = try await Chii.shared.getDB()
+      let db = try await AppContext.shared.getDB()
       do {
         try await CSSearchableIndex.default().deleteAllSearchableItems()
         Notifier.shared.notify(message: "Spotlight 索引清除成功")
@@ -58,7 +58,7 @@ struct SettingsView: View {
           if resp.data.isEmpty {
             break
           }
-          await Chii.shared.index(resp.data)
+          await SearchIndexing.index(resp.data)
           spotlightProgress = CGFloat(offset) / CGFloat(resp.total)
           offset += limit
           if offset >= resp.total {
@@ -278,7 +278,7 @@ struct SettingsView: View {
         }
         HStack {
           Spacer()
-          Text(Chii.shared.version).foregroundStyle(.secondary)
+          Text(AppMetadata.version).foregroundStyle(.secondary)
           Spacer()
         }
       }
@@ -295,7 +295,7 @@ struct SettingsView: View {
             Button("确定", role: .destructive) {
               Task {
                 do {
-                  let db = try await Chii.shared.getDB()
+                  let db = try await AppContext.shared.getDB()
                   try await db.clearDrafts()
                   Notifier.shared.notify(message: "草稿箱已清空")
                 } catch {
@@ -327,7 +327,7 @@ struct SettingsView: View {
           .alert("退出登录", isPresented: $logoutConfirm) {
             Button("确定", role: .destructive) {
               Task {
-                await Chii.shared.logout()
+                await AuthService.logout()
               }
             }
           } message: {

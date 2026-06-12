@@ -17,7 +17,7 @@ struct EpisodeUpdateMenu: View {
   func updateSingle(episode: Episode, type: EpisodeCollectionType) {
     Task {
       do {
-        try await Chii.shared.updateEpisodeCollection(
+        try await EpisodeRepository.updateEpisodeCollection(
           episodeId: episode.episodeId, type: type)
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
       } catch {
@@ -29,7 +29,7 @@ struct EpisodeUpdateMenu: View {
   func updateBatch(episode: Episode) {
     Task {
       do {
-        try await Chii.shared.updateEpisodeCollection(
+        try await EpisodeRepository.updateEpisodeCollection(
           episodeId: episode.episodeId, type: .collect, batch: true)
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
       } catch {

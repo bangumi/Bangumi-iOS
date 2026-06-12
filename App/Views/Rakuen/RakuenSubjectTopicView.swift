@@ -32,10 +32,10 @@ struct RakuenSubjectTopicListView: View {
     do {
       switch mode {
       case .trending:
-        let resp = try await Chii.shared.getTrendingSubjectTopics(limit: limit, offset: offset)
+        let resp = try await TopicService.getTrendingSubjectTopics(limit: limit, offset: offset)
         return resp
       case .latest:
-        let resp = try await Chii.shared.getRecentSubjectTopics(limit: limit, offset: offset)
+        let resp = try await TopicService.getRecentSubjectTopics(limit: limit, offset: offset)
         return resp
       }
     } catch {
@@ -130,9 +130,9 @@ struct CachedSubjectTopicListView: View {
       let resp: PagedDTO<SubjectTopicDTO>?
       switch mode {
       case .trending:
-        resp = try await Chii.shared.getTrendingSubjectTopics(limit: 20, offset: 0)
+        resp = try await TopicService.getTrendingSubjectTopics(limit: 20, offset: 0)
       case .latest:
-        resp = try await Chii.shared.getRecentSubjectTopics(limit: 20, offset: 0)
+        resp = try await TopicService.getRecentSubjectTopics(limit: 20, offset: 0)
       }
       if let resp = resp {
         let updatedItems = [SubjectTopicDTO]().mergedById(with: resp.data)
@@ -145,7 +145,7 @@ struct CachedSubjectTopicListView: View {
         exhausted = resp.data.count == 0 || offset >= resp.total
 
         // Save to cache
-        if let db = try? await Chii.shared.getDB() {
+        if let db = try? await AppContext.shared.getDB() {
           try await db.saveRakuenSubjectTopicCache(mode: mode.rawValue, items: resp.data)
         }
       }
@@ -163,9 +163,9 @@ struct CachedSubjectTopicListView: View {
       let resp: PagedDTO<SubjectTopicDTO>?
       switch mode {
       case .trending:
-        resp = try await Chii.shared.getTrendingSubjectTopics(limit: 20, offset: offset)
+        resp = try await TopicService.getTrendingSubjectTopics(limit: 20, offset: offset)
       case .latest:
-        resp = try await Chii.shared.getRecentSubjectTopics(limit: 20, offset: offset)
+        resp = try await TopicService.getRecentSubjectTopics(limit: 20, offset: offset)
       }
       if let resp = resp {
         let updatedItems = items.mergedById(with: resp.data)

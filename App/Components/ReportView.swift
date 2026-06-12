@@ -17,7 +17,7 @@ struct ReportSheet: View {
       submitting = true
       let commentText = comment.trimmingCharacters(in: .whitespacesAndNewlines)
       let finalComment = commentText.isEmpty ? nil : commentText
-      try await Chii.shared.createReport(
+      try await AccountService.createReport(
         type: reportType,
         id: itemId,
         reason: selectedReason,

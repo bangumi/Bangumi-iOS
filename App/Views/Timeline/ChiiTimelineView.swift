@@ -12,7 +12,7 @@ struct ChiiTimelineView: View {
 
   func checkNotice() async {
     do {
-      let resp = try await Chii.shared.listNotice(limit: 1, unread: true)
+      let resp = try await AccountService.listNotice(limit: 1, unread: true)
       if resp.total == 0 {
         hasUnreadNotice = false
       } else {
@@ -92,7 +92,7 @@ struct ChiiTimelineView: View {
       .alert("退出登录", isPresented: $logoutConfirm) {
         Button("确定", role: .destructive) {
           Task {
-            await Chii.shared.logout()
+            await AuthService.logout()
           }
         }
       } message: {

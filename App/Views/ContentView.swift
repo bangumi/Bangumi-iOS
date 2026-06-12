@@ -21,13 +21,13 @@ struct ContentView: View {
       }
       tries += 1
       do {
-        profile = try await Chii.shared.getProfile()
-        await Chii.shared.setAuthStatus(true)
+        profile = try await AccountService.getProfile()
+        await AuthService.setAuthStatus(true)
         Logger.api.info("refresh profile success: \(profile.rawValue)")
         return
       } catch ChiiError.requireLogin {
         Notifier.shared.notify(message: "请登录")
-        await Chii.shared.setAuthStatus(false)
+        await AuthService.setAuthStatus(false)
         return
       } catch {
         Notifier.shared.notify(message: "获取当前用户信息失败，重试 \(tries)/3")
@@ -36,7 +36,7 @@ struct ContentView: View {
       sleep(2)
     }
     Notifier.shared.alert(message: "无法获取当前用户信息，请重新登录")
-    await Chii.shared.setAuthStatus(false)
+    await AuthService.setAuthStatus(false)
   }
 
   func refreshRelationships() async {
@@ -44,8 +44,8 @@ struct ContentView: View {
       return
     }
     do {
-      friendlist = try await Chii.shared.getFriendList()
-      blocklist = try await Chii.shared.getBlockList()
+      friendlist = try await AccountService.getFriendList()
+      blocklist = try await AccountService.getBlockList()
     } catch {
       Notifier.shared.notify(message: "获取好友/黑名单列表失败")
       Logger.api.warning("refresh relationships failed: \(error)")

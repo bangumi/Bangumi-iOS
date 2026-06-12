@@ -10,7 +10,7 @@ struct CharacterCastListView: View {
 
   func load(limit: Int, offset: Int) async -> PagedDTO<CharacterCastDTO>? {
     do {
-      let resp = try await Chii.shared.getCharacterCasts(
+      let resp = try await CharacterService.getCharacterCasts(
         characterId, type: type, limit: limit, offset: offset)
       return resp
     } catch {

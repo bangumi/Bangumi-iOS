@@ -7,7 +7,7 @@ struct SubjectStaffListView: View {
 
   func load(limit: Int, offset: Int) async -> PagedDTO<SubjectStaffDTO>? {
     do {
-      let resp = try await Chii.shared.getSubjectStaffPersons(
+      let resp = try await SubjectService.getSubjectStaffPersons(
         subjectId, limit: limit, offset: offset)
       return resp
     } catch {

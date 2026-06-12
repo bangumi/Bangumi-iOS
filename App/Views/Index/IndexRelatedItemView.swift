@@ -13,7 +13,7 @@ struct IndexRelatedItemView: View {
 
   func delete() async {
     do {
-      try await Chii.shared.deleteIndexRelated(indexId: item.rid, id: item.id)
+      try await IndexService.deleteIndexRelated(indexId: item.rid, id: item.id)
       Notifier.shared.notify(message: "已删除")
       reloader.toggle()
     } catch {

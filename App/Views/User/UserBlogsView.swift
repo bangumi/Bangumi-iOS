@@ -8,7 +8,7 @@ struct UserBlogsView: View {
 
   func refresh() async {
     do {
-      let resp = try await Chii.shared.getUserBlogs(
+      let resp = try await UserService.getUserBlogs(
         username: user.username, limit: 5)
       blogs = resp.data
     } catch {

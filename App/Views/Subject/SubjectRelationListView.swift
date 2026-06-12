@@ -11,7 +11,7 @@ struct SubjectRelationListView: View {
 
   func load(limit: Int, offset: Int) async -> PagedDTO<SubjectRelationDTO>? {
     do {
-      let resp = try await Chii.shared.getSubjectRelations(
+      let resp = try await SubjectService.getSubjectRelations(
         subjectId, type: subjectType, limit: limit, offset: offset)
       return resp
     } catch {

@@ -102,7 +102,7 @@ struct SubjectBookChaptersView: View {
 
     Task {
       do {
-        try await Chii.shared.updateSubjectProgress(
+        try await SubjectRepository.updateSubjectProgress(
           subjectId: subject.subjectId, eps: eps, vols: vols)
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
       } catch {

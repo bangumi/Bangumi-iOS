@@ -7,7 +7,7 @@ struct PersonIndexListView: View {
 
   func load(limit: Int, offset: Int) async -> PagedDTO<SlimIndexDTO>? {
     do {
-      let resp = try await Chii.shared.getPersonIndexes(
+      let resp = try await PersonService.getPersonIndexes(
         personId: personId, limit: limit, offset: offset)
       return resp
     } catch {

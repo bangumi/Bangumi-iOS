@@ -10,7 +10,7 @@ struct PersonWorkListView: View {
 
   func load(limit: Int, offset: Int) async -> PagedDTO<PersonWorkDTO>? {
     do {
-      let resp = try await Chii.shared.getPersonWorks(
+      let resp = try await PersonService.getPersonWorks(
         personId, subjectType: subjectType, limit: limit, offset: offset)
       return resp
     } catch {

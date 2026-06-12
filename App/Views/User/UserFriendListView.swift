@@ -15,7 +15,7 @@ struct UserFriendListView: View {
 
   func load(limit: Int, offset: Int) async -> PagedDTO<SlimUserDTO>? {
     do {
-      let resp = try await Chii.shared.getUserFriends(
+      let resp = try await UserService.getUserFriends(
         username: user.username, limit: limit, offset: offset)
       return resp
     } catch {

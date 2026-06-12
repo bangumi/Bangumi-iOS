@@ -53,7 +53,7 @@ struct SubjectCollectsView: View {
 
     Task {
       do {
-        let resp = try await Chii.shared.getSubjectCollects(
+        let resp = try await SubjectService.getSubjectCollects(
           subject.subjectId,
           mode: subjectCollectsFilterMode,
           limit: 10

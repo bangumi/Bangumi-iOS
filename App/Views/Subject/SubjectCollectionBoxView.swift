@@ -62,7 +62,7 @@ struct SubjectCollectionBoxView: View {
     subject = try? modelContext.fetch(descriptor).first
     if subject == nil {
       do {
-        _ = try await Chii.shared.loadSubject(subjectId)
+        _ = try await SubjectRepository.loadSubject(subjectId)
       } catch {
         Notifier.shared.alert(error: error)
       }
@@ -88,7 +88,7 @@ struct SubjectCollectionBoxView: View {
     self.updating = true
     Task {
       do {
-        try await Chii.shared.updateSubjectCollection(
+        try await SubjectRepository.updateSubjectCollection(
           subjectId: subjectId,
           type: ctype,
           rate: rate,

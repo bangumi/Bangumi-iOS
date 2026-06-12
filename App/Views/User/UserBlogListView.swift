@@ -15,7 +15,7 @@ struct UserBlogListView: View {
 
   func load(limit: Int, offset: Int) async -> PagedDTO<SlimBlogEntryDTO>? {
     do {
-      let resp = try await Chii.shared.getUserBlogs(
+      let resp = try await UserService.getUserBlogs(
         username: user.username, limit: limit, offset: offset)
       return resp
     } catch {

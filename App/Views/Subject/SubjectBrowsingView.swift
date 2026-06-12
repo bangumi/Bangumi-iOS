@@ -39,10 +39,10 @@ struct SubjectBrowsingView: View {
 
   func fetchPage(page: Int) async -> PagedDTO<SlimSubjectDTO>? {
     do {
-      guard let db = await Chii.shared.db else {
+      guard let db = await AppContext.shared.databaseIfAvailable() else {
         throw ChiiError.uninitialized
       }
-      let resp = try await Chii.shared.getSubjects(
+      let resp = try await SubjectService.getSubjects(
         type: type, sort: sort, filter: filter, page: page)
       for item in resp.data {
         try await db.saveSubject(item)
@@ -551,13 +551,13 @@ struct SubjectTagBrowsingView: View {
 
   func fetchPage(page: Int) async -> PagedDTO<SlimSubjectDTO>? {
     do {
-      guard let db = await Chii.shared.db else {
+      guard let db = await AppContext.shared.databaseIfAvailable() else {
         throw ChiiError.uninitialized
       }
       var filter = SubjectsBrowseFilter()
       filter.tags = [tag]
       filter.tagsCat = tagsCat
-      let resp = try await Chii.shared.getSubjects(
+      let resp = try await SubjectService.getSubjects(
         type: type, sort: sort, filter: filter, page: page)
       for item in resp.data {
         try await db.saveSubject(item)

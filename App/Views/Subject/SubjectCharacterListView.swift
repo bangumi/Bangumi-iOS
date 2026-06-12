@@ -13,7 +13,7 @@ struct SubjectCharacterListView: View {
 
   func load(limit: Int, offset: Int) async -> PagedDTO<SubjectCharacterDTO>? {
     do {
-      let resp = try await Chii.shared.getSubjectCharacters(
+      let resp = try await SubjectService.getSubjectCharacters(
         subjectId, type: castType, limit: limit, offset: offset)
       return resp
     } catch {

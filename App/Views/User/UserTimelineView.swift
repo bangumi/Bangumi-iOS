@@ -21,7 +21,7 @@ struct UserTimelineView: View {
 
   func reload() async {
     do {
-      let data = try await Chii.shared.getUserTimeline(
+      let data = try await UserService.getUserTimeline(
         username: user.username, limit: 20, until: nil)
       if data.count == 0 {
         Notifier.shared.notify(message: "没有新动态")
@@ -51,7 +51,7 @@ struct UserTimelineView: View {
     }
     loading = true
     do {
-      let data = try await Chii.shared.getUserTimeline(
+      let data = try await UserService.getUserTimeline(
         username: user.username, limit: 20, until: lastID)
       if data.count == 0 {
         exhausted = true

@@ -18,10 +18,10 @@ enum TopicParentType {
   func reply(topicId: Int, content: String, replyTo: Int?, token: String) async throws {
     switch self {
     case .subject:
-      try await Chii.shared.createSubjectReply(
+      try await TopicService.createSubjectReply(
         topicId: topicId, content: content, replyTo: replyTo, token: token)
     case .group:
-      try await Chii.shared.createGroupReply(
+      try await TopicService.createGroupReply(
         topicId: topicId, content: content, replyTo: replyTo, token: token)
     }
   }
@@ -29,28 +29,28 @@ enum TopicParentType {
   func editPost(postId: Int, content: String) async throws {
     switch self {
     case .subject:
-      try await Chii.shared.editSubjectPost(postId: postId, content: content)
+      try await TopicService.editSubjectPost(postId: postId, content: content)
     case .group:
-      try await Chii.shared.editGroupPost(postId: postId, content: content)
+      try await TopicService.editGroupPost(postId: postId, content: content)
     }
   }
 
   func editTopic(topicId: Int, title: String, content: String) async throws {
     switch self {
     case .subject:
-      try await Chii.shared.editSubjectTopic(topicId: topicId, title: title, content: content)
+      try await TopicService.editSubjectTopic(topicId: topicId, title: title, content: content)
     case .group:
-      try await Chii.shared.editGroupTopic(topicId: topicId, title: title, content: content)
+      try await TopicService.editGroupTopic(topicId: topicId, title: title, content: content)
     }
   }
 
   func createTopic(title: String, content: String, token: String) async throws {
     switch self {
     case .subject(let subjectId):
-      try await Chii.shared.createSubjectTopic(
+      try await TopicService.createSubjectTopic(
         subjectId: subjectId, title: title, content: content, token: token)
     case .group(let groupName):
-      try await Chii.shared.createGroupTopic(
+      try await TopicService.createGroupTopic(
         groupName: groupName, title: title, content: content, token: token)
     }
   }
@@ -240,7 +240,7 @@ struct ReplyItemNormalView: View {
           Task {
             updating = true
             do {
-              try await Chii.shared.deleteSubjectPost(postId: reply.id)
+              try await TopicService.deleteSubjectPost(postId: reply.id)
               Notifier.shared.notify(message: "删除成功")
             } catch {
               Notifier.shared.alert(error: error)
@@ -410,7 +410,7 @@ struct SubReplyNormalView: View {
         Task {
           updating = true
           do {
-            try await Chii.shared.deleteSubjectPost(postId: subreply.id)
+            try await TopicService.deleteSubjectPost(postId: subreply.id)
             Notifier.shared.notify(message: "删除成功")
           } catch {
             Notifier.shared.alert(error: error)

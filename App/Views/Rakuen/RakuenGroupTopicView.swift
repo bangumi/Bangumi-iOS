@@ -28,7 +28,7 @@ struct RakuenGroupTopicListView: View {
 
   private func load(limit: Int, offset: Int) async -> PagedDTO<GroupTopicDTO>? {
     do {
-      let resp = try await Chii.shared.getRecentGroupTopics(
+      let resp = try await TopicService.getRecentGroupTopics(
         mode: mode, limit: limit, offset: offset)
       return resp
     } catch {
@@ -118,7 +118,7 @@ struct CachedGroupTopicListView: View {
     defer { loading = false }
 
     do {
-      let resp = try await Chii.shared.getRecentGroupTopics(mode: mode, limit: 20, offset: 0)
+      let resp = try await TopicService.getRecentGroupTopics(mode: mode, limit: 20, offset: 0)
       let updatedItems = [GroupTopicDTO]().mergedById(with: resp.data)
       if items != updatedItems {
         withAnimation {
@@ -129,7 +129,7 @@ struct CachedGroupTopicListView: View {
       exhausted = resp.data.count == 0 || offset >= resp.total
 
       // Save to cache
-      if let db = try? await Chii.shared.getDB() {
+      if let db = try? await AppContext.shared.getDB() {
         try await db.saveRakuenGroupTopicCache(mode: mode.rawValue, items: resp.data)
       }
     } catch {
@@ -143,7 +143,7 @@ struct CachedGroupTopicListView: View {
     defer { loading = false }
 
     do {
-      let resp = try await Chii.shared.getRecentGroupTopics(mode: mode, limit: 20, offset: offset)
+      let resp = try await TopicService.getRecentGroupTopics(mode: mode, limit: 20, offset: offset)
       let updatedItems = items.mergedById(with: resp.data)
       if items != updatedItems {
         withAnimation {

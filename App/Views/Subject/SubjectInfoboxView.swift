@@ -60,7 +60,7 @@ struct SubjectInfoboxView: View {
 
   func refresh() async {
     do {
-      try await Chii.shared.loadSubjectPositions(subjectId)
+      try await SubjectRepository.loadSubjectPositions(subjectId)
     } catch {
       Notifier.shared.alert(error: error)
     }

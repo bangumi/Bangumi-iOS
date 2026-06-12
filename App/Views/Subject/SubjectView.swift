@@ -25,11 +25,11 @@ struct SubjectView: View {
     if refreshing { return }
     refreshing = true
     do {
-      let item = try await Chii.shared.loadSubject(subjectId)
+      let item = try await SubjectRepository.loadSubject(subjectId)
       refreshed = true
       Logger.app.debug("subject refreshed: \(subjectId)")
 
-      try await Chii.shared.loadSubjectDetails(
+      try await SubjectRepository.loadSubjectDetails(
         subjectId,
         offprints: item.type == .book && item.series,
         social: !isolationMode
@@ -119,7 +119,7 @@ struct SubjectDetailView: View {
     .sheet(isPresented: $showCreateTopic) {
       CreateTopicBoxSheet(type: .subject(subject.subjectId)) {
         Task {
-          try? await Chii.shared.loadSubjectDetails(
+          try? await SubjectRepository.loadSubjectDetails(
             subject.subjectId, offprints: false, social: true)
         }
       }

@@ -12,7 +12,7 @@ struct SubjectReviewListView: View {
 
   func load(limit: Int, offset: Int) async -> PagedDTO<SubjectReviewDTO>? {
     do {
-      let resp = try await Chii.shared.getSubjectReviews(subjectId, limit: limit, offset: offset)
+      let resp = try await SubjectService.getSubjectReviews(subjectId, limit: limit, offset: offset)
       return resp
     } catch {
       Notifier.shared.alert(error: error)

@@ -12,7 +12,7 @@ struct TimelineSayView: View {
   func postTimeline() async {
     do {
       updating = true
-      try await Chii.shared.postTimeline(content: content, token: token)
+      try await TimelineService.postTimeline(content: content, token: token)
       updating = false
       Notifier.shared.notify(message: "发送成功")
       dismiss()

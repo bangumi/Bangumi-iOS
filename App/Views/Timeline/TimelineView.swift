@@ -12,7 +12,7 @@ struct TimelineView: View {
   func load() async {
     do {
       loadingComments = true
-      comments = try await Chii.shared.getTimelineReplies(item.id)
+      comments = try await TimelineService.getTimelineReplies(item.id)
       loadingComments = false
     } catch {
       Notifier.shared.alert(error: error)

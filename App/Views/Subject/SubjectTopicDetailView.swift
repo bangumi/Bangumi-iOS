@@ -32,7 +32,7 @@ struct SubjectTopicDetailView: View {
 
   func refresh() async {
     do {
-      let resp = try await Chii.shared.getSubjectTopic(topicId)
+      let resp = try await TopicService.getSubjectTopic(topicId)
       topic = resp
       if let mainPost = resp.mainPost {
         mainPostReactions = mainPost.reactions ?? []

@@ -42,16 +42,16 @@ struct PersonView: View {
 
   func refresh() async {
     do {
-      try await Chii.shared.loadPerson(personId)
+      try await PersonRepository.loadPerson(personId)
       refreshed = true
 
       if !isolationMode {
         loadingComments = true
-        comments = try await Chii.shared.getPersonComments(personId)
+        comments = try await PersonService.getPersonComments(personId)
         loadingComments = false
       }
 
-      try await Chii.shared.loadPersonDetails(personId)
+      try await PersonRepository.loadPersonDetails(personId)
     } catch {
       Notifier.shared.alert(error: error)
       return
@@ -158,9 +158,9 @@ struct PersonDetailView: View {
     defer { updating = false }
     do {
       if person.collectedAt == 0 {
-        try await Chii.shared.collectPerson(person.personId)
+        try await PersonRepository.collectPerson(person.personId)
       } else {
-        try await Chii.shared.uncollectPerson(person.personId)
+        try await PersonRepository.uncollectPerson(person.personId)
       }
       UIImpactFeedbackGenerator(style: .medium).impactOccurred()
     } catch {

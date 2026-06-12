@@ -119,7 +119,7 @@ struct ExportView: View {
   private func refreshCount() {
     Task {
       do {
-        let db = try await Chii.shared.getDB()
+        let db = try await AppContext.shared.getDB()
         let count = try await db.countSubjects(
           subjectType: subjectType,
           collectionType: collectionType
@@ -140,7 +140,7 @@ struct ExportView: View {
 
     Task {
       do {
-        let db = try await Chii.shared.getDB()
+        let db = try await AppContext.shared.getDB()
         if let url = try await db.exportSubjectsToCSV(
           subjectType: subjectType,
           collectionType: collectionType,

@@ -10,7 +10,7 @@ struct NoticeView: View {
   @State private var unreadCount: Int = 0
 
   func loadNotice() async throws {
-    let resp = try await Chii.shared.listNotice(limit: 20)
+    let resp = try await AccountService.listNotice(limit: 20)
     notices = resp.data
     unreadCount = notices.count(where: { $0.unread })
     hasUnreadNotice = unreadCount > 0
@@ -33,7 +33,7 @@ struct NoticeView: View {
     let ids = notices.map { $0.id }
     Task {
       do {
-        try await Chii.shared.clearNotice(ids: ids)
+        try await AccountService.clearNotice(ids: ids)
         try await loadNotice()
       } catch {
         Notifier.shared.alert(error: error)
@@ -51,7 +51,7 @@ struct NoticeView: View {
     updating = true
     Task {
       do {
-        try await Chii.shared.clearNotice(ids: [id])
+        try await AccountService.clearNotice(ids: [id])
         if let index = notices.firstIndex(where: { $0.id == id }) {
           notices[index].unread = false
           unreadCount = notices.count(where: { $0.unread })

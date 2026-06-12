@@ -1,9 +1,6 @@
-import CoreSpotlight
 import Foundation
 import KeychainSwift
 import OSLog
-import SwiftData
-import UIKit
 
 let APP_DOMAIN = "com.everpcpc.chobits"
 
@@ -32,11 +29,10 @@ enum AuthMode {
 }
 
 @globalActor
-actor Chii {
-  static let shared = Chii()
+actor APIClient {
+  static let shared = APIClient()
 
   let keychain: KeychainSwift
-  let version: String
   let userAgent: String
   let appInfo: AppInfo
 
@@ -44,62 +40,22 @@ actor Chii {
   var anonymousSession: URLSession?
   var authorizedSession: URLSession?
 
-  var db: DatabaseOperator?
-  var mock: Bool = false
-
   private var refreshTask: Task<Auth, Error>?
 
   init() {
     self.keychain = KeychainSwift(keyPrefix: "\(APP_DOMAIN).")
-    guard let plist = Bundle.main.infoDictionary else {
-      fatalError("Could not find Info.plist")
-    }
-    guard let clientId = plist["BANGUMI_APP_ID"] as? String else {
-      fatalError("Could not find BANGUMI_APP_ID in Info.plist")
-    }
-    guard let clientSecret = plist["BANGUMI_APP_SECRET"] as? String else {
-      fatalError("Could not find BANGUMI_APP_SECRET in Info.plist")
-    }
-    guard let version = plist["CFBundleShortVersionString"] as? String else {
-      fatalError("Could not find CFBundleShortVersionString in Info.plist")
-    }
-    guard let build = plist["CFBundleVersion"] as? String else {
-      fatalError("Could not find CFBundleVersion in Info.plist")
-    }
-    let device = MainActor.assumeIsolated { UIDevice.current.model }
-    let osVersion = MainActor.assumeIsolated { UIDevice.current.systemVersion }
-    self.version = "v\(version) (build \(build))"
-    self.userAgent = "Bangumi/\(version) (\(device); iOS \(osVersion); Build \(build))"
-    self.appInfo = AppInfo(
-      clientId: clientId,
-      clientSecret: clientSecret,
-      callbackURL: "chii://oauth/callback"
-    )
-  }
-
-  func setUp(container: ModelContainer) {
-    self.db = DatabaseOperator(modelContainer: container)
-  }
-
-  func getDB() throws -> DatabaseOperator {
-    guard let db = self.db else {
-      throw ChiiError.uninitialized
-    }
-    return db
-  }
-
-  func setMock() {
-    self.mock = true
+    self.userAgent = AppMetadata.userAgent
+    self.appInfo = AppMetadata.appInfo
   }
 }
 
-extension Chii {
+extension APIClient {
   func setAuthStatus(_ authroized: Bool) {
-    UserDefaults.standard.set(authroized, forKey: "isAuthenticated")
+    AppConfig.isAuthenticated = authroized
   }
 
   func isAuthenticated() -> Bool {
-    return UserDefaults.standard.bool(forKey: "isAuthenticated")
+    return AppConfig.isAuthenticated
   }
 
   private static let jsonDecoder: JSONDecoder = {
@@ -307,17 +263,6 @@ extension Chii {
     } catch {
       timeoutTask.cancel()
       throw error
-    }
-  }
-}
-
-extension Chii {
-  func index(_ items: [SearchableItem]) async {
-    do {
-      try await CSSearchableIndex.default().indexSearchableItems(
-        items.filter { $0.identifier > 0 }.map { $0.index() })
-    } catch {
-      Logger.app.error("Failed to index: \(error)")
     }
   }
 }

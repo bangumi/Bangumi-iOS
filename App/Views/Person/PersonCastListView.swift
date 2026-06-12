@@ -9,7 +9,7 @@ struct PersonCastListView: View {
 
   func load(limit: Int, offset: Int) async -> PagedDTO<PersonCastDTO>? {
     do {
-      let resp = try await Chii.shared.getPersonCasts(
+      let resp = try await PersonService.getPersonCasts(
         personId, type: type.rawValue, limit: limit, offset: offset)
       return resp
     } catch {

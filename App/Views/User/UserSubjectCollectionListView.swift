@@ -20,7 +20,7 @@ struct UserSubjectCollectionListView: View {
 
   func load(limit: Int, offset: Int) async -> PagedDTO<SlimSubjectDTO>? {
     do {
-      let resp = try await Chii.shared.getUserSubjectCollections(
+      let resp = try await UserService.getUserSubjectCollections(
         username: user.username, type: ctype, subjectType: stype, limit: limit, offset: offset)
       return resp
     } catch {

@@ -37,7 +37,7 @@ struct SubjectTopicsView: View {
     .sheet(isPresented: $showCreateTopic) {
       CreateTopicBoxSheet(type: .subject(subjectId)) {
         Task {
-          try? await Chii.shared.loadSubjectDetails(subjectId, offprints: false, social: true)
+          try? await SubjectRepository.loadSubjectDetails(subjectId, offprints: false, social: true)
         }
       }
     }

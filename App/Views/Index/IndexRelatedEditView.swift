@@ -30,7 +30,7 @@ struct IndexRelatedAddSheet: View {
 
     isSubmitting = true
     do {
-      _ = try await Chii.shared.putIndexRelated(
+      _ = try await IndexService.putIndexRelated(
         indexId: indexId,
         cat: selectedCategory,
         sid: rid,
@@ -169,7 +169,7 @@ struct IndexRelatedEditSheet: View {
 
     isSubmitting = true
     do {
-      try await Chii.shared.patchIndexRelated(
+      try await IndexService.patchIndexRelated(
         indexId: indexId,
         id: relatedId,
         order: orderNum,

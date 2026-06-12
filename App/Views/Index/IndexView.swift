@@ -47,7 +47,7 @@ struct IndexView: View {
 
   func refresh() async {
     do {
-      let data = try await Chii.shared.getIndex(indexId)
+      let data = try await IndexService.getIndex(indexId)
       availableSubjectTypes = data.stats.subjectTypeItems
       availableCategories = data.stats.categoryItems
       index = data
@@ -58,7 +58,7 @@ struct IndexView: View {
 
   func loadRelated(limit: Int, offset: Int) async -> PagedDTO<IndexRelatedDTO>? {
     do {
-      let resp = try await Chii.shared.getIndexRelated(
+      let resp = try await IndexService.getIndexRelated(
         indexId: indexId, cat: selectedCategory, type: selectedSubjectType, limit: limit,
         offset: offset)
       return resp
@@ -74,7 +74,7 @@ struct IndexView: View {
     }
     do {
       loadingComments = true
-      comments = try await Chii.shared.getIndexComments(indexId)
+      comments = try await IndexService.getIndexComments(indexId)
       loadingComments = false
     } catch {
       Notifier.shared.alert(error: error)
@@ -84,7 +84,7 @@ struct IndexView: View {
 
   func deleteIndex(_ indexId: Int) async {
     do {
-      try await Chii.shared.deleteIndex(indexId: indexId)
+      try await IndexService.deleteIndex(indexId: indexId)
       Notifier.shared.notify(message: "已删除")
       reloader.toggle()
     } catch {
@@ -94,7 +94,7 @@ struct IndexView: View {
 
   func collectIndex() async {
     do {
-      try await Chii.shared.collectIndex(indexId)
+      try await IndexService.collectIndex(indexId)
       Notifier.shared.notify(message: "已收藏")
       await refresh()
     } catch {
@@ -104,7 +104,7 @@ struct IndexView: View {
 
   func uncollectIndex() async {
     do {
-      try await Chii.shared.uncollectIndex(indexId)
+      try await IndexService.uncollectIndex(indexId)
       Notifier.shared.notify(message: "已取消收藏")
       await refresh()
     } catch {

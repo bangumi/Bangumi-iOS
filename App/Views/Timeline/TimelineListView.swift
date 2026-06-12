@@ -20,11 +20,11 @@ struct TimelineListView: View {
       var data: [TimelineDTO] = []
       switch timelineViewMode {
       case .all:
-        data = try await Chii.shared.getTimeline(mode: .all, limit: 20, until: nil)
+        data = try await TimelineService.getTimeline(mode: .all, limit: 20, until: nil)
       case .friends:
-        data = try await Chii.shared.getTimeline(mode: .friends, limit: 20, until: nil)
+        data = try await TimelineService.getTimeline(mode: .friends, limit: 20, until: nil)
       case .me:
-        data = try await Chii.shared.getUserTimeline(
+        data = try await UserService.getUserTimeline(
           username: profile.username, limit: 20, until: nil)
       }
       if data.count == 0 {
@@ -58,11 +58,11 @@ struct TimelineListView: View {
       var data: [TimelineDTO] = []
       switch timelineViewMode {
       case .all:
-        data = try await Chii.shared.getTimeline(mode: .all, limit: 20, until: lastID)
+        data = try await TimelineService.getTimeline(mode: .all, limit: 20, until: lastID)
       case .friends:
-        data = try await Chii.shared.getTimeline(mode: .friends, limit: 20, until: lastID)
+        data = try await TimelineService.getTimeline(mode: .friends, limit: 20, until: lastID)
       case .me:
-        data = try await Chii.shared.getUserTimeline(
+        data = try await UserService.getUserTimeline(
           username: profile.username, limit: 20, until: lastID)
       }
       if data.count == 0 {

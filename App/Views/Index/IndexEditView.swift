@@ -31,7 +31,7 @@ struct IndexEditSheet: View {
     isSubmitting = true
     do {
       if let indexId = indexId {
-        try await Chii.shared.updateIndex(
+        try await IndexService.updateIndex(
           indexId: indexId,
           title: title,
           desc: desc,
@@ -39,7 +39,7 @@ struct IndexEditSheet: View {
         )
         Notifier.shared.notify(message: "目录已更新")
       } else {
-        _ = try await Chii.shared.createIndex(
+        _ = try await IndexService.createIndex(
           title: title,
           desc: desc,
           private: isPrivate

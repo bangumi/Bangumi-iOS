@@ -64,7 +64,7 @@ struct TextInputView: View {
 
   private func saveDraft() async {
     do {
-      let db = try await Chii.shared.getDB()
+      let db = try await AppContext.shared.getDB()
       let id = try await db.saveDraft(type: type, content: text, id: currentDraftID)
       await MainActor.run {
         self.currentDraftID = id
@@ -188,7 +188,7 @@ private struct DraftBoxView: View {
             .swipeActions {
               Button(role: .destructive) {
                 Task {
-                  if let db = try? await Chii.shared.getDB() {
+                  if let db = try? await AppContext.shared.getDB() {
                     await db.deleteDraft(id: draft.persistentModelID)
                   }
                 }

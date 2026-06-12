@@ -1,10 +1,9 @@
 import Foundation
 import OSLog
 
-extension Chii {
+extension APIClient {
   func getOAuthBase() -> String {
-    let domain = UserDefaults.standard.string(forKey: "authDomain") ?? AuthDomain.next.rawValue
-    return "https://\(domain)/oauth"
+    return "https://\(AppConfig.authDomain.rawValue)/oauth"
   }
 
   func buildOAuthURL() -> URL {
@@ -23,10 +22,10 @@ extension Chii {
     self.keychain.delete("auth")
     self.auth = nil
     self.authorizedSession = nil
-    UserDefaults.standard.set(0, forKey: "collectionsUpdatedAt")
-    UserDefaults.standard.set("", forKey: "profile")
+    AppConfig.collectionsUpdatedAt = 0
+    AppConfig.profile = ""
     do {
-      let db = try self.getDB()
+      let db = try await AppContext.shared.getDB()
       try await db.clearSubjectInterest()
       try await db.clearEpisodeCollection()
       try await db.clearPersonCollection()
@@ -67,8 +66,8 @@ extension Chii {
     ]
     let data = try await self.request(url: url, method: "POST", body: body, auth: .disabled)
     _ = try self.saveAuthResponse(data: data)
-    let profile = try await self.getProfile()
-    UserDefaults.standard.set(profile.rawValue, forKey: "profile")
+    let profile = try await AccountService.getProfile()
+    AppConfig.profile = profile.rawValue
     self.setAuthStatus(true)
   }
 

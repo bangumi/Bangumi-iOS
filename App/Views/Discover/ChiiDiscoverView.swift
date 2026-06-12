@@ -8,8 +8,8 @@ struct ChiiDiscoverView: View {
 
   func refresh() async {
     do {
-      try await Chii.shared.loadCalendar()
-      try await Chii.shared.loadTrendingSubjects()
+      try await DiscoveryRepository.loadCalendar()
+      try await DiscoveryRepository.loadTrendingSubjects()
     } catch {
       Notifier.shared.alert(error: error)
     }

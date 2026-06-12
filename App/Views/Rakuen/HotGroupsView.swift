@@ -43,7 +43,7 @@ struct HotGroupsView: View {
   private func togglePin(_ group: SlimGroupDTO) {
     Task {
       do {
-        let db = try await Chii.shared.getDB()
+        let db = try await AppContext.shared.getDB()
         try await db.togglePinRakuenGroupCache(group: group)
       } catch {
         Logger.app.error("Failed to toggle pin: \(error)")
@@ -56,12 +56,12 @@ struct HotGroupsView: View {
     defer { loading = false }
 
     do {
-      let resp = try await Chii.shared.getGroups(mode: .all, sort: .members, limit: 10)
+      let resp = try await GroupService.getGroups(mode: .all, sort: .members, limit: 10)
       hotItems = resp.data
       hotItems.shuffle()
 
       // Save to hot cache
-      if let db = try? await Chii.shared.getDB() {
+      if let db = try? await AppContext.shared.getDB() {
         try await db.saveRakuenGroupCache(id: "hot", items: hotItems)
       }
     } catch {

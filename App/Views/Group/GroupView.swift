@@ -22,9 +22,9 @@ struct GroupView: View {
   func refresh() async {
     if refreshed { return }
     do {
-      try await Chii.shared.loadGroup(name)
+      try await GroupRepository.loadGroup(name)
       refreshed = true
-      try await Chii.shared.loadGroupDetails(name)
+      try await GroupRepository.loadGroupDetails(name)
     } catch {
       Notifier.shared.alert(error: error)
       return
@@ -80,7 +80,7 @@ struct GroupDetailView: View {
   private func togglePin() {
     Task {
       do {
-        let db = try await Chii.shared.getDB()
+        let db = try await AppContext.shared.getDB()
         try await db.togglePinRakuenGroupCache(group: group.slim)
       } catch {
         Logger.app.error("Failed to toggle pin: \(error)")
@@ -91,9 +91,9 @@ struct GroupDetailView: View {
   func joinGroup() {
     Task {
       do {
-        try await Chii.shared.joinGroup(group.name)
+        try await GroupService.joinGroup(group.name)
         let joinedAt = Int(Date().timeIntervalSince1970)
-        let db = try await Chii.shared.getDB()
+        let db = try await AppContext.shared.getDB()
         try await db.updateGroupJoinStatus(name: group.name, joinedAt: joinedAt)
       } catch {
         Notifier.shared.alert(error: error)
@@ -104,8 +104,8 @@ struct GroupDetailView: View {
   func leaveGroup() {
     Task {
       do {
-        try await Chii.shared.leaveGroup(group.name)
-        let db = try await Chii.shared.getDB()
+        try await GroupService.leaveGroup(group.name)
+        let db = try await AppContext.shared.getDB()
         try await db.updateGroupJoinStatus(name: group.name, joinedAt: 0)
       } catch {
         Notifier.shared.alert(error: error)
@@ -171,7 +171,7 @@ struct GroupDetailView: View {
     .sheet(isPresented: $showCreateTopic) {
       CreateTopicBoxSheet(type: .group(group.name)) {
         Task {
-          try? await Chii.shared.loadGroupDetails(group.name)
+          try? await GroupRepository.loadGroupDetails(group.name)
         }
       }
     }
@@ -320,7 +320,7 @@ struct GroupRecentTopicView: View {
       .sheet(isPresented: $showCreateTopic) {
         CreateTopicBoxSheet(type: .group(group.name)) {
           Task {
-            try? await Chii.shared.loadGroupDetails(group.name)
+            try? await GroupRepository.loadGroupDetails(group.name)
           }
         }
       }
