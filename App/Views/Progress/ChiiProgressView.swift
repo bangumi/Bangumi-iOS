@@ -156,6 +156,9 @@ struct ChiiProgressView: View {
       else {
         return
       }
+      guard progressSubjects.contains(where: { $0.id == subjectId }) else {
+        return
+      }
 
       guard let item else {
         removeProgressSubject(subjectId)
