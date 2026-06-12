@@ -20,10 +20,11 @@ struct ProgressListView: View {
           )
         }
         .onAppear {
-          if row.triggersNextPage {
-            Task {
-              await loadNextPage()
-            }
+          guard row.triggersNextPage, hasMore, !isLoadingPage else {
+            return
+          }
+          Task {
+            await loadNextPage()
           }
         }
       }
