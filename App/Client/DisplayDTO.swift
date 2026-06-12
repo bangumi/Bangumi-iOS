@@ -71,7 +71,10 @@ enum ProgressSubjectInvalidation {
     subjectId: Int,
     mayChangeProgressMembership: Bool = false
   ) async {
-    await ProgressSubjectInvalidationStore.shared.insert(subjectId)
+    await ProgressSubjectInvalidationStore.shared.insert(
+      subjectId,
+      mayChangeProgressMembership: mayChangeProgressMembership
+    )
     NotificationCenter.default.post(
       name: notificationName,
       object: nil,
@@ -91,19 +94,44 @@ enum ProgressSubjectInvalidation {
   }
 }
 
+struct PendingProgressSubjectInvalidation: Sendable {
+  let subjectId: Int
+  let mayChangeProgressMembership: Bool
+}
+
 actor ProgressSubjectInvalidationStore {
   static let shared = ProgressSubjectInvalidationStore()
 
   private var subjectIds: Set<Int> = []
+  private var membershipChangingSubjectIds: Set<Int> = []
 
-  func insert(_ subjectId: Int) {
+  func insert(_ subjectId: Int, mayChangeProgressMembership: Bool) {
     subjectIds.insert(subjectId)
+    if mayChangeProgressMembership {
+      membershipChangingSubjectIds.insert(subjectId)
+    }
   }
 
-  func takeLoadedSubjectIds(_ loadedSubjectIds: Set<Int>) -> [Int] {
-    let matchedSubjectIds = subjectIds.intersection(loadedSubjectIds)
+  func takeSubjectId(_ subjectId: Int) {
+    subjectIds.remove(subjectId)
+    membershipChangingSubjectIds.remove(subjectId)
+  }
+
+  func takePendingInvalidations(
+    loadedSubjectIds: Set<Int>
+  ) -> [PendingProgressSubjectInvalidation] {
+    let membershipChangingSubjectIdsSnapshot = membershipChangingSubjectIds
+    let matchedSubjectIds = subjectIds
+      .intersection(loadedSubjectIds)
+      .union(membershipChangingSubjectIdsSnapshot)
     subjectIds.subtract(matchedSubjectIds)
-    return Array(matchedSubjectIds)
+    self.membershipChangingSubjectIds.subtract(matchedSubjectIds)
+    return matchedSubjectIds.map { subjectId in
+      PendingProgressSubjectInvalidation(
+        subjectId: subjectId,
+        mayChangeProgressMembership: membershipChangingSubjectIdsSnapshot.contains(subjectId)
+      )
+    }
   }
 }
 

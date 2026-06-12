@@ -254,7 +254,7 @@ struct ChiiProgressView: View {
       return
     }
     Task {
-      _ = await ProgressSubjectInvalidationStore.shared.takeLoadedSubjectIds(Set([subjectId]))
+      await ProgressSubjectInvalidationStore.shared.takeSubjectId(subjectId)
       await reloadProgressSubject(
         subjectId,
         mayChangeProgressMembership: mayChangeProgressMembership
@@ -264,14 +264,14 @@ struct ChiiProgressView: View {
 
   private func reloadPendingProgressSubjects() async {
     let loadedSubjectIds = Set(progressSubjects.map(\.id))
-    guard !loadedSubjectIds.isEmpty else {
-      return
-    }
-    let subjectIds = await ProgressSubjectInvalidationStore.shared.takeLoadedSubjectIds(
-      loadedSubjectIds
+    let invalidations = await ProgressSubjectInvalidationStore.shared.takePendingInvalidations(
+      loadedSubjectIds: loadedSubjectIds
     )
-    for subjectId in subjectIds {
-      await reloadProgressSubject(subjectId)
+    for invalidation in invalidations {
+      await reloadProgressSubject(
+        invalidation.subjectId,
+        mayChangeProgressMembership: invalidation.mayChangeProgressMembership
+      )
     }
   }
 
