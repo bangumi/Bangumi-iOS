@@ -7,7 +7,11 @@ struct ProgressTileView: View {
   var body: some View {
     LazyVGrid(columns: [GridItem(.adaptive(minimum: 150))]) {
       ForEach(subjectIds, id: \.self) { subjectId in
-        ProgressSubjectContainerView(subjectId: subjectId, reloadToken: reloadToken) { item, reload in
+        ProgressSubjectContainerView(
+          subjectId: subjectId,
+          reloadToken: reloadToken,
+          episodeWindowSize: 5
+        ) { item, reload in
           CardView(padding: 8) {
             ProgressTileItemContentView(
               subject: item.subject,

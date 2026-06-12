@@ -388,21 +388,99 @@ extension DatabaseOperator {
     )
   }
 
-  public func fetchProgressSubject(subjectId: Int) throws -> ProgressSubjectDTO? {
+  public func fetchProgressSubject(
+    subjectId: Int,
+    episodeWindowSize: Int = 7
+  ) throws -> ProgressSubjectDTO? {
     guard let subject = try getSubject(subjectId) else {
       return nil
     }
+
+    let episodes: [EpisodeDTO]
+    switch subject.typeEnum {
+    case .anime, .real:
+      episodes = try fetchProgressEpisodes(
+        subjectId: subjectId,
+        windowSize: episodeWindowSize
+      )
+    default:
+      episodes = []
+    }
+
+    return ProgressSubjectDTO(
+      subject: SubjectDTO(subject),
+      episodes: episodes
+    )
+  }
+
+  private func fetchProgressEpisodes(subjectId: Int, windowSize: Int) throws -> [EpisodeDTO] {
+    let windowSize = max(1, windowSize)
     let mainType = EpisodeType.main.rawValue
-    let episodeDescriptor = FetchDescriptor<Episode>(
-      predicate: #Predicate<Episode> { $0.subjectId == subjectId && $0.type == mainType },
+    var nextDescriptor = FetchDescriptor<Episode>(
+      predicate: #Predicate<Episode> {
+        $0.subjectId == subjectId && $0.type == mainType && $0.status == 0
+      },
       sortBy: [
         SortDescriptor<Episode>(\.sort, order: .forward)
       ]
     )
-    return ProgressSubjectDTO(
-      subject: SubjectDTO(subject),
-      episodes: try modelContext.fetch(episodeDescriptor).map(EpisodeDTO.init)
+    nextDescriptor.fetchLimit = 1
+
+    guard let nextEpisode = try modelContext.fetch(nextDescriptor).first else {
+      var suffixDescriptor = FetchDescriptor<Episode>(
+        predicate: #Predicate<Episode> { $0.subjectId == subjectId && $0.type == mainType },
+        sortBy: [
+          SortDescriptor<Episode>(\.sort, order: .reverse)
+        ]
+      )
+      suffixDescriptor.fetchLimit = windowSize
+      return try modelContext.fetch(suffixDescriptor)
+        .reversed()
+        .map(EpisodeDTO.init)
+    }
+
+    let halfBefore = (windowSize - 1) / 2
+    let halfAfter = windowSize - halfBefore - 1
+    let nextSort = nextEpisode.sort
+
+    var beforeDescriptor = FetchDescriptor<Episode>(
+      predicate: #Predicate<Episode> {
+        $0.subjectId == subjectId && $0.type == mainType && $0.sort < nextSort
+      },
+      sortBy: [
+        SortDescriptor<Episode>(\.sort, order: .reverse)
+      ]
     )
+    beforeDescriptor.fetchLimit = max(windowSize - 1, 0)
+
+    var afterDescriptor = FetchDescriptor<Episode>(
+      predicate: #Predicate<Episode> {
+        $0.subjectId == subjectId && $0.type == mainType && $0.sort > nextSort
+      },
+      sortBy: [
+        SortDescriptor<Episode>(\.sort, order: .forward)
+      ]
+    )
+    afterDescriptor.fetchLimit = max(windowSize - 1, 0)
+
+    let before = try modelContext.fetch(beforeDescriptor).reversed()
+    let after = try modelContext.fetch(afterDescriptor)
+
+    let beforeCount: Int
+    let afterCount: Int
+    if before.count < halfBefore {
+      beforeCount = before.count
+      afterCount = min(after.count, windowSize - beforeCount - 1)
+    } else if after.count < halfAfter {
+      afterCount = after.count
+      beforeCount = min(before.count, windowSize - afterCount - 1)
+    } else {
+      beforeCount = halfBefore
+      afterCount = halfAfter
+    }
+
+    return (before.suffix(beforeCount) + [nextEpisode] + after.prefix(afterCount))
+      .map(EpisodeDTO.init)
   }
 
   public func getSearchable<T: PersistentModel & Searchable>(

@@ -7,7 +7,11 @@ struct ProgressListView: View {
   var body: some View {
     LazyVStack(alignment: .leading) {
       ForEach(subjectIds, id: \.self) { subjectId in
-        ProgressSubjectContainerView(subjectId: subjectId, reloadToken: reloadToken) { item, reload in
+        ProgressSubjectContainerView(
+          subjectId: subjectId,
+          reloadToken: reloadToken,
+          episodeWindowSize: 7
+        ) { item, reload in
           CardView {
             ProgressListItemContentView(
               subject: item.subject,

@@ -7,6 +7,11 @@ enum EpisodeRecentMode {
   case list
 }
 
+private struct RecentEpisodes {
+  let episodes: [EpisodeDTO]
+  let nextEpisode: EpisodeDTO?
+}
+
 struct EpisodeRecentView: View {
   let subject: SubjectDTO
   let mode: EpisodeRecentMode
@@ -14,10 +19,6 @@ struct EpisodeRecentView: View {
   var reload: (() async -> Void)? = nil
 
   @State private var showCollectionBox: Bool = false
-
-  var nextEpisode: EpisodeDTO? {
-    episodes.first { $0.status == EpisodeCollectionType.none.rawValue }
-  }
 
   var progressText: String {
     return "\(subject.interest?.epStatus ?? 0) / \(subject.eps)"
@@ -34,46 +35,63 @@ struct EpisodeRecentView: View {
     }
   }
 
-  var recentEpisodes: [EpisodeDTO] {
+  private var recentEpisodes: RecentEpisodes {
     let halfBefore = (recentCount - 1) / 2
     let halfAfter = recentCount - halfBefore - 1
     let idx = episodes.firstIndex { $0.status == EpisodeCollectionType.none.rawValue }
     if let idx = idx {
+      let nextEpisode = episodes[idx]
       if idx <= halfBefore {
-        return Array(episodes.prefix(recentCount))
+        return RecentEpisodes(
+          episodes: Array(episodes.prefix(recentCount)),
+          nextEpisode: nextEpisode
+        )
       } else if idx < episodes.count - halfAfter {
         let start = idx - halfBefore
         let end = min(idx + halfAfter + 1, episodes.count)
-        return Array(episodes[start..<end])
+        return RecentEpisodes(
+          episodes: Array(episodes[start..<end]),
+          nextEpisode: nextEpisode
+        )
       } else {
-        return Array(episodes.suffix(recentCount))
+        return RecentEpisodes(
+          episodes: Array(episodes.suffix(recentCount)),
+          nextEpisode: nextEpisode
+        )
       }
     } else {
       if let first = episodes.first {
         if first.status == EpisodeCollectionType.none.rawValue {
-          return Array(episodes.prefix(recentCount))
+          return RecentEpisodes(
+            episodes: Array(episodes.prefix(recentCount)),
+            nextEpisode: first
+          )
         } else {
-          return Array(episodes.suffix(recentCount))
+          return RecentEpisodes(
+            episodes: Array(episodes.suffix(recentCount)),
+            nextEpisode: nil
+          )
         }
       } else {
-        return []
+        return RecentEpisodes(episodes: [], nextEpisode: nil)
       }
     }
   }
 
   var body: some View {
-    if !recentEpisodes.isEmpty {
+    let recent = recentEpisodes
+    if !recent.episodes.isEmpty {
       switch mode {
       case .tile:
         VStack {
           HStack(spacing: 2) {
-            ForEach(recentEpisodes) { episode in
+            ForEach(recent.episodes) { episode in
               EpisodeItemView(episode: episode, reload: reload)
             }
             Spacer(minLength: 0)
           }
           .font(.footnote)
-          if let episode = nextEpisode {
+          if let episode = recent.nextEpisode {
             EpisodeNextView(episode: episode, fillWidth: true, reload: reload)
           } else {
             Button {
@@ -97,17 +115,17 @@ struct EpisodeRecentView: View {
             }
           }
         }
-        .animation(.default, value: nextEpisode)
-        .animation(.default, value: recentEpisodes)
+        .animation(.default, value: recent.nextEpisode)
+        .animation(.default, value: recent.episodes)
       case .list:
         HStack {
           HStack(spacing: 2) {
-            ForEach(recentEpisodes) { episode in
+            ForEach(recent.episodes) { episode in
               EpisodeItemView(episode: episode, reload: reload)
             }
           }.font(.footnote)
           Spacer(minLength: 0)
-          if let episode = nextEpisode {
+          if let episode = recent.nextEpisode {
             EpisodeNextView(episode: episode, fillWidth: false, reload: reload)
           } else {
             Button {
@@ -129,8 +147,8 @@ struct EpisodeRecentView: View {
             }
           }
         }
-        .animation(.default, value: nextEpisode)
-        .animation(.default, value: recentEpisodes)
+        .animation(.default, value: recent.nextEpisode)
+        .animation(.default, value: recent.episodes)
       }
     } else {
       HStack {

@@ -3,6 +3,7 @@ import SwiftUI
 struct ProgressSubjectContainerView<Content: View>: View {
   let subjectId: Int
   let reloadToken: Int
+  let episodeWindowSize: Int
   let content: (ProgressSubjectDTO, @escaping () async -> Void) -> Content
 
   @State private var item: ProgressSubjectDTO?
@@ -11,10 +12,12 @@ struct ProgressSubjectContainerView<Content: View>: View {
   init(
     subjectId: Int,
     reloadToken: Int = 0,
+    episodeWindowSize: Int = 7,
     @ViewBuilder content: @escaping (ProgressSubjectDTO, @escaping () async -> Void) -> Content
   ) {
     self.subjectId = subjectId
     self.reloadToken = reloadToken
+    self.episodeWindowSize = episodeWindowSize
     self.content = content
   }
 
@@ -22,7 +25,10 @@ struct ProgressSubjectContainerView<Content: View>: View {
     loaded = false
     do {
       let db = try await AppContext.shared.getDB()
-      item = try await db.fetchProgressSubject(subjectId: subjectId)
+      item = try await db.fetchProgressSubject(
+        subjectId: subjectId,
+        episodeWindowSize: episodeWindowSize
+      )
     } catch {
       Notifier.shared.alert(error: error)
     }
