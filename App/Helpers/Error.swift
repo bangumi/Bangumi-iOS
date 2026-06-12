@@ -24,6 +24,7 @@ struct ResponseDetailedError: Codable, CustomStringConvertible {
 enum ChiiError: Error, CustomStringConvertible, Sendable {
   case uninitialized
   case requireLogin
+  case network(String)
   case request(String)
   case badRequest(String)
   case notAuthorized(String)
@@ -36,6 +37,28 @@ enum ChiiError: Error, CustomStringConvertible, Sendable {
 
   init(request: String) {
     self = .request(request)
+  }
+
+  init(networkError error: NSError) {
+    switch error.code {
+    case NSURLErrorNotConnectedToInternet:
+      self = .network("没有网络连接，请检查网络设置或权限后重试")
+    case NSURLErrorTimedOut:
+      self = .network("请求超时，请稍后再试")
+    case NSURLErrorCannotFindHost, NSURLErrorDNSLookupFailed:
+      self = .network("无法解析服务器地址，请稍后再试")
+    case NSURLErrorCannotConnectToHost, NSURLErrorNetworkConnectionLost:
+      self = .network("无法连接到服务器，请检查网络后重试")
+    case NSURLErrorSecureConnectionFailed, NSURLErrorServerCertificateHasBadDate,
+      NSURLErrorServerCertificateUntrusted, NSURLErrorServerCertificateHasUnknownRoot,
+      NSURLErrorServerCertificateNotYetValid, NSURLErrorClientCertificateRejected,
+      NSURLErrorClientCertificateRequired, NSURLErrorCannotLoadFromNetwork:
+      self = .network("无法建立安全连接，请检查网络环境或稍后再试")
+    case NSURLErrorCancelled:
+      self = .ignore("请求已取消")
+    default:
+      self = .network("网络请求失败，请稍后再试")
+    }
   }
 
   init(message: String) {
@@ -78,6 +101,8 @@ enum ChiiError: Error, CustomStringConvertible, Sendable {
       return "Client not initialized"
     case .requireLogin:
       return "Please login with Bangumi"
+    case .network(let message):
+      return message
     case .request(let message):
       return "Request Error!\n\(message)"
     case .badRequest(let error):
@@ -101,6 +126,8 @@ enum ChiiError: Error, CustomStringConvertible, Sendable {
 
   var isRetryable: Bool {
     switch self {
+    case .network(let msg):
+      return msg == "请求超时，请稍后再试" || msg == "无法连接到服务器，请检查网络后重试"
     case .notice(let msg):
       return msg == "请求超时，请稍后再试" || msg == "请求过于频繁，请稍后再试"
     case .generic(let msg):

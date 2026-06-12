@@ -111,21 +111,12 @@ extension APIClient {
         let duration = startTime.duration(to: .now).logFormatted
         Logger.api.error(
           "[\(duration)] \(method) \(url.absoluteString) NSURLErrorDomain: \(error)")
-        switch error.code {
-        case NSURLErrorNotConnectedToInternet:
-          throw ChiiError(notice: "没有网络连接，请检查网络设置或权限后重试")
-        case NSURLErrorTimedOut:
-          let err = ChiiError(notice: "请求超时，请稍后再试")
-          if attempt < maxRetries {
-            lastError = err
-            continue
-          }
-          throw err
-        case NSURLErrorCancelled:
-          throw ChiiError(ignore: "请求已取消")
-        default:
-          throw ChiiError(request: "\(error)")
+        let err = ChiiError(networkError: error)
+        if err.isRetryable && attempt < maxRetries {
+          lastError = err
+          continue
         }
+        throw err
       } catch {
         let duration = startTime.duration(to: .now).logFormatted
         Logger.api.error("[\(duration)] \(method) \(url.absoluteString) error: \(error)")

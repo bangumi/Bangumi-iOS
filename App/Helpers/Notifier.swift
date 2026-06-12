@@ -40,6 +40,11 @@ class Notifier {
     if let chiiError = error as? ChiiError {
       self.alert(error: chiiError)
     } else {
+      let nsError = error as NSError
+      if nsError.domain == NSURLErrorDomain {
+        self.alert(error: ChiiError(networkError: nsError))
+        return
+      }
       self.alert(message: "\(error)")
     }
   }
