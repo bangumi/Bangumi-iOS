@@ -5,8 +5,8 @@ struct MusumeView: View {
   let width: CGFloat?
   let height: CGFloat?
 
-  private let originalWidth: CGFloat = 80  // Width of each musume icon (560 / 7)
-  private let originalHeight: CGFloat = 150  // Height of the sprite sheet
+  private let originalWidth: CGFloat = 40
+  private let originalHeight: CGFloat = 75
 
   @State private var musumeIndex: Int = 0
 
@@ -29,7 +29,7 @@ struct MusumeView: View {
   }
 
   private var clippedWidth: CGFloat {
-    displayWidth - 2  // Reduce width by 2 pixels to avoid showing adjacent images
+    displayWidth - 1
   }
 
   private var displayHeight: CGFloat {
@@ -50,7 +50,7 @@ struct MusumeView: View {
   var body: some View {
     Image("Musume")
       .scaleEffect(x: scale, y: scale, anchor: .bottomLeading)
-      .offset(x: offsetX, y: 20 * scale)
+      .offset(x: offsetX, y: 10 * scale)
       .frame(width: clippedWidth, height: displayHeight, alignment: .bottomLeading)
       .clipped()
       .onAppear {

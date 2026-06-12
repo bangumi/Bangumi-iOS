@@ -61,7 +61,7 @@ private struct MigrationLoadingView: View {
 
   var body: some View {
     VStack(spacing: 16) {
-      MusumeView(index: musumeIndex, width: 80, height: 130)
+      MusumeView(index: musumeIndex, width: 40)
         .id(musumeIndex)
         .transition(.opacity)
       Text("正在升级本地数据")
@@ -74,13 +74,13 @@ private struct MigrationLoadingView: View {
     .padding()
     .task {
       while !Task.isCancelled {
-        do {
-          try await Task.sleep(for: .milliseconds(800))
-        } catch {
-          return
-        }
         withAnimation {
           musumeIndex = (musumeIndex + 1) % 7
+        }
+        do {
+          try await Task.sleep(for: .milliseconds(500))
+        } catch {
+          return
         }
       }
     }

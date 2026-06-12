@@ -2,7 +2,8 @@
   "images": [
     {
       "filename": "bg_musume_2x.png",
-      "idiom": "universal"
+      "idiom": "universal",
+      "scale": "2x"
     }
   ],
   "info": {
