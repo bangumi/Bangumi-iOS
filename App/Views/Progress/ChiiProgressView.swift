@@ -132,6 +132,35 @@ struct ChiiProgressView: View {
     await loadProgressPage(reset: false, generation: progressLoadGeneration)
   }
 
+  private func reloadLoadedProgressWindow(
+    generation: Int,
+    progressTab: SubjectType,
+    progressSortMode: ProgressSortMode,
+    progressViewMode: ProgressViewMode,
+    search: String,
+    episodeWindowSize: Int,
+    limit: Int
+  ) async throws {
+    let db = try await AppContext.shared.getDB()
+    let result = try await db.fetchProgressSubjects(
+      progressTab: progressTab,
+      progressSortMode: progressSortMode,
+      search: search,
+      episodeWindowSize: episodeWindowSize,
+      limit: max(limit, progressPageLimit),
+      offset: 0
+    )
+    guard generation == progressLoadGeneration,
+      progressTab == self.progressTab,
+      progressSortMode == self.progressSortMode,
+      progressViewMode == self.progressViewMode,
+      search == self.search
+    else {
+      return
+    }
+    applyProgressSubjects(result.data, total: result.total)
+  }
+
   private func reloadProgressSubject(_ subjectId: Int) async {
     let generation = progressLoadGeneration
     let progressTabSnapshot = progressTab
@@ -162,6 +191,18 @@ struct ChiiProgressView: View {
 
       guard let item else {
         removeProgressSubject(subjectId)
+        return
+      }
+      if progressSortModeSnapshot == .airTime {
+        try await reloadLoadedProgressWindow(
+          generation: generation,
+          progressTab: progressTabSnapshot,
+          progressSortMode: progressSortModeSnapshot,
+          progressViewMode: progressViewModeSnapshot,
+          search: searchSnapshot,
+          episodeWindowSize: episodeWindowSizeSnapshot,
+          limit: progressSubjects.count
+        )
         return
       }
       mergeProgressSubject(item)
