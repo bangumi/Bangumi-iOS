@@ -64,19 +64,30 @@ enum ProgressSubjectInvalidation {
   static let notificationName = Notification.Name("ProgressSubjectInvalidated")
 
   private static let subjectIdKey = "subjectId"
+  private static let mayChangeProgressMembershipKey = "mayChangeProgressMembership"
 
   @MainActor
-  static func post(subjectId: Int) async {
+  static func post(
+    subjectId: Int,
+    mayChangeProgressMembership: Bool = false
+  ) async {
     await ProgressSubjectInvalidationStore.shared.insert(subjectId)
     NotificationCenter.default.post(
       name: notificationName,
       object: nil,
-      userInfo: [subjectIdKey: subjectId]
+      userInfo: [
+        subjectIdKey: subjectId,
+        mayChangeProgressMembershipKey: mayChangeProgressMembership,
+      ]
     )
   }
 
   static func subjectId(from notification: Notification) -> Int? {
     notification.userInfo?[subjectIdKey] as? Int
+  }
+
+  static func mayChangeProgressMembership(from notification: Notification) -> Bool {
+    notification.userInfo?[mayChangeProgressMembershipKey] as? Bool ?? false
   }
 }
 

@@ -161,7 +161,10 @@ struct ChiiProgressView: View {
     applyProgressSubjects(result.data, total: result.total)
   }
 
-  private func reloadProgressSubject(_ subjectId: Int) async {
+  private func reloadProgressSubject(
+    _ subjectId: Int,
+    mayChangeProgressMembership: Bool = false
+  ) async {
     let generation = progressLoadGeneration
     let progressTabSnapshot = progressTab
     let progressSortModeSnapshot = progressSortMode
@@ -185,12 +188,30 @@ struct ChiiProgressView: View {
       else {
         return
       }
-      guard progressSubjects.contains(where: { $0.id == subjectId }) else {
+      let isLoaded = progressSubjects.contains(where: { $0.id == subjectId })
+      guard isLoaded || mayChangeProgressMembership else {
+        return
+      }
+
+      guard isLoaded else {
+        try await reloadLoadedProgressWindow(
+          generation: generation,
+          progressTab: progressTabSnapshot,
+          progressSortMode: progressSortModeSnapshot,
+          progressViewMode: progressViewModeSnapshot,
+          search: searchSnapshot,
+          episodeWindowSize: episodeWindowSizeSnapshot,
+          limit: progressSubjects.count
+        )
+        await loadCounts()
         return
       }
 
       guard let item else {
         removeProgressSubject(subjectId)
+        if mayChangeProgressMembership {
+          await loadCounts()
+        }
         return
       }
       if progressSortModeSnapshot == .airTime {
@@ -203,12 +224,41 @@ struct ChiiProgressView: View {
           episodeWindowSize: episodeWindowSizeSnapshot,
           limit: progressSubjects.count
         )
+        if mayChangeProgressMembership {
+          await loadCounts()
+        }
         return
       }
       mergeProgressSubject(item)
+      if mayChangeProgressMembership {
+        await loadCounts()
+      }
     } catch {
       Logger.app.error("Failed to reload progress subject: \(error)")
       Notifier.shared.alert(error: error)
+    }
+  }
+
+  private func reloadLoadedProgressSubject(_ subjectId: Int) async {
+    await reloadProgressSubject(subjectId)
+  }
+
+  private func handleProgressSubjectInvalidation(_ notification: Notification) {
+    guard let subjectId = ProgressSubjectInvalidation.subjectId(from: notification) else {
+      return
+    }
+    let mayChangeProgressMembership =
+      ProgressSubjectInvalidation.mayChangeProgressMembership(from: notification)
+    guard mayChangeProgressMembership || progressSubjects.contains(where: { $0.id == subjectId })
+    else {
+      return
+    }
+    Task {
+      _ = await ProgressSubjectInvalidationStore.shared.takeLoadedSubjectIds(Set([subjectId]))
+      await reloadProgressSubject(
+        subjectId,
+        mayChangeProgressMembership: mayChangeProgressMembership
+      )
     }
   }
 
@@ -312,66 +362,118 @@ struct ChiiProgressView: View {
     }
   }
 
-  var body: some View {
-    if isAuthenticated {
-      ScrollView {
-        VStack {
-          Picker("SubjectType", selection: $progressTab) {
-            ForEach(SubjectType.progressTypes) { type in
-              Text(typeDesc(stype: type)).tag(type)
-            }
-          }
-          .padding(.horizontal, 8)
-          .pickerStyle(.segmented)
-
-          Group {
-            if !progressSubjects.isEmpty {
-              switch progressViewMode {
-              case .list:
-                ProgressListView(
-                  items: progressSubjects,
-                  isLoadingPage: progressPageLoading,
-                  hasMore: hasMoreProgress,
-                  loadNextPage: loadNextProgressPage,
-                  reloadSubject: reloadProgressSubject
-                )
-              case .tile:
-                ProgressTileView(
-                  items: progressSubjects,
-                  isLoadingPage: progressPageLoading,
-                  hasMore: hasMoreProgress,
-                  loadNextPage: loadNextProgressPage,
-                  reloadSubject: reloadProgressSubject
-                )
-              }
-            } else if collectionsUpdatedAt > 0 {
-              if refreshing || progressPageLoading {
-                ProgressView()
-                  .padding()
-              } else {
-                ContentUnavailableView {
-                  Label("没有条目", systemImage: "tray")
-                } description: {
-                  Text("当前列表为空，或是搜索无结果")
-                }
-              }
-            } else {
-              if refreshing {
-                HStack {
-                  ProgressView(value: refreshProgress)
-                    .progressViewStyle(.linear)
-                }.padding()
-              } else {
-                ContentUnavailableView {
-                  Label("没有收藏数据", systemImage: "tray")
-                } description: {
-                  Text("下拉刷新以获取正在观看的条目")
-                }
-              }
-            }
-          }
+  @ViewBuilder
+  private var progressSubjectsView: some View {
+    if !progressSubjects.isEmpty {
+      switch progressViewMode {
+      case .list:
+        ProgressListView(
+          items: progressSubjects,
+          isLoadingPage: progressPageLoading,
+          hasMore: hasMoreProgress,
+          loadNextPage: loadNextProgressPage,
+          reloadSubject: reloadLoadedProgressSubject
+        )
+      case .tile:
+        ProgressTileView(
+          items: progressSubjects,
+          isLoadingPage: progressPageLoading,
+          hasMore: hasMoreProgress,
+          loadNextPage: loadNextProgressPage,
+          reloadSubject: reloadLoadedProgressSubject
+        )
+      }
+    } else if collectionsUpdatedAt > 0 {
+      if refreshing || progressPageLoading {
+        ProgressView()
+          .padding()
+      } else {
+        ContentUnavailableView {
+          Label("没有条目", systemImage: "tray")
+        } description: {
+          Text("当前列表为空，或是搜索无结果")
         }
       }
+    } else {
+      if refreshing {
+        HStack {
+          ProgressView(value: refreshProgress)
+            .progressViewStyle(.linear)
+        }.padding()
+      } else {
+        ContentUnavailableView {
+          Label("没有收藏数据", systemImage: "tray")
+        } description: {
+          Text("下拉刷新以获取正在观看的条目")
+        }
+      }
+    }
+  }
+
+  private var progressTypePicker: some View {
+    Picker("SubjectType", selection: $progressTab) {
+      ForEach(SubjectType.progressTypes) { type in
+        Text(typeDesc(stype: type)).tag(type)
+      }
+    }
+    .padding(.horizontal, 8)
+    .pickerStyle(.segmented)
+  }
+
+  private var progressOptionsMenu: some View {
+    Menu {
+      Picker("显示模式", selection: $progressViewMode) {
+        ForEach(ProgressViewMode.allCases, id: \.self) { mode in
+          Label(mode.desc, systemImage: mode.icon).tag(mode)
+        }
+      }
+
+      Picker("排序方式", selection: $progressSortMode) {
+        ForEach(ProgressSortMode.allCases, id: \.self) { mode in
+          Text(mode.desc).tag(mode)
+        }
+      }
+
+      Picker("副标题内容", selection: $secondLineMode) {
+        ForEach(ProgressSecondLineMode.allCases, id: \.self) { mode in
+          Label(mode.desc, systemImage: mode.icon).tag(mode)
+        }
+      }
+
+      Divider()
+
+      Button("刷新所有收藏", role: .destructive) {
+        showRefreshAll = true
+      }
+    } label: {
+      Image(systemName: "ellipsis")
+    }
+    .pickerStyle(.menu)
+  }
+
+  @ViewBuilder
+  private var progressToolbarContent: some View {
+    if refreshing {
+      ProgressView()
+    } else {
+      progressOptionsMenu
+    }
+  }
+
+  @ToolbarContentBuilder
+  private var progressToolbar: some ToolbarContent {
+    ToolbarItem(placement: .topBarTrailing) {
+      progressToolbarContent
+    }
+  }
+
+  private var authenticatedBody: some View {
+    ScrollView {
+      VStack {
+        progressTypePicker
+        progressSubjectsView
+      }
+    }
       .refreshable {
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
         await refresh(showProgress: false)
@@ -391,59 +493,15 @@ struct ChiiProgressView: View {
       )
       .navigationTitle("进度管理")
       .navigationBarTitleDisplayMode(.inline)
-      .toolbar {
-        ToolbarItem(placement: .topBarTrailing) {
-          if refreshing {
-            ProgressView()
-          } else {
-            Menu {
-              Picker("显示模式", selection: $progressViewMode) {
-                ForEach(ProgressViewMode.allCases, id: \.self) { mode in
-                  Label(mode.desc, systemImage: mode.icon).tag(mode)
-                }
-              }
-
-              Picker("排序方式", selection: $progressSortMode) {
-                ForEach(ProgressSortMode.allCases, id: \.self) { mode in
-                  Text(mode.desc).tag(mode)
-                }
-              }
-
-              Picker("副标题内容", selection: $secondLineMode) {
-                ForEach(ProgressSecondLineMode.allCases, id: \.self) { mode in
-                  Label(mode.desc, systemImage: mode.icon).tag(mode)
-                }
-              }
-
-              Divider()
-
-              Button("刷新所有收藏", role: .destructive) {
-                showRefreshAll = true
-              }
-            } label: {
-              Image(systemName: "ellipsis")
-            }.pickerStyle(.menu)
-          }
-        }
-      }
+      .toolbar { progressToolbar }
       .onChange(of: progressTab) { Task { await reloadProgressPages() } }
       .onChange(of: search) { Task { await reloadProgressPages() } }
       .onChange(of: progressSortMode) { Task { await reloadProgressPages() } }
       .onChange(of: progressViewMode) { Task { await reloadProgressPages() } }
       .onReceive(
-        NotificationCenter.default.publisher(for: ProgressSubjectInvalidation.notificationName)
-      ) { notification in
-        guard let subjectId = ProgressSubjectInvalidation.subjectId(from: notification) else {
-          return
-        }
-        guard progressSubjects.contains(where: { $0.id == subjectId }) else {
-          return
-        }
-        Task {
-          _ = await ProgressSubjectInvalidationStore.shared.takeLoadedSubjectIds(Set([subjectId]))
-          await reloadProgressSubject(subjectId)
-        }
-      }
+        NotificationCenter.default.publisher(for: ProgressSubjectInvalidation.notificationName),
+        perform: handleProgressSubjectInvalidation
+      )
       .onAppear {
         Task {
           await reloadPendingProgressSubjects()
@@ -457,10 +515,19 @@ struct ChiiProgressView: View {
       } message: {
         Text("将从服务器重新下载所有收藏数据，可能需要较长时间")
       }
+  }
+
+  private var unauthenticatedBody: some View {
+    AuthView(slogan: "使用 Bangumi 管理观看进度")
+      .navigationTitle("进度管理")
+      .navigationBarTitleDisplayMode(.inline)
+  }
+
+  var body: some View {
+    if isAuthenticated {
+      authenticatedBody
     } else {
-      AuthView(slogan: "使用 Bangumi 管理观看进度")
-        .navigationTitle("进度管理")
-        .navigationBarTitleDisplayMode(.inline)
+      unauthenticatedBody
     }
   }
 }

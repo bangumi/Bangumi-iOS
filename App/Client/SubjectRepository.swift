@@ -33,7 +33,10 @@ enum SubjectRepository {
     if item.interest != nil {
       await SearchIndexing.index([item.searchable()])
     }
-    await ProgressSubjectInvalidation.post(subjectId: subjectId)
+    await ProgressSubjectInvalidation.post(
+      subjectId: subjectId,
+      mayChangeProgressMembership: true
+    )
     return item
   }
 
@@ -185,6 +188,9 @@ enum SubjectRepository {
       progress: progress
     )
     try await db.commit()
-    await ProgressSubjectInvalidation.post(subjectId: subjectId)
+    await ProgressSubjectInvalidation.post(
+      subjectId: subjectId,
+      mayChangeProgressMembership: true
+    )
   }
 }
