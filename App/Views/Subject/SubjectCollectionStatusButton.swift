@@ -4,6 +4,7 @@ struct SubjectCollectionStatusButton: View {
   let subjectId: Int
   let subjectType: SubjectType
   let collectionType: CollectionType
+  var reload: (() async -> Void)? = nil
 
   @AppStorage("isAuthenticated") private var isAuthenticated: Bool = false
   @State private var showCollectionBox = false
@@ -40,7 +41,7 @@ struct SubjectCollectionStatusButton: View {
       .disabled(!isAuthenticated)
       .accessibilityLabel(isCollected ? "编辑收藏状态：\(title)" : "添加收藏")
       .sheet(isPresented: $showCollectionBox) {
-        SubjectCollectionBoxView(subjectId: subjectId)
+        SubjectCollectionBoxView(subjectId: subjectId, onSaved: reload)
       }
     }
   }
@@ -50,13 +51,15 @@ extension View {
   func subjectCollectionStatusOverlay(
     subjectId: Int,
     subjectType: SubjectType,
-    collectionType: CollectionType
+    collectionType: CollectionType,
+    reload: (() async -> Void)? = nil
   ) -> some View {
     overlay(alignment: .trailing) {
       SubjectCollectionStatusButton(
         subjectId: subjectId,
         subjectType: subjectType,
-        collectionType: collectionType
+        collectionType: collectionType,
+        reload: reload
       )
       .padding(.trailing, 4)
     }

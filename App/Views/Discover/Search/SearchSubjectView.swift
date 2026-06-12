@@ -17,7 +17,7 @@ struct SearchSubjectView: View {
       for item in resp.data {
         try await db.saveSubject(item)
       }
-      await db.commit()
+      try await db.commit()
       return resp
     } catch {
       Notifier.shared.alert(error: error)
@@ -61,8 +61,9 @@ struct SearchSubjectLocalView: View {
             .subjectCollectionStatusOverlay(
               subjectId: subject.id,
               subjectType: subject.type,
-              collectionType: subject.ctypeEnum
-          )
+              collectionType: subject.ctypeEnum,
+              reload: load
+            )
         }
       }
     }

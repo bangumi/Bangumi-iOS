@@ -12,7 +12,7 @@ enum DiscoveryRepository {
       }
       try await db.saveCalendarItem(weekday: weekday, items: items)
     }
-    await db.commit()
+    try await db.commit()
   }
 
   static func loadTrendingSubjects() async throws {
@@ -25,10 +25,22 @@ enum DiscoveryRepository {
         })
     }
     let db = try await AppContext.shared.getDB()
+    var saved = false
+    var firstError: Error?
     for task in tasks {
-      let (type, response) = try await task.value
-      try await db.saveTrendingSubjects(type: type.rawValue, items: response.data)
+      do {
+        let (type, response) = try await task.value
+        try await db.saveTrendingSubjects(type: type.rawValue, items: response.data)
+        saved = true
+      } catch {
+        firstError = firstError ?? error
+        Logger.api.error("Failed to load trending subjects: \(error)")
+      }
     }
-    await db.commit()
+    if saved {
+      try await db.commit()
+    } else if let firstError {
+      throw firstError
+    }
   }
 }

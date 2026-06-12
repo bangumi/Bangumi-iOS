@@ -38,7 +38,7 @@ struct IndexRelatedSubjectPreview: View {
       }
       let resp = try await SubjectService.getSubject(subjectId)
       try await db.saveSubject(resp)
-      await db.commit()
+      try await db.commit()
       await loadCached()
     } catch {
       Notifier.shared.alert(error: error)
@@ -94,7 +94,7 @@ struct IndexRelatedCharacterPreview: View {
       }
       let resp = try await CharacterService.getCharacter(characterId)
       try await db.saveCharacter(resp)
-      await db.commit()
+      try await db.commit()
       await loadCached()
     } catch {
       Notifier.shared.alert(error: error)
@@ -150,7 +150,7 @@ struct IndexRelatedPersonPreview: View {
       }
       let resp = try await PersonService.getPerson(personId)
       try await db.savePerson(resp)
-      await db.commit()
+      try await db.commit()
       await loadCached()
     } catch {
       Notifier.shared.alert(error: error)

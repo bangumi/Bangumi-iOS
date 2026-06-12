@@ -17,6 +17,7 @@ struct ChiiProgressView: View {
   @State private var search: String = ""
   @State private var subjectIds: [Int] = []
   @State private var counts: [SubjectType: Int] = [:]
+  @State private var progressReloadToken = 0
 
   private func loadCounts() async {
     do {
@@ -51,6 +52,7 @@ struct ChiiProgressView: View {
   private func loadLocalProgress() async {
     await updateSubjectIds()
     await loadCounts()
+    progressReloadToken += 1
   }
 
   func refresh(force: Bool = false, showProgress: Bool = true) async {
@@ -97,14 +99,14 @@ struct ChiiProgressView: View {
         loaded[item.id] = item.type
         refreshProgress = CGFloat(count) / CGFloat(resp.total)
       }
-      await db.commit()
+      try await db.commit()
       await SearchIndexing.index(resp.data.map { $0.searchable() })
       offset += limit
       if offset >= resp.total {
         break
       }
     }
-    await db.commit()
+    try await db.commit()
     if since > 0 {
       checkLoadEpisodes(loaded)
     }
@@ -151,9 +153,9 @@ struct ChiiProgressView: View {
             if !subjectIds.isEmpty {
               switch progressViewMode {
               case .list:
-                ProgressListView(subjectIds: subjectIds)
+                ProgressListView(subjectIds: subjectIds, reloadToken: progressReloadToken)
               case .tile:
-                ProgressTileView(subjectIds: subjectIds)
+                ProgressTileView(subjectIds: subjectIds, reloadToken: progressReloadToken)
               }
             } else if collectionsUpdatedAt > 0 {
               if refreshing {

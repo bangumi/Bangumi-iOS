@@ -28,7 +28,7 @@ struct HotGroupsView: View {
       do {
         let db = try await AppContext.shared.getDB()
         try await db.togglePinRakuenGroupCache(group: group)
-        await db.commit()
+        try await db.commit()
         pinnedItems = try await db.fetchRakuenGroupCache(id: "pin")
       } catch {
         Logger.app.error("Failed to toggle pin: \(error)")
@@ -58,7 +58,7 @@ struct HotGroupsView: View {
       // Save to hot cache
       if let db = try? await AppContext.shared.getDB() {
         try await db.saveRakuenGroupCache(id: "hot", items: hotItems)
-        await db.commit()
+        try await db.commit()
         cachedHotItems = hotItems
       }
     } catch {

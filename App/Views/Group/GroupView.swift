@@ -81,7 +81,7 @@ struct GroupDetailView: View {
       do {
         let db = try await AppContext.shared.getDB()
         try await db.togglePinRakuenGroupCache(group: group.slim)
-        await db.commit()
+        try await db.commit()
         pinnedItems = try await db.fetchRakuenGroupCache(id: "pin")
       } catch {
         Logger.app.error("Failed to toggle pin: \(error)")
@@ -105,7 +105,7 @@ struct GroupDetailView: View {
         let joinedAt = Int(Date().timeIntervalSince1970)
         let db = try await AppContext.shared.getDB()
         try await db.updateGroupJoinStatus(name: group.name, joinedAt: joinedAt)
-        try await db.commitImmediately()
+        try await db.commit()
         await reload()
       } catch {
         Notifier.shared.alert(error: error)
@@ -119,7 +119,7 @@ struct GroupDetailView: View {
         try await GroupService.leaveGroup(group.name)
         let db = try await AppContext.shared.getDB()
         try await db.updateGroupJoinStatus(name: group.name, joinedAt: 0)
-        try await db.commitImmediately()
+        try await db.commit()
         await reload()
       } catch {
         Notifier.shared.alert(error: error)

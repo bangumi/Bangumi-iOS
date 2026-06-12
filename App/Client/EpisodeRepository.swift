@@ -1,14 +1,6 @@
 import Foundation
 
 enum EpisodeRepository {
-  private static func saveAndCommit(db: DatabaseOperator, created: Bool) async throws {
-    if created {
-      try await db.commitImmediately()
-    } else {
-      await db.commit()
-    }
-  }
-
   static func loadEpisodes(_ subjectId: Int) async throws {
     let db = try await AppContext.shared.getDB()
     var offset = 0
@@ -34,20 +26,20 @@ enum EpisodeRepository {
     }
     try await db.saveEpisodes(subjectId: subjectId, items: items)
     try await db.deleteEpisodesNotIn(subjectId: subjectId, episodeIds: episodeIds)
-    await db.commit()
+    try await db.commit()
   }
 
   static func loadEpisode(_ episodeId: Int) async throws {
     let db = try await AppContext.shared.getDB()
     let item = try await EpisodeService.getEpisode(episodeId)
-    let created = try await db.saveEpisode(item)
-    try await saveAndCommit(db: db, created: created)
+    try await db.saveEpisode(item)
+    try await db.commit()
   }
 
   static func deleteEpisode(_ episodeId: Int) async throws {
     let db = try await AppContext.shared.getDB()
     try await db.deleteEpisode(episodeId)
-    await db.commit()
+    try await db.commit()
   }
 
   static func updateEpisodeCollection(
@@ -56,6 +48,6 @@ enum EpisodeRepository {
     try await EpisodeService.updateEpisodeCollection(episodeId: episodeId, type: type, batch: batch)
     let db = try await AppContext.shared.getDB()
     try await db.updateEpisodeCollection(episodeId: episodeId, type: type, batch: batch)
-    try await db.commitImmediately()
+    try await db.commit()
   }
 }

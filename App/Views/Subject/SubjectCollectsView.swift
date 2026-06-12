@@ -5,12 +5,14 @@ struct SubjectCollectsView: View {
   @AppStorage("subjectCollectsFilterMode") var subjectCollectsFilterMode: FilterMode = .all
 
   let subject: SubjectDTO
+  let latestCollects: [SubjectCollectDTO]
 
   @State private var isLoading: Bool = false
   @State private var collects: [SubjectCollectDTO]
 
   init(subject: SubjectDTO, collects: [SubjectCollectDTO]) {
     self.subject = subject
+    self.latestCollects = collects
     _collects = State(initialValue: collects)
   }
 
@@ -148,6 +150,10 @@ struct SubjectCollectsView: View {
     }
     .animation(.default, value: collects)
     .animation(.default, value: subjectCollectsFilterMode)
+    .onChange(of: latestCollects) { _, newValue in
+      guard !isLoading else { return }
+      collects = newValue
+    }
     .onChange(of: subjectCollectsFilterMode) { _, _ in
       updateCollects()
     }

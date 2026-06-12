@@ -5,6 +5,7 @@ struct EpisodeListView: View {
   let subjectId: Int
 
   @State private var refreshed: Bool = false
+  @State private var reloadToken = 0
   @State private var countMain: Int = 0
   @State private var countOther: Int = 0
 
@@ -29,6 +30,7 @@ struct EpisodeListView: View {
 
     do {
       try await EpisodeRepository.loadEpisodes(subjectId)
+      reloadToken += 1
     } catch {
       Notifier.shared.alert(error: error)
     }
@@ -60,7 +62,8 @@ struct EpisodeListView: View {
     }.padding(.horizontal, 8)
     EpisodeListDetailView(
       subjectId: subjectId, sortDesc: sortDesc,
-      main: main, filterCollection: filterCollection
+      main: main, filterCollection: filterCollection,
+      reloadToken: reloadToken
     )
     .navigationTitle("章节列表")
     .navigationBarTitleDisplayMode(.inline)
@@ -79,6 +82,7 @@ struct EpisodeListDetailView: View {
   let sortDesc: Bool
   let main: Bool
   let filterCollection: Bool
+  let reloadToken: Int
 
   @State private var episodes: [EpisodeDTO] = []
 
@@ -107,7 +111,7 @@ struct EpisodeListDetailView: View {
       }.padding(.horizontal, 8)
     }
     .animation(.default, value: episodes)
-    .task(id: "\(sortDesc)-\(main)-\(filterCollection)") {
+    .task(id: "\(subjectId)-\(sortDesc)-\(main)-\(filterCollection)-\(reloadToken)") {
       await load()
     }
   }

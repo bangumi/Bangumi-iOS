@@ -2,11 +2,12 @@ import SwiftUI
 
 struct ProgressListView: View {
   let subjectIds: [Int]
+  let reloadToken: Int
 
   var body: some View {
     LazyVStack(alignment: .leading) {
       ForEach(subjectIds, id: \.self) { subjectId in
-        ProgressSubjectContainerView(subjectId: subjectId) { item, reload in
+        ProgressSubjectContainerView(subjectId: subjectId, reloadToken: reloadToken) { item, reload in
           CardView {
             ProgressListItemContentView(
               subject: item.subject,

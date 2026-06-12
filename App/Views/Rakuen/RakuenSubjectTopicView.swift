@@ -150,7 +150,7 @@ struct CachedSubjectTopicListView: View {
         // Save to cache
         if let db = try? await AppContext.shared.getDB() {
           try await db.saveRakuenSubjectTopicCache(mode: mode.rawValue, items: resp.data)
-          await db.commit()
+          try await db.commit()
           cachedItems = resp.data
         }
       }

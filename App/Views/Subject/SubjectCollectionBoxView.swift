@@ -3,6 +3,7 @@ import SwiftUI
 
 struct SubjectCollectionBoxView: View {
   let subjectId: Int
+  var onSaved: (() async -> Void)? = nil
 
   @AppStorage("autoCompleteProgress") var autoCompleteProgress: Bool = false
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
@@ -102,6 +103,7 @@ struct SubjectCollectionBoxView: View {
           tags: Array(tags.sorted().prefix(10)),
           progress: autoCompleteProgress
         )
+        await onSaved?()
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
         dismiss()
       } catch {

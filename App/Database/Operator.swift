@@ -7,20 +7,8 @@ actor DatabaseOperator {}
 
 // MARK: - basic
 extension DatabaseOperator {
-  public func commit() async {
-    commitScheduled()
-  }
-
-  public func commitImmediately() async throws {
+  public func commit() throws {
     try modelContext.save()
-  }
-
-  public func commitScheduled() {
-    do {
-      try modelContext.save()
-    } catch {
-      Logger.app.error("Failed to commit: \(error)")
-    }
   }
 
   public func fetchOne<T: PersistentModel>(

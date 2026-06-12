@@ -2,14 +2,6 @@ import Foundation
 import OSLog
 
 enum GroupRepository {
-  private static func saveAndCommit(db: DatabaseOperator, created: Bool) async throws {
-    if created {
-      try await db.commitImmediately()
-    } else {
-      await db.commit()
-    }
-  }
-
   private static func loadDetailValue<T>(
     label: String,
     work: @Sendable @escaping () async throws -> PagedDTO<T>
@@ -30,8 +22,8 @@ enum GroupRepository {
   static func loadGroup(_ name: String) async throws {
     let db = try await AppContext.shared.getDB()
     let item = try await GroupService.getGroup(name)
-    let created = try await db.saveGroup(item)
-    try await saveAndCommit(db: db, created: created)
+    try await db.saveGroup(item)
+    try await db.commit()
   }
 
   static func loadGroupDetails(_ name: String) async throws {
@@ -51,6 +43,6 @@ enum GroupRepository {
       moderators: await moderatorsTask.value?.data,
       recentTopics: await topicsTask.value?.data
     )
-    await db.commit()
+    try await db.commit()
   }
 }

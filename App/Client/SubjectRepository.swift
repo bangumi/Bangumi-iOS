@@ -2,14 +2,6 @@ import Foundation
 import OSLog
 
 enum SubjectRepository {
-  private static func saveAndCommit(db: DatabaseOperator, created: Bool) async throws {
-    if created {
-      try await db.commitImmediately()
-    } else {
-      await db.commit()
-    }
-  }
-
   private static func loadDetailValue<T>(
     label: String,
     work: @Sendable @escaping () async throws -> PagedDTO<T>
@@ -36,8 +28,8 @@ enum SubjectRepository {
       throw ChiiError(message: "这是一个被合并的条目")
     }
 
-    let created = try await db.saveSubject(item)
-    try await saveAndCommit(db: db, created: created)
+    try await db.saveSubject(item)
+    try await db.commit()
     if item.interest != nil {
       await SearchIndexing.index([item.searchable()])
     }
@@ -131,7 +123,7 @@ enum SubjectRepository {
       comments: await commentsTask?.value?.data,
       indexes: await indexesTask.value?.data
     )
-    await db.commit()
+    try await db.commit()
   }
 
   static func loadSubjectPositions(_ subjectId: Int) async throws {
@@ -152,14 +144,14 @@ enum SubjectRepository {
       }
     }
     try await db.saveSubjectPositions(subjectId: subjectId, items: items)
-    await db.commit()
+    try await db.commit()
   }
 
   static func updateSubjectProgress(subjectId: Int, eps: Int?, vols: Int?) async throws {
     try await SubjectService.updateSubjectProgress(subjectId: subjectId, eps: eps, vols: vols)
     let db = try await AppContext.shared.getDB()
     try await db.updateSubjectProgress(subjectId: subjectId, eps: eps, vols: vols)
-    try await db.commitImmediately()
+    try await db.commit()
   }
 
   static func updateSubjectCollection(
@@ -190,6 +182,6 @@ enum SubjectRepository {
       tags: tags,
       progress: progress
     )
-    try await db.commitImmediately()
+    try await db.commit()
   }
 }

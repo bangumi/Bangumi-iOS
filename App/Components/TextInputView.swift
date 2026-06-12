@@ -42,6 +42,8 @@ struct TextInputView: View {
   @State private var showingDrafts = false
   @State private var currentDraftID: PersistentIdentifier?
   @State private var drafts: [DraftDTO] = []
+  @State private var isSavingDraft = false
+  @State private var needsDraftSave = false
 
   var draftDesc: String {
     if drafts.count == 0 {
@@ -51,18 +53,45 @@ struct TextInputView: View {
     }
   }
 
+  @MainActor
   private func saveDraft() async {
+    let content = text
+    guard !content.isEmpty else { return }
+
     do {
       let db = try await AppContext.shared.getDB()
-      let id = try await db.saveDraft(type: type, content: text, id: currentDraftID)
-      await db.commit()
+      let id = try await db.saveDraft(type: type, content: content, id: currentDraftID)
+      try await db.commit()
       let drafts = try await db.fetchDrafts(type: type)
-      await MainActor.run {
-        self.currentDraftID = id
-        self.drafts = drafts
-      }
+      currentDraftID = id
+      self.drafts = drafts
     } catch {
       Logger.app.error("Failed to save draft: \(error)")
+    }
+  }
+
+  @MainActor
+  private func queueDraftSave() {
+    guard !text.isEmpty else { return }
+
+    needsDraftSave = true
+    guard !isSavingDraft else { return }
+
+    isSavingDraft = true
+    Task {
+      await drainDraftSaves()
+    }
+  }
+
+  @MainActor
+  private func drainDraftSaves() async {
+    defer {
+      isSavingDraft = false
+    }
+
+    while needsDraftSave {
+      needsDraftSave = false
+      await saveDraft()
     }
   }
 
@@ -114,9 +143,7 @@ struct TextInputView: View {
     }
     .onChange(of: text) { _, newValue in
       guard !newValue.isEmpty else { return }
-      Task {
-        await saveDraft()
-      }
+      queueDraftSave()
     }
     .task {
       await loadDrafts()
@@ -193,7 +220,7 @@ private struct DraftBoxView: View {
                 Task {
                   if let db = try? await AppContext.shared.getDB() {
                     await db.deleteDraft(id: draft.id)
-                    await db.commit()
+                    try? await db.commit()
                     await onDelete()
                   }
                 }

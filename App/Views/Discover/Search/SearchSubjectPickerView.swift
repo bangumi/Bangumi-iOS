@@ -90,7 +90,7 @@ struct SearchSubjectPickerRemoteView: View {
       for item in resp.data {
         try await db.saveSubject(item)
       }
-      await db.commit()
+      try await db.commit()
       return resp
     } catch {
       Notifier.shared.alert(error: error)

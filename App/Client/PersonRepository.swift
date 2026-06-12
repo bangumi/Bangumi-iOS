@@ -2,14 +2,6 @@ import Foundation
 import OSLog
 
 enum PersonRepository {
-  private static func saveAndCommit(db: DatabaseOperator, created: Bool) async throws {
-    if created {
-      try await db.commitImmediately()
-    } else {
-      await db.commit()
-    }
-  }
-
   private static func loadDetailValue<T>(
     label: String,
     work: @Sendable @escaping () async throws -> PagedDTO<T>
@@ -34,8 +26,8 @@ enum PersonRepository {
       Logger.api.warning("person id mismatch: \(personId) != \(item.id)")
       throw ChiiError(message: "这是一个被合并的人物")
     }
-    let created = try await db.savePerson(item)
-    try await saveAndCommit(db: db, created: created)
+    try await db.savePerson(item)
+    try await db.commit()
     if item.collectedAt != nil {
       await SearchIndexing.index([item.searchable()])
     }
@@ -62,7 +54,7 @@ enum PersonRepository {
       relations: await relationsTask.value?.data,
       indexes: await indexesTask.value?.data
     )
-    await db.commit()
+    try await db.commit()
   }
 
   static func collectPerson(_ personId: Int) async throws {
@@ -70,13 +62,13 @@ enum PersonRepository {
     let db = try await AppContext.shared.getDB()
     let now = Int(Date().timeIntervalSince1970)
     try await db.updatePersonCollection(personId: personId, collectedAt: now - 1)
-    try await db.commitImmediately()
+    try await db.commit()
   }
 
   static func uncollectPerson(_ personId: Int) async throws {
     try await PersonService.uncollectPerson(personId)
     let db = try await AppContext.shared.getDB()
     try await db.updatePersonCollection(personId: personId, collectedAt: 0)
-    try await db.commitImmediately()
+    try await db.commit()
   }
 }

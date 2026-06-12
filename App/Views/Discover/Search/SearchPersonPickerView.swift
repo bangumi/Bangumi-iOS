@@ -71,7 +71,7 @@ struct SearchPersonPickerRemoteView: View {
       for item in resp.data {
         try await db.savePerson(item)
       }
-      await db.commit()
+      try await db.commit()
       return resp
     } catch {
       Notifier.shared.alert(error: error)

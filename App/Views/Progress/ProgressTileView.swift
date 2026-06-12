@@ -2,11 +2,12 @@ import SwiftUI
 
 struct ProgressTileView: View {
   let subjectIds: [Int]
+  let reloadToken: Int
 
   var body: some View {
     LazyVGrid(columns: [GridItem(.adaptive(minimum: 150))]) {
       ForEach(subjectIds, id: \.self) { subjectId in
-        ProgressSubjectContainerView(subjectId: subjectId) { item, reload in
+        ProgressSubjectContainerView(subjectId: subjectId, reloadToken: reloadToken) { item, reload in
           CardView(padding: 8) {
             ProgressTileItemContentView(
               subject: item.subject,

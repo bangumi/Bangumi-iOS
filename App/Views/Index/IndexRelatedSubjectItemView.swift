@@ -72,7 +72,8 @@ struct IndexRelatedSubjectItemView: View {
             .subjectCollectionStatusOverlay(
               subjectId: itemSubject.id,
               subjectType: itemSubject.type,
-              collectionType: collectionType
+              collectionType: collectionType,
+              reload: loadCollectionType
             )
 
           if !item.comment.isEmpty {

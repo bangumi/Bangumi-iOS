@@ -123,7 +123,8 @@ struct SubjectItemView: View {
           .subjectCollectionStatusOverlay(
             subjectId: subject.id,
             subjectType: subject.type,
-            collectionType: subject.ctypeEnum
+            collectionType: subject.ctypeEnum,
+            reload: load
           )
       }
     }

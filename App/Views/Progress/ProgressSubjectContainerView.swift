@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ProgressSubjectContainerView<Content: View>: View {
   let subjectId: Int
+  let reloadToken: Int
   let content: (ProgressSubjectDTO, @escaping () async -> Void) -> Content
 
   @State private var item: ProgressSubjectDTO?
@@ -9,9 +10,11 @@ struct ProgressSubjectContainerView<Content: View>: View {
 
   init(
     subjectId: Int,
+    reloadToken: Int = 0,
     @ViewBuilder content: @escaping (ProgressSubjectDTO, @escaping () async -> Void) -> Content
   ) {
     self.subjectId = subjectId
+    self.reloadToken = reloadToken
     self.content = content
   }
 
@@ -36,7 +39,7 @@ struct ProgressSubjectContainerView<Content: View>: View {
           .padding()
       }
     }
-    .task(id: subjectId) {
+    .task(id: "\(subjectId)-\(reloadToken)") {
       await load()
     }
   }
