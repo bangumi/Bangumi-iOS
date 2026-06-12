@@ -396,11 +396,34 @@ extension DatabaseOperator {
       return nil
     }
 
+    return try makeProgressSubject(subject, episodeWindowSize: episodeWindowSize)
+  }
+
+  public func fetchProgressSubject(
+    subjectId: Int,
+    progressTab: SubjectType,
+    search: String,
+    episodeWindowSize: Int = 7
+  ) throws -> ProgressSubjectDTO? {
+    guard let subject = try getSubject(subjectId) else {
+      return nil
+    }
+    guard matchesProgressFilters(subject, progressTab: progressTab, search: search) else {
+      return nil
+    }
+
+    return try makeProgressSubject(subject, episodeWindowSize: episodeWindowSize)
+  }
+
+  private func makeProgressSubject(
+    _ subject: Subject,
+    episodeWindowSize: Int
+  ) throws -> ProgressSubjectDTO {
     let episodes: [EpisodeDTO]
     switch subject.typeEnum {
     case .anime, .real:
       episodes = try fetchProgressEpisodes(
-        subjectId: subjectId,
+        subjectId: subject.subjectId,
         windowSize: episodeWindowSize
       )
     default:
@@ -411,6 +434,20 @@ extension DatabaseOperator {
       subject: SubjectDTO(subject),
       episodes: episodes
     )
+  }
+
+  private func matchesProgressFilters(
+    _ subject: Subject,
+    progressTab: SubjectType,
+    search: String
+  ) -> Bool {
+    let stype = progressTab.rawValue
+    let doingType = CollectionType.doing.rawValue
+    guard (stype == 0 || subject.type == stype) && subject.ctype == doingType else {
+      return false
+    }
+    return search.isEmpty || subject.name.localizedStandardContains(search)
+      || subject.alias.localizedStandardContains(search)
   }
 
   public func fetchProgressSubjects(

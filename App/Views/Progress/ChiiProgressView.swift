@@ -111,6 +111,8 @@ struct ChiiProgressView: View {
       guard
         let item = try await db.fetchProgressSubject(
           subjectId: subjectId,
+          progressTab: progressTab,
+          search: search,
           episodeWindowSize: progressEpisodeWindowSize
         )
       else {
