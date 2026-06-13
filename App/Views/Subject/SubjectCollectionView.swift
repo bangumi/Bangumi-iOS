@@ -33,7 +33,7 @@ struct SubjectCollectionView: View {
           HStack {
             Spacer()
             Text("\(interest.updatedAt.datetimeDisplay)")
-              + Text(" / \(interest.updatedAt.relativeDisplay)")
+              + Text(" / \(interest.updatedAt.relativeAgeDisplay)")
               .foregroundStyle(.secondary)
             Spacer()
           }

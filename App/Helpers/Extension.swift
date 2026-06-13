@@ -152,7 +152,22 @@ extension Int {
   }
 
   var relativeDisplay: String {
-    let elapsed = Swift.max(0, Int(-self.date.timeIntervalSinceNow))
+    let elapsed = relativeElapsedSeconds
+    if elapsed < 604800 {
+      return formatRelativeAge(elapsed: elapsed)
+    }
+    return self.datetimeDisplay
+  }
+
+  var relativeAgeDisplay: String {
+    return formatRelativeAge(elapsed: relativeElapsedSeconds)
+  }
+
+  private var relativeElapsedSeconds: Int {
+    Swift.max(0, Int(-self.date.timeIntervalSinceNow))
+  }
+
+  private func formatRelativeAge(elapsed: Int) -> String {
     if elapsed < 60 {
       return "刚刚"
     }
@@ -162,10 +177,13 @@ extension Int {
     if elapsed < 86400 {
       return "\(elapsed / 3600)小时前"
     }
-    if elapsed < 604800 {
+    if elapsed < 2_592_000 {
       return "\(elapsed / 86400)天前"
     }
-    return self.datetimeDisplay
+    if elapsed < 31_536_000 {
+      return "\(elapsed / 2_592_000)个月前"
+    }
+    return "\(elapsed / 31_536_000)年前"
   }
 }
 
