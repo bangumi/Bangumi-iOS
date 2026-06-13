@@ -235,7 +235,8 @@ struct SubjectSlimItemView: View {
   private func loadCollectionType() async {
     do {
       let db = try await AppContext.shared.getDB()
-      collectionType = try await db.getCollectionTypes(subjectIds: [subject.id])[subject.id] ?? .none
+      collectionType =
+        try await db.getCollectionTypes(subjectIds: [subject.id])[subject.id] ?? .none
     } catch {
       Logger.app.error("Failed to load subject collection type: \(error)")
     }

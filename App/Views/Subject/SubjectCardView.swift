@@ -130,7 +130,8 @@ struct CollectionTypeChipsView: View {
     ScrollView(.horizontal, showsIndicators: false) {
       HStack(alignment: .bottom, spacing: 2) {
         ForEach(visibleTypes, id: \.self) { type in
-          let borderColor = selection == type
+          let borderColor =
+            selection == type
             ? Color.linkText
             : Color.secondary.opacity(0.2)
           BorderView(color: borderColor, padding: 3, cornerRadius: 16) {

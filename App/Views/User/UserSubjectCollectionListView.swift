@@ -32,9 +32,9 @@ struct UserSubjectCollectionListView: View {
   var body: some View {
     VStack {
       CollectionTypeSegmentedPickerView(subjectType: stype, counts: ctypes, selection: $ctype)
-      .onChange(of: ctype) { _, _ in
-        reloader.toggle()
-      }
+        .onChange(of: ctype) { _, _ in
+          reloader.toggle()
+        }
 
       ScrollView {
         PageView<SlimSubjectDTO, _>(limit: 20, reloader: reloader, nextPageFunc: load) {
