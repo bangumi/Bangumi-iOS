@@ -15,15 +15,16 @@ struct EpisodeRowView: View {
         .lineLimit(1)
       HStack {
         if isAuthenticated && episode.collectionTypeEnum != .none {
-          BorderView(color: episode.borderColor, padding: 4) {
+          let colors = episode.badgeColors
+          BorderView(color: colors.border, padding: 4) {
             Text("\(episode.collectionTypeEnum.description)")
-              .foregroundStyle(episode.textColor)
+              .foregroundStyle(colors.foreground)
               .font(.footnote)
           }
           .strikethrough(episode.status == EpisodeCollectionType.dropped.rawValue)
           .background {
             RoundedRectangle(cornerRadius: 5)
-              .fill(episode.backgroundColor)
+              .fill(colors.background)
           }
         } else {
           Menu {

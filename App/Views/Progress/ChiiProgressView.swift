@@ -22,7 +22,14 @@ struct ChiiProgressView: View {
   @State private var progressPageLoading: Bool = false
   @State private var progressLoadGeneration: Int = 0
 
-  private let progressPageLimit = 20
+  private var progressPageLimit: Int {
+    switch progressViewMode {
+    case .list:
+      10
+    case .tile:
+      20
+    }
+  }
 
   private var progressEpisodeWindowSize: Int {
     switch progressViewMode {
@@ -43,12 +50,6 @@ struct ChiiProgressView: View {
     animate: Bool = false
   ) {
     let updatedOffset = min(updatedSubjects.count, total)
-    guard progressSubjects != updatedSubjects
-      || progressTotal != total
-      || progressOffset != updatedOffset
-    else {
-      return
-    }
 
     let update = {
       progressSubjects = updatedSubjects
@@ -81,9 +82,6 @@ struct ChiiProgressView: View {
 
   private func mergeProgressSubject(_ item: ProgressSubjectDTO) {
     let updatedSubjects = progressSubjects.mergedById(with: [item])
-    guard progressSubjects != updatedSubjects else {
-      return
-    }
 
     withAnimation {
       progressSubjects = updatedSubjects
@@ -298,8 +296,8 @@ struct ChiiProgressView: View {
     }
   }
 
-  private func loadLocalProgress() async {
-    await reloadProgressPages()
+  private func loadLocalProgress(animate: Bool = false) async {
+    await reloadProgressPages(animate: animate)
     await loadCounts()
   }
 
@@ -319,7 +317,7 @@ struct ChiiProgressView: View {
       } else {
         Notifier.shared.notify(message: "没有收藏更新")
       }
-      await loadLocalProgress()
+      await loadLocalProgress(animate: true)
       collectionsUpdatedAt = Int(now.timeIntervalSince1970)
     } catch {
       Notifier.shared.notify(message: "更新失败: \(error)")
@@ -497,48 +495,48 @@ struct ChiiProgressView: View {
         progressSubjectsView
       }
     }
-      .refreshable {
-        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-        await refresh(showProgress: false)
+    .refreshable {
+      UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+      await refresh(showProgress: false)
+    }
+    .task {
+      guard !didInitialLoad else { return }
+      didInitialLoad = true
+      refreshing = true
+      await loadLocalProgress()
+      refreshing = false
+      await refresh(showProgress: false)
+    }
+    .searchable(
+      text: $search,
+      placement: .navigationBarDrawer(displayMode: .always),
+      prompt: "搜索正在观看的条目"
+    )
+    .searchInputTraits()
+    .navigationTitle("进度管理")
+    .navigationBarTitleDisplayMode(.inline)
+    .toolbar { progressToolbar }
+    .onChange(of: progressTab) { Task { await reloadProgressPages(animate: true) } }
+    .onChange(of: search) { Task { await reloadProgressPages(animate: true) } }
+    .onChange(of: progressSortMode) { Task { await reloadProgressPages(animate: true) } }
+    .onChange(of: progressViewMode) { Task { await reloadProgressPages(animate: true) } }
+    .onReceive(
+      NotificationCenter.default.publisher(for: ProgressSubjectInvalidation.notificationName),
+      perform: handleProgressSubjectInvalidation
+    )
+    .onAppear {
+      Task {
+        await reloadPendingProgressSubjects()
       }
-      .task {
-        guard !didInitialLoad else { return }
-        didInitialLoad = true
-        refreshing = true
-        await loadLocalProgress()
-        refreshing = false
-        await refresh(showProgress: false)
+    }
+    .alert("刷新所有收藏", isPresented: $showRefreshAll) {
+      Button("取消", role: .cancel) {}
+      Button("确定", role: .destructive) {
+        Task { await refresh(force: true) }
       }
-      .searchable(
-        text: $search,
-        placement: .navigationBarDrawer(displayMode: .always),
-        prompt: "搜索正在观看的条目"
-      )
-      .searchInputTraits()
-      .navigationTitle("进度管理")
-      .navigationBarTitleDisplayMode(.inline)
-      .toolbar { progressToolbar }
-      .onChange(of: progressTab) { Task { await reloadProgressPages(animate: true) } }
-      .onChange(of: search) { Task { await reloadProgressPages(animate: true) } }
-      .onChange(of: progressSortMode) { Task { await reloadProgressPages(animate: true) } }
-      .onChange(of: progressViewMode) { Task { await reloadProgressPages(animate: true) } }
-      .onReceive(
-        NotificationCenter.default.publisher(for: ProgressSubjectInvalidation.notificationName),
-        perform: handleProgressSubjectInvalidation
-      )
-      .onAppear {
-        Task {
-          await reloadPendingProgressSubjects()
-        }
-      }
-      .alert("刷新所有收藏", isPresented: $showRefreshAll) {
-        Button("取消", role: .cancel) {}
-        Button("确定", role: .destructive) {
-          Task { await refresh(force: true) }
-        }
-      } message: {
-        Text("将从服务器重新下载所有收藏数据，可能需要较长时间")
-      }
+    } message: {
+      Text("将从服务器重新下载所有收藏数据，可能需要较长时间")
+    }
   }
 
   private var unauthenticatedBody: some View {

@@ -7,6 +7,8 @@ struct EpisodeGridView: View {
 
   @AppStorage("isolationMode") var isolationMode: Bool = false
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
+  @AppStorage("episodeGridInteractionMode") var episodeGridInteractionMode:
+    EpisodeGridInteractionMode = .menu
 
   @State private var refreshed: Bool = false
   @State private var episodeMains: [EpisodeDTO] = []
@@ -57,7 +59,7 @@ struct EpisodeGridView: View {
     }.padding(.top, 5)
     HFlow(alignment: .center, spacing: 2) {
       ForEach(episodeMains) { episode in
-        EpisodeItemView(episode: episode) {
+        EpisodeItemView(episode: episode, interactionMode: episodeGridInteractionMode) {
           await loadCached()
         }
       }
@@ -76,7 +78,7 @@ struct EpisodeGridView: View {
           .padding(2)
           .bold()
         ForEach(episodeSps) { episode in
-          EpisodeItemView(episode: episode) {
+          EpisodeItemView(episode: episode, interactionMode: episodeGridInteractionMode) {
             await loadCached()
           }
         }

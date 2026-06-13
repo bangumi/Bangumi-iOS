@@ -33,11 +33,11 @@ extension Int {
 
 extension Float {
   var episodeDisplay: String {
-    let formatter = NumberFormatter()
-    formatter.minimumFractionDigits = 0
-    formatter.maximumFractionDigits = 1
-    formatter.minimumIntegerDigits = 2
-    return formatter.string(from: NSNumber(value: self)) ?? ""
+    let roundedTenths = (self * 10).rounded() / 10
+    if roundedTenths.truncatingRemainder(dividingBy: 1) == 0 {
+      return String(format: "%02.0f", roundedTenths)
+    }
+    return String(format: "%04.1f", roundedTenths)
   }
 
   var rateDisplay: String {
@@ -147,6 +147,12 @@ extension Int {
   }
 }
 
+private let safeParseDateCalendar: Calendar = {
+  var calendar = Calendar(identifier: .gregorian)
+  calendar.timeZone = TimeZone(secondsFromGMT: 0) ?? .gmt
+  return calendar
+}()
+
 func safeParseDate(str: String?) -> Date {
   guard let str = str else {
     return Date(timeIntervalSince1970: 0)
@@ -156,25 +162,30 @@ func safeParseDate(str: String?) -> Date {
     return Date(timeIntervalSince1970: 0)
   }
 
-  let dateFormatter = DateFormatter()
-  dateFormatter.locale = Locale(identifier: "en_US_POSIX")
-  dateFormatter.dateFormat = "yyyy-MM-dd"
-  dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
-
-  if let date = dateFormatter.date(from: trimmed) {
-    return date
-  }
-
-  // Bangumi occasionally stores placeholder future dates as a bare year like "2099".
-  if trimmed.count == 4 && trimmed.allSatisfy(\.isNumber) {
-    let yearFormatter = DateFormatter()
-    yearFormatter.locale = Locale(identifier: "en_US_POSIX")
-    yearFormatter.dateFormat = "yyyy"
-    yearFormatter.timeZone = TimeZone(secondsFromGMT: 0)
-
-    if let date = yearFormatter.date(from: trimmed) {
+  if trimmed.count == 10,
+    trimmed[trimmed.index(trimmed.startIndex, offsetBy: 4)] == "-",
+    trimmed[trimmed.index(trimmed.startIndex, offsetBy: 7)] == "-"
+  {
+    let year = Int(trimmed.prefix(4))
+    let monthStart = trimmed.index(trimmed.startIndex, offsetBy: 5)
+    let monthEnd = trimmed.index(monthStart, offsetBy: 2)
+    let dayStart = trimmed.index(trimmed.startIndex, offsetBy: 8)
+    let month = Int(trimmed[monthStart..<monthEnd])
+    let day = Int(trimmed[dayStart...])
+    if let year, let month, let day,
+      let date = safeParseDateCalendar.date(
+        from: DateComponents(year: year, month: month, day: day)
+      )
+    {
       return date
     }
+  }
+
+  if trimmed.count == 4,
+    let year = Int(trimmed),
+    let date = safeParseDateCalendar.date(from: DateComponents(year: year))
+  {
+    return date
   }
 
   // fallback to 1970-01-01

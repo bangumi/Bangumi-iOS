@@ -12,13 +12,36 @@ private struct RecentEpisodes {
   let nextEpisode: EpisodeDTO?
 }
 
-struct EpisodeRecentView: View {
+final class EpisodeRecentPayload {
   let subject: SubjectDTO
-  let mode: EpisodeRecentMode
   let episodes: [EpisodeDTO]
+
+  init(subject: SubjectDTO, episodes: [EpisodeDTO]) {
+    self.subject = subject
+    self.episodes = episodes
+  }
+
+  init(_ item: ProgressSubjectDTO) {
+    self.subject = item.subject
+    self.episodes = item.episodes
+  }
+}
+
+struct EpisodeRecentView: View {
+  let payload: EpisodeRecentPayload
+  let mode: EpisodeRecentMode
+  let interactionMode: EpisodeGridInteractionMode
   var reload: (() async -> Void)? = nil
 
   @State private var showCollectionBox: Bool = false
+
+  private var subject: SubjectDTO {
+    payload.subject
+  }
+
+  private var episodes: [EpisodeDTO] {
+    payload.episodes
+  }
 
   var progressText: String {
     return "\(subject.interest?.epStatus ?? 0) / \(subject.eps)"
@@ -86,7 +109,11 @@ struct EpisodeRecentView: View {
         VStack {
           HStack(spacing: 2) {
             ForEach(recent.episodes) { episode in
-              EpisodeItemView(episode: episode, reload: reload)
+              EpisodeItemView(
+                episode: episode,
+                interactionMode: interactionMode,
+                reload: reload
+              )
             }
             Spacer(minLength: 0)
           }
@@ -119,7 +146,11 @@ struct EpisodeRecentView: View {
         HStack {
           HStack(spacing: 2) {
             ForEach(recent.episodes) { episode in
-              EpisodeItemView(episode: episode, reload: reload)
+              EpisodeItemView(
+                episode: episode,
+                interactionMode: interactionMode,
+                reload: reload
+              )
             }
           }.font(.footnote)
           Spacer(minLength: 0)
@@ -162,11 +193,25 @@ struct EpisodeRecentView: View {
 }
 
 struct EpisodeNextView: View {
-  let episode: EpisodeDTO
+  let payload: EpisodeRenderPayload
   let fillWidth: Bool
   var reload: (() async -> Void)? = nil
 
   @State private var updating: Bool = false
+
+  init(
+    episode: EpisodeDTO,
+    fillWidth: Bool,
+    reload: (() async -> Void)? = nil
+  ) {
+    self.payload = EpisodeRenderPayload(episode)
+    self.fillWidth = fillWidth
+    self.reload = reload
+  }
+
+  private var episode: EpisodeDTO {
+    payload.episode
+  }
 
   func updateSingle(episode: EpisodeDTO, type: EpisodeCollectionType) {
     if updating { return }

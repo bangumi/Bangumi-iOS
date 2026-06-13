@@ -34,6 +34,12 @@ struct GroupDetailDTO: Hashable {
   var recentTopics: [TopicDTO] = []
 }
 
+struct EpisodeBadgeColors {
+  let foreground: Color
+  let background: Color
+  let border: Color
+}
+
 struct CalendarEntryDTO: Identifiable, Hashable {
   let weekday: Int
   var items: [BangumiCalendarItemDTO]
@@ -51,7 +57,7 @@ struct DraftDTO: Identifiable, Hashable {
   var updatedAt: Int
 }
 
-struct ProgressSubjectDTO: Codable, Identifiable, Hashable, Sendable {
+struct ProgressSubjectDTO: Codable, Identifiable, Sendable {
   var subject: SubjectDTO
   var episodes: [EpisodeDTO]
 
@@ -121,7 +127,8 @@ actor ProgressSubjectInvalidationStore {
     loadedSubjectIds: Set<Int>
   ) -> [PendingProgressSubjectInvalidation] {
     let membershipChangingSubjectIdsSnapshot = membershipChangingSubjectIds
-    let matchedSubjectIds = subjectIds
+    let matchedSubjectIds =
+      subjectIds
       .intersection(loadedSubjectIds)
       .union(membershipChangingSubjectIdsSnapshot)
     subjectIds.subtract(matchedSubjectIds)
@@ -283,48 +290,45 @@ extension EpisodeDTO {
   }
 
   var borderColor: Color {
-    var hex = 0x666666
-    switch collectionTypeEnum {
-    case .none:
-      hex = aired ? 0x00A8FF : 0x909090
-    case .wish:
-      hex = 0xFF2293
-    case .collect:
-      hex = 0x1175A8
-    case .dropped:
-      hex = 0x666666
-    }
-    return Color(hex: hex)
+    badgeColors.border
   }
 
   var backgroundColor: Color {
-    var hex = 0xCCCCCC
-    switch collectionTypeEnum {
-    case .none:
-      hex = aired ? 0xDAEAFF : 0xE0E0E0
-    case .wish:
-      hex = 0xFFADD1
-    case .collect:
-      hex = 0x4897FF
-    case .dropped:
-      hex = 0xCCCCCC
-    }
-    return Color(hex: hex)
+    badgeColors.background
   }
 
   var textColor: Color {
-    var hex = 0xFFFFFF
+    badgeColors.foreground
+  }
+
+  var badgeColors: EpisodeBadgeColors {
+    let isAired = aired
+    let borderHex: Int
+    let backgroundHex: Int
+    let foregroundHex: Int
     switch collectionTypeEnum {
     case .none:
-      hex = aired ? 0x0066CC : 0x909090
+      borderHex = isAired ? 0x00A8FF : 0x909090
+      backgroundHex = isAired ? 0xDAEAFF : 0xE0E0E0
+      foregroundHex = isAired ? 0x0066CC : 0x909090
     case .wish:
-      hex = 0xFF2293
+      borderHex = 0xFF2293
+      backgroundHex = 0xFFADD1
+      foregroundHex = 0xFF2293
     case .collect:
-      hex = 0xFFFFFF
+      borderHex = 0x1175A8
+      backgroundHex = 0x4897FF
+      foregroundHex = 0xFFFFFF
     case .dropped:
-      hex = 0xFFFFFF
+      borderHex = 0x666666
+      backgroundHex = 0xCCCCCC
+      foregroundHex = 0xFFFFFF
     }
-    return Color(hex: hex)
+    return EpisodeBadgeColors(
+      foreground: Color(hex: foregroundHex),
+      background: Color(hex: backgroundHex),
+      border: Color(hex: borderHex)
+    )
   }
 
   var trendColor: Color {

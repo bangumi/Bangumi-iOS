@@ -1,5 +1,13 @@
 import SwiftUI
 
+final class ProgressSubjectRenderPayload {
+  let item: ProgressSubjectDTO
+
+  init(_ item: ProgressSubjectDTO) {
+    self.item = item
+  }
+}
+
 struct ProgressListView: View {
   let items: [ProgressSubjectDTO]
   let isLoadingPage: Bool
@@ -7,13 +15,16 @@ struct ProgressListView: View {
   let loadNextPage: () async -> Void
   let reloadSubject: (Int) async -> Void
 
+  @AppStorage("episodeGridInteractionMode") private var episodeGridInteractionMode:
+    EpisodeGridInteractionMode = .menu
+
   var body: some View {
     LazyVStack(alignment: .leading) {
       ForEach(items.withNextPageTriggers()) { row in
         CardView {
           ProgressListItemContentView(
-            subject: row.item.subject,
-            episodes: row.item.episodes,
+            payload: ProgressSubjectRenderPayload(row.item),
+            interactionMode: episodeGridInteractionMode,
             reload: {
               await reloadSubject(row.item.id)
             }
@@ -56,11 +67,19 @@ struct ProgressPageFooterView: View {
 }
 
 struct ProgressListItemContentView: View {
-  let subject: SubjectDTO
-  let episodes: [EpisodeDTO]
+  let payload: ProgressSubjectRenderPayload
+  let interactionMode: EpisodeGridInteractionMode
   let reload: () async -> Void
 
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
+
+  private var item: ProgressSubjectDTO {
+    payload.item
+  }
+
+  private var subject: SubjectDTO {
+    item.subject
+  }
 
   var body: some View {
     let subjectId = subject.id
@@ -87,7 +106,12 @@ struct ProgressListItemContentView: View {
 
           switch subject.type {
           case .anime, .real:
-            EpisodeRecentView(subject: subject, mode: .list, episodes: episodes, reload: reload)
+            EpisodeRecentView(
+              payload: EpisodeRecentPayload(item),
+              mode: .list,
+              interactionMode: interactionMode,
+              reload: reload
+            )
 
           case .book:
             SubjectBookChaptersView(subject: subject, mode: .row, reload: reload)
@@ -144,11 +168,16 @@ struct ProgressListItemContentView: View {
   return ScrollView {
     LazyVStack(alignment: .leading) {
       ProgressListItemContentView(
-        subject: SubjectDTO(subject),
-        episodes: episodes.map(EpisodeDTO.init),
+        payload: ProgressSubjectRenderPayload(
+          ProgressSubjectDTO(
+            subject: SubjectDTO(subject),
+            episodes: episodes.map(EpisodeDTO.init)
+          )
+        ),
+        interactionMode: .menu,
         reload: {}
       )
-        .modelContainer(container)
+      .modelContainer(container)
     }.padding()
   }
 }

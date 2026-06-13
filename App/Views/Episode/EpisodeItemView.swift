@@ -1,25 +1,47 @@
 import SwiftUI
 
-struct EpisodeItemView: View {
-  @AppStorage("episodeGridInteractionMode") var interactionMode: EpisodeGridInteractionMode =
-    .menu
+final class EpisodeRenderPayload {
   let episode: EpisodeDTO
+
+  init(_ episode: EpisodeDTO) {
+    self.episode = episode
+  }
+}
+
+struct EpisodeItemView: View {
+  let payload: EpisodeRenderPayload
+  let interactionMode: EpisodeGridInteractionMode
   var reload: (() async -> Void)? = nil
 
+  init(
+    episode: EpisodeDTO,
+    interactionMode: EpisodeGridInteractionMode,
+    reload: (() async -> Void)? = nil
+  ) {
+    self.payload = EpisodeRenderPayload(episode)
+    self.interactionMode = interactionMode
+    self.reload = reload
+  }
+
+  private var episode: EpisodeDTO {
+    payload.episode
+  }
+
   var badge: some View {
-    Text("\(episode.sort.episodeDisplay)")
+    let colors = episode.badgeColors
+    return Text(verbatim: episode.sort.episodeDisplay)
       .monospacedDigit()
       .lineLimit(1)
       .layoutPriority(1)
-      .foregroundStyle(episode.textColor)
+      .foregroundStyle(colors.foreground)
       .padding(2)
-      .background(episode.backgroundColor)
+      .background(colors.background)
       .cornerRadius(2)
       .strikethrough(episode.status == EpisodeCollectionType.dropped.rawValue)
       .overlay {
         RoundedRectangle(cornerRadius: 2)
           .fill(.clear)
-          .stroke(episode.borderColor, lineWidth: 1)
+          .stroke(colors.border, lineWidth: 1)
       }
       .episodeTrend(episode)
   }
@@ -68,7 +90,7 @@ struct EpisodeItemView: View {
 
   return ScrollView {
     LazyVStack {
-      EpisodeItemView(episode: EpisodeDTO(episodes.first!))
+      EpisodeItemView(episode: EpisodeDTO(episodes.first!), interactionMode: .menu)
         .modelContainer(container)
     }.padding()
   }

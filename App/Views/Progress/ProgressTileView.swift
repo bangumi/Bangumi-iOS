@@ -7,14 +7,17 @@ struct ProgressTileView: View {
   let loadNextPage: () async -> Void
   let reloadSubject: (Int) async -> Void
 
+  @AppStorage("episodeGridInteractionMode") private var episodeGridInteractionMode:
+    EpisodeGridInteractionMode = .menu
+
   var body: some View {
     VStack(spacing: 8) {
       LazyVGrid(columns: [GridItem(.adaptive(minimum: 150))]) {
         ForEach(items.withNextPageTriggers()) { row in
           CardView(padding: 8) {
             ProgressTileItemContentView(
-              subject: row.item.subject,
-              episodes: row.item.episodes,
+              payload: ProgressSubjectRenderPayload(row.item),
+              interactionMode: episodeGridInteractionMode,
               reload: {
                 await reloadSubject(row.item.id)
               }
@@ -38,12 +41,20 @@ struct ProgressTileView: View {
 }
 
 struct ProgressTileItemContentView: View {
-  let subject: SubjectDTO
-  let episodes: [EpisodeDTO]
+  let payload: ProgressSubjectRenderPayload
+  let interactionMode: EpisodeGridInteractionMode
   let reload: () async -> Void
 
   @AppStorage("subjectImageQuality") var subjectImageQuality: ImageQuality = .high
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
+
+  private var item: ProgressSubjectDTO {
+    payload.item
+  }
+
+  private var subject: SubjectDTO {
+    item.subject
+  }
 
   var body: some View {
     let subjectId = subject.id
@@ -75,7 +86,12 @@ struct ProgressTileItemContentView: View {
 
         switch subject.type {
         case .anime, .real:
-          EpisodeRecentView(subject: subject, mode: .tile, episodes: episodes, reload: reload)
+          EpisodeRecentView(
+            payload: EpisodeRecentPayload(item),
+            mode: .tile,
+            interactionMode: interactionMode,
+            reload: reload
+          )
         case .book:
           SubjectBookChaptersView(subject: subject, mode: .tile, reload: reload)
 
@@ -126,11 +142,16 @@ struct ProgressTileItemContentView: View {
     LazyVStack(alignment: .leading) {
       CardView(padding: 8) {
         ProgressTileItemContentView(
-          subject: SubjectDTO(subject),
-          episodes: episodes.map(EpisodeDTO.init),
+          payload: ProgressSubjectRenderPayload(
+            ProgressSubjectDTO(
+              subject: SubjectDTO(subject),
+              episodes: episodes.map(EpisodeDTO.init)
+            )
+          ),
+          interactionMode: .menu,
           reload: {}
         )
-          .modelContainer(container)
+        .modelContainer(container)
       }
     }.padding()
   }
