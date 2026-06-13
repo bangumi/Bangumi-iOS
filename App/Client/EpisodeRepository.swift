@@ -49,7 +49,8 @@ enum EpisodeRepository {
   ) async throws {
     try await EpisodeService.updateEpisodeCollection(episodeId: episodeId, type: type, batch: batch)
     let db = try await AppContext.shared.getDB()
-    let subjectId = try await db.updateEpisodeCollection(episodeId: episodeId, type: type, batch: batch)
+    let subjectId = try await db.updateEpisodeCollection(
+      episodeId: episodeId, type: type, batch: batch)
     try await db.commit()
     if let subjectId {
       await ProgressSubjectInvalidation.post(subjectId: subjectId)
