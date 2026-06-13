@@ -89,6 +89,207 @@ struct SubjectSmallView: View {
   }
 }
 
+struct SubjectCollectionTileView: View {
+  @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
+
+  let subject: SlimSubjectDTO
+  let imageWidth: CGFloat = 60
+
+  var imageHeight: CGFloat {
+    subject.type.coverHeight(for: imageWidth)
+  }
+
+  var body: some View {
+    VStack {
+      ImageView(img: subject.images?.resize(.r200))
+        .imageStyle(width: imageWidth, height: imageHeight)
+        .imageType(.subject)
+        .imageNavLink(subject.link)
+        .subjectPreview(subject)
+        .shadow(radius: 2)
+      Text(subject.title(with: titlePreference))
+        .font(.caption2)
+        .lineLimit(2)
+        .multilineTextAlignment(.leading)
+    }
+    .frame(width: imageWidth + 4)
+  }
+}
+
+struct CollectionTypeChipsView: View {
+  let subjectType: SubjectType
+  let counts: [CollectionType: Int]
+  @Binding var selection: CollectionType
+
+  private var visibleTypes: [CollectionType] {
+    let types = CollectionType.allTypes().filter { counts[$0, default: 0] > 0 }
+    return types.isEmpty ? CollectionType.allTypes() : types
+  }
+
+  var body: some View {
+    ScrollView(.horizontal, showsIndicators: false) {
+      HStack(alignment: .bottom, spacing: 2) {
+        ForEach(visibleTypes, id: \.self) { type in
+          let borderColor = selection == type
+            ? Color.linkText
+            : Color.secondary.opacity(0.2)
+          BorderView(color: borderColor, padding: 3, cornerRadius: 16) {
+            Text("\(type.description(subjectType)) \(counts[type, default: 0])")
+              .lineLimit(1)
+              .font(.footnote)
+              .foregroundStyle(.linkText)
+          }
+          .padding(1)
+          .onTapGesture {
+            guard selection != type else { return }
+            withAnimation(.default) {
+              selection = type
+            }
+          }
+        }
+      }
+    }
+    .scrollClipDisabled()
+  }
+}
+
+struct CollectionTypeSegmentedPickerView: View {
+  let subjectType: SubjectType
+  let counts: [CollectionType: Int]
+  @Binding var selection: CollectionType
+
+  var body: some View {
+    Picker("CollectionType", selection: $selection) {
+      ForEach(CollectionType.allTypes()) { type in
+        Text("\(type.description(subjectType))(\(counts[type, default: 0]))").tag(type)
+      }
+    }
+    .pickerStyle(.segmented)
+    .padding(.horizontal, 8)
+  }
+}
+
+struct SubjectCollectionSectionView: View {
+  let title: String
+  let destination: NavDestination
+  let subjectType: SubjectType
+  let counts: [CollectionType: Int]
+  @Binding var selection: CollectionType
+  let subjects: [SlimSubjectDTO]
+  let refreshing: Bool
+
+  var body: some View {
+    VStack(alignment: .leading, spacing: 2) {
+      HStack(alignment: .bottom, spacing: 2) {
+        NavigationLink(value: destination) {
+          Text(title).font(.title3)
+        }
+        .buttonStyle(.navigation)
+        .padding(.horizontal, 4)
+
+        CollectionTypeChipsView(subjectType: subjectType, counts: counts, selection: $selection)
+
+        Spacer(minLength: 0)
+      }
+      .padding(.top, 8)
+
+      Divider()
+
+      if refreshing {
+        HStack {
+          Spacer()
+          ProgressView().padding()
+          Spacer()
+        }
+      } else {
+        ScrollView(.horizontal, showsIndicators: false) {
+          LazyHStack(alignment: .top) {
+            ForEach(subjects) { subject in
+              SubjectCollectionTileView(subject: subject)
+                .transition(.opacity.combined(with: .scale(scale: 0.98)))
+            }
+          }
+          .padding(2)
+        }
+        .scrollClipDisabled()
+      }
+    }
+  }
+}
+
+struct SubjectCollectionRowContentView: View {
+  @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
+
+  let subject: SlimSubjectDTO
+  let isPrivate: Bool
+
+  init(subject: SlimSubjectDTO, isPrivate: Bool = false) {
+    self.subject = subject
+    self.isPrivate = isPrivate
+  }
+
+  var body: some View {
+    HStack(alignment: .top) {
+      ImageView(img: subject.images?.resize(.r200))
+        .imageStyle(width: 60, height: subject.type.coverHeight(for: 60))
+        .imageType(.subject)
+        .imageNavLink(subject.link)
+      VStack(alignment: .leading) {
+        Text(subject.title(with: titlePreference).withLink(subject.link))
+          .lineLimit(1)
+        if let subtitle = subject.subtitle(with: titlePreference) {
+          Text(subtitle)
+            .lineLimit(1)
+            .font(.caption)
+            .foregroundStyle(.secondary.opacity(0.8))
+        }
+        Text(subject.info ?? "")
+          .lineLimit(1)
+          .font(.footnote)
+          .foregroundStyle(.secondary)
+        Spacer()
+        if let interest = subject.interest {
+          HStack {
+            if isPrivate {
+              Image(systemName: "lock.fill").foregroundStyle(.accent)
+            }
+            Text(interest.updatedAt.datetimeDisplay)
+              .foregroundStyle(.secondary)
+              .lineLimit(1)
+            Spacer()
+            if interest.rate > 0 {
+              StarsView(score: Float(interest.rate), size: 12)
+            }
+          }.font(.footnote)
+          if !interest.comment.isEmpty {
+            VStack(alignment: .leading, spacing: 2) {
+              Divider()
+              Text(interest.comment)
+                .padding(2)
+                .font(.footnote)
+                .multilineTextAlignment(.leading)
+                .textSelection(.enabled)
+            }
+          }
+        }
+      }
+    }
+    .buttonStyle(.navigation)
+    .frame(minHeight: 60)
+    .padding(2)
+    .clipShape(RoundedRectangle(cornerRadius: 10))
+  }
+}
+
+extension CollectionType {
+  static func preferredAvailableType(in counts: [CollectionType: Int]) -> CollectionType? {
+    for type in timelineTypes() where counts[type, default: 0] > 0 {
+      return type
+    }
+    return allTypes().first { counts[$0, default: 0] > 0 }
+  }
+}
+
 struct SubjectCardView: View {
   let subject: SlimSubjectDTO
 

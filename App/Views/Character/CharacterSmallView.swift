@@ -14,8 +14,8 @@ struct CharacterSmallView: View {
   var body: some View {
     BorderView(color: .secondary.opacity(0.2), padding: 4, paddingRatio: 1, cornerRadius: 8) {
       HStack {
-        ImageView(img: character.images?.grid)
-          .imageStyle(width: 50, height: 50)
+        ImageView(img: character.images?.resize(.r200))
+          .imageStyle(width: 50, height: 50, alignment: .top)
           .imageType(.person)
           .imageNSFW(character.nsfw)
         VStack(alignment: .leading) {

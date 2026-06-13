@@ -175,14 +175,14 @@ struct TimelineItemView: View {
             ScrollView(.horizontal, showsIndicators: false) {
               HStack {
                 ForEach(mono.characters.prefix(5)) { character in
-                  ImageView(img: character.images?.grid)
-                    .imageStyle(width: 60, height: 60)
+                  ImageView(img: character.images?.resize(.r200))
+                    .imageStyle(width: 60, height: 60, alignment: .top)
                     .imageType(.person)
                     .imageNavLink(character.link)
                 }
                 ForEach(mono.persons.prefix(5)) { person in
-                  ImageView(img: person.images?.grid)
-                    .imageStyle(width: 60, height: 60)
+                  ImageView(img: person.images?.resize(.r200))
+                    .imageStyle(width: 60, height: 60, alignment: .top)
                     .imageType(.person)
                     .imageNavLink(person.link)
                 }

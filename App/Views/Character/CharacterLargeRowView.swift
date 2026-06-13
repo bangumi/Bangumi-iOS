@@ -7,8 +7,8 @@ struct CharacterLargeRowView: View {
 
   var body: some View {
     HStack(spacing: 8) {
-      ImageView(img: character.images?.grid)
-        .imageStyle(width: 90, height: 90)
+      ImageView(img: character.images?.resize(.r200))
+        .imageStyle(width: 90, height: 90, alignment: .top)
         .imageType(.person)
         .imageNSFW(character.nsfw)
         .imageNavLink(character.link)

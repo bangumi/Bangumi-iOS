@@ -56,7 +56,7 @@ struct CharacterCastItemView: View {
               }
               .lineLimit(1)
               .font(.footnote)
-              ImageView(img: cast.person.images?.grid)
+              ImageView(img: cast.person.images?.resize(.r200))
                 .imageStyle(width: 40, height: 40, alignment: .top)
                 .imageType(.person)
                 .imageNavLink(cast.person.link)

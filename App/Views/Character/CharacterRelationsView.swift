@@ -68,8 +68,8 @@ private struct CharacterRelationCard: View {
           .frame(maxWidth: .infinity, alignment: .center)
           .multilineTextAlignment(.center)
 
-        ImageView(img: item.character.images?.grid)
-          .imageStyle(width: 72, height: 72)
+        ImageView(img: item.character.images?.resize(.r200))
+          .imageStyle(width: 72, height: 72, alignment: .top)
           .imageType(.person)
           .imageNSFW(item.character.nsfw)
           .imageNavLink(item.character.link)

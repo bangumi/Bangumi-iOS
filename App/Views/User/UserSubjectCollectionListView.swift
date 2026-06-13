@@ -31,19 +31,7 @@ struct UserSubjectCollectionListView: View {
 
   var body: some View {
     VStack {
-      Picker("Type", selection: $ctype) {
-        ForEach(CollectionType.allTypes(), id: \.self) { ct in
-          if let count = ctypes[ct], count > 0 {
-            Text("\(ct.description(stype))(\(count))")
-              .tag(ct)
-          } else {
-            Text("\(ct.description(stype))")
-              .tag(ct)
-          }
-        }
-      }
-      .pickerStyle(.segmented)
-      .padding(.horizontal, 8)
+      CollectionTypeSegmentedPickerView(subjectType: stype, counts: ctypes, selection: $ctype)
       .onChange(of: ctype) { _, _ in
         reloader.toggle()
       }
@@ -51,7 +39,7 @@ struct UserSubjectCollectionListView: View {
       ScrollView {
         PageView<SlimSubjectDTO, _>(limit: 20, reloader: reloader, nextPageFunc: load) {
           item in
-          UserSubjectCollectionRowView(subject: item)
+          SubjectCollectionRowContentView(subject: item)
           Divider()
         }.padding(8)
       }

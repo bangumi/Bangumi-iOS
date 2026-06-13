@@ -52,8 +52,8 @@ struct UserCharacterCollectionView: View {
           LazyHStack(alignment: .top) {
             ForEach(characters) { character in
               VStack {
-                ImageView(img: character.images?.grid)
-                  .imageStyle(width: 60, height: 60)
+                ImageView(img: character.images?.resize(.r200))
+                  .imageStyle(width: 60, height: 60, alignment: .top)
                   .imageType(.person)
                   .imageNavLink(character.link)
                   .shadow(radius: 2)

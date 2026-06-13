@@ -69,7 +69,7 @@ struct UserMonoListView: View {
               HStack(alignment: .top) {
                 ImageView(img: item.images?.resize(.r200))
                   .imageType(.person)
-                  .imageStyle(width: 60, height: 60)
+                  .imageStyle(width: 60, height: 60, alignment: .top)
                 VStack(alignment: .leading) {
                   Text(item.name.withLink(item.link))
                   Text(item.nameCN)
@@ -86,7 +86,7 @@ struct UserMonoListView: View {
               HStack(alignment: .top) {
                 ImageView(img: item.images?.resize(.r200))
                   .imageType(.person)
-                  .imageStyle(width: 60, height: 60)
+                  .imageStyle(width: 60, height: 60, alignment: .top)
                 VStack(alignment: .leading) {
                   Text(item.name.withLink(item.link))
                   Text(item.nameCN)

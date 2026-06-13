@@ -36,8 +36,8 @@ struct IndexRelatedItemView: View {
         case .character:
           HStack(alignment: .top) {
             if let character = item.character {
-              ImageView(img: character.images?.grid)
-                .imageStyle(width: 72, height: 72)
+              ImageView(img: character.images?.resize(.r200))
+                .imageStyle(width: 72, height: 72, alignment: .top)
                 .imageType(.person)
                 .imageNavLink(character.link)
               VStack(alignment: .leading) {
@@ -82,8 +82,8 @@ struct IndexRelatedItemView: View {
         case .person:
           HStack(alignment: .top) {
             if let person = item.person {
-              ImageView(img: person.images?.grid)
-                .imageStyle(width: 72, height: 72)
+              ImageView(img: person.images?.resize(.r200))
+                .imageStyle(width: 72, height: 72, alignment: .top)
                 .imageType(.person)
                 .imageNavLink(person.link)
               VStack(alignment: .leading) {

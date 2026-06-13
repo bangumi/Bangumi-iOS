@@ -7,15 +7,22 @@ struct CollectionSubjectTypeView: View {
   @State private var counts: [CollectionType: Int] = [:]
   @State private var subjects: [SubjectDTO] = []
 
+  private var selectedTypeIsAvailable: Bool {
+    counts[ctype, default: 0] > 0
+  }
+
   func load() async {
     do {
       let db = try await AppContext.shared.getDB()
-      subjects = try await db.fetchCollectionSubjects(
+      let fetched = try await db.fetchCollectionSubjects(
         subjectType: stype,
         collectionType: ctype,
         limit: 20,
         offset: 0
       )
+      withAnimation(.default) {
+        subjects = fetched
+      }
     } catch {
       Notifier.shared.alert(error: error)
     }
@@ -25,42 +32,38 @@ struct CollectionSubjectTypeView: View {
     do {
       let db = try await AppContext.shared.getDB()
       counts = try await db.fetchCollectionCounts(subjectType: stype)
+      if !selectedTypeIsAvailable,
+        let preferredType = CollectionType.preferredAvailableType(in: counts)
+      {
+        withAnimation(.default) {
+          ctype = preferredType
+        }
+      }
     } catch {
       Notifier.shared.alert(error: error)
     }
   }
 
   var body: some View {
-    VStack {
-      Picker("CollectionType", selection: $ctype) {
-        ForEach(CollectionType.allTypes()) { ct in
-          Text("\(ct.description(stype))(\(counts[ct, default: 0]))").tag(ct)
-        }
+    SubjectCollectionSectionView(
+      title: "我的\(stype.description)",
+      destination: NavDestination.collectionList(stype),
+      subjectType: stype,
+      counts: counts,
+      selection: $ctype,
+      subjects: subjects.map(\.slim),
+      refreshing: false
+    )
+    .onChange(of: ctype) { _, _ in
+      Task {
+        await load()
       }
-      .pickerStyle(.segmented)
-      .onChange(of: ctype) { _, _ in
-        Task {
-          await load()
-        }
+    }
+    .onAppear {
+      Task {
+        await loadCounts()
+        await load()
       }
-      .onAppear {
-        Task {
-          await load()
-          await loadCounts()
-        }
-      }
-      ScrollView(.horizontal, showsIndicators: false) {
-        LazyHStack {
-          ForEach(subjects) { subject in
-            ImageView(img: subject.images?.resize(.r200))
-              .imageStyle(width: 80, height: subject.type.coverHeight(for: 80))
-              .imageType(.subject)
-              .imageNavLink(subject.link)
-              .shadow(radius: 2)
-          }
-        }
-      }
-      .scrollClipDisabled()
     }
   }
 }

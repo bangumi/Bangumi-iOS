@@ -74,7 +74,7 @@ struct SubjectCharacterListView: View {
                 }
                 ForEach(sortedCasts) { cast in
                   HStack(alignment: .top) {
-                    ImageView(img: cast.person.images?.grid)
+                    ImageView(img: cast.person.images?.resize(.r200))
                       .imageStyle(width: 40, height: 40, alignment: .top)
                       .imageType(.person)
                       .imageNavLink(cast.person.link)

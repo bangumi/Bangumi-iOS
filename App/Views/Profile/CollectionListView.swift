@@ -68,13 +68,11 @@ struct CollectionListView: View {
         }
       } else {
         VStack {
-          Picker("CollectionType", selection: $collectionType) {
-            ForEach(CollectionType.allTypes()) { ctype in
-              Text("\(ctype.description(subjectType))(\(counts[ctype, default: 0]))").tag(
-                ctype)
-            }
-          }
-          .pickerStyle(.segmented)
+          CollectionTypeSegmentedPickerView(
+            subjectType: subjectType,
+            counts: counts,
+            selection: $collectionType
+          )
           .onChange(of: collectionType) {
             Task {
               await load()
@@ -83,7 +81,10 @@ struct CollectionListView: View {
           ScrollView {
             LazyVStack(alignment: .leading, spacing: 10) {
               ForEach(subjects.withNextPageTriggers()) { row in
-                CollectionRowView(subject: row.item)
+                SubjectCollectionRowContentView(
+                  subject: row.item.slim,
+                  isPrivate: row.item.interest?.private ?? false
+                )
                   .onAppear {
                     if row.triggersNextPage {
                       Task {
@@ -103,8 +104,8 @@ struct CollectionListView: View {
                 }
               }
             }
+            .padding(8)
           }
-          .padding(.horizontal, 8)
           .animation(.easeInOut, value: collectionType)
         }
         .animation(.default, value: counts)
