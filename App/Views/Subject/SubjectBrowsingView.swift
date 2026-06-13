@@ -37,7 +37,7 @@ struct SubjectBrowsingView: View {
     return Array(categories.values.sorted { $0.id < $1.id })
   }
 
-  func fetchPage(page: Int) async -> PagedDTO<SlimSubjectDTO>? {
+  func fetchPage(page: Int) async -> PagedDTO<SubjectListItemDTO>? {
     do {
       guard let db = await AppContext.shared.databaseIfAvailable() else {
         throw ChiiError.uninitialized
@@ -48,7 +48,7 @@ struct SubjectBrowsingView: View {
         try await db.saveSubject(item)
       }
       try await db.commit()
-      return resp
+      return PagedDTO(data: try await db.makeSubjectListItems(resp.data), total: resp.total)
     } catch {
       Notifier.shared.alert(error: error)
     }
@@ -122,8 +122,8 @@ struct SubjectBrowsingView: View {
       LazyVStack(alignment: .leading, spacing: 8) {
         browseHeader
 
-        SimplePageView(reloader: reloader, nextPageFunc: fetchPage) { subject in
-          SubjectItemView(subjectId: subject.id)
+        SimplePageView(reloader: reloader, nextPageFunc: fetchPage) { item in
+          SubjectItemView(subject: item.subject, collectionType: item.collectionType)
         }
         .zIndex(0)
 
@@ -549,7 +549,7 @@ struct SubjectTagBrowsingView: View {
     return "\(prefix): \(tag)"
   }
 
-  func fetchPage(page: Int) async -> PagedDTO<SlimSubjectDTO>? {
+  func fetchPage(page: Int) async -> PagedDTO<SubjectListItemDTO>? {
     do {
       guard let db = await AppContext.shared.databaseIfAvailable() else {
         throw ChiiError.uninitialized
@@ -563,7 +563,7 @@ struct SubjectTagBrowsingView: View {
         try await db.saveSubject(item)
       }
       try await db.commit()
-      return resp
+      return PagedDTO(data: try await db.makeSubjectListItems(resp.data), total: resp.total)
     } catch {
       Notifier.shared.alert(error: error)
     }
@@ -609,8 +609,8 @@ struct SubjectTagBrowsingView: View {
 
         Divider()
 
-        SimplePageView(reloader: reloader, nextPageFunc: fetchPage) { subject in
-          SubjectItemView(subjectId: subject.id)
+        SimplePageView(reloader: reloader, nextPageFunc: fetchPage) { item in
+          SubjectItemView(subject: item.subject, collectionType: item.collectionType)
         }
       }.padding(.horizontal, 8)
     }

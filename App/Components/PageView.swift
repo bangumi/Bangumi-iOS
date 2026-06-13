@@ -21,7 +21,7 @@ extension Array where Element: Identifiable {
 /// A view that loads data continuously.
 ///
 struct PageView<T, C>: View
-where C: View, T: Identifiable & Hashable & Codable & Sendable {
+where C: View, T: Identifiable & Codable & Sendable {
   typealias Item = T
   typealias Content = C
 
@@ -44,11 +44,8 @@ where C: View, T: Identifiable & Hashable & Codable & Sendable {
       defer { loading = false }
       let result = await loadPage(currentOffset: 0)
       if let newData = result {
-        let updatedItems = [Item]().mergedById(with: newData)
-        if items != updatedItems {
-          withAnimation {
-            items = updatedItems
-          }
+        withAnimation {
+          items = [Item]().mergedById(with: newData)
         }
       }
     }
@@ -61,10 +58,7 @@ where C: View, T: Identifiable & Hashable & Codable & Sendable {
     defer { loading = false }
     let result = await loadPage(currentOffset: offset)
     if let newData = result {
-      let updatedItems = items.mergedById(with: newData)
-      if items != updatedItems {
-        items = updatedItems
-      }
+      items = items.mergedById(with: newData)
     }
   }
 
@@ -142,7 +136,7 @@ where C: View, T: Identifiable & Hashable & Codable & Sendable {
 }
 
 struct SimplePageView<T, C>: View
-where C: View, T: Identifiable & Hashable & Codable & Sendable {
+where C: View, T: Identifiable & Codable & Sendable {
   typealias Item = T
   typealias Content = C
 
@@ -163,11 +157,8 @@ where C: View, T: Identifiable & Hashable & Codable & Sendable {
       defer { loading = false }
       let result = await loadPage(currentPage: 1)
       if let newData = result {
-        let updatedItems = [Item]().mergedById(with: newData)
-        if items != updatedItems {
-          withAnimation {
-            items = updatedItems
-          }
+        withAnimation {
+          items = [Item]().mergedById(with: newData)
         }
       }
     }
@@ -180,10 +171,7 @@ where C: View, T: Identifiable & Hashable & Codable & Sendable {
     defer { loading = false }
     let result = await loadPage(currentPage: page)
     if let newData = result {
-      let updatedItems = items.mergedById(with: newData)
-      if items != updatedItems {
-        items = updatedItems
-      }
+      items = items.mergedById(with: newData)
     }
   }
 

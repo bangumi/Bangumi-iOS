@@ -246,6 +246,16 @@ extension DatabaseOperator {
     return subjects.reduce(into: [:]) { $0[$1.subjectId] = $1.ctypeEnum }
   }
 
+  public func makeSubjectListItems(_ subjects: [SlimSubjectDTO]) throws -> [SubjectListItemDTO] {
+    let collectionTypes = try getCollectionTypes(subjectIds: subjects.map(\.id))
+    return subjects.map { subject in
+      SubjectListItemDTO(
+        subject: subject,
+        collectionType: collectionTypes[subject.id] ?? .none
+      )
+    }
+  }
+
   public func fetchLocalSubjects(
     search: String,
     subjectType: SubjectType,

@@ -57,6 +57,15 @@ struct DraftDTO: Identifiable, Hashable {
   var updatedAt: Int
 }
 
+struct SubjectListItemDTO: Codable, Identifiable, Sendable {
+  var subject: SlimSubjectDTO
+  var collectionType: CollectionType
+
+  var id: Int {
+    subject.id
+  }
+}
+
 struct ProgressSubjectDTO: Codable, Identifiable, Sendable {
   var subject: SubjectDTO
   var episodes: [EpisodeDTO]

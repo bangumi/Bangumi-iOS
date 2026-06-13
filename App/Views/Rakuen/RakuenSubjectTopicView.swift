@@ -138,11 +138,8 @@ struct CachedSubjectTopicListView: View {
         resp = try await TopicService.getRecentSubjectTopics(limit: 20, offset: 0)
       }
       if let resp = resp {
-        let updatedItems = [SubjectTopicDTO]().mergedById(with: resp.data)
-        if items != updatedItems {
-          withAnimation {
-            items = updatedItems
-          }
+        withAnimation {
+          items = [SubjectTopicDTO]().mergedById(with: resp.data)
         }
         offset = 20
         exhausted = resp.data.count == 0 || offset >= resp.total
@@ -173,12 +170,7 @@ struct CachedSubjectTopicListView: View {
         resp = try await TopicService.getRecentSubjectTopics(limit: 20, offset: offset)
       }
       if let resp = resp {
-        let updatedItems = items.mergedById(with: resp.data)
-        if items != updatedItems {
-          withAnimation {
-            items = updatedItems
-          }
-        }
+        items = items.mergedById(with: resp.data)
         offset += 20
         if resp.data.count == 0 || offset >= resp.total {
           exhausted = true

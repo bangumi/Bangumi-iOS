@@ -108,7 +108,6 @@ struct CollectionListView: View {
           .animation(.easeInOut, value: collectionType)
         }
         .animation(.default, value: counts)
-        .animation(.default, value: subjects)
       }
     }
     .navigationTitle("我的\(subjectType.description)")

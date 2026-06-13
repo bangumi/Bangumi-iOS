@@ -63,7 +63,22 @@ extension Array: @retroactive RawRepresentable where Element: Codable {
   }
 }
 
+struct IndexedIdentifiableItem<Item: Identifiable>: Identifiable {
+  let index: Int
+  let item: Item
+
+  var id: Item.ID {
+    item.id
+  }
+}
+
 extension Array where Element: Identifiable {
+  func indexedById() -> [IndexedIdentifiableItem<Element>] {
+    enumerated().map { index, item in
+      IndexedIdentifiableItem(index: index, item: item)
+    }
+  }
+
   func mergedById(with newData: [Element]) -> [Element] {
     if newData.isEmpty {
       return self

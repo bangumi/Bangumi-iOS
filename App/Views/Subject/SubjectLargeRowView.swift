@@ -102,10 +102,112 @@ struct SubjectLargeRowView: View {
   }
 }
 
+struct SubjectSlimRowView: View {
+  @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
+
+  let subject: SlimSubjectDTO
+  let collectionType: CollectionType
+
+  var body: some View {
+    HStack {
+      ImageView(img: subject.images?.resize(.r200))
+        .imageCollectionStatus(ctype: collectionType)
+        .imageStyle(width: 90, height: subject.type.coverHeight(for: 90))
+        .imageType(.subject)
+        .imageNSFW(subject.nsfw)
+        .imageNavLink(subject.link)
+      VStack(alignment: .leading, spacing: 4) {
+        HStack(spacing: 4) {
+          VStack(alignment: .leading) {
+            HStack(spacing: 4) {
+              if subject.type != .none {
+                Image(systemName: subject.type.icon)
+                  .foregroundStyle(.secondary)
+                  .font(.footnote)
+              }
+              Text(subject.title(with: titlePreference).withLink(subject.link))
+                .font(.headline)
+                .lineLimit(1)
+            }
+          }
+          Spacer(minLength: 0)
+          if let rating = subject.rating, rating.rank > 0 {
+            Label(String(rating.rank), systemImage: "chart.bar.xaxis")
+              .foregroundStyle(.accent)
+              .font(.footnote)
+          }
+        }
+
+        if let subtitle = subject.subtitle(with: titlePreference) {
+          Text(subtitle)
+            .font(.subheadline)
+            .foregroundStyle(.secondary)
+            .lineLimit(1)
+        }
+
+        if let info = subject.info, !info.isEmpty {
+          Text(info)
+            .font(.footnote)
+            .foregroundStyle(.secondary)
+            .lineLimit(2)
+        }
+
+        HStack(spacing: 4) {
+          if subject.type != .none {
+            BorderView {
+              Text(subject.type.description).lineLimit(1)
+            }
+          }
+        }
+        .foregroundStyle(.secondary)
+        .font(.caption)
+
+        if let rating = subject.rating {
+          HStack {
+            if rating.total > 10, rating.score > 0 {
+              StarsView(score: rating.score, size: 12)
+              Text("\(rating.score.rateDisplay)")
+                .font(.callout)
+                .foregroundStyle(.orange)
+              Text("(\(rating.total)人评分)")
+                .foregroundStyle(.secondary)
+            } else {
+              StarsView(score: 0, size: 12)
+              Text("(少于10人评分)")
+                .foregroundStyle(.secondary)
+            }
+            Spacer(minLength: 0)
+          }
+          .font(.footnote)
+        }
+      }.padding(.leading, 2)
+    }
+    .frame(minHeight: subject.type.coverHeight(for: 90))
+    .padding(2)
+    .clipShape(RoundedRectangle(cornerRadius: 10))
+  }
+}
+
 struct SubjectItemView: View {
   let subjectId: Int
+  let slimSubject: SlimSubjectDTO?
+  let loadSubjectOnAppear: Bool
 
   @State private var subject: SubjectDTO?
+  @State private var collectionType: CollectionType = .none
+
+  init(subjectId: Int) {
+    self.subjectId = subjectId
+    self.slimSubject = nil
+    self.loadSubjectOnAppear = true
+  }
+
+  init(subject: SlimSubjectDTO, collectionType: CollectionType) {
+    self.subjectId = subject.id
+    self.slimSubject = subject
+    self.loadSubjectOnAppear = false
+    self._collectionType = State(initialValue: collectionType)
+  }
 
   private func load() async {
     do {
@@ -113,6 +215,15 @@ struct SubjectItemView: View {
       subject = try await db.getSubjectDTO(subjectId)
     } catch {
       Logger.app.error("Failed to load subject item: \(error)")
+    }
+  }
+
+  private func loadCollectionType() async {
+    do {
+      let db = try await AppContext.shared.getDB()
+      collectionType = try await db.getCollectionTypes(subjectIds: [subjectId])[subjectId] ?? .none
+    } catch {
+      Logger.app.error("Failed to load subject collection type: \(error)")
     }
   }
 
@@ -126,10 +237,20 @@ struct SubjectItemView: View {
             collectionType: subject.ctypeEnum,
             reload: load
           )
+      } else if let slimSubject {
+        SubjectSlimRowView(subject: slimSubject, collectionType: collectionType)
+          .subjectCollectionStatusOverlay(
+            subjectId: slimSubject.id,
+            subjectType: slimSubject.type,
+            collectionType: collectionType,
+            reload: loadCollectionType
+          )
       }
     }
     .task(id: subjectId) {
-      await load()
+      if loadSubjectOnAppear {
+        await load()
+      }
     }
   }
 }

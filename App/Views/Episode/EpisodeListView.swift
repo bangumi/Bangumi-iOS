@@ -110,7 +110,6 @@ struct EpisodeListDetailView: View {
         }
       }.padding(.horizontal, 8)
     }
-    .animation(.default, value: episodes)
     .task(id: "\(subjectId)-\(sortDesc)-\(main)-\(filterCollection)-\(reloadToken)") {
       await load()
     }

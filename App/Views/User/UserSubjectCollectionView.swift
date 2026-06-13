@@ -116,7 +116,6 @@ struct UserSubjectCollectionView: View {
       }
       .animation(.default, value: ctype)
       .animation(.default, value: refreshing)
-      .animation(.default, value: subjects)
     }
   }
 }

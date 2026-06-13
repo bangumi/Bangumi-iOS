@@ -122,11 +122,8 @@ struct CachedGroupTopicListView: View {
 
     do {
       let resp = try await TopicService.getRecentGroupTopics(mode: mode, limit: 20, offset: 0)
-      let updatedItems = [GroupTopicDTO]().mergedById(with: resp.data)
-      if items != updatedItems {
-        withAnimation {
-          items = updatedItems
-        }
+      withAnimation {
+        items = [GroupTopicDTO]().mergedById(with: resp.data)
       }
       offset = 20
       exhausted = resp.data.count == 0 || offset >= resp.total
@@ -149,12 +146,7 @@ struct CachedGroupTopicListView: View {
 
     do {
       let resp = try await TopicService.getRecentGroupTopics(mode: mode, limit: 20, offset: offset)
-      let updatedItems = items.mergedById(with: resp.data)
-      if items != updatedItems {
-        withAnimation {
-          items = updatedItems
-        }
-      }
+      items = items.mergedById(with: resp.data)
       offset += 20
       if resp.data.count == 0 || offset >= resp.total {
         exhausted = true

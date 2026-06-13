@@ -94,8 +94,6 @@ struct EpisodeGridView: View {
         Spacer()
       }
     )
-    .animation(.default, value: episodeMains)
-    .animation(.default, value: episodeSps)
     .task {
       await loadCached()
       refresh()

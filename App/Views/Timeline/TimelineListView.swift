@@ -120,15 +120,15 @@ struct TimelineListView: View {
         }
       }.padding(8)
       LazyVStack(alignment: .leading) {
-        ForEach(Array(zip(items.indices, items)), id: \.1) { idx, item in
+        ForEach(items.indexedById()) { row in
           TimelineItemView(
-            item: item,
-            previousUID: idx == items.startIndex ? nil : items[idx - 1].user?.id
+            item: row.item,
+            previousUID: row.index == items.startIndex ? nil : items[row.index - 1].user?.id
           )
           .padding(.bottom, 8)
           .onAppear {
             Task {
-              await loadNextPage(item)
+              await loadNextPage(row.item)
             }
           }
         }
@@ -141,7 +141,6 @@ struct TimelineListView: View {
         }
       }.padding(.horizontal, 8)
     }
-    .animation(.default, value: items)
     .task {
       if items.count > 0 {
         return

@@ -7,7 +7,7 @@ struct SearchSubjectView: View {
 
   @State private var reloader = false
 
-  func fetch(limit: Int, offset: Int) async -> PagedDTO<SlimSubjectDTO>? {
+  func fetch(limit: Int, offset: Int) async -> PagedDTO<SubjectListItemDTO>? {
     do {
       guard let db = await AppContext.shared.databaseIfAvailable() else {
         throw ChiiError.uninitialized
@@ -18,7 +18,7 @@ struct SearchSubjectView: View {
         try await db.saveSubject(item)
       }
       try await db.commit()
-      return resp
+      return PagedDTO(data: try await db.makeSubjectListItems(resp.data), total: resp.total)
     } catch {
       Notifier.shared.alert(error: error)
     }
@@ -26,8 +26,8 @@ struct SearchSubjectView: View {
   }
 
   var body: some View {
-    PageView<SlimSubjectDTO, _>(reloader: reloader, nextPageFunc: fetch) { item in
-      SubjectItemView(subjectId: item.id)
+    PageView<SubjectListItemDTO, _>(reloader: reloader, nextPageFunc: fetch) { item in
+      SubjectItemView(subject: item.subject, collectionType: item.collectionType)
     }
     .onChange(of: subjectType) { _, _ in
       reloader.toggle()

@@ -73,11 +73,10 @@ struct EpisodeDiscView: View {
           Divider()
         }
       }
-    }.animation(.default, value: episodes)
-      .task {
-        await loadCached()
-        refresh()
-      }
+    }.task {
+      await loadCached()
+      refresh()
+    }
   }
 }
 
