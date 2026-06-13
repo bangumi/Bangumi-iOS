@@ -151,57 +151,26 @@ struct SearchSubjectPickerLocalView: View {
 }
 
 struct SearchSubjectPickerItemView: View {
-  let subjectId: Int
-  let slimSubject: SlimSubjectDTO?
-  let loadSubjectOnAppear: Bool
+  let subject: SlimSubjectDTO
+  let collectionType: CollectionType
   let onSelect: (Int) -> Void
-
-  @State private var subject: SubjectDTO?
-  @State private var collectionType: CollectionType = .none
-
-  init(subjectId: Int, onSelect: @escaping (Int) -> Void) {
-    self.subjectId = subjectId
-    self.slimSubject = nil
-    self.loadSubjectOnAppear = true
-    self.onSelect = onSelect
-  }
 
   init(
     subject: SlimSubjectDTO,
     collectionType: CollectionType,
     onSelect: @escaping (Int) -> Void
   ) {
-    self.subjectId = subject.id
-    self.slimSubject = subject
-    self.loadSubjectOnAppear = false
+    self.subject = subject
+    self.collectionType = collectionType
     self.onSelect = onSelect
-    self._collectionType = State(initialValue: collectionType)
-  }
-
-  private func load() async {
-    do {
-      let db = try await AppContext.shared.getDB()
-      subject = try await db.getSubjectDTO(subjectId)
-    } catch {
-      Notifier.shared.alert(error: error)
-    }
   }
 
   var body: some View {
     CardView {
-      if let subject = subject {
-        SubjectLargeRowView(subject: subject)
-      } else if let slimSubject {
-        SubjectSlimRowView(subject: slimSubject, collectionType: collectionType)
-      }
+      SubjectSlimRowView(subject: subject, collectionType: collectionType)
     }
     .onTapGesture {
-      onSelect(subjectId)
-    }
-    .task(id: subjectId) {
-      if loadSubjectOnAppear {
-        await load()
-      }
+      onSelect(subject.id)
     }
   }
 }

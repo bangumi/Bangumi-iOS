@@ -190,24 +190,8 @@ struct SubjectSlimRowView: View {
 
 struct SubjectItemView: View {
   let subjectId: Int
-  let slimSubject: SlimSubjectDTO?
-  let loadSubjectOnAppear: Bool
 
   @State private var subject: SubjectDTO?
-  @State private var collectionType: CollectionType = .none
-
-  init(subjectId: Int) {
-    self.subjectId = subjectId
-    self.slimSubject = nil
-    self.loadSubjectOnAppear = true
-  }
-
-  init(subject: SlimSubjectDTO, collectionType: CollectionType) {
-    self.subjectId = subject.id
-    self.slimSubject = subject
-    self.loadSubjectOnAppear = false
-    self._collectionType = State(initialValue: collectionType)
-  }
 
   private func load() async {
     do {
@@ -215,15 +199,6 @@ struct SubjectItemView: View {
       subject = try await db.getSubjectDTO(subjectId)
     } catch {
       Logger.app.error("Failed to load subject item: \(error)")
-    }
-  }
-
-  private func loadCollectionType() async {
-    do {
-      let db = try await AppContext.shared.getDB()
-      collectionType = try await db.getCollectionTypes(subjectIds: [subjectId])[subjectId] ?? .none
-    } catch {
-      Logger.app.error("Failed to load subject collection type: \(error)")
     }
   }
 
@@ -237,20 +212,47 @@ struct SubjectItemView: View {
             collectionType: subject.ctypeEnum,
             reload: load
           )
-      } else if let slimSubject {
-        SubjectSlimRowView(subject: slimSubject, collectionType: collectionType)
-          .subjectCollectionStatusOverlay(
-            subjectId: slimSubject.id,
-            subjectType: slimSubject.type,
-            collectionType: collectionType,
-            reload: loadCollectionType
-          )
       }
     }
     .task(id: subjectId) {
-      if loadSubjectOnAppear {
-        await load()
-      }
+      await load()
+    }
+  }
+}
+
+struct SubjectSlimItemView: View {
+  let subject: SlimSubjectDTO
+  let initialCollectionType: CollectionType
+
+  @State private var collectionType: CollectionType
+
+  init(subject: SlimSubjectDTO, collectionType: CollectionType) {
+    self.subject = subject
+    self.initialCollectionType = collectionType
+    self._collectionType = State(initialValue: collectionType)
+  }
+
+  private func loadCollectionType() async {
+    do {
+      let db = try await AppContext.shared.getDB()
+      collectionType = try await db.getCollectionTypes(subjectIds: [subject.id])[subject.id] ?? .none
+    } catch {
+      Logger.app.error("Failed to load subject collection type: \(error)")
+    }
+  }
+
+  var body: some View {
+    CardView {
+      SubjectSlimRowView(subject: subject, collectionType: collectionType)
+        .subjectCollectionStatusOverlay(
+          subjectId: subject.id,
+          subjectType: subject.type,
+          collectionType: collectionType,
+          reload: loadCollectionType
+        )
+    }
+    .onChange(of: initialCollectionType) { _, newValue in
+      collectionType = newValue
     }
   }
 }

@@ -123,7 +123,7 @@ struct SubjectBrowsingView: View {
         browseHeader
 
         SimplePageView(reloader: reloader, nextPageFunc: fetchPage) { item in
-          SubjectItemView(subject: item.subject, collectionType: item.collectionType)
+          SubjectSlimItemView(subject: item.subject, collectionType: item.collectionType)
         }
         .zIndex(0)
 
@@ -610,7 +610,7 @@ struct SubjectTagBrowsingView: View {
         Divider()
 
         SimplePageView(reloader: reloader, nextPageFunc: fetchPage) { item in
-          SubjectItemView(subject: item.subject, collectionType: item.collectionType)
+          SubjectSlimItemView(subject: item.subject, collectionType: item.collectionType)
         }
       }.padding(.horizontal, 8)
     }
