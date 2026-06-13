@@ -32,7 +32,7 @@ struct SubjectCommentsView: View {
         Spacer()
       }.padding(.bottom, 5)
     }
-    VStack {
+    LazyVStack {
       ForEach(comments) { comment in
         SubjectCommentItemView(subjectType: subjectType, comment: comment)
       }

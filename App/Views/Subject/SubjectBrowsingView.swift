@@ -119,7 +119,7 @@ struct SubjectBrowsingView: View {
 
   var body: some View {
     ScrollView {
-      LazyVStack(alignment: .leading, spacing: 8) {
+      VStack(alignment: .leading, spacing: 8) {
         browseHeader
 
         SimplePageView(reloader: reloader, nextPageFunc: fetchPage) { item in

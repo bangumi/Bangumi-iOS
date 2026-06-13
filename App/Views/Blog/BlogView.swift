@@ -175,7 +175,7 @@ struct BlogSubjectsView: View {
   var body: some View {
     NavigationStack {
       ScrollView {
-        LazyVStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 8) {
           ForEach(subjects) { subject in
             SubjectSmallView(subject: subject)
           }

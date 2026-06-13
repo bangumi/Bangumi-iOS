@@ -22,7 +22,7 @@ struct TrendingSubjectView: View {
   }
 
   var body: some View {
-    LazyVStack(spacing: 24) {
+    VStack(spacing: 24) {
       ForEach(SubjectType.allTypes) { st in
         TrendingSubjectTypeView(type: st, width: width - 16, reloader: reloader)
       }

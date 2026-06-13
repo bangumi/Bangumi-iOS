@@ -7,7 +7,7 @@ struct InfoboxView: View {
 
   var body: some View {
     ScrollView {
-      LazyVStack(alignment: .leading) {
+      VStack(alignment: .leading) {
         ForEach(infobox) { item in
           HStack(alignment: .top) {
             Text("\(item.key):").bold()

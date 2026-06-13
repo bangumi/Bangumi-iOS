@@ -206,7 +206,7 @@ private struct DraftBoxView: View {
               Text(draft.content)
                 .lineLimit(3)
                 .multilineTextAlignment(.leading)
-              Text("\(draft.content.count)字 · \(draft.updatedAt.date, style: .relative)前")
+              Text("\(draft.content.count)字 · \(draft.updatedAt.relativeDisplay)")
                 .font(.caption)
                 .foregroundStyle(.secondary)
             }

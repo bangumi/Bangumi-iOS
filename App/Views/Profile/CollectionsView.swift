@@ -5,7 +5,7 @@ struct CollectionsView: View {
 
   var body: some View {
     ScrollView(showsIndicators: false) {
-      LazyVStack(alignment: .leading) {
+      VStack(alignment: .leading) {
         ForEach(SubjectType.allTypes) { stype in
           CollectionSubjectTypeView(stype: stype)
             .padding(.top, 5)

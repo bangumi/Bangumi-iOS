@@ -418,7 +418,7 @@ struct SubjectInfoboxDetailView: View {
   }
 
   var body: some View {
-    LazyVStack(alignment: .leading) {
+    VStack(alignment: .leading) {
       ForEach(pinnedItems, id: \.self) { item in
         Text(item)
           .tint(.linkText)

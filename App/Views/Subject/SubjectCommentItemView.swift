@@ -30,7 +30,7 @@ struct SubjectCommentItemView: View {
             HStack(spacing: 2) {
               Text("\(comment.type.description(subjectType))")
               Text("@")
-              comment.updatedAt.relativeText.lineLimit(1)
+              Text(comment.updatedAt.relativeDisplay).monospacedDigit().lineLimit(1)
             }
             .font(.caption)
             .foregroundStyle(.secondary)

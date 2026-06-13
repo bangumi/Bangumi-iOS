@@ -141,7 +141,7 @@ struct CalendarView: View {
             .font(.footnote)
             .foregroundStyle(.secondary)
           }.padding(.horizontal, 8)
-          LazyVStack {
+          VStack {
             ForEach(sortedCalendars) { calendar in
               CalendarWeekdayView(calendar: calendar)
                 .padding(.vertical, 10)

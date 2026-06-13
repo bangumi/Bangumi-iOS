@@ -29,7 +29,7 @@ struct CharacterCastsView: View {
         Spacer()
       }.padding(.bottom, 5)
     }
-    LazyVStack {
+    VStack {
       ForEach(casts, id: \.subject.id) { item in
         CharacterCastItemView(item: item)
       }

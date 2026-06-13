@@ -63,7 +63,7 @@ struct CharacterView: View {
     Section {
       if let character = character {
         ScrollView {
-          LazyVStack(alignment: .leading) {
+          VStack(alignment: .leading) {
             CharacterDetailView(character: character, detail: detail) {
               await loadCached()
             }

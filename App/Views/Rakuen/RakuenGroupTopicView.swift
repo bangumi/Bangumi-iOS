@@ -70,7 +70,7 @@ struct RakuenGroupTopicItemView: View {
               .foregroundStyle(.secondary)
           }
           HStack {
-            topic.updatedAt.relativeText
+            Text(topic.updatedAt.relativeDisplay).monospacedDigit()
               .font(.caption)
               .foregroundStyle(.secondary)
               .lineLimit(1)

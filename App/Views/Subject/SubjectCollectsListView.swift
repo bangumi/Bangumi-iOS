@@ -113,7 +113,7 @@ struct SubjectCollectRowView: View {
           HStack {
             StarsView(score: Float(collect.interest.rate), size: 12)
             Spacer()
-            collect.interest.updatedAt.relativeText
+            Text(collect.interest.updatedAt.relativeDisplay).monospacedDigit()
               .font(.caption2)
               .foregroundStyle(.tertiary)
           }

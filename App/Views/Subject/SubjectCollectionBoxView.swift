@@ -130,7 +130,7 @@ struct SubjectCollectionBoxView: View {
           if let interest = subject?.interest, interest.updatedAt > 0 {
             Section {
               Text("上次更新：\(interest.updatedAt.datetimeDisplay)")
-                + Text(" / \(interest.updatedAt.date, style: .relative)前")
+                + Text(" / \(interest.updatedAt.relativeDisplay)")
                 .foregroundStyle(.secondary)
             }
             .monospacedDigit()
