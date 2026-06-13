@@ -153,13 +153,27 @@ private let safeParseDateCalendar: Calendar = {
   return calendar
 }()
 
+private let safeParseDateFallback = Date(timeIntervalSince1970: 0)
+
+private func validatedDate(year: Int, month: Int, day: Int) -> Date? {
+  let components = DateComponents(year: year, month: month, day: day)
+  guard let date = safeParseDateCalendar.date(from: components) else {
+    return nil
+  }
+  let resolved = safeParseDateCalendar.dateComponents([.year, .month, .day], from: date)
+  guard resolved.year == year, resolved.month == month, resolved.day == day else {
+    return nil
+  }
+  return date
+}
+
 func safeParseDate(str: String?) -> Date {
   guard let str = str else {
-    return Date(timeIntervalSince1970: 0)
+    return safeParseDateFallback
   }
   let trimmed = str.trimmingCharacters(in: .whitespacesAndNewlines)
   if trimmed.isEmpty {
-    return Date(timeIntervalSince1970: 0)
+    return safeParseDateFallback
   }
 
   if trimmed.count == 10,
@@ -173,9 +187,7 @@ func safeParseDate(str: String?) -> Date {
     let month = Int(trimmed[monthStart..<monthEnd])
     let day = Int(trimmed[dayStart...])
     if let year, let month, let day,
-      let date = safeParseDateCalendar.date(
-        from: DateComponents(year: year, month: month, day: day)
-      )
+      let date = validatedDate(year: year, month: month, day: day)
     {
       return date
     }
@@ -189,7 +201,7 @@ func safeParseDate(str: String?) -> Date {
   }
 
   // fallback to 1970-01-01
-  return Date(timeIntervalSince1970: 0)
+  return safeParseDateFallback
 }
 
 func safeParseRFC3339Date(str: String?) -> Date {
