@@ -91,7 +91,6 @@ struct SearchSubjectPickerRemoteView: View {
       for item in resp.data {
         try await db.saveSubject(item)
       }
-      try await db.commit()
       return PagedDTO(data: try await db.makeSubjectListItems(resp.data), total: resp.total)
     } catch {
       Notifier.shared.alert(error: error)

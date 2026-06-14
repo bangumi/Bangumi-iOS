@@ -29,7 +29,6 @@ enum SubjectRepository {
     }
 
     try await db.saveSubject(item)
-    try await db.commit()
     if item.interest != nil {
       await SearchIndexing.index([item.searchable()])
     }
@@ -127,7 +126,6 @@ enum SubjectRepository {
       comments: await commentsTask?.value?.data,
       indexes: await indexesTask.value?.data
     )
-    try await db.commit()
   }
 
   static func loadSubjectPositions(_ subjectId: Int) async throws {
@@ -148,14 +146,12 @@ enum SubjectRepository {
       }
     }
     try await db.saveSubjectPositions(subjectId: subjectId, items: items)
-    try await db.commit()
   }
 
   static func updateSubjectProgress(subjectId: Int, eps: Int?, vols: Int?) async throws {
     try await SubjectService.updateSubjectProgress(subjectId: subjectId, eps: eps, vols: vols)
     let db = try await AppContext.shared.getDB()
     try await db.updateSubjectProgress(subjectId: subjectId, eps: eps, vols: vols)
-    try await db.commit()
     await ProgressSubjectInvalidation.post(subjectId: subjectId)
   }
 
@@ -187,7 +183,6 @@ enum SubjectRepository {
       tags: tags,
       progress: progress
     )
-    try await db.commit()
     await ProgressSubjectInvalidation.post(
       subjectId: subjectId,
       mayChangeProgressMembership: true

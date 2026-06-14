@@ -12,8 +12,6 @@ actor DatabaseOperator {
 
 // MARK: - basic
 extension DatabaseOperator {
-  public func commit() throws {}
-
   public func clearSubjectInterest() throws {
     try database.write { db in
       try db.execute(sql: "UPDATE subjects SET ctype = 0, collected_at = 0, interest_data = NULL")

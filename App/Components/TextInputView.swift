@@ -60,7 +60,6 @@ struct TextInputView: View {
     do {
       let db = try await AppContext.shared.getDB()
       let id = try await db.saveDraft(type: type, content: content, id: currentDraftID)
-      try await db.commit()
       let drafts = try await db.fetchDrafts(type: type)
       currentDraftID = id
       self.drafts = drafts
@@ -219,7 +218,6 @@ private struct DraftBoxView: View {
                 Task {
                   if let db = try? await AppContext.shared.getDB() {
                     await db.deleteDraft(id: draft.id)
-                    try? await db.commit()
                     await onDelete()
                   }
                 }

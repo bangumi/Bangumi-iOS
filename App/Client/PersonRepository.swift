@@ -27,7 +27,6 @@ enum PersonRepository {
       throw ChiiError(message: "这是一个被合并的人物")
     }
     try await db.savePerson(item)
-    try await db.commit()
     if item.collectedAt != nil {
       await SearchIndexing.index([item.searchable()])
     }
@@ -54,7 +53,6 @@ enum PersonRepository {
       relations: await relationsTask.value?.data,
       indexes: await indexesTask.value?.data
     )
-    try await db.commit()
   }
 
   static func collectPerson(_ personId: Int) async throws {
@@ -62,13 +60,11 @@ enum PersonRepository {
     let db = try await AppContext.shared.getDB()
     let now = Int(Date().timeIntervalSince1970)
     try await db.updatePersonCollection(personId: personId, collectedAt: now - 1)
-    try await db.commit()
   }
 
   static func uncollectPerson(_ personId: Int) async throws {
     try await PersonService.uncollectPerson(personId)
     let db = try await AppContext.shared.getDB()
     try await db.updatePersonCollection(personId: personId, collectedAt: 0)
-    try await db.commit()
   }
 }

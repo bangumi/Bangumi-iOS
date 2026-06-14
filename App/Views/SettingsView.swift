@@ -291,7 +291,6 @@ struct SettingsView: View {
                 do {
                   let db = try await AppContext.shared.getDB()
                   try await db.clearDrafts()
-                  try await db.commit()
                   Notifier.shared.notify(message: "草稿箱已清空")
                 } catch {
                   Notifier.shared.alert(error: error)

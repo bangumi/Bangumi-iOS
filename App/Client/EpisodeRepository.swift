@@ -26,7 +26,6 @@ enum EpisodeRepository {
     }
     try await db.saveEpisodes(subjectId: subjectId, items: items)
     try await db.deleteEpisodesNotIn(subjectId: subjectId, episodeIds: episodeIds)
-    try await db.commit()
     await ProgressSubjectInvalidation.post(subjectId: subjectId)
   }
 
@@ -34,14 +33,12 @@ enum EpisodeRepository {
     let db = try await AppContext.shared.getDB()
     let item = try await EpisodeService.getEpisode(episodeId)
     try await db.saveEpisode(item)
-    try await db.commit()
     await ProgressSubjectInvalidation.post(subjectId: item.subjectID)
   }
 
   static func deleteEpisode(_ episodeId: Int) async throws {
     let db = try await AppContext.shared.getDB()
     try await db.deleteEpisode(episodeId)
-    try await db.commit()
   }
 
   static func updateEpisodeCollection(
@@ -51,7 +48,6 @@ enum EpisodeRepository {
     let db = try await AppContext.shared.getDB()
     let subjectId = try await db.updateEpisodeCollection(
       episodeId: episodeId, type: type, batch: batch)
-    try await db.commit()
     if let subjectId {
       await ProgressSubjectInvalidation.post(subjectId: subjectId)
     }

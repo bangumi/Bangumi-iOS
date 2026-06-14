@@ -23,7 +23,6 @@ enum GroupRepository {
     let db = try await AppContext.shared.getDB()
     let item = try await GroupService.getGroup(name)
     try await db.saveGroup(item)
-    try await db.commit()
   }
 
   static func loadGroupDetails(_ name: String) async throws {
@@ -43,6 +42,5 @@ enum GroupRepository {
       moderators: await moderatorsTask.value?.data,
       recentTopics: await topicsTask.value?.data
     )
-    try await db.commit()
   }
 }

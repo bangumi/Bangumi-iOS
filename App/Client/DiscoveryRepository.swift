@@ -12,7 +12,6 @@ enum DiscoveryRepository {
       }
       try await db.saveCalendarItem(weekday: weekday, items: items)
     }
-    try await db.commit()
   }
 
   static func loadTrendingSubjects() async throws {
@@ -38,7 +37,6 @@ enum DiscoveryRepository {
       }
     }
     if saved {
-      try await db.commit()
     } else if let firstError {
       throw firstError
     }

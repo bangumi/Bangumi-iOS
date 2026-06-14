@@ -5,7 +5,6 @@ enum UserRepository {
     let db = try await AppContext.shared.getDB()
     let item = try await UserService.getUser(username)
     try await db.saveUser(item)
-    try await db.commit()
     return item
   }
 }

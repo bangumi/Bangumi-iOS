@@ -27,7 +27,6 @@ enum CharacterRepository {
       throw ChiiError(message: "这是一个被合并的角色")
     }
     try await db.saveCharacter(item)
-    try await db.commit()
     if item.collectedAt != nil {
       await SearchIndexing.index([item.searchable()])
     }
@@ -50,7 +49,6 @@ enum CharacterRepository {
       relations: await relationsTask.value?.data,
       indexes: await indexesTask.value?.data
     )
-    try await db.commit()
   }
 
   static func collectCharacter(_ characterId: Int) async throws {
@@ -58,13 +56,11 @@ enum CharacterRepository {
     let db = try await AppContext.shared.getDB()
     let now = Int(Date().timeIntervalSince1970)
     try await db.updateCharacterCollection(characterId: characterId, collectedAt: now - 1)
-    try await db.commit()
   }
 
   static func uncollectCharacter(_ characterId: Int) async throws {
     try await CharacterService.uncollectCharacter(characterId)
     let db = try await AppContext.shared.getDB()
     try await db.updateCharacterCollection(characterId: characterId, collectedAt: 0)
-    try await db.commit()
   }
 }

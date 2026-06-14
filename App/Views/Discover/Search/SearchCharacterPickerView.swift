@@ -72,7 +72,6 @@ struct SearchCharacterPickerRemoteView: View {
       for item in resp.data {
         try await db.saveCharacter(item)
       }
-      try await db.commit()
       return resp
     } catch {
       Notifier.shared.alert(error: error)

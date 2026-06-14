@@ -359,14 +359,12 @@ struct ChiiProgressView: View {
         loaded[item.id] = item.type
         refreshProgress = CGFloat(count) / CGFloat(resp.total)
       }
-      try await db.commit()
       await SearchIndexing.index(resp.data.map { $0.searchable() })
       offset += limit
       if offset >= resp.total {
         break
       }
     }
-    try await db.commit()
     if since > 0 {
       checkLoadEpisodes(loaded)
     }
