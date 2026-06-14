@@ -1630,7 +1630,8 @@ extension DatabaseOperator {
     in db: Database,
     fallbackSubject: Subject? = nil
   ) throws -> Episode {
-    let episode = Episode(item)
+    let episode = try fetchEpisode(in: db, id: item.id, includeSubject: false) ?? Episode(item)
+    episode.update(item)
     if let slim = item.subject {
       let (subject, _) = try ensureSubject(slim, in: db)
       try upsertSubject(subject, in: db)
