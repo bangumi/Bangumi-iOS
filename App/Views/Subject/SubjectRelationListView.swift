@@ -32,7 +32,7 @@ struct SubjectRelationListView: View {
       reloader.toggle()
     }
     ScrollView {
-      PageView<SubjectRelationDTO, _>(reloader: reloader, nextPageFunc: load) { item in
+      OffsetPagedView<SubjectRelationDTO, _>(reloader: reloader, nextPageFunc: load) { item in
         CardView {
           HStack {
             ImageView(img: item.subject.images?.resize(.r200))

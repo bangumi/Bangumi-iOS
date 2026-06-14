@@ -31,7 +31,7 @@ struct PersonWorkListView: View {
       reloader.toggle()
     }
     ScrollView {
-      PageView<PersonWorkDTO, _>(limit: 10, reloader: reloader, nextPageFunc: load) { item in
+      OffsetPagedView<PersonWorkDTO, _>(limit: 10, reloader: reloader, nextPageFunc: load) { item in
         PersonWorksItemView(item: item)
       }
       .padding(8)

@@ -22,7 +22,7 @@ struct SubjectReviewListView: View {
 
   var body: some View {
     ScrollView {
-      PageView<SubjectReviewDTO, _>(reloader: reloader, nextPageFunc: load) { review in
+      OffsetPagedView<SubjectReviewDTO, _>(reloader: reloader, nextPageFunc: load) { review in
         if !hideBlocklist || !blocklist.contains(review.user.id) {
           SubjectReviewItemView(item: review)
         }

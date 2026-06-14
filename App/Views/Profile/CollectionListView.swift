@@ -55,7 +55,7 @@ struct CollectionListView: View {
             reloader.toggle()
           }
           ScrollView {
-            PageView<SubjectDTO, _>(limit: 20, reloader: reloader, nextPageFunc: load) { item in
+            OffsetPagedView<SubjectDTO, _>(limit: 20, reloader: reloader, nextPageFunc: load) { item in
               SubjectCollectionRowContentView(
                 subject: item.slim,
                 isPrivate: item.interest?.private ?? false

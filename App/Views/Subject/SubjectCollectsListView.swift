@@ -68,7 +68,7 @@ struct SubjectCollectsListView: View {
       }
 
       ScrollView {
-        PageView<SubjectCollectDTO, _>(limit: 20, reloader: reloader, nextPageFunc: load) {
+        OffsetPagedView<SubjectCollectDTO, _>(limit: 20, reloader: reloader, nextPageFunc: load) {
           item in
           SubjectCollectRowView(collect: item, subjectType: subjectType)
         }.padding(8)

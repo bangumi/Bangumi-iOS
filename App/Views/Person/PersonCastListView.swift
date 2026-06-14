@@ -30,7 +30,7 @@ struct PersonCastListView: View {
       reloader.toggle()
     }
     ScrollView {
-      PageView<PersonCastDTO, _>(reloader: reloader, nextPageFunc: load) { item in
+      OffsetPagedView<PersonCastDTO, _>(reloader: reloader, nextPageFunc: load) { item in
         PersonCastItemView(item: item)
       }
       .padding(8)

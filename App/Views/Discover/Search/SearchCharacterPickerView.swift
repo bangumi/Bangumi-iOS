@@ -81,7 +81,7 @@ struct SearchCharacterPickerRemoteView: View {
   }
 
   var body: some View {
-    PageView<SlimCharacterDTO, _>(nextPageFunc: fetch) { item in
+    OffsetPagedView<SlimCharacterDTO, _>(nextPageFunc: fetch) { item in
       SearchCharacterPickerItemView(characterId: item.id) { selectedId in
         onSelect(selectedId)
         dismiss()

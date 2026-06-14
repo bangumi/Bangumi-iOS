@@ -48,7 +48,7 @@ struct FriendsView: View {
       }
 
       ScrollView {
-        PageView<FriendDTO, _>(reloader: reloader, nextPageFunc: load) { item in
+        OffsetPagedView<FriendDTO, _>(reloader: reloader, nextPageFunc: load) { item in
           CardView {
             HStack(alignment: .top) {
               ImageView(img: item.user.avatar?.large)

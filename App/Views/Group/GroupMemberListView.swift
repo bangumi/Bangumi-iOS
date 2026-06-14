@@ -69,7 +69,7 @@ struct GroupMemberListView: View {
             Text("成员")
               .font(.title3)
             Divider()
-            PageView<GroupMemberDTO, _>(nextPageFunc: loadMembers) { member in
+            OffsetPagedView<GroupMemberDTO, _>(nextPageFunc: loadMembers) { member in
               GroupMemberItemView(member: member)
             }
           }

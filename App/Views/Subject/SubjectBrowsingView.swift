@@ -122,7 +122,7 @@ struct SubjectBrowsingView: View {
       VStack(alignment: .leading, spacing: 8) {
         browseHeader
 
-        SimplePageView(reloader: reloader, nextPageFunc: fetchPage) { item in
+        PageNumberPagedView(reloader: reloader, nextPageFunc: fetchPage) { item in
           SubjectSlimItemView(subject: item.subject, collectionType: item.collectionType)
         }
         .zIndex(0)
@@ -609,7 +609,7 @@ struct SubjectTagBrowsingView: View {
 
         Divider()
 
-        SimplePageView(reloader: reloader, nextPageFunc: fetchPage) { item in
+        PageNumberPagedView(reloader: reloader, nextPageFunc: fetchPage) { item in
           SubjectSlimItemView(subject: item.subject, collectionType: item.collectionType)
         }
       }.padding(.horizontal, 8)

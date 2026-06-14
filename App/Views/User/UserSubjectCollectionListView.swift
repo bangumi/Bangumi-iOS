@@ -37,7 +37,7 @@ struct UserSubjectCollectionListView: View {
         }
 
       ScrollView {
-        PageView<SlimSubjectDTO, _>(limit: 20, reloader: reloader, nextPageFunc: load) {
+        OffsetPagedView<SlimSubjectDTO, _>(limit: 20, reloader: reloader, nextPageFunc: load) {
           item in
           SubjectCollectionRowContentView(subject: item)
           Divider()

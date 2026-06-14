@@ -18,7 +18,7 @@ struct CharacterRelationListView: View {
 
   var body: some View {
     ScrollView {
-      PageView<CharacterRelationDTO, _>(reloader: reloader, nextPageFunc: load) { item in
+      OffsetPagedView<CharacterRelationDTO, _>(reloader: reloader, nextPageFunc: load) { item in
         CharacterRelationItemView(item: item)
       }
       .padding(8)

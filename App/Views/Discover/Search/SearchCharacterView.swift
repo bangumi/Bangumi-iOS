@@ -23,7 +23,7 @@ struct SearchCharacterView: View {
   }
 
   var body: some View {
-    PageView<SlimCharacterDTO, _>(nextPageFunc: fetch) { item in
+    OffsetPagedView<SlimCharacterDTO, _>(nextPageFunc: fetch) { item in
       SearchCharacterItemView(characterId: item.id)
     }
   }

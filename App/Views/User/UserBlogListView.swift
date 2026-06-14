@@ -26,7 +26,7 @@ struct UserBlogListView: View {
 
   var body: some View {
     ScrollView {
-      PageView<SlimBlogEntryDTO, _>(nextPageFunc: load) { item in
+      OffsetPagedView<SlimBlogEntryDTO, _>(nextPageFunc: load) { item in
         VStack {
           HStack(alignment: .top) {
             ImageView(img: item.icon)

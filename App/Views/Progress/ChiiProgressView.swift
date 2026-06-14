@@ -40,6 +40,15 @@ struct ChiiProgressView: View {
     }
   }
 
+  private var progressPagePrefetchWindow: Int {
+    switch progressViewMode {
+    case .list:
+      5
+    case .tile:
+      10
+    }
+  }
+
   private var hasMoreProgress: Bool {
     progressOffset < progressTotal
   }
@@ -61,7 +70,11 @@ struct ChiiProgressView: View {
         update()
       }
     } else {
-      update()
+      var transaction = Transaction()
+      transaction.disablesAnimations = true
+      withTransaction(transaction) {
+        update()
+      }
     }
   }
 
@@ -105,10 +118,10 @@ struct ChiiProgressView: View {
     reset: Bool,
     generation: Int,
     animateReset: Bool = false
-  ) async {
+  ) async -> Bool {
     if !reset {
       guard !progressPageLoading, hasMoreProgress else {
-        return
+        return false
       }
     }
     progressPageLoading = true
@@ -129,7 +142,7 @@ struct ChiiProgressView: View {
         offset: pageOffset
       )
       guard generation == progressLoadGeneration else {
-        return
+        return true
       }
       if reset {
         applyProgressSubjects(result.data, total: result.total, animate: animateReset)
@@ -141,15 +154,16 @@ struct ChiiProgressView: View {
       Logger.app.error("Failed to load progress page: \(error)")
       Notifier.shared.alert(error: error)
     }
+    return true
   }
 
   private func reloadProgressPages(animate: Bool = false) async {
     progressLoadGeneration += 1
     let generation = progressLoadGeneration
-    await loadProgressPage(reset: true, generation: generation, animateReset: animate)
+    _ = await loadProgressPage(reset: true, generation: generation, animateReset: animate)
   }
 
-  private func loadNextProgressPage() async {
+  private func loadNextProgressPage() async -> Bool {
     await loadProgressPage(reset: false, generation: progressLoadGeneration)
   }
 
@@ -392,6 +406,8 @@ struct ChiiProgressView: View {
           items: progressSubjects,
           isLoadingPage: progressPageLoading,
           hasMore: hasMoreProgress,
+          prefetchWindow: progressPagePrefetchWindow,
+          paginationResetToken: progressLoadGeneration,
           loadNextPage: loadNextProgressPage,
           reloadSubject: reloadLoadedProgressSubject
         )
@@ -400,6 +416,8 @@ struct ChiiProgressView: View {
           items: progressSubjects,
           isLoadingPage: progressPageLoading,
           hasMore: hasMoreProgress,
+          prefetchWindow: progressPagePrefetchWindow,
+          paginationResetToken: progressLoadGeneration,
           loadNextPage: loadNextProgressPage,
           reloadSubject: reloadLoadedProgressSubject
         )

@@ -267,7 +267,7 @@ struct IndexView: View {
               .padding(2)
             }
             .scrollClipDisabled()
-            PageView<IndexRelatedDTO, _>(reloader: reloader, nextPageFunc: loadRelated) { item in
+            OffsetPagedView<IndexRelatedDTO, _>(reloader: reloader, nextPageFunc: loadRelated) { item in
               IndexRelatedItemView(
                 reloader: $reloader,
                 item: item,

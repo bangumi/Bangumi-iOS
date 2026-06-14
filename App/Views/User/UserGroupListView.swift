@@ -26,7 +26,7 @@ struct UserGroupListView: View {
 
   var body: some View {
     ScrollView {
-      PageView<SlimGroupDTO, _>(nextPageFunc: load) { item in
+      OffsetPagedView<SlimGroupDTO, _>(nextPageFunc: load) { item in
         CardView {
           HStack(alignment: .top) {
             ImageView(img: item.icon?.large)

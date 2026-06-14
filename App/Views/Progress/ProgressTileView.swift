@@ -4,39 +4,68 @@ struct ProgressTileView: View {
   let items: [ProgressSubjectDTO]
   let isLoadingPage: Bool
   let hasMore: Bool
-  let loadNextPage: () async -> Void
+  let prefetchWindow: Int
+  let paginationResetToken: Int
+  let loadNextPage: () async -> Bool
   let reloadSubject: (Int) async -> Void
 
   @AppStorage("episodeGridInteractionMode") private var episodeGridInteractionMode:
     EpisodeGridInteractionMode = .menu
+  @State private var prefetchState = NextPagePrefetchState<ProgressSubjectDTO.ID>()
+
+  private func requestNextPage(for trigger: NextPagePrefetchTaskKey<ProgressSubjectDTO.ID>) {
+    if let triggerId = prefetchState.request(
+      trigger: trigger,
+      isLoading: isLoadingPage,
+      canLoadMore: hasMore
+    ) {
+      Task {
+        if await !loadNextPage() {
+          prefetchState.cancelRequest(triggerId: triggerId)
+        }
+      }
+    }
+  }
 
   var body: some View {
+    let nextPageTrigger = items.nextPagePrefetchTrigger(prefetchWindow: prefetchWindow)
+
     VStack(spacing: 8) {
       LazyVGrid(columns: [GridItem(.adaptive(minimum: 150))]) {
-        ForEach(items.withNextPageTriggers()) { row in
+        ForEach(items) { item in
+          let trigger = NextPagePrefetchTaskKey(
+            triggerId: nextPageTrigger.triggerId(for: item.id),
+            itemCount: items.count,
+            resetToken: paginationResetToken
+          )
           CardView(padding: 8) {
             ProgressTileItemContentView(
-              payload: ProgressSubjectRenderPayload(row.item),
+              payload: ProgressSubjectRenderPayload(item),
               interactionMode: episodeGridInteractionMode,
               reload: {
-                await reloadSubject(row.item.id)
+                await reloadSubject(item.id)
               }
             )
           }
-          .onAppear {
-            guard row.triggersNextPage, hasMore, !isLoadingPage else {
-              return
-            }
-            Task {
-              await loadNextPage()
-            }
+          .task(id: trigger) {
+            requestNextPage(for: trigger)
           }
         }
+
       }
 
       ProgressPageFooterView(isLoading: isLoadingPage, hasMore: hasMore)
     }
     .padding(.horizontal, 8)
+    .onChange(of: isLoadingPage) { _, isLoading in
+      guard !isLoading else {
+        return
+      }
+      prefetchState.completeLoading(canLoadMore: hasMore)
+    }
+    .onChange(of: paginationResetToken) { _, _ in
+      prefetchState.reset()
+    }
   }
 }
 
@@ -103,26 +132,7 @@ struct ProgressTileItemContentView: View {
           .foregroundStyle(.accent)
         }
 
-        switch subject.type {
-        case .book:
-          VStack(spacing: 1) {
-            ProgressView(
-              value: Float(min(subject.eps, subject.interest?.epStatus ?? 0)),
-              total: Float(subject.eps))
-            ProgressView(
-              value: Float(min(subject.volumes, subject.interest?.volStatus ?? 0)),
-              total: Float(subject.volumes))
-          }.progressViewStyle(.linear)
-
-        case .anime, .real:
-          ProgressView(
-            value: Float(min(subject.eps, subject.interest?.epStatus ?? 0)),
-            total: Float(subject.eps)
-          ).progressViewStyle(.linear)
-
-        default:
-          ProgressView(value: 0, total: 0).progressViewStyle(.linear)
-        }
+        ProgressSubjectLinearBarsView(subject: subject)
       }.frame(height: 128)
     }
   }

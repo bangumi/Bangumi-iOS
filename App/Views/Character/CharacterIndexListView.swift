@@ -18,7 +18,7 @@ struct CharacterIndexListView: View {
 
   var body: some View {
     ScrollView {
-      PageView<SlimIndexDTO, _>(reloader: reloader, nextPageFunc: load) { item in
+      OffsetPagedView<SlimIndexDTO, _>(reloader: reloader, nextPageFunc: load) { item in
         IndexItemView(index: item)
       }.padding(8)
     }

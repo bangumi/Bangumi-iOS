@@ -32,7 +32,7 @@ struct SubjectCommentListView: View {
 
   var body: some View {
     ScrollView {
-      PageView<SubjectCommentDTO, _>(reloader: reloader, nextPageFunc: load) { comment in
+      OffsetPagedView<SubjectCommentDTO, _>(reloader: reloader, nextPageFunc: load) { comment in
         SubjectCommentItemView(subjectType: subjectType, comment: comment)
       }.padding(.horizontal, 8)
     }

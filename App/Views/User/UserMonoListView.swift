@@ -64,7 +64,7 @@ struct UserMonoListView: View {
       ScrollView {
         switch type {
         case .character:
-          PageView<SlimCharacterDTO, _>(nextPageFunc: loadCharacters) { item in
+          OffsetPagedView<SlimCharacterDTO, _>(nextPageFunc: loadCharacters) { item in
             CardView {
               HStack(alignment: .top) {
                 ImageView(img: item.images?.resize(.r200))
@@ -81,7 +81,7 @@ struct UserMonoListView: View {
             }
           }.padding(8)
         case .person:
-          PageView<SlimPersonDTO, _>(nextPageFunc: loadPersons) { item in
+          OffsetPagedView<SlimPersonDTO, _>(nextPageFunc: loadPersons) { item in
             CardView {
               HStack(alignment: .top) {
                 ImageView(img: item.images?.resize(.r200))

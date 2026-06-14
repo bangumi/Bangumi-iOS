@@ -1,26 +1,138 @@
 import SwiftUI
 
-struct NextPageTriggerRow<Item: Identifiable>: Identifiable {
-  let item: Item
-  let triggersNextPage: Bool
+extension Array where Element: Identifiable {
+  func nextPagePrefetchTrigger(prefetchWindow: Int = 5) -> NextPagePrefetchTrigger<Element.ID> {
+    let triggerItems = suffix(Swift.max(prefetchWindow, 1))
+    return NextPagePrefetchTrigger(
+      triggerId: triggerItems.first?.id,
+      itemIds: Set(triggerItems.map(\.id))
+    )
+  }
 
-  var id: Item.ID {
-    item.id
+  func nextPagePrefetchTriggerId(for item: Element, prefetchWindow: Int = 5) -> Element.ID? {
+    guard let itemIndex = firstIndex(where: { $0.id == item.id }) else {
+      return nil
+    }
+    let triggerIndex = Swift.max(count - Swift.max(prefetchWindow, 1), 0)
+    guard itemIndex >= triggerIndex else {
+      return nil
+    }
+    return self[triggerIndex].id
   }
 }
 
-extension Array where Element: Identifiable {
-  func withNextPageTriggers(threshold: Int = 5) -> [NextPageTriggerRow<Element>] {
-    let triggerIndex = Swift.max(count - threshold, 0)
-    return enumerated().map { index, item in
-      NextPageTriggerRow(item: item, triggersNextPage: index >= triggerIndex)
+struct NextPagePrefetchTrigger<ID: Hashable> {
+  let triggerId: ID?
+  private let itemIds: Set<ID>
+
+  init(triggerId: ID?, itemIds: Set<ID>) {
+    self.triggerId = triggerId
+    self.itemIds = itemIds
+  }
+
+  func triggerId(for itemId: ID) -> ID? {
+    guard itemIds.contains(itemId) else {
+      return nil
     }
+    return triggerId
+  }
+}
+
+struct NextPagePrefetchState<ID: Hashable> {
+  private var requestedTriggerId: ID?
+
+  mutating func reset() {
+    requestedTriggerId = nil
+  }
+
+  mutating func request(triggerId: ID, isLoading: Bool, canLoadMore: Bool) -> Bool {
+    guard canLoadMore else {
+      reset()
+      return false
+    }
+    guard !isLoading else {
+      return false
+    }
+    guard requestedTriggerId != triggerId else {
+      return false
+    }
+
+    requestedTriggerId = triggerId
+    return true
+  }
+
+  mutating func request(
+    trigger: NextPagePrefetchTaskKey<ID>,
+    isLoading: Bool,
+    canLoadMore: Bool
+  ) -> ID? {
+    guard let triggerId = trigger.triggerId else {
+      return nil
+    }
+    guard request(
+      triggerId: triggerId,
+      isLoading: isLoading,
+      canLoadMore: canLoadMore
+    ) else {
+      return nil
+    }
+    return triggerId
+  }
+
+  mutating func request<Item: Identifiable>(
+    item: Item,
+    in items: [Item],
+    isLoading: Bool,
+    canLoadMore: Bool,
+    prefetchWindow: Int = 5
+  ) -> ID? where Item.ID == ID {
+    guard let triggerId = items.nextPagePrefetchTriggerId(
+      for: item,
+      prefetchWindow: prefetchWindow
+    ) else {
+      return nil
+    }
+    guard request(triggerId: triggerId, isLoading: isLoading, canLoadMore: canLoadMore) else {
+      return nil
+    }
+    return triggerId
+  }
+
+  mutating func cancelRequest(triggerId: ID) {
+    guard requestedTriggerId == triggerId else {
+      return
+    }
+    requestedTriggerId = nil
+  }
+
+  mutating func completeLoading(canLoadMore: Bool) {
+    if canLoadMore {
+      requestedTriggerId = nil
+    } else {
+      reset()
+    }
+  }
+}
+
+struct NextPagePrefetchTaskKey<ID: Hashable>: Equatable {
+  let triggerId: ID?
+  let itemCount: Int
+  let resetToken: Int
+
+  init(
+    triggerId: ID?,
+    itemCount: Int,
+    resetToken: Int = 0
+  ) {
+    self.triggerId = triggerId
+    self.itemCount = itemCount
+    self.resetToken = resetToken
   }
 }
 
 /// A view that loads data continuously.
 ///
-struct PageView<T, C>: View
+struct OffsetPagedView<T, C>: View
 where C: View, T: Identifiable & Codable & Sendable {
   typealias Item = T
   typealias Content = C
@@ -35,13 +147,15 @@ where C: View, T: Identifiable & Codable & Sendable {
   @State private var offset: Int = 0
   @State private var exhausted: Bool = false
   @State private var items: [Item] = []
+  @State private var prefetchState = NextPagePrefetchState<Item.ID>()
 
   func reload() {
     loading = true
     exhausted = false
     offset = 0
+    prefetchState.reset()
     Task {
-      defer { loading = false }
+      defer { completeLoading() }
       let result = await loadPage(currentOffset: 0)
       if let newData = result {
         withAnimation {
@@ -51,14 +165,23 @@ where C: View, T: Identifiable & Codable & Sendable {
     }
   }
 
+  func completeLoading() {
+    loading = false
+    prefetchState.completeLoading(canLoadMore: !exhausted)
+  }
+
   func loadNextPage() async {
     if loading { return }
     if exhausted { return }
     loading = true
-    defer { loading = false }
+    defer { completeLoading() }
     let result = await loadPage(currentOffset: offset)
     if let newData = result {
-      items = items.mergedById(with: newData)
+      var transaction = Transaction()
+      transaction.disablesAnimations = true
+      withTransaction(transaction) {
+        items = items.mergedById(with: newData)
+      }
     }
   }
 
@@ -92,17 +215,33 @@ where C: View, T: Identifiable & Codable & Sendable {
     self.content = content
   }
 
+  private func requestNextPage(for trigger: NextPagePrefetchTaskKey<Item.ID>) {
+    if prefetchState.request(
+      trigger: trigger,
+      isLoading: loading,
+      canLoadMore: !exhausted
+    ) != nil {
+      Task {
+        await loadNextPage()
+      }
+    }
+  }
+
   public var body: some View {
+    let displayItems = items.filter(isIncluded)
+    let nextPageTrigger = displayItems.nextPagePrefetchTrigger()
+
     LazyVStack(alignment: .leading) {
-      ForEach(items.withNextPageTriggers().filter { isIncluded($0.item) }) { row in
-        content(row.item)
+      ForEach(displayItems) { item in
+        let trigger = NextPagePrefetchTaskKey(
+          triggerId: nextPageTrigger.triggerId(for: item.id),
+          itemCount: items.count,
+          resetToken: offset
+        )
+        content(item)
           .transition(.opacity)
-          .onAppear {
-            if row.triggersNextPage {
-              Task {
-                await loadNextPage()
-              }
-            }
+          .task(id: trigger) {
+            requestNextPage(for: trigger)
           }
       }
 
@@ -135,7 +274,7 @@ where C: View, T: Identifiable & Codable & Sendable {
   }
 }
 
-struct SimplePageView<T, C>: View
+struct PageNumberPagedView<T, C>: View
 where C: View, T: Identifiable & Codable & Sendable {
   typealias Item = T
   typealias Content = C
@@ -148,13 +287,15 @@ where C: View, T: Identifiable & Codable & Sendable {
   @State private var page: Int = 1
   @State private var exhausted: Bool = false
   @State private var items: [Item] = []
+  @State private var prefetchState = NextPagePrefetchState<Item.ID>()
 
   func reload() {
     loading = true
     exhausted = false
     page = 1
+    prefetchState.reset()
     Task {
-      defer { loading = false }
+      defer { completeLoading() }
       let result = await loadPage(currentPage: 1)
       if let newData = result {
         withAnimation {
@@ -164,14 +305,23 @@ where C: View, T: Identifiable & Codable & Sendable {
     }
   }
 
+  func completeLoading() {
+    loading = false
+    prefetchState.completeLoading(canLoadMore: !exhausted)
+  }
+
   func loadNextPage() async {
     if loading { return }
     if exhausted { return }
     loading = true
-    defer { loading = false }
+    defer { completeLoading() }
     let result = await loadPage(currentPage: page)
     if let newData = result {
-      items = items.mergedById(with: newData)
+      var transaction = Transaction()
+      transaction.disablesAnimations = true
+      withTransaction(transaction) {
+        items = items.mergedById(with: newData)
+      }
     }
   }
 
@@ -202,17 +352,32 @@ where C: View, T: Identifiable & Codable & Sendable {
     self.content = content
   }
 
+  private func requestNextPage(for trigger: NextPagePrefetchTaskKey<Item.ID>) {
+    if prefetchState.request(
+      trigger: trigger,
+      isLoading: loading,
+      canLoadMore: !exhausted
+    ) != nil {
+      Task {
+        await loadNextPage()
+      }
+    }
+  }
+
   public var body: some View {
+    let nextPageTrigger = items.nextPagePrefetchTrigger()
+
     LazyVStack(alignment: .leading) {
-      ForEach(items.withNextPageTriggers(threshold: 1)) { row in
-        content(row.item)
+      ForEach(items) { item in
+        let trigger = NextPagePrefetchTaskKey(
+          triggerId: nextPageTrigger.triggerId(for: item.id),
+          itemCount: items.count,
+          resetToken: page
+        )
+        content(item)
           .transition(.opacity)
-          .onAppear {
-            if row.triggersNextPage {
-              Task {
-                await loadNextPage()
-              }
-            }
+          .task(id: trigger) {
+            requestNextPage(for: trigger)
           }
       }
 
@@ -255,7 +420,7 @@ where C: View, T: Identifiable & Codable & Sendable {
   }
 
   return ScrollView {
-    PageView<EpisodeDTO, _>(nextPageFunc: nextPage) { item in
+    OffsetPagedView<EpisodeDTO, _>(nextPageFunc: nextPage) { item in
       VStack {
         Text("\(item.id): \(item.name)")
         Divider()

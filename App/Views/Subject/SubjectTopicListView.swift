@@ -22,7 +22,7 @@ struct SubjectTopicListView: View {
 
   var body: some View {
     ScrollView {
-      PageView<TopicDTO, _>(reloader: reloader, nextPageFunc: load) { topic in
+      OffsetPagedView<TopicDTO, _>(reloader: reloader, nextPageFunc: load) { topic in
         if !hideBlocklist || !blocklist.contains(topic.creator?.id ?? 0) {
           SubjectTopicItemView(topic: topic)
         }

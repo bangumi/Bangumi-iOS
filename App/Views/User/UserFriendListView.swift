@@ -26,7 +26,7 @@ struct UserFriendListView: View {
 
   var body: some View {
     ScrollView {
-      PageView<SlimUserDTO, _>(nextPageFunc: load) { item in
+      OffsetPagedView<SlimUserDTO, _>(nextPageFunc: load) { item in
         CardView {
           HStack(alignment: .top) {
             ImageView(img: item.avatar?.large)

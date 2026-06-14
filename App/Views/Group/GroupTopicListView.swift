@@ -22,7 +22,7 @@ struct GroupTopicListView: View {
 
   var body: some View {
     ScrollView {
-      PageView<TopicDTO, _>(nextPageFunc: loadTopics) { topic in
+      OffsetPagedView<TopicDTO, _>(nextPageFunc: loadTopics) { topic in
         if !hideBlocklist || !blocklist.contains(topic.creator?.id ?? 0) {
           CardView {
             VStack(alignment: .leading, spacing: 4) {

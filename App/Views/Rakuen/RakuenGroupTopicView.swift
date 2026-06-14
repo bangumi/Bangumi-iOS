@@ -37,7 +37,7 @@ struct RakuenGroupTopicListView: View {
   }
 
   var body: some View {
-    PageView<GroupTopicDTO, _>(
+    OffsetPagedView<GroupTopicDTO, _>(
       reloader: reloader,
       isIncluded: isVisible,
       nextPageFunc: load
@@ -101,6 +101,7 @@ struct CachedGroupTopicListView: View {
   @State private var offset = 0
   @State private var exhausted = false
   @State private var initialized = false
+  @State private var prefetchState = NextPagePrefetchState<GroupTopicDTO.ID>()
 
   private var displayItems: [GroupTopicDTO] {
     items.isEmpty ? cachedItems : items
@@ -118,7 +119,8 @@ struct CachedGroupTopicListView: View {
   private func loadFirstPage() async {
     if loading { return }
     loading = true
-    defer { loading = false }
+    prefetchState.reset()
+    defer { completeLoading() }
 
     do {
       let resp = try await TopicService.getRecentGroupTopics(mode: mode, limit: 20, offset: 0)
@@ -139,10 +141,16 @@ struct CachedGroupTopicListView: View {
     }
   }
 
+  private func completeLoading() {
+    loading = false
+    prefetchState.completeLoading(canLoadMore: !exhausted)
+  }
+
   private func loadNextPage() async {
-    if loading || exhausted { return }
+    if loading { return }
+    if exhausted { return }
     loading = true
-    defer { loading = false }
+    defer { completeLoading() }
 
     do {
       let resp = try await TopicService.getRecentGroupTopics(mode: mode, limit: 20, offset: offset)
@@ -156,17 +164,28 @@ struct CachedGroupTopicListView: View {
     }
   }
 
+  private func requestNextPage(for item: GroupTopicDTO, in visibleItems: [GroupTopicDTO]) {
+    if prefetchState.request(
+      item: item,
+      in: visibleItems,
+      isLoading: loading,
+      canLoadMore: !exhausted
+    ) != nil {
+      Task {
+        await loadNextPage()
+      }
+    }
+  }
+
   var body: some View {
+    let visibleItems = displayItems.filter(isVisible)
+
     LazyVStack(alignment: .leading) {
-      ForEach(displayItems.withNextPageTriggers().filter { isVisible($0.item) }) { row in
-        RakuenGroupTopicItemView(topic: row.item)
+      ForEach(visibleItems) { item in
+        RakuenGroupTopicItemView(topic: item)
           .transition(.opacity)
           .onAppear {
-            if row.triggersNextPage {
-              Task {
-                await loadNextPage()
-              }
-            }
+            requestNextPage(for: item, in: visibleItems)
           }
       }
 
@@ -203,6 +222,7 @@ struct CachedGroupTopicListView: View {
       offset = 0
       exhausted = false
       loading = false
+      prefetchState.reset()
       Task {
         await loadCache()
         await loadFirstPage()
@@ -212,6 +232,7 @@ struct CachedGroupTopicListView: View {
       exhausted = false
       offset = 0
       initialized = false
+      prefetchState.reset()
       Task {
         await loadCache()
         await loadFirstPage()

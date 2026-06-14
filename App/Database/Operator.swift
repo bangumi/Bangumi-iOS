@@ -446,6 +446,45 @@ extension DatabaseOperator {
     )
   }
 
+  private func makeProgressSubjects(
+    _ subjects: [Subject],
+    episodeWindowSize: Int
+  ) throws -> [ProgressSubjectDTO] {
+    let episodeSubjectIds = subjects.compactMap { subject in
+      switch subject.typeEnum {
+      case .anime, .real:
+        subject.subjectId
+      default:
+        nil
+      }
+    }
+    let episodesBySubjectId = try fetchProgressEpisodes(
+      subjectIds: episodeSubjectIds,
+      windowSize: episodeWindowSize
+    )
+
+    return subjects.map { subject in
+      ProgressSubjectDTO(
+        subject: SubjectDTO(subject),
+        episodes: episodesBySubjectId[subject.subjectId] ?? []
+      )
+    }
+  }
+
+  private func fetchSubjectsById(_ subjectIds: [Int]) throws -> [Int: Subject] {
+    guard !subjectIds.isEmpty else {
+      return [:]
+    }
+    let descriptor = FetchDescriptor<Subject>(
+      predicate: #Predicate<Subject> {
+        subjectIds.contains($0.subjectId)
+      }
+    )
+    return try modelContext.fetch(descriptor).reduce(into: [:]) { result, subject in
+      result[subject.subjectId] = subject
+    }
+  }
+
   private func matchesProgressFilters(
     _ subject: Subject,
     progressTab: SubjectType,
@@ -460,6 +499,23 @@ extension DatabaseOperator {
       || subject.alias.localizedStandardContains(search)
   }
 
+  private func makeProgressSubjectDescriptor(
+    progressTab: SubjectType,
+    search: String
+  ) -> FetchDescriptor<Subject> {
+    let stype = progressTab.rawValue
+    let doingType = CollectionType.doing.rawValue
+    return FetchDescriptor<Subject>(
+      predicate: #Predicate<Subject> {
+        (stype == 0 || $0.type == stype) && $0.ctype == doingType
+          && (search == "" || $0.name.localizedStandardContains(search)
+            || $0.alias.localizedStandardContains(search))
+      },
+      sortBy: [
+        SortDescriptor(\.collectedAt, order: .reverse)
+      ])
+  }
+
   public func fetchProgressSubjects(
     progressTab: SubjectType,
     progressSortMode: ProgressSortMode,
@@ -468,16 +524,83 @@ extension DatabaseOperator {
     limit: Int,
     offset: Int
   ) throws -> PagedDTO<ProgressSubjectDTO> {
+    if progressSortMode == .collectedAt {
+      var descriptor = makeProgressSubjectDescriptor(
+        progressTab: progressTab,
+        search: search
+      )
+      let total = try modelContext.fetchCount(descriptor)
+      descriptor.fetchLimit = limit
+      descriptor.fetchOffset = offset
+      let subjects = try modelContext.fetch(descriptor)
+      let items = try makeProgressSubjects(subjects, episodeWindowSize: episodeWindowSize)
+      return PagedDTO(data: items, total: total)
+    }
+
     let subjectIds = try fetchProgressSubjectIds(
       progressTab: progressTab,
       progressSortMode: progressSortMode,
       search: search
     )
     let pageIds = subjectIds.dropFirst(offset).prefix(limit)
-    let items = try pageIds.compactMap {
-      try fetchProgressSubject(subjectId: $0, episodeWindowSize: episodeWindowSize)
-    }
+    let subjectsById = try fetchSubjectsById(Array(pageIds))
+    let subjects = pageIds.compactMap { subjectsById[$0] }
+    let items = try makeProgressSubjects(subjects, episodeWindowSize: episodeWindowSize)
     return PagedDTO(data: items, total: subjectIds.count)
+  }
+
+  private func fetchProgressEpisodes(
+    subjectIds: [Int],
+    windowSize: Int
+  ) throws -> [Int: [EpisodeDTO]] {
+    guard !subjectIds.isEmpty else {
+      return [:]
+    }
+    let mainType = EpisodeType.main.rawValue
+    let descriptor = FetchDescriptor<Episode>(
+      predicate: #Predicate<Episode> {
+        subjectIds.contains($0.subjectId) && $0.type == mainType
+      },
+      sortBy: [
+        SortDescriptor<Episode>(\.subjectId, order: .forward),
+        SortDescriptor<Episode>(\.sort, order: .forward),
+      ]
+    )
+    let episodesBySubjectId = try modelContext.fetch(descriptor).reduce(into: [:]) {
+      result, episode in
+      result[episode.subjectId, default: []].append(episode)
+    }
+    return episodesBySubjectId.mapValues {
+      progressEpisodeWindow(from: $0, windowSize: windowSize).map(EpisodeDTO.init)
+    }
+  }
+
+  private func progressEpisodeWindow(from episodes: [Episode], windowSize: Int) -> [Episode] {
+    let windowSize = max(1, windowSize)
+    guard let nextEpisodeIndex = episodes.firstIndex(where: { $0.status == 0 }) else {
+      return Array(episodes.suffix(windowSize))
+    }
+
+    let halfBefore = (windowSize - 1) / 2
+    let halfAfter = windowSize - halfBefore - 1
+    let before = episodes[..<nextEpisodeIndex]
+    let after = episodes[episodes.index(after: nextEpisodeIndex)...]
+
+    let beforeCount: Int
+    let afterCount: Int
+    if before.count < halfBefore {
+      beforeCount = before.count
+      afterCount = min(after.count, windowSize - beforeCount - 1)
+    } else if after.count < halfAfter {
+      afterCount = after.count
+      beforeCount = min(before.count, windowSize - afterCount - 1)
+    } else {
+      beforeCount = halfBefore
+      afterCount = halfAfter
+    }
+
+    return Array(
+      before.suffix(beforeCount) + [episodes[nextEpisodeIndex]] + after.prefix(afterCount))
   }
 
   private func fetchProgressEpisodes(subjectId: Int, windowSize: Int) throws -> [EpisodeDTO] {
@@ -657,17 +780,10 @@ extension DatabaseOperator {
     progressSortMode: ProgressSortMode,
     search: String
   ) throws -> [Int] {
-    let stype = progressTab.rawValue
-    let doingType = CollectionType.doing.rawValue
-    let descriptor = FetchDescriptor<Subject>(
-      predicate: #Predicate<Subject> {
-        (stype == 0 || $0.type == stype) && $0.ctype == doingType
-          && (search == "" || $0.name.localizedStandardContains(search)
-            || $0.alias.localizedStandardContains(search))
-      },
-      sortBy: [
-        SortDescriptor(\.collectedAt, order: .reverse)
-      ])
+    let descriptor = makeProgressSubjectDescriptor(
+      progressTab: progressTab,
+      search: search
+    )
 
     let subjects = try modelContext.fetch(descriptor)
 

@@ -34,7 +34,7 @@ struct SubjectCharacterListView: View {
       reloader.toggle()
     }
     ScrollView {
-      PageView<SubjectCharacterDTO, _>(limit: 10, reloader: reloader, nextPageFunc: load) { item in
+      OffsetPagedView<SubjectCharacterDTO, _>(limit: 10, reloader: reloader, nextPageFunc: load) { item in
         CardView {
           HStack {
             ImageView(img: item.character.images?.medium)

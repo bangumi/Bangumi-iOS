@@ -31,7 +31,7 @@ struct CharacterCastListView: View {
       reloader.toggle()
     }
     ScrollView {
-      PageView<CharacterCastDTO, _>(reloader: reloader, nextPageFunc: load) { item in
+      OffsetPagedView<CharacterCastDTO, _>(reloader: reloader, nextPageFunc: load) { item in
         CharacterCastItemView(item: item)
       }
       .padding(8)

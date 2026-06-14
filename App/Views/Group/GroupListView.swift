@@ -23,7 +23,7 @@ struct GroupListView: View {
 
   var body: some View {
     ScrollView {
-      PageView(reloader: reloader, nextPageFunc: load) { (group: SlimGroupDTO) in
+      OffsetPagedView(reloader: reloader, nextPageFunc: load) { (group: SlimGroupDTO) in
         CardView {
           HStack(alignment: .top) {
             ImageView(img: group.icon?.large)

@@ -26,7 +26,7 @@ struct SearchSubjectView: View {
   }
 
   var body: some View {
-    PageView<SubjectListItemDTO, _>(reloader: reloader, nextPageFunc: fetch) { item in
+    OffsetPagedView<SubjectListItemDTO, _>(reloader: reloader, nextPageFunc: fetch) { item in
       SubjectSlimItemView(subject: item.subject, collectionType: item.collectionType)
     }
     .onChange(of: subjectType) { _, _ in

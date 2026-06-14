@@ -18,7 +18,7 @@ struct SubjectStaffListView: View {
 
   var body: some View {
     ScrollView {
-      PageView<SubjectStaffDTO, _>(limit: 20, nextPageFunc: load) { item in
+      OffsetPagedView<SubjectStaffDTO, _>(limit: 20, nextPageFunc: load) { item in
         CardView {
           HStack {
             ImageView(img: item.staff.images?.resize(.r200))
