@@ -553,54 +553,9 @@ extension DatabaseOperator {
     subjectIds: [Int],
     windowSize: Int
   ) throws -> [Int: [EpisodeDTO]] {
-    guard !subjectIds.isEmpty else {
-      return [:]
+    try subjectIds.reduce(into: [:]) { result, subjectId in
+      result[subjectId] = try fetchProgressEpisodes(subjectId: subjectId, windowSize: windowSize)
     }
-    let mainType = EpisodeType.main.rawValue
-    let descriptor = FetchDescriptor<Episode>(
-      predicate: #Predicate<Episode> {
-        subjectIds.contains($0.subjectId) && $0.type == mainType
-      },
-      sortBy: [
-        SortDescriptor<Episode>(\.subjectId, order: .forward),
-        SortDescriptor<Episode>(\.sort, order: .forward),
-      ]
-    )
-    let episodesBySubjectId = try modelContext.fetch(descriptor).reduce(into: [:]) {
-      result, episode in
-      result[episode.subjectId, default: []].append(episode)
-    }
-    return episodesBySubjectId.mapValues {
-      progressEpisodeWindow(from: $0, windowSize: windowSize).map(EpisodeDTO.init)
-    }
-  }
-
-  private func progressEpisodeWindow(from episodes: [Episode], windowSize: Int) -> [Episode] {
-    let windowSize = max(1, windowSize)
-    guard let nextEpisodeIndex = episodes.firstIndex(where: { $0.status == 0 }) else {
-      return Array(episodes.suffix(windowSize))
-    }
-
-    let halfBefore = (windowSize - 1) / 2
-    let halfAfter = windowSize - halfBefore - 1
-    let before = episodes[..<nextEpisodeIndex]
-    let after = episodes[episodes.index(after: nextEpisodeIndex)...]
-
-    let beforeCount: Int
-    let afterCount: Int
-    if before.count < halfBefore {
-      beforeCount = before.count
-      afterCount = min(after.count, windowSize - beforeCount - 1)
-    } else if after.count < halfAfter {
-      afterCount = after.count
-      beforeCount = min(before.count, windowSize - afterCount - 1)
-    } else {
-      beforeCount = halfBefore
-      afterCount = halfAfter
-    }
-
-    return Array(
-      before.suffix(beforeCount) + [episodes[nextEpisodeIndex]] + after.prefix(afterCount))
   }
 
   private func fetchProgressEpisodes(subjectId: Int, windowSize: Int) throws -> [EpisodeDTO] {
