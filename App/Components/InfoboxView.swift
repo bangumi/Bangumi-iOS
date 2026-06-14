@@ -33,9 +33,3 @@ struct InfoboxView: View {
     .navigationBarTitleDisplayMode(.inline)
   }
 }
-
-#Preview {
-  ScrollView {
-    InfoboxView(title: "", infobox: Subject.previewAnime.infobox)
-  }
-}

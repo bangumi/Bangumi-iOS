@@ -85,7 +85,3 @@ struct FriendsView: View {
     .navigationBarTitleDisplayMode(.inline)
   }
 }
-
-#Preview {
-  FriendsView()
-}

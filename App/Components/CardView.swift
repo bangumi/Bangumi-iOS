@@ -31,13 +31,3 @@ struct CardView<Content: View>: View {
     }
   }
 }
-
-#Preview {
-  VStack {
-    Spacer()
-    CardView {
-      Text("Hello, World!")
-    }
-    Spacer()
-  }.padding()
-}

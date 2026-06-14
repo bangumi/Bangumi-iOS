@@ -1,5 +1,4 @@
 import BBCode
-import SwiftData
 import SwiftUI
 
 struct BlogView: View {

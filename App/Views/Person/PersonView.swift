@@ -278,15 +278,3 @@ struct PersonDetailView: View {
     PersonIndexsView(personId: person.id, indexes: detail.indexes)
   }
 }
-
-#Preview {
-  let container = mockContainer()
-
-  let person = Person.preview
-  container.mainContext.insert(person)
-
-  return NavigationStack {
-    PersonView(personId: person.personId)
-      .modelContainer(container)
-  }
-}

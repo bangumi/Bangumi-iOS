@@ -164,30 +164,3 @@ struct ProgressListItemContentView: View {
     }
   }
 }
-
-#Preview {
-  let container = mockContainer()
-
-  let subject = Subject.previewAnime
-  let episodes = Episode.previewAnime
-  container.mainContext.insert(subject)
-  for episode in episodes {
-    container.mainContext.insert(episode)
-  }
-
-  return ScrollView {
-    LazyVStack(alignment: .leading) {
-      ProgressListItemContentView(
-        payload: ProgressSubjectRenderPayload(
-          ProgressSubjectDTO(
-            subject: SubjectDTO(subject),
-            episodes: episodes.map(EpisodeDTO.init)
-          )
-        ),
-        interactionMode: .menu,
-        reload: {}
-      )
-      .modelContainer(container)
-    }.padding()
-  }
-}

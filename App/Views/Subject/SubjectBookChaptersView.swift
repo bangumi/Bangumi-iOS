@@ -390,19 +390,3 @@ struct TileChapterView: View {
     }
   }
 }
-
-#Preview {
-  let subject = Subject.previewBook
-
-  ScrollView {
-    LazyVStack(alignment: .leading) {
-      SubjectBookChaptersView(subject: SubjectDTO(subject), mode: .large)
-      SubjectBookChaptersView(subject: SubjectDTO(subject), mode: .row)
-      HStack(spacing: 8) {
-        SubjectBookChaptersView(subject: SubjectDTO(subject), mode: .tile)
-        Spacer()
-        SubjectBookChaptersView(subject: SubjectDTO(subject), mode: .tile)
-      }
-    }.padding()
-  }
-}

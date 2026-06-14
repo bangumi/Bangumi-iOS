@@ -4,7 +4,7 @@
 
 [![Download on the App Store](https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg)](https://apps.apple.com/app/id6499502714)
 
-一个基于 SwiftData & SwiftUI 的 Bangumi iOS 客户端。
+一个基于 SwiftUI 的 Bangumi iOS 客户端。
 
 完全使用 [Private API](https://github.com/bangumi/server-private) 获取数据。
 

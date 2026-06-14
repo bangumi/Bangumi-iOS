@@ -1,4 +1,3 @@
-import SwiftData
 import SwiftUI
 
 struct PersonCastListView: View {
@@ -39,9 +38,4 @@ struct PersonCastListView: View {
     .navigationTitle("出演角色")
     .navigationBarTitleDisplayMode(.inline)
   }
-}
-
-#Preview {
-  let person = Person.preview
-  return PersonCastListView(personId: person.personId)
 }

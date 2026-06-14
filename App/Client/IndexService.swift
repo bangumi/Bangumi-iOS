@@ -2,9 +2,6 @@ import Foundation
 
 enum IndexService {
   static func getIndex(_ indexId: Int) async throws -> IndexDTO {
-    if await AppContext.shared.isMock {
-      return loadFixture(fixture: "index.json", target: IndexDTO.self)
-    }
     let url = BangumiAPI.priv.build("p1/indexes/\(indexId)")
     let data = try await APIClient.shared.request(url: url, method: "GET")
     let resp: IndexDTO = try await APIClient.shared.decodeResponse(data)
@@ -64,9 +61,6 @@ enum IndexService {
     indexId: Int, cat: IndexRelatedCategory? = nil, type: SubjectType? = nil,
     limit: Int = 20, offset: Int = 0
   ) async throws -> PagedDTO<IndexRelatedDTO> {
-    if await AppContext.shared.isMock {
-      return loadFixture(fixture: "index_related.json", target: PagedDTO<IndexRelatedDTO>.self)
-    }
     let url = BangumiAPI.priv.build("p1/indexes/\(indexId)/related")
     var queryItems: [URLQueryItem] = [
       URLQueryItem(name: "limit", value: String(limit)),
@@ -123,9 +117,6 @@ enum IndexService {
   }
 
   static func getIndexComments(_ indexId: Int) async throws -> [CommentDTO] {
-    if await AppContext.shared.isMock {
-      return loadFixture(fixture: "index_comments.json", target: [CommentDTO].self)
-    }
     let url = BangumiAPI.priv.build("p1/indexes/\(indexId)/comments")
     let data = try await APIClient.shared.request(url: url, method: "GET")
     let resp: [CommentDTO] = try await APIClient.shared.decodeResponse(data)

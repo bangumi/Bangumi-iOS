@@ -267,7 +267,8 @@ struct IndexView: View {
               .padding(2)
             }
             .scrollClipDisabled()
-            OffsetPagedView<IndexRelatedDTO, _>(reloader: reloader, nextPageFunc: loadRelated) { item in
+            OffsetPagedView<IndexRelatedDTO, _>(reloader: reloader, nextPageFunc: loadRelated) {
+              item in
               IndexRelatedItemView(
                 reloader: $reloader,
                 item: item,
@@ -386,8 +387,4 @@ struct IndexView: View {
     }
     .handoff(url: shareLink, title: index?.title ?? "目录")
   }
-}
-
-#Preview {
-  IndexView(indexId: 83001)
 }

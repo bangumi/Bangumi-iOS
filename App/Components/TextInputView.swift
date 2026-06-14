@@ -1,6 +1,5 @@
 import BBCode
 import OSLog
-import SwiftData
 import SwiftUI
 
 struct TextInputStyle {
@@ -40,7 +39,7 @@ struct TextInputView: View {
   @FocusState private var isEditing: Bool
   @State private var showingBBCodeMenu = false
   @State private var showingDrafts = false
-  @State private var currentDraftID: PersistentIdentifier?
+  @State private var currentDraftID: Int64?
   @State private var drafts: [DraftDTO] = []
   @State private var isSavingDraft = false
   @State private var needsDraftSave = false
@@ -182,7 +181,7 @@ private struct PlainTextEditor: View {
 }
 
 private struct DraftBoxView: View {
-  let currentID: PersistentIdentifier?
+  let currentID: Int64?
   let drafts: [DraftDTO]
   let onLoad: (DraftDTO) -> Void
   let onDelete: () async -> Void

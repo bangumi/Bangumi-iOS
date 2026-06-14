@@ -36,19 +36,3 @@ struct BorderView<Content: View>: View {
     }
   }
 }
-
-#Preview {
-  VStack {
-    Spacer()
-    BorderView(color: .red, padding: 3) {
-      Text("Hello, World!")
-    }
-    BorderView(color: .secondary, padding: 2) {
-      Text("Hello, World!")
-    }
-    BorderView(color: .accent, padding: 1) {
-      Text("Hello, World!")
-    }
-    Spacer()
-  }.padding()
-}

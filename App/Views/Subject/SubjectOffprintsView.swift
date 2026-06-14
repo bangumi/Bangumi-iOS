@@ -1,6 +1,5 @@
 import Foundation
 import OSLog
-import SwiftData
 import SwiftUI
 
 struct SubjectOffprintsView: View {
@@ -73,14 +72,4 @@ struct SubjectOffprintsView: View {
       SubjectCollectionBoxView(subjectId: item.id)
     }
   }
-}
-
-#Preview {
-  ScrollView {
-    LazyVStack(alignment: .leading) {
-      SubjectOffprintsView(
-        subjectId: Subject.previewBook.subjectId, offprints: Subject.previewOffprints
-      )
-    }.padding()
-  }.modelContainer(mockContainer())
 }

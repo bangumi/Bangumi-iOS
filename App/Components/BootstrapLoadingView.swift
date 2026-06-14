@@ -14,7 +14,3 @@ struct BootstrapLoadingView: View {
     .padding(24)
   }
 }
-
-#Preview {
-  BootstrapLoadingView()
-}

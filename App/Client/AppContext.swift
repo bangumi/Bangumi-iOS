@@ -1,22 +1,17 @@
-import SwiftData
+import GRDB
 
 @globalActor
 actor AppContext {
   static let shared = AppContext()
 
   private var db: DatabaseOperator?
-  private var mock = false
-
-  var isMock: Bool {
-    mock
-  }
 
   var appVersion: String {
     AppMetadata.version
   }
 
-  func setUp(container: ModelContainer) {
-    db = DatabaseOperator(modelContainer: container)
+  func setUp(database: DatabaseQueue) {
+    db = DatabaseOperator(database: database)
   }
 
   func getDB() throws -> DatabaseOperator {
@@ -28,9 +23,5 @@ actor AppContext {
 
   func databaseIfAvailable() -> DatabaseOperator? {
     db
-  }
-
-  func setMock() {
-    mock = true
   }
 }

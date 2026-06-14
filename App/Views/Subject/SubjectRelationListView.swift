@@ -1,4 +1,3 @@
-import SwiftData
 import SwiftUI
 
 struct SubjectRelationListView: View {
@@ -64,14 +63,4 @@ struct SubjectRelationListView: View {
     .navigationTitle("关联条目")
     .navigationBarTitleDisplayMode(.inline)
   }
-}
-
-#Preview {
-  let container = mockContainer()
-
-  let subject = Subject.previewAnime
-  container.mainContext.insert(subject)
-
-  return SubjectRelationListView(subjectId: subject.subjectId)
-    .modelContainer(container)
 }

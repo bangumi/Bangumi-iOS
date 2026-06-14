@@ -2,9 +2,6 @@ import Foundation
 
 enum AccountService {
   static func getProfile() async throws -> Profile {
-    if await AppContext.shared.isMock {
-      return loadFixture(fixture: "profile.json", target: Profile.self)
-    }
     let url = BangumiAPI.priv.build("p1/me")
     let data = try await APIClient.shared.request(url: url, method: "GET", auth: .required)
     guard let rawValue = String(data: data, encoding: .utf8) else {

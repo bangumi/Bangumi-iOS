@@ -44,16 +44,3 @@ struct SubjectCommentListView: View {
     }
   }
 }
-
-#Preview {
-  let container = mockContainer()
-
-  let subject = Subject.previewAnime
-  container.mainContext.insert(subject)
-
-  return ScrollView {
-    LazyVStack(alignment: .leading) {
-      SubjectCommentListView(subjectId: subject.subjectId)
-    }.padding()
-  }.modelContainer(container)
-}

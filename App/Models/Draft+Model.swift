@@ -1,5 +1,4 @@
 import Foundation
-import SwiftData
 
 typealias Draft = BangumiSchemaV3.DraftV1
 

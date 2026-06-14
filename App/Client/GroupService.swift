@@ -19,9 +19,6 @@ enum GroupService {
   }
 
   static func getGroup(_ groupName: String) async throws -> GroupDTO {
-    if await AppContext.shared.isMock {
-      return loadFixture(fixture: "group.json", target: GroupDTO.self)
-    }
     let url = BangumiAPI.priv.build("p1/groups/\(groupName)")
     let data = try await APIClient.shared.request(url: url, method: "GET")
     let resp: GroupDTO = try await APIClient.shared.decodeResponse(data)
@@ -32,9 +29,6 @@ enum GroupService {
     _ groupName: String, role: GroupMemberRole? = nil,
     limit: Int = 20, offset: Int = 0
   ) async throws -> PagedDTO<GroupMemberDTO> {
-    if await AppContext.shared.isMock {
-      return loadFixture(fixture: "group_members.json", target: PagedDTO<GroupMemberDTO>.self)
-    }
     let url = BangumiAPI.priv.build("p1/groups/\(groupName)/members")
     var queryItems: [URLQueryItem] = [
       URLQueryItem(name: "limit", value: String(limit)),
@@ -52,9 +46,6 @@ enum GroupService {
   static func getGroupTopics(_ groupName: String, limit: Int = 20, offset: Int = 0) async throws
     -> PagedDTO<TopicDTO>
   {
-    if await AppContext.shared.isMock {
-      return loadFixture(fixture: "group_topics.json", target: PagedDTO<TopicDTO>.self)
-    }
     let url = BangumiAPI.priv.build("p1/groups/\(groupName)/topics")
     let queryItems: [URLQueryItem] = [
       URLQueryItem(name: "limit", value: String(limit)),

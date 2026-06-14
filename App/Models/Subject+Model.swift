@@ -1,6 +1,5 @@
 import Foundation
 import OSLog
-import SwiftData
 
 typealias Subject = BangumiSchemaV3.SubjectV3
 
@@ -156,80 +155,22 @@ extension Subject {
     if self.type != item.type.rawValue { self.type = item.type.rawValue }
   }
 
-  func nextEpisodeDays(context: ModelContext) -> Int {
-    // 只处理动画和真人剧集
-    guard typeEnum == .anime || typeEnum == .real else {
-      return Int.max
-    }
-
-    do {
-      // 查找该条目的第一个未看的主要剧集
-      let currentSubjectId = self.subjectId
-      let descriptor = FetchDescriptor<Episode>(
-        predicate: #Predicate<Episode> {
-          $0.subjectId == currentSubjectId && $0.type == 0 && $0.status == 0
-        },
-        sortBy: [SortDescriptor<Episode>(\.sort, order: .forward)]
-      )
-
-      let episodes = try context.fetch(descriptor)
-
-      // 没有未看的剧集，返回最低优先级
-      guard let nextEpisode = episodes.first else {
-        return Int.max
-      }
-
-      // 播出时间未知，返回较低优先级
-      if nextEpisode.air.timeIntervalSince1970 == 0 {
-        return Int.max - 1
-      }
-
-      // 计算与当前时间的天数差
-      let calendar = Calendar.current
-      let now = Date()
-      let episodeDate = nextEpisode.air
-
-      // 获取两个日期的开始时间
-      let nowDate = calendar.startOfDay(for: now)
-      let airDate = calendar.startOfDay(for: episodeDate)
-
-      let components = calendar.dateComponents([.day], from: nowDate, to: airDate)
-
-      if let days = components.day {
-        // 返回实际的天数差
-        return days
-      }
-      return Int.max
-    } catch {
-      return Int.max
-    }
-  }
-
-  /// 用于比较两个条目的播出天数优先级
   static func compareDays(_ days1: Int, _ days2: Int, _ subject1: Subject, _ subject2: Subject)
     -> Bool
   {
-    // 处理无播出时间的情况
     if days1 >= Int.max - 1 && days2 >= Int.max - 1 {
-      // 两个都没有播出时间，按收藏时间排序
       return subject1.collectedAt > subject2.collectedAt
     } else if days1 >= Int.max - 1 {
-      // subject1 没有播出时间，排在后面
       return false
     } else if days2 >= Int.max - 1 {
-      // subject2 没有播出时间，排在后面
       return true
     } else if days1 < 0 && days2 >= 0 {
-      // subject1 已播出，subject2 未播出，则 subject1 优先
       return true
     } else if days1 >= 0 && days2 < 0 {
-      // subject1 未播出，subject2 已播出，则 subject2 优先
       return false
     } else if days1 < 0 && days2 < 0 {
-      // 两个都已播出，则越近播出的越优先（-1 > -2）
       return days1 > days2
     } else {
-      // 两个都未播出，则越早播出的越优先
       return days1 < days2
     }
   }

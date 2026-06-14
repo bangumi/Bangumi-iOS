@@ -14,7 +14,3 @@ struct NotFoundView: View {
     }
   }
 }
-
-#Preview {
-  NotFoundView()
-}

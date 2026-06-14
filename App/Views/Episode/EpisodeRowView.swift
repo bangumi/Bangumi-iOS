@@ -76,22 +76,3 @@ struct EpisodeRowView: View {
     }
   }
 }
-
-#Preview {
-  let container = mockContainer()
-
-  let subject = Subject.previewAnime
-  container.mainContext.insert(subject)
-
-  let episodes = Episode.previewAnime
-  for episode in episodes {
-    container.mainContext.insert(episode)
-  }
-
-  return ScrollView {
-    LazyVStack {
-      EpisodeRowView(episode: EpisodeDTO(episodes.first!))
-        .modelContainer(container)
-    }.padding()
-  }
-}

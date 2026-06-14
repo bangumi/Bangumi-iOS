@@ -1,4 +1,3 @@
-import SwiftData
 import SwiftUI
 
 struct CharacterCastsView: View {
@@ -34,18 +33,5 @@ struct CharacterCastsView: View {
         CharacterCastItemView(item: item)
       }
     }.animation(.default, value: casts)
-  }
-}
-
-#Preview {
-  NavigationStack {
-    ScrollView {
-      LazyVStack(alignment: .leading) {
-        CharacterCastsView(
-          characterId: Character.preview.characterId,
-          casts: Character.preview.casts
-        )
-      }.padding()
-    }
   }
 }

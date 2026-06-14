@@ -26,9 +26,3 @@ struct PersonIndexListView: View {
     .navigationBarTitleDisplayMode(.inline)
   }
 }
-
-#Preview {
-  NavigationStack {
-    PersonIndexListView(personId: 1)
-  }
-}

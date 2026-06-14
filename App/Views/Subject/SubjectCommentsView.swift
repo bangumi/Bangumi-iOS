@@ -39,17 +39,3 @@ struct SubjectCommentsView: View {
     }.animation(.default, value: comments)
   }
 }
-
-#Preview {
-  NavigationStack {
-    ScrollView {
-      LazyVStack(alignment: .leading) {
-        SubjectCommentsView(
-          subjectId: Subject.previewAnime.subjectId,
-          subjectType: Subject.previewAnime.typeEnum,
-          comments: Subject.previewComments
-        )
-      }.padding()
-    }
-  }
-}

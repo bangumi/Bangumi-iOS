@@ -65,20 +65,3 @@ extension View {
     }
   }
 }
-
-#Preview {
-  HStack {
-    SubjectCollectionStatusButton(
-      subjectId: Subject.previewAnime.subjectId,
-      subjectType: .anime,
-      collectionType: .none
-    )
-    SubjectCollectionStatusButton(
-      subjectId: Subject.previewAnime.subjectId,
-      subjectType: .anime,
-      collectionType: .doing
-    )
-  }
-  .padding()
-  .modelContainer(mockContainer())
-}

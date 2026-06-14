@@ -2,9 +2,6 @@ import Foundation
 
 enum TopicService {
   static func getGroupTopic(_ topicId: Int) async throws -> GroupTopicDTO {
-    if await AppContext.shared.isMock {
-      return loadFixture(fixture: "group_topic.json", target: GroupTopicDTO.self)
-    }
     let url = BangumiAPI.priv.build("p1/groups/-/topics/\(topicId)")
     let data = try await APIClient.shared.request(url: url, method: "GET")
     let resp: GroupTopicDTO = try await APIClient.shared.decodeResponse(data)
@@ -24,9 +21,6 @@ enum TopicService {
   }
 
   static func getSubjectTopic(_ topicId: Int) async throws -> SubjectTopicDTO {
-    if await AppContext.shared.isMock {
-      return loadFixture(fixture: "subject_topic.json", target: SubjectTopicDTO.self)
-    }
     let url = BangumiAPI.priv.build("p1/subjects/-/topics/\(topicId)")
     let data = try await APIClient.shared.request(url: url, method: "GET")
     let resp: SubjectTopicDTO = try await APIClient.shared.decodeResponse(data)

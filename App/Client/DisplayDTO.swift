@@ -1,5 +1,4 @@
 import Foundation
-import SwiftData
 import SwiftUI
 
 struct SubjectDetailDTO: Hashable {
@@ -50,7 +49,7 @@ struct CalendarEntryDTO: Identifiable, Hashable {
 }
 
 struct DraftDTO: Identifiable, Hashable {
-  let id: PersistentIdentifier
+  let id: Int64
   var type: String
   var content: String
   var createdAt: Int
@@ -509,7 +508,7 @@ extension UserDTO {
 
 extension DraftDTO {
   init(_ draft: Draft) {
-    id = draft.persistentModelID
+    id = draft.draftId ?? 0
     type = draft.type
     content = draft.content
     createdAt = draft.createdAt

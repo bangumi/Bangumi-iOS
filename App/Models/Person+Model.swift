@@ -1,5 +1,4 @@
 import Foundation
-import SwiftData
 
 typealias Person = BangumiSchemaV3.PersonV3
 

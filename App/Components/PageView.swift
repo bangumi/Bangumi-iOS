@@ -69,11 +69,13 @@ struct NextPagePrefetchState<ID: Hashable> {
     guard let triggerId = trigger.triggerId else {
       return nil
     }
-    guard request(
-      triggerId: triggerId,
-      isLoading: isLoading,
-      canLoadMore: canLoadMore
-    ) else {
+    guard
+      request(
+        triggerId: triggerId,
+        isLoading: isLoading,
+        canLoadMore: canLoadMore
+      )
+    else {
       return nil
     }
     return triggerId
@@ -86,10 +88,12 @@ struct NextPagePrefetchState<ID: Hashable> {
     canLoadMore: Bool,
     prefetchWindow: Int = 5
   ) -> ID? where Item.ID == ID {
-    guard let triggerId = items.nextPagePrefetchTriggerId(
-      for: item,
-      prefetchWindow: prefetchWindow
-    ) else {
+    guard
+      let triggerId = items.nextPagePrefetchTriggerId(
+        for: item,
+        prefetchWindow: prefetchWindow
+      )
+    else {
       return nil
     }
     guard request(triggerId: triggerId, isLoading: isLoading, canLoadMore: canLoadMore) else {
@@ -408,23 +412,4 @@ where C: View, T: Identifiable & Codable & Sendable {
       reload()
     }
   }
-}
-
-#Preview {
-  func nextPage(page: Int, size: Int) async -> PagedDTO<EpisodeDTO>? {
-    let episodes = loadFixture(
-      fixture: "subject_episodes.json",
-      target: PagedDTO<EpisodeDTO>.self
-    )
-    return episodes
-  }
-
-  return ScrollView {
-    OffsetPagedView<EpisodeDTO, _>(nextPageFunc: nextPage) { item in
-      VStack {
-        Text("\(item.id): \(item.name)")
-        Divider()
-      }
-    }
-  }.padding()
 }

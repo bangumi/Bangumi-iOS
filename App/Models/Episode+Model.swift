@@ -1,6 +1,5 @@
 import Foundation
 import OSLog
-import SwiftData
 import SwiftUI
 
 typealias Episode = BangumiSchemaV3.EpisodeV3

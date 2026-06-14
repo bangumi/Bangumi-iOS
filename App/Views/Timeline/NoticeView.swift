@@ -117,10 +117,3 @@ struct NoticeView: View {
     }
   }
 }
-
-#Preview {
-  let container = mockContainer()
-
-  return NoticeView()
-    .modelContainer(container)
-}

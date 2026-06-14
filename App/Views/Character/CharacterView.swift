@@ -264,15 +264,3 @@ struct CharacterDetailView: View {
     CharacterIndexsView(characterId: character.id, indexes: detail.indexes)
   }
 }
-
-#Preview {
-  let container = mockContainer()
-
-  let character = Character.preview
-  container.mainContext.insert(character)
-
-  return NavigationStack {
-    CharacterView(characterId: character.characterId)
-      .modelContainer(container)
-  }
-}

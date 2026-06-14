@@ -98,17 +98,3 @@ private struct PersonRelationCard: View {
     .frame(width: 80)
   }
 }
-
-#Preview {
-  NavigationStack {
-    ScrollView {
-      LazyVStack(alignment: .leading) {
-        PersonRelationsView(
-          personId: Person.preview.personId,
-          relations: Person.previewRelations
-        )
-      }
-      .padding()
-    }
-  }
-}

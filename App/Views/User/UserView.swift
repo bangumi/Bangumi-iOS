@@ -307,7 +307,3 @@ struct UserDetailView: View {
     }
   }
 }
-
-#Preview {
-  UserView(username: "873244")
-}

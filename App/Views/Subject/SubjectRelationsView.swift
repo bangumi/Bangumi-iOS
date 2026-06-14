@@ -1,6 +1,5 @@
 import Foundation
 import OSLog
-import SwiftData
 import SwiftUI
 
 struct SubjectRelationsView: View {
@@ -110,14 +109,4 @@ struct SubjectRelationsView: View {
       SubjectCollectionBoxView(subjectId: item.id)
     }
   }
-}
-
-#Preview {
-  ScrollView {
-    LazyVStack(alignment: .leading) {
-      SubjectRelationsView(
-        subjectId: Subject.previewBook.subjectId, relations: Subject.previewRelations
-      )
-    }.padding()
-  }.modelContainer(mockContainer())
 }

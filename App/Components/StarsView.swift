@@ -24,7 +24,3 @@ struct StarsView: View {
     }
   }
 }
-
-#Preview {
-  StarsView(score: 7.8, size: 40)
-}

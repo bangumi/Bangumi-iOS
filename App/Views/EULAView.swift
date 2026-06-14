@@ -143,7 +143,3 @@ struct EULARuleItem: View {
     }
   }
 }
-
-#Preview {
-  EULAView(isPresented: .constant(true))
-}

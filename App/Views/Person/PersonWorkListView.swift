@@ -1,5 +1,4 @@
 import Flow
-import SwiftData
 import SwiftUI
 
 struct PersonWorkListView: View {
@@ -40,9 +39,4 @@ struct PersonWorkListView: View {
     .navigationTitle("参与作品")
     .navigationBarTitleDisplayMode(.inline)
   }
-}
-
-#Preview {
-  let person = Person.preview
-  return PersonWorkListView(personId: person.personId)
 }

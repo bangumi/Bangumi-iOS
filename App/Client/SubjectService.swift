@@ -2,9 +2,6 @@ import Foundation
 
 enum SubjectService {
   static func getSubject(_ subjectId: Int) async throws -> SubjectDTO {
-    if await AppContext.shared.isMock {
-      return loadFixture(fixture: "subject_anime.json", target: SubjectDTO.self)
-    }
     let url = BangumiAPI.priv.build("p1/subjects/\(subjectId)")
     let data = try await APIClient.shared.request(url: url, method: "GET")
     let subject: SubjectDTO = try await APIClient.shared.decodeResponse(data)
@@ -53,10 +50,6 @@ enum SubjectService {
     _ subjectId: Int, type: CastType = .none,
     limit: Int = 20, offset: Int = 0
   ) async throws -> PagedDTO<SubjectCharacterDTO> {
-    if await AppContext.shared.isMock {
-      return loadFixture(
-        fixture: "subject_characters.json", target: PagedDTO<SubjectCharacterDTO>.self)
-    }
     let url = BangumiAPI.priv.build("p1/subjects/\(subjectId)/characters")
     var queryItems: [URLQueryItem] = [
       URLQueryItem(name: "limit", value: String(limit)),
@@ -74,10 +67,6 @@ enum SubjectService {
   static func getSubjectComments(_ subjectId: Int, limit: Int, offset: Int = 0) async throws
     -> PagedDTO<SubjectCommentDTO>
   {
-    if await AppContext.shared.isMock {
-      return loadFixture(
-        fixture: "subject_comments.json", target: PagedDTO<SubjectCommentDTO>.self)
-    }
     let url = BangumiAPI.priv.build("p1/subjects/\(subjectId)/comments")
     let queryItems: [URLQueryItem] = [
       URLQueryItem(name: "limit", value: String(limit)),
@@ -92,9 +81,6 @@ enum SubjectService {
   static func getSubjectEpisodes(
     _ subjectId: Int, type: EpisodeType? = nil, limit: Int = 100, offset: Int = 0
   ) async throws -> PagedDTO<EpisodeDTO> {
-    if await AppContext.shared.isMock {
-      return loadFixture(fixture: "subject_episodes.json", target: PagedDTO<EpisodeDTO>.self)
-    }
     let url = BangumiAPI.priv.build("p1/subjects/\(subjectId)/episodes")
     var queryItems: [URLQueryItem] = [
       URLQueryItem(name: "limit", value: String(limit)),
@@ -112,9 +98,6 @@ enum SubjectService {
   static func getSubjectRecs(_ subjectId: Int, limit: Int = 10, offset: Int = 0) async throws
     -> PagedDTO<SubjectRecDTO>
   {
-    if await AppContext.shared.isMock {
-      return loadFixture(fixture: "subject_recs.json", target: PagedDTO<SubjectRecDTO>.self)
-    }
     let url = BangumiAPI.priv.build("p1/subjects/\(subjectId)/recs")
     let queryItems: [URLQueryItem] = [
       URLQueryItem(name: "limit", value: String(limit)),
@@ -130,14 +113,6 @@ enum SubjectService {
     _ subjectId: Int, type: SubjectType = .none, offprint: Bool? = nil, limit: Int = 20,
     offset: Int = 0
   ) async throws -> PagedDTO<SubjectRelationDTO> {
-    if await AppContext.shared.isMock {
-      if offprint == true {
-        return loadFixture(
-          fixture: "subject_offprints.json", target: PagedDTO<SubjectRelationDTO>.self)
-      }
-      return loadFixture(
-        fixture: "subject_relations.json", target: PagedDTO<SubjectRelationDTO>.self)
-    }
     let url = BangumiAPI.priv.build("p1/subjects/\(subjectId)/relations")
     var queryItems: [URLQueryItem] = [
       URLQueryItem(name: "limit", value: String(limit)),
@@ -158,9 +133,6 @@ enum SubjectService {
   static func getSubjectReviews(_ subjectId: Int, limit: Int = 5, offset: Int = 0) async throws
     -> PagedDTO<SubjectReviewDTO>
   {
-    if await AppContext.shared.isMock {
-      return loadFixture(fixture: "subject_reviews.json", target: PagedDTO<SubjectReviewDTO>.self)
-    }
     let url = BangumiAPI.priv.build("p1/subjects/\(subjectId)/reviews")
     let queryItems: [URLQueryItem] = [
       URLQueryItem(name: "limit", value: String(limit)),
@@ -179,9 +151,6 @@ enum SubjectService {
     limit: Int = 20,
     offset: Int = 0
   ) async throws -> PagedDTO<SubjectCollectDTO> {
-    if await AppContext.shared.isMock {
-      return loadFixture(fixture: "subject_collects.json", target: PagedDTO<SubjectCollectDTO>.self)
-    }
     let url = BangumiAPI.priv.build("p1/subjects/\(subjectId)/collects")
     var queryItems: [URLQueryItem] = [
       URLQueryItem(name: "limit", value: String(limit)),
@@ -202,9 +171,6 @@ enum SubjectService {
   static func getSubjectStaffPersons(
     _ subjectId: Int, position: Int? = nil, limit: Int = 20, offset: Int = 0
   ) async throws -> PagedDTO<SubjectStaffDTO> {
-    if await AppContext.shared.isMock {
-      return loadFixture(fixture: "subject_staffs.json", target: PagedDTO<SubjectStaffDTO>.self)
-    }
     let url = BangumiAPI.priv.build("p1/subjects/\(subjectId)/staffs/persons")
     var queryItems: [URLQueryItem] = [
       URLQueryItem(name: "limit", value: String(limit)),
@@ -236,9 +202,6 @@ enum SubjectService {
   static func getSubjectIndexes(subjectId: Int, limit: Int = 20, offset: Int = 0) async throws
     -> PagedDTO<SlimIndexDTO>
   {
-    if await AppContext.shared.isMock {
-      return loadFixture(fixture: "subject_indexes.json", target: PagedDTO<SlimIndexDTO>.self)
-    }
     let url = BangumiAPI.priv.build("p1/subjects/\(subjectId)/indexes")
     let queryItems: [URLQueryItem] = [
       URLQueryItem(name: "limit", value: String(limit)),
@@ -253,9 +216,6 @@ enum SubjectService {
   static func getSubjectTopics(_ subjectId: Int, limit: Int, offset: Int = 0) async throws
     -> PagedDTO<TopicDTO>
   {
-    if await AppContext.shared.isMock {
-      return loadFixture(fixture: "subject_topics.json", target: PagedDTO<TopicDTO>.self)
-    }
     let url = BangumiAPI.priv.build("p1/subjects/\(subjectId)/topics")
     let queryItems: [URLQueryItem] = [
       URLQueryItem(name: "limit", value: String(limit)),
@@ -268,9 +228,6 @@ enum SubjectService {
   }
 
   static func updateSubjectProgress(subjectId: Int, eps: Int?, vols: Int?) async throws {
-    if await AppContext.shared.isMock {
-      return
-    }
     let url = BangumiAPI.priv.build("p1/collections/subjects/\(subjectId)")
     var body: [String: Any] = [:]
     if let eps {
@@ -295,9 +252,6 @@ enum SubjectService {
     tags: [String]?,
     progress: Bool?
   ) async throws {
-    if await AppContext.shared.isMock {
-      return
-    }
     let url = BangumiAPI.priv.build("p1/collections/subjects/\(subjectId)")
     var body: [String: Any] = [:]
     if let type {

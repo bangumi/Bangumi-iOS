@@ -71,20 +71,3 @@ struct EpisodeInfoView: View {
     }
   }
 }
-
-#Preview {
-  let container = mockContainer()
-
-  let subject = Subject.previewAnime
-  container.mainContext.insert(subject)
-
-  let episodes = Episode.previewAnime
-  for episode in episodes {
-    container.mainContext.insert(episode)
-  }
-
-  return ScrollView {
-    EpisodeInfoView(episode: EpisodeDTO(episodes.first!))
-      .modelContainer(container)
-  }
-}

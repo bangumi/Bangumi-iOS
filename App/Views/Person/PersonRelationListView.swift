@@ -27,9 +27,3 @@ struct PersonRelationListView: View {
     .navigationBarTitleDisplayMode(.inline)
   }
 }
-
-#Preview {
-  NavigationStack {
-    PersonRelationListView(personId: Person.preview.personId)
-  }
-}

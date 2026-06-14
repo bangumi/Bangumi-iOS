@@ -137,32 +137,3 @@ struct ProgressTileItemContentView: View {
     }
   }
 }
-
-#Preview {
-  let container = mockContainer()
-
-  let subject = Subject.previewAnime
-  let episodes = Episode.previewAnime
-  container.mainContext.insert(subject)
-  for episode in episodes {
-    container.mainContext.insert(episode)
-  }
-
-  return ScrollView {
-    LazyVStack(alignment: .leading) {
-      CardView(padding: 8) {
-        ProgressTileItemContentView(
-          payload: ProgressSubjectRenderPayload(
-            ProgressSubjectDTO(
-              subject: SubjectDTO(subject),
-              episodes: episodes.map(EpisodeDTO.init)
-            )
-          ),
-          interactionMode: .menu,
-          reload: {}
-        )
-        .modelContainer(container)
-      }
-    }.padding()
-  }
-}

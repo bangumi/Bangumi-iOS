@@ -1,5 +1,4 @@
 import Flow
-import SwiftData
 import SwiftUI
 
 struct SubjectStaffListView: View {
@@ -58,9 +57,4 @@ struct SubjectStaffListView: View {
     .navigationTitle("制作人员")
     .navigationBarTitleDisplayMode(.inline)
   }
-}
-
-#Preview {
-  let subject = Subject.previewAnime
-  return SubjectStaffListView(subjectId: subject.subjectId)
 }

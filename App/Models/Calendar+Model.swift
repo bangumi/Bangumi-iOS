@@ -1,5 +1,4 @@
 import Foundation
-import SwiftData
 
 typealias BangumiCalendar = BangumiSchemaV3.BangumiCalendarV2
 

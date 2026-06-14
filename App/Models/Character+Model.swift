@@ -1,5 +1,4 @@
 import Foundation
-import SwiftData
 
 typealias Character = BangumiSchemaV3.CharacterV3
 

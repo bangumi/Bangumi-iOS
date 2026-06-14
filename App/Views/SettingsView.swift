@@ -338,10 +338,3 @@ struct SettingsView: View {
     }
   }
 }
-
-#Preview {
-  let container = mockContainer()
-
-  return SettingsView()
-    .modelContainer(container)
-}

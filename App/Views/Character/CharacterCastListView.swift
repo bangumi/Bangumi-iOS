@@ -1,5 +1,4 @@
 import Flow
-import SwiftData
 import SwiftUI
 
 struct CharacterCastListView: View {
@@ -40,9 +39,4 @@ struct CharacterCastListView: View {
     .navigationTitle("出演作品")
     .navigationBarTitleDisplayMode(.inline)
   }
-}
-
-#Preview {
-  let character = Character.preview
-  return CharacterCastListView(characterId: character.characterId)
 }

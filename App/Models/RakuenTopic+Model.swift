@@ -1,5 +1,4 @@
 import Foundation
-import SwiftData
 
 typealias RakuenSubjectTopicCache = BangumiSchemaV3.RakuenSubjectTopicCacheV2
 typealias RakuenGroupTopicCache = BangumiSchemaV3.RakuenGroupTopicCacheV2

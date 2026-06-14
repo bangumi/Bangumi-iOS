@@ -1,4 +1,3 @@
-import SwiftData
 import SwiftUI
 
 struct PersonCastsView: View {
@@ -27,20 +26,5 @@ struct PersonCastsView: View {
     }
     .padding(.bottom, 8)
     .animation(.default, value: casts)
-  }
-}
-
-#Preview {
-  let container = mockContainer()
-  let person = Person.preview
-  container.mainContext.insert(person)
-
-  return NavigationStack {
-    ScrollView {
-      LazyVStack(alignment: .leading) {
-        PersonCastsView(personId: person.personId, casts: person.casts)
-          .modelContainer(container)
-      }.padding()
-    }
   }
 }

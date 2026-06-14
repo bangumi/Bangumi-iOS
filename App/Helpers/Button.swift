@@ -51,22 +51,3 @@ extension ButtonStyle where Self == ExplodeButtonStyle {
     ExplodeButtonStyle()
   }
 }
-
-#Preview {
-  Button("Button") {
-  }
-  .buttonStyle(.navigation)
-  .padding()
-
-  Button(action: {}) {
-    Image(systemName: "heart")
-  }
-  .buttonStyle(.scale)
-  .padding()
-
-  Button(action: {}) {
-    Image(systemName: "heart")
-  }
-  .buttonStyle(.explode)
-  .padding()
-}

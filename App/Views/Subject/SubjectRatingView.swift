@@ -89,7 +89,3 @@ struct SubjectRatingView: View {
     }
   }
 }
-
-#Preview {
-  SubjectRatingView(subject: SubjectDTO(Subject.previewAnime))
-}

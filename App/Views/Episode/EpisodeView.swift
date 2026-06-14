@@ -140,18 +140,3 @@ struct EpisodeView: View {
     .handoff(url: shareLink, title: "章节详情")
   }
 }
-
-#Preview {
-  let container = mockContainer()
-
-  let subject = Subject.previewAnime
-  container.mainContext.insert(subject)
-
-  let episodes = Episode.previewAnime
-  for episode in episodes {
-    container.mainContext.insert(episode)
-  }
-
-  return EpisodeView(episodeId: episodes.first!.episodeId)
-    .modelContainer(container)
-}

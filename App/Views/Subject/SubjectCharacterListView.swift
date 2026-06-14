@@ -1,5 +1,4 @@
 import Flow
-import SwiftData
 import SwiftUI
 
 struct SubjectCharacterListView: View {
@@ -34,7 +33,8 @@ struct SubjectCharacterListView: View {
       reloader.toggle()
     }
     ScrollView {
-      OffsetPagedView<SubjectCharacterDTO, _>(limit: 10, reloader: reloader, nextPageFunc: load) { item in
+      OffsetPagedView<SubjectCharacterDTO, _>(limit: 10, reloader: reloader, nextPageFunc: load) {
+        item in
         CardView {
           HStack {
             ImageView(img: item.character.images?.medium)
@@ -107,9 +107,4 @@ struct SubjectCharacterListView: View {
     .navigationTitle("角色列表")
     .navigationBarTitleDisplayMode(.inline)
   }
-}
-
-#Preview {
-  let subject = Subject.previewAnime
-  return SubjectCharacterListView(subjectId: subject.subjectId)
 }

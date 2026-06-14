@@ -27,9 +27,3 @@ struct CharacterRelationListView: View {
     .navigationBarTitleDisplayMode(.inline)
   }
 }
-
-#Preview {
-  NavigationStack {
-    CharacterRelationListView(characterId: Character.preview.characterId)
-  }
-}

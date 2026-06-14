@@ -177,12 +177,3 @@ struct ShareSheet: UIViewControllerRepresentable {
 
   func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }
-
-#Preview {
-  let container = mockContainer()
-
-  return NavigationStack {
-    ExportView()
-  }
-  .modelContainer(container)
-}

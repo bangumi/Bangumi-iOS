@@ -1041,12 +1041,3 @@ enum BBCodeType: String, CaseIterable, Identifiable {
     }
   }
 }
-
-#Preview {
-  @Previewable @State var text = ""
-  ScrollView {
-    VStack {
-      BBCodeEditor(text: $text)
-    }.padding()
-  }
-}

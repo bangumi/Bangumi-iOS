@@ -2,9 +2,6 @@ import Foundation
 
 enum CharacterService {
   static func getCharacter(_ characterId: Int) async throws -> CharacterDTO {
-    if await AppContext.shared.isMock {
-      return loadFixture(fixture: "character.json", target: CharacterDTO.self)
-    }
     let url = BangumiAPI.priv.build("p1/characters/\(characterId)")
     let data = try await APIClient.shared.request(url: url, method: "GET")
     let character: CharacterDTO = try await APIClient.shared.decodeResponse(data)
@@ -15,10 +12,6 @@ enum CharacterService {
     _ characterId: Int, type: CastType = .none, subjectType: SubjectType = .none, limit: Int = 20,
     offset: Int = 0
   ) async throws -> PagedDTO<CharacterCastDTO> {
-    if await AppContext.shared.isMock {
-      return loadFixture(
-        fixture: "character_casts.json", target: PagedDTO<CharacterCastDTO>.self)
-    }
     let url = BangumiAPI.priv.build("p1/characters/\(characterId)/casts")
     var queryItems: [URLQueryItem] = [
       URLQueryItem(name: "limit", value: String(limit)),
@@ -39,10 +32,6 @@ enum CharacterService {
   static func getCharacterRelations(_ characterId: Int, limit: Int = 20, offset: Int = 0)
     async throws -> PagedDTO<CharacterRelationDTO>
   {
-    if await AppContext.shared.isMock {
-      return loadFixture(
-        fixture: "character_relations.json", target: PagedDTO<CharacterRelationDTO>.self)
-    }
     let url = BangumiAPI.priv.build("p1/characters/\(characterId)/relations")
     let queryItems: [URLQueryItem] = [
       URLQueryItem(name: "limit", value: String(limit)),
@@ -57,10 +46,6 @@ enum CharacterService {
   static func getCharacterCollects(_ characterId: Int, limit: Int = 20, offset: Int = 0)
     async throws -> PagedDTO<PersonCollectDTO>
   {
-    if await AppContext.shared.isMock {
-      return loadFixture(
-        fixture: "character_collects.json", target: PagedDTO<PersonCollectDTO>.self)
-    }
     let url = BangumiAPI.priv.build("p1/characters/\(characterId)/collects")
     let queryItems: [URLQueryItem] = [
       URLQueryItem(name: "limit", value: String(limit)),
@@ -75,9 +60,6 @@ enum CharacterService {
   static func getCharacterIndexes(characterId: Int, limit: Int = 20, offset: Int = 0)
     async throws -> PagedDTO<SlimIndexDTO>
   {
-    if await AppContext.shared.isMock {
-      return loadFixture(fixture: "character_indexes.json", target: PagedDTO<SlimIndexDTO>.self)
-    }
     let url = BangumiAPI.priv.build("p1/characters/\(characterId)/indexes")
     let queryItems: [URLQueryItem] = [
       URLQueryItem(name: "limit", value: String(limit)),
@@ -90,9 +72,6 @@ enum CharacterService {
   }
 
   static func getCharacterComments(_ characterId: Int) async throws -> [CommentDTO] {
-    if await AppContext.shared.isMock {
-      return loadFixture(fixture: "character_comments.json", target: [CommentDTO].self)
-    }
     let url = BangumiAPI.priv.build("p1/characters/\(characterId)/comments")
     let data = try await APIClient.shared.request(url: url, method: "GET")
     let resp: [CommentDTO] = try await APIClient.shared.decodeResponse(data)

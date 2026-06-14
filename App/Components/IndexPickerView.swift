@@ -101,11 +101,3 @@ struct IndexPickerSheet: View {
     }
   }
 }
-
-#Preview {
-  IndexPickerSheet(
-    category: .subject,
-    itemId: 123,
-    itemTitle: "测试条目"
-  )
-}

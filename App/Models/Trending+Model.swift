@@ -1,5 +1,4 @@
 import Foundation
-import SwiftData
 
 typealias TrendingSubject = BangumiSchemaV3.TrendingSubjectV2
 

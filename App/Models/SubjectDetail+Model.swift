@@ -1,5 +1,4 @@
 import Foundation
-import SwiftData
 
 typealias SubjectDetail = BangumiSchemaV3.SubjectDetailV2
 

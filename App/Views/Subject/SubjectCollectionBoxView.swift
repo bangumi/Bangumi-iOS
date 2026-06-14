@@ -270,9 +270,3 @@ struct SubjectCollectionBoxView: View {
     .presentationDetents(.init([.medium, .large]))
   }
 }
-
-#Preview {
-  let subject = Subject.previewBook
-
-  return SubjectCollectionBoxView(subjectId: subject.subjectId)
-}

@@ -156,11 +156,3 @@ struct SubjectRankView: View {
     }.padding(5)
   }
 }
-
-#Preview {
-  ScrollView {
-    LazyVStack(alignment: .leading) {
-      SubjectHeaderView(subject: SubjectDTO(Subject.previewBook))
-    }.padding()
-  }
-}

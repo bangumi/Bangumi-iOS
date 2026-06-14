@@ -181,14 +181,3 @@ struct SubjectDetailView: View {
     .handoff(url: shareLink, title: subject.name)
   }
 }
-
-#Preview {
-  let container = mockContainer()
-
-  let subject = Subject.previewAnime
-  container.mainContext.insert(subject)
-
-  return NavigationStack {
-    SubjectView(subjectId: subject.subjectId)
-  }.modelContainer(container)
-}

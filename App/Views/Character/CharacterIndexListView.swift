@@ -26,9 +26,3 @@ struct CharacterIndexListView: View {
     .navigationBarTitleDisplayMode(.inline)
   }
 }
-
-#Preview {
-  NavigationStack {
-    CharacterIndexListView(characterId: 1)
-  }
-}

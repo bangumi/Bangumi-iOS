@@ -11,10 +11,6 @@ enum DiscoveryService {
   static func getTrendingSubjects(
     type: SubjectType, limit: Int = 12, offset: Int = 0
   ) async throws -> PagedDTO<TrendingSubjectDTO> {
-    if await AppContext.shared.isMock {
-      return loadFixture(
-        fixture: "trending_subjects_anime.json", target: PagedDTO<TrendingSubjectDTO>.self)
-    }
     let url = BangumiAPI.priv.build("p1/trending/subjects")
     let queryItems: [URLQueryItem] = [
       URLQueryItem(name: "type", value: String(type.rawValue)),

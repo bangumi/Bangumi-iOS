@@ -41,16 +41,3 @@ struct SubjectReviewsView: View {
     .animation(.default, value: reviews)
   }
 }
-
-#Preview {
-  NavigationStack {
-    ScrollView {
-      LazyVStack(alignment: .leading) {
-        SubjectReviewsView(
-          subjectId: Subject.previewAnime.subjectId,
-          reviews: Subject.previewReviews
-        )
-      }.padding()
-    }.modelContainer(mockContainer())
-  }
-}

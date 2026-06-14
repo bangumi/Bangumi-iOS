@@ -14,6 +14,7 @@
 		19DAAA772F176B840070BFAE /* SDWebImageSVGCoder in Frameworks */ = {isa = PBXBuildFile; productRef = 19DAAA762F176B840070BFAE /* SDWebImageSVGCoder */; };
 		19DAAA7A2F176BAB0070BFAE /* SDWebImageWebPCoder in Frameworks */ = {isa = PBXBuildFile; productRef = 19DAAA792F176BAB0070BFAE /* SDWebImageWebPCoder */; };
 		19DAAA7D2F176BB60070BFAE /* SDWebImageAVIFCoder in Frameworks */ = {isa = PBXBuildFile; productRef = 19DAAA7C2F176BB60070BFAE /* SDWebImageAVIFCoder */; };
+		19E4B4AB2F28000100BDB001 /* GRDB in Frameworks */ = {isa = PBXBuildFile; productRef = 19E4B4A92F28000100BDB001 /* GRDB */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -43,6 +44,7 @@
 				19DAAA742F176AF60070BFAE /* SDWebImageSwiftUI in Frameworks */,
 				19B9E2D62EAC955A00934E31 /* BBCode in Frameworks */,
 				19DAAA7A2F176BAB0070BFAE /* SDWebImageWebPCoder in Frameworks */,
+				19E4B4AB2F28000100BDB001 /* GRDB in Frameworks */,
 				19671C732BDEB8B1000B4D99 /* KeychainSwift in Frameworks */,
 				19DAAA772F176B840070BFAE /* SDWebImageSVGCoder in Frameworks */,
 				19DAAA7D2F176BB60070BFAE /* SDWebImageAVIFCoder in Frameworks */,
@@ -96,6 +98,7 @@
 				19DAAA762F176B840070BFAE /* SDWebImageSVGCoder */,
 				19DAAA792F176BAB0070BFAE /* SDWebImageWebPCoder */,
 				19DAAA7C2F176BB60070BFAE /* SDWebImageAVIFCoder */,
+				19E4B4A92F28000100BDB001 /* GRDB */,
 			);
 			productName = Bangumi;
 			productReference = 19BB342B2BD239AB00E5C295 /* Bangumi.app */;
@@ -133,6 +136,7 @@
 				19DAAA752F176B840070BFAE /* XCRemoteSwiftPackageReference "SDWebImageSVGCoder" */,
 				19DAAA782F176BAB0070BFAE /* XCRemoteSwiftPackageReference "SDWebImageWebPCoder" */,
 				19DAAA7B2F176BB50070BFAE /* XCRemoteSwiftPackageReference "SDWebImageAVIFCoder" */,
+				19E4B4AA2F28000100BDB001 /* XCRemoteSwiftPackageReference "GRDB.swift" */,
 			);
 			productRefGroup = 19BB342C2BD239AB00E5C295 /* Products */;
 			projectDirPath = "";
@@ -447,6 +451,14 @@
 				minimumVersion = 0.11.1;
 			};
 		};
+		19E4B4AA2F28000100BDB001 /* XCRemoteSwiftPackageReference "GRDB.swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/groue/GRDB.swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 7.11.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -483,6 +495,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 19DAAA7B2F176BB50070BFAE /* XCRemoteSwiftPackageReference "SDWebImageAVIFCoder" */;
 			productName = SDWebImageAVIFCoder;
+		};
+		19E4B4A92F28000100BDB001 /* GRDB */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 19E4B4AA2F28000100BDB001 /* XCRemoteSwiftPackageReference "GRDB.swift" */;
+			productName = GRDB;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

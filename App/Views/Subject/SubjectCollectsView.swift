@@ -159,11 +159,3 @@ struct SubjectCollectsView: View {
     }
   }
 }
-
-#Preview {
-  ScrollView {
-    LazyVStack(alignment: .leading) {
-      SubjectCollectsView(subject: SubjectDTO(Subject.previewAnime), collects: [])
-    }.padding()
-  }
-}

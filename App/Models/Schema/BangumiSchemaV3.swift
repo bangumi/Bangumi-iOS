@@ -482,12 +482,16 @@ enum BangumiSchemaV3: VersionedSchema {
 
   @Model
   final class DraftV1 {
+    @Transient
+    var draftId: Int64?
+
     var content: String
     var type: String
     var createdAt: Int
     var updatedAt: Int
 
-    init(type: String, content: String) {
+    init(draftId: Int64? = nil, type: String, content: String) {
+      self.draftId = draftId
       self.content = content
       self.type = type
       self.createdAt = Int(Date().timeIntervalSince1970)

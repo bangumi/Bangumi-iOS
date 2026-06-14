@@ -1,4 +1,3 @@
-import SwiftData
 import SwiftUI
 
 struct SubjectTopicsView: View {
@@ -59,17 +58,5 @@ struct SubjectTopicsView: View {
     }
     .buttonStyle(.navigation)
     .animation(.default, value: topics)
-  }
-}
-
-#Preview {
-  NavigationStack {
-    ScrollView {
-      LazyVStack(alignment: .leading) {
-        SubjectTopicsView(
-          subjectId: Subject.previewAnime.subjectId, topics: Subject.previewTopics
-        )
-      }.padding()
-    }.modelContainer(mockContainer())
   }
 }

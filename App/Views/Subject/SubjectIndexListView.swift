@@ -26,9 +26,3 @@ struct SubjectIndexListView: View {
     .navigationBarTitleDisplayMode(.inline)
   }
 }
-
-#Preview {
-  NavigationStack {
-    SubjectIndexListView(subjectId: 1)
-  }
-}

@@ -1,6 +1,5 @@
 import Foundation
 import OSLog
-import SwiftData
 import SwiftUI
 
 struct SubjectRecsView: View {
@@ -95,14 +94,4 @@ struct SubjectRecsView: View {
       SubjectCollectionBoxView(subjectId: item.id)
     }
   }
-}
-
-#Preview {
-  ScrollView {
-    LazyVStack(alignment: .leading) {
-      SubjectRecsView(
-        subjectId: Subject.previewAnime.subjectId, recs: Subject.previewRecs
-      )
-    }.padding()
-  }.modelContainer(mockContainer())
 }

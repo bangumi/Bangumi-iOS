@@ -257,20 +257,3 @@ struct SubjectSlimItemView: View {
     }
   }
 }
-
-#Preview {
-  let container = mockContainer()
-
-  let subject = Subject.previewAnime
-  let episodes = Episode.previewAnime
-  container.mainContext.insert(subject)
-  for episode in episodes {
-    container.mainContext.insert(episode)
-  }
-
-  return ScrollView {
-    LazyVStack(alignment: .leading) {
-      SubjectLargeRowView(subject: SubjectDTO(subject))
-    }.padding()
-  }.modelContainer(container)
-}

@@ -94,13 +94,3 @@ struct SubjectCollectionView: View {
     }
   }
 }
-
-#Preview {
-  let subject = Subject.previewBook
-
-  ScrollView {
-    LazyVStack(alignment: .leading) {
-      SubjectCollectionView(subject: SubjectDTO(subject), reload: {})
-    }.padding()
-  }
-}

@@ -1,4 +1,3 @@
-import SwiftData
 import SwiftUI
 
 struct SubjectCharactersView: View {
@@ -94,17 +93,5 @@ struct CharacterCard: View {
     }
     .padding(4)
     .frame(width: 80)
-  }
-}
-
-#Preview {
-  NavigationStack {
-    ScrollView {
-      LazyVStack(alignment: .leading) {
-        SubjectCharactersView(
-          subjectId: Subject.previewAnime.subjectId,
-          characters: Subject.previewCharacters)
-      }.padding()
-    }
   }
 }

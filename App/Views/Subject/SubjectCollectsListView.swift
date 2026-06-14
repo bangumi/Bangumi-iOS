@@ -137,9 +137,3 @@ struct SubjectCollectRowView: View {
     }
   }
 }
-
-#Preview {
-  NavigationStack {
-    SubjectCollectsListView(subjectId: 8)
-  }
-}

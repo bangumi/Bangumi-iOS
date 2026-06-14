@@ -2,9 +2,6 @@ import Foundation
 
 enum EpisodeService {
   static func getEpisode(_ episodeId: Int) async throws -> EpisodeDTO {
-    if await AppContext.shared.isMock {
-      return loadFixture(fixture: "subject_anime_episode.json", target: EpisodeDTO.self)
-    }
     let url = BangumiAPI.priv.build("p1/episodes/\(episodeId)")
     let data = try await APIClient.shared.request(url: url, method: "GET")
     let episode: EpisodeDTO = try await APIClient.shared.decodeResponse(data)
@@ -12,9 +9,6 @@ enum EpisodeService {
   }
 
   static func getEpisodeComments(_ episodeId: Int) async throws -> [CommentDTO] {
-    if await AppContext.shared.isMock {
-      return loadFixture(fixture: "episode_comments.json", target: [CommentDTO].self)
-    }
     let url = BangumiAPI.priv.build("p1/episodes/\(episodeId)/comments")
     let data = try await APIClient.shared.request(url: url, method: "GET")
     let resp: [CommentDTO] = try await APIClient.shared.decodeResponse(data)
@@ -38,9 +32,6 @@ enum EpisodeService {
   static func updateEpisodeCollection(
     episodeId: Int, type: EpisodeCollectionType, batch: Bool = false
   ) async throws {
-    if await AppContext.shared.isMock {
-      return
-    }
     let url = BangumiAPI.priv.build("p1/collections/episodes/\(episodeId)")
     var body: [String: Any] = [:]
     if batch {

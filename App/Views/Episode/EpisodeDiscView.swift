@@ -79,22 +79,3 @@ struct EpisodeDiscView: View {
     }
   }
 }
-
-#Preview {
-  let container = mockContainer()
-
-  let subject = Subject.previewMusic
-  container.mainContext.insert(subject)
-
-  let episodes = Episode.previewMusic
-  for episode in episodes {
-    container.mainContext.insert(episode)
-  }
-
-  return ScrollView {
-    LazyVStack(alignment: .leading) {
-      EpisodeDiscView(subjectId: subject.subjectId)
-        .modelContainer(container)
-    }
-  }.padding()
-}

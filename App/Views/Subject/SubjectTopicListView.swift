@@ -1,5 +1,4 @@
 import OSLog
-import SwiftData
 import SwiftUI
 
 struct SubjectTopicListView: View {
@@ -32,17 +31,4 @@ struct SubjectTopicListView: View {
     .navigationTitle("讨论版")
     .navigationBarTitleDisplayMode(.inline)
   }
-}
-
-#Preview {
-  let container = mockContainer()
-
-  let subject = Subject.previewAnime
-  container.mainContext.insert(subject)
-
-  return ScrollView {
-    LazyVStack(alignment: .leading) {
-      SubjectTopicListView(subjectId: subject.subjectId)
-    }.padding()
-  }.modelContainer(container)
 }

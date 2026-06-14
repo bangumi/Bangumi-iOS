@@ -60,24 +60,3 @@ struct MusumeView: View {
       }
   }
 }
-
-#Preview {
-  ScrollView {
-    VStack(spacing: 20) {
-      MusumeView()
-      Divider()
-      MusumeView(index: 0)
-      MusumeView(index: 1)
-      MusumeView(index: 2)
-      MusumeView(index: 3)
-      MusumeView(index: 4)
-      MusumeView(index: 5)
-      MusumeView(index: 6)
-      Divider()
-      MusumeView(index: 2, width: 40)
-      MusumeView(index: 4, width: 80, height: 100)
-      MusumeView(width: 30, height: 50)
-    }
-    .padding()
-  }
-}

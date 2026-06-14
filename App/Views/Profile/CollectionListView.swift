@@ -55,7 +55,8 @@ struct CollectionListView: View {
             reloader.toggle()
           }
           ScrollView {
-            OffsetPagedView<SubjectDTO, _>(limit: 20, reloader: reloader, nextPageFunc: load) { item in
+            OffsetPagedView<SubjectDTO, _>(limit: 20, reloader: reloader, nextPageFunc: load) {
+              item in
               SubjectCollectionRowContentView(
                 subject: item.slim,
                 isPrivate: item.interest?.private ?? false
@@ -75,8 +76,4 @@ struct CollectionListView: View {
     .navigationTitle("我的\(subjectType.description)")
     .navigationBarTitleDisplayMode(.inline)
   }
-}
-
-#Preview {
-  CollectionListView(subjectType: SubjectType.anime)
 }

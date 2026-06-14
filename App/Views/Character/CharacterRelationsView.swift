@@ -98,17 +98,3 @@ private struct CharacterRelationCard: View {
     .frame(width: 80)
   }
 }
-
-#Preview {
-  NavigationStack {
-    ScrollView {
-      LazyVStack(alignment: .leading) {
-        CharacterRelationsView(
-          characterId: Character.preview.characterId,
-          relations: Character.previewRelations
-        )
-      }
-      .padding()
-    }
-  }
-}

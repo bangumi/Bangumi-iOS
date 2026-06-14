@@ -1,5 +1,4 @@
 import Flow
-import SwiftData
 import SwiftUI
 
 struct PersonWorksView: View {
@@ -28,20 +27,5 @@ struct PersonWorksView: View {
     }
     .padding(.bottom, 8)
     .animation(.default, value: works)
-  }
-}
-
-#Preview {
-  let container = mockContainer()
-  let person = Person.preview
-  container.mainContext.insert(person)
-
-  return NavigationStack {
-    ScrollView {
-      LazyVStack(alignment: .leading) {
-        PersonWorksView(personId: person.personId, works: person.works)
-          .modelContainer(container)
-      }.padding()
-    }
   }
 }

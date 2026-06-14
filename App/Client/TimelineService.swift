@@ -4,9 +4,6 @@ enum TimelineService {
   static func getTimeline(mode: TimelineMode = .friends, limit: Int = 20, until: Int? = nil)
     async throws -> [TimelineDTO]
   {
-    if await AppContext.shared.isMock {
-      return loadFixture(fixture: "timeline.json", target: [TimelineDTO].self)
-    }
     let url = BangumiAPI.priv.build("p1/timeline")
     var queryItems: [URLQueryItem] = [
       URLQueryItem(name: "mode", value: mode.rawValue),
@@ -22,9 +19,6 @@ enum TimelineService {
   }
 
   static func getTimelineReplies(_ id: Int) async throws -> [CommentDTO] {
-    if await AppContext.shared.isMock {
-      return loadFixture(fixture: "timeline_replies.json", target: [CommentDTO].self)
-    }
     let url = BangumiAPI.priv.build("p1/timeline/\(id)/replies")
     let data = try await APIClient.shared.request(url: url, method: "GET")
     let resp: [CommentDTO] = try await APIClient.shared.decodeResponse(data)

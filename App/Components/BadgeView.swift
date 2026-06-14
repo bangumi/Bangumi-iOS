@@ -25,13 +25,3 @@ struct BadgeView<Content: View>: View {
       .clipShape(Capsule())
   }
 }
-
-#Preview {
-  VStack {
-    Spacer()
-    BadgeView(background: .accent) {
-      Text("Bangumi")
-    }
-    Spacer()
-  }.padding()
-}

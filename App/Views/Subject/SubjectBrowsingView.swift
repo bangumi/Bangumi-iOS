@@ -1,5 +1,4 @@
 import Flow
-import SwiftData
 import SwiftUI
 
 enum FilterExpand: String {
@@ -651,14 +650,5 @@ struct SubjectTagBrowsingView: View {
         }
       }
     }
-  }
-}
-
-#Preview {
-  let container = mockContainer()
-
-  return NavigationStack {
-    SubjectBrowsingView(type: .anime)
-      .modelContainer(container)
   }
 }

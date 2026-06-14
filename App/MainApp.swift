@@ -1,6 +1,5 @@
 import BBCode
 import OSLog
-import SwiftData
 import SwiftUI
 
 @main
@@ -20,9 +19,8 @@ struct MainApp: App {
         switch bootstrapState {
         case .migrating:
           MigrationLoadingView()
-        case .ready(let container):
+        case .ready:
           ContentView()
-            .modelContainer(container)
         case .failed:
           MigrationFailedView()
         }
@@ -39,12 +37,12 @@ struct MainApp: App {
 
     do {
       let container = try await Task.detached(priority: .userInitiated) {
-        try ModelContainerFactory.make()
+        try await DatabaseFactory.make()
       }.value
-      await AppContext.shared.setUp(container: container)
-      bootstrapState = .ready(container)
+      await AppContext.shared.setUp(database: container)
+      bootstrapState = .ready
     } catch {
-      Logger.app.error("Failed to create ModelContainer: \(error)")
+      Logger.app.error("Failed to create database: \(error)")
       bootstrapState = .failed
     }
   }
@@ -52,7 +50,7 @@ struct MainApp: App {
 
 private enum BootstrapState {
   case migrating
-  case ready(ModelContainer)
+  case ready
   case failed
 }
 
@@ -64,7 +62,7 @@ private struct MigrationLoadingView: View {
       MusumeView(index: musumeIndex, width: 40)
         .id(musumeIndex)
         .transition(.opacity)
-      Text("正在升级本地数据")
+      Text("正在初始化本地数据")
         .font(.headline)
       Text("数据较多时可能需要一些时间，请勿关闭应用。")
         .font(.subheadline)
@@ -94,7 +92,7 @@ private struct MigrationFailedView: View {
         .resizable()
         .scaledToFit()
         .frame(width: 180, height: 180)
-      Text("数据迁移失败")
+      Text("本地数据初始化失败")
         .font(.headline)
       Text("本地数据无法升级，请删除并重新安装应用。")
         .font(.subheadline)
@@ -102,17 +100,5 @@ private struct MigrationFailedView: View {
         .multilineTextAlignment(.center)
     }
     .padding()
-  }
-}
-
-private enum ModelContainerFactory {
-  static func make() throws -> ModelContainer {
-    let schema = Schema(versionedSchema: BangumiSchemaV3.self)
-    let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
-    return try ModelContainer(
-      for: schema,
-      migrationPlan: BangumiMigrationPlan.self,
-      configurations: [modelConfiguration]
-    )
   }
 }

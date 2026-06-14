@@ -1,5 +1,4 @@
 import Foundation
-import SwiftData
 
 typealias ChiiGroup = BangumiSchemaV3.GroupV3
 
