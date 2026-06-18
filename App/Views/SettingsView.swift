@@ -3,6 +3,7 @@ import SwiftUI
 
 struct SettingsView: View {
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
+  @AppStorage("profile") var profile: Profile = Profile()
   @AppStorage("appearance") var appearance: AppearanceType = .system
   @AppStorage("shareDomain") var shareDomain: ShareDomain = .chii
   @AppStorage("authDomain") var authDomain: AuthDomain = .next
@@ -23,7 +24,6 @@ struct SettingsView: View {
   @AppStorage("showSpoilerRelations") var showSpoilerRelations: Bool = false
 
   @State private var spotlightRefreshing: Bool = false
-  @State private var spotlightProgress: CGFloat = 0
   @State private var logoutConfirm: Bool = false
   @State private var clearDraftsConfirm: Bool = false
   @State private var showEULA: Bool = false
@@ -37,7 +37,6 @@ struct SettingsView: View {
 
   func reindex() {
     spotlightRefreshing = true
-    spotlightProgress = 0
     let limit: Int = 50
     var offset: Int = 0
     Task {
@@ -54,13 +53,24 @@ struct SettingsView: View {
             break
           }
           await SearchIndexing.index(resp.data)
-          spotlightProgress = CGFloat(offset) / CGFloat(resp.total)
           offset += limit
           if offset >= resp.total {
             break
           }
         }
         Notifier.shared.notify(message: "Spotlight 索引重建完成")
+      } catch {
+        Notifier.shared.alert(error: error)
+      }
+    }
+  }
+
+  func clearDrafts() {
+    Task {
+      do {
+        let db = try await AppContext.shared.getDB()
+        try await db.clearDrafts()
+        Notifier.shared.notify(message: "草稿箱已清空")
       } catch {
         Notifier.shared.alert(error: error)
       }
@@ -77,6 +87,8 @@ struct SettingsView: View {
 
   var body: some View {
     Form {
+      profileHeaderContent
+
       // MARK: - 外观
       Section {
         Picker(selection: $appearance) {
@@ -276,64 +288,200 @@ struct SettingsView: View {
           Spacer()
         }
       }
-
-      // MARK: - 已登录操作
+    }
+    .contentMargins(.top, 0, for: .scrollContent)
+    .navigationTitle("")
+    .navigationBarTitleDisplayMode(.inline)
+    .toolbar {
       if isAuthenticated {
-        Section {
-          Button(role: .destructive) {
-            clearDraftsConfirm = true
-          } label: {
-            Text("清空草稿箱")
-          }
-          .alert("清空草稿箱", isPresented: $clearDraftsConfirm) {
-            Button("确定", role: .destructive) {
-              Task {
-                do {
-                  let db = try await AppContext.shared.getDB()
-                  try await db.clearDrafts()
-                  Notifier.shared.notify(message: "草稿箱已清空")
-                } catch {
-                  Notifier.shared.alert(error: error)
-                }
-              }
+        ToolbarItem(placement: .topBarTrailing) {
+          Menu {
+            Button(role: .destructive) {
+              clearDraftsConfirm = true
+            } label: {
+              Label("清空草稿箱", systemImage: "trash")
             }
-          } message: {
-            Text("确定要清空所有草稿吗？")
-          }
 
-          if spotlightRefreshing {
-            HStack {
-              ProgressView(value: spotlightProgress)
-            }.frame(height: 20)
-          } else {
             Button(role: .destructive) {
               reindex()
             } label: {
-              Text("重建 Spotlight 索引")
-            }.disabled(spotlightRefreshing)
-          }
-
-          Button(role: .destructive) {
-            logoutConfirm = true
-          } label: {
-            Text("退出登录")
-          }
-          .alert("退出登录", isPresented: $logoutConfirm) {
-            Button("确定", role: .destructive) {
-              Task {
-                await AuthService.logout()
-              }
+              Label(
+                spotlightRefreshing ? "重建 Spotlight 索引中" : "重建 Spotlight 索引",
+                systemImage: spotlightRefreshing ? "hourglass" : "magnifyingglass.circle")
             }
-          } message: {
-            Text("确定要退出登录吗？")
+            .disabled(spotlightRefreshing)
+
+            Divider()
+
+            Button(role: .destructive) {
+              logoutConfirm = true
+            } label: {
+              Label("退出登录", systemImage: "rectangle.portrait.and.arrow.right")
+            }
+          } label: {
+            Image(systemName: "ellipsis")
           }
         }
       }
     }
-    .navigationTitle("设置")
-    .navigationBarTitleDisplayMode(.inline)
     .sheet(isPresented: $showEULA) {
       EULAView(isPresented: $showEULA, showLoginButton: false)
     }
+    .alert("清空草稿箱", isPresented: $clearDraftsConfirm) {
+      Button("确定", role: .destructive) {
+        clearDrafts()
+      }
+    } message: {
+      Text("确定要清空所有草稿吗？")
+    }
+    .alert("退出登录", isPresented: $logoutConfirm) {
+      Button("确定", role: .destructive) {
+        Task {
+          await AuthService.logout()
+        }
+      }
+    } message: {
+      Text("确定要退出登录吗？")
+    }
+  }
+
+  private var profileHeaderContent: some View {
+    SettingsProfileHeader(profile: profile, isAuthenticated: isAuthenticated)
+      .frame(maxWidth: .infinity)
+      .padding(.top, 6)
+      .padding(.bottom, 18)
+      .listRowInsets(EdgeInsets())
+      .listRowBackground(Color(uiColor: .systemGroupedBackground))
+      .listRowSeparator(.hidden)
+  }
+}
+
+private struct SettingsProfileHeader: View {
+  let profile: Profile
+  let isAuthenticated: Bool
+
+  private let avatarSize: CGFloat = 92
+
+  private var displayName: String {
+    guard isAuthenticated else { return "未登录" }
+    return profile.name
+  }
+
+  private var userIDText: String? {
+    guard isAuthenticated, !profile.username.isEmpty else { return nil }
+    return "@\(profile.username)"
+  }
+
+  private var roleBadges: [String] {
+    switch UserGroup(profile.group) {
+    case .none:
+      return ["未知"]
+    case .admin:
+      return ["管理员"]
+    case .bangumiManager:
+      return ["管理", "Bangumi"]
+    case .doujinManager:
+      return ["管理", "天窗"]
+    case .banned:
+      return ["受限", "禁言"]
+    case .forbidden:
+      return ["受限", "禁止访问"]
+    case .characterManager:
+      return ["管理", "人物"]
+    case .wikiManager:
+      return ["管理", "维基条目"]
+    case .user:
+      return ["用户"]
+    case .wikipedians:
+      return ["维基人"]
+    }
+  }
+
+  private var detailText: String? {
+    guard isAuthenticated else { return nil }
+    if !profile.sign.isEmpty {
+      return profile.sign
+    }
+    if let joinedAt = profile.joinedAt, joinedAt > 0 {
+      return "\(joinedAt.dateDisplay)加入"
+    }
+    return nil
+  }
+
+  private func copyUserID() {
+    UIPasteboard.general.string = profile.username
+    Notifier.shared.notify(message: "已复制用户 ID")
+  }
+
+  var body: some View {
+    VStack(spacing: 12) {
+      ImageView(img: isAuthenticated ? profile.avatar?.large : nil)
+        .imageStyle(width: avatarSize, height: avatarSize, cornerRadius: 18, alignment: .center)
+        .imageType(.avatar)
+
+      VStack(spacing: 6) {
+        Text(verbatim: displayName)
+          .font(.title2)
+          .fontWeight(.semibold)
+          .lineLimit(1)
+          .truncationMode(.tail)
+
+        if let userIDText {
+          Button {
+            copyUserID()
+          } label: {
+            HStack(spacing: 4) {
+              Text(verbatim: userIDText)
+              Image(systemName: "doc.on.doc")
+                .font(.caption2)
+            }
+          }
+          .buttonStyle(.plain)
+          .font(.subheadline)
+          .foregroundStyle(.secondary)
+          .lineLimit(1)
+          .accessibilityLabel("复制用户 ID")
+          .accessibilityValue(userIDText)
+        } else if !isAuthenticated {
+          Text("登录后同步收藏、进度与讨论")
+            .font(.subheadline)
+            .foregroundStyle(.secondary)
+            .lineLimit(1)
+        }
+
+        if isAuthenticated {
+          HStack(spacing: 6) {
+            ForEach(roleBadges, id: \.self) { badge in
+              SettingsRoleBadge(title: badge)
+            }
+          }
+          .accessibilityElement(children: .combine)
+          .accessibilityLabel("用户组")
+        }
+
+        if let detailText {
+          Text(verbatim: detailText)
+            .font(.footnote)
+            .foregroundStyle(.secondary)
+            .multilineTextAlignment(.center)
+            .lineLimit(2)
+        }
+      }
+    }
+    .frame(maxWidth: .infinity)
+  }
+}
+
+private struct SettingsRoleBadge: View {
+  let title: String
+
+  var body: some View {
+    Text(verbatim: title)
+      .font(.caption2.weight(.medium))
+      .foregroundStyle(.secondary)
+      .lineLimit(1)
+      .padding(.horizontal, 8)
+      .padding(.vertical, 4)
+      .background(Color(uiColor: .tertiarySystemFill), in: .capsule)
   }
 }
