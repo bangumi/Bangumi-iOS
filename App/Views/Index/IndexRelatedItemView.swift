@@ -31,7 +31,8 @@ struct IndexRelatedItemView: View {
       let db = try await AppContext.shared.getDB()
       characterCollectionStatuses = try await db.characterCollectionStatuses(
         characterIds: collectionCharacterIds)
-      personCollectionStatuses = try await db.personCollectionStatuses(personIds: collectionPersonIds)
+      personCollectionStatuses = try await db.personCollectionStatuses(
+        personIds: collectionPersonIds)
     } catch {
       Logger.app.error("Failed to load index related collection statuses: \(error)")
     }

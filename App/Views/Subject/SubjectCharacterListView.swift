@@ -77,8 +77,8 @@ struct SubjectCharacterListView: View {
                     item.item.character.title(with: titlePreference)
                       .withLink(item.item.character.link)
                   )
-                    .foregroundStyle(.linkText)
-                    .lineLimit(1)
+                  .foregroundStyle(.linkText)
+                  .lineLimit(1)
                   Spacer()
                   if let comment = item.item.character.comment, comment > 0, !isolationMode {
                     Text("(+\(comment))")
