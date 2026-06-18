@@ -103,7 +103,7 @@ struct IndexRelatedCharacterPreview: View {
   var body: some View {
     Group {
       if let character = character {
-        CharacterSmallView(character: character.slim)
+        CharacterSmallView(character: character.slim, isCollected: (character.collectedAt ?? 0) > 0)
           .allowsHitTesting(false)
       } else {
         HStack {
@@ -158,7 +158,7 @@ struct IndexRelatedPersonPreview: View {
   var body: some View {
     Group {
       if let person = person {
-        PersonSmallView(person: person.slim)
+        PersonSmallView(person: person.slim, isCollected: (person.collectedAt ?? 0) > 0)
           .allowsHitTesting(false)
       } else {
         HStack {

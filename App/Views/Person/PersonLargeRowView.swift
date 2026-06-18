@@ -11,6 +11,7 @@ struct PersonLargeRowView: View {
         .imageStyle(width: 90, height: 90, alignment: .top)
         .imageType(.person)
         .imageNSFW(person.nsfw)
+        .imageCollectedStatus((person.collectedAt ?? 0) > 0)
         .imageNavLink(person.link)
       VStack(alignment: .leading, spacing: 4) {
         Text(person.title(with: titlePreference))

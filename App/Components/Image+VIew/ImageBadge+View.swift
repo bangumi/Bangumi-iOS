@@ -56,22 +56,42 @@ extension View {
   }
 }
 
+private struct ImageStatusBadge: View {
+  let icon: String
+  let background: Color
+  let fontSize: CGFloat
+
+  var body: some View {
+    Image(systemName: icon)
+      .font(.system(size: fontSize, weight: .bold))
+      .foregroundStyle(.white)
+      .frame(width: 18, height: 18)
+      .background(background.opacity(0.9))
+      .clipShape(Circle())
+      .overlay {
+        Circle()
+          .stroke(Color(uiColor: .systemBackground), lineWidth: 2.5)
+      }
+      .allowsHitTesting(false)
+  }
+}
+
 struct ImageCollectionStatus: View {
   let ctype: CollectionType?
 
   var body: some View {
     if let ctype, ctype != .none {
-      Image(systemName: ctype.icon)
-        .font(.system(size: 8, weight: .bold))
-        .foregroundStyle(.white)
-        .frame(width: 18, height: 18)
-        .background(ctype.color.opacity(0.9))
-        .clipShape(Circle())
-        .overlay {
-          Circle()
-            .stroke(Color(uiColor: .systemBackground), lineWidth: 2.5)
-        }
-        .allowsHitTesting(false)
+      ImageStatusBadge(icon: ctype.icon, background: ctype.color, fontSize: 8)
+    }
+  }
+}
+
+struct ImageCollectedStatus: View {
+  let isCollected: Bool
+
+  var body: some View {
+    if isCollected {
+      ImageStatusBadge(icon: "heart.fill", background: .red, fontSize: 8)
     }
   }
 }
@@ -80,6 +100,13 @@ extension View {
   func imageCollectionStatus(ctype: CollectionType? = nil) -> some View {
     self.overlay(alignment: .bottomTrailing) {
       ImageCollectionStatus(ctype: ctype)
+        .padding(-3)
+    }
+  }
+
+  func imageCollectedStatus(_ isCollected: Bool) -> some View {
+    self.overlay(alignment: .bottomTrailing) {
+      ImageCollectedStatus(isCollected: isCollected)
         .padding(-3)
     }
   }

@@ -228,6 +228,44 @@ extension DatabaseOperator {
     }
   }
 
+  public func characterCollectionStatuses(characterIds: [Int]) throws -> [Int: Bool] {
+    try database.read { db in
+      guard !characterIds.isEmpty else { return [:] }
+      let rows = try Row.fetchAll(
+        db,
+        sql: """
+          SELECT character_id, collected_at FROM characters
+          WHERE character_id IN (\(placeholders(characterIds.count)))
+          """,
+        arguments: StatementArguments(characterIds)
+      )
+      return rows.reduce(into: [:]) { result, row in
+        let id: Int = row["character_id"]
+        let collectedAt: Int = row["collected_at"]
+        result[id] = collectedAt > 0
+      }
+    }
+  }
+
+  public func personCollectionStatuses(personIds: [Int]) throws -> [Int: Bool] {
+    try database.read { db in
+      guard !personIds.isEmpty else { return [:] }
+      let rows = try Row.fetchAll(
+        db,
+        sql: """
+          SELECT person_id, collected_at FROM persons
+          WHERE person_id IN (\(placeholders(personIds.count)))
+          """,
+        arguments: StatementArguments(personIds)
+      )
+      return rows.reduce(into: [:]) { result, row in
+        let id: Int = row["person_id"]
+        let collectedAt: Int = row["collected_at"]
+        result[id] = collectedAt > 0
+      }
+    }
+  }
+
   public func makeSubjectListItems(_ subjects: [SlimSubjectDTO]) throws -> [SubjectListItemDTO] {
     let collectionTypes = try getCollectionTypes(subjectIds: subjects.map(\.id))
     return subjects.map { subject in

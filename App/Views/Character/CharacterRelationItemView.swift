@@ -2,6 +2,7 @@ import SwiftUI
 
 struct CharacterRelationItemView: View {
   let item: CharacterRelationDTO
+  let isCollected: Bool
 
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
 
@@ -17,6 +18,7 @@ struct CharacterRelationItemView: View {
             .imageStyle(width: 60, height: 60, alignment: .top)
             .imageType(.person)
             .imageNSFW(item.character.nsfw)
+            .imageCollectedStatus(isCollected)
             .imageNavLink(item.character.link)
 
           VStack(alignment: .leading, spacing: 4) {

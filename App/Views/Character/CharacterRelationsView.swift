@@ -1,3 +1,4 @@
+import OSLog
 import SwiftUI
 
 struct CharacterRelationsView: View {
@@ -5,6 +6,21 @@ struct CharacterRelationsView: View {
   let relations: [CharacterRelationDTO]
 
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
+  @State private var collectionStatuses: [Int: Bool] = [:]
+
+  private var collectionCharacterIds: [Int] {
+    relations.map { $0.character.id }
+  }
+
+  private func loadCollections() async {
+    do {
+      let db = try await AppContext.shared.getDB()
+      collectionStatuses = try await db.characterCollectionStatuses(
+        characterIds: collectionCharacterIds)
+    } catch {
+      Logger.app.error("Failed to load character collection statuses: \(error)")
+    }
+  }
 
   var body: some View {
     VStack(spacing: 2) {
@@ -37,7 +53,10 @@ struct CharacterRelationsView: View {
         ScrollView(.horizontal, showsIndicators: false) {
           LazyHStack(alignment: .top, spacing: 6) {
             ForEach(relations) { item in
-              CharacterRelationCard(item: item)
+              CharacterRelationCard(
+                item: item,
+                isCollected: collectionStatuses[item.character.id] ?? false
+              )
             }
           }
           .padding(.horizontal, 2)
@@ -46,11 +65,15 @@ struct CharacterRelationsView: View {
       }
     }
     .animation(.default, value: relations)
+    .task(id: collectionCharacterIds) {
+      await loadCollections()
+    }
   }
 }
 
 private struct CharacterRelationCard: View {
   let item: CharacterRelationDTO
+  let isCollected: Bool
 
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
 
@@ -69,12 +92,12 @@ private struct CharacterRelationCard: View {
           .multilineTextAlignment(.center)
 
         ImageView(img: item.character.images?.resize(.r200))
-          .imageStyle(width: 72, height: 72, alignment: .top)
+          .imageStyle(width: 72, height: 72, cornerRadius: 8, alignment: .top)
           .imageType(.person)
           .imageNSFW(item.character.nsfw)
-          .imageNavLink(item.character.link)
-          .clipShape(RoundedRectangle(cornerRadius: 8))
           .shadow(radius: 2)
+          .imageCollectedStatus(isCollected)
+          .imageNavLink(item.character.link)
 
         Text(item.character.title(with: titlePreference))
           .font(.caption)

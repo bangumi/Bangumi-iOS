@@ -65,6 +65,42 @@ struct SubjectListItemDTO: Codable, Identifiable, Sendable {
   }
 }
 
+struct CharacterRelationListItemDTO: Codable, Identifiable, Sendable, Equatable {
+  var relation: CharacterRelationDTO
+  var isCollected: Bool
+
+  var id: String {
+    relation.id
+  }
+}
+
+struct PersonRelationListItemDTO: Codable, Identifiable, Sendable, Equatable {
+  var relation: PersonRelationDTO
+  var isCollected: Bool
+
+  var id: String {
+    relation.id
+  }
+}
+
+struct SubjectCharacterListItemDTO: Codable, Identifiable, Sendable, Equatable {
+  var item: SubjectCharacterDTO
+  var isCharacterCollected: Bool
+
+  var id: Int {
+    item.id
+  }
+}
+
+struct SubjectStaffListItemDTO: Codable, Identifiable, Sendable, Equatable {
+  var item: SubjectStaffDTO
+  var isCollected: Bool
+
+  var id: Int {
+    item.id
+  }
+}
+
 struct ProgressSubjectDTO: Codable, Identifiable, Sendable {
   var subject: SubjectDTO
   var episodes: [EpisodeDTO]

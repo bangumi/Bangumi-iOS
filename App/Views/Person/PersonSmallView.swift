@@ -2,6 +2,7 @@ import SwiftUI
 
 struct PersonSmallView: View {
   let person: SlimPersonDTO
+  let isCollected: Bool
 
   var title: String {
     if person.nameCN.isEmpty {
@@ -18,6 +19,7 @@ struct PersonSmallView: View {
           .imageStyle(width: 50, height: 50, alignment: .top)
           .imageType(.person)
           .imageNSFW(person.nsfw)
+          .imageCollectedStatus(isCollected)
         VStack(alignment: .leading) {
           Text(title)
           if let info = person.info, !info.isEmpty {
@@ -32,5 +34,10 @@ struct PersonSmallView: View {
     .background(.secondary.opacity(0.01))
     .clipShape(RoundedRectangle(cornerRadius: 8))
     .frame(height: 58)
+  }
+
+  init(person: SlimPersonDTO, isCollected: Bool = false) {
+    self.person = person
+    self.isCollected = isCollected
   }
 }

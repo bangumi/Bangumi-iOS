@@ -2,6 +2,7 @@ import SwiftUI
 
 struct CharacterSmallView: View {
   let character: SlimCharacterDTO
+  let isCollected: Bool
 
   var title: String {
     if character.nameCN.isEmpty {
@@ -18,6 +19,7 @@ struct CharacterSmallView: View {
           .imageStyle(width: 50, height: 50, alignment: .top)
           .imageType(.person)
           .imageNSFW(character.nsfw)
+          .imageCollectedStatus(isCollected)
         VStack(alignment: .leading) {
           Text(title)
           if let info = character.info, !info.isEmpty {
@@ -32,5 +34,10 @@ struct CharacterSmallView: View {
     .background(.secondary.opacity(0.01))
     .clipShape(RoundedRectangle(cornerRadius: 8))
     .frame(height: 58)
+  }
+
+  init(character: SlimCharacterDTO, isCollected: Bool = false) {
+    self.character = character
+    self.isCollected = isCollected
   }
 }

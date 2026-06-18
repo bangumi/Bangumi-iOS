@@ -1,3 +1,4 @@
+import OSLog
 import SwiftUI
 
 struct IndexRelatedItemView: View {
@@ -10,6 +11,31 @@ struct IndexRelatedItemView: View {
 
   @State private var showEditRelated = false
   @State private var showDeleteRelated = false
+  @State private var characterCollectionStatuses: [Int: Bool] = [:]
+  @State private var personCollectionStatuses: [Int: Bool] = [:]
+
+  private var collectionCharacterIds: [Int] {
+    item.character.map { [$0.id] } ?? []
+  }
+
+  private var collectionPersonIds: [Int] {
+    item.person.map { [$0.id] } ?? []
+  }
+
+  private var collectionTaskId: String {
+    "\(collectionCharacterIds)-\(collectionPersonIds)"
+  }
+
+  private func loadCollections() async {
+    do {
+      let db = try await AppContext.shared.getDB()
+      characterCollectionStatuses = try await db.characterCollectionStatuses(
+        characterIds: collectionCharacterIds)
+      personCollectionStatuses = try await db.personCollectionStatuses(personIds: collectionPersonIds)
+    } catch {
+      Logger.app.error("Failed to load index related collection statuses: \(error)")
+    }
+  }
 
   func delete() async {
     do {
@@ -39,6 +65,7 @@ struct IndexRelatedItemView: View {
               ImageView(img: character.images?.resize(.r200))
                 .imageStyle(width: 72, height: 72, alignment: .top)
                 .imageType(.person)
+                .imageCollectedStatus(characterCollectionStatuses[character.id] ?? false)
                 .imageNavLink(character.link)
               VStack(alignment: .leading) {
                 HStack {
@@ -85,6 +112,7 @@ struct IndexRelatedItemView: View {
               ImageView(img: person.images?.resize(.r200))
                 .imageStyle(width: 72, height: 72, alignment: .top)
                 .imageType(.person)
+                .imageCollectedStatus(personCollectionStatuses[person.id] ?? false)
                 .imageNavLink(person.link)
               VStack(alignment: .leading) {
                 HStack {
@@ -361,6 +389,9 @@ struct IndexRelatedItemView: View {
           await delete()
         }
       }
+    }
+    .task(id: collectionTaskId) {
+      await loadCollections()
     }
   }
 }

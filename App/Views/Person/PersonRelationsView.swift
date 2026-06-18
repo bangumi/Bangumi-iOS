@@ -1,3 +1,4 @@
+import OSLog
 import SwiftUI
 
 struct PersonRelationsView: View {
@@ -5,6 +6,20 @@ struct PersonRelationsView: View {
   let relations: [PersonRelationDTO]
 
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
+  @State private var collectionStatuses: [Int: Bool] = [:]
+
+  private var collectionPersonIds: [Int] {
+    relations.map { $0.person.id }
+  }
+
+  private func loadCollections() async {
+    do {
+      let db = try await AppContext.shared.getDB()
+      collectionStatuses = try await db.personCollectionStatuses(personIds: collectionPersonIds)
+    } catch {
+      Logger.app.error("Failed to load person collection statuses: \(error)")
+    }
+  }
 
   var body: some View {
     VStack(spacing: 2) {
@@ -37,7 +52,10 @@ struct PersonRelationsView: View {
         ScrollView(.horizontal, showsIndicators: false) {
           LazyHStack(alignment: .top, spacing: 6) {
             ForEach(relations) { item in
-              PersonRelationCard(item: item)
+              PersonRelationCard(
+                item: item,
+                isCollected: collectionStatuses[item.person.id] ?? false
+              )
             }
           }
           .padding(.horizontal, 2)
@@ -46,11 +64,15 @@ struct PersonRelationsView: View {
       }
     }
     .animation(.default, value: relations)
+    .task(id: collectionPersonIds) {
+      await loadCollections()
+    }
   }
 }
 
 private struct PersonRelationCard: View {
   let item: PersonRelationDTO
+  let isCollected: Bool
 
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
 
@@ -69,12 +91,12 @@ private struct PersonRelationCard: View {
           .multilineTextAlignment(.center)
 
         ImageView(img: item.person.images?.resize(.r200))
-          .imageStyle(width: 72, height: 72, alignment: .top)
+          .imageStyle(width: 72, height: 72, cornerRadius: 8, alignment: .top)
           .imageType(.person)
           .imageNSFW(item.person.nsfw)
-          .imageNavLink(item.person.link)
-          .clipShape(RoundedRectangle(cornerRadius: 8))
           .shadow(radius: 2)
+          .imageCollectedStatus(isCollected)
+          .imageNavLink(item.person.link)
 
         Text(item.person.title(with: titlePreference))
           .font(.caption)
