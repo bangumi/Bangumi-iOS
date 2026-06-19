@@ -105,6 +105,17 @@ struct SearchPersonPickerLocalView: View {
     }
   }
 
+  private func handleMonoCollectionInvalidation(_ notification: Notification) {
+    guard let personId = MonoCollectionInvalidation.personId(from: notification),
+      persons.contains(where: { $0.id == personId })
+    else {
+      return
+    }
+    Task {
+      await load()
+    }
+  }
+
   var body: some View {
     LazyVStack {
       ForEach(persons) { person in
@@ -119,6 +130,15 @@ struct SearchPersonPickerLocalView: View {
     }
     .task(id: text) {
       await load()
+    }
+    .onReceive(
+      NotificationCenter.default.publisher(for: MonoCollectionInvalidation.notificationName),
+      perform: handleMonoCollectionInvalidation
+    )
+    .onAppear {
+      Task {
+        await load()
+      }
     }
   }
 }
@@ -138,6 +158,15 @@ struct SearchPersonPickerItemView: View {
     }
   }
 
+  private func handleMonoCollectionInvalidation(_ notification: Notification) {
+    guard MonoCollectionInvalidation.personId(from: notification) == personId else {
+      return
+    }
+    Task {
+      await load()
+    }
+  }
+
   var body: some View {
     CardView {
       if let person = person {
@@ -149,6 +178,15 @@ struct SearchPersonPickerItemView: View {
     }
     .task(id: personId) {
       await load()
+    }
+    .onReceive(
+      NotificationCenter.default.publisher(for: MonoCollectionInvalidation.notificationName),
+      perform: handleMonoCollectionInvalidation
+    )
+    .onAppear {
+      Task {
+        await load()
+      }
     }
   }
 }

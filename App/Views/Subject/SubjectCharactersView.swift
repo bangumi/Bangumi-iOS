@@ -23,6 +23,17 @@ struct SubjectCharactersView: View {
     }
   }
 
+  private func handleMonoCollectionInvalidation(_ notification: Notification) {
+    guard let characterId = MonoCollectionInvalidation.characterId(from: notification),
+      collectionCharacterIds.contains(characterId)
+    else {
+      return
+    }
+    Task {
+      await loadCollections()
+    }
+  }
+
   var body: some View {
     VStack(spacing: 2) {
       HStack(alignment: .bottom) {
@@ -66,6 +77,15 @@ struct SubjectCharactersView: View {
     .animation(.default, value: characters)
     .task(id: collectionCharacterIds) {
       await loadCollections()
+    }
+    .onReceive(
+      NotificationCenter.default.publisher(for: MonoCollectionInvalidation.notificationName),
+      perform: handleMonoCollectionInvalidation
+    )
+    .onAppear {
+      Task {
+        await loadCollections()
+      }
     }
   }
 }

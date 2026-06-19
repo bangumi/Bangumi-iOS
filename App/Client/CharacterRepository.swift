@@ -56,11 +56,13 @@ enum CharacterRepository {
     let db = try await AppContext.shared.getDB()
     let now = Int(Date().timeIntervalSince1970)
     try await db.updateCharacterCollection(characterId: characterId, collectedAt: now - 1)
+    await MonoCollectionInvalidation.postCharacter(characterId: characterId)
   }
 
   static func uncollectCharacter(_ characterId: Int) async throws {
     try await CharacterService.uncollectCharacter(characterId)
     let db = try await AppContext.shared.getDB()
     try await db.updateCharacterCollection(characterId: characterId, collectedAt: 0)
+    await MonoCollectionInvalidation.postCharacter(characterId: characterId)
   }
 }

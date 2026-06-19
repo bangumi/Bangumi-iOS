@@ -85,6 +85,15 @@ struct IndexRelatedCharacterPreview: View {
     character = try? await db.getCharacterDTO(characterId)
   }
 
+  private func handleMonoCollectionInvalidation(_ notification: Notification) {
+    guard MonoCollectionInvalidation.characterId(from: notification) == characterId else {
+      return
+    }
+    Task {
+      await loadCached()
+    }
+  }
+
   private func refresh() async {
     isLoading = true
     do {
@@ -126,6 +135,15 @@ struct IndexRelatedCharacterPreview: View {
     .task(id: characterId) {
       await loadCached()
     }
+    .onReceive(
+      NotificationCenter.default.publisher(for: MonoCollectionInvalidation.notificationName),
+      perform: handleMonoCollectionInvalidation
+    )
+    .onAppear {
+      Task {
+        await loadCached()
+      }
+    }
   }
 }
 
@@ -138,6 +156,15 @@ struct IndexRelatedPersonPreview: View {
   private func loadCached() async {
     guard let db = await AppContext.shared.databaseIfAvailable() else { return }
     person = try? await db.getPersonDTO(personId)
+  }
+
+  private func handleMonoCollectionInvalidation(_ notification: Notification) {
+    guard MonoCollectionInvalidation.personId(from: notification) == personId else {
+      return
+    }
+    Task {
+      await loadCached()
+    }
   }
 
   private func refresh() async {
@@ -180,6 +207,15 @@ struct IndexRelatedPersonPreview: View {
     }
     .task(id: personId) {
       await loadCached()
+    }
+    .onReceive(
+      NotificationCenter.default.publisher(for: MonoCollectionInvalidation.notificationName),
+      perform: handleMonoCollectionInvalidation
+    )
+    .onAppear {
+      Task {
+        await loadCached()
+      }
     }
   }
 }

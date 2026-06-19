@@ -21,6 +21,17 @@ struct PersonRelationsView: View {
     }
   }
 
+  private func handleMonoCollectionInvalidation(_ notification: Notification) {
+    guard let personId = MonoCollectionInvalidation.personId(from: notification),
+      collectionPersonIds.contains(personId)
+    else {
+      return
+    }
+    Task {
+      await loadCollections()
+    }
+  }
+
   var body: some View {
     VStack(spacing: 2) {
       HStack(alignment: .bottom) {
@@ -66,6 +77,15 @@ struct PersonRelationsView: View {
     .animation(.default, value: relations)
     .task(id: collectionPersonIds) {
       await loadCollections()
+    }
+    .onReceive(
+      NotificationCenter.default.publisher(for: MonoCollectionInvalidation.notificationName),
+      perform: handleMonoCollectionInvalidation
+    )
+    .onAppear {
+      Task {
+        await loadCollections()
+      }
     }
   }
 }

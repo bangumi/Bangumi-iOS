@@ -60,11 +60,13 @@ enum PersonRepository {
     let db = try await AppContext.shared.getDB()
     let now = Int(Date().timeIntervalSince1970)
     try await db.updatePersonCollection(personId: personId, collectedAt: now - 1)
+    await MonoCollectionInvalidation.postPerson(personId: personId)
   }
 
   static func uncollectPerson(_ personId: Int) async throws {
     try await PersonService.uncollectPerson(personId)
     let db = try await AppContext.shared.getDB()
     try await db.updatePersonCollection(personId: personId, collectedAt: 0)
+    await MonoCollectionInvalidation.postPerson(personId: personId)
   }
 }

@@ -42,6 +42,15 @@ struct SearchCharacterItemView: View {
     }
   }
 
+  private func handleMonoCollectionInvalidation(_ notification: Notification) {
+    guard MonoCollectionInvalidation.characterId(from: notification) == characterId else {
+      return
+    }
+    Task {
+      await load()
+    }
+  }
+
   var body: some View {
     CardView {
       if let character = character {
@@ -50,6 +59,15 @@ struct SearchCharacterItemView: View {
     }
     .task(id: characterId) {
       await load()
+    }
+    .onReceive(
+      NotificationCenter.default.publisher(for: MonoCollectionInvalidation.notificationName),
+      perform: handleMonoCollectionInvalidation
+    )
+    .onAppear {
+      Task {
+        await load()
+      }
     }
   }
 }
@@ -68,6 +86,17 @@ struct SearchCharacterLocalView: View {
     }
   }
 
+  private func handleMonoCollectionInvalidation(_ notification: Notification) {
+    guard let characterId = MonoCollectionInvalidation.characterId(from: notification),
+      characters.contains(where: { $0.id == characterId })
+    else {
+      return
+    }
+    Task {
+      await load()
+    }
+  }
+
   var body: some View {
     LazyVStack {
       ForEach(characters) { character in
@@ -78,6 +107,15 @@ struct SearchCharacterLocalView: View {
     }
     .task(id: text) {
       await load()
+    }
+    .onReceive(
+      NotificationCenter.default.publisher(for: MonoCollectionInvalidation.notificationName),
+      perform: handleMonoCollectionInvalidation
+    )
+    .onAppear {
+      Task {
+        await load()
+      }
     }
   }
 }

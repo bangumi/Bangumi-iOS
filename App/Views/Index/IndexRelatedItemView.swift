@@ -38,6 +38,24 @@ struct IndexRelatedItemView: View {
     }
   }
 
+  private func handleMonoCollectionInvalidation(_ notification: Notification) {
+    if let characterId = MonoCollectionInvalidation.characterId(from: notification),
+      collectionCharacterIds.contains(characterId)
+    {
+      Task {
+        await loadCollections()
+      }
+      return
+    }
+    if let personId = MonoCollectionInvalidation.personId(from: notification),
+      collectionPersonIds.contains(personId)
+    {
+      Task {
+        await loadCollections()
+      }
+    }
+  }
+
   func delete() async {
     do {
       try await IndexService.deleteIndexRelated(indexId: item.rid, id: item.id)
@@ -393,6 +411,15 @@ struct IndexRelatedItemView: View {
     }
     .task(id: collectionTaskId) {
       await loadCollections()
+    }
+    .onReceive(
+      NotificationCenter.default.publisher(for: MonoCollectionInvalidation.notificationName),
+      perform: handleMonoCollectionInvalidation
+    )
+    .onAppear {
+      Task {
+        await loadCollections()
+      }
     }
   }
 }

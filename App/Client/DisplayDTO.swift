@@ -65,48 +65,45 @@ struct SubjectListItemDTO: Codable, Identifiable, Sendable {
   }
 }
 
-struct CharacterRelationListItemDTO: Codable, Identifiable, Sendable, Equatable {
-  var relation: CharacterRelationDTO
-  var isCollected: Bool
-
-  var id: String {
-    relation.id
-  }
-}
-
-struct PersonRelationListItemDTO: Codable, Identifiable, Sendable, Equatable {
-  var relation: PersonRelationDTO
-  var isCollected: Bool
-
-  var id: String {
-    relation.id
-  }
-}
-
-struct SubjectCharacterListItemDTO: Codable, Identifiable, Sendable, Equatable {
-  var item: SubjectCharacterDTO
-  var isCharacterCollected: Bool
-
-  var id: Int {
-    item.id
-  }
-}
-
-struct SubjectStaffListItemDTO: Codable, Identifiable, Sendable, Equatable {
-  var item: SubjectStaffDTO
-  var isCollected: Bool
-
-  var id: Int {
-    item.id
-  }
-}
-
 struct ProgressSubjectDTO: Codable, Identifiable, Sendable {
   var subject: SubjectDTO
   var episodes: [EpisodeDTO]
 
   var id: Int {
     subject.id
+  }
+}
+
+enum MonoCollectionInvalidation {
+  static let notificationName = Notification.Name("MonoCollectionInvalidated")
+
+  private static let characterIdKey = "characterId"
+  private static let personIdKey = "personId"
+
+  @MainActor
+  static func postCharacter(characterId: Int) async {
+    NotificationCenter.default.post(
+      name: notificationName,
+      object: nil,
+      userInfo: [characterIdKey: characterId]
+    )
+  }
+
+  @MainActor
+  static func postPerson(personId: Int) async {
+    NotificationCenter.default.post(
+      name: notificationName,
+      object: nil,
+      userInfo: [personIdKey: personId]
+    )
+  }
+
+  static func characterId(from notification: Notification) -> Int? {
+    notification.userInfo?[characterIdKey] as? Int
+  }
+
+  static func personId(from notification: Notification) -> Int? {
+    notification.userInfo?[personIdKey] as? Int
   }
 }
 
