@@ -32,6 +32,6 @@ struct CharacterCastsView: View {
       ForEach(casts, id: \.subject.id) { item in
         CharacterCastItemView(item: item)
       }
-    }.animation(.default, value: casts)
+    }
   }
 }

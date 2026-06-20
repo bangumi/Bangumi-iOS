@@ -13,12 +13,13 @@ struct SearchView: View {
 
   @State private var searchType: SearchType = .subject
   @State private var subjectType: SubjectType = .none
+  @State private var showsResults = false
 
   var body: some View {
     ScrollView {
       VStack(spacing: 4) {
         HStack(spacing: 4) {
-          Picker("SearchType", selection: $searchType) {
+          Picker("SearchType", selection: $searchType.animated()) {
             Text("条目").tag(SearchType.subject)
             Text("角色").tag(SearchType.character)
             Text("人物").tag(SearchType.person)
@@ -29,7 +30,7 @@ struct SearchView: View {
             .padding(.horizontal, 4)
         }
         if searchType == .subject {
-          Picker("Subject Type", selection: $subjectType) {
+          Picker("Subject Type", selection: $subjectType.animated()) {
             Text("全部").tag(SubjectType.none)
             ForEach(SubjectType.allTypes) { type in
               Text(type.description).tag(type)
@@ -37,7 +38,7 @@ struct SearchView: View {
           }.pickerStyle(.segmented)
         }
       }.padding(.horizontal, 8)
-      if text.isEmpty {
+      if !showsResults {
         Text("输入关键字搜索")
           .foregroundStyle(.secondary)
           .padding(8)
@@ -66,8 +67,15 @@ struct SearchView: View {
         }.padding(.horizontal, 8)
       }
     }
-    .animation(.default, value: searchType)
-    .animation(.default, value: subjectType)
-    .animation(.default, value: text)
+    .onAppear {
+      showsResults = !text.isEmpty
+    }
+    .onChange(of: text) { _, newValue in
+      let nextShowsResults = !newValue.isEmpty
+      guard showsResults != nextShowsResults else { return }
+      withAnimation(.default) {
+        showsResults = nextShowsResults
+      }
+    }
   }
 }

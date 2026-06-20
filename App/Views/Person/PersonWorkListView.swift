@@ -19,7 +19,7 @@ struct PersonWorkListView: View {
   }
 
   var body: some View {
-    Picker("Subject Type", selection: $subjectType) {
+    Picker("Subject Type", selection: $subjectType.animated()) {
       ForEach(SubjectType.allCases) { type in
         Text(type.description).tag(type)
       }
@@ -27,7 +27,9 @@ struct PersonWorkListView: View {
     .padding(.horizontal, 8)
     .pickerStyle(.segmented)
     .onChange(of: subjectType) { _, _ in
-      reloader.toggle()
+      withAnimation(.default) {
+        reloader.toggle()
+      }
     }
     ScrollView {
       OffsetPagedView<PersonWorkDTO, _>(limit: 10, reloader: reloader, nextPageFunc: load) { item in

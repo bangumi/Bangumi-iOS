@@ -28,7 +28,10 @@ struct HotGroupsView: View {
       do {
         let db = try await AppContext.shared.getDB()
         try await db.togglePinRakuenGroupCache(group: group)
-        pinnedItems = try await db.fetchRakuenGroupCache(id: "pin")
+        let fetchedPins = try await db.fetchRakuenGroupCache(id: "pin")
+        withAnimation(.default) {
+          pinnedItems = fetchedPins
+        }
       } catch {
         Logger.app.error("Failed to toggle pin: \(error)")
       }
@@ -38,26 +41,41 @@ struct HotGroupsView: View {
   private func loadCache() async {
     do {
       let db = try await AppContext.shared.getDB()
-      cachedHotItems = try await db.fetchRakuenGroupCache(id: "hot")
-      pinnedItems = try await db.fetchRakuenGroupCache(id: "pin")
+      let fetchedCachedItems = try await db.fetchRakuenGroupCache(id: "hot")
+      let fetchedPinnedItems = try await db.fetchRakuenGroupCache(id: "pin")
+      withAnimation(.default) {
+        cachedHotItems = fetchedCachedItems
+        pinnedItems = fetchedPinnedItems
+      }
     } catch {
       Logger.app.error("Failed to load group cache: \(error)")
     }
   }
 
   private func load() async {
-    loading = true
-    defer { loading = false }
+    withAnimation(.default) {
+      loading = true
+    }
+    defer {
+      withAnimation(.default) {
+        loading = false
+      }
+    }
 
     do {
       let resp = try await GroupService.getGroups(mode: .all, sort: .members, limit: 10)
-      hotItems = resp.data
-      hotItems.shuffle()
+      var fetchedItems = resp.data
+      fetchedItems.shuffle()
+      withAnimation(.default) {
+        hotItems = fetchedItems
+      }
 
       // Save to hot cache
       if let db = try? await AppContext.shared.getDB() {
-        try await db.saveRakuenGroupCache(id: "hot", items: hotItems)
-        cachedHotItems = hotItems
+        try await db.saveRakuenGroupCache(id: "hot", items: fetchedItems)
+        withAnimation(.default) {
+          cachedHotItems = fetchedItems
+        }
       }
     } catch {
       Notifier.shared.alert(error: error)
@@ -117,7 +135,6 @@ struct HotGroupsView: View {
         .frame(height: 120)
       }
     }
-    .animation(.default, value: displayItems.map(\.id))
     .onAppear {
       if !initialized {
         initialized = true

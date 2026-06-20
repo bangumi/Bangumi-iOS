@@ -25,6 +25,5 @@ struct PersonCastsView: View {
       }
     }
     .padding(.bottom, 8)
-    .animation(.default, value: casts)
   }
 }

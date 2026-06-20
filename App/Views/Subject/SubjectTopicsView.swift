@@ -57,6 +57,5 @@ struct SubjectTopicsView: View {
       }
     }
     .buttonStyle(.navigation)
-    .animation(.default, value: topics)
   }
 }

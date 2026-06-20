@@ -53,7 +53,7 @@ struct UserMonoListView: View {
 
   var body: some View {
     VStack {
-      Picker("Type", selection: $type) {
+      Picker("Type", selection: $type.animated()) {
         ForEach(MonoType.allCases, id: \.self) { type in
           Text(type.title).tag(type)
         }

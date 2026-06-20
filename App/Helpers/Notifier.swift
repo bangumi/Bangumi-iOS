@@ -57,9 +57,13 @@ class Notifier {
   func notify(message: String, duration: TimeInterval = 2) {
     Logger.app.info("notify: \(message)")
     let notification = Notification(message: message)
-    self.notifications.append(notification)
+    withAnimation(.snappy) {
+      self.notifications.append(notification)
+    }
     DispatchQueue.main.asyncAfter(deadline: .now() + duration) { [weak self] in
-      self?.notifications.removeAll(where: { $0.id == notification.id })
+      withAnimation(.snappy) {
+        self?.notifications.removeAll(where: { $0.id == notification.id })
+      }
     }
   }
 }

@@ -50,14 +50,21 @@ struct SubjectCollectionBoxView: View {
   }
 
   func load() async {
-    updating = true
+    withAnimation(.default) {
+      updating = true
+    }
     defer {
-      updating = false
+      withAnimation(.default) {
+        updating = false
+      }
     }
 
     do {
       let db = try await AppContext.shared.getDB()
-      subject = try await db.getSubjectDTO(subjectId)
+      let cachedSubject = try await db.getSubjectDTO(subjectId)
+      withAnimation(.default) {
+        subject = cachedSubject
+      }
     } catch {
       Notifier.shared.alert(error: error)
     }
@@ -69,30 +76,44 @@ struct SubjectCollectionBoxView: View {
       }
       do {
         let db = try await AppContext.shared.getDB()
-        subject = try await db.getSubjectDTO(subjectId)
+        let cachedSubject = try await db.getSubjectDTO(subjectId)
+        withAnimation(.default) {
+          subject = cachedSubject
+        }
       } catch {
         Notifier.shared.alert(error: error)
       }
     }
 
     if let interest = subject?.interest {
-      self.ctype = interest.type
-      self.rate = interest.rate
-      self.comment = interest.comment
-      self.priv = interest.private
-      self.tags = Set(interest.tags)
+      withAnimation(.default) {
+        self.ctype = interest.type
+        self.rate = interest.rate
+        self.comment = interest.comment
+        self.priv = interest.private
+        self.tags = Set(interest.tags)
+      }
     }
   }
 
   func updateTags() {
     let inputTags = tagsInput.split(separator: " ").map { String($0) }
-    tags.formUnion(inputTags)
-    tagsInput = ""
+    withAnimation(.default) {
+      tags.formUnion(inputTags)
+      tagsInput = ""
+    }
   }
 
   func update() {
-    self.updating = true
+    withAnimation(.default) {
+      self.updating = true
+    }
     Task {
+      defer {
+        withAnimation(.default) {
+          self.updating = false
+        }
+      }
       do {
         try await SubjectRepository.updateSubjectCollection(
           subjectId: subjectId,
@@ -109,7 +130,6 @@ struct SubjectCollectionBoxView: View {
       } catch {
         Notifier.shared.alert(error: error)
       }
-      self.updating = false
     }
   }
 
@@ -137,7 +157,7 @@ struct SubjectCollectionBoxView: View {
             .font(.caption)
           }
 
-          Picker("CollectionType", selection: $ctype) {
+          Picker("CollectionType", selection: $ctype.animated()) {
             ForEach(CollectionType.allTypes()) { ct in
               Text("\(ct.description(subject?.type ?? .anime))").tag(ct)
             }
@@ -156,7 +176,9 @@ struct SubjectCollectionBoxView: View {
                 .foregroundStyle(.secondary)
                 .frame(width: 20, height: 20)
                 .onTapGesture {
-                  rate = 0
+                  withAnimation(.default) {
+                    rate = 0
+                  }
                 }
               ForEach(1..<11) { idx in
                 Image(systemName: rate >= idx ? "star.fill" : "star")
@@ -164,7 +186,9 @@ struct SubjectCollectionBoxView: View {
                   .foregroundStyle(.orange)
                   .frame(width: 20, height: 20)
                   .onTapGesture {
-                    rate = Int(idx)
+                    withAnimation(.default) {
+                      rate = Int(idx)
+                    }
                   }
               }
             }
@@ -176,7 +200,9 @@ struct SubjectCollectionBoxView: View {
               ForEach(Array(tags.sorted().prefix(10)), id: \.self) { tag in
                 BorderView(padding: 2) {
                   Button {
-                    tags.remove(tag)
+                    withAnimation(.default) {
+                      _ = tags.remove(tag)
+                    }
                   } label: {
                     Label(tag, systemImage: "xmark.circle")
                       .labelStyle(.compact)
@@ -208,7 +234,9 @@ struct SubjectCollectionBoxView: View {
               HFlow(alignment: .center, spacing: 2) {
                 ForEach(recommendedTags, id: \.self) { tag in
                   Button {
-                    tags.insert(tag)
+                    withAnimation(.default) {
+                      _ = tags.insert(tag)
+                    }
                   } label: {
                     if tags.contains(tag) {
                       Label(tag, systemImage: "checkmark.circle")
@@ -238,9 +266,6 @@ struct SubjectCollectionBoxView: View {
           Spacer()
         }
         .disabled(updating)
-        .animation(.default, value: subject != nil)
-        .animation(.default, value: priv)
-        .animation(.default, value: rate)
         .padding(.horizontal)
       }
       .navigationTitle(subjectTitle)
@@ -256,7 +281,9 @@ struct SubjectCollectionBoxView: View {
         }
         ToolbarItem(placement: .primaryAction) {
           Button {
-            priv.toggle()
+            withAnimation(.default) {
+              priv.toggle()
+            }
           } label: {
             Image(systemName: priv ? "lock.fill" : "lock.circle.dotted")
           }

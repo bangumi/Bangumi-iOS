@@ -31,11 +31,12 @@ struct CollectionSubjectTypeView: View {
   func loadCounts() async {
     do {
       let db = try await AppContext.shared.getDB()
-      counts = try await db.fetchCollectionCounts(subjectType: stype)
-      if !selectedTypeIsAvailable,
-        let preferredType = CollectionType.preferredAvailableType(in: counts)
-      {
-        withAnimation(.default) {
+      let fetchedCounts = try await db.fetchCollectionCounts(subjectType: stype)
+      withAnimation(.default) {
+        counts = fetchedCounts
+        if fetchedCounts[ctype, default: 0] == 0,
+          let preferredType = CollectionType.preferredAvailableType(in: fetchedCounts)
+        {
           ctype = preferredType
         }
       }

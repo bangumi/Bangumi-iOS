@@ -159,7 +159,7 @@ struct CollectionTypeSegmentedPickerView: View {
   @Binding var selection: CollectionType
 
   var body: some View {
-    Picker("CollectionType", selection: $selection) {
+    Picker("CollectionType", selection: $selection.animated()) {
       ForEach(CollectionType.allTypes()) { type in
         Text("\(type.description(subjectType))(\(counts[type, default: 0]))").tag(type)
       }

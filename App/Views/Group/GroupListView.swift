@@ -55,8 +55,10 @@ struct GroupListView: View {
         Menu {
           ForEach(GroupSortMode.allCases, id: \.self) { mode in
             Button {
-              sortMode = mode
-              reloader.toggle()
+              withAnimation(.default) {
+                sortMode = mode
+                reloader.toggle()
+              }
             } label: {
               if sortMode == mode {
                 Label(mode.description, systemImage: "checkmark")

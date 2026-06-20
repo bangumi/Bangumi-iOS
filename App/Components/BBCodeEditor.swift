@@ -351,7 +351,9 @@ struct BBCodeEditor: View {
   var body: some View {
     VStack {
       Button {
-        preview.toggle()
+        withAnimation(.default) {
+          preview.toggle()
+        }
       } label: {
         HStack {
           Spacer()
@@ -393,7 +395,6 @@ struct BBCodeEditor: View {
           ).padding(.vertical, 2)
       }
     }
-    .animation(.default, value: preview)
     .alert("插入图片", isPresented: $showingImageInput) {
       TextField("图片链接", text: $inputURL)
         .textInputAutocapitalization(.never)

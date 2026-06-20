@@ -8,12 +8,13 @@ struct SearchPersonPickerView: View {
   @State private var searchText: String = ""
   @State private var searching: Bool = false
   @State private var remote: Bool = false
+  @State private var showsResults = false
 
   var body: some View {
     NavigationStack {
       ScrollView {
         VStack {
-          if searchText.isEmpty {
+          if !showsResults {
             Text("输入关键字搜索")
               .foregroundStyle(.secondary)
               .padding(8)
@@ -26,18 +27,31 @@ struct SearchPersonPickerView: View {
           }
         }.padding()
       }
-      .animation(.default, value: searchText)
-      .animation(.default, value: remote)
       .navigationTitle("搜索人物")
       .navigationBarTitleDisplayMode(.inline)
       .searchable(text: $searchText, isPresented: $searching, prompt: "搜索人物")
       .searchInputTraits()
       .searchPresentationToolbarBehavior(.avoidHidingContent)
-      .onSubmit(of: .search) {
-        remote = true
+      .onAppear {
+        showsResults = !searchText.isEmpty
       }
-      .onChange(of: searchText) { _, _ in
-        remote = false
+      .onSubmit(of: .search) {
+        withAnimation(.default) {
+          remote = true
+        }
+      }
+      .onChange(of: searchText) { _, newValue in
+        let nextShowsResults = !newValue.isEmpty
+        if showsResults != nextShowsResults {
+          withAnimation(.default) {
+            showsResults = nextShowsResults
+          }
+        }
+        if remote {
+          withAnimation(.default) {
+            remote = false
+          }
+        }
       }
       .toolbar {
         ToolbarItem(placement: .cancellationAction) {
@@ -99,7 +113,10 @@ struct SearchPersonPickerLocalView: View {
   private func load() async {
     do {
       let db = try await AppContext.shared.getDB()
-      persons = try await db.fetchLocalPersons(search: text.gb)
+      let fetched = try await db.fetchLocalPersons(search: text.gb)
+      withAnimation(.default) {
+        persons = fetched
+      }
     } catch {
       Notifier.shared.alert(error: error)
     }

@@ -11,56 +11,79 @@ struct NoticeView: View {
 
   func loadNotice() async throws {
     let resp = try await AccountService.listNotice(limit: 20)
-    notices = resp.data
-    unreadCount = notices.count(where: { $0.unread })
-    hasUnreadNotice = unreadCount > 0
+    let nextUnreadCount = resp.data.count(where: { $0.unread })
+    withAnimation(.default) {
+      notices = resp.data
+      unreadCount = nextUnreadCount
+      hasUnreadNotice = nextUnreadCount > 0
+    }
   }
 
   func refreshNotice() async {
-    updating = true
+    withAnimation(.default) {
+      updating = true
+    }
     do {
       try await loadNotice()
     } catch {
       Notifier.shared.alert(error: error)
     }
-    fetched = true
-    updating = false
+    withAnimation(.default) {
+      fetched = true
+      updating = false
+    }
   }
 
   func clearNotice() {
     if updating { return }
-    updating = true
+    withAnimation(.default) {
+      updating = true
+    }
     let ids = notices.map { $0.id }
     Task {
+      defer {
+        withAnimation(.default) {
+          updating = false
+        }
+      }
       do {
         try await AccountService.clearNotice(ids: ids)
         try await loadNotice()
       } catch {
         Notifier.shared.alert(error: error)
       }
-      for i in 0..<notices.count {
-        notices[i].unread = false
+      withAnimation(.default) {
+        for i in 0..<notices.count {
+          notices[i].unread = false
+        }
+        unreadCount = 0
+        hasUnreadNotice = false
       }
-      unreadCount = 0
-      hasUnreadNotice = false
-      updating = false
     }
   }
 
   func markAsRead(id: Int) {
-    updating = true
+    withAnimation(.default) {
+      updating = true
+    }
     Task {
+      defer {
+        withAnimation(.default) {
+          updating = false
+        }
+      }
       do {
         try await AccountService.clearNotice(ids: [id])
         if let index = notices.firstIndex(where: { $0.id == id }) {
-          notices[index].unread = false
-          unreadCount = notices.count(where: { $0.unread })
-          hasUnreadNotice = unreadCount > 0
+          withAnimation(.default) {
+            notices[index].unread = false
+            unreadCount = notices.count(where: { $0.unread })
+            hasUnreadNotice = unreadCount > 0
+          }
         }
       } catch {
         Notifier.shared.alert(error: error)
       }
-      updating = false
     }
   }
 
@@ -91,7 +114,6 @@ struct NoticeView: View {
         }
       }
       .listStyle(.plain)
-      .animation(.default, value: notices)
       .refreshable {
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
         await refreshNotice()

@@ -80,7 +80,10 @@ struct SearchCharacterLocalView: View {
   private func load() async {
     do {
       let db = try await AppContext.shared.getDB()
-      characters = try await db.fetchLocalCharacters(search: text.gb)
+      let fetched = try await db.fetchLocalCharacters(search: text.gb)
+      withAnimation(.default) {
+        characters = fetched
+      }
     } catch {
       Notifier.shared.alert(error: error)
     }

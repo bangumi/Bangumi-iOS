@@ -17,12 +17,16 @@ struct EpisodeGridView: View {
   private func loadCached() async {
     do {
       let db = try await AppContext.shared.getDB()
-      episodeMains = try await db.fetchEpisodes(subjectId: subjectId, main: true, limit: 50)
-      episodeSps = Array(
+      let fetchedEpisodeMains = try await db.fetchEpisodes(subjectId: subjectId, main: true, limit: 50)
+      let fetchedEpisodeSps = Array(
         try await db.fetchEpisodes(subjectId: subjectId)
           .filter { $0.type == .sp }
           .prefix(10)
       )
+      withAnimation(.default) {
+        episodeMains = fetchedEpisodeMains
+        episodeSps = fetchedEpisodeSps
+      }
     } catch {
       Logger.app.error("Failed to load cached episodes: \(error)")
     }

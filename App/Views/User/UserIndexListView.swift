@@ -53,7 +53,7 @@ struct UserIndexListView: View {
 
   var body: some View {
     VStack {
-      Picker("Type", selection: $type) {
+      Picker("Type", selection: $type.animated()) {
         ForEach(IndexListType.allCases, id: \.self) { type in
           Text(type.title).tag(type)
         }
@@ -61,7 +61,9 @@ struct UserIndexListView: View {
       .pickerStyle(.segmented)
       .padding(.horizontal, 8)
       .onChange(of: type) { _, _ in
-        reloader.toggle()
+        withAnimation(.default) {
+          reloader.toggle()
+        }
       }
       ScrollView {
         OffsetPagedView<SlimIndexDTO, _>(reloader: reloader, nextPageFunc: load) { item in
@@ -84,7 +86,9 @@ struct UserIndexListView: View {
     }
     .sheet(isPresented: $showCreateIndex) {
       IndexEditSheet {
-        reloader.toggle()
+        withAnimation(.default) {
+          reloader.toggle()
+        }
       }
     }
   }

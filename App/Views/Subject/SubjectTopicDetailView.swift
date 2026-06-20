@@ -33,11 +33,13 @@ struct SubjectTopicDetailView: View {
   func refresh() async {
     do {
       let resp = try await TopicService.getSubjectTopic(topicId)
-      topic = resp
-      if let mainPost = resp.mainPost {
-        mainPostReactions = mainPost.reactions ?? []
+      withAnimation(.default) {
+        topic = resp
+        if let mainPost = resp.mainPost {
+          mainPostReactions = mainPost.reactions ?? []
+        }
+        refreshed = true
       }
-      refreshed = true
     } catch {
       Notifier.shared.alert(error: error)
     }
@@ -214,8 +216,6 @@ struct SubjectTopicDetailView: View {
             Spacer()
           }.padding(.bottom, 16)
         }
-        .animation(.default, value: filterMode)
-        .animation(.default, value: sortOrder)
         .padding(8)
         .refreshable {
           Task {
@@ -258,7 +258,7 @@ struct SubjectTopicDetailView: View {
     .toolbar {
       ToolbarItem(placement: .topBarTrailing) {
         Menu {
-          Picker(selection: $filterMode) {
+          Picker(selection: $filterMode.animated()) {
             ForEach(ReplyFilterMode.allCases, id: \.self) { mode in
               Label(mode.description, systemImage: mode.icon).tag(mode)
             }
@@ -267,14 +267,16 @@ struct SubjectTopicDetailView: View {
           }
           .pickerStyle(.menu)
           .onChange(of: filterMode) {
-            replyLimit = 0
+            withAnimation(.default) {
+              replyLimit = 0
+            }
           }
 
           Picker(
             selection: Binding(
               get: { effectiveSortOrder },
               set: { sortOrder = $0 }
-            )
+            ).animated()
           ) {
             ForEach(ReplySortOrder.allCases, id: \.self) { order in
               Label(order.description, systemImage: order.icon).tag(order)

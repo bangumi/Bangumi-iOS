@@ -10,7 +10,9 @@ struct UserIndexesView: View {
     do {
       let resp = try await UserService.getUserIndexes(
         username: user.username, limit: 5)
-      indexes = resp.data
+      withAnimation(.default) {
+        indexes = resp.data
+      }
     } catch {
       Notifier.shared.alert(error: error)
     }
@@ -33,6 +35,6 @@ struct UserIndexesView: View {
       ForEach(indexes) { index in
         IndexItemView(index: index)
       }
-    }.animation(.default, value: indexes)
+    }
   }
 }

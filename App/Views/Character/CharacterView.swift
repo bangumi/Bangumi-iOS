@@ -29,11 +29,20 @@ struct CharacterView: View {
     return character.title(with: titlePreference)
   }
 
-  private func loadCached() async {
+  private func loadCached(animated: Bool = false) async {
     do {
       let db = try await AppContext.shared.getDB()
-      character = try await db.getCharacterDTO(characterId)
-      detail = try await db.getCharacterDetailDTO(characterId)
+      let cachedCharacter = try await db.getCharacterDTO(characterId)
+      let cachedDetail = try await db.getCharacterDetailDTO(characterId)
+      if animated {
+        withAnimation(.default) {
+          character = cachedCharacter
+          detail = cachedDetail
+        }
+      } else {
+        character = cachedCharacter
+        detail = cachedDetail
+      }
     } catch {
       Logger.app.error("Failed to load cached character: \(error)")
     }
@@ -42,17 +51,24 @@ struct CharacterView: View {
   func refresh() async {
     do {
       try await CharacterRepository.loadCharacter(characterId)
-      await loadCached()
-      refreshed = true
+      await loadCached(animated: true)
+      withAnimation(.default) {
+        refreshed = true
+      }
 
       if !isolationMode {
-        loadingComments = true
-        comments = try await CharacterService.getCharacterComments(characterId)
-        loadingComments = false
+        withAnimation(.default) {
+          loadingComments = true
+        }
+        let fetchedComments = try await CharacterService.getCharacterComments(characterId)
+        withAnimation(.default) {
+          comments = fetchedComments
+          loadingComments = false
+        }
       }
 
       try await CharacterRepository.loadCharacterDetails(characterId)
-      await loadCached()
+      await loadCached(animated: true)
     } catch {
       Notifier.shared.alert(error: error)
       return

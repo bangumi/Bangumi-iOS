@@ -11,11 +11,19 @@ struct TimelineView: View {
 
   func load() async {
     do {
-      loadingComments = true
-      comments = try await TimelineService.getTimelineReplies(item.id)
-      loadingComments = false
+      withAnimation(.default) {
+        loadingComments = true
+      }
+      let fetchedComments = try await TimelineService.getTimelineReplies(item.id)
+      withAnimation(.default) {
+        comments = fetchedComments
+        loadingComments = false
+      }
     } catch {
       Notifier.shared.alert(error: error)
+      withAnimation(.default) {
+        loadingComments = false
+      }
     }
   }
 

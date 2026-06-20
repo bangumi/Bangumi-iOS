@@ -60,7 +60,9 @@ struct IndexRelatedItemView: View {
     do {
       try await IndexService.deleteIndexRelated(indexId: item.rid, id: item.id)
       Notifier.shared.notify(message: "已删除")
-      reloader.toggle()
+      withAnimation(.default) {
+        reloader.toggle()
+      }
     } catch {
       Notifier.shared.alert(error: error)
     }
@@ -398,7 +400,9 @@ struct IndexRelatedItemView: View {
         indexId: item.rid, relatedId: item.id,
         order: item.order, comment: item.comment
       ) {
-        reloader.toggle()
+        withAnimation(.default) {
+          reloader.toggle()
+        }
       }
     }
     .alert("确定删除这个关联吗？", isPresented: $showDeleteRelated) {

@@ -65,8 +65,6 @@ struct SubjectSummaryView: View {
           }
           Spacer(minLength: 0)
         }
-        .animation(.default, value: tags)
-        .animation(.default, value: metaTags)
       }
     }
   }

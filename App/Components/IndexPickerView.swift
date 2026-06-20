@@ -13,17 +13,23 @@ struct IndexPickerSheet: View {
   @State private var adding = false
 
   func loadUserIndexes() async {
-    loading = true
+    withAnimation(.default) {
+      loading = true
+    }
     do {
       let resp = try await UserService.getUserIndexes(
         username: profile.username,
         limit: 100
       )
-      indexes = resp.data
+      withAnimation(.default) {
+        indexes = resp.data
+      }
     } catch {
       Notifier.shared.alert(error: error)
     }
-    loading = false
+    withAnimation(.default) {
+      loading = false
+    }
   }
 
   func addToIndex(_ index: SlimIndexDTO) async {

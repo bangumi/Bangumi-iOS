@@ -29,11 +29,20 @@ struct PersonView: View {
     return person.title(with: titlePreference)
   }
 
-  private func loadCached() async {
+  private func loadCached(animated: Bool = false) async {
     do {
       let db = try await AppContext.shared.getDB()
-      person = try await db.getPersonDTO(personId)
-      detail = try await db.getPersonDetailDTO(personId)
+      let cachedPerson = try await db.getPersonDTO(personId)
+      let cachedDetail = try await db.getPersonDetailDTO(personId)
+      if animated {
+        withAnimation(.default) {
+          person = cachedPerson
+          detail = cachedDetail
+        }
+      } else {
+        person = cachedPerson
+        detail = cachedDetail
+      }
     } catch {
       Logger.app.error("Failed to load cached person: \(error)")
     }
@@ -42,17 +51,24 @@ struct PersonView: View {
   func refresh() async {
     do {
       try await PersonRepository.loadPerson(personId)
-      await loadCached()
-      refreshed = true
+      await loadCached(animated: true)
+      withAnimation(.default) {
+        refreshed = true
+      }
 
       if !isolationMode {
-        loadingComments = true
-        comments = try await PersonService.getPersonComments(personId)
-        loadingComments = false
+        withAnimation(.default) {
+          loadingComments = true
+        }
+        let fetchedComments = try await PersonService.getPersonComments(personId)
+        withAnimation(.default) {
+          comments = fetchedComments
+          loadingComments = false
+        }
       }
 
       try await PersonRepository.loadPersonDetails(personId)
-      await loadCached()
+      await loadCached(animated: true)
     } catch {
       Notifier.shared.alert(error: error)
       return

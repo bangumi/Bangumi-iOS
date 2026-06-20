@@ -9,7 +9,7 @@ struct ReplyFilterSortButtons: View {
   var body: some View {
     HStack(spacing: 8) {
       Menu {
-        Picker(selection: $filterMode) {
+        Picker(selection: $filterMode.animated()) {
           ForEach(ReplyFilterMode.allCases, id: \.self) { mode in
             Label(mode.description, systemImage: mode.icon).tag(mode)
           }
@@ -18,14 +18,16 @@ struct ReplyFilterSortButtons: View {
         }
         .pickerStyle(.inline)
         .onChange(of: filterMode) {
-          onFilterChange()
+          withAnimation(.default) {
+            onFilterChange()
+          }
         }
       } label: {
         Label(filterMode.description, systemImage: filterMode.icon)
       }
 
       Menu {
-        Picker(selection: $sortOrder) {
+        Picker(selection: $sortOrder.animated()) {
           ForEach(ReplySortOrder.allCases, id: \.self) { order in
             Label(order.description, systemImage: order.icon).tag(order)
           }

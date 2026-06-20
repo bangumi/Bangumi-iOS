@@ -43,10 +43,12 @@ struct EpisodeListView: View {
         .font(.title)
         .sensoryFeedback(.selection, trigger: filterCollection)
         .onTapGesture {
-          self.filterCollection.toggle()
+          withAnimation(.default) {
+            self.filterCollection.toggle()
+          }
         }
       Spacer()
-      Picker("Episode Type", selection: $main) {
+      Picker("Episode Type", selection: $main.animated()) {
         Text("本篇(\(countMain))").tag(true)
         Text("其他(\(countOther))").tag(false)
       }
@@ -57,7 +59,9 @@ struct EpisodeListView: View {
         .font(.title)
         .sensoryFeedback(.selection, trigger: sortDesc)
         .onTapGesture {
-          self.sortDesc.toggle()
+          withAnimation(.default) {
+            self.sortDesc.toggle()
+          }
         }
     }.padding(.horizontal, 8)
     EpisodeListDetailView(
@@ -89,12 +93,15 @@ struct EpisodeListDetailView: View {
   private func load() async {
     do {
       let db = try await AppContext.shared.getDB()
-      episodes = try await db.fetchEpisodes(
+      let fetchedEpisodes = try await db.fetchEpisodes(
         subjectId: subjectId,
         main: main,
         uncollectedOnly: filterCollection,
         sortDesc: sortDesc
       )
+      withAnimation(.default) {
+        episodes = fetchedEpisodes
+      }
     } catch {
       Notifier.shared.alert(error: error)
     }

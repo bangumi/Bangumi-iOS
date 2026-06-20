@@ -5,6 +5,7 @@ struct ChiiDiscoverView: View {
   @State private var query: String = ""
   @State private var searching: Bool = false
   @State private var remote: Bool = false
+  @State private var showsSearch = false
 
   func refresh() async {
     do {
@@ -18,7 +19,7 @@ struct ChiiDiscoverView: View {
   var body: some View {
     GeometryReader { geometry in
       VStack {
-        if query.isEmpty {
+        if !showsSearch {
           ScrollView {
             VStack {
               CalendarSlimView()
@@ -41,11 +42,26 @@ struct ChiiDiscoverView: View {
       prompt: "搜索条目，角色，人物"
     )
     .searchInputTraits()
-    .onChange(of: query) {
-      remote = false
+    .onAppear {
+      showsSearch = !query.isEmpty
+    }
+    .onChange(of: query) { _, newValue in
+      let nextShowsSearch = !newValue.isEmpty
+      if showsSearch != nextShowsSearch {
+        withAnimation(.default) {
+          showsSearch = nextShowsSearch
+        }
+      }
+      if remote {
+        withAnimation(.default) {
+          remote = false
+        }
+      }
     }
     .onSubmit(of: .search) {
-      remote = true
+      withAnimation(.default) {
+        remote = true
+      }
     }
   }
 }

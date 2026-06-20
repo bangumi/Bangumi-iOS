@@ -36,6 +36,6 @@ struct SubjectCommentsView: View {
       ForEach(comments) { comment in
         SubjectCommentItemView(subjectType: subjectType, comment: comment)
       }
-    }.animation(.default, value: comments)
+    }
   }
 }

@@ -127,11 +127,10 @@ struct SubjectBrowsingView: View {
 
       }.padding(.horizontal, 8)
     }
-    .animation(.default, value: reloader)
-    .animation(.default, value: filter)
-    .animation(.default, value: sort)
     .onChange(of: sort) { _, _ in
-      reloader.toggle()
+      withAnimation(.default) {
+        reloader.toggle()
+      }
     }
     .navigationTitle("全部\(type.description)")
     .navigationBarTitleDisplayMode(.inline)
@@ -140,18 +139,22 @@ struct SubjectBrowsingView: View {
     }
     .onChange(of: showFilter) {
       if !showFilter {
-        reloader.toggle()
+        withAnimation(.default) {
+          reloader.toggle()
+        }
       }
     }
     .toolbar {
       ToolbarItemGroup(placement: .topBarTrailing) {
         Button {
-          showFilter = true
+          withAnimation(.default) {
+            showFilter = true
+          }
         } label: {
           Image(systemName: "line.3.horizontal.decrease")
         }
         Menu {
-          Picker("排序", selection: $sort) {
+          Picker("排序", selection: $sort.animated()) {
             ForEach(SubjectSortMode.allCases, id: \.self) { sortMode in
               Label(sortMode.description, systemImage: sortMode.icon).tag(sortMode)
             }
@@ -250,7 +253,9 @@ struct SubjectBrowsingFilterView: View {
   }
 
   func updateYears(modifier: Int) {
-    years = years.map { $0 + modifier }
+    withAnimation(.default) {
+      years = years.map { $0 + modifier }
+    }
   }
 
   var body: some View {
@@ -268,7 +273,9 @@ struct SubjectBrowsingFilterView: View {
             }
             HFlow {
               Button {
-                filter.cat = nil
+                withAnimation(.default) {
+                  filter.cat = nil
+                }
               } label: {
                 BadgeView(background: catBackgroundColor(nil), padding: 5) {
                   Text("全部")
@@ -277,7 +284,9 @@ struct SubjectBrowsingFilterView: View {
               }.buttonStyle(.scale)
               ForEach(categories) { category in
                 Button {
-                  filter.cat = category
+                  withAnimation(.default) {
+                    filter.cat = category
+                  }
                 } label: {
                   BadgeView(background: catBackgroundColor(category), padding: 5) {
                     Text(category.typeCN)
@@ -299,7 +308,9 @@ struct SubjectBrowsingFilterView: View {
               }
               HFlow {
                 Button {
-                  filter.series = nil
+                  withAnimation(.default) {
+                    filter.series = nil
+                  }
                 } label: {
                   BadgeView(background: seriesBackgroundColor(nil), padding: 5) {
                     Text("全部")
@@ -307,7 +318,9 @@ struct SubjectBrowsingFilterView: View {
                   }
                 }.buttonStyle(.scale)
                 Button {
-                  filter.series = true
+                  withAnimation(.default) {
+                    filter.series = true
+                  }
                 } label: {
                   BadgeView(background: seriesBackgroundColor(true), padding: 5) {
                     Text("系列")
@@ -315,7 +328,9 @@ struct SubjectBrowsingFilterView: View {
                   }
                 }.buttonStyle(.scale)
                 Button {
-                  filter.series = false
+                  withAnimation(.default) {
+                    filter.series = false
+                  }
                 } label: {
                   BadgeView(background: seriesBackgroundColor(false), padding: 5) {
                     Text("单行本")
@@ -365,8 +380,10 @@ struct SubjectBrowsingFilterView: View {
               }
             }
             Button {
-              filter.year = nil
-              filter.month = nil
+              withAnimation(.default) {
+                filter.year = nil
+                filter.month = nil
+              }
             } label: {
               BadgeView(background: yearBackgroundColor(nil), padding: 4) {
                 HStack {
@@ -392,7 +409,9 @@ struct SubjectBrowsingFilterView: View {
               }.buttonStyle(.scale)
               ForEach(years, id: \.self) { year in
                 Button {
-                  filter.year = year
+                  withAnimation(.default) {
+                    filter.year = year
+                  }
                 } label: {
                   BadgeView(background: yearBackgroundColor(year), padding: 4) {
                     Text("\(String(year))年")
@@ -407,10 +426,12 @@ struct SubjectBrowsingFilterView: View {
                   Text("往年们").foregroundStyle(.linkText)
                 }
               }.buttonStyle(.scale)
-            }.animation(.default, value: years)
+            }
             if filter.year != nil {
               Button {
-                filter.month = nil
+                withAnimation(.default) {
+                  filter.month = nil
+                }
               } label: {
                 BadgeView(background: monthBackgroundColor(nil), padding: 4) {
                   HStack {
@@ -429,7 +450,9 @@ struct SubjectBrowsingFilterView: View {
               ]) {
                 ForEach(1..<13) { month in
                   Button {
-                    filter.month = Int(month)
+                    withAnimation(.default) {
+                      filter.month = Int(month)
+                    }
                   } label: {
                     BadgeView(background: monthBackgroundColor(month), padding: 4) {
                       Text("\(month)月")
@@ -472,7 +495,9 @@ struct SubjectBrowsingFilterTagView: View {
   }
 
   private func updateFilterTags(_ updated: [String]) {
-    selectedTags = updated.isEmpty ? nil : updated
+    withAnimation(.default) {
+      selectedTags = updated.isEmpty ? nil : updated
+    }
   }
 
   private func selectTag(_ tag: String) {
@@ -612,19 +637,21 @@ struct SubjectTagBrowsingView: View {
       }.padding(.horizontal, 8)
     }
     .onChange(of: tagsCat) { _, _ in
-      reloader.toggle()
+      withAnimation(.default) {
+        reloader.toggle()
+      }
     }
     .onChange(of: sort) { _, _ in
-      reloader.toggle()
+      withAnimation(.default) {
+        reloader.toggle()
+      }
     }
-    .animation(.default, value: tagsCat)
-    .animation(.default, value: sort)
     .navigationTitle(title)
     .navigationBarTitleDisplayMode(.inline)
     .toolbar {
       ToolbarItemGroup(placement: .topBarTrailing) {
         Menu {
-          Picker("标签", selection: $tagsCat) {
+          Picker("标签", selection: $tagsCat.animated()) {
             ForEach(SubjectTagsCategory.allCases, id: \.self) { cat in
               Text(cat.description).tag(cat)
             }
@@ -636,7 +663,7 @@ struct SubjectTagBrowsingView: View {
         }
 
         Menu {
-          Picker("排序", selection: $sort) {
+          Picker("排序", selection: $sort.animated()) {
             ForEach(SubjectSortMode.allCases, id: \.self) { sortMode in
               Label(sortMode.description, systemImage: sortMode.icon).tag(sortMode)
             }

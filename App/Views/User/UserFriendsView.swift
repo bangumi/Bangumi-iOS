@@ -8,15 +8,21 @@ struct UserFriendsView: View {
 
   func refresh() async {
     if refreshing { return }
-    refreshing = true
+    withAnimation(.default) {
+      refreshing = true
+    }
     do {
       let resp = try await UserService.getUserFriends(
         username: user.username, limit: 20)
-      users = resp.data
+      withAnimation(.default) {
+        users = resp.data
+      }
     } catch {
       Notifier.shared.alert(error: error)
     }
-    refreshing = false
+    withAnimation(.default) {
+      refreshing = false
+    }
   }
 
   var body: some View {
@@ -65,7 +71,5 @@ struct UserFriendsView: View {
         .scrollClipDisabled()
       }
     }
-    .animation(.default, value: refreshing)
-    .animation(.default, value: users)
   }
 }

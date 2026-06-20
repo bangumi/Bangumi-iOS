@@ -96,7 +96,10 @@ struct CalendarView: View {
   func loadCachedCalendar() async {
     do {
       let db = try await AppContext.shared.getDB()
-      calendars = try await db.fetchCalendarEntries()
+      let fetchedCalendars = try await db.fetchCalendarEntries()
+      withAnimation(.default) {
+        calendars = fetchedCalendars
+      }
     } catch {
       Logger.app.error("Failed to load cached calendar: \(error)")
     }
@@ -105,7 +108,9 @@ struct CalendarView: View {
   func updateCurrentDate() {
     let today = Calendar.current.startOfDay(for: Date())
     if currentDate != today {
-      currentDate = today
+      withAnimation(.default) {
+        currentDate = today
+      }
     }
   }
 

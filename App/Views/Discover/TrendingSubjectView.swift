@@ -14,8 +14,10 @@ struct TrendingSubjectView: View {
     }
     do {
       try await DiscoveryRepository.loadTrendingSubjects()
-      loaded = true
-      reloader.toggle()
+      withAnimation(.default) {
+        loaded = true
+        reloader.toggle()
+      }
     } catch {
       Notifier.shared.alert(error: error)
     }
@@ -146,7 +148,10 @@ struct TrendingSubjectTypeView: View {
   private func loadCached() async {
     do {
       let db = try await AppContext.shared.getDB()
-      items = try await db.fetchTrendingSubjects(type: type)
+      let fetchedItems = try await db.fetchTrendingSubjects(type: type)
+      withAnimation(.default) {
+        items = fetchedItems
+      }
     } catch {
       Notifier.shared.alert(error: error)
     }

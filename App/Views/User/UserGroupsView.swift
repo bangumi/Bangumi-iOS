@@ -8,15 +8,21 @@ struct UserGroupsView: View {
 
   func refresh() async {
     if refreshing { return }
-    refreshing = true
+    withAnimation(.default) {
+      refreshing = true
+    }
     do {
       let resp = try await UserService.getUserGroups(
         username: user.username, limit: 20)
-      groups = resp.data
+      withAnimation(.default) {
+        groups = resp.data
+      }
     } catch {
       Notifier.shared.alert(error: error)
     }
-    refreshing = false
+    withAnimation(.default) {
+      refreshing = false
+    }
   }
 
   var body: some View {
@@ -73,7 +79,5 @@ struct UserGroupsView: View {
         .scrollClipDisabled()
       }
     }
-    .animation(.default, value: refreshing)
-    .animation(.default, value: groups)
   }
 }

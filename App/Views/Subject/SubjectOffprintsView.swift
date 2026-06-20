@@ -56,7 +56,6 @@ struct SubjectOffprintsView: View {
         }.padding(.horizontal, 2)
       }
       .scrollClipDisabled()
-      .animation(.default, value: offprints)
     }
     .task(id: collectionSubjectIds) {
       await loadCollections()

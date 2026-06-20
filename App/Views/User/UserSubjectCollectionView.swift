@@ -19,15 +19,21 @@ struct UserSubjectCollectionView: View {
 
   func refresh() async {
     if refreshing { return }
-    refreshing = true
+    withAnimation(.default) {
+      refreshing = true
+    }
     do {
       let resp = try await UserService.getUserSubjectCollections(
         username: user.username, type: ctype, subjectType: stype, limit: 20)
-      subjects = resp.data
+      withAnimation(.default) {
+        subjects = resp.data
+      }
     } catch {
       Notifier.shared.alert(error: error)
     }
-    refreshing = false
+    withAnimation(.default) {
+      refreshing = false
+    }
   }
 
   var body: some View {
@@ -54,8 +60,6 @@ struct UserSubjectCollectionView: View {
         }
         await refresh()
       }
-      .animation(.default, value: ctype)
-      .animation(.default, value: refreshing)
     }
   }
 }

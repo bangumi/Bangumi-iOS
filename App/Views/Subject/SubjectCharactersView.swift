@@ -74,7 +74,6 @@ struct SubjectCharactersView: View {
         .scrollClipDisabled()
       }
     }
-    .animation(.default, value: characters)
     .task(id: collectionCharacterIds) {
       await loadCollections()
     }

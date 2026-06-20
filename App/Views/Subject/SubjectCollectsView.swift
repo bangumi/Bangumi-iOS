@@ -57,7 +57,9 @@ struct SubjectCollectsView: View {
 
   func updateCollects() {
     guard !isLoading else { return }
-    isLoading = true
+    withAnimation(.default) {
+      isLoading = true
+    }
 
     Task {
       do {
@@ -66,11 +68,15 @@ struct SubjectCollectsView: View {
           mode: subjectCollectsFilterMode,
           limit: 10
         )
-        collects = resp.data
-        isLoading = false
+        withAnimation(.default) {
+          collects = resp.data
+          isLoading = false
+        }
       } catch {
         Notifier.shared.alert(error: error)
-        isLoading = false
+        withAnimation(.default) {
+          isLoading = false
+        }
       }
     }
   }
@@ -83,7 +89,7 @@ struct SubjectCollectsView: View {
             .foregroundStyle(collects.count > 0 ? .primary : .secondary)
             .font(.title3)
           if isAuthenticated {
-            Picker("", selection: $subjectCollectsFilterMode) {
+            Picker("", selection: $subjectCollectsFilterMode.animated()) {
               ForEach(FilterMode.allCases, id: \.self) { mode in
                 Text(mode.description).tag(mode)
               }
@@ -148,11 +154,11 @@ struct SubjectCollectsView: View {
         .scrollClipDisabled()
       }
     }
-    .animation(.default, value: collects)
-    .animation(.default, value: subjectCollectsFilterMode)
     .onChange(of: latestCollects) { _, newValue in
       guard !isLoading else { return }
-      collects = newValue
+      withAnimation(.default) {
+        collects = newValue
+      }
     }
     .onChange(of: subjectCollectsFilterMode) { _, _ in
       updateCollects()

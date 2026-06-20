@@ -31,13 +31,24 @@ struct BlogView: View {
 
   func load() async {
     do {
-      blog = try await BlogService.getBlogEntry(blogId)
-      refreshed = true
-      subjects = try await BlogService.getBlogSubjects(blogId)
+      let fetchedBlog = try await BlogService.getBlogEntry(blogId)
+      withAnimation(.default) {
+        blog = fetchedBlog
+        refreshed = true
+      }
+      let fetchedSubjects = try await BlogService.getBlogSubjects(blogId)
+      withAnimation(.default) {
+        subjects = fetchedSubjects
+      }
       if !isolationMode {
-        loadingComments = true
-        comments = try await BlogService.getBlogComments(blogId)
-        loadingComments = false
+        withAnimation(.default) {
+          loadingComments = true
+        }
+        let fetchedComments = try await BlogService.getBlogComments(blogId)
+        withAnimation(.default) {
+          comments = fetchedComments
+          loadingComments = false
+        }
       }
     } catch {
       Notifier.shared.alert(error: error)

@@ -94,7 +94,6 @@ struct SubjectRelationsView: View {
         }.padding(.horizontal, 2)
       }
       .scrollClipDisabled()
-      .animation(.default, value: relations)
     }.task(id: collectionSubjectIds) {
       await loadCollections()
     }

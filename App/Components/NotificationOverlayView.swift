@@ -24,7 +24,6 @@ struct NotificationOverlayView: View {
       .padding(.bottom, 64)
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
-    .animation(.snappy, value: notifier.notifications)
     .allowsHitTesting(false)
   }
 }

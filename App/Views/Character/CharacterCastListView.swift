@@ -19,7 +19,7 @@ struct CharacterCastListView: View {
   }
 
   var body: some View {
-    Picker("Cast Type", selection: $type) {
+    Picker("Cast Type", selection: $type.animated()) {
       ForEach(CastType.allCases) { ct in
         Text(ct.description).tag(ct)
       }
@@ -27,7 +27,9 @@ struct CharacterCastListView: View {
     .padding(.horizontal, 8)
     .pickerStyle(.segmented)
     .onChange(of: type) { _, _ in
-      reloader.toggle()
+      withAnimation(.default) {
+        reloader.toggle()
+      }
     }
     ScrollView {
       OffsetPagedView<CharacterCastDTO, _>(reloader: reloader, nextPageFunc: load) { item in

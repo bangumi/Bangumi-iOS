@@ -27,10 +27,12 @@ struct UserTimelineView: View {
         Notifier.shared.notify(message: "没有新动态")
         return
       }
-      exhausted = false
-      items = data
-      fetched = [:]
-      lastID = data.last?.id
+      withAnimation(.default) {
+        exhausted = false
+        items = data
+        fetched = [:]
+        lastID = data.last?.id
+      }
     } catch {
       Notifier.shared.alert(error: error)
     }
@@ -49,7 +51,9 @@ struct UserTimelineView: View {
     if fetched[item.id] == true {
       return
     }
-    loading = true
+    withAnimation(.default) {
+      loading = true
+    }
     do {
       let data = try await UserService.getUserTimeline(
         username: user.username, limit: 20, until: lastID)
@@ -62,7 +66,9 @@ struct UserTimelineView: View {
     } catch {
       Notifier.shared.alert(error: error)
     }
-    loading = false
+    withAnimation(.default) {
+      loading = false
+    }
   }
   var body: some View {
     ScrollView {
@@ -95,9 +101,13 @@ struct UserTimelineView: View {
       if items.count > 0 {
         return
       }
-      loading = true
+      withAnimation(.default) {
+        loading = true
+      }
       await reload()
-      loading = false
+      withAnimation(.default) {
+        loading = false
+      }
     }
     .refreshable {
       await reload()

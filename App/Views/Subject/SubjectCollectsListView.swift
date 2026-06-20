@@ -46,13 +46,13 @@ struct SubjectCollectsListView: View {
   var body: some View {
     VStack {
       VStack {
-        Picker("Type", selection: $selectedType) {
+        Picker("Type", selection: $selectedType.animated()) {
           ForEach(CollectionType.allCases, id: \.self) { ct in
             Text(ct.description(subjectType))
               .tag(ct)
           }
         }.pickerStyle(.segmented)
-        Picker("Mode", selection: $selectedMode) {
+        Picker("Mode", selection: $selectedMode.animated()) {
           ForEach(FilterMode.allCases, id: \.self) { mode in
             Text(mode.description)
               .tag(mode)
@@ -61,10 +61,14 @@ struct SubjectCollectsListView: View {
       }
       .padding(.horizontal, 8)
       .onChange(of: selectedType) { _, _ in
-        reloader.toggle()
+        withAnimation(.default) {
+          reloader.toggle()
+        }
       }
       .onChange(of: selectedMode) { _, _ in
-        reloader.toggle()
+        withAnimation(.default) {
+          reloader.toggle()
+        }
       }
 
       ScrollView {

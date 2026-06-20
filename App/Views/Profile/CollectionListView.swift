@@ -52,7 +52,9 @@ struct CollectionListView: View {
             selection: $collectionType
           )
           .onChange(of: collectionType) { _, _ in
-            reloader.toggle()
+            withAnimation(.default) {
+              reloader.toggle()
+            }
           }
           ScrollView {
             OffsetPagedView<SubjectDTO, _>(limit: 20, reloader: reloader, nextPageFunc: load) {

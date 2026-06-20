@@ -56,6 +56,5 @@ struct NoticeRowView: View {
         ? Color.accent.opacity(0.05)
         : Color.clear
     )
-    .animation(.default, value: notice.unread)
   }
 }

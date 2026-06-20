@@ -48,9 +48,11 @@ struct IndexView: View {
   func refresh() async {
     do {
       let data = try await IndexService.getIndex(indexId)
-      availableSubjectTypes = data.stats.subjectTypeItems
-      availableCategories = data.stats.categoryItems
-      index = data
+      withAnimation(.default) {
+        availableSubjectTypes = data.stats.subjectTypeItems
+        availableCategories = data.stats.categoryItems
+        index = data
+      }
     } catch {
       Notifier.shared.alert(error: error)
     }
@@ -73,12 +75,19 @@ struct IndexView: View {
       return
     }
     do {
-      loadingComments = true
-      comments = try await IndexService.getIndexComments(indexId)
-      loadingComments = false
+      withAnimation(.default) {
+        loadingComments = true
+      }
+      let fetchedComments = try await IndexService.getIndexComments(indexId)
+      withAnimation(.default) {
+        comments = fetchedComments
+        loadingComments = false
+      }
     } catch {
       Notifier.shared.alert(error: error)
-      loadingComments = false
+      withAnimation(.default) {
+        loadingComments = false
+      }
     }
   }
 
@@ -86,7 +95,9 @@ struct IndexView: View {
     do {
       try await IndexService.deleteIndex(indexId: indexId)
       Notifier.shared.notify(message: "已删除")
-      reloader.toggle()
+      withAnimation(.default) {
+        reloader.toggle()
+      }
     } catch {
       Notifier.shared.alert(error: error)
     }
@@ -163,7 +174,7 @@ struct IndexView: View {
           }
 
           if !isolationMode {
-            Picker("选择", selection: $selectedTab) {
+            Picker("选择", selection: $selectedTab.animated()) {
               ForEach(IndexTab.allCases, id: \.self) { tab in
                 Text(tab.title(with: index)).tag(tab)
               }
@@ -205,9 +216,11 @@ struct IndexView: View {
 
                 HStack {
                   Button {
-                    selectedCategory = nil
-                    selectedSubjectType = nil
-                    reloader.toggle()
+                    withAnimation(.default) {
+                      selectedCategory = nil
+                      selectedSubjectType = nil
+                      reloader.toggle()
+                    }
                   } label: {
                     Text("全部 \(index.total)")
                       .padding(.horizontal, 6)
@@ -221,9 +234,11 @@ struct IndexView: View {
 
                   ForEach(availableSubjectTypes) { item in
                     Button {
-                      selectedCategory = .subject
-                      selectedSubjectType = item.type
-                      reloader.toggle()
+                      withAnimation(.default) {
+                        selectedCategory = .subject
+                        selectedSubjectType = item.type
+                        reloader.toggle()
+                      }
                     } label: {
                       Text("\(item.type.description) \(item.count)")
                         .padding(.horizontal, 6)
@@ -239,9 +254,11 @@ struct IndexView: View {
 
                   ForEach(availableCategories) { item in
                     Button {
-                      selectedCategory = item.category
-                      selectedSubjectType = nil
-                      reloader.toggle()
+                      withAnimation(.default) {
+                        selectedCategory = item.category
+                        selectedSubjectType = nil
+                        reloader.toggle()
+                      }
                     } label: {
                       Text("\(item.category.title) \(item.count)")
                         .padding(.horizontal, 6)
@@ -370,7 +387,9 @@ struct IndexView: View {
     }
     .sheet(isPresented: $showAddRelated) {
       IndexRelatedAddSheet(indexId: indexId) {
-        reloader.toggle()
+        withAnimation(.default) {
+          reloader.toggle()
+        }
       }
     }
     .sheet(isPresented: $showCommentBox) {

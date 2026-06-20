@@ -107,7 +107,9 @@ struct ChiiProgressView: View {
       let db = try await AppContext.shared.getDB()
       let result = try await db.fetchProgressCounts()
       if counts != result {
-        counts = result
+        withAnimation(.default) {
+          counts = result
+        }
       }
     } catch {
       Logger.app.error("Failed to load counts: \(error)")
@@ -124,10 +126,14 @@ struct ChiiProgressView: View {
         return false
       }
     }
-    progressPageLoading = true
+    withAnimation(.default) {
+      progressPageLoading = true
+    }
     defer {
       if generation == progressLoadGeneration {
-        progressPageLoading = false
+        withAnimation(.default) {
+          progressPageLoading = false
+        }
       }
     }
     do {
@@ -321,7 +327,9 @@ struct ChiiProgressView: View {
       collectionsUpdatedAt = 0
     }
     if showProgress {
-      refreshing = true
+      withAnimation(.default) {
+        refreshing = true
+      }
     }
 
     do {
@@ -337,7 +345,9 @@ struct ChiiProgressView: View {
       Notifier.shared.notify(message: "更新失败: \(error)")
       Notifier.shared.alert(error: error)
     }
-    refreshing = false
+    withAnimation(.default) {
+      refreshing = false
+    }
   }
 
   func refreshCollections(since: Int = 0) async throws -> Int {
@@ -448,7 +458,7 @@ struct ChiiProgressView: View {
   }
 
   private var progressTypePicker: some View {
-    Picker("SubjectType", selection: $progressTab) {
+    Picker("SubjectType", selection: $progressTab.animated()) {
       ForEach(SubjectType.progressTypes) { type in
         Text(typeDesc(stype: type)).tag(type)
       }
@@ -459,19 +469,19 @@ struct ChiiProgressView: View {
 
   private var progressOptionsMenu: some View {
     Menu {
-      Picker("显示模式", selection: $progressViewMode) {
+      Picker("显示模式", selection: $progressViewMode.animated()) {
         ForEach(ProgressViewMode.allCases, id: \.self) { mode in
           Label(mode.desc, systemImage: mode.icon).tag(mode)
         }
       }
 
-      Picker("排序方式", selection: $progressSortMode) {
+      Picker("排序方式", selection: $progressSortMode.animated()) {
         ForEach(ProgressSortMode.allCases, id: \.self) { mode in
           Text(mode.desc).tag(mode)
         }
       }
 
-      Picker("副标题内容", selection: $secondLineMode) {
+      Picker("副标题内容", selection: $secondLineMode.animated()) {
         ForEach(ProgressSecondLineMode.allCases, id: \.self) { mode in
           Label(mode.desc, systemImage: mode.icon).tag(mode)
         }
@@ -518,9 +528,13 @@ struct ChiiProgressView: View {
     .task {
       guard !didInitialLoad else { return }
       didInitialLoad = true
-      refreshing = true
+      withAnimation(.default) {
+        refreshing = true
+      }
       await loadLocalProgress()
-      refreshing = false
+      withAnimation(.default) {
+        refreshing = false
+      }
       await refresh(showProgress: false)
     }
     .searchable(

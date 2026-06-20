@@ -20,7 +20,7 @@ struct SubjectRelationListView: View {
   }
 
   var body: some View {
-    Picker("Subject Type", selection: $subjectType) {
+    Picker("Subject Type", selection: $subjectType.animated()) {
       ForEach(SubjectType.allCases) { type in
         Text(type.description).tag(type)
       }
@@ -28,7 +28,9 @@ struct SubjectRelationListView: View {
     .padding(.horizontal, 8)
     .pickerStyle(.segmented)
     .onChange(of: subjectType) { _, _ in
-      reloader.toggle()
+      withAnimation(.default) {
+        reloader.toggle()
+      }
     }
     ScrollView {
       OffsetPagedView<SubjectRelationDTO, _>(reloader: reloader, nextPageFunc: load) { item in

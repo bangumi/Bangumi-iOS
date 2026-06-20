@@ -37,14 +37,16 @@ struct FriendsView: View {
 
   var body: some View {
     VStack {
-      Picker("Type", selection: $type) {
+      Picker("Type", selection: $type.animated()) {
         Text("我的关注").tag(FriendType.friends)
         Text("关注我的").tag(FriendType.followers)
       }
       .pickerStyle(.segmented)
       .padding(.horizontal, 8)
       .onChange(of: type) { _, _ in
-        reloader.toggle()
+        withAnimation(.default) {
+          reloader.toggle()
+        }
       }
 
       ScrollView {

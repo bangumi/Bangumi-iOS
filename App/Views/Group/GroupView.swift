@@ -9,11 +9,20 @@ struct GroupView: View {
   @State private var group: GroupDTO?
   @State private var detail: GroupDetailDTO = GroupDetailDTO()
 
-  private func loadCached() async {
+  private func loadCached(animated: Bool = false) async {
     do {
       let db = try await AppContext.shared.getDB()
-      group = try await db.getGroupDTO(name)
-      detail = try await db.getGroupDetailDTO(name)
+      let cachedGroup = try await db.getGroupDTO(name)
+      let cachedDetail = try await db.getGroupDetailDTO(name)
+      if animated {
+        withAnimation(.default) {
+          group = cachedGroup
+          detail = cachedDetail
+        }
+      } else {
+        group = cachedGroup
+        detail = cachedDetail
+      }
     } catch {
       Logger.app.error("Failed to load cached group: \(error)")
     }
@@ -23,10 +32,12 @@ struct GroupView: View {
     if refreshed { return }
     do {
       try await GroupRepository.loadGroup(name)
-      await loadCached()
-      refreshed = true
+      await loadCached(animated: true)
+      withAnimation(.default) {
+        refreshed = true
+      }
       try await GroupRepository.loadGroupDetails(name)
-      await loadCached()
+      await loadCached(animated: true)
     } catch {
       Notifier.shared.alert(error: error)
       return
@@ -81,7 +92,10 @@ struct GroupDetailView: View {
       do {
         let db = try await AppContext.shared.getDB()
         try await db.togglePinRakuenGroupCache(group: group.slim)
-        pinnedItems = try await db.fetchRakuenGroupCache(id: "pin")
+        let fetchedPins = try await db.fetchRakuenGroupCache(id: "pin")
+        withAnimation(.default) {
+          pinnedItems = fetchedPins
+        }
       } catch {
         Logger.app.error("Failed to toggle pin: \(error)")
       }
@@ -91,7 +105,10 @@ struct GroupDetailView: View {
   private func loadPinnedItems() async {
     do {
       let db = try await AppContext.shared.getDB()
-      pinnedItems = try await db.fetchRakuenGroupCache(id: "pin")
+      let fetchedPins = try await db.fetchRakuenGroupCache(id: "pin")
+      withAnimation(.default) {
+        pinnedItems = fetchedPins
+      }
     } catch {
       Logger.app.error("Failed to load pinned groups: \(error)")
     }
@@ -294,7 +311,7 @@ struct GroupRecentMemberView: View {
           }
         }
       }
-    }.animation(.default, value: members)
+    }
   }
 }
 
@@ -370,6 +387,6 @@ struct GroupRecentTopicView: View {
           }
         }
       }
-    }.animation(.default, value: topics)
+    }
   }
 }

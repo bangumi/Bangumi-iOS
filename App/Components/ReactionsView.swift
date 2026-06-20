@@ -103,7 +103,7 @@ struct ReactionsView: View {
             }
           }
         }
-      }.animation(.default, value: reactions)
+      }
     } else {
       EmptyView()
     }

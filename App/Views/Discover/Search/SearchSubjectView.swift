@@ -29,7 +29,9 @@ struct SearchSubjectView: View {
       SubjectSlimItemView(subject: item.subject, collectionType: item.collectionType)
     }
     .onChange(of: subjectType) { _, _ in
-      reloader.toggle()
+      withAnimation(.default) {
+        reloader.toggle()
+      }
     }
   }
 }
@@ -43,10 +45,13 @@ struct SearchSubjectLocalView: View {
   private func load() async {
     do {
       let db = try await AppContext.shared.getDB()
-      subjects = try await db.fetchLocalSubjects(
+      let fetched = try await db.fetchLocalSubjects(
         search: text.gb,
         subjectType: subjectType
       )
+      withAnimation(.default) {
+        subjects = fetched
+      }
     } catch {
       Notifier.shared.alert(error: error)
     }

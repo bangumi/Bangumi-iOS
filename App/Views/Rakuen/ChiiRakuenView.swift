@@ -111,9 +111,10 @@ struct ChiiRakuenView: View {
       }.padding(.horizontal, 8)
     }
     .refreshable {
-      reloader.toggle()
+      withAnimation(.default) {
+        reloader.toggle()
+      }
     }
-    .animation(.default, value: rakuenListMode)
     .navigationTitle("超展开")
     .toolbarTitleDisplayMode(.inline)
     .toolbar {
@@ -160,7 +161,9 @@ struct ChiiRakuenView: View {
     }
     .onAppear {
       if !isAuthenticated && rakuenListMode.requiresLogin {
-        rakuenListMode = .subjectTrending
+        withAnimation(.default) {
+          rakuenListMode = .subjectTrending
+        }
       }
     }
   }
@@ -190,7 +193,9 @@ struct ChiiRakuenView: View {
 
         ForEach(availableModes, id: \.self) { mode in
           Button {
-            rakuenListMode = mode
+            withAnimation(.default) {
+              rakuenListMode = mode
+            }
           } label: {
             Text(mode.description)
           }.adaptiveButtonStyle(rakuenListMode == mode ? .borderedProminent : .bordered)

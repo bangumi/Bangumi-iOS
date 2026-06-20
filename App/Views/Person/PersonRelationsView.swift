@@ -74,7 +74,6 @@ struct PersonRelationsView: View {
         .scrollClipDisabled()
       }
     }
-    .animation(.default, value: relations)
     .task(id: collectionPersonIds) {
       await loadCollections()
     }

@@ -30,10 +30,12 @@ struct TimelineListView: View {
         Notifier.shared.notify(message: "没有新动态")
         return
       }
-      exhausted = false
-      items = data
-      fetched = [:]
-      lastID = data.last?.id
+      withAnimation(.default) {
+        exhausted = false
+        items = data
+        fetched = [:]
+        lastID = data.last?.id
+      }
     } catch {
       Notifier.shared.alert(error: error)
     }
@@ -52,7 +54,9 @@ struct TimelineListView: View {
     if fetched[item.id] == true {
       return
     }
-    loading = true
+    withAnimation(.default) {
+      loading = true
+    }
     do {
       var data: [TimelineDTO] = []
       switch timelineViewMode {
@@ -73,7 +77,9 @@ struct TimelineListView: View {
     } catch {
       Notifier.shared.alert(error: error)
     }
-    loading = false
+    withAnimation(.default) {
+      loading = false
+    }
   }
 
   var body: some View {
@@ -88,7 +94,7 @@ struct TimelineListView: View {
             if loading, items.count > 0 {
               ProgressView()
             }
-            Picker("", selection: $timelineViewMode) {
+            Picker("", selection: $timelineViewMode.animated()) {
               ForEach(TimelineViewMode.allCases, id: \.self) { mode in
                 Text(mode.desc).tag(mode)
               }
@@ -96,9 +102,13 @@ struct TimelineListView: View {
             .disabled(loading)
             .onChange(of: timelineViewMode) {
               Task {
-                loading = true
+                withAnimation(.default) {
+                  loading = true
+                }
                 await reload()
-                loading = false
+                withAnimation(.default) {
+                  loading = false
+                }
               }
             }
             Button {
@@ -144,9 +154,13 @@ struct TimelineListView: View {
       if items.count > 0 {
         return
       }
-      loading = true
+      withAnimation(.default) {
+        loading = true
+      }
       await reload()
-      loading = false
+      withAnimation(.default) {
+        loading = false
+      }
     }
     .refreshable {
       await reload()

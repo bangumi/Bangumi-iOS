@@ -38,6 +38,5 @@ struct SubjectReviewsView: View {
         }
       }
     }
-    .animation(.default, value: reviews)
   }
 }

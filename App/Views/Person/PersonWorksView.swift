@@ -26,6 +26,5 @@ struct PersonWorksView: View {
       }
     }
     .padding(.bottom, 8)
-    .animation(.default, value: works)
   }
 }

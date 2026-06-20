@@ -50,7 +50,7 @@ struct CharacterIndexsView: View {
         ForEach(indexes) { index in
           IndexItemView(index: index)
         }
-      }.animation(.default, value: indexes)
+      }
     }
   }
 }

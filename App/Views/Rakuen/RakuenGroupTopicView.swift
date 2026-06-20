@@ -13,7 +13,9 @@ struct RakuenGroupTopicView: View {
     .navigationTitle(mode.title)
     .navigationBarTitleDisplayMode(.inline)
     .refreshable {
-      reloader.toggle()
+      withAnimation(.default) {
+        reloader.toggle()
+      }
     }
   }
 }
@@ -110,9 +112,14 @@ struct CachedGroupTopicListView: View {
   private func loadCache() async {
     do {
       let db = try await AppContext.shared.getDB()
-      cachedItems = try await db.fetchRakuenGroupTopicCache(mode: mode.rawValue)
+      let fetchedItems = try await db.fetchRakuenGroupTopicCache(mode: mode.rawValue)
+      withAnimation(.default) {
+        cachedItems = fetchedItems
+      }
     } catch {
-      cachedItems = []
+      withAnimation(.default) {
+        cachedItems = []
+      }
     }
   }
 
@@ -133,7 +140,9 @@ struct CachedGroupTopicListView: View {
       // Save to cache
       if let db = try? await AppContext.shared.getDB() {
         try await db.saveRakuenGroupTopicCache(mode: mode.rawValue, items: resp.data)
-        cachedItems = resp.data
+        withAnimation(.default) {
+          cachedItems = resp.data
+        }
       }
     } catch {
       Notifier.shared.alert(error: error)
@@ -217,21 +226,25 @@ struct CachedGroupTopicListView: View {
       }
     }
     .onChange(of: mode) { _, _ in
-      items = []
-      offset = 0
-      exhausted = false
-      loading = false
-      prefetchState.reset()
+      withAnimation(.default) {
+        items = []
+        offset = 0
+        exhausted = false
+        loading = false
+        prefetchState.reset()
+      }
       Task {
         await loadCache()
         await loadFirstPage()
       }
     }
     .onChange(of: reloader) { _, _ in
-      exhausted = false
-      offset = 0
-      initialized = false
-      prefetchState.reset()
+      withAnimation(.default) {
+        exhausted = false
+        offset = 0
+        initialized = false
+        prefetchState.reset()
+      }
       Task {
         await loadCache()
         await loadFirstPage()

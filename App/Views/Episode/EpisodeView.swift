@@ -18,7 +18,10 @@ struct EpisodeView: View {
   private func loadCached() async {
     do {
       let db = try await AppContext.shared.getDB()
-      episode = try await db.getEpisodeDTO(episodeId)
+      let cachedEpisode = try await db.getEpisodeDTO(episodeId)
+      withAnimation(.default) {
+        episode = cachedEpisode
+      }
     } catch {
       Notifier.shared.alert(error: error)
     }
@@ -29,9 +32,14 @@ struct EpisodeView: View {
       try await EpisodeRepository.loadEpisode(episodeId)
       await loadCached()
       if !isolationMode {
-        loadingComments = true
-        comments = try await EpisodeService.getEpisodeComments(episodeId)
-        loadingComments = false
+        withAnimation(.default) {
+          loadingComments = true
+        }
+        let fetchedComments = try await EpisodeService.getEpisodeComments(episodeId)
+        withAnimation(.default) {
+          comments = fetchedComments
+          loadingComments = false
+        }
       }
     } catch let error as ChiiError {
       switch error {
@@ -98,7 +106,6 @@ struct EpisodeView: View {
       await loadCached()
       await load()
     }
-    .animation(.default, value: comments)
     .navigationTitle("章节详情")
     .navigationBarTitleDisplayMode(.inline)
     .toolbar {

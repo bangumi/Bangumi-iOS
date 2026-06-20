@@ -80,7 +80,10 @@ struct SearchPersonLocalView: View {
   private func load() async {
     do {
       let db = try await AppContext.shared.getDB()
-      persons = try await db.fetchLocalPersons(search: text.gb)
+      let fetched = try await db.fetchLocalPersons(search: text.gb)
+      withAnimation(.default) {
+        persons = fetched
+      }
     } catch {
       Notifier.shared.alert(error: error)
     }

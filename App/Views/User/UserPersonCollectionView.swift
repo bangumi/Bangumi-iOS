@@ -10,15 +10,21 @@ struct UserPersonCollectionView: View {
 
   func refresh() async {
     if refreshing { return }
-    refreshing = true
+    withAnimation(.default) {
+      refreshing = true
+    }
     do {
       let resp = try await UserService.getUserPersonCollections(
         username: user.username, limit: 20)
-      persons = resp.data
+      withAnimation(.default) {
+        persons = resp.data
+      }
     } catch {
       Notifier.shared.alert(error: error)
     }
-    refreshing = false
+    withAnimation(.default) {
+      refreshing = false
+    }
   }
 
   var body: some View {
@@ -68,7 +74,5 @@ struct UserPersonCollectionView: View {
         .scrollClipDisabled()
       }
     }
-    .animation(.default, value: refreshing)
-    .animation(.default, value: persons)
   }
 }

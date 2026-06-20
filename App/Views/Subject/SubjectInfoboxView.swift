@@ -42,11 +42,20 @@ struct SubjectInfoboxView: View {
   @State private var subject: SubjectDTO?
   @State private var detail: SubjectDetailDTO = SubjectDetailDTO()
 
-  private func loadCached() async {
+  private func loadCached(animated: Bool = false) async {
     do {
       let db = try await AppContext.shared.getDB()
-      subject = try await db.getSubjectDTO(subjectId)
-      detail = try await db.getSubjectDetailDTO(subjectId)
+      let cachedSubject = try await db.getSubjectDTO(subjectId)
+      let cachedDetail = try await db.getSubjectDetailDTO(subjectId)
+      if animated {
+        withAnimation(.default) {
+          subject = cachedSubject
+          detail = cachedDetail
+        }
+      } else {
+        subject = cachedSubject
+        detail = cachedDetail
+      }
     } catch {
       Logger.app.error("Failed to load cached subject infobox: \(error)")
     }
@@ -65,7 +74,7 @@ struct SubjectInfoboxView: View {
   func refresh() async {
     do {
       try await SubjectRepository.loadSubjectPositions(subjectId)
-      await loadCached()
+      await loadCached(animated: true)
     } catch {
       Notifier.shared.alert(error: error)
     }
@@ -448,10 +457,12 @@ struct SubjectInfoboxDetailView: View {
       }
       ForEach(Array(versionItems.keys.sorted()), id: \.self) { key in
         Button {
-          if showVersion[key] == nil {
-            showVersion[key] = true
-          } else {
-            showVersion[key]?.toggle()
+          withAnimation(.default) {
+            if showVersion[key] == nil {
+              showVersion[key] = true
+            } else {
+              showVersion[key]?.toggle()
+            }
           }
         } label: {
           Text(key + " " + (showVersion[key] ?? false ? "▼" : "▶"))
@@ -475,7 +486,9 @@ struct SubjectInfoboxDetailView: View {
           }
         } else {
           Button {
-            showFolded.toggle()
+            withAnimation(.default) {
+              showFolded.toggle()
+            }
           } label: {
             HStack {
               Spacer()
@@ -486,9 +499,6 @@ struct SubjectInfoboxDetailView: View {
         }
       }
     }
-    .animation(.default, value: positions)
-    .animation(.default, value: showFolded)
-    .animation(.default, value: showVersion)
     .padding(8)
   }
 }

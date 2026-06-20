@@ -10,7 +10,9 @@ struct UserBlogsView: View {
     do {
       let resp = try await UserService.getUserBlogs(
         username: user.username, limit: 5)
-      blogs = resp.data
+      withAnimation(.default) {
+        blogs = resp.data
+      }
     } catch {
       Notifier.shared.alert(error: error)
     }
@@ -55,6 +57,6 @@ struct UserBlogsView: View {
           Divider()
         }
       }
-    }.animation(.default, value: blogs)
+    }
   }
 }

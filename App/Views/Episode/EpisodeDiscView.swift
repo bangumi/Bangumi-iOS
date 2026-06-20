@@ -19,7 +19,10 @@ struct EpisodeDiscView: View {
   private func loadCached() async {
     do {
       let db = try await AppContext.shared.getDB()
-      episodes = try await db.fetchDiscEpisodes(subjectId: subjectId)
+      let fetchedEpisodes = try await db.fetchDiscEpisodes(subjectId: subjectId)
+      withAnimation(.default) {
+        episodes = fetchedEpisodes
+      }
     } catch {
       Logger.app.error("Failed to load cached disc episodes: \(error)")
     }

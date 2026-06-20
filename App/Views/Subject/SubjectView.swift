@@ -13,13 +13,20 @@ struct SubjectView: View {
   @State private var subject: SubjectDTO?
   @State private var detail: SubjectDetailDTO = SubjectDetailDTO()
 
-  private func loadCached() async {
+  private func loadCached(animated: Bool = false) async {
     do {
       let db = try await AppContext.shared.getDB()
       let cachedSubject = try await db.getSubjectDTO(subjectId)
       let cachedDetail = try await db.getSubjectDetailDTO(subjectId)
-      subject = cachedSubject
-      detail = cachedDetail
+      if animated {
+        withAnimation(.default) {
+          subject = cachedSubject
+          detail = cachedDetail
+        }
+      } else {
+        subject = cachedSubject
+        detail = cachedDetail
+      }
     } catch {
       Logger.app.error("Failed to load cached subject: \(error)")
     }
@@ -28,11 +35,15 @@ struct SubjectView: View {
   func refresh(force: Bool = false) async {
     if refreshed && !force { return }
     if refreshing { return }
-    refreshing = true
+    withAnimation(.default) {
+      refreshing = true
+    }
     do {
       let item = try await SubjectRepository.loadSubject(subjectId)
-      subject = item
-      refreshed = true
+      withAnimation(.default) {
+        subject = item
+        refreshed = true
+      }
       Logger.app.debug("subject refreshed: \(subjectId)")
 
       try await SubjectRepository.loadSubjectDetails(
@@ -40,12 +51,16 @@ struct SubjectView: View {
         offprints: item.type == .book && item.series,
         social: !isolationMode
       )
-      await loadCached()
+      await loadCached(animated: true)
     } catch {
       Notifier.shared.alert(error: error)
-      refreshed = true
+      withAnimation(.default) {
+        refreshed = true
+      }
     }
-    refreshing = false
+    withAnimation(.default) {
+      refreshing = false
+    }
   }
 
   var body: some View {
