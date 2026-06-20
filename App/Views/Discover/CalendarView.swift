@@ -65,6 +65,7 @@ enum WeekDay: Int, CaseIterable {
 struct CalendarView: View {
 
   @Environment(\.scenePhase) private var scenePhase
+  private let horizontalPadding: CGFloat = 16
 
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
 
@@ -195,7 +196,7 @@ struct CalendarView: View {
             }
             .font(.footnote)
             .foregroundStyle(.secondary)
-          }.padding(.horizontal, 8)
+          }.padding(.horizontal, horizontalPadding)
           VStack {
             ForEach(sortedCalendars) { calendar in
               CalendarWeekdayView(
@@ -205,7 +206,7 @@ struct CalendarView: View {
               )
                 .padding(.vertical, 10)
             }
-          }.padding(.horizontal, 8)
+          }.padding(.horizontal, horizontalPadding)
         }
         .navigationTitle("每日放送")
         .navigationBarTitleDisplayMode(.inline)
