@@ -32,13 +32,11 @@ struct GroupTopicDetailView: View {
   func refresh() async {
     do {
       let resp = try await TopicService.getGroupTopic(topicId)
-      withAnimation(.default) {
-        topic = resp
-        if let mainPost = resp.mainPost {
-          mainPostReactions = mainPost.reactions ?? []
-        }
-        refreshed = true
+      topic = resp
+      if let mainPost = resp.mainPost {
+        mainPostReactions = mainPost.reactions ?? []
       }
+      refreshed = true
     } catch {
       Notifier.shared.alert(error: error)
     }
