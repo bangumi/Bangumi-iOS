@@ -7,6 +7,7 @@ struct ImageView: View {
 
   @Environment(\.imageStyle) var style
   @Environment(\.imageType) var type
+  @Environment(\.displayScale) private var displayScale
   @State private var isLoaded = false
 
   init(img: String?) {
@@ -25,9 +26,7 @@ struct ImageView: View {
           if let width = style.width, let height = style.height {
             AnimatedImage(
               url: imageURL,
-              context: [
-                .imageThumbnailPixelSize: CGSize(width: width * 2, height: height * 2)
-              ]
+              context: thumbnailContext(width: width, height: height)
             )
             .onSuccess { _, _, _ in
               markLoaded()
@@ -50,7 +49,10 @@ struct ImageView: View {
               .applyClipShape(type: type, cornerRadius: style.cornerRadius)
           } else if style.contentMode == .fill {
             GeometryReader { geometry in
-              AnimatedImage(url: imageURL)
+              AnimatedImage(
+                url: imageURL,
+                context: thumbnailContext(width: geometry.size.width, height: geometry.size.height)
+              )
                 .onSuccess { _, _, _ in
                   markLoaded()
                 }
@@ -124,6 +126,20 @@ struct ImageView: View {
     DispatchQueue.main.async {
       isLoaded = true
     }
+  }
+
+  private func thumbnailContext(width: CGFloat, height: CGFloat) -> [SDWebImageContextOption: Any]? {
+    guard width > 0, height > 0 else {
+      return nil
+    }
+
+    let thumbnailScale = min(max(displayScale, 1), 2)
+    return [
+      .imageThumbnailPixelSize: CGSize(
+        width: width * thumbnailScale,
+        height: height * thumbnailScale
+      )
+    ]
   }
 }
 

@@ -52,10 +52,7 @@ struct EpisodeRecentView: View {
   }
 
   var recentCount: Int {
-    switch mode {
-    case .tile: return 5
-    case .list: return 7
-    }
+    5
   }
 
   private var recentEpisodes: RecentEpisodes {

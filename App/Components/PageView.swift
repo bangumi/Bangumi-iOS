@@ -120,16 +120,13 @@ struct NextPagePrefetchState<ID: Hashable> {
 
 struct NextPagePrefetchTaskKey<ID: Hashable>: Equatable {
   let triggerId: ID?
-  let itemCount: Int
   let resetToken: Int
 
   init(
     triggerId: ID?,
-    itemCount: Int,
     resetToken: Int = 0
   ) {
     self.triggerId = triggerId
-    self.itemCount = itemCount
     self.resetToken = resetToken
   }
 }
@@ -239,7 +236,6 @@ where C: View, T: Identifiable & Codable & Sendable {
       ForEach(displayItems) { item in
         let trigger = NextPagePrefetchTaskKey(
           triggerId: nextPageTrigger.triggerId(for: item.id),
-          itemCount: items.count,
           resetToken: offset
         )
         content(item)
@@ -375,7 +371,6 @@ where C: View, T: Identifiable & Codable & Sendable {
       ForEach(items) { item in
         let trigger = NextPagePrefetchTaskKey(
           triggerId: nextPageTrigger.triggerId(for: item.id),
-          itemCount: items.count,
           resetToken: page
         )
         content(item)

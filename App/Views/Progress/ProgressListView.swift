@@ -10,7 +10,6 @@ final class ProgressSubjectRenderPayload {
 
 struct ProgressListView: View {
   let items: [ProgressSubjectDTO]
-  let isLoadingPage: Bool
   let hasMore: Bool
   let prefetchWindow: Int
   let paginationResetToken: Int
@@ -24,11 +23,13 @@ struct ProgressListView: View {
   private func requestNextPage(for trigger: NextPagePrefetchTaskKey<ProgressSubjectDTO.ID>) {
     if let triggerId = prefetchState.request(
       trigger: trigger,
-      isLoading: isLoadingPage,
+      isLoading: false,
       canLoadMore: hasMore
     ) {
       Task {
-        if await !loadNextPage() {
+        if await loadNextPage() {
+          prefetchState.completeLoading(canLoadMore: hasMore)
+        } else {
           prefetchState.cancelRequest(triggerId: triggerId)
         }
       }
@@ -42,7 +43,6 @@ struct ProgressListView: View {
       ForEach(items) { item in
         let trigger = NextPagePrefetchTaskKey(
           triggerId: nextPageTrigger.triggerId(for: item.id),
-          itemCount: items.count,
           resetToken: paginationResetToken
         )
         CardView {
@@ -59,15 +59,11 @@ struct ProgressListView: View {
         }
       }
 
-      ProgressPageFooterView(isLoading: isLoadingPage, hasMore: hasMore)
+      if !hasMore {
+        ProgressPageFooterView()
+      }
     }
     .padding(.horizontal, 8)
-    .onChange(of: isLoadingPage) { _, isLoading in
-      guard !isLoading else {
-        return
-      }
-      prefetchState.completeLoading(canLoadMore: hasMore)
-    }
     .onChange(of: paginationResetToken) { _, _ in
       prefetchState.reset()
     }
@@ -75,21 +71,12 @@ struct ProgressListView: View {
 }
 
 struct ProgressPageFooterView: View {
-  let isLoading: Bool
-  let hasMore: Bool
-
   var body: some View {
     HStack {
       Spacer()
-      ZStack {
-        ProgressView()
-          .opacity(isLoading ? 1 : 0)
-
-        Text("没有更多了")
-          .font(.footnote)
-          .foregroundStyle(.secondary)
-          .opacity(!isLoading && !hasMore ? 1 : 0)
-      }
+      Text("没有更多了")
+        .font(.footnote)
+        .foregroundStyle(.secondary)
       Spacer()
     }
     .frame(height: 28)

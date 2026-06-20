@@ -32,12 +32,7 @@ struct ChiiProgressView: View {
   }
 
   private var progressEpisodeWindowSize: Int {
-    switch progressViewMode {
-    case .list:
-      7
-    case .tile:
-      5
-    }
+    5
   }
 
   private var progressPagePrefetchWindow: Int {
@@ -126,14 +121,10 @@ struct ChiiProgressView: View {
         return false
       }
     }
-    withAnimation(.default) {
-      progressPageLoading = true
-    }
+    progressPageLoading = true
     defer {
       if generation == progressLoadGeneration {
-        withAnimation(.default) {
-          progressPageLoading = false
-        }
+        progressPageLoading = false
       }
     }
     do {
@@ -412,7 +403,6 @@ struct ChiiProgressView: View {
       case .list:
         ProgressListView(
           items: progressSubjects,
-          isLoadingPage: progressPageLoading,
           hasMore: hasMoreProgress,
           prefetchWindow: progressPagePrefetchWindow,
           paginationResetToken: progressLoadGeneration,
@@ -422,7 +412,6 @@ struct ChiiProgressView: View {
       case .tile:
         ProgressTileView(
           items: progressSubjects,
-          isLoadingPage: progressPageLoading,
           hasMore: hasMoreProgress,
           prefetchWindow: progressPagePrefetchWindow,
           paginationResetToken: progressLoadGeneration,

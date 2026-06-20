@@ -2,7 +2,6 @@ import SwiftUI
 
 struct ProgressTileView: View {
   let items: [ProgressSubjectDTO]
-  let isLoadingPage: Bool
   let hasMore: Bool
   let prefetchWindow: Int
   let paginationResetToken: Int
@@ -16,11 +15,13 @@ struct ProgressTileView: View {
   private func requestNextPage(for trigger: NextPagePrefetchTaskKey<ProgressSubjectDTO.ID>) {
     if let triggerId = prefetchState.request(
       trigger: trigger,
-      isLoading: isLoadingPage,
+      isLoading: false,
       canLoadMore: hasMore
     ) {
       Task {
-        if await !loadNextPage() {
+        if await loadNextPage() {
+          prefetchState.completeLoading(canLoadMore: hasMore)
+        } else {
           prefetchState.cancelRequest(triggerId: triggerId)
         }
       }
@@ -35,7 +36,6 @@ struct ProgressTileView: View {
         ForEach(items) { item in
           let trigger = NextPagePrefetchTaskKey(
             triggerId: nextPageTrigger.triggerId(for: item.id),
-            itemCount: items.count,
             resetToken: paginationResetToken
           )
           CardView(padding: 8) {
@@ -54,15 +54,11 @@ struct ProgressTileView: View {
 
       }
 
-      ProgressPageFooterView(isLoading: isLoadingPage, hasMore: hasMore)
+      if !hasMore {
+        ProgressPageFooterView()
+      }
     }
     .padding(.horizontal, 8)
-    .onChange(of: isLoadingPage) { _, isLoading in
-      guard !isLoading else {
-        return
-      }
-      prefetchState.completeLoading(canLoadMore: hasMore)
-    }
     .onChange(of: paginationResetToken) { _, _ in
       prefetchState.reset()
     }
