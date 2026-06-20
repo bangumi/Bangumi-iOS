@@ -1,3 +1,4 @@
+import OSLog
 import SwiftUI
 
 struct TrendingSubjectView: View {
@@ -43,6 +44,7 @@ struct TrendingSubjectTypeView: View {
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
 
   @State private var items: [TrendingSubjectDTO] = []
+  @State private var collectionTypes: [Int: CollectionType] = [:]
 
   var columnCount: Int {
     let count = Int(width / 320)
@@ -66,6 +68,10 @@ struct TrendingSubjectTypeView: View {
 
   var smallItems: [TrendingSubjectDTO] {
     return Array(items.dropFirst(largeItems.count))
+  }
+
+  private static func subjectIds(in items: [TrendingSubjectDTO]) -> [Int] {
+    SubjectCollectionTypeResolver.sortedUniqueSubjectIds(items.map(\.subject.id))
   }
 
   var body: some View {
@@ -104,8 +110,16 @@ struct TrendingSubjectTypeView: View {
                   Spacer(minLength: 0)
                 }.padding(8)
               }
+              .imageCollectionStatus(
+                ctype: collectionTypes[item.subject.id] ?? CollectionType.none
+              )
               .imageNavLink(item.subject.link)
-              .subjectPreview(item.subject)
+              .subjectPreview(
+                item.subject,
+                collectionType: collectionTypes[item.subject.id] ?? CollectionType.none
+              ) {
+                await reloadCollectionType(subjectId: item.subject.id)
+              }
           }
         }
         ScrollView(.horizontal, showsIndicators: false) {
@@ -131,8 +145,16 @@ struct TrendingSubjectTypeView: View {
                     Spacer(minLength: 0)
                   }.padding(4)
                 }
+                .imageCollectionStatus(
+                  ctype: collectionTypes[item.subject.id] ?? CollectionType.none
+                )
                 .imageNavLink(item.subject.link)
-                .subjectPreview(item.subject)
+                .subjectPreview(
+                  item.subject,
+                  collectionType: collectionTypes[item.subject.id] ?? CollectionType.none
+                ) {
+                  await reloadCollectionType(subjectId: item.subject.id)
+                }
             }
           }.scrollTargetLayout()
         }
@@ -143,17 +165,53 @@ struct TrendingSubjectTypeView: View {
     .task(id: "\(type.rawValue)-\(reloader)") {
       await loadCached()
     }
+    .onReceive(
+      NotificationCenter.default.publisher(for: ProgressSubjectInvalidation.notificationName),
+      perform: handleSubjectInvalidation
+    )
   }
 
   private func loadCached() async {
     do {
       let db = try await AppContext.shared.getDB()
       let fetchedItems = try await db.fetchTrendingSubjects(type: type)
+      let fetchedCollectionTypes: [Int: CollectionType]
+      do {
+        fetchedCollectionTypes = try await SubjectCollectionTypeResolver.load(
+          subjectIds: Self.subjectIds(in: fetchedItems)
+        )
+      } catch {
+        Logger.app.error("Failed to load trending collection types: \(error)")
+        fetchedCollectionTypes = [:]
+      }
       withAnimation(.default) {
         items = fetchedItems
+        collectionTypes = fetchedCollectionTypes
       }
     } catch {
       Notifier.shared.alert(error: error)
+    }
+  }
+
+  private func reloadCollectionType(subjectId: Int) async {
+    do {
+      let fetchedCollectionTypes = try await SubjectCollectionTypeResolver.load(
+        subjectIds: [subjectId]
+      )
+      withAnimation(.default) {
+        collectionTypes[subjectId] = fetchedCollectionTypes[subjectId] ?? CollectionType.none
+      }
+    } catch {
+      Logger.app.error("Failed to load trending collection type: \(error)")
+    }
+  }
+
+  private func handleSubjectInvalidation(_ notification: Notification) {
+    guard let subjectId = ProgressSubjectInvalidation.subjectId(from: notification),
+      Self.subjectIds(in: items).contains(subjectId)
+    else { return }
+    Task {
+      await reloadCollectionType(subjectId: subjectId)
     }
   }
 }

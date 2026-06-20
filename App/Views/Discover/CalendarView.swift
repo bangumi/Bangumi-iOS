@@ -71,6 +71,7 @@ struct CalendarView: View {
   @State private var currentDate = Calendar.current.startOfDay(for: Date())
   @State private var refreshed: Bool = false
   @State private var calendars: [CalendarEntryDTO] = []
+  @State private var collectionTypes: [Int: CollectionType] = [:]
 
   var sortedCalendars: [CalendarEntryDTO] {
     let todayWeekday = WeekDay(date: currentDate).rawValue
@@ -93,15 +94,64 @@ struct CalendarView: View {
     sortedCalendars.first?.items.reduce(0) { $0 + $1.watchers } ?? 0
   }
 
+  private static func subjectIds(in calendars: [CalendarEntryDTO]) -> [Int] {
+    SubjectCollectionTypeResolver.sortedUniqueSubjectIds(
+      calendars.flatMap { $0.items.map(\.subject.id) }
+    )
+  }
+
   func loadCachedCalendar() async {
     do {
       let db = try await AppContext.shared.getDB()
       let fetchedCalendars = try await db.fetchCalendarEntries()
+      let fetchedCollectionTypes = try await SubjectCollectionTypeResolver.load(
+        subjectIds: Self.subjectIds(in: fetchedCalendars)
+      )
       withAnimation(.default) {
         calendars = fetchedCalendars
+        collectionTypes = fetchedCollectionTypes
       }
     } catch {
       Logger.app.error("Failed to load cached calendar: \(error)")
+    }
+  }
+
+  private func loadCollectionTypes(for subjectIds: [Int], replacing: Bool = false) async {
+    let subjectIds = SubjectCollectionTypeResolver.sortedUniqueSubjectIds(subjectIds)
+    guard !subjectIds.isEmpty else {
+      if replacing {
+        withAnimation(.default) {
+          collectionTypes = [:]
+        }
+      }
+      return
+    }
+    do {
+      let fetchedCollectionTypes = try await SubjectCollectionTypeResolver.load(subjectIds: subjectIds)
+      withAnimation(.default) {
+        if replacing {
+          collectionTypes = fetchedCollectionTypes
+        } else {
+          for subjectId in subjectIds {
+            collectionTypes[subjectId] = fetchedCollectionTypes[subjectId] ?? CollectionType.none
+          }
+        }
+      }
+    } catch {
+      Logger.app.error("Failed to load calendar collection types: \(error)")
+    }
+  }
+
+  private func reloadCollectionType(subjectId: Int) async {
+    await loadCollectionTypes(for: [subjectId])
+  }
+
+  private func handleSubjectInvalidation(_ notification: Notification) {
+    guard let subjectId = ProgressSubjectInvalidation.subjectId(from: notification),
+      Self.subjectIds(in: calendars).contains(subjectId)
+    else { return }
+    Task {
+      await reloadCollectionType(subjectId: subjectId)
     }
   }
 
@@ -148,7 +198,11 @@ struct CalendarView: View {
           }.padding(.horizontal, 8)
           VStack {
             ForEach(sortedCalendars) { calendar in
-              CalendarWeekdayView(calendar: calendar)
+              CalendarWeekdayView(
+                calendar: calendar,
+                collectionTypes: collectionTypes,
+                reloadCollectionType: reloadCollectionType
+              )
                 .padding(.vertical, 10)
             }
           }.padding(.horizontal, 8)
@@ -173,11 +227,17 @@ struct CalendarView: View {
     .onReceive(NotificationCenter.default.publisher(for: .NSCalendarDayChanged)) { _ in
       updateCurrentDate()
     }
+    .onReceive(
+      NotificationCenter.default.publisher(for: ProgressSubjectInvalidation.notificationName),
+      perform: handleSubjectInvalidation
+    )
   }
 }
 
 struct CalendarWeekdayView: View {
   let calendar: CalendarEntryDTO
+  let collectionTypes: [Int: CollectionType]
+  let reloadCollectionType: (Int) async -> Void
 
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
 
@@ -222,8 +282,16 @@ struct CalendarWeekdayView: View {
                   Spacer(minLength: 0)
                 }.padding(4)
               }
+              .imageCollectionStatus(
+                ctype: collectionTypes[item.subject.id] ?? CollectionType.none
+              )
               .imageNavLink(item.subject.link)
-              .subjectPreview(item.subject)
+              .subjectPreview(
+                item.subject,
+                collectionType: collectionTypes[item.subject.id] ?? CollectionType.none
+              ) {
+                await reloadCollectionType(item.subject.id)
+              }
           }
         }
       }

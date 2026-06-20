@@ -349,20 +349,83 @@ struct SubjectCardView: View {
 }
 
 extension View {
-  func subjectPreview(_ subject: SlimSubjectDTO, eps: Bool = false) -> some View {
-    self.contextMenu {
-      NavigationLink(value: NavDestination.subject(subject.id)) {
-        Label("查看详情", systemImage: "magnifyingglass")
-      }
-      if eps, subject.type == .anime || subject.type == .real {
-        NavigationLink(value: NavDestination.episodeList(subject.id)) {
-          Label("章节列表", systemImage: "list.bullet")
+  func subjectPreview(
+    _ subject: SlimSubjectDTO,
+    eps: Bool = false,
+    collectionType: CollectionType? = nil,
+    onCollectionSaved: (() async -> Void)? = nil
+  ) -> some View {
+    modifier(
+      SubjectPreviewModifier(
+        subject: subject,
+        eps: eps,
+        collectionType: collectionType,
+        onCollectionSaved: onCollectionSaved
+      )
+    )
+  }
+}
+
+private struct SubjectPreviewModifier: ViewModifier {
+  let subject: SlimSubjectDTO
+  let eps: Bool
+  let collectionType: CollectionType?
+  let onCollectionSaved: (() async -> Void)?
+
+  @AppStorage("isAuthenticated") private var isAuthenticated: Bool = false
+  @State private var showCollectionBox = false
+
+  private var showsCollectionAction: Bool {
+    guard let collectionType else { return false }
+    return isAuthenticated || collectionType != CollectionType.none
+  }
+
+  private var collectionActionTitle: String {
+    collectionType == CollectionType.none ? "收藏" : "修改收藏"
+  }
+
+  private var collectionActionIcon: String {
+    collectionType == CollectionType.none ? "plus" : "square.and.pencil"
+  }
+
+  func body(content: Content) -> some View {
+    content
+      .contextMenu {
+        NavigationLink(value: NavDestination.subject(subject.id)) {
+          Label("查看详情", systemImage: "magnifyingglass")
         }
+        if eps, subject.type == .anime || subject.type == .real {
+          NavigationLink(value: NavDestination.episodeList(subject.id)) {
+            Label("章节列表", systemImage: "list.bullet")
+          }
+        }
+        if showsCollectionAction {
+          Button {
+            showCollectionBox = true
+          } label: {
+            Label(collectionActionTitle, systemImage: collectionActionIcon)
+          }
+          .disabled(!isAuthenticated)
+        }
+      } preview: {
+        SubjectCardView(subject: subject)
+          .padding()
+          .frame(idealWidth: 360)
       }
-    } preview: {
-      SubjectCardView(subject: subject)
-        .padding()
-        .frame(idealWidth: 360)
-    }
+      .sheet(isPresented: $showCollectionBox) {
+        SubjectCollectionBoxView(subjectId: subject.id, onSaved: onCollectionSaved)
+      }
+  }
+}
+
+enum SubjectCollectionTypeResolver {
+  static func load(subjectIds: [Int]) async throws -> [Int: CollectionType] {
+    guard !subjectIds.isEmpty else { return [:] }
+    let db = try await AppContext.shared.getDB()
+    return try await db.getCollectionTypes(subjectIds: subjectIds)
+  }
+
+  static func sortedUniqueSubjectIds(_ subjectIds: [Int]) -> [Int] {
+    Array(Set(subjectIds)).sorted()
   }
 }
