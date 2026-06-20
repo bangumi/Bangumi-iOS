@@ -54,11 +54,6 @@ struct ChiiTimelineView: View {
 
               Divider()
 
-              NavigationLink(value: NavDestination.export) {
-                Label("导出收藏", systemImage: "square.and.arrow.up")
-              }
-              Divider()
-
               Button(role: .destructive) {
                 logoutConfirm = true
               } label: {

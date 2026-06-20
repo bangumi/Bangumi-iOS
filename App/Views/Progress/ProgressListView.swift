@@ -38,7 +38,7 @@ struct ProgressListView: View {
   var body: some View {
     let nextPageTrigger = items.nextPagePrefetchTrigger(prefetchWindow: prefetchWindow)
 
-    LazyVStack(alignment: .leading) {
+    LazyVStack(alignment: .leading, spacing: 4) {
       ForEach(items) { item in
         let trigger = NextPagePrefetchTaskKey(
           triggerId: nextPageTrigger.triggerId(for: item.id),
@@ -133,8 +133,6 @@ struct ProgressListItemContentView: View {
             }
           }.buttonStyle(.scale)
 
-          Spacer()
-
           switch subject.type {
           case .anime, .real:
             EpisodeRecentView(
@@ -158,9 +156,7 @@ struct ProgressListItemContentView: View {
         }
       }
 
-      Section {
-        ProgressSubjectLinearBarsView(subject: subject)
-      }
+      ProgressSubjectLinearBarsView(subject: subject)
     }
   }
 }

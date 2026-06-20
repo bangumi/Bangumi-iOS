@@ -297,16 +297,18 @@ private struct TrendingSubjectTypeHeader: View {
           collapseState[type].toggle()
         }
       } label: {
-        Image(systemName: isCollapsed ? "chevron.right" : "chevron.down")
-          .font(.headline)
-          .frame(width: 28, height: 28)
-          .contentShape(Rectangle())
-          .accessibilityLabel(isCollapsed ? "展开" : "收起")
+        HStack(spacing: 0) {
+          Image(systemName: isCollapsed ? "chevron.right" : "chevron.down")
+            .font(.headline)
+            .frame(width: 28, height: 28)
+
+          Text(type.description)
+            .font(.title)
+        }
+        .contentShape(Rectangle())
+        .accessibilityLabel(isCollapsed ? "展开" : "收起")
       }
       .buttonStyle(.plain)
-
-      Text(type.description)
-        .font(.title)
 
       Spacer()
 

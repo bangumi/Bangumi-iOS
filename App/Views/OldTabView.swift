@@ -12,6 +12,15 @@ struct OldTabView: View {
   @State private var rakuenNav: NavigationPath = NavigationPath()
   @State private var meNav: NavigationPath = NavigationPath()
 
+  private func selectVisibleTabIfNeeded() {
+    if !isAuthenticated, mainTab == .progress || mainTab == .me {
+      mainTab = .timeline
+    }
+    if isolationMode, mainTab == .rakuen {
+      mainTab = .timeline
+    }
+  }
+
   var body: some View {
     TabView(selection: $mainTab) {
       NavigationStack(path: $timelineNav) {
@@ -54,24 +63,26 @@ struct OldTabView: View {
         )
       }
 
-      NavigationStack(path: $meNav) {
-        CollectionsView()
-          .navigationDestination(for: NavDestination.self) { $0 }
-      }
-      .tag(ChiiViewTab.me)
-      .tabItem {
-        Label(ChiiViewTab.me.title, systemImage: ChiiViewTab.me.icon)
-      }
-      .environment(
-        \.openURL,
-        OpenURLAction { url in
-          if handleURL(url, nav: $meNav) {
-            return .handled
-          } else {
-            return .systemAction
-          }
+      if isAuthenticated {
+        NavigationStack(path: $meNav) {
+          CollectionsView()
+            .navigationDestination(for: NavDestination.self) { $0 }
         }
-      )
+        .tag(ChiiViewTab.me)
+        .tabItem {
+          Label(ChiiViewTab.me.title, systemImage: ChiiViewTab.me.icon)
+        }
+        .environment(
+          \.openURL,
+          OpenURLAction { url in
+            if handleURL(url, nav: $meNav) {
+              return .handled
+            } else {
+              return .systemAction
+            }
+          }
+        )
+      }
 
       if !isolationMode {
         NavigationStack(path: $rakuenNav) {
@@ -115,6 +126,15 @@ struct OldTabView: View {
         handleSearchActivity(activity, nav: $discoverNav)
         mainTab = .discover
       }
+    }
+    .onAppear {
+      selectVisibleTabIfNeeded()
+    }
+    .onChange(of: isAuthenticated) { _, _ in
+      selectVisibleTabIfNeeded()
+    }
+    .onChange(of: isolationMode) { _, _ in
+      selectVisibleTabIfNeeded()
     }
   }
 }

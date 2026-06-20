@@ -178,16 +178,13 @@ struct EpisodeRecentView: View {
         }
       }
     } else {
-      HStack {
-        Spacer()
-        NavigationLink(value: NavDestination.subject(subject.id)) {
-          HStack(spacing: 4) {
-            Text(progressText)
-            Image(systemName: progressIcon)
-          }
+      NavigationLink(value: NavDestination.subject(subject.id)) {
+        HStack(spacing: 4) {
+          Text(progressText)
+          Image(systemName: progressIcon)
         }
-        .progressButtonStyle()
       }
+      .progressButtonStyle()
     }
   }
 }

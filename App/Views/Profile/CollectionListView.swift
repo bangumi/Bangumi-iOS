@@ -40,6 +40,13 @@ struct CollectionListView: View {
     return nil
   }
 
+  func reloadAfterCollectionSaved() async {
+    await loadCounts()
+    withAnimation(.default) {
+      reloader.toggle()
+    }
+  }
+
   var body: some View {
     Section {
       if counts.isEmpty {
@@ -61,8 +68,11 @@ struct CollectionListView: View {
               item in
               SubjectCollectionRowContentView(
                 subject: item.slim,
-                isPrivate: item.interest?.private ?? false
-              )
+                isPrivate: item.interest?.private ?? false,
+                showsCollectionEditButton: true
+              ) {
+                await reloadAfterCollectionSaved()
+              }
               Divider()
             }
             .padding(8)
