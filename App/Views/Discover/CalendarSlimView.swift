@@ -2,7 +2,6 @@ import OSLog
 import SwiftUI
 
 struct CalendarSlimView: View {
-  private let horizontalPadding: CGFloat = 16
 
   private struct CalendarDay: Identifiable {
     let weekday: WeekDay
@@ -174,7 +173,7 @@ struct CalendarSlimView: View {
         }
       }
     }
-    .padding(.horizontal, horizontalPadding)
+    .padding(.horizontal, 8)
     .onAppear {
       updateCurrentDate()
     }

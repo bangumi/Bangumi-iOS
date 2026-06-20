@@ -66,7 +66,6 @@ private struct TrendingSubjectCollapseState: Equatable, RawRepresentable {
 
 struct TrendingSubjectView: View {
   let width: CGFloat
-  private let horizontalPadding: CGFloat = 16
 
   @AppStorage("trendingSubjectCollapseState")
   private var collapseState: TrendingSubjectCollapseState = TrendingSubjectCollapseState()
@@ -94,11 +93,10 @@ struct TrendingSubjectView: View {
     VStack(spacing: 24) {
       ForEach(SubjectType.allTypes) { type in
         TrendingSubjectTypeView(
-          type: type, width: width - horizontalPadding * 2, reloader: reloader,
-          collapseState: $collapseState)
+          type: type, width: width - 16, reloader: reloader, collapseState: $collapseState)
       }
     }
-    .padding(.horizontal, horizontalPadding)
+    .padding(.horizontal, 8)
     .task(load)
   }
 }
