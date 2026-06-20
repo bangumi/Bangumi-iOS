@@ -9,15 +9,136 @@ enum FilterExpand: String {
   case sort = "sort"
 }
 
+private struct SubjectBrowsingOptions: Equatable, RawRepresentable {
+  typealias RawValue = String
+
+  var filter: SubjectsBrowseFilter = SubjectsBrowseFilter()
+  var sort: SubjectSortMode = .rank
+
+  var rawValue: String {
+    let dict: [String: String] = [
+      "filter": Self.encodeFilter(filter),
+      "sort": sort.rawValue,
+    ]
+    guard let data = try? JSONSerialization.data(withJSONObject: dict, options: [.sortedKeys]),
+      let json = String(data: data, encoding: .utf8)
+    else {
+      return "{}"
+    }
+    return json
+  }
+
+  init?(rawValue: String) {
+    guard !rawValue.isEmpty else {
+      return nil
+    }
+    guard let data = rawValue.data(using: .utf8),
+      let dict = try? JSONSerialization.jsonObject(with: data) as? [String: String]
+    else {
+      return nil
+    }
+    self.filter = Self.decodeFilter(dict["filter"] ?? "")
+    self.sort = SubjectSortMode(rawValue: dict["sort"] ?? "") ?? .rank
+  }
+
+  init() {}
+
+  private static func encodeFilter(_ filter: SubjectsBrowseFilter) -> String {
+    guard let data = try? JSONEncoder().encode(filter),
+      let json = String(data: data, encoding: .utf8)
+    else {
+      return "{}"
+    }
+    return json
+  }
+
+  private static func decodeFilter(_ rawValue: String) -> SubjectsBrowseFilter {
+    guard let data = rawValue.data(using: .utf8),
+      let filter = try? JSONDecoder().decode(SubjectsBrowseFilter.self, from: data)
+    else {
+      return SubjectsBrowseFilter()
+    }
+    return filter
+  }
+}
+
+private struct SubjectBrowsingOptionsState: Equatable, RawRepresentable {
+  typealias RawValue = String
+
+  private var rawOptionsByType: [String: String] = [:]
+
+  subscript(type: SubjectType) -> SubjectBrowsingOptions {
+    get {
+      SubjectBrowsingOptions(rawValue: rawOptionsByType[String(type.rawValue)] ?? "")
+        ?? SubjectBrowsingOptions()
+    }
+    set {
+      let key = String(type.rawValue)
+      if newValue == SubjectBrowsingOptions() {
+        rawOptionsByType.removeValue(forKey: key)
+      } else {
+        rawOptionsByType[key] = newValue.rawValue
+      }
+    }
+  }
+
+  var rawValue: String {
+    guard let data = try? JSONSerialization.data(
+      withJSONObject: rawOptionsByType,
+      options: [.sortedKeys]
+    ),
+      let json = String(data: data, encoding: .utf8)
+    else {
+      return "{}"
+    }
+    return json
+  }
+
+  init?(rawValue: String) {
+    guard !rawValue.isEmpty else {
+      self.init()
+      return
+    }
+    guard let data = rawValue.data(using: .utf8),
+      let dict = try? JSONSerialization.jsonObject(with: data) as? [String: String]
+    else {
+      self.init()
+      return
+    }
+    self.init()
+    self.rawOptionsByType = dict
+  }
+
+  init() {}
+}
+
 struct SubjectBrowsingView: View {
   let type: SubjectType
 
   @State private var showFilter: Bool = false
   @State private var filterExpand: FilterExpand? = nil
-  @State private var filter: SubjectsBrowseFilter = SubjectsBrowseFilter()
-  @State private var sort: SubjectSortMode = .rank
+  @AppStorage("subjectBrowsingOptionsState")
+  private var optionsState: SubjectBrowsingOptionsState = SubjectBrowsingOptionsState()
 
   @State private var reloader: Bool = false
+
+  private var options: SubjectBrowsingOptions {
+    optionsState[type]
+  }
+
+  private var filterBinding: Binding<SubjectsBrowseFilter> {
+    Binding(
+      get: { optionsState[type].filter },
+      set: { optionsState[type].filter = $0 }
+    )
+  }
+
+  private var sortBinding: Binding<SubjectSortMode> {
+    Binding(
+      get: { optionsState[type].sort },
+      set: { optionsState[type].sort = $0 }
+    )
+  }
 
   var categories: [PlatformInfo] {
     var categories: [Int: PlatformInfo]
@@ -42,7 +163,7 @@ struct SubjectBrowsingView: View {
         throw ChiiError.uninitialized
       }
       let resp = try await SubjectService.getSubjects(
-        type: type, sort: sort, filter: filter, page: page)
+        type: type, sort: options.sort, filter: options.filter, page: page)
       for item in resp.data {
         try await db.saveSubject(item)
       }
@@ -63,7 +184,7 @@ struct SubjectBrowsingView: View {
 
   private func sortBadge() -> some View {
     BadgeView(background: .accent, padding: 4) {
-      Label(sort.description, systemImage: sort.icon)
+      Label(options.sort.description, systemImage: options.sort.icon)
         .font(.caption)
         .labelStyle(.compact)
     }
@@ -74,25 +195,25 @@ struct SubjectBrowsingView: View {
       HFlow {
         Label("筛选", systemImage: "line.3.horizontal.decrease.circle")
         // cat
-        if let cat = filter.cat {
+        if let cat = options.filter.cat {
           filterBadge(cat.typeCN)
         }
 
         // series
-        if let series = filter.series {
+        if let series = options.filter.series {
           filterBadge(series ? "系列" : "单行本")
         }
 
         // tags
-        if let tags = filter.tags {
+        if let tags = options.filter.tags {
           ForEach(tags, id: \.self) { tag in
             filterBadge(tag)
           }
         }
 
         // date
-        if let year = filter.year {
-          if let month = filter.month {
+        if let year = options.filter.year {
+          if let month = options.filter.month {
             filterBadge("\(String(year))年\(String(month))月")
           } else {
             filterBadge("\(String(year))年")
@@ -127,7 +248,7 @@ struct SubjectBrowsingView: View {
 
       }.padding(.horizontal, 8)
     }
-    .onChange(of: sort) { _, _ in
+    .onChange(of: options.sort) { _, _ in
       withAnimation(.default) {
         reloader.toggle()
       }
@@ -135,7 +256,7 @@ struct SubjectBrowsingView: View {
     .navigationTitle("全部\(type.description)")
     .navigationBarTitleDisplayMode(.inline)
     .sheet(isPresented: $showFilter) {
-      SubjectBrowsingFilterView(type: type, filter: $filter, categories: categories)
+      SubjectBrowsingFilterView(type: type, filter: filterBinding, categories: categories)
     }
     .onChange(of: showFilter) {
       if !showFilter {
@@ -154,7 +275,7 @@ struct SubjectBrowsingView: View {
           Image(systemName: "line.3.horizontal.decrease")
         }
         Menu {
-          Picker("排序", selection: $sort.animated()) {
+          Picker("排序", selection: sortBinding.animated()) {
             ForEach(SubjectSortMode.allCases, id: \.self) { sortMode in
               Label(sortMode.description, systemImage: sortMode.icon).tag(sortMode)
             }

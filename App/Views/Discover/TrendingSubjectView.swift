@@ -1,9 +1,74 @@
+import Foundation
 import OSLog
 import SwiftUI
+
+private struct TrendingSubjectCollapseState: Equatable, RawRepresentable {
+  typealias RawValue = String
+
+  private var collapsedTypeValues: Set<Int> = []
+
+  subscript(type: SubjectType) -> Bool {
+    get {
+      collapsedTypeValues.contains(type.rawValue)
+    }
+    set {
+      if newValue {
+        collapsedTypeValues.insert(type.rawValue)
+      } else {
+        collapsedTypeValues.remove(type.rawValue)
+      }
+    }
+  }
+
+  var rawValue: String {
+    let dict: [String: Any] = [
+      "collapsedTypes": collapsedTypeValues.sorted()
+    ]
+    guard let data = try? JSONSerialization.data(withJSONObject: dict, options: [.sortedKeys]),
+      let json = String(data: data, encoding: .utf8)
+    else {
+      return "{}"
+    }
+    return json
+  }
+
+  init?(rawValue: String) {
+    guard !rawValue.isEmpty else {
+      self.init()
+      return
+    }
+    guard let data = rawValue.data(using: .utf8),
+      let dict = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
+    else {
+      self.init()
+      return
+    }
+    let rawTypes = dict["collapsedTypes"] as? [Any] ?? []
+    self.init()
+    self.collapsedTypeValues = Set(rawTypes.compactMap(Self.decodeTypeValue))
+  }
+
+  init() {}
+
+  private static func decodeTypeValue(_ value: Any) -> Int? {
+    if let value = value as? Int {
+      return value
+    }
+    if let value = value as? String {
+      return Int(value)
+    }
+    if let value = value as? NSNumber {
+      return value.intValue
+    }
+    return nil
+  }
+}
 
 struct TrendingSubjectView: View {
   let width: CGFloat
 
+  @AppStorage("trendingSubjectCollapseState")
+  private var collapseState: TrendingSubjectCollapseState = TrendingSubjectCollapseState()
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
 
   @State private var loaded: Bool = false
@@ -26,8 +91,9 @@ struct TrendingSubjectView: View {
 
   var body: some View {
     VStack(spacing: 24) {
-      ForEach(SubjectType.allTypes) { st in
-        TrendingSubjectTypeView(type: st, width: width - 16, reloader: reloader)
+      ForEach(SubjectType.allTypes) { type in
+        TrendingSubjectTypeView(
+          type: type, width: width - 16, reloader: reloader, collapseState: $collapseState)
       }
     }
     .padding(.horizontal, 8)
@@ -35,10 +101,11 @@ struct TrendingSubjectView: View {
   }
 }
 
-struct TrendingSubjectTypeView: View {
+private struct TrendingSubjectTypeView: View {
   let type: SubjectType
   let width: CGFloat
   let reloader: Bool
+  @Binding var collapseState: TrendingSubjectCollapseState
 
   @AppStorage("subjectImageQuality") var subjectImageQuality: ImageQuality = .high
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
@@ -74,20 +141,19 @@ struct TrendingSubjectTypeView: View {
     SubjectCollectionTypeResolver.sortedUniqueSubjectIds(items.map(\.subject.id))
   }
 
+  private var isCollapsed: Bool {
+    collapseState[type]
+  }
+
   var body: some View {
     VStack(spacing: 8) {
-      if items.isEmpty {
+      TrendingSubjectTypeHeader(type: type, collapseState: $collapseState)
+
+      if isCollapsed {
+        EmptyView()
+      } else if items.isEmpty {
         ProgressView()
       } else {
-        VStack(spacing: 5) {
-          HStack {
-            Text("\(type.description)").font(.title)
-            Spacer()
-            NavigationLink(value: NavDestination.subjectBrowsing(type)) {
-              Text("更多 »")
-            }.buttonStyle(.navigation)
-          }
-        }
         HStack {
           ForEach(largeItems) { item in
             ImageView(img: item.subject.images?.resize(subjectImageQuality.largeSize))
@@ -212,6 +278,42 @@ struct TrendingSubjectTypeView: View {
     else { return }
     Task {
       await reloadCollectionType(subjectId: subjectId)
+    }
+  }
+}
+
+private struct TrendingSubjectTypeHeader: View {
+  let type: SubjectType
+  @Binding var collapseState: TrendingSubjectCollapseState
+
+  private var isCollapsed: Bool {
+    collapseState[type]
+  }
+
+  var body: some View {
+    HStack {
+      Button {
+        withAnimation(.default) {
+          collapseState[type].toggle()
+        }
+      } label: {
+        Image(systemName: isCollapsed ? "chevron.right" : "chevron.down")
+          .font(.headline)
+          .frame(width: 28, height: 28)
+          .contentShape(Rectangle())
+          .accessibilityLabel(isCollapsed ? "展开" : "收起")
+      }
+      .buttonStyle(.plain)
+
+      Text(type.description)
+        .font(.title)
+
+      Spacer()
+
+      NavigationLink(value: NavDestination.subjectBrowsing(type)) {
+        Text("更多 »")
+      }
+      .buttonStyle(.navigation)
     }
   }
 }
