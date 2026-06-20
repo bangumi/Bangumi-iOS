@@ -92,6 +92,8 @@ struct SubjectCollectionTileView: View {
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
 
   let subject: SlimSubjectDTO
+  var collectionType: CollectionType? = nil
+  var onCollectionSaved: (() async -> Void)? = nil
   let imageWidth: CGFloat = 80
 
   var imageHeight: CGFloat {
@@ -104,7 +106,11 @@ struct SubjectCollectionTileView: View {
         .imageStyle(width: imageWidth, height: imageHeight)
         .imageType(.subject)
         .imageNavLink(subject.link)
-        .subjectPreview(subject)
+        .subjectPreview(
+          subject,
+          collectionType: collectionType,
+          onCollectionSaved: onCollectionSaved
+        )
         .shadow(radius: 2)
       Text(subject.title(with: titlePreference))
         .font(.caption2)
@@ -177,6 +183,8 @@ struct SubjectCollectionSectionView: View {
   @Binding var selection: CollectionType
   let subjects: [SlimSubjectDTO]
   let refreshing: Bool
+  var collectionType: CollectionType? = nil
+  var onCollectionSaved: (() async -> Void)? = nil
 
   var body: some View {
     VStack(alignment: .leading, spacing: 2) {
@@ -205,7 +213,11 @@ struct SubjectCollectionSectionView: View {
         ScrollView(.horizontal, showsIndicators: false) {
           LazyHStack(alignment: .top) {
             ForEach(subjects) { subject in
-              SubjectCollectionTileView(subject: subject)
+              SubjectCollectionTileView(
+                subject: subject,
+                collectionType: collectionType,
+                onCollectionSaved: onCollectionSaved
+              )
                 .transition(.opacity.combined(with: .scale(scale: 0.98)))
             }
           }

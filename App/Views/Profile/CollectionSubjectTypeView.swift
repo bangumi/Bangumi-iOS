@@ -45,6 +45,11 @@ struct CollectionSubjectTypeView: View {
     }
   }
 
+  func reloadAfterCollectionSaved() async {
+    await loadCounts()
+    await load()
+  }
+
   var body: some View {
     SubjectCollectionSectionView(
       title: "我的\(stype.description)",
@@ -53,8 +58,11 @@ struct CollectionSubjectTypeView: View {
       counts: counts,
       selection: $ctype,
       subjects: subjects.map(\.slim),
-      refreshing: false
-    )
+      refreshing: false,
+      collectionType: ctype
+    ) {
+      await reloadAfterCollectionSaved()
+    }
     .onChange(of: ctype) { _, _ in
       Task {
         await load()
