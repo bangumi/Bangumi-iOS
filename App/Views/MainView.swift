@@ -13,6 +13,15 @@ struct MainView: View {
   @State private var meNav: NavigationPath = NavigationPath()
   @State private var discoverNav: NavigationPath = NavigationPath()
 
+  private func selectVisibleTabIfNeeded() {
+    if !isAuthenticated, mainTab == .progress || mainTab == .me {
+      mainTab = .timeline
+    }
+    if isolationMode, mainTab == .rakuen {
+      mainTab = .timeline
+    }
+  }
+
   var body: some View {
     TabView(selection: $mainTab) {
       Tab(ChiiViewTab.timeline.title, systemImage: ChiiViewTab.timeline.icon, value: .timeline) {
@@ -55,23 +64,25 @@ struct MainView: View {
         }
       }
 
-      Tab(ChiiViewTab.me.title, systemImage: ChiiViewTab.me.icon, value: .me) {
-        ZoomTransitionContainer {
-          NavigationStack(path: $meNav) {
-            CollectionsView()
-              .navigationDestination(for: NavDestination.self) { $0 }
-          }
-        }
-        .environment(
-          \.openURL,
-          OpenURLAction { url in
-            if handleURL(url, nav: $meNav) {
-              return .handled
-            } else {
-              return .systemAction
+      if isAuthenticated {
+        Tab(ChiiViewTab.me.title, systemImage: ChiiViewTab.me.icon, value: .me) {
+          ZoomTransitionContainer {
+            NavigationStack(path: $meNav) {
+              CollectionsView()
+                .navigationDestination(for: NavDestination.self) { $0 }
             }
           }
-        )
+          .environment(
+            \.openURL,
+            OpenURLAction { url in
+              if handleURL(url, nav: $meNav) {
+                return .handled
+              } else {
+                return .systemAction
+              }
+            }
+          )
+        }
       }
 
       if !isolationMode {
@@ -121,7 +132,17 @@ struct MainView: View {
         }
       }
 
-    }.tabBarMinimizeBehaviorIfAvailable()
+    }
+    .tabBarMinimizeBehaviorIfAvailable()
+    .onAppear {
+      selectVisibleTabIfNeeded()
+    }
+    .onChange(of: isAuthenticated) { _, _ in
+      selectVisibleTabIfNeeded()
+    }
+    .onChange(of: isolationMode) { _, _ in
+      selectVisibleTabIfNeeded()
+    }
 
   }
 }
