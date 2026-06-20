@@ -77,14 +77,14 @@ struct ChiiTimelineView: View {
           }
         }
         ToolbarItemGroup(placement: .topBarTrailing) {
-          NavigationLink(value: NavDestination.settings) {
-            Image(systemName: "gearshape")
-          }
-
           if isAuthenticated, !isolationMode {
             NavigationLink(value: NavDestination.notice) {
               Image(systemName: hasUnreadNotice ? "bell.badge.fill" : "bell")
             }
+          }
+
+          NavigationLink(value: NavDestination.settings) {
+            Image(systemName: "gearshape")
           }
         }
       }
