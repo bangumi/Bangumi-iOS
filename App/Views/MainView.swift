@@ -10,7 +10,7 @@ struct MainView: View {
   @State private var timelineNav: NavigationPath = NavigationPath()
   @State private var progressNav: NavigationPath = NavigationPath()
   @State private var rakuenNav: NavigationPath = NavigationPath()
-  @State private var settingsNav: NavigationPath = NavigationPath()
+  @State private var meNav: NavigationPath = NavigationPath()
   @State private var discoverNav: NavigationPath = NavigationPath()
 
   var body: some View {
@@ -55,6 +55,15 @@ struct MainView: View {
         }
       }
 
+      Tab(ChiiViewTab.me.title, systemImage: ChiiViewTab.me.icon, value: .me) {
+        ZoomTransitionContainer {
+          NavigationStack(path: $meNav) {
+            CollectionsView()
+              .navigationDestination(for: NavDestination.self) { $0 }
+          }
+        }
+      }
+
       if !isolationMode {
         Tab(ChiiViewTab.rakuen.title, systemImage: ChiiViewTab.rakuen.icon, value: .rakuen) {
           ZoomTransitionContainer {
@@ -73,12 +82,6 @@ struct MainView: View {
               }
             }
           )
-        }
-      }
-
-      Tab(ChiiViewTab.settings.title, systemImage: ChiiViewTab.settings.icon, value: .settings) {
-        NavigationStack(path: $settingsNav) {
-          SettingsView()
         }
       }
 

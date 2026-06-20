@@ -10,7 +10,7 @@ struct OldTabView: View {
   @State private var progressNav: NavigationPath = NavigationPath()
   @State private var discoverNav: NavigationPath = NavigationPath()
   @State private var rakuenNav: NavigationPath = NavigationPath()
-  @State private var settingsNav: NavigationPath = NavigationPath()
+  @State private var meNav: NavigationPath = NavigationPath()
 
   var body: some View {
     TabView(selection: $mainTab) {
@@ -54,6 +54,15 @@ struct OldTabView: View {
         )
       }
 
+      NavigationStack(path: $meNav) {
+        CollectionsView()
+          .navigationDestination(for: NavDestination.self) { $0 }
+      }
+      .tag(ChiiViewTab.me)
+      .tabItem {
+        Label(ChiiViewTab.me.title, systemImage: ChiiViewTab.me.icon)
+      }
+
       if !isolationMode {
         NavigationStack(path: $rakuenNav) {
           ChiiRakuenView()
@@ -95,15 +104,6 @@ struct OldTabView: View {
       .onContinueUserActivity(CSSearchableItemActionType) { activity in
         handleSearchActivity(activity, nav: $discoverNav)
         mainTab = .discover
-      }
-
-      NavigationStack(path: $settingsNav) {
-        SettingsView()
-          .navigationDestination(for: NavDestination.self) { $0 }
-      }
-      .tag(ChiiViewTab.settings)
-      .tabItem {
-        Label(ChiiViewTab.settings.title, systemImage: ChiiViewTab.settings.icon)
       }
     }
   }

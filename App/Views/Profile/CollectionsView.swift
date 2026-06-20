@@ -1,11 +1,17 @@
-import OSLog
 import SwiftUI
 
 struct CollectionsView: View {
+  @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
+  @AppStorage("profile") var profile: Profile = Profile()
 
   var body: some View {
     ScrollView(showsIndicators: false) {
-      VStack(alignment: .leading) {
+      VStack(alignment: .leading, spacing: 10) {
+        ProfileHeaderView(profile: profile, isAuthenticated: isAuthenticated)
+          .padding(.top, 12)
+          .padding(.bottom, 8)
+          .frame(maxWidth: .infinity)
+
         ForEach(SubjectType.allTypes) { stype in
           CollectionSubjectTypeView(stype: stype)
             .padding(.top, 5)

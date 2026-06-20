@@ -15,7 +15,7 @@ struct LinkableDTO: Codable, Hashable, Linkable {
 enum NavDestination: Hashable, View {
   case notice
   case friends
-  case collections
+  case settings
   case calendar
   case collectionList(_ subjectType: SubjectType)
   case export
@@ -77,8 +77,8 @@ enum NavDestination: Hashable, View {
     switch self {
     case .notice:
       NoticeView()
-    case .collections:
-      CollectionsView()
+    case .settings:
+      SettingsView()
     case .friends:
       FriendsView()
     case .calendar:

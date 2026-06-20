@@ -320,7 +320,7 @@ enum ChiiViewTab: String {
   case timeline = "timeline"
   case progress = "progress"
   case rakuen = "rakuen"
-  case settings = "settings"
+  case me = "me"
   case discover = "discover"
 
   init(_ label: String? = nil) {
@@ -331,8 +331,8 @@ enum ChiiViewTab: String {
       self = .progress
     case "rakuen":
       self = .rakuen
-    case "settings":
-      self = .settings
+    case "me":
+      self = .me
     case "discover":
       self = .discover
     default:
@@ -348,8 +348,8 @@ enum ChiiViewTab: String {
       "进度管理"
     case .rakuen:
       "超展开"
-    case .settings:
-      "设置"
+    case .me:
+      "我的"
     case .discover:
       "发现"
     }
@@ -358,13 +358,13 @@ enum ChiiViewTab: String {
   var icon: String {
     switch self {
     case .timeline:
-      "person"
+      "list.bullet.rectangle"
     case .progress:
       "square.grid.2x2"
     case .rakuen:
       "rectangle.3.group.bubble"
-    case .settings:
-      "gear"
+    case .me:
+      "person.crop.circle"
     case .discover:
       "magnifyingglass"
     }

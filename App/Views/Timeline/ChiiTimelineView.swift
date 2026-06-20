@@ -33,9 +33,6 @@ struct ChiiTimelineView: View {
               NavigationLink(value: NavDestination.user(profile.user.username)) {
                 Label("时光机", systemImage: "house")
               }
-              NavigationLink(value: NavDestination.collections) {
-                Label("收藏", systemImage: "star")
-              }
               NavigationLink(value: NavDestination.userMono(profile.user)) {
                 Label("人物", systemImage: "person")
               }
@@ -79,8 +76,12 @@ struct ChiiTimelineView: View {
             TimelineToolbarAvatarView(imageURL: nil)
           }
         }
-        if isAuthenticated, !isolationMode {
-          ToolbarItem(placement: .topBarTrailing) {
+        ToolbarItemGroup(placement: .topBarTrailing) {
+          NavigationLink(value: NavDestination.settings) {
+            Image(systemName: "gearshape")
+          }
+
+          if isAuthenticated, !isolationMode {
             NavigationLink(value: NavDestination.notice) {
               Image(systemName: hasUnreadNotice ? "bell.badge.fill" : "bell")
             }
