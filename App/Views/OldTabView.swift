@@ -62,6 +62,16 @@ struct OldTabView: View {
       .tabItem {
         Label(ChiiViewTab.me.title, systemImage: ChiiViewTab.me.icon)
       }
+      .environment(
+        \.openURL,
+        OpenURLAction { url in
+          if handleURL(url, nav: $meNav) {
+            return .handled
+          } else {
+            return .systemAction
+          }
+        }
+      )
 
       if !isolationMode {
         NavigationStack(path: $rakuenNav) {

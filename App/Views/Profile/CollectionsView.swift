@@ -12,9 +12,15 @@ struct CollectionsView: View {
           .padding(.bottom, 8)
           .frame(maxWidth: .infinity)
 
-        ForEach(SubjectType.allTypes) { stype in
-          CollectionSubjectTypeView(stype: stype)
-            .padding(.top, 5)
+        if isAuthenticated {
+          ForEach(SubjectType.allTypes) { stype in
+            CollectionSubjectTypeView(stype: stype)
+              .padding(.top, 5)
+          }
+        } else {
+          AuthView(slogan: "请登录 Bangumi 以查看收藏")
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 24)
         }
       }.padding(.horizontal, 8)
     }

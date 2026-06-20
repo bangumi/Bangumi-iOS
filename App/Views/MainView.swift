@@ -62,6 +62,16 @@ struct MainView: View {
               .navigationDestination(for: NavDestination.self) { $0 }
           }
         }
+        .environment(
+          \.openURL,
+          OpenURLAction { url in
+            if handleURL(url, nav: $meNav) {
+              return .handled
+            } else {
+              return .systemAction
+            }
+          }
+        )
       }
 
       if !isolationMode {
