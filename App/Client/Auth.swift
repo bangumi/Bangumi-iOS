@@ -46,6 +46,7 @@ extension APIClient {
     let value = try encoder.encode(auth)
     self.keychain.set(value, forKey: "auth")
     self.auth = auth
+    self.authorizedSession = nil
     return auth
   }
 
