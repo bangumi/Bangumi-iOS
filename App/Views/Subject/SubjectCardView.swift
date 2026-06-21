@@ -114,7 +114,7 @@ struct SubjectCollectionTileView: View {
         .shadow(radius: 2)
       Text(subject.title(with: titlePreference))
         .font(.caption2)
-        .lineLimit(2)
+        .lineLimit(2, reservesSpace: true)
         .multilineTextAlignment(.leading)
     }
     .frame(width: imageWidth + 4)
