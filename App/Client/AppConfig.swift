@@ -24,6 +24,16 @@ enum AppConfig {
     set { UserDefaults.standard.set(newValue, forKey: "profile") }
   }
 
+  static nonisolated var friendlist: [Int] {
+    get { [Int](rawValue: UserDefaults.standard.string(forKey: "friendlist") ?? "") ?? [] }
+    set { UserDefaults.standard.set(newValue.rawValue, forKey: "friendlist") }
+  }
+
+  static nonisolated var blocklist: [Int] {
+    get { [Int](rawValue: UserDefaults.standard.string(forKey: "blocklist") ?? "") ?? [] }
+    set { UserDefaults.standard.set(newValue.rawValue, forKey: "blocklist") }
+  }
+
   static nonisolated var userAgent: String {
     get { UserDefaults.standard.string(forKey: "userAgent") ?? "" }
     set { UserDefaults.standard.set(newValue, forKey: "userAgent") }

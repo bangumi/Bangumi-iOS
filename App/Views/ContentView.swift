@@ -20,8 +20,7 @@ struct ContentView: View {
       }
       tries += 1
       do {
-        profile = try await AccountService.getProfile()
-        await AuthService.setAuthStatus(true)
+        profile = try await AuthService.refreshProfile()
         Logger.api.info("refresh profile success: \(profile.rawValue)")
         return
       } catch ChiiError.requireLogin {

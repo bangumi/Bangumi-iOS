@@ -22,15 +22,9 @@ extension APIClient {
     self.keychain.delete("auth")
     self.auth = nil
     self.authorizedSession = nil
-    AppConfig.collectionsUpdatedAt = 0
     AppConfig.profile = ""
     do {
-      let db = try await AppContext.shared.getDB()
-      try await db.clearSubjectInterest()
-      try await db.clearEpisodeCollection()
-      try await db.clearPersonCollection()
-      try await db.clearCharacterCollection()
-      try await db.clearNoticeCache()
+      try await AccountLocalState.clear()
       await Notifier.shared.notify(message: "退出登录成功")
     } catch {
       await Notifier.shared.alert(error: error)
@@ -67,9 +61,6 @@ extension APIClient {
     ]
     let data = try await self.request(url: url, method: "POST", body: body, auth: .disabled)
     _ = try self.saveAuthResponse(data: data)
-    let profile = try await AccountService.getProfile()
-    AppConfig.profile = profile.rawValue
-    self.setAuthStatus(true)
   }
 
   func refreshAccessToken(auth: Auth) async throws -> Auth {
