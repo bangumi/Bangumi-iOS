@@ -89,10 +89,13 @@ struct EpisodeListDetailView: View {
   let reloadToken: Int
 
   @State private var episodes: [EpisodeDTO] = []
+  @State private var subjectCollectionType: CollectionType = .none
 
   private func load() async {
     do {
       let db = try await AppContext.shared.getDB()
+      let fetchedSubjectCollectionType =
+        try await db.getSubjectDTO(subjectId)?.ctypeEnum ?? .none
       let fetchedEpisodes = try await db.fetchEpisodes(
         subjectId: subjectId,
         main: main,
@@ -100,6 +103,7 @@ struct EpisodeListDetailView: View {
         sortDesc: sortDesc
       )
       withAnimation(.default) {
+        subjectCollectionType = fetchedSubjectCollectionType
         episodes = fetchedEpisodes
       }
     } catch {
@@ -111,7 +115,10 @@ struct EpisodeListDetailView: View {
     ScrollView {
       LazyVStack(spacing: 10) {
         ForEach(episodes) { item in
-          EpisodeRowView(episode: item) {
+          EpisodeRowView(
+            episode: item,
+            subjectCollectionType: subjectCollectionType
+          ) {
             await load()
           }
         }

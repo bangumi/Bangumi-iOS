@@ -6,6 +6,7 @@ struct EpisodeUpdateMenu: View {
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
 
   let episode: EpisodeDTO
+  let subjectCollectionType: CollectionType
   var reload: (() async -> Void)? = nil
   var showsTitle: Bool = false
 
@@ -40,6 +41,10 @@ struct EpisodeUpdateMenu: View {
     }
   }
 
+  var canUpdateCollection: Bool {
+    isAuthenticated && subjectCollectionType != .none
+  }
+
   var body: some View {
     if showsTitle {
       Section {
@@ -47,7 +52,7 @@ struct EpisodeUpdateMenu: View {
           .lineLimit(2)
       }
     }
-    if isAuthenticated, (episode.subject?.ctypeEnum ?? .none) != .none {
+    if canUpdateCollection {
       ForEach(episode.collectionTypeEnum.otherTypes()) { type in
         Button {
           updateSingle(episode: episode, type: type)

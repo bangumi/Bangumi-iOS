@@ -11,15 +11,18 @@ final class EpisodeRenderPayload {
 struct EpisodeItemView: View {
   let payload: EpisodeRenderPayload
   let interactionMode: EpisodeGridInteractionMode
+  let subjectCollectionType: CollectionType
   var reload: (() async -> Void)? = nil
 
   init(
     episode: EpisodeDTO,
     interactionMode: EpisodeGridInteractionMode,
+    subjectCollectionType: CollectionType,
     reload: (() async -> Void)? = nil
   ) {
     self.payload = EpisodeRenderPayload(episode)
     self.interactionMode = interactionMode
+    self.subjectCollectionType = subjectCollectionType
     self.reload = reload
   }
 
@@ -59,7 +62,11 @@ struct EpisodeItemView: View {
         menuLabel
           .contentShape(.contextMenuPreview, RoundedRectangle(cornerRadius: 4))
           .contextMenu {
-            EpisodeUpdateMenu(episode: episode, reload: reload)
+            EpisodeUpdateMenu(
+              episode: episode,
+              subjectCollectionType: subjectCollectionType,
+              reload: reload
+            )
           } preview: {
             EpisodeInfoView(episode: episode)
               .padding()
@@ -67,7 +74,12 @@ struct EpisodeItemView: View {
           }
       case .menu:
         Menu {
-          EpisodeUpdateMenu(episode: episode, reload: reload, showsTitle: true)
+          EpisodeUpdateMenu(
+            episode: episode,
+            subjectCollectionType: subjectCollectionType,
+            reload: reload,
+            showsTitle: true
+          )
         } label: {
           menuLabel
         }

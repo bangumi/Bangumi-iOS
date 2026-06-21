@@ -13,10 +13,13 @@ struct EpisodeGridView: View {
   @State private var refreshed: Bool = false
   @State private var episodeMains: [EpisodeDTO] = []
   @State private var episodeSps: [EpisodeDTO] = []
+  @State private var subjectCollectionType: CollectionType = .none
 
   private func loadCached() async {
     do {
       let db = try await AppContext.shared.getDB()
+      let fetchedSubjectCollectionType =
+        try await db.getSubjectDTO(subjectId)?.ctypeEnum ?? .none
       let fetchedEpisodeMains = try await db.fetchEpisodes(subjectId: subjectId, main: true, limit: 50)
       let fetchedEpisodeSps = Array(
         try await db.fetchEpisodes(subjectId: subjectId)
@@ -24,6 +27,7 @@ struct EpisodeGridView: View {
           .prefix(10)
       )
       withAnimation(.default) {
+        subjectCollectionType = fetchedSubjectCollectionType
         episodeMains = fetchedEpisodeMains
         episodeSps = fetchedEpisodeSps
       }
@@ -63,7 +67,11 @@ struct EpisodeGridView: View {
     }.padding(.top, 5)
     HFlow(alignment: .center, spacing: 2) {
       ForEach(episodeMains) { episode in
-        EpisodeItemView(episode: episode, interactionMode: episodeGridInteractionMode) {
+        EpisodeItemView(
+          episode: episode,
+          interactionMode: episodeGridInteractionMode,
+          subjectCollectionType: subjectCollectionType
+        ) {
           await loadCached()
         }
       }
@@ -82,7 +90,11 @@ struct EpisodeGridView: View {
           .padding(2)
           .bold()
         ForEach(episodeSps) { episode in
-          EpisodeItemView(episode: episode, interactionMode: episodeGridInteractionMode) {
+          EpisodeItemView(
+            episode: episode,
+            interactionMode: episodeGridInteractionMode,
+            subjectCollectionType: subjectCollectionType
+          ) {
             await loadCached()
           }
         }

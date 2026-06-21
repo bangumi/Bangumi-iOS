@@ -109,6 +109,7 @@ struct EpisodeRecentView: View {
               EpisodeItemView(
                 episode: episode,
                 interactionMode: interactionMode,
+                subjectCollectionType: subject.ctypeEnum,
                 reload: reload
               )
             }
@@ -146,6 +147,7 @@ struct EpisodeRecentView: View {
               EpisodeItemView(
                 episode: episode,
                 interactionMode: interactionMode,
+                subjectCollectionType: subject.ctypeEnum,
                 reload: reload
               )
             }

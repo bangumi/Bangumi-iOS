@@ -6,6 +6,7 @@ struct EpisodeRowView: View {
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
 
   let episode: EpisodeDTO
+  let subjectCollectionType: CollectionType
   var reload: (() async -> Void)? = nil
 
   var body: some View {
@@ -28,7 +29,11 @@ struct EpisodeRowView: View {
           }
         } else {
           Menu {
-            EpisodeUpdateMenu(episode: episode, reload: reload)
+            EpisodeUpdateMenu(
+              episode: episode,
+              subjectCollectionType: subjectCollectionType,
+              reload: reload
+            )
           } label: {
             if episode.typeEnum == .main {
               if episode.aired {
