@@ -187,16 +187,21 @@ struct SubjectCollectionSectionView: View {
   var onCollectionSaved: (() async -> Void)? = nil
 
   private let tileSpacing: CGFloat = 8
+  private let headerDividerSpacing: CGFloat = 2
   private let contentInset: CGFloat = 2
 
   var body: some View {
     VStack(alignment: .leading, spacing: tileSpacing) {
+      headerAndDivider
+      content
+    }
+  }
+
+  private var headerAndDivider: some View {
+    VStack(alignment: .leading, spacing: headerDividerSpacing) {
       header
         .padding(.top, 8)
-
       Divider()
-
-      content
     }
   }
 
