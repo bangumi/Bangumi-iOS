@@ -19,6 +19,20 @@ struct NoticeView: View {
     }
   }
 
+  func applyReadNoticeIDs(_ ids: [Int]) {
+    let idSet = Set(ids)
+    var clearedUnreadCount = 0
+    withAnimation(.default) {
+      for index in notices.indices where idSet.contains(notices[index].id) {
+        if notices[index].unread {
+          clearedUnreadCount += 1
+        }
+        notices[index].unread = false
+      }
+      unreadCount = max(0, unreadCount - clearedUnreadCount)
+    }
+  }
+
   func loadNotice() async {
     if let cachedSnapshot = await NoticeRepository.loadCachedNotices() {
       applyNoticeSnapshot(cachedSnapshot)
@@ -56,12 +70,8 @@ struct NoticeView: View {
         }
       }
       do {
-        let nextSnapshot = try await NoticeRepository.markNoticesAsRead(
-          ids: ids,
-          current: notices,
-          unreadCount: unreadCount
-        )
-        applyNoticeSnapshot(nextSnapshot)
+        try await NoticeRepository.markNoticesAsRead(ids: ids)
+        applyReadNoticeIDs(ids)
       } catch {
         Notifier.shared.alert(error: error)
       }
@@ -80,12 +90,8 @@ struct NoticeView: View {
         }
       }
       do {
-        let nextSnapshot = try await NoticeRepository.markNoticesAsRead(
-          ids: [id],
-          current: notices,
-          unreadCount: unreadCount
-        )
-        applyNoticeSnapshot(nextSnapshot)
+        try await NoticeRepository.markNoticesAsRead(ids: [id])
+        applyReadNoticeIDs([id])
       } catch {
         Notifier.shared.alert(error: error)
       }

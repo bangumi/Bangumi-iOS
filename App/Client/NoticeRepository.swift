@@ -17,7 +17,7 @@ enum NoticeRepository {
     do {
       let notices = try await db.fetchNoticeCache()
       guard !notices.isEmpty else { return nil }
-      let unreadCount = try await db.fetchNoticeUnreadCount()
+      let unreadCount = notices.count(where: { $0.unread })
       return NoticeSnapshot(notices: notices, unreadCount: unreadCount)
     } catch {
       Logger.app.error("Failed to load notice cache: \(error)")
@@ -59,34 +59,16 @@ enum NoticeRepository {
     return snapshot
   }
 
-  static func markNoticesAsRead(
-    ids: [Int],
-    current notices: [NoticeDTO],
-    unreadCount: Int
-  ) async throws -> NoticeSnapshot
-  {
+  static func markNoticesAsRead(ids: [Int]) async throws {
     guard !ids.isEmpty else {
-      return NoticeSnapshot(notices: notices, unreadCount: unreadCount)
+      return
     }
 
     try await AccountService.clearNotice(ids: ids)
 
-    let idSet = Set(ids)
-    var nextNotices = notices
-    var clearedUnreadCount = 0
-    for index in nextNotices.indices where idSet.contains(nextNotices[index].id) {
-      if nextNotices[index].unread {
-        clearedUnreadCount += 1
-      }
-      nextNotices[index].unread = false
+    if let unreadCount = await markNoticeCacheEntriesAsReadIfPossible(ids) {
+      await postUnreadCountDidChange(unreadCount)
     }
-    let nextSnapshot = NoticeSnapshot(
-      notices: nextNotices,
-      unreadCount: max(0, unreadCount - clearedUnreadCount)
-    )
-    await markNoticeCacheEntriesAsReadIfPossible(ids)
-    await postUnreadCountDidChange(nextSnapshot.unreadCount)
-    return nextSnapshot
   }
 
   private static func saveNoticeCacheIfPossible(_ notices: [NoticeDTO]) async {
@@ -100,14 +82,16 @@ enum NoticeRepository {
     }
   }
 
-  private static func markNoticeCacheEntriesAsReadIfPossible(_ ids: [Int]) async {
+  private static func markNoticeCacheEntriesAsReadIfPossible(_ ids: [Int]) async -> Int? {
     guard let db = await AppContext.shared.databaseIfAvailable() else {
-      return
+      return nil
     }
     do {
       try await db.markNoticeCacheEntriesAsRead(ids: ids)
+      return try await db.fetchNoticeUnreadCount()
     } catch {
       Logger.app.error("Failed to mark notice cache entries as read: \(error)")
+      return nil
     }
   }
 
