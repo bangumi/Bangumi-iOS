@@ -35,6 +35,12 @@ extension DatabaseOperator {
       try db.execute(sql: "UPDATE characters SET collected_at = 0")
     }
   }
+
+  public func clearNoticeCache() throws {
+    try database.write { db in
+      try db.execute(sql: "DELETE FROM notice_cache_entries")
+    }
+  }
 }
 
 // MARK: - fetch
@@ -199,6 +205,25 @@ extension DatabaseOperator {
         sql: "SELECT * FROM rakuen_group_caches WHERE id = ?",
         arguments: [id]
       ).map { RakuenGroupCache(row: $0).items } ?? []
+    }
+  }
+
+  public func fetchNoticeCache(limit: Int = 20) throws -> [NoticeDTO] {
+    try database.read { db in
+      try Row.fetchAll(
+        db,
+        sql: "SELECT * FROM notice_cache_entries ORDER BY created_at DESC LIMIT ?",
+        arguments: [limit]
+      ).compactMap { NoticeCacheEntry(row: $0).notice }
+    }
+  }
+
+  public func fetchNoticeUnreadCount() throws -> Int {
+    try database.read { db in
+      try Int.fetchOne(
+        db,
+        sql: "SELECT COUNT(*) FROM notice_cache_entries WHERE unread != 0"
+      ) ?? 0
     }
   }
 
@@ -1263,6 +1288,40 @@ extension DatabaseOperator {
     }
   }
 
+  public func saveNoticeCache(_ items: [NoticeDTO]) throws {
+    try database.write { db in
+      for item in items {
+        try upsertNoticeCacheEntry(NoticeCacheEntry(item), in: db)
+      }
+    }
+  }
+
+  public func markNoticeCacheEntriesAsRead(ids: [Int]) throws {
+    guard !ids.isEmpty else { return }
+    try database.write { db in
+      let updatedAt = Date().timeIntervalSince1970
+      for id in ids {
+        try db.execute(
+          sql: """
+            UPDATE notice_cache_entries
+            SET unread = 0, updated_at = ?
+            WHERE notice_id = ?
+            """,
+          arguments: [updatedAt, id]
+        )
+      }
+    }
+  }
+
+  public func markAllNoticeCacheEntriesAsRead() throws {
+    try database.write { db in
+      try db.execute(
+        sql: "UPDATE notice_cache_entries SET unread = 0, updated_at = ?",
+        arguments: [Date().timeIntervalSince1970]
+      )
+    }
+  }
+
   public func togglePinRakuenGroupCache(group: SlimGroupDTO) throws {
     try database.write { db in
       let cache =
@@ -2107,6 +2166,29 @@ extension DatabaseOperator {
           updated_at = excluded.updated_at
         """,
       arguments: [cache.id, cache.itemsData, cache.updatedAt.timeIntervalSince1970]
+    )
+  }
+
+  private func upsertNoticeCacheEntry(_ entry: NoticeCacheEntry, in db: Database) throws {
+    try db.execute(
+      sql: """
+        INSERT INTO notice_cache_entries(
+          notice_id, unread, created_at, payload_data, updated_at
+        )
+        VALUES (?, ?, ?, ?, ?)
+        ON CONFLICT(notice_id) DO UPDATE SET
+          unread = excluded.unread,
+          created_at = excluded.created_at,
+          payload_data = excluded.payload_data,
+          updated_at = excluded.updated_at
+        """,
+      arguments: [
+        entry.noticeID,
+        DatabaseRecordCoding.bool(entry.unread),
+        entry.createdAt,
+        entry.payloadData,
+        entry.updatedAt.timeIntervalSince1970,
+      ]
     )
   }
 }

@@ -30,6 +30,7 @@ extension APIClient {
       try await db.clearEpisodeCollection()
       try await db.clearPersonCollection()
       try await db.clearCharacterCollection()
+      try await db.clearNoticeCache()
       await Notifier.shared.notify(message: "退出登录成功")
     } catch {
       await Notifier.shared.alert(error: error)

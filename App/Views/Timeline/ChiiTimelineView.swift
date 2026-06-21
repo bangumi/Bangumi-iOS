@@ -5,21 +5,28 @@ struct ChiiTimelineView: View {
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
   @AppStorage("profile") var profile: Profile = Profile()
   @AppStorage("isolationMode") var isolationMode: Bool = false
-  @AppStorage("hasUnreadNotice") var hasUnreadNotice: Bool = false
 
   @State private var logoutConfirm: Bool = false
+  @State private var noticeUnreadCount: Int = 0
 
   func checkNotice() async {
+    if let cachedUnreadCount = await NoticeRepository.loadCachedUnreadCount() {
+      noticeUnreadCount = cachedUnreadCount
+    }
     do {
-      let resp = try await AccountService.listNotice(limit: 1, unread: true)
-      if resp.total == 0 {
-        hasUnreadNotice = false
-      } else {
-        hasUnreadNotice = true
-      }
+      noticeUnreadCount = try await NoticeRepository.refreshUnreadCount()
     } catch {
       Logger.app.error("check notice failed: \(error)")
     }
+  }
+
+  func handleNoticeUnreadCountChange(_ notification: Notification) {
+    guard
+      let unreadCount = notification.userInfo?[NoticeRepository.unreadCountUserInfoKey] as? Int
+    else {
+      return
+    }
+    noticeUnreadCount = unreadCount
   }
 
   var body: some View {
@@ -74,7 +81,7 @@ struct ChiiTimelineView: View {
         ToolbarItemGroup(placement: .topBarTrailing) {
           if isAuthenticated, !isolationMode {
             NavigationLink(value: NavDestination.notice) {
-              Image(systemName: hasUnreadNotice ? "bell.badge.fill" : "bell")
+              Image(systemName: noticeUnreadCount > 0 ? "bell.badge.fill" : "bell")
             }
           }
 
@@ -84,6 +91,13 @@ struct ChiiTimelineView: View {
         }
       }
       .task(checkNotice)
+      .onReceive(
+        NotificationCenter.default.publisher(
+          for: NoticeRepository.unreadCountDidChangeNotification
+        )
+      ) { notification in
+        handleNoticeUnreadCountChange(notification)
+      }
       .alert("退出登录", isPresented: $logoutConfirm) {
         Button("确定", role: .destructive) {
           Task {

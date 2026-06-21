@@ -54,6 +54,10 @@ enum DatabaseFactory {
       try createLocalMigrationMarkers(db)
     }
 
+    migrator.registerMigration("00003_create_notice_cache_entries") { db in
+      try createNoticeCacheEntries(db)
+    }
+
     return migrator
   }
 
@@ -308,6 +312,29 @@ enum DatabaseFactory {
           value TEXT NOT NULL,
           updated_at INTEGER NOT NULL
         )
+        """)
+  }
+
+  private static func createNoticeCacheEntries(_ db: Database) throws {
+    try db.execute(
+      sql: """
+        CREATE TABLE IF NOT EXISTS notice_cache_entries (
+          notice_id INTEGER PRIMARY KEY NOT NULL,
+          unread INTEGER NOT NULL DEFAULT 0,
+          created_at INTEGER NOT NULL,
+          payload_data BLOB NOT NULL,
+          updated_at REAL NOT NULL
+        )
+        """)
+    try db.execute(
+      sql: """
+        CREATE INDEX IF NOT EXISTS notice_cache_entries_unread_idx
+        ON notice_cache_entries(unread, created_at DESC)
+        """)
+    try db.execute(
+      sql: """
+        CREATE INDEX IF NOT EXISTS notice_cache_entries_created_idx
+        ON notice_cache_entries(created_at DESC)
         """)
   }
 }

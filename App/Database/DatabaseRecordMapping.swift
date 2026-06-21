@@ -330,3 +330,14 @@ extension RakuenGroupCache {
     updatedAt = Date(timeIntervalSince1970: updatedAtValue)
   }
 }
+
+extension NoticeCacheEntry {
+  init(row: Row) {
+    noticeID = row["notice_id"]
+    unread = DatabaseRecordCoding.bool(row["unread"] as Int)
+    createdAt = row["created_at"]
+    payloadData = row["payload_data"]
+    let updatedAtValue: Double = row["updated_at"]
+    updatedAt = Date(timeIntervalSince1970: updatedAtValue)
+  }
+}
