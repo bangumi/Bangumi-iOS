@@ -89,13 +89,12 @@ struct TurnstileSheetView: View {
   @Environment(\.dismiss) private var dismiss
 
   var body: some View {
-    ScrollView {
+    SheetView(title: "请完成验证", size: .medium, showsCloseButton: false) {
       VStack {
-        Text("请完成验证")
-          .font(.headline)
         TrunstileView(token: $token)
           .frame(width: 300, height: 65)
       }
+      .frame(maxWidth: .infinity, maxHeight: .infinity)
       .padding()
       .onChange(of: token) {
         if !token.isEmpty {
@@ -103,6 +102,6 @@ struct TurnstileSheetView: View {
           onSuccess()
         }
       }
-    }.presentationDetents([.medium])
+    }
   }
 }

@@ -52,7 +52,7 @@ struct IndexPickerSheet: View {
   }
 
   var body: some View {
-    NavigationStack {
+    SheetView(title: "选择目录", size: .both) {
       VStack {
         if loading {
           ProgressView("加载目录中...")
@@ -89,19 +89,7 @@ struct IndexPickerSheet: View {
           }
         }
       }
-      .navigationTitle("选择目录")
-      .navigationBarTitleDisplayMode(.inline)
-      .toolbar {
-        ToolbarItem(placement: .topBarTrailing) {
-          Button {
-            dismiss()
-          } label: {
-            Label("取消", systemImage: "xmark")
-          }
-        }
-      }
     }
-    .presentationDetents([.medium, .large])
     .task {
       await loadUserIndexes()
     }

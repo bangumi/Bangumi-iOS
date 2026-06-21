@@ -1,8 +1,6 @@
 import SwiftUI
 
 struct SearchCharacterPickerView: View {
-  @Environment(\.dismiss) var dismiss
-
   let onSelect: (Int) -> Void
 
   @State private var searchText: String = ""
@@ -11,7 +9,7 @@ struct SearchCharacterPickerView: View {
   @State private var showsResults = false
 
   var body: some View {
-    NavigationStack {
+    SheetView(title: "搜索角色") {
       ScrollView {
         VStack {
           if !showsResults {
@@ -27,8 +25,6 @@ struct SearchCharacterPickerView: View {
           }
         }.padding()
       }
-      .navigationTitle("搜索角色")
-      .navigationBarTitleDisplayMode(.inline)
       .searchable(text: $searchText, isPresented: $searching, prompt: "搜索角色")
       .searchInputTraits()
       .searchPresentationToolbarBehavior(.avoidHidingContent)
@@ -53,19 +49,9 @@ struct SearchCharacterPickerView: View {
           }
         }
       }
-      .toolbar {
-        ToolbarItem(placement: .cancellationAction) {
-          Button {
-            dismiss()
-          } label: {
-            Label("取消", systemImage: "xmark")
-          }
-        }
-        ToolbarItem(placement: .confirmationAction) {
-          Image(systemName: remote ? "globe" : "internaldrive")
-            .foregroundColor(remote ? .blue : .green)
-        }
-      }
+    } controls: {
+      Image(systemName: remote ? "globe" : "internaldrive")
+        .foregroundColor(remote ? .blue : .green)
     }
   }
 }

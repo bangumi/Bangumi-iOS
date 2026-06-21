@@ -95,6 +95,7 @@ struct SubjectDetailView: View {
 
   @State private var showCreateTopic: Bool = false
   @State private var showIndexPicker: Bool = false
+  @State private var showRatingSheet: Bool = false
 
   var shareLink: URL {
     URL(string: "\(shareDomain.url)/subject/\(subject.id)")!
@@ -103,7 +104,9 @@ struct SubjectDetailView: View {
   var body: some View {
     ScrollView(showsIndicators: false) {
       VStack(alignment: .leading) {
-        SubjectHeaderView(subject: subject)
+        SubjectHeaderView(subject: subject) {
+          showRatingSheet = true
+        }
 
         if isAuthenticated {
           SubjectCollectionView(subject: subject, reload: reload)
@@ -161,6 +164,9 @@ struct SubjectDetailView: View {
         itemTitle: subject.title(with: titlePreference)
       )
     }
+    .sheet(isPresented: $showRatingSheet) {
+      SubjectRatingSheet(subject: subject)
+    }
     .navigationTitle(subject.name)
     .navigationBarTitleDisplayMode(.inline)
     .toolbar {
@@ -168,9 +174,6 @@ struct SubjectDetailView: View {
         Menu {
           NavigationLink(value: NavDestination.subjectStaffList(subject.id)) {
             Label("制作人员", systemImage: "person.3")
-          }
-          NavigationLink(value: NavDestination.subjectRating(subject)) {
-            Label("评分分布", systemImage: "chart.bar.xaxis")
           }
           if isAuthenticated {
             Divider()

@@ -444,10 +444,9 @@ struct BBCodeEditor: View {
         start: $inputColorStart,
         end: $inputColorEnd,
         gradient: $inputColorGradient,
-        show: $showingColorInput,
         handleColorInput: handleColorInput,
         handleGradientInput: handleGradientInput
-      ).presentationDetents([.medium])
+      )
     }
     .sheet(isPresented: $showingEmojiInput) {
       SmileyPicker { code in
@@ -532,7 +531,6 @@ private struct BBCodeToolbarSeparator: View {
 }
 
 private struct SmileyPicker: View {
-  @Environment(\.dismiss) private var dismiss
   let onSelect: (String) -> Void
 
   @State private var selectedSectionKey = SmileyCatalog.sections.first?.key ?? ""
@@ -560,7 +558,7 @@ private struct SmileyPicker: View {
   }
 
   var body: some View {
-    NavigationStack {
+    SheetView(title: "", size: .both) {
       ScrollView {
         VStack(alignment: .leading, spacing: 16) {
           ScrollView(.horizontal, showsIndicators: false) {
@@ -607,19 +605,7 @@ private struct SmileyPicker: View {
         }
         .padding()
       }
-      .navigationTitle("")
-      .navigationBarTitleDisplayMode(.inline)
-      .toolbar {
-        ToolbarItem(placement: .cancellationAction) {
-          Button {
-            dismiss()
-          } label: {
-            Image(systemName: "xmark")
-          }
-        }
-      }
     }
-    .presentationDetents([.medium, .large])
   }
 }
 
@@ -867,10 +853,11 @@ struct GradientColor {
 }
 
 struct ColorEditor: View {
+  @Environment(\.dismiss) private var dismiss
+
   @Binding var start: Color
   @Binding var end: Color
   @Binding var gradient: Bool
-  @Binding var show: Bool
 
   let handleColorInput: () -> Void
   let handleGradientInput: () -> Void
@@ -887,26 +874,34 @@ struct ColorEditor: View {
   ]
 
   var body: some View {
-    ScrollView {
-      VStack {
-        HStack {
-          Button("取消") {
-            show = false
-            gradient = false
-          }
-          .adaptiveButtonStyle(.bordered)
-          Spacer()
-          Button("确定") {
-            if gradient {
-              handleGradientInput()
-            } else {
-              handleColorInput()
-            }
-            show = false
-            gradient = false
-          }
-          .adaptiveButtonStyle(.borderedProminent)
+    SheetView(
+      title: "颜色",
+      size: .medium,
+      onClose: {
+        gradient = false
+      }
+    ) {
+      ScrollView {
+        VStack {
+          colorContent
         }
+        .padding()
+      }
+    } controls: {
+      Button("确定") {
+        if gradient {
+          handleGradientInput()
+        } else {
+          handleColorInput()
+        }
+        gradient = false
+        dismiss()
+      }
+    }
+  }
+
+  private var colorContent: some View {
+    VStack {
         HStack {
           ColorPicker("", selection: $start)
             .labelsHidden()
@@ -953,8 +948,7 @@ struct ColorEditor: View {
               }
             }
           }
-        }
-      }.padding()
+      }
     }
   }
 }

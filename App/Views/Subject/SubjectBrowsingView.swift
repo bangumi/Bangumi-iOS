@@ -380,7 +380,11 @@ struct SubjectBrowsingFilterView: View {
   }
 
   var body: some View {
-    NavigationStack {
+    SheetView(
+      title: "筛选",
+      showsCloseButton: false,
+      controlsPlacement: .topBarTrailing
+    ) {
       ScrollView {
         VStack {
 
@@ -587,16 +591,11 @@ struct SubjectBrowsingFilterView: View {
 
         }.padding()
       }
-      .navigationTitle("筛选")
-      .navigationBarTitleDisplayMode(.inline)
-      .toolbar {
-        ToolbarItem(placement: .topBarTrailing) {
-          Button {
-            dismiss()
-          } label: {
-            Text("完成")
-          }
-        }
+    } controls: {
+      Button {
+        dismiss()
+      } label: {
+        Text("完成")
       }
     }
   }

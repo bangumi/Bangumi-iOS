@@ -55,7 +55,11 @@ struct IndexEditSheet: View {
   }
 
   var body: some View {
-    NavigationStack {
+    SheetView(
+      title: indexId == nil ? "创建目录" : "编辑目录",
+      closeDisabled: isSubmitting,
+      applyFormStyle: true
+    ) {
       Form {
         Section {
           TextField("标题", text: $title)
@@ -81,28 +85,15 @@ struct IndexEditSheet: View {
           Text("隐私设置")
         }
       }
-      .navigationTitle(indexId == nil ? "创建目录" : "编辑目录")
-      .navigationBarTitleDisplayMode(.inline)
-      .toolbar {
-        ToolbarItem(placement: .cancellationAction) {
-          Button {
-            dismiss()
-          } label: {
-            Label("取消", systemImage: "xmark")
-          }
-          .disabled(isSubmitting)
+    } controls: {
+      Button {
+        Task {
+          await submit()
         }
-        ToolbarItem(placement: .confirmationAction) {
-          Button {
-            Task {
-              await submit()
-            }
-          } label: {
-            Label("保存", systemImage: "checkmark")
-          }
-          .disabled(isSubmitting || title.isEmpty || desc.isEmpty)
-        }
+      } label: {
+        Label("保存", systemImage: "checkmark")
       }
+      .disabled(isSubmitting || title.isEmpty || desc.isEmpty)
     }
   }
 }

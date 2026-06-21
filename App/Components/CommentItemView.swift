@@ -505,7 +505,7 @@ struct CreateCommentBoxSheet: View {
   }
 
   var body: some View {
-    NavigationStack {
+    SheetView(title: title, closeDisabled: updating) {
       ScrollView {
         VStack {
           TextInputView(type: "回复", text: $content)
@@ -522,29 +522,16 @@ struct CreateCommentBoxSheet: View {
             }
         }.padding()
       }
-      .navigationTitle(title)
-      .navigationBarTitleDisplayMode(.inline)
-      .toolbar {
-        ToolbarItem(placement: .cancellationAction) {
-          Button {
-            dismiss()
-          } label: {
-            Label("取消", systemImage: "xmark")
-          }
-          .disabled(updating)
+    } controls: {
+      if updating {
+        ProgressView()
+      } else {
+        Button {
+          showTurnstile = true
+        } label: {
+          Label("发送", systemImage: "paperplane")
         }
-        ToolbarItem(placement: .confirmationAction) {
-          if updating {
-            ProgressView()
-          } else {
-            Button {
-              showTurnstile = true
-            } label: {
-              Label("发送", systemImage: "paperplane")
-            }
-            .disabled(content.isEmpty)
-          }
-        }
+        .disabled(content.isEmpty)
       }
     }
   }
@@ -605,7 +592,7 @@ struct EditCommentBoxSheet: View {
   }
 
   var body: some View {
-    NavigationStack {
+    SheetView(title: title, closeDisabled: updating) {
       ScrollView {
         VStack {
           TextInputView(type: "回复", text: $content)
@@ -613,31 +600,18 @@ struct EditCommentBoxSheet: View {
             .disabled(updating)
         }.padding()
       }
-      .navigationTitle(title)
-      .navigationBarTitleDisplayMode(.inline)
-      .toolbar {
-        ToolbarItem(placement: .cancellationAction) {
-          Button {
-            dismiss()
-          } label: {
-            Label("取消", systemImage: "xmark")
+    } controls: {
+      if updating {
+        ProgressView()
+      } else {
+        Button {
+          Task {
+            await editComment(content: content)
           }
-          .disabled(updating)
+        } label: {
+          Label("保存", systemImage: "checkmark")
         }
-        ToolbarItem(placement: .confirmationAction) {
-          if updating {
-            ProgressView()
-          } else {
-            Button {
-              Task {
-                await editComment(content: content)
-              }
-            } label: {
-              Label("保存", systemImage: "checkmark")
-            }
-            .disabled(content.isEmpty)
-          }
-        }
+        .disabled(content.isEmpty)
       }
     }
   }

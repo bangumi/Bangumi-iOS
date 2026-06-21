@@ -480,7 +480,7 @@ struct CreateReplyBoxSheet: View {
   }
 
   var body: some View {
-    NavigationStack {
+    SheetView(title: title, closeDisabled: updating) {
       ScrollView {
         VStack {
           TextInputView(type: "回复", text: $content)
@@ -497,29 +497,16 @@ struct CreateReplyBoxSheet: View {
             }
         }.padding()
       }
-      .navigationTitle(title)
-      .navigationBarTitleDisplayMode(.inline)
-      .toolbar {
-        ToolbarItem(placement: .cancellationAction) {
-          Button {
-            dismiss()
-          } label: {
-            Label("取消", systemImage: "xmark")
-          }
-          .disabled(updating)
+    } controls: {
+      if updating {
+        ProgressView()
+      } else {
+        Button {
+          showTurnstile = true
+        } label: {
+          Label("发送", systemImage: "paperplane")
         }
-        ToolbarItem(placement: .confirmationAction) {
-          if updating {
-            ProgressView()
-          } else {
-            Button {
-              showTurnstile = true
-            } label: {
-              Label("发送", systemImage: "paperplane")
-            }
-            .disabled(content.isEmpty)
-          }
-        }
+        .disabled(content.isEmpty)
       }
     }
   }
@@ -582,7 +569,7 @@ struct EditReplyBoxSheet: View {
   }
 
   var body: some View {
-    NavigationStack {
+    SheetView(title: title, closeDisabled: updating) {
       ScrollView {
         VStack {
           TextInputView(type: "回复", text: $content)
@@ -590,31 +577,18 @@ struct EditReplyBoxSheet: View {
             .disabled(updating)
         }.padding()
       }
-      .navigationTitle(title)
-      .navigationBarTitleDisplayMode(.inline)
-      .toolbar {
-        ToolbarItem(placement: .cancellationAction) {
-          Button {
-            dismiss()
-          } label: {
-            Label("取消", systemImage: "xmark")
+    } controls: {
+      if updating {
+        ProgressView()
+      } else {
+        Button {
+          Task {
+            await editReply(content: content)
           }
-          .disabled(updating)
+        } label: {
+          Label("保存", systemImage: "checkmark")
         }
-        ToolbarItem(placement: .confirmationAction) {
-          if updating {
-            ProgressView()
-          } else {
-            Button {
-              Task {
-                await editReply(content: content)
-              }
-            } label: {
-              Label("保存", systemImage: "checkmark")
-            }
-            .disabled(content.isEmpty)
-          }
-        }
+        .disabled(content.isEmpty)
       }
     }
   }
@@ -658,7 +632,7 @@ struct CreateTopicBoxSheet: View {
   }
 
   var body: some View {
-    NavigationStack {
+    SheetView(title: header, closeDisabled: updating) {
       ScrollView {
         VStack {
           BorderView(color: .secondary.opacity(0.2), padding: 4) {
@@ -681,29 +655,16 @@ struct CreateTopicBoxSheet: View {
             }
         }.padding()
       }
-      .navigationTitle(header)
-      .navigationBarTitleDisplayMode(.inline)
-      .toolbar {
-        ToolbarItem(placement: .cancellationAction) {
-          Button {
-            dismiss()
-          } label: {
-            Label("取消", systemImage: "xmark")
-          }
-          .disabled(updating)
+    } controls: {
+      if updating {
+        ProgressView()
+      } else {
+        Button {
+          showTurnstile = true
+        } label: {
+          Label("发送", systemImage: "paperplane")
         }
-        ToolbarItem(placement: .confirmationAction) {
-          if updating {
-            ProgressView()
-          } else {
-            Button {
-              showTurnstile = true
-            } label: {
-              Label("发送", systemImage: "paperplane")
-            }
-            .disabled(title.isEmpty || content.isEmpty)
-          }
-        }
+        .disabled(title.isEmpty || content.isEmpty)
       }
     }
   }
@@ -768,7 +729,7 @@ struct EditTopicBoxSheet: View {
   }
 
   var body: some View {
-    NavigationStack {
+    SheetView(title: header, closeDisabled: updating) {
       ScrollView {
         VStack {
           if post == nil {
@@ -794,31 +755,18 @@ struct EditTopicBoxSheet: View {
             .disabled(updating)
         }.padding()
       }
-      .navigationTitle(header)
-      .navigationBarTitleDisplayMode(.inline)
-      .toolbar {
-        ToolbarItem(placement: .cancellationAction) {
-          Button {
-            dismiss()
-          } label: {
-            Label("取消", systemImage: "xmark")
+    } controls: {
+      if updating {
+        ProgressView()
+      } else {
+        Button {
+          Task {
+            await editTopic(title: title, content: content)
           }
-          .disabled(updating)
+        } label: {
+          Label("保存", systemImage: "checkmark")
         }
-        ToolbarItem(placement: .confirmationAction) {
-          if updating {
-            ProgressView()
-          } else {
-            Button {
-              Task {
-                await editTopic(title: title, content: content)
-              }
-            } label: {
-              Label("保存", systemImage: "checkmark")
-            }
-            .disabled(submitDisabled)
-          }
-        }
+        .disabled(submitDisabled)
       }
     }
   }

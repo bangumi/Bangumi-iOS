@@ -47,7 +47,7 @@ struct IndexRelatedAddSheet: View {
   }
 
   var body: some View {
-    NavigationStack {
+    SheetView(title: "添加关联内容", closeDisabled: isSubmitting, applyFormStyle: true) {
       Form {
         Section {
           Picker("类型", selection: $selectedCategory) {
@@ -95,28 +95,6 @@ struct IndexRelatedAddSheet: View {
           }
         }
       }
-      .navigationTitle("添加关联内容")
-      .navigationBarTitleDisplayMode(.inline)
-      .toolbar {
-        ToolbarItem(placement: .cancellationAction) {
-          Button {
-            dismiss()
-          } label: {
-            Label("取消", systemImage: "xmark")
-          }
-          .disabled(isSubmitting)
-        }
-        ToolbarItem(placement: .confirmationAction) {
-          Button {
-            Task {
-              await submit()
-            }
-          } label: {
-            Label("添加", systemImage: "plus")
-          }
-          .disabled(isSubmitting || relatedId.isEmpty)
-        }
-      }
       .sheet(isPresented: $showSearch) {
         switch selectedCategory {
         case .subject:
@@ -135,6 +113,15 @@ struct IndexRelatedAddSheet: View {
           EmptyView()
         }
       }
+    } controls: {
+      Button {
+        Task {
+          await submit()
+        }
+      } label: {
+        Label("添加", systemImage: "plus")
+      }
+      .disabled(isSubmitting || relatedId.isEmpty)
     }
   }
 }
@@ -185,7 +172,7 @@ struct IndexRelatedEditSheet: View {
   }
 
   var body: some View {
-    NavigationStack {
+    SheetView(title: "编辑关联内容", closeDisabled: isSubmitting, applyFormStyle: true) {
       Form {
         TextField("排序", text: $order)
           .keyboardType(.numberPad)
@@ -201,28 +188,15 @@ struct IndexRelatedEditSheet: View {
             }
           }
       }
-      .navigationTitle("编辑关联内容")
-      .navigationBarTitleDisplayMode(.inline)
-      .toolbar {
-        ToolbarItem(placement: .cancellationAction) {
-          Button {
-            dismiss()
-          } label: {
-            Label("取消", systemImage: "xmark")
-          }
-          .disabled(isSubmitting)
+    } controls: {
+      Button {
+        Task {
+          await submit()
         }
-        ToolbarItem(placement: .confirmationAction) {
-          Button {
-            Task {
-              await submit()
-            }
-          } label: {
-            Label("保存", systemImage: "checkmark")
-          }
-          .disabled(isSubmitting || order.isEmpty)
-        }
+      } label: {
+        Label("保存", systemImage: "checkmark")
       }
+      .disabled(isSubmitting || order.isEmpty)
     }
   }
 }

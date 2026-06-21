@@ -134,7 +134,12 @@ struct SubjectCollectionBoxView: View {
   }
 
   var body: some View {
-    NavigationStack {
+    SheetView(
+      title: subjectTitle,
+      size: .both,
+      closeDisabled: updating,
+      controlsPlacement: .primaryAction
+    ) {
       ScrollView {
         VStack {
           HStack {
@@ -268,32 +273,18 @@ struct SubjectCollectionBoxView: View {
         .disabled(updating)
         .padding(.horizontal)
       }
-      .navigationTitle(subjectTitle)
-      .navigationBarTitleDisplayMode(.inline)
-      .toolbar {
-        ToolbarItem(placement: .cancellationAction) {
-          Button {
-            dismiss()
-          } label: {
-            Image(systemName: "xmark")
-          }
-          .disabled(updating)
-        }
-        ToolbarItem(placement: .primaryAction) {
-          Button {
-            withAnimation(.default) {
-              priv.toggle()
-            }
-          } label: {
-            Image(systemName: priv ? "lock.fill" : "lock.circle.dotted")
-          }
-          .adaptiveButtonStyle(priv ? .borderedProminent : .plain)
-          .disabled(updating)
-          .sensoryFeedback(.selection, trigger: priv)
-        }
-      }
       .task(load)
+    } controls: {
+      Button {
+        withAnimation(.default) {
+          priv.toggle()
+        }
+      } label: {
+        Image(systemName: priv ? "lock.fill" : "lock.circle.dotted")
+      }
+      .adaptiveButtonStyle(priv ? .borderedProminent : .plain)
+      .disabled(updating)
+      .sensoryFeedback(.selection, trigger: priv)
     }
-    .presentationDetents(.init([.medium, .large]))
   }
 }

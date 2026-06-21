@@ -32,7 +32,7 @@ struct ReportSheet: View {
   }
 
   var body: some View {
-    NavigationStack {
+    SheetView(title: "报告疑虑", size: .both, closeDisabled: submitting) {
       ScrollView {
         VStack(alignment: .leading, spacing: 16) {
           VStack(alignment: .leading, spacing: 8) {
@@ -94,28 +94,15 @@ struct ReportSheet: View {
         }
         .padding()
       }
-      .navigationTitle("报告疑虑")
-      .navigationBarTitleDisplayMode(.inline)
-      .toolbar {
-        ToolbarItem(placement: .cancellationAction) {
-          Button {
-            dismiss()
-          } label: {
-            Label("取消", systemImage: "xmark")
-          }
-          .disabled(submitting)
+    } controls: {
+      Button {
+        Task {
+          await submitReport()
         }
-        ToolbarItem(placement: .confirmationAction) {
-          Button {
-            Task {
-              await submitReport()
-            }
-          } label: {
-            Label("提交", systemImage: "paperplane")
-          }
-          .disabled(submitting || comment.count > 2000)
-        }
+      } label: {
+        Label("提交", systemImage: "paperplane")
       }
-    }.presentationDetents([.medium, .large])
+      .disabled(submitting || comment.count > 2000)
+    }
   }
 }

@@ -187,7 +187,7 @@ private struct DraftBoxView: View {
   @Binding var isPresented: Bool
 
   var body: some View {
-    NavigationStack {
+    SheetView(title: "草稿箱", size: .medium, closeTitle: "关闭") {
       List {
         ForEach(drafts) { draft in
           if draft.id == currentID {
@@ -228,15 +228,6 @@ private struct DraftBoxView: View {
           }
         }
       }
-      .navigationTitle("草稿箱")
-      .navigationBarTitleDisplayMode(.inline)
-      .toolbar {
-        ToolbarItem(placement: .topBarTrailing) {
-          Button("关闭", role: .cancel) {
-            isPresented = false
-          }
-        }
-      }
-    }.presentationDetents([.medium])
+    }
   }
 }

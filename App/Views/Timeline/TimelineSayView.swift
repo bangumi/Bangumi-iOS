@@ -22,37 +22,7 @@ struct TimelineSayView: View {
   }
 
   var body: some View {
-    VStack(spacing: 0) {
-      HStack {
-        Button {
-          dismiss()
-        } label: {
-          Label("取消", systemImage: "xmark")
-        }
-        .disabled(updating)
-        .adaptiveButtonStyle(.bordered)
-
-        Spacer()
-
-        Text("吐槽")
-          .font(.headline)
-          .fontWeight(.semibold)
-
-        Spacer()
-
-        Button {
-          showTurnstile = true
-        } label: {
-          Label("发送", systemImage: "paperplane")
-        }
-        .disabled(content.isEmpty || updating || content.count > 380)
-        .adaptiveButtonStyle(.borderedProminent)
-      }
-      .padding()
-      .background(Color(.systemBackground))
-
-      Divider()
-
+    SheetView(title: "吐槽", closeDisabled: updating) {
       ScrollView {
         VStack {
           TextInputView(type: "吐槽", text: $content)
@@ -68,6 +38,13 @@ struct TimelineSayView: View {
             }
         }.padding()
       }
+    } controls: {
+      Button {
+        showTurnstile = true
+      } label: {
+        Label("发送", systemImage: "paperplane")
+      }
+      .disabled(content.isEmpty || updating || content.count > 380)
     }
   }
 }

@@ -2,6 +2,7 @@ import SwiftUI
 
 struct SubjectHeaderView: View {
   let subject: SubjectDTO
+  let onShowRating: () -> Void
 
   var type: SubjectType {
     subject.type
@@ -98,14 +99,17 @@ struct SubjectHeaderView: View {
               Text("(\(subject.rating.total) 人评分)")
                 .foregroundStyle(.secondary)
                 .lineLimit(1)
-              Spacer()
             }
+            Spacer()
+            ratingDistributionButton
           }.font(.footnote)
         } else {
           HStack {
             StarsView(score: 0, size: 12)
             Text("(少于 10 人评分)")
               .foregroundStyle(.secondary)
+            Spacer()
+            ratingDistributionButton
           }.font(.footnote)
         }
       }
@@ -114,6 +118,18 @@ struct SubjectHeaderView: View {
     if subject.rating.rank > 0 && subject.rating.rank < 1000 {
       SubjectRankView(rank: subject.rating.rank)
     }
+  }
+
+  private var ratingDistributionButton: some View {
+    Button {
+      onShowRating()
+    } label: {
+      Image(systemName: "chart.bar.xaxis")
+    }
+    .buttonStyle(.borderless)
+    .font(.callout)
+    .foregroundStyle(.linkText)
+    .accessibilityLabel("评分分布")
   }
 }
 
