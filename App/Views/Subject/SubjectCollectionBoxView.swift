@@ -19,6 +19,17 @@ struct SubjectCollectionBoxView: View {
   @State private var tagsInput: String = ""
   @State private var updating: Bool = false
 
+  init(subjectId: Int, initialSubject: SubjectDTO? = nil, onSaved: (() async -> Void)? = nil) {
+    self.subjectId = subjectId
+    self.onSaved = onSaved
+    _subject = State(initialValue: initialSubject)
+    _ctype = State(initialValue: initialSubject?.interest?.type ?? .none)
+    _rate = State(initialValue: initialSubject?.interest?.rate ?? 0)
+    _comment = State(initialValue: initialSubject?.interest?.comment ?? "")
+    _priv = State(initialValue: initialSubject?.interest?.private ?? false)
+    _tags = State(initialValue: Set(initialSubject?.interest?.tags ?? []))
+  }
+
   var subjectTitle: String {
     subject?.title(with: titlePreference) ?? ""
   }
@@ -49,50 +60,51 @@ struct SubjectCollectionBoxView: View {
     return ctype == .none || comment.count > 380
   }
 
-  func load() async {
-    withAnimation(.default) {
-      updating = true
+  func populateEditor(with loadedSubject: SubjectDTO) {
+    subject = loadedSubject
+    populateCollectionFields(from: loadedSubject.interest)
+  }
+
+  func populateCollectionFields(from interest: SubjectInterest?) {
+    if let interest {
+      ctype = interest.type
+      rate = interest.rate
+      comment = interest.comment
+      priv = interest.private
+      tags = Set(interest.tags)
+    } else {
+      ctype = .none
+      rate = 0
+      comment = ""
+      priv = false
+      tags = []
     }
+  }
+
+  func loadIfNeeded() async {
+    guard subject == nil else {
+      return
+    }
+
+    updating = true
     defer {
-      withAnimation(.default) {
-        updating = false
-      }
+      updating = false
     }
 
     do {
       let db = try await AppContext.shared.getDB()
-      let cachedSubject = try await db.getSubjectDTO(subjectId)
-      withAnimation(.default) {
-        subject = cachedSubject
+      if let cachedSubject = try await db.getSubjectDTO(subjectId) {
+        populateEditor(with: cachedSubject)
+        return
       }
     } catch {
       Notifier.shared.alert(error: error)
     }
-    if subject == nil {
-      do {
-        _ = try await SubjectRepository.loadSubject(subjectId)
-      } catch {
-        Notifier.shared.alert(error: error)
-      }
-      do {
-        let db = try await AppContext.shared.getDB()
-        let cachedSubject = try await db.getSubjectDTO(subjectId)
-        withAnimation(.default) {
-          subject = cachedSubject
-        }
-      } catch {
-        Notifier.shared.alert(error: error)
-      }
-    }
-
-    if let interest = subject?.interest {
-      withAnimation(.default) {
-        self.ctype = interest.type
-        self.rate = interest.rate
-        self.comment = interest.comment
-        self.priv = interest.private
-        self.tags = Set(interest.tags)
-      }
+    do {
+      let loadedSubject = try await SubjectRepository.loadSubject(subjectId)
+      populateEditor(with: loadedSubject)
+    } catch {
+      Notifier.shared.alert(error: error)
     }
   }
 
@@ -273,7 +285,7 @@ struct SubjectCollectionBoxView: View {
         .disabled(updating)
         .padding(.horizontal)
       }
-      .task(load)
+      .task(loadIfNeeded)
     } controls: {
       Button {
         withAnimation(.default) {

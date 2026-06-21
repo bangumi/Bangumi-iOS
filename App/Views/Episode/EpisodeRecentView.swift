@@ -131,7 +131,7 @@ struct EpisodeRecentView: View {
             }
             .progressButtonStyle()
             .sheet(isPresented: $showCollectionBox) {
-              SubjectCollectionBoxView(subjectId: subject.id)
+              SubjectCollectionBoxView(subjectId: subject.id, initialSubject: subject)
                 .onDisappear {
                   Task {
                     await reload?()
@@ -166,7 +166,7 @@ struct EpisodeRecentView: View {
             }
             .progressButtonStyle()
             .sheet(isPresented: $showCollectionBox) {
-              SubjectCollectionBoxView(subjectId: subject.id)
+              SubjectCollectionBoxView(subjectId: subject.id, initialSubject: subject)
                 .onDisappear {
                   Task {
                     await reload?()

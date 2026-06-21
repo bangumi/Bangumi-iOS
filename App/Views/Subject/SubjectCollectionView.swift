@@ -84,7 +84,7 @@ struct SubjectCollectionView: View {
       }
     }
     .sheet(isPresented: $edit) {
-      SubjectCollectionBoxView(subjectId: subject.id)
+      SubjectCollectionBoxView(subjectId: subject.id, initialSubject: subject)
         .presentationDragIndicator(.visible)
         .onDisappear {
           Task {
