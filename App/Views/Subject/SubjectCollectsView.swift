@@ -123,6 +123,7 @@ struct SubjectCollectsView: View {
             ForEach(collects.prefix(10)) { collect in
               VStack(spacing: 4) {
                 ImageView(img: collect.user.avatar?.large)
+                  .imageCollectionStatus(ctype: collect.interest.type)
                   .imageStyle(width: 60, height: 60)
                   .imageType(.avatar)
                   .contextMenu {
@@ -138,12 +139,6 @@ struct SubjectCollectsView: View {
                   Text(collect.user.nickname)
                     .lineLimit(1)
                   StarsView(score: Float(collect.interest.rate), size: 8)
-                  Label(
-                    collect.interest.type.description(subject.type),
-                    systemImage: collect.interest.type.icon
-                  )
-                  .labelStyle(.compact)
-                  .foregroundStyle(.secondary)
                 }
                 .font(.caption)
                 .frame(width: 60)
