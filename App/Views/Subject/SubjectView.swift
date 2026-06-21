@@ -110,7 +110,10 @@ struct SubjectDetailView: View {
         }
 
         if subject.type == .anime || subject.type == .real {
-          EpisodeGridView(subjectId: subject.id)
+          EpisodeGridView(
+            subjectId: subject.id,
+            subjectCollectionType: subject.ctypeEnum
+          )
         }
 
         SubjectSummaryView(subject: subject)

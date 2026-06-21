@@ -4,6 +4,7 @@ import SwiftUI
 
 struct EpisodeGridView: View {
   let subjectId: Int
+  let subjectCollectionType: CollectionType
 
   @AppStorage("isolationMode") var isolationMode: Bool = false
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
@@ -13,13 +14,10 @@ struct EpisodeGridView: View {
   @State private var refreshed: Bool = false
   @State private var episodeMains: [EpisodeDTO] = []
   @State private var episodeSps: [EpisodeDTO] = []
-  @State private var subjectCollectionType: CollectionType = .none
 
   private func loadCached() async {
     do {
       let db = try await AppContext.shared.getDB()
-      let fetchedSubjectCollectionType =
-        try await db.getSubjectDTO(subjectId)?.ctypeEnum ?? .none
       let fetchedEpisodeMains = try await db.fetchEpisodes(subjectId: subjectId, main: true, limit: 50)
       let fetchedEpisodeSps = Array(
         try await db.fetchEpisodes(subjectId: subjectId)
@@ -27,7 +25,6 @@ struct EpisodeGridView: View {
           .prefix(10)
       )
       withAnimation(.default) {
-        subjectCollectionType = fetchedSubjectCollectionType
         episodeMains = fetchedEpisodeMains
         episodeSps = fetchedEpisodeSps
       }

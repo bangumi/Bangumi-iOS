@@ -712,11 +712,23 @@ extension DatabaseOperator {
         }
         subject.interest?.epStatus = rows.count
       } else {
+        let previousType = episode.collectionTypeEnum
         episode.status = type.rawValue
         episode.collectedAt = now
         try upsertEpisode(episode, in: db)
-        let epStatus = subject.interest?.epStatus ?? 0
-        subject.interest?.epStatus = epStatus + 1
+        if episode.typeEnum == .main {
+          let epStatus = subject.interest?.epStatus ?? 0
+          let delta =
+            switch (previousType == .collect, type == .collect) {
+            case (false, true):
+              1
+            case (true, false):
+              -1
+            default:
+              0
+            }
+          subject.interest?.epStatus = max(0, epStatus + delta)
+        }
       }
       subject.interest?.updatedAt = now
       subject.collectedAt = now
