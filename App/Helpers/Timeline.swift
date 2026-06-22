@@ -1,5 +1,27 @@
 import SwiftUI
 
+struct TimelineListRowItem: Identifiable {
+  let item: TimelineDTO
+  let previousUID: Int?
+  let nextPageTriggerID: Int?
+
+  var id: TimelineDTO.ID {
+    item.id
+  }
+}
+
+extension Array where Element == TimelineDTO {
+  func timelineListRows(lastID: TimelineDTO.ID?) -> [TimelineListRowItem] {
+    indexedById().map { row in
+      TimelineListRowItem(
+        item: row.item,
+        previousUID: row.index == startIndex ? nil : self[row.index - 1].user?.id,
+        nextPageTriggerID: row.item.id == lastID ? row.item.id : nil
+      )
+    }
+  }
+}
+
 extension TimelineDTO {
 
   func unknown(_ op: String) -> AttributedString {

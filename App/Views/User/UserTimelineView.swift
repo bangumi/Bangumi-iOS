@@ -38,17 +38,17 @@ struct UserTimelineView: View {
     }
   }
 
-  func loadNextPage(_ item: TimelineDTO) async {
+  func loadNextPage(triggerID: TimelineDTO.ID) async {
     if loading {
       return
     }
     if exhausted {
       return
     }
-    if lastID != nil, item.id != lastID {
+    if lastID != triggerID {
       return
     }
-    if fetched[item.id] == true {
+    if fetched[triggerID] == true {
       return
     }
     withAnimation(.default) {
@@ -56,11 +56,11 @@ struct UserTimelineView: View {
     }
     do {
       let data = try await UserService.getUserTimeline(
-        username: user.username, limit: 20, until: lastID)
+        username: user.username, limit: 20, until: triggerID)
       if data.count == 0 {
         exhausted = true
       }
-      fetched[item.id] = true
+      fetched[triggerID] = true
       items.append(contentsOf: data)
       lastID = data.last?.id
     } catch {
@@ -71,18 +71,20 @@ struct UserTimelineView: View {
     }
   }
   var body: some View {
+    let rows = items.timelineListRows(lastID: lastID)
+
     ScrollView {
       UserSmallView(user: user)
         .padding(.top, 8)
         .padding(.horizontal, 8)
       LazyVStack(alignment: .leading) {
-        ForEach(items.indexedById()) { row in
+        ForEach(rows) { row in
           TimelineItemView(
             item: row.item,
-            previousUID: row.index == items.startIndex ? nil : items[row.index - 1].user?.id
-          ).onAppear {
-            Task {
-              await loadNextPage(row.item)
+            previousUID: row.previousUID
+          ).task(id: row.nextPageTriggerID) {
+            if let triggerID = row.nextPageTriggerID {
+              await loadNextPage(triggerID: triggerID)
             }
           }
         }

@@ -41,17 +41,17 @@ struct TimelineListView: View {
     }
   }
 
-  func loadNextPage(_ item: TimelineDTO) async {
+  func loadNextPage(triggerID: TimelineDTO.ID) async {
     if loading {
       return
     }
     if exhausted {
       return
     }
-    if lastID != nil, item.id != lastID {
+    if lastID != triggerID {
       return
     }
-    if fetched[item.id] == true {
+    if fetched[triggerID] == true {
       return
     }
     withAnimation(.default) {
@@ -61,17 +61,17 @@ struct TimelineListView: View {
       var data: [TimelineDTO] = []
       switch timelineViewMode {
       case .all:
-        data = try await TimelineService.getTimeline(mode: .all, limit: 20, until: lastID)
+        data = try await TimelineService.getTimeline(mode: .all, limit: 20, until: triggerID)
       case .friends:
-        data = try await TimelineService.getTimeline(mode: .friends, limit: 20, until: lastID)
+        data = try await TimelineService.getTimeline(mode: .friends, limit: 20, until: triggerID)
       case .me:
         data = try await UserService.getUserTimeline(
-          username: profile.username, limit: 20, until: lastID)
+          username: profile.username, limit: 20, until: triggerID)
       }
       if data.count == 0 {
         exhausted = true
       }
-      fetched[item.id] = true
+      fetched[triggerID] = true
       items.append(contentsOf: data)
       lastID = data.last?.id
     } catch {
@@ -83,6 +83,8 @@ struct TimelineListView: View {
   }
 
   var body: some View {
+    let rows = items.timelineListRows(lastID: lastID)
+
     ScrollView {
       VStack {
         if isAuthenticated {
@@ -129,15 +131,15 @@ struct TimelineListView: View {
         }
       }.padding(8)
       LazyVStack(alignment: .leading) {
-        ForEach(items.indexedById()) { row in
+        ForEach(rows) { row in
           TimelineItemView(
             item: row.item,
-            previousUID: row.index == items.startIndex ? nil : items[row.index - 1].user?.id
+            previousUID: row.previousUID
           )
           .padding(.bottom, 8)
-          .onAppear {
-            Task {
-              await loadNextPage(row.item)
+          .task(id: row.nextPageTriggerID) {
+            if let triggerID = row.nextPageTriggerID {
+              await loadNextPage(triggerID: triggerID)
             }
           }
         }
