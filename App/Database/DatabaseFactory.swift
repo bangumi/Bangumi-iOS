@@ -61,6 +61,11 @@ enum DatabaseFactory {
       try db.execute(sql: "DROP TABLE IF EXISTS local_migration_markers")
     }
 
+    migrator.registerMigration("00005_add_mono_photo_preview_cache") { db in
+      try db.execute(sql: "ALTER TABLE characters ADD COLUMN photos_data BLOB")
+      try db.execute(sql: "ALTER TABLE persons ADD COLUMN photos_data BLOB")
+    }
+
     return migrator
   }
 

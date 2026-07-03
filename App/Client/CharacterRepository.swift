@@ -43,11 +43,15 @@ enum CharacterRepository {
     let indexesTask = loadDetailValue(label: "角色目录") {
       try await CharacterService.getCharacterIndexes(characterId: characterId, limit: 5)
     }
+    let photosTask = loadDetailValue(label: "角色相册") {
+      try await CharacterService.getCharacterPhotoPreview(characterId, limit: 6)
+    }
     try await db.saveCharacterDetails(
       characterId: characterId,
       casts: await castsTask.value?.data,
       relations: await relationsTask.value?.data,
-      indexes: await indexesTask.value?.data
+      indexes: await indexesTask.value?.data,
+      photos: await photosTask.value?.data
     )
   }
 

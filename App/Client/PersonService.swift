@@ -92,6 +92,46 @@ enum PersonService {
     return resp
   }
 
+  static func getPersonPhotos(_ personId: Int, limit: Int = 24, offset: Int = 0)
+    async throws -> PagedDTO<MonoPhotoDTO>
+  {
+    let url = BangumiAPI.priv.build("p1/persons/\(personId)/photos")
+    let queryItems: [URLQueryItem] = [
+      URLQueryItem(name: "limit", value: String(limit)),
+      URLQueryItem(name: "offset", value: String(offset)),
+    ]
+    let pageURL = url.appending(queryItems: queryItems)
+    let data = try await APIClient.shared.request(url: pageURL, method: "GET")
+    let resp: PagedDTO<MonoPhotoDTO> = try await APIClient.shared.decodeResponse(data)
+    return resp
+  }
+
+  static func getPersonPhotoPreview(_ personId: Int, limit: Int = 6)
+    async throws -> PagedDTO<MonoPhotoDTO>
+  {
+    let url = BangumiAPI.priv.build("p1/persons/\(personId)/photos/preview")
+    let pageURL = url.appending(queryItems: [
+      URLQueryItem(name: "limit", value: String(limit))
+    ])
+    let data = try await APIClient.shared.request(url: pageURL, method: "GET")
+    let resp: PagedDTO<MonoPhotoDTO> = try await APIClient.shared.decodeResponse(data)
+    return resp
+  }
+
+  static func getPersonPhoto(_ personId: Int, photoId: Int) async throws -> MonoPhotoDTO {
+    let url = BangumiAPI.priv.build("p1/persons/\(personId)/photos/\(photoId)")
+    let data = try await APIClient.shared.request(url: url, method: "GET")
+    let resp: MonoPhotoDTO = try await APIClient.shared.decodeResponse(data)
+    return resp
+  }
+
+  static func getPersonPhotoComments(_ personId: Int, photoId: Int) async throws -> [CommentDTO] {
+    let url = BangumiAPI.priv.build("p1/persons/\(personId)/photos/\(photoId)/comments")
+    let data = try await APIClient.shared.request(url: url, method: "GET")
+    let resp: [CommentDTO] = try await APIClient.shared.decodeResponse(data)
+    return resp
+  }
+
   static func getPersonComments(_ personId: Int) async throws -> [CommentDTO] {
     let url = BangumiAPI.priv.build("p1/persons/\(personId)/comments")
     let data = try await APIClient.shared.request(url: url, method: "GET")
@@ -103,6 +143,22 @@ enum PersonService {
     async throws
   {
     let url = BangumiAPI.priv.build("p1/persons/\(personId)/comments")
+    var body: [String: Any] = [
+      "content": content,
+      "turnstileToken": token,
+    ]
+    if let replyTo {
+      body["replyTo"] = replyTo
+    }
+    _ = try await APIClient.shared.request(url: url, method: "POST", body: body, auth: .required)
+  }
+
+  static func createPersonPhotoComment(
+    personId: Int, photoId: Int, content: String, replyTo: Int?, token: String
+  )
+    async throws
+  {
+    let url = BangumiAPI.priv.build("p1/persons/\(personId)/photos/\(photoId)/comments")
     var body: [String: Any] = [
       "content": content,
       "turnstileToken": token,

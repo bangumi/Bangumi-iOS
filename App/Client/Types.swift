@@ -860,6 +860,23 @@ struct CommentDTO: Codable, Identifiable, Hashable {
   var reactions: [ReactionDTO]?
 }
 
+struct MonoPhotoDTO: Codable, Identifiable, Hashable {
+  var id: Int
+  var type: Int
+  var mainID: Int
+  var creatorID: Int
+  var target: String
+  var images: SubjectImages
+  var title: String
+  var comment: String
+  var tags: [String]
+  var spoiler: Bool
+  var createdAt: Int
+  var updatedAt: Int
+  var lastPost: Int
+  var user: SlimUserDTO?
+}
+
 struct SubjectRelationDTO: Codable, Identifiable, Hashable {
   var order: Int
   var subject: SlimSubjectDTO

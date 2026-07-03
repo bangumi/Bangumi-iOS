@@ -46,12 +46,16 @@ enum PersonRepository {
     let indexesTask = loadDetailValue(label: "人物目录") {
       try await PersonService.getPersonIndexes(personId: personId, limit: 5)
     }
+    let photosTask = loadDetailValue(label: "人物相册") {
+      try await PersonService.getPersonPhotoPreview(personId, limit: 6)
+    }
     try await db.savePersonDetails(
       personId: personId,
       casts: await castsTask.value?.data,
       works: await worksTask.value?.data,
       relations: await relationsTask.value?.data,
-      indexes: await indexesTask.value?.data
+      indexes: await indexesTask.value?.data,
+      photos: await photosTask.value?.data
     )
   }
 

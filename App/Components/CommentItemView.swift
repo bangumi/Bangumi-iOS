@@ -4,7 +4,9 @@ import SwiftUI
 enum CommentParentType {
   case blog(Int)
   case character(Int)
+  case characterPhoto(Int, Int)
   case person(Int)
+  case personPhoto(Int, Int)
   case episode(Int)
   case timeline(Int)
   case index(Int)
@@ -15,8 +17,12 @@ enum CommentParentType {
       return "日志"
     case .character:
       return "角色"
+    case .characterPhoto:
+      return "角色相册"
     case .person:
       return "人物"
+    case .personPhoto:
+      return "人物相册"
     case .episode:
       return "章节"
     case .timeline:
@@ -32,8 +38,12 @@ enum CommentParentType {
       return id
     case .character(let id):
       return id
+    case .characterPhoto(_, let photoId):
+      return photoId
     case .person(let id):
       return id
+    case .personPhoto(_, let photoId):
+      return photoId
     case .episode(let id):
       return id
     case .timeline(let id):
@@ -50,8 +60,12 @@ enum CommentParentType {
       return URL(string: "\(shareDomain.url)/blog/\(id)#post_\(commentId)")!
     case .character(let id):
       return URL(string: "\(shareDomain.url)/character/\(id)#post_\(commentId)")!
+    case .characterPhoto(let id, let photoId):
+      return URL(string: "\(shareDomain.url)/character/\(id)/photos/\(photoId)#post_\(commentId)")!
     case .person(let id):
       return URL(string: "\(shareDomain.url)/person/\(id)#post_\(commentId)")!
+    case .personPhoto(let id, let photoId):
+      return URL(string: "\(shareDomain.url)/person/\(id)/photos/\(photoId)#post_\(commentId)")!
     case .episode(let id):
       return URL(string: "\(shareDomain.url)/ep/\(id)#post_\(commentId)")!
     case .timeline(let id):
@@ -69,9 +83,15 @@ enum CommentParentType {
     case .character(let id):
       try await CharacterService.createCharacterComment(
         characterId: id, content: content, replyTo: commentId, token: token)
+    case .characterPhoto(let id, let photoId):
+      try await CharacterService.createCharacterPhotoComment(
+        characterId: id, photoId: photoId, content: content, replyTo: commentId, token: token)
     case .person(let id):
       try await PersonService.createPersonComment(
         personId: id, content: content, replyTo: commentId, token: token)
+    case .personPhoto(let id, let photoId):
+      try await PersonService.createPersonPhotoComment(
+        personId: id, photoId: photoId, content: content, replyTo: commentId, token: token)
     case .episode(let id):
       try await EpisodeService.createEpisodeComment(
         episodeId: id, content: content, replyTo: commentId, token: token)
@@ -234,12 +254,12 @@ struct CommentItemNormalView: View {
           reportType: .episodeReply, itemId: comment.id, itemTitle: "评论 #\(idx+1)",
           user: comment.user
         )
-      case .character:
+      case .character, .characterPhoto:
         ReportSheet(
           reportType: .characterReply, itemId: comment.id, itemTitle: "评论 #\(idx+1)",
           user: comment.user
         )
-      case .person:
+      case .person, .personPhoto:
         ReportSheet(
           reportType: .personReply, itemId: comment.id, itemTitle: "评论 #\(idx+1)",
           user: comment.user
@@ -404,12 +424,12 @@ struct CommentSubReplyNormalView: View {
           reportType: .episodeReply, itemId: reply.id, itemTitle: "回复 #\(idx+1)-\(subidx+1)",
           user: reply.user
         )
-      case .character:
+      case .character, .characterPhoto:
         ReportSheet(
           reportType: .characterReply, itemId: reply.id, itemTitle: "回复 #\(idx+1)-\(subidx+1)",
           user: reply.user
         )
-      case .person:
+      case .person, .personPhoto:
         ReportSheet(
           reportType: .personReply, itemId: reply.id, itemTitle: "回复 #\(idx+1)-\(subidx+1)",
           user: reply.user

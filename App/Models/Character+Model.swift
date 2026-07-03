@@ -21,6 +21,7 @@ final class Character: Searchable, Linkable {
   var castsData: Data?
   var relationsData: Data?
   var indexesData: Data?
+  var photosData: Data?
 
   init(_ item: CharacterDTO) {
     characterId = item.id
@@ -71,6 +72,11 @@ extension Character {
   var indexes: [SlimIndexDTO] {
     get { PersistedJSON.decode([SlimIndexDTO].self, from: indexesData) ?? [] }
     set { indexesData = PersistedJSON.encode(newValue) ?? indexesData }
+  }
+
+  var photos: [MonoPhotoDTO] {
+    get { PersistedJSON.decode([MonoPhotoDTO].self, from: photosData) ?? [] }
+    set { photosData = PersistedJSON.encode(newValue) ?? photosData }
   }
 
   var roleEnum: CharacterType {

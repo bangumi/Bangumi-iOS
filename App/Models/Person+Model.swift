@@ -23,6 +23,7 @@ final class Person: Searchable, Linkable {
   var worksData: Data?
   var relationsData: Data?
   var indexesData: Data?
+  var photosData: Data?
 
   init(_ item: PersonDTO) {
     personId = item.id
@@ -80,6 +81,11 @@ extension Person {
   var indexes: [SlimIndexDTO] {
     get { PersistedJSON.decode([SlimIndexDTO].self, from: indexesData) ?? [] }
     set { indexesData = PersistedJSON.encode(newValue) ?? indexesData }
+  }
+
+  var photos: [MonoPhotoDTO] {
+    get { PersistedJSON.decode([MonoPhotoDTO].self, from: photosData) ?? [] }
+    set { photosData = PersistedJSON.encode(newValue) ?? photosData }
   }
 
   var typeEnum: PersonType {

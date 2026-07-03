@@ -149,6 +149,7 @@ extension Character {
     castsData = row["casts_data"]
     relationsData = row["relations_data"]
     indexesData = row["indexes_data"]
+    photosData = row["photos_data"]
   }
 }
 
@@ -181,6 +182,7 @@ extension Person {
     worksData = row["works_data"]
     relationsData = row["relations_data"]
     indexesData = row["indexes_data"]
+    photosData = row["photos_data"]
   }
 }
 

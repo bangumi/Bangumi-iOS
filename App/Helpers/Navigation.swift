@@ -58,6 +58,8 @@ enum NavDestination: Hashable, View {
   case personWorkList(_ personId: Int)
   case personRelationList(_ personId: Int)
   case personIndexList(_ personId: Int)
+  case monoPhotoList(_ owner: MonoPhotoOwner)
+  case monoPhoto(_ owner: MonoPhotoOwner, _ photoId: Int)
 
   case index(_ indexId: Int)
 
@@ -159,6 +161,10 @@ enum NavDestination: Hashable, View {
       PersonRelationListView(personId: personId)
     case .personIndexList(let personId):
       PersonIndexListView(personId: personId)
+    case .monoPhotoList(let owner):
+      MonoPhotoListView(owner: owner)
+    case .monoPhoto(let owner, let photoId):
+      MonoPhotoView(owner: owner, photoId: photoId)
 
     case .index(let indexId):
       IndexView(indexId: indexId)
@@ -225,11 +231,23 @@ func handleChiiURL(_ url: URL, _ nav: Binding<NavigationPath>) -> Bool {
     }
   case "character":
     if let characterId = components.first.flatMap({ Int($0) }) {
-      nav.wrappedValue.append(NavDestination.character(characterId))
+      if components.dropFirst().first == "photos",
+        let photoId = components.dropFirst(2).first.flatMap({ Int($0) })
+      {
+        nav.wrappedValue.append(NavDestination.monoPhoto(.character(characterId), photoId))
+      } else {
+        nav.wrappedValue.append(NavDestination.character(characterId))
+      }
     }
   case "person":
     if let personId = components.first.flatMap({ Int($0) }) {
-      nav.wrappedValue.append(NavDestination.person(personId))
+      if components.dropFirst().first == "photos",
+        let photoId = components.dropFirst(2).first.flatMap({ Int($0) })
+      {
+        nav.wrappedValue.append(NavDestination.monoPhoto(.person(personId), photoId))
+      } else {
+        nav.wrappedValue.append(NavDestination.person(personId))
+      }
     }
   case "blog":
     if let blogId = components.first.flatMap({ Int($0) }) {
@@ -303,12 +321,24 @@ func handleBangumiURL(_ url: URL, _ nav: Binding<NavigationPath>) -> Bool {
     guard let characterId = components.dropFirst().first.flatMap({ Int($0) }) else {
       return false
     }
-    nav.wrappedValue.append(NavDestination.character(characterId))
+    if components.dropFirst(2).first == "photos",
+      let photoId = components.dropFirst(3).first.flatMap({ Int($0) })
+    {
+      nav.wrappedValue.append(NavDestination.monoPhoto(.character(characterId), photoId))
+    } else {
+      nav.wrappedValue.append(NavDestination.character(characterId))
+    }
   case "person":
     guard let personId = components.dropFirst().first.flatMap({ Int($0) }) else {
       return false
     }
-    nav.wrappedValue.append(NavDestination.person(personId))
+    if components.dropFirst(2).first == "photos",
+      let photoId = components.dropFirst(3).first.flatMap({ Int($0) })
+    {
+      nav.wrappedValue.append(NavDestination.monoPhoto(.person(personId), photoId))
+    } else {
+      nav.wrappedValue.append(NavDestination.person(personId))
+    }
   case "blog":
     guard let blogId = components.dropFirst().first.flatMap({ Int($0) }) else {
       return false

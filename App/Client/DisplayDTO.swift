@@ -18,6 +18,7 @@ struct CharacterDetailDTO: Hashable {
   var casts: [CharacterCastDTO] = []
   var relations: [CharacterRelationDTO] = []
   var indexes: [SlimIndexDTO] = []
+  var photos: [MonoPhotoDTO] = []
 }
 
 struct PersonDetailDTO: Hashable {
@@ -25,6 +26,7 @@ struct PersonDetailDTO: Hashable {
   var works: [PersonWorkDTO] = []
   var relations: [PersonRelationDTO] = []
   var indexes: [SlimIndexDTO] = []
+  var photos: [MonoPhotoDTO] = []
 }
 
 struct GroupDetailDTO: Hashable {

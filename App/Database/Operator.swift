@@ -129,7 +129,8 @@ extension DatabaseOperator {
     return CharacterDetailDTO(
       casts: character.casts,
       relations: character.relations,
-      indexes: character.indexes
+      indexes: character.indexes,
+      photos: character.photos
     )
   }
 
@@ -141,7 +142,8 @@ extension DatabaseOperator {
       casts: person.casts,
       works: person.works,
       relations: person.relations,
-      indexes: person.indexes
+      indexes: person.indexes,
+      photos: person.photos
     )
   }
 
@@ -1013,7 +1015,8 @@ extension DatabaseOperator {
     characterId: Int,
     casts: [CharacterCastDTO]?,
     relations: [CharacterRelationDTO]?,
-    indexes: [SlimIndexDTO]?
+    indexes: [SlimIndexDTO]?,
+    photos: [MonoPhotoDTO]?
   ) throws {
     try database.write { db in
       guard let character = try fetchCharacter(in: db, id: characterId) else { return }
@@ -1025,6 +1028,9 @@ extension DatabaseOperator {
       }
       if let indexes, character.indexes != indexes {
         character.indexes = indexes
+      }
+      if let photos, character.photos != photos {
+        character.photos = photos
       }
       try upsertCharacter(character, in: db)
     }
@@ -1096,7 +1102,8 @@ extension DatabaseOperator {
     casts: [PersonCastDTO]?,
     works: [PersonWorkDTO]?,
     relations: [PersonRelationDTO]?,
-    indexes: [SlimIndexDTO]?
+    indexes: [SlimIndexDTO]?,
+    photos: [MonoPhotoDTO]?
   ) throws {
     try database.write { db in
       guard let person = try fetchPerson(in: db, id: personId) else { return }
@@ -1111,6 +1118,9 @@ extension DatabaseOperator {
       }
       if let indexes, person.indexes != indexes {
         person.indexes = indexes
+      }
+      if let photos, person.photos != photos {
+        person.photos = photos
       }
       try upsertPerson(person, in: db)
     }
@@ -1877,9 +1887,9 @@ extension DatabaseOperator {
         INSERT INTO characters(
           character_id, collects, comment, images_data, infobox_data, lock,
           name, name_cn, nsfw, role, summary, info, alias, collected_at,
-          casts_data, relations_data, indexes_data
+          casts_data, relations_data, indexes_data, photos_data
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT(character_id) DO UPDATE SET
           collects = excluded.collects,
           comment = excluded.comment,
@@ -1896,7 +1906,8 @@ extension DatabaseOperator {
           collected_at = excluded.collected_at,
           casts_data = excluded.casts_data,
           relations_data = excluded.relations_data,
-          indexes_data = excluded.indexes_data
+          indexes_data = excluded.indexes_data,
+          photos_data = excluded.photos_data
         """,
       arguments: [
         character.characterId,
@@ -1916,6 +1927,7 @@ extension DatabaseOperator {
         character.castsData,
         character.relationsData,
         character.indexesData,
+        character.photosData,
       ]
     )
   }
@@ -1926,9 +1938,9 @@ extension DatabaseOperator {
         INSERT INTO persons(
           person_id, career_data, collects, comment, images_data, infobox_data,
           lock, name, name_cn, nsfw, summary, type, info, alias, collected_at,
-          casts_data, works_data, relations_data, indexes_data
+          casts_data, works_data, relations_data, indexes_data, photos_data
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT(person_id) DO UPDATE SET
           career_data = excluded.career_data,
           collects = excluded.collects,
@@ -1947,7 +1959,8 @@ extension DatabaseOperator {
           casts_data = excluded.casts_data,
           works_data = excluded.works_data,
           relations_data = excluded.relations_data,
-          indexes_data = excluded.indexes_data
+          indexes_data = excluded.indexes_data,
+          photos_data = excluded.photos_data
         """,
       arguments: [
         person.personId,
@@ -1969,6 +1982,7 @@ extension DatabaseOperator {
         person.worksData,
         person.relationsData,
         person.indexesData,
+        person.photosData,
       ]
     )
   }

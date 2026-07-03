@@ -47,7 +47,11 @@ enum CommentService {
       BangumiAPI.priv.build("p1/blogs/-/comments/\(commentId)")
     case .character:
       BangumiAPI.priv.build("p1/characters/-/comments/\(commentId)")
+    case .characterPhoto:
+      BangumiAPI.priv.build("p1/characters/-/comments/\(commentId)")
     case .person:
+      BangumiAPI.priv.build("p1/persons/-/comments/\(commentId)")
+    case .personPhoto:
       BangumiAPI.priv.build("p1/persons/-/comments/\(commentId)")
     case .episode:
       BangumiAPI.priv.build("p1/episodes/-/comments/\(commentId)")
