@@ -66,7 +66,7 @@ final class Subject: Searchable, Linkable {
     infobox = []
     info = item.info ?? ""
     locked = item.locked
-    metaTags = []
+    metaTags = item.metaTags
     tags = []
     name = item.name
     nameCN = item.nameCN
@@ -228,6 +228,7 @@ extension Subject {
     if let info = item.info, self.info != info { self.info = info }
     if let rating = item.rating, self.rating != rating { self.rating = rating }
     if self.locked != item.locked { self.locked = item.locked }
+    if self.metaTags != item.metaTags { self.metaTags = item.metaTags }
     if self.name != item.name { self.name = item.name }
     if self.nameCN != item.nameCN { self.nameCN = item.nameCN }
     if self.nsfw != item.nsfw { self.nsfw = item.nsfw }

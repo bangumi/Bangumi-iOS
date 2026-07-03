@@ -139,7 +139,7 @@ struct SearchSubjectPickerLocalView: View {
     LazyVStack {
       ForEach(subjects) { subject in
         CardView {
-          SubjectLargeRowView(subject: subject)
+          SubjectSlimRowView(subject: subject.slim, collectionType: subject.ctypeEnum)
         }
         .onTapGesture {
           onSelect(subject.id)

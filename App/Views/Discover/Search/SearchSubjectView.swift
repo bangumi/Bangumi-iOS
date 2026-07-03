@@ -61,7 +61,7 @@ struct SearchSubjectLocalView: View {
     LazyVStack {
       ForEach(subjects) { subject in
         CardView {
-          SubjectLargeRowView(subject: subject)
+          SubjectSlimRowView(subject: subject.slim, collectionType: subject.ctypeEnum)
             .subjectCollectionStatusOverlay(
               subjectId: subject.id,
               subjectType: subject.type,

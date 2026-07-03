@@ -426,11 +426,41 @@ struct SlimSubjectDTO: Codable, Identifiable, Hashable, Linkable {
   var info: String?
   var rating: SubjectRating?
   var locked: Bool
+  var metaTags: [String]
   var name: String
   var nameCN: String
   var nsfw: Bool
   var type: SubjectType
   var interest: SlimSubjectInterestDTO?
+
+  enum CodingKeys: String, CodingKey {
+    case id
+    case images
+    case info
+    case rating
+    case locked
+    case metaTags
+    case name
+    case nameCN
+    case nsfw
+    case type
+    case interest
+  }
+
+  init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.id = try container.decode(Int.self, forKey: .id)
+    self.images = try container.decodeIfPresent(SubjectImages.self, forKey: .images)
+    self.info = try container.decodeIfPresent(String.self, forKey: .info)
+    self.rating = try container.decodeIfPresent(SubjectRating.self, forKey: .rating)
+    self.locked = try container.decode(Bool.self, forKey: .locked)
+    self.metaTags = try container.decodeIfPresent([String].self, forKey: .metaTags) ?? []
+    self.name = try container.decode(String.self, forKey: .name)
+    self.nameCN = try container.decode(String.self, forKey: .nameCN)
+    self.nsfw = try container.decode(Bool.self, forKey: .nsfw)
+    self.type = try container.decode(SubjectType.self, forKey: .type)
+    self.interest = try container.decodeIfPresent(SlimSubjectInterestDTO.self, forKey: .interest)
+  }
 
   init() {
     self.id = 0
@@ -438,6 +468,7 @@ struct SlimSubjectDTO: Codable, Identifiable, Hashable, Linkable {
     self.info = nil
     self.rating = nil
     self.locked = false
+    self.metaTags = []
     self.name = ""
     self.nameCN = ""
     self.nsfw = false
@@ -451,6 +482,7 @@ struct SlimSubjectDTO: Codable, Identifiable, Hashable, Linkable {
     self.info = subject.info
     self.rating = subject.rating
     self.locked = subject.locked
+    self.metaTags = subject.metaTags
     self.name = subject.name
     self.nameCN = subject.nameCN
     self.nsfw = subject.nsfw
@@ -464,6 +496,7 @@ struct SlimSubjectDTO: Codable, Identifiable, Hashable, Linkable {
     self.info = subject.info
     self.rating = subject.rating
     self.locked = subject.locked
+    self.metaTags = subject.metaTags
     self.name = subject.name
     self.nameCN = subject.nameCN
     self.nsfw = subject.nsfw
