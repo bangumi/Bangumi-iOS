@@ -1,6 +1,61 @@
 import Foundation
 
-typealias Character = BangumiSchemaV3.CharacterV3
+final class Character: Searchable, Linkable {
+  var characterId: Int
+
+  var collects: Int
+  var comment: Int
+  var images: Images?
+  var infobox: Infobox
+  var lock: Bool
+  var name: String
+  var nameCN: String
+  var nsfw: Bool
+  var role: Int
+  var summary: String
+  var info: String = ""
+  var alias: String = ""
+
+  var collectedAt: Int = 0
+
+  var castsData: Data?
+  var relationsData: Data?
+  var indexesData: Data?
+
+  init(_ item: CharacterDTO) {
+    characterId = item.id
+    collects = item.collects
+    comment = item.comment
+    images = item.images
+    infobox = item.infobox.clean()
+    lock = item.lock
+    name = item.name
+    nameCN = item.nameCN
+    nsfw = item.nsfw
+    role = item.role.rawValue
+    summary = item.summary
+    info = item.info
+    alias = item.infobox.aliases.joined(separator: " ")
+    collectedAt = item.collectedAt ?? 0
+  }
+
+  init(_ item: SlimCharacterDTO) {
+    characterId = item.id
+    collects = 0
+    comment = item.comment ?? 0
+    images = item.images
+    infobox = []
+    lock = item.lock
+    name = item.name
+    nameCN = item.nameCN
+    nsfw = item.nsfw
+    role = item.role.rawValue
+    info = item.info ?? ""
+    summary = ""
+    alias = ""
+    collectedAt = 0
+  }
+}
 
 extension Character {
   var casts: [CharacterCastDTO] {

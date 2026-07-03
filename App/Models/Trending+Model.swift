@@ -1,6 +1,15 @@
 import Foundation
 
-typealias TrendingSubject = BangumiSchemaV3.TrendingSubjectV2
+final class TrendingSubject {
+  var type: Int
+
+  var itemsData: Data?
+
+  init(type: Int, items: [TrendingSubjectDTO]) {
+    self.type = type
+    itemsData = PersistedJSON.encode(items)
+  }
+}
 
 extension TrendingSubject {
   var items: [TrendingSubjectDTO] {

@@ -37,7 +37,7 @@ struct MainApp: App {
 
     do {
       let container = try await Task.detached(priority: .userInitiated) {
-        try await DatabaseFactory.make()
+        try DatabaseFactory.make()
       }.value
       await AppContext.shared.setUp(database: container)
       bootstrapState = .ready

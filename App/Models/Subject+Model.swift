@@ -1,7 +1,86 @@
 import Foundation
-import OSLog
 
-typealias Subject = BangumiSchemaV3.SubjectV3
+final class Subject: Searchable, Linkable {
+  var subjectId: Int
+
+  var airtime: SubjectAirtime
+  var collection: SubjectCollection
+  var eps: Int
+  var images: SubjectImages?
+  var infobox: Infobox
+  var locked: Bool
+  var metaTags: [String]
+  var tags: [Tag]
+  var name: String
+  var nameCN: String
+  var nsfw: Bool
+  var platform: SubjectPlatform
+  var rating: SubjectRating
+  var series: Bool
+  var summary: String
+  var type: Int
+  var volumes: Int
+  var info: String = ""
+  var alias: String = ""
+
+  var ctype: Int = 0
+  var collectedAt: Int = 0
+  var interest: SubjectInterest?
+
+  var detail: SubjectDetail?
+
+  init(_ item: SubjectDTO) {
+    subjectId = item.id
+    airtime = item.airtime
+    collection = item.collection
+    eps = item.eps
+    images = item.images
+    infobox = item.infobox.clean()
+    info = item.info
+    locked = item.locked
+    metaTags = item.metaTags
+    tags = item.tags
+    name = item.name
+    nameCN = item.nameCN
+    nsfw = item.nsfw
+    platform = item.platform
+    rating = item.rating
+    series = item.series
+    summary = item.summary
+    type = item.type.rawValue
+    volumes = item.volumes
+    interest = item.interest
+    if let interest = item.interest {
+      ctype = interest.type.rawValue
+      collectedAt = interest.updatedAt
+    }
+    alias = item.infobox.aliases.joined(separator: " ")
+  }
+
+  init(_ item: SlimSubjectDTO) {
+    subjectId = item.id
+    airtime = SubjectAirtime(date: "")
+    collection = [:]
+    eps = 0
+    images = item.images
+    infobox = []
+    info = item.info ?? ""
+    locked = item.locked
+    metaTags = []
+    tags = []
+    name = item.name
+    nameCN = item.nameCN
+    nsfw = item.nsfw
+    platform = SubjectPlatform(name: "")
+    rating = item.rating ?? SubjectRating()
+    series = false
+    summary = ""
+    type = item.type.rawValue
+    volumes = 0
+    alias = ""
+    interest = nil
+  }
+}
 
 extension Subject {
   var typeEnum: SubjectType {

@@ -1,6 +1,23 @@
 import Foundation
 
-typealias SubjectDetail = BangumiSchemaV3.SubjectDetailV2
+final class SubjectDetail {
+  var subjectId: Int
+
+  var positionsData: Data?
+  var charactersData: Data?
+  var offprintsData: Data?
+  var relationsData: Data?
+  var recsData: Data?
+  var collectsData: Data?
+  var reviewsData: Data?
+  var topicsData: Data?
+  var commentsData: Data?
+  var indexesData: Data?
+
+  init(subjectId: Int) {
+    self.subjectId = subjectId
+  }
+}
 
 extension SubjectDetail {
   var positions: [SubjectPositionDTO] {

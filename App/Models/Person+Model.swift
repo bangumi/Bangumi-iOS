@@ -1,6 +1,65 @@
 import Foundation
 
-typealias Person = BangumiSchemaV3.PersonV3
+final class Person: Searchable, Linkable {
+  var personId: Int
+
+  var career: [String]
+  var collects: Int
+  var comment: Int
+  var images: Images?
+  var infobox: Infobox
+  var lock: Bool
+  var name: String
+  var nameCN: String
+  var nsfw: Bool
+  var summary: String
+  var type: Int
+  var info: String = ""
+  var alias: String = ""
+
+  var collectedAt: Int = 0
+
+  var castsData: Data?
+  var worksData: Data?
+  var relationsData: Data?
+  var indexesData: Data?
+
+  init(_ item: PersonDTO) {
+    personId = item.id
+    career = item.career.map(\.rawValue)
+    collects = item.collects
+    comment = item.comment
+    images = item.images
+    infobox = item.infobox.clean()
+    lock = item.lock
+    name = item.name
+    nameCN = item.nameCN
+    nsfw = item.nsfw
+    summary = item.summary
+    type = item.type.rawValue
+    info = item.info
+    alias = item.infobox.aliases.joined(separator: " ")
+    collectedAt = item.collectedAt ?? 0
+  }
+
+  init(_ item: SlimPersonDTO) {
+    personId = item.id
+    career = []
+    collects = 0
+    comment = item.comment ?? 0
+    images = item.images
+    infobox = []
+    lock = item.lock
+    name = item.name
+    nameCN = item.nameCN
+    nsfw = item.nsfw
+    summary = ""
+    info = item.info ?? ""
+    type = item.type.rawValue
+    alias = ""
+    collectedAt = 0
+  }
+}
 
 extension Person {
   var casts: [PersonCastDTO] {

@@ -1,6 +1,48 @@
 import Foundation
 
-typealias ChiiGroup = BangumiSchemaV3.GroupV3
+final class ChiiGroup: Linkable {
+  var groupId: Int
+
+  var name: String
+  var nsfw: Bool
+  var title: String
+  var icon: Avatar?
+  var creatorData: Data?
+  var creatorID: Int
+  var desc: String
+  var cat: Int
+  var accessible: Bool
+  var members: Int
+  var posts: Int
+  var topics: Int
+  var createdAt: Int
+
+  var role: Int = -1
+  var joinedAt: Int = 0
+
+  var moderatorsData: Data?
+  var recentMembersData: Data?
+  var recentTopicsData: Data?
+
+  init(_ item: GroupDTO) {
+    groupId = item.id
+    name = item.name
+    nsfw = item.nsfw
+    title = item.title
+    icon = item.icon
+    creatorData = PersistedJSON.encode(item.creator)
+    creatorID = item.creatorID
+    desc = item.description
+    cat = item.cat
+    accessible = item.accessible
+    members = item.members
+    posts = item.posts
+    topics = item.topics
+    createdAt = item.createdAt
+    role = item.membership?.role?.rawValue ?? -1
+    joinedAt = item.membership?.joinedAt ?? 0
+  }
+}
 
 extension ChiiGroup {
   var creator: SlimUserDTO? {

@@ -2,7 +2,7 @@ import Foundation
 import GRDB
 
 enum DatabaseFactory {
-  static func make() async throws -> DatabaseQueue {
+  static func make() throws -> DatabaseQueue {
     let directoryURL = try databaseDirectoryURL()
     try FileManager.default.createDirectory(
       at: directoryURL,
@@ -19,7 +19,6 @@ enum DatabaseFactory {
       configuration: configuration
     )
     try migrator.migrate(queue)
-    try await LegacySwiftDataMigrator.migrateIfNeeded(to: queue)
     return queue
   }
 

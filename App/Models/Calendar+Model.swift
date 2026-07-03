@@ -1,6 +1,15 @@
 import Foundation
 
-typealias BangumiCalendar = BangumiSchemaV3.BangumiCalendarV2
+final class BangumiCalendar {
+  var weekday: Int
+
+  var itemsData: Data?
+
+  init(weekday: Int, items: [BangumiCalendarItemDTO]) {
+    self.weekday = weekday
+    itemsData = PersistedJSON.encode(items)
+  }
+}
 
 extension BangumiCalendar {
   var items: [BangumiCalendarItemDTO] {

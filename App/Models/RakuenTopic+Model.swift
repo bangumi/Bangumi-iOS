@@ -1,8 +1,43 @@
 import Foundation
 
-typealias RakuenSubjectTopicCache = BangumiSchemaV3.RakuenSubjectTopicCacheV2
-typealias RakuenGroupTopicCache = BangumiSchemaV3.RakuenGroupTopicCacheV2
-typealias RakuenGroupCache = BangumiSchemaV3.RakuenGroupCacheV2
+final class RakuenSubjectTopicCache {
+  var mode: String
+
+  var itemsData: Data?
+  var updatedAt: Date
+
+  init(mode: String, items: [SubjectTopicDTO]) {
+    self.mode = mode
+    itemsData = PersistedJSON.encode(items)
+    updatedAt = Date()
+  }
+}
+
+final class RakuenGroupTopicCache {
+  var mode: String
+
+  var itemsData: Data?
+  var updatedAt: Date
+
+  init(mode: String, items: [GroupTopicDTO]) {
+    self.mode = mode
+    itemsData = PersistedJSON.encode(items)
+    updatedAt = Date()
+  }
+}
+
+final class RakuenGroupCache {
+  var id: String
+
+  var itemsData: Data?
+  var updatedAt: Date
+
+  init(id: String, items: [SlimGroupDTO]) {
+    self.id = id
+    itemsData = PersistedJSON.encode(items)
+    updatedAt = Date()
+  }
+}
 
 extension RakuenSubjectTopicCache {
   var items: [SubjectTopicDTO] {

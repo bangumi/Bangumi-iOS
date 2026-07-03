@@ -1,8 +1,43 @@
 import Foundation
-import OSLog
 import SwiftUI
 
-typealias Episode = BangumiSchemaV3.EpisodeV3
+final class Episode: Linkable {
+  var episodeId: Int
+
+  var subjectId: Int
+  var type: Int
+  var sort: Float
+  var name: String
+  var nameCN: String
+  var duration: String
+  var airdate: String
+  var comment: Int
+  var desc: String
+  var disc: Int
+
+  var status: Int = 0
+  var collectedAt: Int = 0
+
+  var subject: Subject?
+
+  init(_ item: EpisodeDTO) {
+    episodeId = item.id
+    subjectId = item.subjectID
+    type = item.type.rawValue
+    sort = item.sort
+    name = item.name
+    nameCN = item.nameCN
+    duration = item.duration
+    airdate = item.airdate
+    comment = item.comment
+    desc = item.desc ?? ""
+    disc = item.disc
+    if let collection = item.collection {
+      status = collection.status
+      collectedAt = collection.updatedAt ?? 0
+    }
+  }
+}
 
 extension Episode {
   var typeEnum: EpisodeType {

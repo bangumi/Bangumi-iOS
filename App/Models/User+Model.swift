@@ -1,6 +1,37 @@
 import Foundation
 
-typealias User = BangumiSchemaV3.UserV2
+final class User {
+  var userId: Int
+
+  var username: String
+  var nickname: String
+  var avatar: Avatar?
+  var group: Int
+  var joinedAt: Int
+  var sign: String
+  var site: String
+  var location: String
+  var bio: String
+  var networkServicesData: Data?
+  var homepageData: Data?
+  var statsData: Data?
+
+  init(_ item: UserDTO) {
+    userId = item.id
+    username = item.username
+    nickname = item.nickname
+    avatar = item.avatar
+    group = item.group.rawValue
+    joinedAt = item.joinedAt
+    sign = item.sign
+    site = item.site
+    location = item.location
+    bio = item.bio
+    networkServicesData = PersistedJSON.encode(item.networkServices)
+    homepageData = PersistedJSON.encode(item.homepage)
+    statsData = PersistedJSON.encode(item.stats)
+  }
+}
 
 extension User {
   var networkServices: [UserNetworkServiceDTO] {
