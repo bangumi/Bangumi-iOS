@@ -57,6 +57,10 @@ enum DatabaseFactory {
       try createNoticeCacheEntries(db)
     }
 
+    migrator.registerMigration("00004_drop_local_migration_markers") { db in
+      try db.execute(sql: "DROP TABLE IF EXISTS local_migration_markers")
+    }
+
     return migrator
   }
 
