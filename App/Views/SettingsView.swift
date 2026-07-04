@@ -48,37 +48,12 @@ struct SettingsView: View {
     }
   }
 
-  private var shareDomainDescription: String {
-    "分享链接时使用：\(BangumiURL.shareHost(for: shareDomain))"
-  }
-
-  private var authDomainDescription: String {
-    "OAuth 认证服务器：\(BangumiURL.authHost(for: authDomain))"
-  }
-
   private func shareDomainTitle(for domain: ShareDomain) -> String {
-    guard domain == .mirror else {
-      return domain.title
-    }
-
-    if hasMirrorRootDomain {
-      return "镜像站（\(BangumiURL.shareHost(for: domain))）"
-    }
-    return "镜像站（未启用）"
+    domain.title
   }
 
   private func authDomainTitle(for domain: AuthDomain) -> String {
-    let host = BangumiURL.authHost(for: domain)
-    guard hasMirrorRootDomain else {
-      return host
-    }
-
-    switch domain {
-    case .origin:
-      return "镜像主站（\(host)）"
-    case .next:
-      return "镜像 Next（\(host)）"
-    }
+    domain.title
   }
 
   func reindex() {
@@ -253,7 +228,7 @@ struct SettingsView: View {
             Text(shareDomainTitle(for: domain)).tag(domain)
           }
         } label: {
-          SettingLabel("分享域名", description: "\(shareDomainDescription)")
+          SettingLabel("分享域名", description: "分享链接时使用的域名")
         }
 
         Picker(selection: $authDomain) {
@@ -261,7 +236,7 @@ struct SettingsView: View {
             Text(authDomainTitle(for: domain)).tag(domain)
           }
         } label: {
-          SettingLabel("认证域名", description: "\(authDomainDescription)")
+          SettingLabel("认证域名", description: "OAuth 认证服务器")
         }
 
         Button {
@@ -279,6 +254,12 @@ struct SettingsView: View {
         .buttonStyle(.plain)
       } header: {
         Text("网络")
+      } footer: {
+        if hasMirrorRootDomain {
+          Text(
+            "当前认证：\(BangumiURL.authHost(for: authDomain))\n当前分享：\(BangumiURL.shareHost(for: shareDomain))"
+          )
+        }
       }
 
       // MARK: - 关于

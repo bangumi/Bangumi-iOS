@@ -91,6 +91,15 @@ enum AuthDomain: String, CaseIterable {
       self = .next
     }
   }
+
+  var title: String {
+    switch self {
+    case .origin:
+      "主站"
+    case .next:
+      "Next"
+    }
+  }
 }
 
 enum TimelineViewMode: String, CaseIterable {
