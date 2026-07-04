@@ -19,6 +19,7 @@ enum NavDestination: Hashable, View {
   case calendar
   case collectionList(_ subjectType: SubjectType)
   case export
+  case profilePrivacy
 
   case user(_ username: String)
   case userCollection(_ user: SlimUserDTO, _ stype: SubjectType, _ ctypes: [CollectionType: Int])
@@ -86,6 +87,8 @@ enum NavDestination: Hashable, View {
       CollectionListView(subjectType: subjectType)
     case .export:
       ExportView()
+    case .profilePrivacy:
+      ProfilePrivacyView()
 
     case .user(let username):
       UserView(username: username)

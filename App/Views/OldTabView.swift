@@ -65,7 +65,7 @@ struct OldTabView: View {
 
       if isAuthenticated {
         NavigationStack(path: $meNav) {
-          CollectionsView()
+          ProfileHomeView()
             .navigationDestination(for: NavDestination.self) { $0 }
         }
         .tag(ChiiViewTab.me)

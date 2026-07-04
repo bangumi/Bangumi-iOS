@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct CollectionsView: View {
+struct ProfileHomeView: View {
   @AppStorage("profile") var profile: Profile = Profile()
 
   var body: some View {
@@ -22,6 +22,10 @@ struct CollectionsView: View {
     .toolbar {
       ToolbarItem(placement: .topBarTrailing) {
         Menu {
+          NavigationLink(value: NavDestination.profilePrivacy) {
+            Label("隐私设置", systemImage: "hand.raised")
+          }
+
           NavigationLink(value: NavDestination.export) {
             Label("导出收藏", systemImage: "square.and.arrow.up")
           }

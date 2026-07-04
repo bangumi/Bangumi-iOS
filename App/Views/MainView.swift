@@ -68,7 +68,7 @@ struct MainView: View {
         Tab(ChiiViewTab.me.title, systemImage: ChiiViewTab.me.icon, value: .me) {
           ZoomTransitionContainer {
             NavigationStack(path: $meNav) {
-              CollectionsView()
+              ProfileHomeView()
                 .navigationDestination(for: NavDestination.self) { $0 }
             }
           }
