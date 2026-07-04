@@ -6,6 +6,14 @@ enum BangumiURL {
     BangumiDomains(mirrorRootDomain: mirrorRootDomain)
   }
 
+  static nonisolated func domains(mirrorRootDomain: String?) -> BangumiDomains {
+    BangumiDomains(mirrorRootDomain: mirrorRootDomain)
+  }
+
+  static nonisolated func normalizedMirrorRootDomain(_ rawValue: String?) -> String? {
+    BangumiDomains.normalizedRootDomain(rawValue)
+  }
+
   static nonisolated func main(path: String = "") -> URL {
     domains.mainURL(path: path)
   }
@@ -24,6 +32,33 @@ enum BangumiURL {
       return main(path: path)
     case .next:
       return next(path: path)
+    }
+  }
+
+  static nonisolated func authHost(for authDomain: AuthDomain) -> String {
+    switch authDomain {
+    case .origin:
+      domains.main
+    case .next:
+      domains.next
+    }
+  }
+
+  static nonisolated func shareRootURL(for shareDomain: ShareDomain) -> URL {
+    switch shareDomain {
+    case .mirror:
+      domains.mainURL()
+    default:
+      URL(string: "https://\(shareDomain.rawValue)")!
+    }
+  }
+
+  static nonisolated func shareHost(for shareDomain: ShareDomain) -> String {
+    switch shareDomain {
+    case .mirror:
+      domains.main
+    default:
+      shareDomain.rawValue
     }
   }
 

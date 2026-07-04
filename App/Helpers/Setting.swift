@@ -46,6 +46,7 @@ enum ShareDomain: String, CaseIterable {
   case chii = "chii.in"
   case bgm = "bgm.tv"
   case bangumi = "bangumi.tv"
+  case mirror = "mirror"
 
   init(_ label: String? = nil) {
     switch label {
@@ -55,13 +56,24 @@ enum ShareDomain: String, CaseIterable {
       self = .bgm
     case "bangumi.tv":
       self = .bangumi
+    case "mirror":
+      self = .mirror
     default:
       self = .chii
     }
   }
 
+  var title: String {
+    switch self {
+    case .mirror:
+      "镜像站"
+    default:
+      rawValue
+    }
+  }
+
   var url: String {
-    "https://\(self.rawValue)"
+    BangumiURL.shareRootURL(for: self).absoluteString
   }
 }
 

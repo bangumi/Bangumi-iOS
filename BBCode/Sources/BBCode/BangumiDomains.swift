@@ -19,7 +19,7 @@ public struct BangumiDomains: Hashable, Sendable {
   }
 
   public init(mirrorRootDomain: String?) {
-    guard let root = Self.normalizedDomain(mirrorRootDomain) else {
+    guard let root = Self.normalizedRootDomain(mirrorRootDomain) else {
       self = .official
       return
     }
@@ -31,6 +31,10 @@ public struct BangumiDomains: Hashable, Sendable {
 
   public var cacheKey: String {
     "\(main)|\(image)|\(next)"
+  }
+
+  public static func normalizedRootDomain(_ rawValue: String?) -> String? {
+    normalizedDomain(rawValue)
   }
 
   public func mainURL(path: String = "") -> URL {
