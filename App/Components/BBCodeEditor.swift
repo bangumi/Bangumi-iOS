@@ -1,4 +1,3 @@
-import BBCode
 import SwiftUI
 
 struct BBCodeEditor: View {
@@ -533,11 +532,11 @@ private struct BBCodeToolbarSeparator: View {
 private struct SmileyPicker: View {
   let onSelect: (String) -> Void
 
-  @State private var selectedSectionKey = SmileyCatalog.sections.first?.key ?? ""
+  @State private var selectedSectionKey = BBCodeSmileyCatalog.sections.first?.key ?? ""
 
-  private var selectedSection: SmileySection? {
-    SmileyCatalog.sections.first(where: { $0.key == selectedSectionKey })
-      ?? SmileyCatalog.sections.first
+  private var selectedSection: BBCodeSmileySection? {
+    BBCodeSmileyCatalog.sections.first(where: { $0.key == selectedSectionKey })
+      ?? BBCodeSmileyCatalog.sections.first
   }
 
   private var gridItemSize: CGFloat {
@@ -563,7 +562,7 @@ private struct SmileyPicker: View {
         VStack(alignment: .leading, spacing: 16) {
           ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
-              ForEach(SmileyCatalog.sections) { section in
+              ForEach(BBCodeSmileyCatalog.sections) { section in
                 if section.key == selectedSectionKey {
                   Button(section.title) {
                     selectedSectionKey = section.key
@@ -610,13 +609,13 @@ private struct SmileyPicker: View {
 }
 
 private struct SmileyGridItem: View {
-  let item: SmileyItem
+  let item: BBCodeSmileyItem
   let size: CGFloat
 
   var body: some View {
     Group {
       if item.resourceURL() != nil {
-        SmileyImageView(item: item, size: size)
+        BBCodeSmileyImageView(item: item, size: size)
       } else {
         Text(item.token)
           .font(.caption2)

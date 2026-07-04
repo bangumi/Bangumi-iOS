@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		19671C732BDEB8B1000B4D99 /* KeychainSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 19671C722BDEB8B1000B4D99 /* KeychainSwift */; };
 		1968C5DD2CD5010C00242103 /* Flow in Frameworks */ = {isa = PBXBuildFile; productRef = 1968C5DC2CD5010C00242103 /* Flow */; };
-		19B9E2D62EAC955A00934E31 /* BBCode in Frameworks */ = {isa = PBXBuildFile; productRef = 19B9E2D52EAC955A00934E31 /* BBCode */; };
 		19DAAA742F176AF60070BFAE /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 19DAAA732F176AF60070BFAE /* SDWebImageSwiftUI */; };
 		19DAAA772F176B840070BFAE /* SDWebImageSVGCoder in Frameworks */ = {isa = PBXBuildFile; productRef = 19DAAA762F176B840070BFAE /* SDWebImageSVGCoder */; };
 		19DAAA7A2F176BAB0070BFAE /* SDWebImageWebPCoder in Frameworks */ = {isa = PBXBuildFile; productRef = 19DAAA792F176BAB0070BFAE /* SDWebImageWebPCoder */; };
@@ -42,7 +41,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				19DAAA742F176AF60070BFAE /* SDWebImageSwiftUI in Frameworks */,
-				19B9E2D62EAC955A00934E31 /* BBCode in Frameworks */,
 				19DAAA7A2F176BAB0070BFAE /* SDWebImageWebPCoder in Frameworks */,
 				19E4B4AB2F28000100BDB001 /* GRDB in Frameworks */,
 				19671C732BDEB8B1000B4D99 /* KeychainSwift in Frameworks */,
@@ -93,7 +91,6 @@
 			packageProductDependencies = (
 				19671C722BDEB8B1000B4D99 /* KeychainSwift */,
 				1968C5DC2CD5010C00242103 /* Flow */,
-				19B9E2D52EAC955A00934E31 /* BBCode */,
 				19DAAA732F176AF60070BFAE /* SDWebImageSwiftUI */,
 				19DAAA762F176B840070BFAE /* SDWebImageSVGCoder */,
 				19DAAA792F176BAB0070BFAE /* SDWebImageWebPCoder */,
@@ -131,7 +128,6 @@
 			packageReferences = (
 				191FEF252BDCF59B0047162A /* XCRemoteSwiftPackageReference "keychain-swift" */,
 				1968C5DB2CD5010C00242103 /* XCRemoteSwiftPackageReference "SwiftUI-Flow" */,
-				19B9E2D42EAC955A00934E31 /* XCLocalSwiftPackageReference "BBCode" */,
 				19DAAA722F176AF60070BFAE /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */,
 				19DAAA752F176B840070BFAE /* XCRemoteSwiftPackageReference "SDWebImageSVGCoder" */,
 				19DAAA782F176BAB0070BFAE /* XCRemoteSwiftPackageReference "SDWebImageWebPCoder" */,
@@ -395,13 +391,6 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCLocalSwiftPackageReference section */
-		19B9E2D42EAC955A00934E31 /* XCLocalSwiftPackageReference "BBCode" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = BBCode;
-		};
-/* End XCLocalSwiftPackageReference section */
-
 /* Begin XCRemoteSwiftPackageReference section */
 		191FEF252BDCF59B0047162A /* XCRemoteSwiftPackageReference "keychain-swift" */ = {
 			isa = XCRemoteSwiftPackageReference;
@@ -471,10 +460,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 1968C5DB2CD5010C00242103 /* XCRemoteSwiftPackageReference "SwiftUI-Flow" */;
 			productName = Flow;
-		};
-		19B9E2D52EAC955A00934E31 /* BBCode */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = BBCode;
 		};
 		19DAAA732F176AF60070BFAE /* SDWebImageSwiftUI */ = {
 			isa = XCSwiftPackageProductDependency;

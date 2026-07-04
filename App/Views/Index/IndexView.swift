@@ -1,4 +1,3 @@
-import BBCode
 import SwiftUI
 
 struct IndexView: View {

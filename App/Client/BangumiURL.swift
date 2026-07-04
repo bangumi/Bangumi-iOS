@@ -1,4 +1,3 @@
-import BBCode
 import Foundation
 
 enum BangumiURL {

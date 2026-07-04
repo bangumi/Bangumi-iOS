@@ -1,4 +1,3 @@
-import BBCode
 import Flow
 import SwiftUI
 
@@ -211,8 +210,8 @@ private struct SmileyReactionImage: View {
   let size: CGFloat
 
   var body: some View {
-    if let item = SmileyCatalog.item(for: code) {
-      SmileyImageView(item: item, size: size)
+    if let item = BBCodeSmileyCatalog.item(for: code) {
+      BBCodeSmileyImageView(item: item, size: size)
     } else {
       Text("(\(code))")
         .font(.caption2)
