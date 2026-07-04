@@ -262,12 +262,12 @@ func handleChiiURL(_ url: URL, _ nav: Binding<NavigationPath>) -> Bool {
 
 @MainActor
 func handleHTTPURL(_ url: URL, _ nav: Binding<NavigationPath>) -> Bool {
-  switch url.host {
-  case "bgm.tv", "bangumi.tv", "chii.in":
+  let officialHosts = ["bgm.tv", "bangumi.tv", "chii.in"]
+  if let host = url.host, officialHosts.contains(host) || BangumiURL.isMainURL(url) {
     return handleBangumiURL(url, nav)
-  default:
-    return false
   }
+
+  return false
 }
 
 @MainActor

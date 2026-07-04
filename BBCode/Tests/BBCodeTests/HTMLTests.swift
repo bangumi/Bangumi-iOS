@@ -19,6 +19,13 @@ class HTMLTests: XCTestCase {
     XCTAssertEqual(domains.next, "next.mirror.example")
   }
 
+  func testBangumiDomainsSplitHostAndPort() {
+    let domain = BangumiDomains.hostAndPort(from: "lain.mirror.example:8443")
+
+    XCTAssertEqual(domain?.host, "lain.mirror.example")
+    XCTAssertEqual(domain?.port, 8443)
+  }
+
   func testBold() {
     XCTAssertEqual(try BBCode().html("我是[b]粗体字[/b]"), "我是<strong>粗体字</strong>")
   }

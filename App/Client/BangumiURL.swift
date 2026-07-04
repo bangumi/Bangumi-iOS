@@ -26,6 +26,10 @@ enum BangumiURL {
     domains.nextURL(path: path)
   }
 
+  static nonisolated func officialNext(path: String = "") -> URL {
+    BangumiDomains.official.nextURL(path: path)
+  }
+
   static nonisolated func auth(path: String = "") -> URL {
     switch AppConfig.authDomain {
     case .origin:
@@ -69,8 +73,17 @@ enum BangumiURL {
       return rawValue
     }
 
-    components.host = domains.image
+    guard let imageHost = BangumiDomains.hostAndPort(from: domains.image) else {
+      return rawValue
+    }
+
+    components.host = imageHost.host
+    components.port = imageHost.port
     return components.url?.absoluteString ?? rawValue
+  }
+
+  static nonisolated func isMainURL(_ url: URL) -> Bool {
+    BangumiDomains.normalizedDomain(for: url.host, port: url.port) == domains.main
   }
 
   private static nonisolated var mirrorRootDomain: String {

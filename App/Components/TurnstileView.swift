@@ -51,7 +51,7 @@ struct TrunstileView: UIViewRepresentable {
     webView.scrollView.isScrollEnabled = false
     webView.loadHTMLString(
       turnstileHTML,
-      baseURL: BangumiURL.next(path: "/turnstile")
+      baseURL: BangumiURL.officialNext(path: "/turnstile")
     )
     return webView
   }

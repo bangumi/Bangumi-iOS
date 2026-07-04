@@ -37,6 +37,30 @@ public struct BangumiDomains: Hashable, Sendable {
     normalizedDomain(rawValue)
   }
 
+  public static func normalizedDomain(for host: String?, port: Int?) -> String? {
+    guard let host, !host.isEmpty else {
+      return nil
+    }
+
+    let normalizedHost = host.lowercased()
+    if let port {
+      return "\(normalizedHost):\(port)"
+    }
+    return normalizedHost
+  }
+
+  public static func hostAndPort(from domain: String) -> (host: String, port: Int?)? {
+    let candidate = domain.contains("://") ? domain : "https://\(domain)"
+    guard let components = URLComponents(string: candidate),
+      let host = components.host?.lowercased(),
+      !host.isEmpty
+    else {
+      return nil
+    }
+
+    return (host, components.port)
+  }
+
   public func mainURL(path: String = "") -> URL {
     url(domain: main, path: path)
   }
