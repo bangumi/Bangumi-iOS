@@ -48,12 +48,12 @@ struct SettingsView: View {
     }
   }
 
-  private func shareDomainTitle(for domain: ShareDomain) -> String {
-    domain.title
+  private var shareDomainDescription: String {
+    "当前：\(BangumiURL.shareHost(for: shareDomain))"
   }
 
-  private func authDomainTitle(for domain: AuthDomain) -> String {
-    domain.title
+  private var authDomainDescription: String {
+    "当前：\(BangumiURL.authHost(for: authDomain))"
   }
 
   func reindex() {
@@ -225,18 +225,18 @@ struct SettingsView: View {
       Section {
         Picker(selection: $shareDomain) {
           ForEach(ShareDomain.allCases, id: \.self) { domain in
-            Text(shareDomainTitle(for: domain)).tag(domain)
+            Text(domain.title).tag(domain)
           }
         } label: {
-          SettingLabel("分享域名", description: "分享链接时使用的域名")
+          SettingLabel("分享域名", description: "\(shareDomainDescription)")
         }
 
         Picker(selection: $authDomain) {
           ForEach(AuthDomain.allCases, id: \.self) { domain in
-            Text(authDomainTitle(for: domain)).tag(domain)
+            Text(domain.title).tag(domain)
           }
         } label: {
-          SettingLabel("认证域名", description: "OAuth 认证服务器")
+          SettingLabel("认证域名", description: "\(authDomainDescription)")
         }
 
         Button {
@@ -254,12 +254,6 @@ struct SettingsView: View {
         .buttonStyle(.plain)
       } header: {
         Text("网络")
-      } footer: {
-        if hasMirrorRootDomain {
-          Text(
-            "当前认证：\(BangumiURL.authHost(for: authDomain))\n当前分享：\(BangumiURL.shareHost(for: shareDomain))"
-          )
-        }
       }
 
       // MARK: - 关于
