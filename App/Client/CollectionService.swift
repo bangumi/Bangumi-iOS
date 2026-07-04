@@ -4,7 +4,7 @@ enum CollectionService {
   static func getCharacterCollections(limit: Int = 20, offset: Int = 0) async throws
     -> PagedDTO<CharacterDTO>
   {
-    let url = BangumiAPI.priv.build("p1/collections/characters")
+    let url = BangumiURL.next(path: "p1/collections/characters")
     let data = try await APIClient.shared.request(
       url: url.appending(queryItems: paginationQueryItems(limit: limit, offset: offset)),
       method: "GET",
@@ -16,7 +16,7 @@ enum CollectionService {
   static func getIndexCollections(limit: Int = 20, offset: Int = 0) async throws
     -> PagedDTO<IndexDTO>
   {
-    let url = BangumiAPI.priv.build("p1/collections/indexes")
+    let url = BangumiURL.next(path: "p1/collections/indexes")
     let data = try await APIClient.shared.request(
       url: url.appending(queryItems: paginationQueryItems(limit: limit, offset: offset)),
       method: "GET",
@@ -28,7 +28,7 @@ enum CollectionService {
   static func getPersonCollections(limit: Int = 20, offset: Int = 0) async throws
     -> PagedDTO<PersonDTO>
   {
-    let url = BangumiAPI.priv.build("p1/collections/persons")
+    let url = BangumiURL.next(path: "p1/collections/persons")
     let data = try await APIClient.shared.request(
       url: url.appending(queryItems: paginationQueryItems(limit: limit, offset: offset)),
       method: "GET",
@@ -44,7 +44,7 @@ enum CollectionService {
     limit: Int = 100,
     offset: Int = 0
   ) async throws -> PagedDTO<SubjectDTO> {
-    let url = BangumiAPI.priv.build("p1/collections/subjects")
+    let url = BangumiURL.next(path: "p1/collections/subjects")
     var queryItems = [
       URLQueryItem(name: "since", value: String(since)),
       URLQueryItem(name: "limit", value: String(limit)),

@@ -6,6 +6,7 @@ struct SettingsView: View {
   @AppStorage("appearance") var appearance: AppearanceType = .system
   @AppStorage("shareDomain") var shareDomain: ShareDomain = .chii
   @AppStorage("authDomain") var authDomain: AuthDomain = .next
+  @AppStorage("mirrorRootDomain") var mirrorRootDomain: String = ""
   @AppStorage("subjectImageQuality") var subjectImageQuality: ImageQuality = .high
   @AppStorage("isolationMode") var isolationMode: Bool = false
   @AppStorage("showNSFWBadge") var showNSFWBadge: Bool = true
@@ -216,8 +217,31 @@ struct SettingsView: View {
         } label: {
           SettingLabel("认证域名", description: "OAuth 认证服务器域名")
         }
+
+        VStack(alignment: .leading, spacing: 8) {
+          SettingLabel("镜像站", description: "留空时使用官方域名")
+          HStack {
+            TextField("根域名", text: $mirrorRootDomain, prompt: Text("example.com"))
+              .keyboardType(.URL)
+              .textInputAutocapitalization(.never)
+              .autocorrectionDisabled()
+
+            if !mirrorRootDomain.isEmpty {
+              Button {
+                mirrorRootDomain = ""
+              } label: {
+                Image(systemName: "xmark.circle.fill")
+                  .foregroundStyle(.secondary)
+              }
+              .buttonStyle(.plain)
+              .accessibilityLabel("清空镜像站")
+            }
+          }
+        }
       } header: {
         Text("网络")
+      } footer: {
+        Text("仅在你信任该镜像站时填写。登录、请求和图片会发送到该站点；使用风险自负。")
       }
 
       // MARK: - 关于

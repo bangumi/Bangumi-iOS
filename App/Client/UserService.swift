@@ -2,7 +2,7 @@ import Foundation
 
 enum UserService {
   static func getUser(_ username: String) async throws -> UserDTO {
-    let url = BangumiAPI.priv.build("p1/users/\(username)")
+    let url = BangumiURL.next(path: "p1/users/\(username)")
     let data = try await APIClient.shared.request(url: url, method: "GET")
     let user: UserDTO = try await APIClient.shared.decodeResponse(data)
     return user
@@ -11,7 +11,7 @@ enum UserService {
   static func getUserBlogs(username: String, limit: Int = 20, offset: Int = 0) async throws
     -> PagedDTO<SlimBlogEntryDTO>
   {
-    let url = BangumiAPI.priv.build("p1/users/\(username)/blogs")
+    let url = BangumiURL.next(path: "p1/users/\(username)/blogs")
     let queryItems = paginationQueryItems(limit: limit, offset: offset)
     let data = try await APIClient.shared.request(
       url: url.appending(queryItems: queryItems), method: "GET")
@@ -22,7 +22,7 @@ enum UserService {
   static func getUserCharacterCollections(username: String, limit: Int = 20, offset: Int = 0)
     async throws -> PagedDTO<SlimCharacterDTO>
   {
-    let url = BangumiAPI.priv.build("p1/users/\(username)/collections/characters")
+    let url = BangumiURL.next(path: "p1/users/\(username)/collections/characters")
     let data = try await APIClient.shared.request(
       url: url.appending(queryItems: paginationQueryItems(limit: limit, offset: offset)),
       method: "GET")
@@ -33,7 +33,7 @@ enum UserService {
   static func getUserIndexCollections(username: String, limit: Int = 20, offset: Int = 0)
     async throws -> PagedDTO<SlimIndexDTO>
   {
-    let url = BangumiAPI.priv.build("p1/users/\(username)/collections/indexes")
+    let url = BangumiURL.next(path: "p1/users/\(username)/collections/indexes")
     let data = try await APIClient.shared.request(
       url: url.appending(queryItems: paginationQueryItems(limit: limit, offset: offset)),
       method: "GET")
@@ -47,7 +47,7 @@ enum UserService {
     if username.isEmpty {
       throw ChiiError.badRequest("username is empty")
     }
-    let url = BangumiAPI.priv.build("p1/users/\(username)/collections/persons")
+    let url = BangumiURL.next(path: "p1/users/\(username)/collections/persons")
     let data = try await APIClient.shared.request(
       url: url.appending(queryItems: paginationQueryItems(limit: limit, offset: offset)),
       method: "GET")
@@ -65,7 +65,7 @@ enum UserService {
     if username.isEmpty {
       throw ChiiError.badRequest("username is empty")
     }
-    let url = BangumiAPI.priv.build("p1/users/\(username)/collections/subjects")
+    let url = BangumiURL.next(path: "p1/users/\(username)/collections/subjects")
     var queryItems = paginationQueryItems(limit: limit, offset: offset)
     if type != .none {
       queryItems.append(URLQueryItem(name: "type", value: String(type.rawValue)))
@@ -82,7 +82,7 @@ enum UserService {
   static func getUserFollowers(username: String, limit: Int = 20, offset: Int = 0) async throws
     -> PagedDTO<SlimUserDTO>
   {
-    let url = BangumiAPI.priv.build("p1/users/\(username)/followers")
+    let url = BangumiURL.next(path: "p1/users/\(username)/followers")
     let data = try await APIClient.shared.request(
       url: url.appending(queryItems: paginationQueryItems(limit: limit, offset: offset)),
       method: "GET")
@@ -93,7 +93,7 @@ enum UserService {
   static func getUserFriends(username: String, limit: Int = 20, offset: Int = 0) async throws
     -> PagedDTO<SlimUserDTO>
   {
-    let url = BangumiAPI.priv.build("p1/users/\(username)/friends")
+    let url = BangumiURL.next(path: "p1/users/\(username)/friends")
     let data = try await APIClient.shared.request(
       url: url.appending(queryItems: paginationQueryItems(limit: limit, offset: offset)),
       method: "GET")
@@ -104,7 +104,7 @@ enum UserService {
   static func getUserGroups(username: String, limit: Int = 20, offset: Int = 0) async throws
     -> PagedDTO<SlimGroupDTO>
   {
-    let url = BangumiAPI.priv.build("p1/users/\(username)/groups")
+    let url = BangumiURL.next(path: "p1/users/\(username)/groups")
     let data = try await APIClient.shared.request(
       url: url.appending(queryItems: paginationQueryItems(limit: limit, offset: offset)),
       method: "GET")
@@ -115,7 +115,7 @@ enum UserService {
   static func getUserIndexes(username: String, limit: Int = 20, offset: Int = 0) async throws
     -> PagedDTO<SlimIndexDTO>
   {
-    let url = BangumiAPI.priv.build("p1/users/\(username)/indexes")
+    let url = BangumiURL.next(path: "p1/users/\(username)/indexes")
     let data = try await APIClient.shared.request(
       url: url.appending(queryItems: paginationQueryItems(limit: limit, offset: offset)),
       method: "GET")
@@ -126,7 +126,7 @@ enum UserService {
   static func getUserTimeline(username: String, limit: Int = 20, until: Int? = nil) async throws
     -> [TimelineDTO]
   {
-    let url = BangumiAPI.priv.build("p1/users/\(username)/timeline")
+    let url = BangumiURL.next(path: "p1/users/\(username)/timeline")
     var queryItems = [URLQueryItem(name: "limit", value: String(limit))]
     if let until {
       queryItems.append(URLQueryItem(name: "until", value: String(until)))

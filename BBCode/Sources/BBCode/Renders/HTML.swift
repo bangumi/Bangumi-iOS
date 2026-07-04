@@ -35,6 +35,10 @@ extension Node {
   }
 }
 
+private func bangumiDomains(from args: [String: Any]?) -> BangumiDomains {
+  args?["domains"] as? BangumiDomains ?? .official
+}
+
 var htmlRenders: [BBType: HTMLRender] {
   return [
     .plain: { (n: Node, args: [String: Any]?) in
@@ -135,13 +139,14 @@ var htmlRenders: [BBType: HTMLRender] {
       return html
     },
     .subject: { (n: Node, args: [String: Any]?) in
+      let domains = bangumiDomains(from: args)
       let host = args?["host"] as? String
       var html: String
       var link: String
       if n.attr.isEmpty {
         html = n.renderInnerHTML(args)
       } else {
-        link = "https://bgm.tv/subject/\(n.escapedAttr)"
+        link = domains.mainURLString(path: "/subject/\(n.escapedAttr)")
         if let safeLink = safeUrl(url: link, defaultScheme: "https", defaultHost: host) {
           html =
             "<a href=\"\(safeLink)\" target=\"_blank\" rel=\"nofollow external noopener noreferrer\">\(n.renderInnerHTML(args))</a>"
@@ -152,13 +157,14 @@ var htmlRenders: [BBType: HTMLRender] {
       return html
     },
     .user: { (n: Node, args: [String: Any]?) in
+      let domains = bangumiDomains(from: args)
       let host = args?["host"] as? String
       var html: String
       var link: String
       if n.attr.isEmpty {
         html = n.renderInnerHTML(args)
       } else {
-        link = "https://bgm.tv/user/\(n.escapedAttr)"
+        link = domains.mainURLString(path: "/user/\(n.escapedAttr)")
         if let safeLink = safeUrl(url: link, defaultScheme: "https", defaultHost: host) {
           html =
             "<a href=\"\(safeLink)\" target=\"_blank\" rel=\"nofollow external noopener noreferrer\">@\(n.renderInnerHTML(args))</a>"
@@ -227,9 +233,10 @@ var htmlRenders: [BBType: HTMLRender] {
       }
     },
     .photo: { (n: Node, args: [String: Any]?) in
+      let domains = bangumiDomains(from: args)
       let host = args?["host"] as? String
       var html: String
-      let link: String = "https://lain.bgm.tv/pic/photo/l/\(n.renderInnerHTML(args))"
+      let link: String = domains.imageURLString(path: "/pic/photo/l/\(n.renderInnerHTML(args))")
       if let safeLink = safeUrl(url: link, defaultScheme: "https", defaultHost: host) {
         if n.attr.isEmpty {
           html =
@@ -353,8 +360,9 @@ var htmlRenders: [BBType: HTMLRender] {
       }
 
       let widthAttribute = smiley.preferredDisplayWidth.map { " width=\"\($0)\"" } ?? ""
+      let src = smiley.remoteURLString(domains: bangumiDomains(from: args))
       return
-        "<img src=\"\(smiley.remoteURLString)\" class=\"\(smiley.htmlClassString)\" alt=\"\(smiley.token)\"\(widthAttribute) />"
+        "<img src=\"\(src)\" class=\"\(smiley.htmlClassString)\" alt=\"\(smiley.token)\"\(widthAttribute) />"
     },
     .bmo: { (n: Node, args: [String: Any]?) in
       let bmoCode = n.attr
@@ -382,8 +390,17 @@ var htmlRenders: [BBType: HTMLRender] {
   ]
 }
 
-func BBCodeToHTML(code: String, textSize: Int) -> String {
-  guard let body = try? BBCode().html(code, args: ["textSize": textSize]) else {
+func BBCodeToHTML(
+  code: String,
+  textSize: Int,
+  domains: BangumiDomains = .official
+) -> String {
+  guard
+    let body = try? BBCode().html(
+      code,
+      args: ["textSize": textSize, "domains": domains]
+    )
+  else {
     return code
   }
   let html = """

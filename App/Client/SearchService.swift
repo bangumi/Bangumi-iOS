@@ -5,7 +5,7 @@ enum SearchService {
     keyword: String, type: SubjectType = .none, limit: Int = 10, offset: Int = 0
   ) async throws -> PagedDTO<SlimSubjectDTO> {
     let queries = paginationQueryItems(limit: limit, offset: offset)
-    let url = BangumiAPI.priv.build("p1/search/subjects").appending(queryItems: queries)
+    let url = BangumiURL.next(path: "p1/search/subjects").appending(queryItems: queries)
     var body: [String: Any] = [
       "keyword": keyword,
       "sort": "match",
@@ -23,7 +23,7 @@ enum SearchService {
   static func searchCharacters(keyword: String, limit: Int = 10, offset: Int = 0) async throws
     -> PagedDTO<SlimCharacterDTO>
   {
-    let url = BangumiAPI.priv.build("p1/search/characters").appending(
+    let url = BangumiURL.next(path: "p1/search/characters").appending(
       queryItems: paginationQueryItems(limit: limit, offset: offset))
     let body: [String: Any] = ["keyword": keyword]
     let data = try await APIClient.shared.request(url: url, method: "POST", body: body)
@@ -34,7 +34,7 @@ enum SearchService {
   static func searchPersons(keyword: String, limit: Int = 10, offset: Int = 0) async throws
     -> PagedDTO<SlimPersonDTO>
   {
-    let url = BangumiAPI.priv.build("p1/search/persons").appending(
+    let url = BangumiURL.next(path: "p1/search/persons").appending(
       queryItems: paginationQueryItems(limit: limit, offset: offset))
     let body: [String: Any] = ["keyword": keyword]
     let data = try await APIClient.shared.request(url: url, method: "POST", body: body)

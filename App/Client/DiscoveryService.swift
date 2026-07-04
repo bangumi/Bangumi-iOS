@@ -2,7 +2,7 @@ import Foundation
 
 enum DiscoveryService {
   static func getCalendar() async throws -> BangumiCalendarDTO {
-    let url = BangumiAPI.priv.build("p1/calendar")
+    let url = BangumiURL.next(path: "p1/calendar")
     let data = try await APIClient.shared.request(url: url, method: "GET")
     let calendars: BangumiCalendarDTO = try await APIClient.shared.decodeResponse(data)
     return calendars
@@ -11,7 +11,7 @@ enum DiscoveryService {
   static func getTrendingSubjects(
     type: SubjectType, limit: Int = 12, offset: Int = 0
   ) async throws -> PagedDTO<TrendingSubjectDTO> {
-    let url = BangumiAPI.priv.build("p1/trending/subjects")
+    let url = BangumiURL.next(path: "p1/trending/subjects")
     let queryItems: [URLQueryItem] = [
       URLQueryItem(name: "type", value: String(type.rawValue)),
       URLQueryItem(name: "limit", value: String(limit)),

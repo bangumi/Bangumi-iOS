@@ -49,7 +49,10 @@ struct TrunstileView: UIViewRepresentable {
     config.userContentController = userController
     let webView = WKWebView(frame: .zero, configuration: config)
     webView.scrollView.isScrollEnabled = false
-    webView.loadHTMLString(turnstileHTML, baseURL: URL(string: "https://next.bgm.tv/turnstile")!)
+    webView.loadHTMLString(
+      turnstileHTML,
+      baseURL: BangumiURL.next(path: "/turnstile")
+    )
     return webView
   }
 

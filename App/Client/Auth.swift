@@ -3,7 +3,7 @@ import OSLog
 
 extension APIClient {
   func getOAuthBase() -> String {
-    return "https://\(AppConfig.authDomain.rawValue)/oauth"
+    return BangumiURL.auth(path: "/oauth").absoluteString
   }
 
   func buildOAuthURL() -> URL {

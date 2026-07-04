@@ -93,7 +93,8 @@ struct SubjectImages: Codable, Hashable {
 
   func resize(_ size: ImageSize) -> String {
     guard let url = URL(string: large) else { return "" }
-    return "\(url.scheme ?? HTTPS)://\(url.host ?? CDN_DOMAIN)/r/\(size.rawValue)\(url.path)"
+    let host = url.host == CDN_DOMAIN ? BangumiURL.domains.image : (url.host ?? CDN_DOMAIN)
+    return "\(url.scheme ?? HTTPS)://\(host)/r/\(size.rawValue)\(url.path)"
   }
 }
 
@@ -105,7 +106,8 @@ struct Images: Codable, Hashable {
 
   func resize(_ size: ImageSize) -> String {
     guard let url = URL(string: large) else { return "" }
-    return "\(url.scheme ?? HTTPS)://\(url.host ?? CDN_DOMAIN)/r/\(size.rawValue)\(url.path)"
+    let host = url.host == CDN_DOMAIN ? BangumiURL.domains.image : (url.host ?? CDN_DOMAIN)
+    return "\(url.scheme ?? HTTPS)://\(host)/r/\(size.rawValue)\(url.path)"
   }
 }
 

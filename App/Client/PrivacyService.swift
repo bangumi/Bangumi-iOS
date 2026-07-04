@@ -55,7 +55,7 @@ struct ProfilePrivacyDTO: Codable, Equatable, Sendable {
 
 enum PrivacyService {
   static func getProfilePrivacy() async throws -> ProfilePrivacyDTO {
-    let url = BangumiAPI.priv.build("p1/privacy")
+    let url = BangumiURL.next(path: "p1/privacy")
     let data = try await APIClient.shared.request(url: url, method: "GET", auth: .required)
     let resp: ProfilePrivacyDTO = try await APIClient.shared.decodeResponse(data)
     return resp
@@ -65,7 +65,7 @@ enum PrivacyService {
     settings: ProfilePrivacySettingsDTO,
     showNsfwSubject: Bool?
   ) async throws -> ProfilePrivacyDTO {
-    let url = BangumiAPI.priv.build("p1/privacy")
+    let url = BangumiURL.next(path: "p1/privacy")
     var body: [String: Any] = [
       "settings": [
         "privateMessage": settings.privateMessage.rawValue,

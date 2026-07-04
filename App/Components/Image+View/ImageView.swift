@@ -13,7 +13,7 @@ struct ImageView: View {
   init(img: String?) {
     if let img = img, !img.isEmpty {
       let urlString = img.replacing("http://", with: "https://")
-      self.imageURL = URL(string: urlString)
+      self.imageURL = URL(string: BangumiURL.imageURLString(from: urlString))
     } else {
       self.imageURL = nil
     }

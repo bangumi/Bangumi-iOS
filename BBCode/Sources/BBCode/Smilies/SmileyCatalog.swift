@@ -10,6 +10,9 @@ public struct SmileyItem: Identifiable, Hashable, Sendable {
   public var id: String { code }
   public var token: String { "(\(code))" }
   public var remoteURLString: String { "https://lain.bgm.tv\(remotePath)" }
+  public func remoteURLString(domains: BangumiDomains) -> String {
+    domains.imageURLString(path: remotePath)
+  }
   public var isDynamic: Bool { code.hasPrefix("musume_") || code.hasPrefix("blake_") }
   public var preferredDisplayWidth: Int? {
     switch code {

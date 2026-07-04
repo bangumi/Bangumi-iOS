@@ -2,7 +2,7 @@ import Foundation
 
 enum CharacterService {
   static func getCharacter(_ characterId: Int) async throws -> CharacterDTO {
-    let url = BangumiAPI.priv.build("p1/characters/\(characterId)")
+    let url = BangumiURL.next(path: "p1/characters/\(characterId)")
     let data = try await APIClient.shared.request(url: url, method: "GET")
     let character: CharacterDTO = try await APIClient.shared.decodeResponse(data)
     return character
@@ -12,7 +12,7 @@ enum CharacterService {
     _ characterId: Int, type: CastType = .none, subjectType: SubjectType = .none, limit: Int = 20,
     offset: Int = 0
   ) async throws -> PagedDTO<CharacterCastDTO> {
-    let url = BangumiAPI.priv.build("p1/characters/\(characterId)/casts")
+    let url = BangumiURL.next(path: "p1/characters/\(characterId)/casts")
     var queryItems: [URLQueryItem] = [
       URLQueryItem(name: "limit", value: String(limit)),
       URLQueryItem(name: "offset", value: String(offset)),
@@ -32,7 +32,7 @@ enum CharacterService {
   static func getCharacterRelations(_ characterId: Int, limit: Int = 20, offset: Int = 0)
     async throws -> PagedDTO<CharacterRelationDTO>
   {
-    let url = BangumiAPI.priv.build("p1/characters/\(characterId)/relations")
+    let url = BangumiURL.next(path: "p1/characters/\(characterId)/relations")
     let queryItems: [URLQueryItem] = [
       URLQueryItem(name: "limit", value: String(limit)),
       URLQueryItem(name: "offset", value: String(offset)),
@@ -46,7 +46,7 @@ enum CharacterService {
   static func getCharacterCollects(_ characterId: Int, limit: Int = 20, offset: Int = 0)
     async throws -> PagedDTO<PersonCollectDTO>
   {
-    let url = BangumiAPI.priv.build("p1/characters/\(characterId)/collects")
+    let url = BangumiURL.next(path: "p1/characters/\(characterId)/collects")
     let queryItems: [URLQueryItem] = [
       URLQueryItem(name: "limit", value: String(limit)),
       URLQueryItem(name: "offset", value: String(offset)),
@@ -60,7 +60,7 @@ enum CharacterService {
   static func getCharacterIndexes(characterId: Int, limit: Int = 20, offset: Int = 0)
     async throws -> PagedDTO<SlimIndexDTO>
   {
-    let url = BangumiAPI.priv.build("p1/characters/\(characterId)/indexes")
+    let url = BangumiURL.next(path: "p1/characters/\(characterId)/indexes")
     let queryItems: [URLQueryItem] = [
       URLQueryItem(name: "limit", value: String(limit)),
       URLQueryItem(name: "offset", value: String(offset)),
@@ -72,7 +72,7 @@ enum CharacterService {
   }
 
   static func getCharacterComments(_ characterId: Int) async throws -> [CommentDTO] {
-    let url = BangumiAPI.priv.build("p1/characters/\(characterId)/comments")
+    let url = BangumiURL.next(path: "p1/characters/\(characterId)/comments")
     let data = try await APIClient.shared.request(url: url, method: "GET")
     let resp: [CommentDTO] = try await APIClient.shared.decodeResponse(data)
     return resp
@@ -83,7 +83,7 @@ enum CharacterService {
   )
     async throws
   {
-    let url = BangumiAPI.priv.build("p1/characters/\(characterId)/comments")
+    let url = BangumiURL.next(path: "p1/characters/\(characterId)/comments")
     var body: [String: Any] = [
       "content": content,
       "turnstileToken": token,
@@ -95,13 +95,13 @@ enum CharacterService {
   }
 
   static func collectCharacter(_ characterId: Int) async throws {
-    let url = BangumiAPI.priv.build("p1/collections/characters/\(characterId)")
+    let url = BangumiURL.next(path: "p1/collections/characters/\(characterId)")
     let body: [String: Any] = [:]
     _ = try await APIClient.shared.request(url: url, method: "PUT", body: body, auth: .required)
   }
 
   static func uncollectCharacter(_ characterId: Int) async throws {
-    let url = BangumiAPI.priv.build("p1/collections/characters/\(characterId)")
+    let url = BangumiURL.next(path: "p1/collections/characters/\(characterId)")
     let body: [String: Any] = [:]
     _ = try await APIClient.shared.request(url: url, method: "DELETE", body: body, auth: .required)
   }

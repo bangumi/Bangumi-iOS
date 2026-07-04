@@ -2,7 +2,7 @@ import Foundation
 
 enum SubjectService {
   static func getSubject(_ subjectId: Int) async throws -> SubjectDTO {
-    let url = BangumiAPI.priv.build("p1/subjects/\(subjectId)")
+    let url = BangumiURL.next(path: "p1/subjects/\(subjectId)")
     let data = try await APIClient.shared.request(url: url, method: "GET")
     let subject: SubjectDTO = try await APIClient.shared.decodeResponse(data)
     return subject
@@ -14,7 +14,7 @@ enum SubjectService {
     filter: SubjectsBrowseFilter,
     page: Int = 1
   ) async throws -> PagedDTO<SlimSubjectDTO> {
-    let url = BangumiAPI.priv.build("p1/subjects")
+    let url = BangumiURL.next(path: "p1/subjects")
     var queryItems: [URLQueryItem] = [
       URLQueryItem(name: "type", value: String(type.rawValue)),
       URLQueryItem(name: "sort", value: sort.rawValue),
@@ -50,7 +50,7 @@ enum SubjectService {
     _ subjectId: Int, type: CastType = .none,
     limit: Int = 20, offset: Int = 0
   ) async throws -> PagedDTO<SubjectCharacterDTO> {
-    let url = BangumiAPI.priv.build("p1/subjects/\(subjectId)/characters")
+    let url = BangumiURL.next(path: "p1/subjects/\(subjectId)/characters")
     var queryItems: [URLQueryItem] = [
       URLQueryItem(name: "limit", value: String(limit)),
       URLQueryItem(name: "offset", value: String(offset)),
@@ -67,7 +67,7 @@ enum SubjectService {
   static func getSubjectComments(_ subjectId: Int, limit: Int, offset: Int = 0) async throws
     -> PagedDTO<SubjectCommentDTO>
   {
-    let url = BangumiAPI.priv.build("p1/subjects/\(subjectId)/comments")
+    let url = BangumiURL.next(path: "p1/subjects/\(subjectId)/comments")
     let queryItems: [URLQueryItem] = [
       URLQueryItem(name: "limit", value: String(limit)),
       URLQueryItem(name: "offset", value: String(offset)),
@@ -81,7 +81,7 @@ enum SubjectService {
   static func getSubjectEpisodes(
     _ subjectId: Int, type: EpisodeType? = nil, limit: Int = 100, offset: Int = 0
   ) async throws -> PagedDTO<EpisodeDTO> {
-    let url = BangumiAPI.priv.build("p1/subjects/\(subjectId)/episodes")
+    let url = BangumiURL.next(path: "p1/subjects/\(subjectId)/episodes")
     var queryItems: [URLQueryItem] = [
       URLQueryItem(name: "limit", value: String(limit)),
       URLQueryItem(name: "offset", value: String(offset)),
@@ -98,7 +98,7 @@ enum SubjectService {
   static func getSubjectRecs(_ subjectId: Int, limit: Int = 10, offset: Int = 0) async throws
     -> PagedDTO<SubjectRecDTO>
   {
-    let url = BangumiAPI.priv.build("p1/subjects/\(subjectId)/recs")
+    let url = BangumiURL.next(path: "p1/subjects/\(subjectId)/recs")
     let queryItems: [URLQueryItem] = [
       URLQueryItem(name: "limit", value: String(limit)),
       URLQueryItem(name: "offset", value: String(offset)),
@@ -113,7 +113,7 @@ enum SubjectService {
     _ subjectId: Int, type: SubjectType = .none, offprint: Bool? = nil, limit: Int = 20,
     offset: Int = 0
   ) async throws -> PagedDTO<SubjectRelationDTO> {
-    let url = BangumiAPI.priv.build("p1/subjects/\(subjectId)/relations")
+    let url = BangumiURL.next(path: "p1/subjects/\(subjectId)/relations")
     var queryItems: [URLQueryItem] = [
       URLQueryItem(name: "limit", value: String(limit)),
       URLQueryItem(name: "offset", value: String(offset)),
@@ -133,7 +133,7 @@ enum SubjectService {
   static func getSubjectReviews(_ subjectId: Int, limit: Int = 5, offset: Int = 0) async throws
     -> PagedDTO<SubjectReviewDTO>
   {
-    let url = BangumiAPI.priv.build("p1/subjects/\(subjectId)/reviews")
+    let url = BangumiURL.next(path: "p1/subjects/\(subjectId)/reviews")
     let queryItems: [URLQueryItem] = [
       URLQueryItem(name: "limit", value: String(limit)),
       URLQueryItem(name: "offset", value: String(offset)),
@@ -151,7 +151,7 @@ enum SubjectService {
     limit: Int = 20,
     offset: Int = 0
   ) async throws -> PagedDTO<SubjectCollectDTO> {
-    let url = BangumiAPI.priv.build("p1/subjects/\(subjectId)/collects")
+    let url = BangumiURL.next(path: "p1/subjects/\(subjectId)/collects")
     var queryItems: [URLQueryItem] = [
       URLQueryItem(name: "limit", value: String(limit)),
       URLQueryItem(name: "offset", value: String(offset)),
@@ -171,7 +171,7 @@ enum SubjectService {
   static func getSubjectStaffPersons(
     _ subjectId: Int, position: Int? = nil, limit: Int = 20, offset: Int = 0
   ) async throws -> PagedDTO<SubjectStaffDTO> {
-    let url = BangumiAPI.priv.build("p1/subjects/\(subjectId)/staffs/persons")
+    let url = BangumiURL.next(path: "p1/subjects/\(subjectId)/staffs/persons")
     var queryItems: [URLQueryItem] = [
       URLQueryItem(name: "limit", value: String(limit)),
       URLQueryItem(name: "offset", value: String(offset)),
@@ -188,7 +188,7 @@ enum SubjectService {
   static func getSubjectStaffPositions(_ subjectId: Int, limit: Int = 100, offset: Int = 0)
     async throws -> PagedDTO<SubjectPositionDTO>
   {
-    let url = BangumiAPI.priv.build("p1/subjects/\(subjectId)/staffs/positions")
+    let url = BangumiURL.next(path: "p1/subjects/\(subjectId)/staffs/positions")
     let queryItems: [URLQueryItem] = [
       URLQueryItem(name: "limit", value: String(limit)),
       URLQueryItem(name: "offset", value: String(offset)),
@@ -202,7 +202,7 @@ enum SubjectService {
   static func getSubjectIndexes(subjectId: Int, limit: Int = 20, offset: Int = 0) async throws
     -> PagedDTO<SlimIndexDTO>
   {
-    let url = BangumiAPI.priv.build("p1/subjects/\(subjectId)/indexes")
+    let url = BangumiURL.next(path: "p1/subjects/\(subjectId)/indexes")
     let queryItems: [URLQueryItem] = [
       URLQueryItem(name: "limit", value: String(limit)),
       URLQueryItem(name: "offset", value: String(offset)),
@@ -216,7 +216,7 @@ enum SubjectService {
   static func getSubjectTopics(_ subjectId: Int, limit: Int, offset: Int = 0) async throws
     -> PagedDTO<TopicDTO>
   {
-    let url = BangumiAPI.priv.build("p1/subjects/\(subjectId)/topics")
+    let url = BangumiURL.next(path: "p1/subjects/\(subjectId)/topics")
     let queryItems: [URLQueryItem] = [
       URLQueryItem(name: "limit", value: String(limit)),
       URLQueryItem(name: "offset", value: String(offset)),
@@ -228,7 +228,7 @@ enum SubjectService {
   }
 
   static func updateSubjectProgress(subjectId: Int, eps: Int?, vols: Int?) async throws {
-    let url = BangumiAPI.priv.build("p1/collections/subjects/\(subjectId)")
+    let url = BangumiURL.next(path: "p1/collections/subjects/\(subjectId)")
     var body: [String: Any] = [:]
     if let eps {
       body["epStatus"] = eps
@@ -252,7 +252,7 @@ enum SubjectService {
     tags: [String]?,
     progress: Bool?
   ) async throws {
-    let url = BangumiAPI.priv.build("p1/collections/subjects/\(subjectId)")
+    let url = BangumiURL.next(path: "p1/collections/subjects/\(subjectId)")
     var body: [String: Any] = [:]
     if let type {
       body["type"] = type.rawValue

@@ -3,6 +3,21 @@ import XCTest
 @testable import BBCode
 
 class HTMLTests: XCTestCase {
+  func testBangumiDomainsDefaultToOfficialDomains() {
+    let domains = BangumiDomains()
+
+    XCTAssertEqual(domains.main, "bgm.tv")
+    XCTAssertEqual(domains.image, "lain.bgm.tv")
+    XCTAssertEqual(domains.next, "next.bgm.tv")
+  }
+
+  func testBangumiDomainsUseMirrorRootForUsedDomains() {
+    let domains = BangumiDomains(mirrorRootDomain: "mirror.example")
+
+    XCTAssertEqual(domains.main, "mirror.example")
+    XCTAssertEqual(domains.image, "lain.mirror.example")
+    XCTAssertEqual(domains.next, "next.mirror.example")
+  }
 
   func testBold() {
     XCTAssertEqual(try BBCode().html("我是[b]粗体字[/b]"), "我是<strong>粗体字</strong>")
@@ -90,10 +105,32 @@ class HTMLTests: XCTestCase {
     )
   }
 
+  func testSubjectUsesConfiguredMainDomain() {
+    let domains = BangumiDomains(mirrorRootDomain: "mirror.example")
+    XCTAssertEqual(
+      try BBCode().html(
+        "条目链接：[subject=12]ちょびっツ[/subject]",
+        args: ["domains": domains]
+      ),
+      "条目链接：<a href=\"https://mirror.example/subject/12\" target=\"_blank\" rel=\"nofollow external noopener noreferrer\">&#12385;&#12423;&#12403;&#12387;&#12484;</a>"
+    )
+  }
+
   func testUser() {
     XCTAssertEqual(
       try BBCode().html("用户链接：[user=873244]五月雨[/user]"),
       "用户链接：<a href=\"https://bgm.tv/user/873244\" target=\"_blank\" rel=\"nofollow external noopener noreferrer\">@五月雨</a>"
+    )
+  }
+
+  func testUserUsesConfiguredMainDomain() {
+    let domains = BangumiDomains(mirrorRootDomain: "mirror.example")
+    XCTAssertEqual(
+      try BBCode().html(
+        "用户链接：[user=873244]五月雨[/user]",
+        args: ["domains": domains]
+      ),
+      "用户链接：<a href=\"https://mirror.example/user/873244\" target=\"_blank\" rel=\"nofollow external noopener noreferrer\">@五月雨</a>"
     )
   }
 
@@ -104,10 +141,32 @@ class HTMLTests: XCTestCase {
     )
   }
 
+  func testURLAndImageKeepUserProvidedDomains() {
+    let domains = BangumiDomains(mirrorRootDomain: "mirror.example")
+    XCTAssertEqual(
+      try BBCode().html(
+        "[url]https://bgm.tv/subject/12[/url][img]https://lain.bgm.tv/pic/photo/l/a.jpg[/img]",
+        args: ["domains": domains]
+      ),
+      "<a href=\"https://bgm.tv/subject/12\" target=\"_blank\" rel=\"nofollow external noopener noreferrer\">https://bgm.tv/subject/12</a><img src=\"https://lain.bgm.tv/pic/photo/l/a.jpg\" rel=\"noreferrer\" referrerpolicy=\"no-referrer\" alt=\"\" />"
+    )
+  }
+
   func testPhoto() {
     XCTAssertEqual(
       try BBCode().html("日志里的图片：[photo=104569]4b/d1/873244_3p4I7.jpg[/photo]"),
       "日志里的图片：<img src=\"https://lain.bgm.tv/pic/photo/l/4b/d1/873244_3p4I7.jpg\" rel=\"noreferrer\" referrerpolicy=\"no-referrer\" alt=\"104569\" />"
+    )
+  }
+
+  func testPhotoUsesConfiguredImageDomain() {
+    let domains = BangumiDomains(mirrorRootDomain: "mirror.example")
+    XCTAssertEqual(
+      try BBCode().html(
+        "日志里的图片：[photo=104569]4b/d1/873244_3p4I7.jpg[/photo]",
+        args: ["domains": domains]
+      ),
+      "日志里的图片：<img src=\"https://lain.mirror.example/pic/photo/l/4b/d1/873244_3p4I7.jpg\" rel=\"noreferrer\" referrerpolicy=\"no-referrer\" alt=\"104569\" />"
     )
   }
 
@@ -129,6 +188,17 @@ class HTMLTests: XCTestCase {
     XCTAssertEqual(
       try BBCode().html("表情符号：(bgm38)"),
       "表情符号：<img src=\"https://lain.bgm.tv/img/smiles/tv/15.gif\" class=\"smile\" alt=\"(bgm38)\" />"
+    )
+  }
+
+  func testSmiliesUseConfiguredImageDomain() {
+    let domains = BangumiDomains(mirrorRootDomain: "mirror.example")
+    XCTAssertEqual(
+      try BBCode().html(
+        "表情符号：(bgm38)",
+        args: ["domains": domains]
+      ),
+      "表情符号：<img src=\"https://lain.mirror.example/img/smiles/tv/15.gif\" class=\"smile\" alt=\"(bgm38)\" />"
     )
   }
 

@@ -4,6 +4,7 @@ public struct BBCodeView: View {
   let code: String
   let textSize: Int
 
+  @Environment(\.bangumiDomains) private var domains
   @Environment(\.openURL) private var openURL
   @State private var document: BBCodePreparedDocument?
 
@@ -17,7 +18,7 @@ public struct BBCodeView: View {
       if let document {
         BBCodeDocumentView(
           document: document,
-          renderID: "\(textSize)|\(code)",
+          renderID: "\(domains.cacheKey)|\(textSize)|\(code)",
           openURLHandler: { url in
             openURL(url)
           }
@@ -27,8 +28,12 @@ public struct BBCodeView: View {
           .font(.system(size: CGFloat(textSize)))
       }
     }
-    .task(id: "\(textSize)|\(code)") {
-      document = await BBCode().preparedDocument(code, textSize: textSize)
+    .task(id: "\(domains.cacheKey)|\(textSize)|\(code)") {
+      document = await BBCode().preparedDocument(
+        code,
+        textSize: textSize,
+        domains: domains
+      )
     }
   }
 }

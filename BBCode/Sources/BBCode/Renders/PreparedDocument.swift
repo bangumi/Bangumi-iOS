@@ -12,14 +12,23 @@ private final class BBCodePreparedDocumentCache {
   private struct Key: Hashable {
     let bbcode: String
     let textSize: Int
+    let domainsCacheKey: String
   }
 
   private let limit = 256
   private var documents: [Key: BBCodePreparedDocument] = [:]
   private var accessOrder: [Key] = []
 
-  func document(for bbcode: String, textSize: Int) -> BBCodePreparedDocument? {
-    let key = Key(bbcode: bbcode, textSize: textSize)
+  func document(
+    for bbcode: String,
+    textSize: Int,
+    domains: BangumiDomains
+  ) -> BBCodePreparedDocument? {
+    let key = Key(
+      bbcode: bbcode,
+      textSize: textSize,
+      domainsCacheKey: domains.cacheKey
+    )
     guard let document = documents[key] else {
       return nil
     }
@@ -28,8 +37,17 @@ private final class BBCodePreparedDocumentCache {
     return document
   }
 
-  func store(_ document: BBCodePreparedDocument, for bbcode: String, textSize: Int) {
-    let key = Key(bbcode: bbcode, textSize: textSize)
+  func store(
+    _ document: BBCodePreparedDocument,
+    for bbcode: String,
+    textSize: Int,
+    domains: BangumiDomains
+  ) {
+    let key = Key(
+      bbcode: bbcode,
+      textSize: textSize,
+      domainsCacheKey: domains.cacheKey
+    )
     documents[key] = document
     markRecentlyUsed(key)
     trimIfNeeded()
@@ -87,10 +105,15 @@ enum BBCodeLayoutMetrics {
 
 extension BBCode {
   @MainActor
-  func preparedDocument(_ bbcode: String, textSize: Int) async -> BBCodePreparedDocument {
+  func preparedDocument(
+    _ bbcode: String,
+    textSize: Int,
+    domains: BangumiDomains = .official
+  ) async -> BBCodePreparedDocument {
     if let cachedDocument = BBCodePreparedDocumentCache.shared.document(
       for: bbcode,
-      textSize: textSize
+      textSize: textSize,
+      domains: domains
     ) {
       return cachedDocument
     }
@@ -104,14 +127,24 @@ extension BBCode {
           BBCodePreparedBlock(id: 0, payload: .text(renderer.makePlainText(bbcode)))
         ]
       )
-      BBCodePreparedDocumentCache.shared.store(document, for: bbcode, textSize: textSize)
+      BBCodePreparedDocumentCache.shared.store(
+        document,
+        for: bbcode,
+        textSize: textSize,
+        domains: domains
+      )
       return document
     }
 
     handleNewlineAndParagraph(node: tree, tagManager: tagManager)
-    let renderer = BBCodeTextKitRenderer(textSize: textSize)
+    let renderer = BBCodeTextKitRenderer(textSize: textSize, domains: domains)
     let document = BBCodePreparedDocument(blocks: renderer.renderBlocks(root: tree))
-    BBCodePreparedDocumentCache.shared.store(document, for: bbcode, textSize: textSize)
+    BBCodePreparedDocumentCache.shared.store(
+      document,
+      for: bbcode,
+      textSize: textSize,
+      domains: domains
+    )
     return document
   }
 }
@@ -140,9 +173,11 @@ private struct BBCodeTextKitRenderer {
   let linkColor: UIColor
   let secondaryColor: UIColor
   let baseParagraphStyle: NSParagraphStyle
+  let domains: BangumiDomains
 
-  init(textSize: Int) {
+  init(textSize: Int, domains: BangumiDomains = .official) {
     self.textSize = CGFloat(textSize)
+    self.domains = domains
     self.baseFont = .systemFont(ofSize: CGFloat(textSize))
     self.linkColor = UIColor(named: "LinkTextColor") ?? .systemBlue
     self.secondaryColor = .secondaryLabel
@@ -282,9 +317,10 @@ private struct BBCodeTextKitRenderer {
         node.attr.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
         ? subjectText
         : node.attr.trimmingCharacters(in: .whitespacesAndNewlines)
-      guard !subjectID.isEmpty, let url = URL(string: "https://bgm.tv/subject/\(subjectID)") else {
+      guard !subjectID.isEmpty else {
         return segments
       }
+      let url = domains.mainURL(path: "/subject/\(subjectID)")
 
       return mapTextSegments(segments) { attributed in
         applyLinkAttributes(to: attributed, url: url)
@@ -295,9 +331,10 @@ private struct BBCodeTextKitRenderer {
         node.attr.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
         ? usernameText
         : node.attr.trimmingCharacters(in: .whitespacesAndNewlines)
-      guard !username.isEmpty, let url = URL(string: "https://bgm.tv/user/\(username)") else {
+      guard !username.isEmpty else {
         return segments
       }
+      let url = domains.mainURL(path: "/user/\(username)")
 
       let prefixedSegments = prefixFirstTextSegment(with: "@", in: segments)
       return mapTextSegments(prefixedSegments) { attributed in
@@ -608,11 +645,10 @@ private struct BBCodeTextKitRenderer {
       )
     case .photo:
       let path = node.renderInnerHTML(nil).trimmingCharacters(in: .whitespacesAndNewlines)
-      guard !path.isEmpty,
-        let url = URL(string: "https://lain.bgm.tv/pic/photo/l/\(path)")
-      else {
+      guard !path.isEmpty else {
         return nil
       }
+      let url = domains.imageURL(path: "/pic/photo/l/\(path)")
       return .image(
         BBCodePreparedMedia(
           url: url,
@@ -745,9 +781,10 @@ private struct BBCodeTextKitRenderer {
       node.attr.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
       ? inner.string.trimmingCharacters(in: .whitespacesAndNewlines)
       : node.attr.trimmingCharacters(in: .whitespacesAndNewlines)
-    guard !subjectID.isEmpty, let url = URL(string: "https://bgm.tv/subject/\(subjectID)") else {
+    guard !subjectID.isEmpty else {
       return inner
     }
+    let url = domains.mainURL(path: "/subject/\(subjectID)")
 
     applyLinkAttributes(to: inner, url: url)
     return inner
@@ -762,9 +799,10 @@ private struct BBCodeTextKitRenderer {
       node.attr.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
       ? inner.string.trimmingCharacters(in: .whitespacesAndNewlines)
       : node.attr.trimmingCharacters(in: .whitespacesAndNewlines)
-    guard !username.isEmpty, let url = URL(string: "https://bgm.tv/user/\(username)") else {
+    guard !username.isEmpty else {
       return inner
     }
+    let url = domains.mainURL(path: "/user/\(username)")
 
     let result = NSMutableAttributedString(string: "")
     result.append(makeText("@"))

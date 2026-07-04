@@ -5,7 +5,7 @@ enum GroupService {
     mode: GroupFilterMode = .all, sort: GroupSortMode = .created,
     limit: Int = 20, offset: Int = 0
   ) async throws -> PagedDTO<SlimGroupDTO> {
-    let url = BangumiAPI.priv.build("p1/groups")
+    let url = BangumiURL.next(path: "p1/groups")
     let queryItems: [URLQueryItem] = [
       URLQueryItem(name: "mode", value: mode.rawValue),
       URLQueryItem(name: "sort", value: sort.rawValue),
@@ -19,7 +19,7 @@ enum GroupService {
   }
 
   static func getGroup(_ groupName: String) async throws -> GroupDTO {
-    let url = BangumiAPI.priv.build("p1/groups/\(groupName)")
+    let url = BangumiURL.next(path: "p1/groups/\(groupName)")
     let data = try await APIClient.shared.request(url: url, method: "GET")
     let resp: GroupDTO = try await APIClient.shared.decodeResponse(data)
     return resp
@@ -29,7 +29,7 @@ enum GroupService {
     _ groupName: String, role: GroupMemberRole? = nil,
     limit: Int = 20, offset: Int = 0
   ) async throws -> PagedDTO<GroupMemberDTO> {
-    let url = BangumiAPI.priv.build("p1/groups/\(groupName)/members")
+    let url = BangumiURL.next(path: "p1/groups/\(groupName)/members")
     var queryItems: [URLQueryItem] = [
       URLQueryItem(name: "limit", value: String(limit)),
       URLQueryItem(name: "offset", value: String(offset)),
@@ -46,7 +46,7 @@ enum GroupService {
   static func getGroupTopics(_ groupName: String, limit: Int = 20, offset: Int = 0) async throws
     -> PagedDTO<TopicDTO>
   {
-    let url = BangumiAPI.priv.build("p1/groups/\(groupName)/topics")
+    let url = BangumiURL.next(path: "p1/groups/\(groupName)/topics")
     let queryItems: [URLQueryItem] = [
       URLQueryItem(name: "limit", value: String(limit)),
       URLQueryItem(name: "offset", value: String(offset)),
@@ -58,13 +58,13 @@ enum GroupService {
   }
 
   static func joinGroup(_ groupName: String) async throws {
-    let url = BangumiAPI.priv.build("p1/groups/\(groupName)/join")
+    let url = BangumiURL.next(path: "p1/groups/\(groupName)/join")
     let body: [String: Any] = [:]
     _ = try await APIClient.shared.request(url: url, method: "POST", body: body, auth: .required)
   }
 
   static func leaveGroup(_ groupName: String) async throws {
-    let url = BangumiAPI.priv.build("p1/groups/\(groupName)/leave")
+    let url = BangumiURL.next(path: "p1/groups/\(groupName)/leave")
     let body: [String: Any] = [:]
     _ = try await APIClient.shared.request(url: url, method: "POST", body: body, auth: .required)
   }

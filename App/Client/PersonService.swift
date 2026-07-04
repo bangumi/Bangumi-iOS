@@ -2,7 +2,7 @@ import Foundation
 
 enum PersonService {
   static func getPerson(_ personId: Int) async throws -> PersonDTO {
-    let url = BangumiAPI.priv.build("p1/persons/\(personId)")
+    let url = BangumiURL.next(path: "p1/persons/\(personId)")
     let data = try await APIClient.shared.request(url: url, method: "GET")
     let person: PersonDTO = try await APIClient.shared.decodeResponse(data)
     return person
@@ -12,7 +12,7 @@ enum PersonService {
     _ personId: Int, position: Int? = nil, subjectType: SubjectType = .none,
     limit: Int = 20, offset: Int = 0
   ) async throws -> PagedDTO<PersonWorkDTO> {
-    let url = BangumiAPI.priv.build("p1/persons/\(personId)/works")
+    let url = BangumiURL.next(path: "p1/persons/\(personId)/works")
     var queryItems: [URLQueryItem] = [
       URLQueryItem(name: "limit", value: String(limit)),
       URLQueryItem(name: "offset", value: String(offset)),
@@ -33,7 +33,7 @@ enum PersonService {
     _ personId: Int, type: Int? = nil, subjectType: SubjectType? = nil,
     limit: Int = 20, offset: Int = 0
   ) async throws -> PagedDTO<PersonCastDTO> {
-    let url = BangumiAPI.priv.build("p1/persons/\(personId)/casts")
+    let url = BangumiURL.next(path: "p1/persons/\(personId)/casts")
     var queryItems: [URLQueryItem] = [
       URLQueryItem(name: "limit", value: String(limit)),
       URLQueryItem(name: "offset", value: String(offset)),
@@ -53,7 +53,7 @@ enum PersonService {
   static func getPersonRelations(_ personId: Int, limit: Int = 20, offset: Int = 0)
     async throws -> PagedDTO<PersonRelationDTO>
   {
-    let url = BangumiAPI.priv.build("p1/persons/\(personId)/relations")
+    let url = BangumiURL.next(path: "p1/persons/\(personId)/relations")
     let queryItems: [URLQueryItem] = [
       URLQueryItem(name: "limit", value: String(limit)),
       URLQueryItem(name: "offset", value: String(offset)),
@@ -67,7 +67,7 @@ enum PersonService {
   static func getPersonCollects(_ personId: Int, limit: Int = 20, offset: Int = 0)
     async throws -> PagedDTO<PersonCollectDTO>
   {
-    let url = BangumiAPI.priv.build("p1/persons/\(personId)/collects")
+    let url = BangumiURL.next(path: "p1/persons/\(personId)/collects")
     let queryItems: [URLQueryItem] = [
       URLQueryItem(name: "limit", value: String(limit)),
       URLQueryItem(name: "offset", value: String(offset)),
@@ -81,7 +81,7 @@ enum PersonService {
   static func getPersonIndexes(personId: Int, limit: Int = 20, offset: Int = 0)
     async throws -> PagedDTO<SlimIndexDTO>
   {
-    let url = BangumiAPI.priv.build("p1/persons/\(personId)/indexes")
+    let url = BangumiURL.next(path: "p1/persons/\(personId)/indexes")
     let queryItems: [URLQueryItem] = [
       URLQueryItem(name: "limit", value: String(limit)),
       URLQueryItem(name: "offset", value: String(offset)),
@@ -93,7 +93,7 @@ enum PersonService {
   }
 
   static func getPersonComments(_ personId: Int) async throws -> [CommentDTO] {
-    let url = BangumiAPI.priv.build("p1/persons/\(personId)/comments")
+    let url = BangumiURL.next(path: "p1/persons/\(personId)/comments")
     let data = try await APIClient.shared.request(url: url, method: "GET")
     let resp: [CommentDTO] = try await APIClient.shared.decodeResponse(data)
     return resp
@@ -102,7 +102,7 @@ enum PersonService {
   static func createPersonComment(personId: Int, content: String, replyTo: Int?, token: String)
     async throws
   {
-    let url = BangumiAPI.priv.build("p1/persons/\(personId)/comments")
+    let url = BangumiURL.next(path: "p1/persons/\(personId)/comments")
     var body: [String: Any] = [
       "content": content,
       "turnstileToken": token,
@@ -114,13 +114,13 @@ enum PersonService {
   }
 
   static func collectPerson(_ personId: Int) async throws {
-    let url = BangumiAPI.priv.build("p1/collections/persons/\(personId)")
+    let url = BangumiURL.next(path: "p1/collections/persons/\(personId)")
     let body: [String: Any] = [:]
     _ = try await APIClient.shared.request(url: url, method: "PUT", body: body, auth: .required)
   }
 
   static func uncollectPerson(_ personId: Int) async throws {
-    let url = BangumiAPI.priv.build("p1/collections/persons/\(personId)")
+    let url = BangumiURL.next(path: "p1/collections/persons/\(personId)")
     let body: [String: Any] = [:]
     _ = try await APIClient.shared.request(url: url, method: "DELETE", body: body, auth: .required)
   }

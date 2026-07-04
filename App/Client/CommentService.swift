@@ -44,17 +44,17 @@ enum CommentService {
   private static func commentURL(type: CommentParentType, commentId: Int) -> URL {
     switch type {
     case .blog:
-      BangumiAPI.priv.build("p1/blogs/-/comments/\(commentId)")
+      BangumiURL.next(path: "p1/blogs/-/comments/\(commentId)")
     case .character:
-      BangumiAPI.priv.build("p1/characters/-/comments/\(commentId)")
+      BangumiURL.next(path: "p1/characters/-/comments/\(commentId)")
     case .person:
-      BangumiAPI.priv.build("p1/persons/-/comments/\(commentId)")
+      BangumiURL.next(path: "p1/persons/-/comments/\(commentId)")
     case .episode:
-      BangumiAPI.priv.build("p1/episodes/-/comments/\(commentId)")
+      BangumiURL.next(path: "p1/episodes/-/comments/\(commentId)")
     case .timeline:
-      BangumiAPI.priv.build("p1/timeline/\(commentId)")
+      BangumiURL.next(path: "p1/timeline/\(commentId)")
     case .index:
-      BangumiAPI.priv.build("p1/indexes/-/comments/\(commentId)")
+      BangumiURL.next(path: "p1/indexes/-/comments/\(commentId)")
     }
   }
 }

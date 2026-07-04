@@ -4,24 +4,6 @@ import OSLog
 
 let APP_DOMAIN = "com.everpcpc.chobits"
 
-enum BangumiAPI {
-  case pub
-  case priv
-
-  var endpoint: URL {
-    switch self {
-    case .pub:
-      return URL(string: "https://api.bgm.tv")!
-    case .priv:
-      return URL(string: "https://next.bgm.tv")!
-    }
-  }
-
-  func build(_ path: String) -> URL {
-    return self.endpoint.appendingPathComponent(path)
-  }
-}
-
 enum AuthMode {
   case auto
   case disabled

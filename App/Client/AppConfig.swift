@@ -39,6 +39,11 @@ enum AppConfig {
     set { UserDefaults.standard.set(newValue, forKey: "userAgent") }
   }
 
+  static nonisolated var mirrorRootDomain: String {
+    get { UserDefaults.standard.string(forKey: "mirrorRootDomain") ?? "" }
+    set { UserDefaults.standard.set(newValue, forKey: "mirrorRootDomain") }
+  }
+
   static nonisolated var subjectCollectsFilterMode: FilterMode {
     get { FilterMode(UserDefaults.standard.string(forKey: "subjectCollectsFilterMode")) }
     set { UserDefaults.standard.set(newValue.rawValue, forKey: "subjectCollectsFilterMode") }
