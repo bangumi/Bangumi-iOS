@@ -242,7 +242,7 @@ struct SubjectBrowsingView: View {
         browseHeader
 
         PageNumberPagedView(reloader: reloader, nextPageFunc: fetchPage) { item in
-          SubjectSlimItemView(subject: item.subject, collectionType: item.collectionType)
+          SubjectSlimListItemView(subject: item.subject, collectionType: item.collectionType)
         }
         .zIndex(0)
 
@@ -752,7 +752,7 @@ struct SubjectTagBrowsingView: View {
         Divider()
 
         PageNumberPagedView(reloader: reloader, nextPageFunc: fetchPage) { item in
-          SubjectSlimItemView(subject: item.subject, collectionType: item.collectionType)
+          SubjectSlimListItemView(subject: item.subject, collectionType: item.collectionType)
         }
       }.padding(.horizontal, 8)
     }

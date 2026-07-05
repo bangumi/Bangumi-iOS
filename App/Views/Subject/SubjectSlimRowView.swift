@@ -96,39 +96,7 @@ struct SubjectSlimRowView: View {
   }
 }
 
-struct SubjectItemView: View {
-  let subjectId: Int
-
-  @State private var subject: SubjectDTO?
-
-  private func load() async {
-    do {
-      let db = try await AppContext.shared.getDB()
-      subject = try await db.getSubjectDTO(subjectId)
-    } catch {
-      Logger.app.error("Failed to load subject item: \(error)")
-    }
-  }
-
-  var body: some View {
-    CardView {
-      if let subject = subject {
-        SubjectSlimRowView(subject: subject.slim, collectionType: subject.ctypeEnum)
-          .subjectCollectionStatusOverlay(
-            subjectId: subject.id,
-            subjectType: subject.type,
-            collectionType: subject.ctypeEnum,
-            reload: load
-          )
-      }
-    }
-    .task(id: subjectId) {
-      await load()
-    }
-  }
-}
-
-struct SubjectSlimItemView: View {
+struct SubjectSlimListItemView: View {
   let subject: SlimSubjectDTO
   let initialCollectionType: CollectionType
 
@@ -150,6 +118,15 @@ struct SubjectSlimItemView: View {
     }
   }
 
+  private func handleSubjectInvalidation(_ notification: Notification) {
+    guard ProgressSubjectInvalidation.subjectId(from: notification) == subject.id else {
+      return
+    }
+    Task {
+      await loadCollectionType()
+    }
+  }
+
   var body: some View {
     CardView {
       SubjectSlimRowView(subject: subject, collectionType: collectionType)
@@ -163,5 +140,9 @@ struct SubjectSlimItemView: View {
     .onChange(of: initialCollectionType) { _, newValue in
       collectionType = newValue
     }
+    .onReceive(
+      NotificationCenter.default.publisher(for: ProgressSubjectInvalidation.notificationName),
+      perform: handleSubjectInvalidation
+    )
   }
 }
