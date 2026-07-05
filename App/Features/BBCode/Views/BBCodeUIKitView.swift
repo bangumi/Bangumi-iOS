@@ -106,6 +106,9 @@ final class BBCodeBlocksContainerView: UIView {
     if let textBlockView = view as? BBCodeTextBlockView {
       textBlockView.openURLHandler = openURLHandler
     }
+    if let mediaBlockView = view as? BBCodeMediaBlockView {
+      mediaBlockView.openURLHandler = openURLHandler
+    }
 
     for subview in view.subviews {
       applyOpenURLHandler(to: subview)
@@ -367,6 +370,7 @@ private final class BBCodeMediaBlockView: UIView {
   private var lastMeasuredWidth: CGFloat = 0
   private var loadedThumbnailPixelSize: CGSize?
   private var didLoadOriginalImage = false
+  var openURLHandler: ((URL) -> Void)?
 
   init(media: BBCodePreparedMedia) {
     self.media = media
@@ -387,7 +391,7 @@ private final class BBCodeMediaBlockView: UIView {
     isUserInteractionEnabled = true
     isAccessibilityElement = true
     accessibilityTraits = [.image, .button]
-    accessibilityLabel = "Preview image"
+    accessibilityLabel = media.linkURL == nil ? "Preview image" : "Open image link"
     setContentCompressionResistancePriority(.required, for: .vertical)
     setContentHuggingPriority(.required, for: .vertical)
 
@@ -582,6 +586,11 @@ private final class BBCodeMediaBlockView: UIView {
   }
 
   @objc private func handlePreviewTap() {
+    if let linkURL = media.linkURL, let openURLHandler {
+      openURLHandler(linkURL)
+      return
+    }
+
     presentPreview()
   }
 

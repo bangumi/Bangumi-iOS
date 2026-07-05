@@ -73,6 +73,7 @@ struct BBCodePreparedListItem: Identifiable {
 
 struct BBCodePreparedMedia {
   let url: URL
+  let linkURL: URL?
   let constrainedSize: CGSize?
   let alignment: NSTextAlignment
 }
@@ -322,9 +323,7 @@ private struct BBCodeTextKitRenderer {
       }
       let url = domains.mainURL(path: "/subject/\(subjectID)")
 
-      return mapTextSegments(segments) { attributed in
-        applyLinkAttributes(to: attributed, url: url)
-      }
+      return mapLinkedSegments(segments, url: url)
     case .user:
       let usernameText = node.renderInnerHTML(nil).trimmingCharacters(in: .whitespacesAndNewlines)
       let username =
@@ -337,9 +336,7 @@ private struct BBCodeTextKitRenderer {
       let url = domains.mainURL(path: "/user/\(username)")
 
       let prefixedSegments = prefixFirstTextSegment(with: "@", in: segments)
-      return mapTextSegments(prefixedSegments) { attributed in
-        applyLinkAttributes(to: attributed, url: url)
-      }
+      return mapLinkedSegments(prefixedSegments, url: url)
     case .url:
       let fallbackText = node.renderInnerHTML(nil).trimmingCharacters(in: .whitespacesAndNewlines)
       let rawURL = node.attr.isEmpty ? fallbackText : node.attr
@@ -349,9 +346,7 @@ private struct BBCodeTextKitRenderer {
         return segments
       }
 
-      return mapTextSegments(segments) { attributed in
-        applyLinkAttributes(to: attributed, url: url)
-      }
+      return mapLinkedSegments(segments, url: url)
     case .bold:
       return mapTextSegments(segments) { attributed in
         applyFontTransform(to: attributed) { makeBoldFont(from: $0) }
@@ -415,6 +410,26 @@ private struct BBCodeTextKitRenderer {
     )
   }
 
+  private func mapLinkedSegments(
+    _ segments: [RenderedSegment],
+    url: URL
+  ) -> [RenderedSegment] {
+    normalizeSegments(
+      segments.map { segment in
+        switch segment {
+        case .text(let attributed):
+          let transformed = NSMutableAttributedString(attributedString: attributed)
+          applyLinkAttributes(to: transformed, url: url)
+          return .text(transformed)
+        case .block(let payload):
+          return .block(linkedPayload(payload, url: url))
+        case .separator:
+          return segment
+        }
+      }
+    )
+  }
+
   private func mapAlignedSegments(
     _ segments: [RenderedSegment],
     alignment: NSTextAlignment,
@@ -445,12 +460,47 @@ private struct BBCodeTextKitRenderer {
       return .image(
         BBCodePreparedMedia(
           url: media.url,
+          linkURL: media.linkURL,
           constrainedSize: media.constrainedSize,
           alignment: alignment
         )
       )
     case .quote, .list, .text:
       return payload
+    }
+  }
+
+  private func linkedPayload(
+    _ payload: BBCodePreparedBlock.Payload,
+    url: URL
+  ) -> BBCodePreparedBlock.Payload {
+    switch payload {
+    case .image(let media):
+      return .image(
+        BBCodePreparedMedia(
+          url: media.url,
+          linkURL: url,
+          constrainedSize: media.constrainedSize,
+          alignment: media.alignment
+        )
+      )
+    case .quote(let blocks):
+      return .quote(blocks.map { block in
+        BBCodePreparedBlock(id: block.id, payload: linkedPayload(block.payload, url: url))
+      })
+    case .list(let items):
+      return .list(items.map { item in
+        BBCodePreparedListItem(
+          id: item.id,
+          blocks: item.blocks.map { block in
+            BBCodePreparedBlock(id: block.id, payload: linkedPayload(block.payload, url: url))
+          }
+        )
+      })
+    case .text(let attributed):
+      let transformed = NSMutableAttributedString(attributedString: attributed)
+      applyLinkAttributes(to: transformed, url: url)
+      return .text(transformed)
     }
   }
 
@@ -639,6 +689,7 @@ private struct BBCodeTextKitRenderer {
       return .image(
         BBCodePreparedMedia(
           url: url,
+          linkURL: nil,
           constrainedSize: parsedMediaSize(from: node.attr),
           alignment: .left
         )
@@ -652,6 +703,7 @@ private struct BBCodeTextKitRenderer {
       return .image(
         BBCodePreparedMedia(
           url: url,
+          linkURL: nil,
           constrainedSize: parsedMediaSize(from: node.attr),
           alignment: .left
         )
