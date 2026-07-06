@@ -70,12 +70,22 @@ enum WikiService {
     subjectId: Int,
     subject: SubjectWikiEditDTO,
     expectedRevision: SubjectWikiExpectedDTO?,
-    commitMessage: String
+    commitMessage: String,
+    originalInfo: SubjectWikiInfoDTO? = nil
   ) async throws {
     let url = BangumiURL.next(path: "p1/wiki/subjects/\(subjectId)")
+    var subjectPayload = try body(subject) as? [String: Any] ?? [:]
+    if let originalInfo {
+      if subject.series == originalInfo.series {
+        subjectPayload.removeValue(forKey: "series")
+      }
+      if subject.nsfw == originalInfo.nsfw {
+        subjectPayload.removeValue(forKey: "nsfw")
+      }
+    }
     var payload: [String: Any] = [
       "commitMessage": commitMessage,
-      "subject": try body(subject),
+      "subject": subjectPayload,
     ]
     if let expectedRevision {
       payload["expectedRevision"] = try body(expectedRevision)

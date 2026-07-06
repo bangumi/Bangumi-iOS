@@ -102,36 +102,42 @@ struct SubjectWikiEditSheet: View {
     }
   }
 
+  private func payload() -> SubjectWikiEditDTO {
+    let currentTags = wikiTags(from: tagsText)
+    return SubjectWikiEditDTO(
+      name: edit.name,
+      infobox: edit.infobox,
+      platform: edit.platform,
+      series: edit.series,
+      nsfw: edit.nsfw,
+      metaTags: currentTags,
+      summary: edit.summary,
+      date: edit.date
+    )
+  }
+
   private func submit() async {
-    if saveDisabled {
+    guard let info, !saveDisabled else {
       return
     }
     submitting = true
     defer { submitting = false }
     do {
-      let payload = SubjectWikiEditDTO(
-        name: edit.name,
-        infobox: edit.infobox,
-        platform: edit.platform,
-        series: edit.series,
-        nsfw: edit.nsfw,
-        metaTags: wikiTags(from: tagsText),
-        summary: edit.summary,
-        date: edit.date
-      )
+      let payload = payload()
       if mode == .full {
         try await WikiService.updateSubjectWikiInfo(
           subjectId: subjectId,
           subject: payload,
-          expectedRevision: info?.expectedRevision,
+          expectedRevision: info.expectedRevision,
           commitMessage: commitMessage
         )
       } else {
         try await WikiService.patchSubjectWikiInfo(
           subjectId: subjectId,
           subject: payload,
-          expectedRevision: info?.expectedRevision,
-          commitMessage: commitMessage
+          expectedRevision: info.expectedRevision,
+          commitMessage: commitMessage,
+          originalInfo: info
         )
       }
       _ = try? await SubjectRepository.loadSubject(subjectId)
@@ -636,6 +642,7 @@ struct SubjectEpisodeWikiSheet: View {
   @State private var duration = ""
   @State private var summary = ""
   @State private var expectedRevision: EpisodeWikiExpectedDTO?
+  @State private var loadedEpisode: EpisodeWikiInfoDTO?
   @State private var loadedEpisodeId: Int?
   @State private var commitMessage = ""
   @State private var loadingEpisode = false
@@ -665,6 +672,11 @@ struct SubjectEpisodeWikiSheet: View {
     defer { loadingEpisode = false }
     do {
       let fetched = try await WikiService.getEpisodeWikiInfo(episodeId)
+      guard fetched.subjectID == subjectId else {
+        resetLoadedEpisode()
+        Notifier.shared.alert(message: "章节不属于当前条目")
+        return
+      }
       name = fetched.name
       nameCN = fetched.nameCN
       epText = String(fetched.ep)
@@ -674,6 +686,7 @@ struct SubjectEpisodeWikiSheet: View {
       duration = fetched.duration
       summary = fetched.summary
       expectedRevision = fetched.expectedRevision
+      loadedEpisode = fetched
       loadedEpisodeId = episodeId
     } catch {
       Notifier.shared.alert(error: error)
@@ -682,6 +695,7 @@ struct SubjectEpisodeWikiSheet: View {
 
   private func resetLoadedEpisode() {
     expectedRevision = nil
+    loadedEpisode = nil
     loadedEpisodeId = nil
   }
 
@@ -708,6 +722,21 @@ struct SubjectEpisodeWikiSheet: View {
     )
   }
 
+  private func editPayload(id: Int, original: EpisodeWikiInfoDTO) -> EpisodeWikiEditDTO? {
+    var payload = payload(id: id, preservingEmptyText: true)
+    if payload?.ep == original.ep {
+      payload?.ep = nil
+    }
+    let trimmedDiscText = discText.trimmingCharacters(in: .whitespacesAndNewlines)
+    if payload?.disc == original.disc || (trimmedDiscText.isEmpty && original.disc == nil) {
+      payload?.disc = nil
+    }
+    if payload?.type == original.type {
+      payload?.type = nil
+    }
+    return payload
+  }
+
   private func submit() async {
     if saveDisabled {
       return
@@ -723,7 +752,8 @@ struct SubjectEpisodeWikiSheet: View {
         Notifier.shared.notify(message: "已创建章节 #\(idsText)")
       case .edit:
         guard let episodeId = parsedEpisodeId,
-          let payload = payload(id: episodeId, preservingEmptyText: true)
+          let loadedEpisode,
+          let payload = editPayload(id: episodeId, original: loadedEpisode)
         else { return }
         guard loadedEpisodeId == episodeId else { return }
         try await WikiService.patchEpisodes(
