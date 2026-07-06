@@ -230,7 +230,13 @@ struct PersonWikiEditSheet: View {
   @State private var submitting = false
 
   private var saveDisabled: Bool {
-    submitting || edit.name.isEmpty || edit.infobox.isEmpty || commitMessage.isEmpty
+    guard let info else {
+      return true
+    }
+    return submitting
+      || edit.name.isEmpty
+      || (edit.infobox.isEmpty && !info.infobox.isEmpty)
+      || commitMessage.isEmpty
   }
 
   private func professionBinding(_ career: PersonCareer) -> Binding<Bool> {
@@ -340,7 +346,13 @@ struct CharacterWikiEditSheet: View {
   @State private var submitting = false
 
   private var saveDisabled: Bool {
-    submitting || edit.name.isEmpty || edit.infobox.isEmpty || commitMessage.isEmpty
+    guard let info else {
+      return true
+    }
+    return submitting
+      || edit.name.isEmpty
+      || (edit.infobox.isEmpty && !info.infobox.isEmpty)
+      || commitMessage.isEmpty
   }
 
   private func load() async {

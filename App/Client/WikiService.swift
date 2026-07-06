@@ -6,6 +6,14 @@ enum WikiService {
     return try JSONSerialization.jsonObject(with: data)
   }
 
+  private static func bodyWithoutEmptyInfobox(_ value: SimpleWikiExpectedDTO) throws -> [String: Any] {
+    var payload = try body(value) as? [String: Any] ?? [:]
+    if value.infobox?.isEmpty ?? true {
+      payload.removeValue(forKey: "infobox")
+    }
+    return payload
+  }
+
   private static func pageURL(_ path: String, limit: Int, offset: Int) -> URL {
     BangumiURL.next(path: path).appending(queryItems: [
       URLQueryItem(name: "limit", value: String(limit)),
@@ -182,17 +190,20 @@ enum WikiService {
     commitMessage: String
   ) async throws {
     let url = BangumiURL.next(path: "p1/wiki/persons/\(personId)")
+    var personPayload: [String: Any] = [
+      "name": person.name,
+      "summary": person.summary,
+      "profession": person.profession.bodyValue,
+    ]
+    if !person.infobox.isEmpty {
+      personPayload["infobox"] = person.infobox
+    }
     var payload: [String: Any] = [
       "commitMessage": commitMessage,
-      "person": [
-        "name": person.name,
-        "infobox": person.infobox,
-        "summary": person.summary,
-        "profession": person.profession.bodyValue,
-      ],
+      "person": personPayload,
     ]
     if let expectedRevision {
-      payload["expectedRevision"] = try body(expectedRevision)
+      payload["expectedRevision"] = try bodyWithoutEmptyInfobox(expectedRevision)
     }
     _ = try await APIClient.shared.request(url: url, method: "PATCH", body: payload, auth: .required)
   }
@@ -251,12 +262,16 @@ enum WikiService {
     commitMessage: String
   ) async throws {
     let url = BangumiURL.next(path: "p1/wiki/characters/\(characterId)")
+    var characterPayload = try body(character) as? [String: Any] ?? [:]
+    if character.infobox.isEmpty {
+      characterPayload.removeValue(forKey: "infobox")
+    }
     var payload: [String: Any] = [
       "commitMessage": commitMessage,
-      "character": try body(character),
+      "character": characterPayload,
     ]
     if let expectedRevision {
-      payload["expectedRevision"] = try body(expectedRevision)
+      payload["expectedRevision"] = try bodyWithoutEmptyInfobox(expectedRevision)
     }
     _ = try await APIClient.shared.request(url: url, method: "PATCH", body: payload, auth: .required)
   }
