@@ -6,6 +6,7 @@ struct EpisodeView: View {
   @AppStorage("shareDomain") var shareDomain: ShareDomain = .chii
   @AppStorage("isolationMode") var isolationMode: Bool = false
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
+  @AppStorage("profile") var profile: Profile = Profile()
 
   @Environment(\.dismiss) private var dismiss
 
@@ -14,6 +15,7 @@ struct EpisodeView: View {
   @State private var loadingComments: Bool = false
   @State private var showCommentBox: Bool = false
   @State private var showIndexPicker: Bool = false
+  @State private var showWikiEdit: Bool = false
 
   private func loadCached() async {
     do {
@@ -111,6 +113,14 @@ struct EpisodeView: View {
     .toolbar {
       ToolbarItem(placement: .topBarTrailing) {
         Menu {
+          if isAuthenticated && profile.groupEnum.canEditEpisodeWiki {
+            Button {
+              showWikiEdit = true
+            } label: {
+              Label("编辑 Wiki", systemImage: "pencil")
+            }
+            Divider()
+          }
           Button {
             showCommentBox = true
           } label: {
@@ -143,6 +153,13 @@ struct EpisodeView: View {
         itemId: episodeId,
         itemTitle: "章节详情"
       )
+    }
+    .sheet(isPresented: $showWikiEdit) {
+      EpisodeWikiEditSheet(episodeId: episodeId) {
+        Task {
+          await loadCached()
+        }
+      }
     }
     .handoff(url: shareLink, title: "章节详情")
   }

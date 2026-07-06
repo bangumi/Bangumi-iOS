@@ -7,6 +7,7 @@ struct CharacterView: View {
   @AppStorage("shareDomain") var shareDomain: ShareDomain = .chii
   @AppStorage("isolationMode") var isolationMode: Bool = false
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
+  @AppStorage("profile") var profile: Profile = Profile()
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
 
   @State private var refreshed: Bool = false
@@ -16,6 +17,8 @@ struct CharacterView: View {
   @State private var loadingComments: Bool = false
   @State private var showCommentBox: Bool = false
   @State private var showIndexPicker: Bool = false
+  @State private var showWikiEdit: Bool = false
+  @State private var showPortraitUpload: Bool = false
 
   var shareLink: URL {
     URL(string: "\(shareDomain.url)/character/\(characterId)")!
@@ -138,6 +141,35 @@ struct CharacterView: View {
     .toolbar {
       ToolbarItem(placement: .topBarTrailing) {
         Menu {
+          if isAuthenticated && profile.groupEnum.canAccessWikiTools {
+            Menu {
+              if profile.groupEnum.canEditMonoWiki {
+                Button {
+                  showWikiEdit = true
+                } label: {
+                  Label("编辑 Wiki", systemImage: "pencil")
+                }
+                Button {
+                  showPortraitUpload = true
+                } label: {
+                  Label("上传肖像", systemImage: "photo")
+                }
+                Divider()
+              }
+              NavigationLink(value: NavDestination.wikiHistory(.character, characterId)) {
+                Label("角色信息历史", systemImage: WikiHistoryKind.character.icon)
+              }
+              NavigationLink(value: NavDestination.wikiHistory(.characterSubjects, characterId)) {
+                Label("出演作品历史", systemImage: WikiHistoryKind.characterSubjects.icon)
+              }
+              NavigationLink(value: NavDestination.wikiHistory(.characterCasts, characterId)) {
+                Label("关联人物历史", systemImage: WikiHistoryKind.characterCasts.icon)
+              }
+            } label: {
+              Label("Wiki", systemImage: "pencil.and.list.clipboard")
+            }
+            Divider()
+          }
           Button {
             showCommentBox = true
           } label: {
@@ -156,6 +188,20 @@ struct CharacterView: View {
           }
         } label: {
           Image(systemName: "ellipsis")
+        }
+      }
+    }
+    .sheet(isPresented: $showWikiEdit) {
+      CharacterWikiEditSheet(characterId: characterId) {
+        Task {
+          await loadCached()
+        }
+      }
+    }
+    .sheet(isPresented: $showPortraitUpload) {
+      WikiPortraitUploadSheet(kind: .character, entityId: characterId) {
+        Task {
+          await loadCached()
         }
       }
     }

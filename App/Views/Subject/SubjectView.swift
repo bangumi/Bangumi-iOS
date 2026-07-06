@@ -87,6 +87,7 @@ struct SubjectDetailView: View {
   @AppStorage("shareDomain") var shareDomain: ShareDomain = .chii
   @AppStorage("isolationMode") var isolationMode: Bool = false
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
+  @AppStorage("profile") var profile: Profile = Profile()
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
 
   let subject: SubjectDTO
@@ -96,6 +97,9 @@ struct SubjectDetailView: View {
   @State private var showCreateTopic: Bool = false
   @State private var showIndexPicker: Bool = false
   @State private var showRatingSheet: Bool = false
+  @State private var showWikiEdit: Bool = false
+  @State private var showWikiLock: Bool = false
+  @State private var showEpisodeWiki: Bool = false
 
   var shareLink: URL {
     URL(string: "\(shareDomain.url)/subject/\(subject.id)")!
@@ -167,6 +171,32 @@ struct SubjectDetailView: View {
     .sheet(isPresented: $showRatingSheet) {
       SubjectRatingSheet(subject: subject)
     }
+    .sheet(isPresented: $showWikiEdit) {
+      SubjectWikiEditSheet(subjectId: subject.id) {
+        Task {
+          await reload()
+        }
+      }
+    }
+    .sheet(isPresented: $showWikiLock) {
+      SubjectWikiLockSheet(subjectId: subject.id, locked: subject.locked) {
+        Task {
+          await reload()
+        }
+      }
+    }
+    .sheet(isPresented: $showEpisodeWiki) {
+      SubjectEpisodeWikiSheet(subjectId: subject.id) {
+        Task {
+          try? await SubjectRepository.loadSubjectDetails(
+            subject.id,
+            offprints: subject.type == .book && subject.series,
+            social: !isolationMode
+          )
+          await reload()
+        }
+      }
+    }
     .navigationTitle(subject.name)
     .navigationBarTitleDisplayMode(.inline)
     .toolbar {
@@ -174,6 +204,54 @@ struct SubjectDetailView: View {
         Menu {
           NavigationLink(value: NavDestination.subjectStaffList(subject.id)) {
             Label("制作人员", systemImage: "person.3")
+          }
+          if isAuthenticated && profile.groupEnum.canAccessWikiTools {
+            Menu {
+              if profile.groupEnum.canEditSubjectWiki {
+                Button {
+                  showWikiEdit = true
+                } label: {
+                  Label("编辑 Wiki", systemImage: "pencil")
+                }
+              }
+              if profile.groupEnum.canEditEpisodeWiki {
+                Button {
+                  showEpisodeWiki = true
+                } label: {
+                  Label("章节 Wiki", systemImage: "list.number")
+                }
+              }
+              if profile.groupEnum.canLockSubjectWiki {
+                Button {
+                  showWikiLock = true
+                } label: {
+                  Label(
+                    subject.locked ? "解锁条目" : "锁定条目",
+                    systemImage: subject.locked ? "lock.open" : "lock"
+                  )
+                }
+              }
+              if profile.groupEnum.canEditSubjectWiki {
+                NavigationLink(value: NavDestination.subjectWikiCovers(subject.id)) {
+                  Label("封面", systemImage: "photo")
+                }
+              }
+              Divider()
+              NavigationLink(value: NavDestination.wikiHistory(.subject, subject.id)) {
+                Label("条目信息历史", systemImage: WikiHistoryKind.subject.icon)
+              }
+              NavigationLink(value: NavDestination.wikiHistory(.subjectRelations, subject.id)) {
+                Label("关联条目历史", systemImage: WikiHistoryKind.subjectRelations.icon)
+              }
+              NavigationLink(value: NavDestination.wikiHistory(.subjectCharacters, subject.id)) {
+                Label("关联角色历史", systemImage: WikiHistoryKind.subjectCharacters.icon)
+              }
+              NavigationLink(value: NavDestination.wikiHistory(.subjectPersons, subject.id)) {
+                Label("制作人员历史", systemImage: WikiHistoryKind.subjectPersons.icon)
+              }
+            } label: {
+              Label("Wiki", systemImage: "pencil.and.list.clipboard")
+            }
           }
           if isAuthenticated {
             Divider()

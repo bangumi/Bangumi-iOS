@@ -162,6 +162,51 @@ enum UserGroup: Int, Codable {
       return "维基人"
     }
   }
+
+  var canAccessWikiTools: Bool {
+    switch self {
+    case .admin, .bangumiManager, .doujinManager, .characterManager, .wikiManager, .wikipedians:
+      return true
+    case .none, .banned, .forbidden, .user:
+      return false
+    }
+  }
+
+  var canEditSubjectWiki: Bool {
+    switch self {
+    case .admin, .bangumiManager, .wikiManager, .wikipedians:
+      return true
+    case .none, .doujinManager, .banned, .forbidden, .characterManager, .user:
+      return false
+    }
+  }
+
+  var canEditMonoWiki: Bool {
+    switch self {
+    case .admin, .characterManager, .wikiManager, .wikipedians:
+      return true
+    case .none, .bangumiManager, .doujinManager, .banned, .forbidden, .user:
+      return false
+    }
+  }
+
+  var canEditEpisodeWiki: Bool {
+    switch self {
+    case .admin, .bangumiManager, .wikiManager, .wikipedians:
+      return true
+    case .none, .doujinManager, .banned, .forbidden, .characterManager, .user:
+      return false
+    }
+  }
+
+  var canLockSubjectWiki: Bool {
+    switch self {
+    case .admin, .bangumiManager, .wikiManager:
+      return true
+    case .none, .doujinManager, .banned, .forbidden, .characterManager, .user, .wikipedians:
+      return false
+    }
+  }
 }
 
 enum UserHomeSection: String, Codable {

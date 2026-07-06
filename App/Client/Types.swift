@@ -69,6 +69,10 @@ struct Profile: Codable, Identifiable, Hashable, Linkable {
     SimpleUserDTO(self)
   }
 
+  var groupEnum: UserGroup {
+    UserGroup(group)
+  }
+
   init() {
     self.id = 0
     self.username = ""

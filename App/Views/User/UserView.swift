@@ -6,6 +6,7 @@ struct UserView: View {
 
   @AppStorage("shareDomain") var shareDomain: ShareDomain = .chii
   @AppStorage("profile") var profile: Profile = Profile()
+  @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
   @AppStorage("friendlist") var friendlist: [Int] = []
   @AppStorage("blocklist") var blocklist: [Int] = []
 
@@ -139,6 +140,11 @@ struct UserView: View {
             }
             NavigationLink(value: NavDestination.userTimeline(user)) {
               Label("时间胶囊", systemImage: "clock")
+            }
+            if isAuthenticated && profile.groupEnum.canAccessWikiTools {
+              NavigationLink(value: NavDestination.wikiUserContributions(user)) {
+                Label("Wiki 编辑", systemImage: "pencil.and.list.clipboard")
+              }
             }
             NavigationLink(value: NavDestination.userGroup(user)) {
               Label("小组", systemImage: "rectangle.3.group.bubble")

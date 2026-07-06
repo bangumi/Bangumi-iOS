@@ -20,6 +20,13 @@ enum NavDestination: Hashable, View {
   case collectionList(_ subjectType: SubjectType)
   case export
   case profilePrivacy
+  case wikiHome
+  case wikiRecent(_ kind: WikiEntityKind)
+  case wikiCreate(_ kind: WikiEntityKind)
+  case wikiHistory(_ kind: WikiHistoryKind, _ entityId: Int)
+  case wikiRevision(_ kind: WikiHistoryKind, _ revisionId: Int)
+  case wikiUserContributions(_ user: SlimUserDTO)
+  case wikiContributionList(_ user: SlimUserDTO, _ kind: WikiEntityKind)
 
   case user(_ username: String)
   case userCollection(_ user: SlimUserDTO, _ stype: SubjectType, _ ctypes: [CollectionType: Int])
@@ -45,6 +52,7 @@ enum NavDestination: Hashable, View {
   case subjectCollectsList(_ subjectId: Int)
   case subjectIndexList(_ subjectId: Int)
   case subjectInfobox(_ subjectId: Int)
+  case subjectWikiCovers(_ subjectId: Int)
   case subjectBrowsing(_ type: SubjectType)
   case subjectTagBrowsing(_ type: SubjectType, _ tag: String, _ tagsCat: SubjectTagsCategory)
 
@@ -89,6 +97,20 @@ enum NavDestination: Hashable, View {
       ExportView()
     case .profilePrivacy:
       ProfilePrivacyView()
+    case .wikiHome:
+      WikiHomeView()
+    case .wikiRecent(let kind):
+      WikiRecentView(kind: kind)
+    case .wikiCreate(let kind):
+      WikiCreateEntityView(kind: kind)
+    case .wikiHistory(let kind, let entityId):
+      WikiHistoryView(kind: kind, entityId: entityId)
+    case .wikiRevision(let kind, let revisionId):
+      WikiRevisionDetailView(kind: kind, revisionId: revisionId)
+    case .wikiUserContributions(let user):
+      WikiUserContributionsView(user: user)
+    case .wikiContributionList(let user, let kind):
+      WikiContributionListView(user: user, kind: kind)
 
     case .user(let username):
       UserView(username: username)
@@ -133,6 +155,8 @@ enum NavDestination: Hashable, View {
       SubjectIndexListView(subjectId: subjectId)
     case .subjectInfobox(let subjectId):
       SubjectInfoboxView(subjectId: subjectId)
+    case .subjectWikiCovers(let subjectId):
+      SubjectWikiCoversView(subjectId: subjectId)
     case .subjectBrowsing(let type):
       SubjectBrowsingView(type: type)
     case .subjectTagBrowsing(let type, let tag, let tagsCat):
