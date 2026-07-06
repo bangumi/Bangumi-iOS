@@ -435,7 +435,7 @@ struct EpisodeWikiEditSheet: View {
   @State private var submitting = false
 
   private var saveDisabled: Bool {
-    submitting || name.isEmpty || epText.isEmpty || wikiDouble(from: epText) == nil
+    submitting || info == nil || epText.isEmpty || wikiDouble(from: epText) == nil
       || commitMessage.isEmpty
   }
 
@@ -472,7 +472,7 @@ struct EpisodeWikiEditSheet: View {
       nameCN: nameCN,
       ep: ep,
       disc: wikiDouble(from: discText),
-      date: optionalWikiText(date),
+      date: date.trimmingCharacters(in: .whitespacesAndNewlines),
       type: type,
       duration: duration,
       summary: summary
@@ -480,16 +480,16 @@ struct EpisodeWikiEditSheet: View {
   }
 
   private func submit() async {
-    guard let payload = payload(includeId: false), !saveDisabled else {
+    guard let info, let payload = payload(includeId: true), !saveDisabled else {
       return
     }
     submitting = true
     defer { submitting = false }
     do {
-      try await WikiService.patchEpisodeWikiInfo(
-        episodeId: episodeId,
-        episode: payload,
-        expectedRevision: info?.expectedRevision,
+      try await WikiService.patchEpisodes(
+        subjectId: info.subjectID,
+        episodes: [payload],
+        expectedRevision: [info.expectedRevision],
         commitMessage: commitMessage
       )
       try? await EpisodeRepository.loadEpisode(episodeId)
