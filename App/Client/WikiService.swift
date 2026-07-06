@@ -186,6 +186,7 @@ enum WikiService {
   static func patchPersonWikiInfo(
     personId: Int,
     person: PersonWikiEditDTO,
+    originalProfession: PersonProfessionDTO,
     expectedRevision: SimpleWikiExpectedDTO?,
     commitMessage: String
   ) async throws {
@@ -193,8 +194,10 @@ enum WikiService {
     var personPayload: [String: Any] = [
       "name": person.name,
       "summary": person.summary,
-      "profession": person.profession.bodyValue,
     ]
+    if person.profession.bodyValue != originalProfession.bodyValue {
+      personPayload["profession"] = person.profession.bodyValue
+    }
     if !person.infobox.isEmpty {
       personPayload["infobox"] = person.infobox
     }

@@ -266,13 +266,17 @@ struct PersonWikiEditSheet: View {
     if saveDisabled {
       return
     }
+    guard let info else {
+      return
+    }
     submitting = true
     defer { submitting = false }
     do {
       try await WikiService.patchPersonWikiInfo(
         personId: personId,
         person: edit,
-        expectedRevision: info?.expectedRevision,
+        originalProfession: info.profession,
+        expectedRevision: info.expectedRevision,
         commitMessage: commitMessage
       )
       try? await PersonRepository.loadPerson(personId)

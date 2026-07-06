@@ -1,5 +1,11 @@
 import Foundation
 
+private extension String {
+  var nilIfEmpty: String? {
+    isEmpty ? nil : self
+  }
+}
+
 enum WikiEntityKind: String, Codable, Hashable, Identifiable, CaseIterable {
   case subject
   case person
@@ -138,10 +144,10 @@ struct SubjectWikiInfoDTO: Codable, Hashable, Sendable, Identifiable {
 
   var expectedRevision: SubjectWikiExpectedDTO {
     SubjectWikiExpectedDTO(
-      name: name,
-      infobox: infobox,
+      name: name.nilIfEmpty,
+      infobox: infobox.nilIfEmpty,
       platform: platform,
-      summary: summary,
+      summary: summary.nilIfEmpty,
       metaTags: metaTags
     )
   }
