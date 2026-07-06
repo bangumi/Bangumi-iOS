@@ -51,6 +51,14 @@ private func wikiDouble(from text: String) -> Double? {
   Double(text.trimmingCharacters(in: .whitespacesAndNewlines))
 }
 
+private func episodeDisc(from text: String, preservingEmpty: Bool) -> Double? {
+  let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+  if trimmed.isEmpty {
+    return preservingEmpty ? 0 : nil
+  }
+  return Double(trimmed)
+}
+
 struct SubjectWikiEditSheet: View {
   @Environment(\.dismiss) private var dismiss
 
@@ -75,7 +83,7 @@ struct SubjectWikiEditSheet: View {
   @State private var submitting = false
 
   private var saveDisabled: Bool {
-    submitting || edit.name.isEmpty || edit.infobox.isEmpty || commitMessage.isEmpty
+    submitting || info == nil || edit.name.isEmpty || edit.infobox.isEmpty || commitMessage.isEmpty
   }
 
   private func load() async {
@@ -471,7 +479,7 @@ struct EpisodeWikiEditSheet: View {
       name: name,
       nameCN: nameCN,
       ep: ep,
-      disc: wikiDouble(from: discText),
+      disc: episodeDisc(from: discText, preservingEmpty: true),
       date: date.trimmingCharacters(in: .whitespacesAndNewlines),
       type: type,
       duration: duration,
@@ -676,7 +684,7 @@ struct SubjectEpisodeWikiSheet: View {
       name: episodeText(name, preservingEmpty: preservingEmptyText),
       nameCN: episodeText(nameCN, preservingEmpty: preservingEmptyText),
       ep: ep,
-      disc: wikiDouble(from: discText),
+      disc: episodeDisc(from: discText, preservingEmpty: preservingEmptyText),
       date: episodeText(date, preservingEmpty: preservingEmptyText),
       type: type,
       duration: episodeText(duration, preservingEmpty: preservingEmptyText),
