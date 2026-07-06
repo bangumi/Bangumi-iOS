@@ -80,7 +80,7 @@ struct ChiiTimelineView: View {
         }
         ToolbarItem(placement: .topBarTrailing) {
           HStack(spacing: 8) {
-            if isAuthenticated, profile.groupEnum.canAccessWikiTools {
+            if isAuthenticated, profile.canAccessWikiTools {
               NavigationLink(value: NavDestination.wikiHome) {
                 Image(systemName: "pencil.and.list.clipboard")
               }

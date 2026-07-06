@@ -37,7 +37,7 @@ struct SubjectWikiCoversView: View {
   @State private var updatingVote: Int?
 
   private var canEditCovers: Bool {
-    isAuthenticated && profile.groupEnum.canEditSubjectWiki
+    isAuthenticated && profile.canEditSubjectWiki
   }
 
   private func load() async {
@@ -214,13 +214,16 @@ struct WikiPortraitUploadSheet: View {
 
   private func loadImage(_ item: PhotosPickerItem?) async {
     guard let item else {
+      imageBase64 = nil
       return
     }
+    imageBase64 = nil
     loadingImage = true
     defer { loadingImage = false }
     do {
       imageBase64 = try await WikiImagePayload.base64(from: item)
     } catch {
+      imageBase64 = nil
       Notifier.shared.alert(error: error)
     }
   }

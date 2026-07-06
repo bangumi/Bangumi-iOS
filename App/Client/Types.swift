@@ -73,6 +73,14 @@ struct Profile: Codable, Identifiable, Hashable, Linkable {
     UserGroup(group)
   }
 
+  var canEditSubjectWiki: Bool {
+    permissions.subjectWikiEdit || groupEnum.canEditSubjectWiki
+  }
+
+  var canAccessWikiTools: Bool {
+    groupEnum.canAccessWikiTools || canEditSubjectWiki
+  }
+
   init() {
     self.id = 0
     self.username = ""

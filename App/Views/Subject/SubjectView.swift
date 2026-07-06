@@ -205,9 +205,9 @@ struct SubjectDetailView: View {
           NavigationLink(value: NavDestination.subjectStaffList(subject.id)) {
             Label("制作人员", systemImage: "person.3")
           }
-          if isAuthenticated && profile.groupEnum.canAccessWikiTools {
+          if isAuthenticated && profile.canAccessWikiTools {
             Menu {
-              if profile.groupEnum.canEditSubjectWiki {
+              if profile.canEditSubjectWiki {
                 Button {
                   showWikiEdit = true
                 } label: {
@@ -231,7 +231,7 @@ struct SubjectDetailView: View {
                   )
                 }
               }
-              if profile.groupEnum.canEditSubjectWiki {
+              if profile.canEditSubjectWiki {
                 NavigationLink(value: NavDestination.subjectWikiCovers(subject.id)) {
                   Label("封面", systemImage: "photo")
                 }

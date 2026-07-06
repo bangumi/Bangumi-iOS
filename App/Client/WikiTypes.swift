@@ -498,8 +498,8 @@ struct SubjectRelationRevisionDTO: Codable, Identifiable, Hashable, Sendable {
   var type: Int
   var order: Int
 
-  var id: Int {
-    subject.id
+  var id: String {
+    "\(subject.id)-\(type)-\(order)"
   }
 }
 
@@ -508,8 +508,8 @@ struct SubjectCharacterRevisionDTO: Codable, Identifiable, Hashable, Sendable {
   var type: Int
   var order: Int
 
-  var id: Int {
-    character.id
+  var id: String {
+    "\(character.id)-\(type)-\(order)"
   }
 }
 
@@ -517,8 +517,8 @@ struct SubjectPersonRevisionDTO: Codable, Identifiable, Hashable, Sendable {
   var person: WikiSimplePersonDTO
   var position: Int
 
-  var id: Int {
-    person.id
+  var id: String {
+    "\(person.id)-\(position)"
   }
 }
 
@@ -526,8 +526,8 @@ struct PersonSubjectRevisionDTO: Codable, Identifiable, Hashable, Sendable {
   var subject: WikiSimpleSubjectDTO
   var position: Int
 
-  var id: Int {
-    subject.id
+  var id: String {
+    "\(subject.id)-\(position)"
   }
 }
 
@@ -545,8 +545,8 @@ struct CharacterSubjectRevisionDTO: Codable, Identifiable, Hashable, Sendable {
   var type: Int
   var order: Int
 
-  var id: Int {
-    subject.id
+  var id: String {
+    "\(subject.id)-\(type)-\(order)"
   }
 }
 

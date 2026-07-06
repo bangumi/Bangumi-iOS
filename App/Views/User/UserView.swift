@@ -141,7 +141,7 @@ struct UserView: View {
             NavigationLink(value: NavDestination.userTimeline(user)) {
               Label("时间胶囊", systemImage: "clock")
             }
-            if isAuthenticated && profile.groupEnum.canAccessWikiTools {
+            if isAuthenticated && profile.canAccessWikiTools {
               NavigationLink(value: NavDestination.wikiUserContributions(user)) {
                 Label("Wiki 编辑", systemImage: "pencil.and.list.clipboard")
               }

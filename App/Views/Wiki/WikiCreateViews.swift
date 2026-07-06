@@ -12,7 +12,7 @@ struct WikiCreateEntityView: View {
     }
     switch kind {
     case .subject:
-      return profile.groupEnum.canEditSubjectWiki
+      return profile.canEditSubjectWiki
     case .person, .character:
       return profile.groupEnum.canEditMonoWiki
     case .episode:
@@ -270,6 +270,8 @@ private struct CharacterWikiCreateView: View {
   @State private var summary = ""
   @State private var submitting = false
 
+  private let supportedTypes: [CharacterType] = [.crt, .mecha, .vessel, .org]
+
   private var saveDisabled: Bool {
     submitting || name.isEmpty || infobox.isEmpty
   }
@@ -299,7 +301,7 @@ private struct CharacterWikiCreateView: View {
     Form {
       Section("基本信息") {
         Picker("类型", selection: $type) {
-          ForEach(CharacterType.allCases.filter { $0 != .none }) { item in
+          ForEach(supportedTypes) { item in
             Text(item.description).tag(item)
           }
         }

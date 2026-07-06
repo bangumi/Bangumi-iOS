@@ -661,21 +661,26 @@ struct SubjectEpisodeWikiSheet: View {
     loadedEpisodeId = nil
   }
 
-  private func payload(id: Int?) -> EpisodeWikiEditDTO? {
+  private func episodeText(_ text: String, preservingEmpty: Bool) -> String? {
+    let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+    return preservingEmpty ? trimmed : optionalWikiText(text)
+  }
+
+  private func payload(id: Int?, preservingEmptyText: Bool) -> EpisodeWikiEditDTO? {
     guard let ep = wikiDouble(from: epText) else {
       return nil
     }
     return EpisodeWikiEditDTO(
       id: id,
       subjectID: nil,
-      name: optionalWikiText(name),
-      nameCN: optionalWikiText(nameCN),
+      name: episodeText(name, preservingEmpty: preservingEmptyText),
+      nameCN: episodeText(nameCN, preservingEmpty: preservingEmptyText),
       ep: ep,
       disc: wikiDouble(from: discText),
-      date: optionalWikiText(date),
+      date: episodeText(date, preservingEmpty: preservingEmptyText),
       type: type,
-      duration: optionalWikiText(duration),
-      summary: optionalWikiText(summary)
+      duration: episodeText(duration, preservingEmpty: preservingEmptyText),
+      summary: episodeText(summary, preservingEmpty: preservingEmptyText)
     )
   }
 
@@ -688,12 +693,14 @@ struct SubjectEpisodeWikiSheet: View {
     do {
       switch mode {
       case .create:
-        guard let payload = payload(id: nil) else { return }
+        guard let payload = payload(id: nil, preservingEmptyText: false) else { return }
         let ids = try await WikiService.createEpisodes(subjectId: subjectId, episodes: [payload])
         let idsText = ids.map(String.init).joined(separator: ", ")
         Notifier.shared.notify(message: "已创建章节 #\(idsText)")
       case .edit:
-        guard let episodeId = parsedEpisodeId, let payload = payload(id: episodeId) else { return }
+        guard let episodeId = parsedEpisodeId,
+          let payload = payload(id: episodeId, preservingEmptyText: true)
+        else { return }
         guard loadedEpisodeId == episodeId else { return }
         try await WikiService.patchEpisodes(
           subjectId: subjectId,

@@ -5,11 +5,11 @@ struct WikiHomeView: View {
   @AppStorage("isAuthenticated") private var isAuthenticated = false
 
   private var canAccessWikiTools: Bool {
-    isAuthenticated && profile.groupEnum.canAccessWikiTools
+    isAuthenticated && profile.canAccessWikiTools
   }
 
   private var canCreateWikiEntities: Bool {
-    profile.groupEnum.canEditSubjectWiki || profile.groupEnum.canEditMonoWiki
+    profile.canEditSubjectWiki || profile.groupEnum.canEditMonoWiki
   }
 
   var body: some View {
@@ -33,7 +33,7 @@ struct WikiHomeView: View {
 
         if canCreateWikiEntities {
           Section("创建") {
-            if profile.groupEnum.canEditSubjectWiki {
+            if profile.canEditSubjectWiki {
               NavigationLink(value: NavDestination.wikiCreate(.subject)) {
                 Label("创建条目", systemImage: "plus.rectangle.on.rectangle")
               }
