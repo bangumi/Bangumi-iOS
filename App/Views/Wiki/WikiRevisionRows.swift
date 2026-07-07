@@ -5,6 +5,8 @@ private enum WikiContributionRevisionType {
   static let subjectErase = 12
   static let subjectLock = 103
   static let subjectUnlock = 104
+  static let characterMerge = 13
+  static let characterErase = 14
   static let personMerge = 15
   static let personErase = 16
 }
@@ -311,7 +313,14 @@ struct WikiContributionRowDTO: Codable, Identifiable, Hashable, Sendable {
       default:
         return nil
       }
-    case .character, .episode:
+    case .character:
+      switch type {
+      case WikiContributionRevisionType.characterMerge, WikiContributionRevisionType.characterErase:
+        return .character
+      default:
+        return nil
+      }
+    case .episode:
       return nil
     }
   }
