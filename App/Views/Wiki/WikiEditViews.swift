@@ -51,6 +51,11 @@ private func wikiDouble(from text: String) -> Double? {
   Double(text.trimmingCharacters(in: .whitespacesAndNewlines))
 }
 
+private func hasInvalidOptionalWikiDouble(_ text: String) -> Bool {
+  let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+  return !trimmed.isEmpty && Double(trimmed) == nil
+}
+
 private func episodeDisc(from text: String, preservingEmpty: Bool) -> Double? {
   let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
   if trimmed.isEmpty {
@@ -499,6 +504,7 @@ struct EpisodeWikiEditSheet: View {
 
   private var saveDisabled: Bool {
     submitting || info == nil || epText.isEmpty || wikiDouble(from: epText) == nil
+      || hasInvalidOptionalWikiDouble(discText)
       || commitMessage.isEmpty
   }
 
@@ -699,7 +705,9 @@ struct SubjectEpisodeWikiSheet: View {
   }
 
   private var saveDisabled: Bool {
-    if submitting || epText.isEmpty || wikiDouble(from: epText) == nil {
+    if submitting || epText.isEmpty || wikiDouble(from: epText) == nil
+      || hasInvalidOptionalWikiDouble(discText)
+    {
       return true
     }
     switch mode {
