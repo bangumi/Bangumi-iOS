@@ -1,5 +1,14 @@
 import SwiftUI
 
+private enum WikiContributionRevisionType {
+  static let subjectMerge = 11
+  static let subjectErase = 12
+  static let subjectLock = 103
+  static let subjectUnlock = 104
+  static let personMerge = 15
+  static let personErase = 16
+}
+
 struct WikiSubjectRelationRevisionRow: View {
   let item: SubjectRelationRevisionDTO
 
@@ -284,6 +293,28 @@ struct WikiContributionRowDTO: Codable, Identifiable, Hashable, Sendable {
     commitMessage = item.commitMessage
     createdAt = item.createdAt
   }
+
+  var revisionKind: WikiHistoryKind? {
+    switch kind {
+    case .subject:
+      switch type {
+      case WikiContributionRevisionType.subjectMerge, WikiContributionRevisionType.subjectErase,
+        WikiContributionRevisionType.subjectLock, WikiContributionRevisionType.subjectUnlock:
+        return .subject
+      default:
+        return nil
+      }
+    case .person:
+      switch type {
+      case WikiContributionRevisionType.personMerge, WikiContributionRevisionType.personErase:
+        return .person
+      default:
+        return nil
+      }
+    case .character, .episode:
+      return nil
+    }
+  }
 }
 
 struct WikiContributionRowView: View {
@@ -312,6 +343,10 @@ struct WikiContributionRowView: View {
   }
 
   private var destination: NavDestination {
+    if let revisionKind = item.revisionKind {
+      return .wikiRevision(revisionKind, item.id)
+    }
+
     switch item.kind {
     case .subject:
       return .subject(item.entityId)

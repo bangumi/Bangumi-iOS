@@ -724,6 +724,19 @@ struct SubjectEpisodeWikiSheet: View {
     loadedEpisodeId = nil
   }
 
+  private func resetEpisodeCreateFields() {
+    episodeIdText = ""
+    name = ""
+    nameCN = ""
+    epText = "1"
+    discText = ""
+    date = ""
+    type = .main
+    duration = ""
+    summary = ""
+    resetLoadedEpisode()
+  }
+
   private func episodeText(_ text: String, preservingEmpty: Bool) -> String? {
     let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
     return preservingEmpty ? trimmed : optionalWikiText(text)
@@ -799,8 +812,13 @@ struct SubjectEpisodeWikiSheet: View {
               Text(item.title).tag(item)
             }
           }
-          .onChange(of: mode) {
-            resetLoadedEpisode()
+          .onChange(of: mode) { _, newMode in
+            switch newMode {
+            case .create:
+              resetEpisodeCreateFields()
+            case .edit:
+              resetLoadedEpisode()
+            }
           }
 
           if mode == .edit {

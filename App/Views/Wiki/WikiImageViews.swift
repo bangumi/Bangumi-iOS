@@ -198,6 +198,7 @@ struct WikiPortraitUploadSheet: View {
 
   @State private var selectedPhoto: PhotosPickerItem?
   @State private var imageBase64: String?
+  @State private var imageLoadToken = 0
   @State private var loadingImage = false
   @State private var submitting = false
 
@@ -212,17 +213,32 @@ struct WikiPortraitUploadSheet: View {
     }
   }
 
-  private func loadImage(_ item: PhotosPickerItem?) async {
+  private func loadImage(_ item: PhotosPickerItem?, token: Int) async {
+    guard imageLoadToken == token else {
+      return
+    }
     guard let item else {
       imageBase64 = nil
+      loadingImage = false
       return
     }
     imageBase64 = nil
     loadingImage = true
-    defer { loadingImage = false }
+    defer {
+      if imageLoadToken == token {
+        loadingImage = false
+      }
+    }
     do {
-      imageBase64 = try await WikiImagePayload.base64(from: item)
+      let payload = try await WikiImagePayload.base64(from: item)
+      guard imageLoadToken == token else {
+        return
+      }
+      imageBase64 = payload
     } catch {
+      guard imageLoadToken == token else {
+        return
+      }
       imageBase64 = nil
       Notifier.shared.alert(error: error)
     }
@@ -271,8 +287,10 @@ struct WikiPortraitUploadSheet: View {
         }
       }
       .onChange(of: selectedPhoto) { _, newValue in
+        imageLoadToken += 1
+        let token = imageLoadToken
         Task {
-          await loadImage(newValue)
+          await loadImage(newValue, token: token)
         }
       }
     } controls: {

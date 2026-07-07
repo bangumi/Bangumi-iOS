@@ -138,7 +138,7 @@ components:
         redirect:
           type: integer
         role:
-          $ref: '#/components/schemas/CharacterType'
+          type: integer
         summary:
           type: string
       required:
@@ -11968,12 +11968,27 @@ paths:
                 properties: {}
                 type: object
           description: Default Response
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: default error response type
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: default error response type
         '500':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
           description: 意料之外的服务器错误
+      security:
+        - CookiesSession: []
+          HTTPBearer: []
       tags:
         - wiki
   /p1/wiki/persons:
@@ -12575,9 +12590,9 @@ paths:
             unix time stamp, only return last update time >= since
 
             only allow recent 2 days
-          in: path
+          in: query
           name: since
-          required: true
+          required: false
           schema:
             default: 0
             type: integer
@@ -12621,9 +12636,9 @@ paths:
             unix time stamp, only return last update time >= since
 
             only allow recent 2 days
-          in: path
+          in: query
           name: since
-          required: true
+          required: false
           schema:
             default: 0
             type: integer
@@ -12667,9 +12682,9 @@ paths:
             unix time stamp, only return last update time >= since
 
             only allow recent 2 days
-          in: path
+          in: query
           name: since
-          required: true
+          required: false
           schema:
             default: 0
             type: integer
@@ -12713,9 +12728,9 @@ paths:
             unix time stamp, only return last update time >= since
 
             only allow recent 2 days
-          in: path
+          in: query
           name: since
-          required: true
+          required: false
           schema:
             default: 0
             type: integer
@@ -13416,6 +13431,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
           description: default error response type
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: default error response type
         '403':
           content:
             application/json:
@@ -13428,6 +13449,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
           description: 意料之外的服务器错误
+      security:
+        - CookiesSession: []
+          HTTPBearer: []
       tags:
         - wiki
   /p1/wiki/subjects/{subjectID}/covers/{imageID}/vote:
@@ -13455,12 +13479,27 @@ paths:
                 properties: {}
                 type: object
           description: Default Response
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: default error response type
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: default error response type
         '500':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
           description: 意料之外的服务器错误
+      security:
+        - CookiesSession: []
+          HTTPBearer: []
       summary: 撤消条目封面投票
       tags:
         - wiki
@@ -13488,12 +13527,27 @@ paths:
                 properties: {}
                 type: object
           description: Default Response
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: default error response type
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: default error response type
         '500':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
           description: 意料之外的服务器错误
+      security:
+        - CookiesSession: []
+          HTTPBearer: []
       summary: 为条目封面投票
       tags:
         - wiki
@@ -13867,12 +13921,27 @@ paths:
                 properties: {}
                 type: object
           description: Default Response
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: default error response type
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: default error response type
         '500':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
           description: 意料之外的服务器错误
+      security:
+        - CookiesSession: []
+          HTTPBearer: []
       tags:
         - wiki
   /p1/wiki/users/{username}/contributions/characters:
