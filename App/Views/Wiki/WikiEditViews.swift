@@ -535,7 +535,7 @@ struct EpisodeWikiEditSheet: View {
       nameCN: nameCN,
       ep: ep,
       disc: episodeDisc(from: discText, preservingEmpty: true),
-      date: date.trimmingCharacters(in: .whitespacesAndNewlines),
+      date: optionalWikiText(date),
       type: type,
       duration: duration,
       summary: summary
@@ -774,7 +774,7 @@ struct SubjectEpisodeWikiSheet: View {
       nameCN: episodeText(nameCN, preservingEmpty: preservingEmptyText),
       ep: ep,
       disc: episodeDisc(from: discText, preservingEmpty: preservingEmptyText),
-      date: episodeText(date, preservingEmpty: preservingEmptyText),
+      date: optionalWikiText(date),
       type: type,
       duration: episodeText(duration, preservingEmpty: preservingEmptyText),
       summary: episodeText(summary, preservingEmpty: preservingEmptyText)
