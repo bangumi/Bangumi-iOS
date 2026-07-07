@@ -126,7 +126,9 @@ struct Profile: Codable, Identifiable, Hashable, Linkable {
     self.joinedAt = try container.decodeIfPresent(Int.self, forKey: .joinedAt)
     self.group = try container.decode(Int.self, forKey: .group)
     self.location = try container.decode(String.self, forKey: .location)
-    self.permissions = try container.decode(Permissions.self, forKey: .permissions)
+    self.permissions =
+      try container.decodeIfPresent(Permissions.self, forKey: .permissions)
+      ?? Permissions(subjectWikiEdit: false)
     self.site = try container.decode(String.self, forKey: .site)
   }
 }
