@@ -138,7 +138,7 @@ components:
         redirect:
           type: integer
         role:
-          type: integer
+          $ref: '#/components/schemas/CharacterType'
         summary:
           type: string
       required:
