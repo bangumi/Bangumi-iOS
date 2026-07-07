@@ -61,7 +61,10 @@ private func episodeDisc(from text: String, preservingEmpty: Bool) -> Double? {
   if trimmed.isEmpty {
     return preservingEmpty ? 0 : nil
   }
-  return Double(trimmed)
+  guard let disc = Double(trimmed) else {
+    return nil
+  }
+  return disc
 }
 
 private func omitUnchangedEpisodePatchFields(
@@ -531,7 +534,7 @@ struct EpisodeWikiEditSheet: View {
   }
 
   private func payload(includeId: Bool) -> EpisodeWikiEditDTO? {
-    guard let ep = wikiDouble(from: epText) else {
+    guard let ep = wikiDouble(from: epText), !hasInvalidOptionalWikiDouble(discText) else {
       return nil
     }
     return EpisodeWikiEditDTO(
@@ -772,7 +775,7 @@ struct SubjectEpisodeWikiSheet: View {
   }
 
   private func payload(id: Int?, preservingEmptyText: Bool) -> EpisodeWikiEditDTO? {
-    guard let ep = wikiDouble(from: epText) else {
+    guard let ep = wikiDouble(from: epText), !hasInvalidOptionalWikiDouble(discText) else {
       return nil
     }
     return EpisodeWikiEditDTO(
