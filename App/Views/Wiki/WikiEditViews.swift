@@ -59,10 +59,11 @@ private func episodeDisc(from text: String, preservingEmpty: Bool) -> Double? {
   return Double(trimmed)
 }
 
-private func omitUnchangedEpisodeOrderingFields(
+private func omitUnchangedEpisodePatchFields(
   _ payload: inout EpisodeWikiEditDTO,
   original: EpisodeWikiInfoDTO,
-  discText: String
+  discText: String,
+  dateText: String
 ) {
   if payload.ep == original.ep {
     payload.ep = nil
@@ -73,6 +74,10 @@ private func omitUnchangedEpisodeOrderingFields(
   }
   if payload.type == original.type {
     payload.type = nil
+  }
+  let trimmedDateText = dateText.trimmingCharacters(in: .whitespacesAndNewlines)
+  if trimmedDateText.isEmpty || payload.date == original.date {
+    payload.date = nil
   }
 }
 
@@ -100,7 +105,18 @@ struct SubjectWikiEditSheet: View {
   @State private var submitting = false
 
   private var saveDisabled: Bool {
-    submitting || info == nil || edit.name.isEmpty || edit.infobox.isEmpty || commitMessage.isEmpty
+    guard let info else {
+      return true
+    }
+    if submitting || edit.name.isEmpty || commitMessage.isEmpty {
+      return true
+    }
+    switch mode {
+    case .full:
+      return edit.infobox.isEmpty
+    case .partial:
+      return edit.infobox.isEmpty && !info.infobox.isEmpty
+    }
   }
 
   private func load() async {
@@ -530,7 +546,12 @@ struct EpisodeWikiEditSheet: View {
     guard var payload = payload(includeId: true) else {
       return nil
     }
-    omitUnchangedEpisodeOrderingFields(&payload, original: info, discText: discText)
+    omitUnchangedEpisodePatchFields(
+      &payload,
+      original: info,
+      discText: discText,
+      dateText: date
+    )
     return payload
   }
 
@@ -764,7 +785,12 @@ struct SubjectEpisodeWikiSheet: View {
     guard var payload = payload(id: id, preservingEmptyText: true) else {
       return nil
     }
-    omitUnchangedEpisodeOrderingFields(&payload, original: original, discText: discText)
+    omitUnchangedEpisodePatchFields(
+      &payload,
+      original: original,
+      discText: discText,
+      dateText: date
+    )
     return payload
   }
 

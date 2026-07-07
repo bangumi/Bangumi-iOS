@@ -82,6 +82,9 @@ enum WikiService {
       if subject.nsfw == originalInfo.nsfw {
         subjectPayload.removeValue(forKey: "nsfw")
       }
+      if subject.infobox.isEmpty {
+        subjectPayload.removeValue(forKey: "infobox")
+      }
     }
     var payload: [String: Any] = [
       "commitMessage": commitMessage,
