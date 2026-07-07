@@ -59,6 +59,23 @@ private func episodeDisc(from text: String, preservingEmpty: Bool) -> Double? {
   return Double(trimmed)
 }
 
+private func omitUnchangedEpisodeOrderingFields(
+  _ payload: inout EpisodeWikiEditDTO,
+  original: EpisodeWikiInfoDTO,
+  discText: String
+) {
+  if payload.ep == original.ep {
+    payload.ep = nil
+  }
+  let trimmedDiscText = discText.trimmingCharacters(in: .whitespacesAndNewlines)
+  if payload.disc == original.disc || (trimmedDiscText.isEmpty && original.disc == nil) {
+    payload.disc = nil
+  }
+  if payload.type == original.type {
+    payload.type = nil
+  }
+}
+
 struct SubjectWikiEditSheet: View {
   @Environment(\.dismiss) private var dismiss
 
@@ -509,8 +526,16 @@ struct EpisodeWikiEditSheet: View {
     )
   }
 
+  private func editPayload(info: EpisodeWikiInfoDTO) -> EpisodeWikiEditDTO? {
+    guard var payload = payload(includeId: true) else {
+      return nil
+    }
+    omitUnchangedEpisodeOrderingFields(&payload, original: info, discText: discText)
+    return payload
+  }
+
   private func submit() async {
-    guard let info, let payload = payload(includeId: true), !saveDisabled else {
+    guard let info, let payload = editPayload(info: info), !saveDisabled else {
       return
     }
     submitting = true
@@ -723,17 +748,10 @@ struct SubjectEpisodeWikiSheet: View {
   }
 
   private func editPayload(id: Int, original: EpisodeWikiInfoDTO) -> EpisodeWikiEditDTO? {
-    var payload = payload(id: id, preservingEmptyText: true)
-    if payload?.ep == original.ep {
-      payload?.ep = nil
+    guard var payload = payload(id: id, preservingEmptyText: true) else {
+      return nil
     }
-    let trimmedDiscText = discText.trimmingCharacters(in: .whitespacesAndNewlines)
-    if payload?.disc == original.disc || (trimmedDiscText.isEmpty && original.disc == nil) {
-      payload?.disc = nil
-    }
-    if payload?.type == original.type {
-      payload?.type = nil
-    }
+    omitUnchangedEpisodeOrderingFields(&payload, original: original, discText: discText)
     return payload
   }
 
