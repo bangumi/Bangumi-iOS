@@ -34,6 +34,7 @@ struct EpisodeRecentView: View {
   var reload: (() async -> Void)? = nil
 
   @State private var showCollectionBox: Bool = false
+  @State private var loadingEpisodes: Bool = false
 
   private var subject: SubjectDTO {
     payload.subject
@@ -94,6 +95,19 @@ struct EpisodeRecentView: View {
         }
       } else {
         return RecentEpisodes(episodes: [], nextEpisode: nil)
+      }
+    }
+  }
+
+  private func loadEpisodes() {
+    guard !loadingEpisodes else { return }
+    Task {
+      loadingEpisodes = true
+      defer { loadingEpisodes = false }
+      do {
+        try await EpisodeRepository.loadEpisodes(subject.id)
+      } catch {
+        Notifier.shared.alert(error: error)
       }
     }
   }
@@ -177,13 +191,23 @@ struct EpisodeRecentView: View {
         }
       }
     } else {
-      NavigationLink(value: NavDestination.subject(subject.id)) {
-        HStack(spacing: 4) {
-          Text(progressText)
-          Image(systemName: progressIcon)
+      Button(action: loadEpisodes) {
+        ZStack {
+          HStack(spacing: 4) {
+            Text(progressText)
+            Image(systemName: progressIcon)
+          }
+          .opacity(loadingEpisodes ? 0 : 1)
+          .accessibilityHidden(loadingEpisodes)
+
+          if loadingEpisodes {
+            ProgressView()
+              .accessibilityLabel("正在加载章节")
+          }
         }
       }
       .progressButtonStyle()
+      .disabled(loadingEpisodes)
     }
   }
 }
