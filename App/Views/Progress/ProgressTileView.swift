@@ -129,7 +129,7 @@ struct ProgressTileItemContentView: View {
         }
 
         ProgressSubjectLinearBarsView(subject: subject)
-      }.frame(height: 128)
+      }.frame(height: 108)
     }
   }
 }

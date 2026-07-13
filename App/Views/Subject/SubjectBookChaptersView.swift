@@ -35,6 +35,24 @@ struct SubjectBookChaptersView: View {
   let mode: BookChapterMode
   var reload: (() async -> Void)? = nil
 
+  var body: some View {
+    switch mode {
+    case .large:
+      LargeBookProgressEditorView(subject: subject, reload: reload)
+
+    case .row:
+      BookProgressSummaryView(subject: subject, fillWidth: false, reload: reload)
+
+    case .tile:
+      BookProgressSummaryView(subject: subject, fillWidth: true, reload: reload)
+    }
+  }
+}
+
+private struct LargeBookProgressEditorView: View {
+  let subject: SubjectDTO
+  let reload: (() async -> Void)?
+
   @State private var inputEps: String = ""
   @State private var eps: Int? = nil
   @State private var inputVols: String = ""
@@ -146,31 +164,12 @@ struct SubjectBookChaptersView: View {
   }
 
   var body: some View {
-    VStack {
-      switch mode {
-      case .large:
-        LargeChapterView(
-          data: chapterData,
-          state: chapterState,
-          inputs: chapterInputs,
-          actions: chapterActions
-        )
-      case .row:
-        RowChapterView(
-          data: chapterData,
-          state: chapterState,
-          inputs: chapterInputs,
-          actions: chapterActions
-        )
-      case .tile:
-        TileChapterView(
-          data: chapterData,
-          state: chapterState,
-          inputs: chapterInputs,
-          actions: chapterActions
-        )
-      }
-    }
+    LargeChapterView(
+      data: chapterData,
+      state: chapterState,
+      inputs: chapterInputs,
+      actions: chapterActions
+    )
     .disabled(updating)
     .onChange(of: inputEps) { _, _ in parseInputEps() }
     .onChange(of: inputVols) { _, _ in parseInputVols() }
@@ -247,145 +246,179 @@ struct LargeChapterView: View {
   }
 }
 
-struct RowChapterView: View {
-  let data: ChapterData
-  let state: ChapterState
-  let inputs: ChapterInputs
-  let actions: ChapterActions
+private struct BookProgressSummaryView: View {
+  let subject: SubjectDTO
+  let fillWidth: Bool
+  let reload: (() async -> Void)?
+
+  @State private var showingEditor = false
+
+  private var epStatus: Int {
+    subject.interest?.epStatus ?? 0
+  }
+
+  private var volStatus: Int {
+    subject.interest?.volStatus ?? 0
+  }
 
   var body: some View {
-    HStack {
-      HStack(alignment: .firstTextBaseline, spacing: 0) {
-        TextField("\(data.epStatus)", text: inputs.eps)
-          .keyboardType(.numberPad)
-          .frame(minWidth: 15, maxWidth: 30)
-          .multilineTextAlignment(.trailing)
-          .fixedSize(horizontal: true, vertical: false)
-          .padding(.trailing, 2)
-          .textFieldStyle(.plain)
-        Text("/\(data.epsDesc)话")
+    Button {
+      showingEditor = true
+    } label: {
+      HStack(spacing: 4) {
+        Image(systemName: "book.closed")
+        BookProgressSummaryMetric(value: epStatus, total: subject.epsDesc, unit: "话")
+        Text("·")
+          .font(.caption2)
           .foregroundStyle(.secondary)
-          .padding(.trailing, 2)
-        Button {
-          actions.incrEps()
-        } label: {
-          Image(systemName: "plus.circle")
-            .foregroundStyle(.secondary)
-        }.buttonStyle(.scale)
+        BookProgressSummaryMetric(value: volStatus, total: subject.volumesDesc, unit: "卷")
       }
-      .monospaced()
-      HStack(alignment: .firstTextBaseline, spacing: 0) {
-        TextField("\(data.volStatus)", text: inputs.vols)
-          .keyboardType(.numberPad)
-          .frame(minWidth: 15, maxWidth: 30)
-          .multilineTextAlignment(.trailing)
-          .fixedSize(horizontal: true, vertical: false)
-          .padding(.trailing, 2)
-          .textFieldStyle(.plain)
-        Text("/\(data.volumesDesc)卷")
-          .foregroundStyle(.secondary)
-          .padding(.trailing, 2)
-        Button {
-          actions.incrVols()
-        } label: {
-          Image(systemName: "plus.circle")
-            .foregroundStyle(.secondary)
-        }.buttonStyle(.scale)
-      }
-      .monospaced()
-      Spacer()
-      if state.updating {
-        ZStack {
-          Button {
-          } label: {
-            Image(systemName: "checkmark.circle")
-          }
-          .disabled(true)
-          .hidden()
-          .buttonStyle(.scale)
-          ProgressView()
-        }
-      } else {
-        Button {
-          actions.update()
-        } label: {
-          Image(systemName: "checkmark.circle")
-        }
-        .disabled(state.updateButtonDisable)
-        .buttonStyle(.borderless)
-      }
-    }.font(.callout)
+      .lineLimit(1)
+      .frame(maxWidth: fillWidth ? .infinity : nil)
+    }
+    .progressButtonStyle()
+    .accessibilityLabel(
+      "阅读进度：\(epStatus)/\(subject.epsDesc)话，\(volStatus)/\(subject.volumesDesc)卷"
+    )
+    .sheet(isPresented: $showingEditor) {
+      BookProgressEditorSheet(subject: subject, reload: reload)
+        .presentationDragIndicator(.visible)
+    }
   }
 }
 
-struct TileChapterView: View {
-  let data: ChapterData
-  let state: ChapterState
-  let inputs: ChapterInputs
-  let actions: ChapterActions
+private struct BookProgressSummaryMetric: View {
+  let value: Int
+  let total: String
+  let unit: LocalizedStringKey
 
   var body: some View {
-    HStack {
-      VStack {
-        if state.updating {
-          ZStack {
-            Button {
-            } label: {
-              Image(systemName: "checkmark.circle")
-            }
-            .disabled(true)
-            .hidden()
-            .buttonStyle(.borderless)
-            ProgressView()
-          }
-        } else {
-          Button {
-            actions.update()
-          } label: {
-            Image(systemName: "checkmark.circle")
-          }
-          .disabled(state.updateButtonDisable)
-          .buttonStyle(.borderless)
+    HStack(alignment: .firstTextBaseline, spacing: 0) {
+      Text(value, format: .number)
+        .font(.caption)
+        .fontWeight(.medium)
+        .monospacedDigit()
+
+      HStack(spacing: 0) {
+        Text(verbatim: "/\(total)")
+        Text(unit)
+      }
+      .font(.caption2)
+      .monospacedDigit()
+    }
+  }
+}
+
+private struct BookProgressEditorSheet: View {
+  let subjectId: Int
+  let epsDesc: String
+  let volumesDesc: String
+  let initialEps: Int
+  let initialVols: Int
+  let reload: (() async -> Void)?
+
+  @Environment(\.dismiss) private var dismiss
+
+  @State private var eps: Int
+  @State private var vols: Int
+  @State private var updating = false
+
+  init(subject: SubjectDTO, reload: (() async -> Void)?) {
+    let initialEps = subject.interest?.epStatus ?? 0
+    let initialVols = subject.interest?.volStatus ?? 0
+
+    subjectId = subject.id
+    epsDesc = subject.epsDesc
+    volumesDesc = subject.volumesDesc
+    self.initialEps = initialEps
+    self.initialVols = initialVols
+    self.reload = reload
+    _eps = State(initialValue: initialEps)
+    _vols = State(initialValue: initialVols)
+  }
+
+  private var hasChanges: Bool {
+    eps != initialEps || vols != initialVols
+  }
+
+  private func update() {
+    guard hasChanges, !updating else {
+      return
+    }
+
+    updating = true
+    Task {
+      defer {
+        updating = false
+      }
+      do {
+        try await SubjectRepository.updateSubjectProgress(
+          subjectId: subjectId,
+          eps: eps == initialEps ? nil : eps,
+          vols: vols == initialVols ? nil : vols
+        )
+        await reload?()
+        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+        dismiss()
+      } catch {
+        Notifier.shared.alert(error: error)
+      }
+    }
+  }
+
+  var body: some View {
+    SheetView(
+      title: "更新阅读进度",
+      size: .medium,
+      closeDisabled: updating,
+      applyFormStyle: true
+    ) {
+      Form {
+        Section {
+          BookProgressField(title: "话数", value: $eps, total: epsDesc)
+          BookProgressField(title: "卷数", value: $vols, total: volumesDesc)
         }
-      }.font(.title3)
-      Spacer()
-      VStack(alignment: .trailing) {
-        HStack(alignment: .firstTextBaseline, spacing: 0) {
-          TextField("\(data.epStatus)", text: inputs.eps)
-            .keyboardType(.numberPad)
-            .frame(minWidth: 32, maxWidth: 48)
-            .multilineTextAlignment(.trailing)
-            .fixedSize(horizontal: true, vertical: false)
-            .padding(.trailing, 2)
-            .textFieldStyle(.plain)
-          Text("/\(data.epsDesc)话")
-            .foregroundStyle(.secondary)
-            .padding(.trailing, 2)
-          Button {
-            actions.incrEps()
-          } label: {
-            Image(systemName: "plus.circle")
-              .foregroundStyle(.secondary)
-          }.buttonStyle(.scale)
-        }.monospaced()
-        HStack(alignment: .firstTextBaseline, spacing: 0) {
-          TextField("\(data.volStatus)", text: inputs.vols)
-            .keyboardType(.numberPad)
-            .frame(minWidth: 32, maxWidth: 48)
-            .multilineTextAlignment(.trailing)
-            .fixedSize(horizontal: true, vertical: false)
-            .padding(.trailing, 2)
-            .textFieldStyle(.plain)
-          Text("/\(data.volumesDesc)卷")
-            .foregroundStyle(.secondary)
-            .padding(.trailing, 2)
-          Button {
-            actions.incrVols()
-          } label: {
-            Image(systemName: "plus.circle")
-              .foregroundStyle(.secondary)
-          }.buttonStyle(.scale)
-        }.monospaced()
+      }
+      .disabled(updating)
+    } controls: {
+      Button(action: update) {
+        Text("更新")
+          .opacity(updating ? 0 : 1)
+          .overlay {
+            if updating {
+              ProgressView()
+            }
+          }
+      }
+      .disabled(!hasChanges || updating)
+    }
+    .tint(.accent)
+  }
+}
+
+private struct BookProgressField: View {
+  let title: LocalizedStringKey
+  @Binding var value: Int
+  let total: String
+
+  var body: some View {
+    LabeledContent(title) {
+      HStack {
+        TextField("进度", value: $value, format: .number)
+          .keyboardType(.numberPad)
+          .multilineTextAlignment(.trailing)
+          .monospacedDigit()
+          .frame(minWidth: 48, maxWidth: 72)
+          .textFieldStyle(.roundedBorder)
+
+        Text("/ \(total)")
+          .foregroundStyle(.secondary)
+          .monospacedDigit()
+
+        Stepper(value: $value, in: 0...Int.max) {
+          EmptyView()
+        }
+        .labelsHidden()
       }
     }
   }
