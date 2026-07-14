@@ -112,6 +112,15 @@ struct EpisodeRecentView: View {
     }
   }
 
+  private var actionPresentation: ProgressActionPresentation {
+    switch mode {
+    case .tile:
+      .standalone
+    case .list:
+      .inline
+    }
+  }
+
   var body: some View {
     let recent = recentEpisodes
     if !recent.episodes.isEmpty {
@@ -142,8 +151,9 @@ struct EpisodeRecentView: View {
                 Image(systemName: progressIcon)
                 Spacer()
               }
+              .progressActionLabelStyle(.standalone)
             }
-            .progressButtonStyle()
+            .progressActionButtonStyle()
             .sheet(isPresented: $showCollectionBox) {
               SubjectCollectionBoxView(subjectId: subject.id, initialSubject: subject)
                 .onDisappear {
@@ -155,7 +165,7 @@ struct EpisodeRecentView: View {
           }
         }
       case .list:
-        HStack {
+        HStack(alignment: .bottom) {
           HStack(spacing: 2) {
             ForEach(recent.episodes) { episode in
               EpisodeItemView(
@@ -177,8 +187,9 @@ struct EpisodeRecentView: View {
                 Text(progressText)
                 Image(systemName: progressIcon)
               }
+              .progressActionLabelStyle(.inline)
             }
-            .progressButtonStyle()
+            .progressActionButtonStyle()
             .sheet(isPresented: $showCollectionBox) {
               SubjectCollectionBoxView(subjectId: subject.id, initialSubject: subject)
                 .onDisappear {
@@ -205,8 +216,10 @@ struct EpisodeRecentView: View {
               .accessibilityLabel("正在加载章节")
           }
         }
+        .frame(maxWidth: actionPresentation.isStandalone ? .infinity : nil)
+        .progressActionLabelStyle(actionPresentation)
       }
-      .progressButtonStyle()
+      .progressActionButtonStyle()
       .disabled(loadingEpisodes)
     }
   }
@@ -269,28 +282,20 @@ struct EpisodeNextView: View {
     Button {
       updateSingle(episode: episode, type: .collect)
     } label: {
-      Group {
+      ZStack {
+        Label(episodeDesc, systemImage: episodeIcon)
+          .opacity(updating ? 0 : 1)
+          .accessibilityHidden(updating)
+
         if updating {
           ProgressView()
-        } else {
-          Label(episodeDesc, systemImage: episodeIcon)
+            .accessibilityLabel("正在更新进度")
         }
       }
       .frame(maxWidth: fillWidth ? .infinity : nil)
+      .progressActionLabelStyle(fillWidth ? .standalone : .inline)
     }
-    .progressButtonStyle()
+    .progressActionButtonStyle()
     .disabled(buttonDisabled)
-  }
-}
-
-extension View {
-  func progressButtonStyle() -> some View {
-    self
-      .labelStyle(.compact)
-      .font(.caption)
-      .tint(.accent)
-      .adaptiveButtonStyle(.bordered)
-      .buttonBorderShape(.roundedRectangle(radius: 8))
-      .controlSize(.mini)
   }
 }

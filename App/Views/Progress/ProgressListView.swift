@@ -102,7 +102,7 @@ struct ProgressListItemContentView: View {
   var body: some View {
     let subjectId = subject.id
     VStack(alignment: .leading, spacing: 4) {
-      HStack {
+      HStack(alignment: .top, spacing: 8) {
         ImageView(img: subject.images?.resize(.r200))
           .imageStyle(width: 72, height: 72)
           .imageType(.subject)
@@ -110,7 +110,7 @@ struct ProgressListItemContentView: View {
             Image(systemName: "lock")
           }
           .imageNavLink(subject.link)
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: 0) {
           NavigationLink(value: NavDestination.subject(subjectId)) {
             VStack(alignment: .leading, spacing: 4) {
               Text(subject.title(with: titlePreference))
@@ -119,6 +119,8 @@ struct ProgressListItemContentView: View {
               ProgressSecondLineView(subject: subject)
             }
           }.buttonStyle(.scale)
+
+          Spacer(minLength: 4)
 
           switch subject.type {
           case .anime, .real:
@@ -141,6 +143,7 @@ struct ProgressListItemContentView: View {
             .font(.callout)
           }
         }
+        .frame(maxWidth: .infinity, minHeight: 72, alignment: .topLeading)
       }
 
       ProgressSubjectLinearBarsView(subject: subject)

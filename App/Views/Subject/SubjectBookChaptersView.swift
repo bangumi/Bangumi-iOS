@@ -265,16 +265,28 @@ private struct BookProgressSummaryView: View {
     } label: {
       HStack(spacing: 4) {
         Image(systemName: "book.closed")
-        BookProgressSummaryMetric(value: epStatus, total: subject.epsDesc, unit: "话")
+        BookProgressSummaryMetric(
+          value: epStatus,
+          total: subject.epsDesc,
+          unit: "话",
+          usesCompactSecondaryText: fillWidth
+        )
         Text("·")
-          .font(.caption2)
+          .font(fillWidth ? .caption : .footnote)
           .foregroundStyle(.secondary)
-        BookProgressSummaryMetric(value: volStatus, total: subject.volumesDesc, unit: "卷")
+        BookProgressSummaryMetric(
+          value: volStatus,
+          total: subject.volumesDesc,
+          unit: "卷",
+          usesCompactSecondaryText: fillWidth
+        )
       }
       .lineLimit(1)
+      .padding(.vertical, fillWidth ? 0 : 2)
       .frame(maxWidth: fillWidth ? .infinity : nil)
+      .progressActionLabelStyle(fillWidth ? .standalone : .inline)
     }
-    .progressButtonStyle()
+    .progressActionButtonStyle()
     .accessibilityLabel(
       "阅读进度：\(epStatus)/\(subject.epsDesc)话，\(volStatus)/\(subject.volumesDesc)卷"
     )
@@ -289,11 +301,12 @@ private struct BookProgressSummaryMetric: View {
   let value: Int
   let total: String
   let unit: LocalizedStringKey
+  let usesCompactSecondaryText: Bool
 
   var body: some View {
     HStack(alignment: .firstTextBaseline, spacing: 0) {
       Text(value, format: .number)
-        .font(.caption)
+        .font(.footnote)
         .fontWeight(.medium)
         .monospacedDigit()
 
@@ -301,7 +314,7 @@ private struct BookProgressSummaryMetric: View {
         Text(verbatim: "/\(total)")
         Text(unit)
       }
-      .font(.caption2)
+      .font(usesCompactSecondaryText ? .caption : .footnote)
       .monospacedDigit()
     }
   }
