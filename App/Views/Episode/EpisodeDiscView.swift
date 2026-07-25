@@ -5,8 +5,6 @@ import SwiftUI
 struct EpisodeDiscView: View {
   let subjectId: Int
 
-  @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
-
   @State private var refreshed: Bool = false
   @State private var episodes: [EpisodeDTO] = []
 
@@ -45,9 +43,14 @@ struct EpisodeDiscView: View {
   }
 
   func episodeLine(_ episode: EpisodeDTO) -> AttributedString {
-    var line =
-      "\(Int(episode.sort)) \(episode.title(with: titlePreference))".withLink(episode.link)
+    var line = "\(Int(episode.sort)) \(episode.name)".withLink(episode.link)
     line.font = .footnote
+    if !episode.nameCN.isEmpty {
+      var subline = AttributedString(" / \(episode.nameCN)")
+      subline.font = .caption
+      subline.foregroundColor = .secondary
+      line += subline
+    }
     return line
   }
 
