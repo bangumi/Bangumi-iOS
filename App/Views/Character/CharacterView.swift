@@ -5,7 +5,6 @@ struct CharacterView: View {
   var characterId: Int
 
   @AppStorage("shareDomain") var shareDomain: ShareDomain = .chii
-  @AppStorage("isolationMode") var isolationMode: Bool = false
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
   @AppStorage("profile") var profile: Profile = Profile()
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
@@ -13,9 +12,6 @@ struct CharacterView: View {
   @State private var refreshed: Bool = false
   @State private var character: CharacterDTO?
   @State private var detail: CharacterDetailDTO = CharacterDetailDTO()
-  @State private var comments: [CommentDTO] = []
-  @State private var loadingComments: Bool = false
-  @State private var showCommentBox: Bool = false
   @State private var showIndexPicker: Bool = false
   @State private var showWikiEdit: Bool = false
   @State private var showPortraitUpload: Bool = false
@@ -58,17 +54,6 @@ struct CharacterView: View {
         refreshed = true
       }
 
-      if !isolationMode {
-        withAnimation(.default) {
-          loadingComments = true
-        }
-        let fetchedComments = try await CharacterService.getCharacterComments(characterId)
-        withAnimation(.default) {
-          comments = fetchedComments
-          loadingComments = false
-        }
-      }
-
       try await CharacterRepository.loadCharacterDetails(characterId)
       await loadCached(animated: true)
     } catch {
@@ -85,38 +70,11 @@ struct CharacterView: View {
             CharacterDetailView(character: character, detail: detail) {
               await loadCached()
             }
-
-            /// comments
-            if !isolationMode {
-              VStack(alignment: .leading, spacing: 2) {
-                HStack {
-                  Text("吐槽箱").font(.title3)
-                  if loadingComments {
-                    ProgressView()
-                      .controlSize(.small)
-                  }
-                }
-                Divider()
-              }
-              LazyVStack(alignment: .leading, spacing: 8) {
-                ForEach(Array(zip(comments.indices, comments)), id: \.1) { idx, comment in
-                  CommentItemView(type: .character(characterId), comment: comment, idx: idx)
-                  if comment.id != comments.last?.id {
-                    Divider()
-                  }
-                }
-              }
-            }
           }.padding(.horizontal, 8)
         }
         .refreshable {
           Task {
             await refresh()
-          }
-        }
-        .sheet(isPresented: $showCommentBox) {
-          CreateCommentBoxSheet(type: .character(characterId)) {
-            Task { await refresh() }
           }
         }
         .sheet(isPresented: $showIndexPicker) {
@@ -171,13 +129,6 @@ struct CharacterView: View {
             Divider()
           }
           Button {
-            showCommentBox = true
-          } label: {
-            Label("吐槽", systemImage: "plus.bubble")
-          }
-          .disabled(!isAuthenticated)
-          Divider()
-          Button {
             showIndexPicker = true
           } label: {
             Label("收藏", systemImage: "book")
@@ -215,6 +166,7 @@ struct CharacterDetailView: View {
   let detail: CharacterDetailDTO
   let reload: () async -> Void
 
+  @AppStorage("isolationMode") private var isolationMode = false
   @State private var updating: Bool = false
 
   func collect() async {
@@ -296,18 +248,19 @@ struct CharacterDetailView: View {
         .buttonStyle(.navigation)
         .padding(.vertical, 4)
 
-        HStack {
-          Label("\(character.collects)人收藏", systemImage: "heart")
-            .font(.footnote)
-            .foregroundStyle(.secondary)
-            .lineLimit(1)
-          Label("\(character.comment)条评论", systemImage: "bubble")
-            .font(.footnote)
-            .foregroundStyle(.secondary)
-            .lineLimit(1)
-        }
+        Label("\(character.collects)人收藏", systemImage: "heart")
+          .font(.footnote)
+          .foregroundStyle(.secondary)
+          .lineLimit(1)
       }.padding(.leading, 2)
     }.frame(height: 120)
+
+    if !isolationMode {
+      CommentListNavigationLink(
+        route: CommentListRoute(parent: .character(character.id)),
+        count: character.comment
+      )
+    }
 
     /// summary
     BBCodeView(character.summary, textSize: 14)

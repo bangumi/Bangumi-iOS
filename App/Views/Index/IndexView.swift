@@ -19,26 +19,7 @@ struct IndexView: View {
   @State private var showEditIndex = false
   @State private var showDeleteIndex = false
   @State private var showAddRelated = false
-  @State private var showCommentBox = false
   @State private var showReportView = false
-
-  @State private var selectedTab: IndexTab = .related
-  @State private var comments: [CommentDTO] = []
-  @State private var loadingComments: Bool = false
-
-  enum IndexTab: CaseIterable {
-    case related
-    case comments
-
-    func title(with index: IndexDTO?) -> String {
-      switch self {
-      case .related:
-        return "关联 \(index?.total ?? 0)"
-      case .comments:
-        return "评论 \(index?.replies ?? 0)"
-      }
-    }
-  }
 
   var shareLink: URL {
     URL(string: "\(shareDomain.url)/index/\(indexId)")!
@@ -67,27 +48,6 @@ struct IndexView: View {
       Notifier.shared.alert(error: error)
     }
     return nil
-  }
-
-  func loadComments() async {
-    if isolationMode {
-      return
-    }
-    do {
-      withAnimation(.default) {
-        loadingComments = true
-      }
-      let fetchedComments = try await IndexService.getIndexComments(indexId)
-      withAnimation(.default) {
-        comments = fetchedComments
-        loadingComments = false
-      }
-    } catch {
-      Notifier.shared.alert(error: error)
-      withAnimation(.default) {
-        loadingComments = false
-      }
-    }
   }
 
   func deleteIndex(_ indexId: Int) async {
@@ -164,134 +124,111 @@ struct IndexView: View {
                   Spacer(minLength: 0)
                 }
               }.font(.callout)
-              if !index.desc.isEmpty {
-                Divider()
-                BBCodeView(index.desc)
-                  .tint(.linkText)
-              }
             }
           }
 
           if !isolationMode {
-            Picker("选择", selection: $selectedTab.animated()) {
-              ForEach(IndexTab.allCases, id: \.self) { tab in
-                Text(tab.title(with: index)).tag(tab)
-              }
-            }
-            .pickerStyle(.segmented)
-            .font(.footnote)
+            CommentListNavigationLink(
+              route: CommentListRoute(parent: .index(indexId)),
+              title: "留言",
+              count: index.replies
+            )
           }
 
-          if !isolationMode && selectedTab == .comments {
-            VStack(alignment: .leading, spacing: 8) {
-              if loadingComments {
-                HStack {
-                  Spacer()
-                  ProgressView()
-                  Spacer()
+          if !index.desc.isEmpty {
+            BBCodeView(index.desc)
+              .tint(.linkText)
+          }
+
+          ScrollView(.horizontal, showsIndicators: false) {
+            HStack {
+              if isOwner {
+                Button {
+                  showAddRelated = true
+                } label: {
+                  Label("添加新关联", systemImage: "plus")
                 }
+                .adaptiveButtonStyle(.borderedProminent)
               }
 
-              LazyVStack(alignment: .leading, spacing: 8) {
-                ForEach(Array(zip(comments.indices, comments)), id: \.1) { idx, comment in
-                  CommentItemView(type: .index(indexId), comment: comment, idx: idx)
-                  if comment.id != comments.last?.id {
-                    Divider()
-                  }
-                }
-              }
-            }
-          } else {
-            ScrollView(.horizontal, showsIndicators: false) {
               HStack {
-                if isOwner {
-                  Button {
-                    showAddRelated = true
-                  } label: {
-                    Label("添加新关联", systemImage: "plus")
+                Button {
+                  withAnimation(.default) {
+                    selectedCategory = nil
+                    selectedSubjectType = nil
+                    reloader.toggle()
                   }
-                  .adaptiveButtonStyle(.borderedProminent)
+                } label: {
+                  Text("全部 \(index.total)")
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 3)
+                    .background(
+                      selectedCategory == nil ? Color.accentColor : Color.clear
+                    )
+                    .foregroundColor(selectedCategory == nil ? .white : .linkText)
+                    .cornerRadius(20)
                 }
 
-                HStack {
+                ForEach(availableSubjectTypes) { item in
                   Button {
                     withAnimation(.default) {
-                      selectedCategory = nil
+                      selectedCategory = .subject
+                      selectedSubjectType = item.type
+                      reloader.toggle()
+                    }
+                  } label: {
+                    Text("\(item.type.description) \(item.count)")
+                      .padding(.horizontal, 6)
+                      .padding(.vertical, 3)
+                      .background(
+                        selectedSubjectType == item.type
+                          ? Color.accentColor : Color.clear
+                      )
+                      .foregroundColor(selectedSubjectType == item.type ? .white : .linkText)
+                      .cornerRadius(20)
+                  }
+                }
+
+                ForEach(availableCategories) { item in
+                  Button {
+                    withAnimation(.default) {
+                      selectedCategory = item.category
                       selectedSubjectType = nil
                       reloader.toggle()
                     }
                   } label: {
-                    Text("全部 \(index.total)")
+                    Text("\(item.category.title) \(item.count)")
                       .padding(.horizontal, 6)
                       .padding(.vertical, 3)
                       .background(
-                        selectedCategory == nil ? Color.accentColor : Color.clear
+                        selectedCategory == item.category
+                          ? Color.accentColor : Color.clear
                       )
-                      .foregroundColor(selectedCategory == nil ? .white : .linkText)
+                      .foregroundColor(selectedCategory == item.category ? .white : .linkText)
                       .cornerRadius(20)
                   }
-
-                  ForEach(availableSubjectTypes) { item in
-                    Button {
-                      withAnimation(.default) {
-                        selectedCategory = .subject
-                        selectedSubjectType = item.type
-                        reloader.toggle()
-                      }
-                    } label: {
-                      Text("\(item.type.description) \(item.count)")
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 3)
-                        .background(
-                          selectedSubjectType == item.type
-                            ? Color.accentColor : Color.clear
-                        )
-                        .foregroundColor(selectedSubjectType == item.type ? .white : .linkText)
-                        .cornerRadius(20)
-                    }
-                  }
-
-                  ForEach(availableCategories) { item in
-                    Button {
-                      withAnimation(.default) {
-                        selectedCategory = item.category
-                        selectedSubjectType = nil
-                        reloader.toggle()
-                      }
-                    } label: {
-                      Text("\(item.category.title) \(item.count)")
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 3)
-                        .background(
-                          selectedCategory == item.category
-                            ? Color.accentColor : Color.clear
-                        )
-                        .foregroundColor(selectedCategory == item.category ? .white : .linkText)
-                        .cornerRadius(20)
-                    }
-                  }
-                }
-                .padding(2)
-                .background {
-                  Capsule()
-                    .fill(.ultraThinMaterial)
-                    .shadow(color: .primary.opacity(0.3), radius: 2)
                 }
               }
-              .font(.footnote)
-              .controlSize(.mini)
               .padding(2)
+              .background {
+                Capsule()
+                  .fill(.ultraThinMaterial)
+                  .shadow(color: .primary.opacity(0.3), radius: 2)
+              }
             }
-            .scrollClipDisabled()
-            OffsetPagedView<IndexRelatedDTO, _>(reloader: reloader, nextPageFunc: loadRelated) {
-              item in
-              IndexRelatedItemView(
-                reloader: $reloader,
-                item: item,
-                isOwner: isOwner,
-                indexAwardYear: index.award,
-              )
-            }
+            .font(.footnote)
+            .controlSize(.mini)
+            .padding(2)
+          }
+          .scrollClipDisabled()
+          OffsetPagedView<IndexRelatedDTO, _>(reloader: reloader, nextPageFunc: loadRelated) {
+            item in
+            IndexRelatedItemView(
+              reloader: $reloader,
+              item: item,
+              isOwner: isOwner,
+              indexAwardYear: index.award,
+            )
           }
         }.padding(8)
       } else {
@@ -331,15 +268,6 @@ struct IndexView: View {
               }
             }
           }
-          if !isolationMode {
-            Divider()
-            Button {
-              showCommentBox = true
-            } label: {
-              Label("留言", systemImage: "plus.bubble")
-            }
-            .disabled(!isAuthenticated)
-          }
           Divider()
           Button {
             showReportView = true
@@ -357,13 +285,6 @@ struct IndexView: View {
     }
     .task {
       await refresh()
-    }
-    .onChange(of: selectedTab) { _, newTab in
-      if newTab == .comments && comments.isEmpty {
-        Task {
-          await loadComments()
-        }
-      }
     }
     .alert("确定删除这个目录吗？", isPresented: $showDeleteIndex) {
       Button("取消", role: .cancel) {}
@@ -388,13 +309,6 @@ struct IndexView: View {
       IndexRelatedAddSheet(indexId: indexId) {
         withAnimation(.default) {
           reloader.toggle()
-        }
-      }
-    }
-    .sheet(isPresented: $showCommentBox) {
-      if !isolationMode {
-        CreateCommentBoxSheet(type: .index(indexId)) {
-          Task { await loadComments() }
         }
       }
     }

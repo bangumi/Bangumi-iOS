@@ -11,9 +11,6 @@ struct BlogView: View {
   @State private var blog: BlogEntryDTO?
   @State private var subjects: [SlimSubjectDTO] = []
   @State private var showSubjects: Bool = false
-  @State private var comments: [CommentDTO] = []
-  @State private var loadingComments: Bool = false
-  @State private var showCommentBox: Bool = false
   @State private var showIndexPicker: Bool = false
   @State private var showReportView: Bool = false
 
@@ -38,16 +35,6 @@ struct BlogView: View {
       let fetchedSubjects = try await BlogService.getBlogSubjects(blogId)
       withAnimation(.default) {
         subjects = fetchedSubjects
-      }
-      if !isolationMode {
-        withAnimation(.default) {
-          loadingComments = true
-        }
-        let fetchedComments = try await BlogService.getBlogComments(blogId)
-        withAnimation(.default) {
-          comments = fetchedComments
-          loadingComments = false
-        }
       }
     } catch {
       Notifier.shared.alert(error: error)
@@ -81,6 +68,14 @@ struct BlogView: View {
               }
               Divider()
 
+              if !isolationMode {
+                CommentListNavigationLink(
+                  route: CommentListRoute(parent: .blog(blogId)),
+                  count: blog.replies
+                )
+                .padding(.top, 8)
+              }
+
               BBCodeView(blog.content)
                 .textSelection(.enabled)
                 .padding(.top, 8)
@@ -89,36 +84,11 @@ struct BlogView: View {
               BlogSubjectsView(subjects: subjects)
                 .presentationDetents([.medium])
             }
-
-            /// comments
-            if !isolationMode {
-              Divider()
-              LazyVStack(alignment: .leading, spacing: 8) {
-                if loadingComments {
-                  HStack {
-                    Spacer()
-                    ProgressView()
-                    Spacer()
-                  }
-                }
-                ForEach(Array(zip(comments.indices, comments)), id: \.1) { idx, comment in
-                  CommentItemView(type: .blog(blogId), comment: comment, idx: idx)
-                  if comment.id != comments.last?.id {
-                    Divider()
-                  }
-                }
-              }
-            }
           }.padding(.horizontal, 8)
         }
         .refreshable {
           Task {
             await load()
-          }
-        }
-        .sheet(isPresented: $showCommentBox) {
-          CreateCommentBoxSheet(type: .blog(blogId)) {
-            Task { await load() }
           }
         }
         .sheet(isPresented: $showIndexPicker) {
@@ -139,13 +109,6 @@ struct BlogView: View {
     .toolbar {
       ToolbarItem(placement: .topBarTrailing) {
         Menu {
-          Button {
-            showCommentBox = true
-          } label: {
-            Label("吐槽", systemImage: "plus.bubble")
-          }
-          .disabled(!isAuthenticated)
-          Divider()
           Button {
             showIndexPicker = true
           } label: {

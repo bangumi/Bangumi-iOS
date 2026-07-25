@@ -38,6 +38,7 @@ enum NavDestination: Hashable, View {
   case userFriend(_ user: SlimUserDTO)
 
   case timeline(_ timeline: TimelineDTO)
+  case commentList(_ route: CommentListRoute)
 
   case infobox(_ title: String, _ infobox: Infobox)
 
@@ -130,7 +131,15 @@ enum NavDestination: Hashable, View {
       UserTimelineView(user: user)
 
     case .timeline(let item):
-      TimelineView(item: item)
+      CommentListView(
+        route: CommentListRoute(
+          parent: .timeline(item.id),
+          timelineUsername: item.user?.username
+        ),
+        timeline: item
+      )
+    case .commentList(let route):
+      CommentListView(route: route)
 
     case .infobox(let title, let infobox):
       InfoboxView(title: title, infobox: infobox)
@@ -230,6 +239,8 @@ func handleURL(_ url: URL, nav: Binding<NavigationPath>) -> Bool {
 func handleChiiURL(_ url: URL, _ nav: Binding<NavigationPath>) -> Bool {
   Logger.app.info("chii URL: \(url)")
   let components = url.pathComponents.dropFirst()
+  let initialPostID = commentPostID(from: url)
+  let opensCommentList = shouldOpenCommentList(url)
   switch url.host {
   case "user":
     if let username = components.first {
@@ -248,23 +259,71 @@ func handleChiiURL(_ url: URL, _ nav: Binding<NavigationPath>) -> Bool {
     }
   case "episode":
     if let episodeId = components.first.flatMap({ Int($0) }) {
-      nav.wrappedValue.append(NavDestination.episode(episodeId))
+      if opensCommentList {
+        nav.wrappedValue.append(
+          NavDestination.commentList(
+            CommentListRoute(parent: .episode(episodeId), initialPostID: initialPostID)
+          )
+        )
+      } else {
+        nav.wrappedValue.append(NavDestination.episode(episodeId))
+      }
     }
   case "character":
     if let characterId = components.first.flatMap({ Int($0) }) {
-      nav.wrappedValue.append(NavDestination.character(characterId))
+      if opensCommentList {
+        nav.wrappedValue.append(
+          NavDestination.commentList(
+            CommentListRoute(parent: .character(characterId), initialPostID: initialPostID)
+          )
+        )
+      } else {
+        nav.wrappedValue.append(NavDestination.character(characterId))
+      }
     }
   case "person":
     if let personId = components.first.flatMap({ Int($0) }) {
-      nav.wrappedValue.append(NavDestination.person(personId))
+      if opensCommentList {
+        nav.wrappedValue.append(
+          NavDestination.commentList(
+            CommentListRoute(parent: .person(personId), initialPostID: initialPostID)
+          )
+        )
+      } else {
+        nav.wrappedValue.append(NavDestination.person(personId))
+      }
     }
   case "blog":
     if let blogId = components.first.flatMap({ Int($0) }) {
-      nav.wrappedValue.append(NavDestination.blog(blogId))
+      if opensCommentList {
+        nav.wrappedValue.append(
+          NavDestination.commentList(
+            CommentListRoute(parent: .blog(blogId), initialPostID: initialPostID)
+          )
+        )
+      } else {
+        nav.wrappedValue.append(NavDestination.blog(blogId))
+      }
     }
   case "index":
     if let indexId = components.first.flatMap({ Int($0) }) {
-      nav.wrappedValue.append(NavDestination.index(indexId))
+      if opensCommentList {
+        nav.wrappedValue.append(
+          NavDestination.commentList(
+            CommentListRoute(parent: .index(indexId), initialPostID: initialPostID)
+          )
+        )
+      } else {
+        nav.wrappedValue.append(NavDestination.index(indexId))
+      }
+    }
+  case "timeline":
+    if let timelineID = components.first.flatMap({ Int($0) }) {
+      nav.wrappedValue.append(
+        NavDestination.commentList(
+          CommentListRoute(parent: .timeline(timelineID), initialPostID: initialPostID)
+        )
+      )
     }
   case "group":
     switch components.first {
@@ -298,12 +357,29 @@ func handleHTTPURL(_ url: URL, _ nav: Binding<NavigationPath>) -> Bool {
 func handleBangumiURL(_ url: URL, _ nav: Binding<NavigationPath>) -> Bool {
   Logger.app.info("bangumi URL: \(url)")
   let components = url.pathComponents.dropFirst()
+  let initialPostID = commentPostID(from: url)
+  let opensCommentList = shouldOpenCommentList(url)
   switch components.first {
   case "user":
     guard let username = components.dropFirst().first else {
       return false
     }
-    nav.wrappedValue.append(NavDestination.user(username))
+    if components.dropFirst(2).first == "timeline",
+      components.dropFirst(3).first == "status",
+      let timelineID = components.dropFirst(4).first.flatMap({ Int($0) })
+    {
+      nav.wrappedValue.append(
+        NavDestination.commentList(
+          CommentListRoute(
+            parent: .timeline(timelineID),
+            initialPostID: initialPostID,
+            timelineUsername: username
+          )
+        )
+      )
+    } else {
+      nav.wrappedValue.append(NavDestination.user(username))
+    }
   case "subject":
     guard let subPath = components.dropFirst().first else {
       return false
@@ -325,27 +401,76 @@ func handleBangumiURL(_ url: URL, _ nav: Binding<NavigationPath>) -> Bool {
     guard let episodeId = components.dropFirst().last.flatMap({ Int($0) }) else {
       return false
     }
-    nav.wrappedValue.append(NavDestination.episode(episodeId))
+    if opensCommentList {
+      nav.wrappedValue.append(
+        NavDestination.commentList(
+          CommentListRoute(parent: .episode(episodeId), initialPostID: initialPostID)
+        )
+      )
+    } else {
+      nav.wrappedValue.append(NavDestination.episode(episodeId))
+    }
   case "character":
     guard let characterId = components.dropFirst().first.flatMap({ Int($0) }) else {
       return false
     }
-    nav.wrappedValue.append(NavDestination.character(characterId))
+    if opensCommentList {
+      nav.wrappedValue.append(
+        NavDestination.commentList(
+          CommentListRoute(parent: .character(characterId), initialPostID: initialPostID)
+        )
+      )
+    } else {
+      nav.wrappedValue.append(NavDestination.character(characterId))
+    }
   case "person":
     guard let personId = components.dropFirst().first.flatMap({ Int($0) }) else {
       return false
     }
-    nav.wrappedValue.append(NavDestination.person(personId))
+    if opensCommentList {
+      nav.wrappedValue.append(
+        NavDestination.commentList(
+          CommentListRoute(parent: .person(personId), initialPostID: initialPostID)
+        )
+      )
+    } else {
+      nav.wrappedValue.append(NavDestination.person(personId))
+    }
   case "blog":
     guard let blogId = components.dropFirst().first.flatMap({ Int($0) }) else {
       return false
     }
-    nav.wrappedValue.append(NavDestination.blog(blogId))
+    if opensCommentList {
+      nav.wrappedValue.append(
+        NavDestination.commentList(
+          CommentListRoute(parent: .blog(blogId), initialPostID: initialPostID)
+        )
+      )
+    } else {
+      nav.wrappedValue.append(NavDestination.blog(blogId))
+    }
   case "index":
     guard let indexId = components.dropFirst().first.flatMap({ Int($0) }) else {
       return false
     }
-    nav.wrappedValue.append(NavDestination.index(indexId))
+    if components.dropFirst(2).first == "comments" || opensCommentList {
+      nav.wrappedValue.append(
+        NavDestination.commentList(
+          CommentListRoute(parent: .index(indexId), initialPostID: initialPostID)
+        )
+      )
+    } else {
+      nav.wrappedValue.append(NavDestination.index(indexId))
+    }
+  case "timeline":
+    guard let timelineID = components.dropFirst().first.flatMap({ Int($0) }) else {
+      return false
+    }
+    nav.wrappedValue.append(
+      NavDestination.commentList(
+        CommentListRoute(parent: .timeline(timelineID), initialPostID: initialPostID)
+      )
+    )
   case "group":
     guard let groupName = components.dropFirst().first else {
       return false
@@ -363,4 +488,20 @@ func handleBangumiURL(_ url: URL, _ nav: Binding<NavigationPath>) -> Bool {
     return false
   }
   return true
+}
+
+private func commentPostID(from url: URL) -> Int? {
+  guard let fragment = url.fragment,
+    fragment.hasPrefix("post_")
+  else {
+    return nil
+  }
+  return Int(fragment.dropFirst("post_".count))
+}
+
+private func shouldOpenCommentList(_ url: URL) -> Bool {
+  commentPostID(from: url) != nil
+    || URLComponents(url: url, resolvingAgainstBaseURL: false)?
+      .queryItems?
+      .contains(where: { $0.name == "comments" && $0.value == "1" }) == true
 }

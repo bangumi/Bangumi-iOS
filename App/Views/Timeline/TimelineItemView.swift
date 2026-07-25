@@ -6,6 +6,7 @@ struct TimelineItemView: View {
   let previousUID: Int?
 
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
+  @AppStorage("isolationMode") private var isolationMode = false
 
   @State private var reactions: [ReactionDTO]
   @State private var showTime = false
@@ -212,11 +213,6 @@ struct TimelineItemView: View {
               if showReactions {
                 ReactionButton(type: .timelineStatus(item.id), reactions: $reactions)
               }
-              if item.type == 1 {
-                NavigationLink(value: NavDestination.timeline(item)) {
-                  Text(item.replies > 0 ? "\(item.replies) 回复 " : "回复")
-                }.buttonStyle(.navigation)
-              }
             case .subject:
               if showReactions, let collectID = collectID {
                 ReactionButton(type: .subjectCollect(collectID), reactions: $reactions)
@@ -224,6 +220,16 @@ struct TimelineItemView: View {
             default:
               EmptyView()
             }
+          }
+          if !isolationMode, item.cat == .status, item.type == 1 {
+            NavigationLink(value: NavDestination.timeline(item)) {
+              Label(
+                item.replies > 0 ? "\(item.replies) 回复" : "回复",
+                systemImage: "bubble"
+              )
+              .foregroundStyle(Color.accentColor)
+            }
+            .buttonStyle(.borderless)
           }
           Button {
             showTime = true
