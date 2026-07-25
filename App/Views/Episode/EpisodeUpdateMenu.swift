@@ -74,7 +74,7 @@ struct EpisodeUpdateMenu: View {
       if isolationMode {
         Label("详情...", systemImage: "info")
       } else {
-        Label("参与讨论...", systemImage: "bubble")
+        Label("讨论 (+\(episode.comment))", systemImage: "bubble")
       }
     }
   }
