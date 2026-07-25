@@ -149,18 +149,22 @@ var bbcodeHTMLRenderers: [BBCodeTagType: BBCodeHTMLRender] {
       return html
     },
     .list: { (n: BBCodeNode, args: [String: Any]?) in
-      var html: String
-      if n.attr.isEmpty {
-        html = "<ul>"
-      } else {
-        html = "<ol>"
+      let openingTag: String
+      let closingTag: String
+      switch n.attr {
+      case "1":
+        openingTag = "<ol>"
+        closingTag = "</ol>"
+      case "a", "A":
+        openingTag = "<ol type=\"\(n.escapedAttr)\">"
+        closingTag = "</ol>"
+      default:
+        openingTag = "<ul>"
+        closingTag = "</ul>"
       }
+      var html = openingTag
       html.append(n.renderInnerHTML(args))
-      if n.attr.isEmpty {
-        html.append("</ul>")
-      } else {
-        html.append("</ol>")
-      }
+      html.append(closingTag)
       return html
     },
     .listitem: { (n: BBCodeNode, args: [String: Any]?) in
@@ -274,17 +278,12 @@ var bbcodeHTMLRenderers: [BBCodeTagType: BBCodeHTMLRender] {
         if n.attr.isEmpty {
           html =
             "<img src=\"\(safeLink)\" rel=\"noreferrer\" referrerpolicy=\"no-referrer\" loading=\"lazy\" decoding=\"async\" alt=\"\" />"
+        } else if let dimensions = BBCodeMediaDimensions(rawValue: n.attr) {
+          html =
+            "<img src=\"\(safeLink)\" rel=\"noreferrer\" referrerpolicy=\"no-referrer\" loading=\"lazy\" decoding=\"async\" alt=\"\" width=\"\(dimensions.width)\" height=\"\(dimensions.height)\" />"
         } else {
-          let values = n.attr.components(separatedBy: ",").compactMap { Int($0) }
-          if values.count == 2 && values[0] > 0 && values[0] <= 4096 && values[1] > 0
-            && values[1] <= 4096
-          {
-            html =
-              "<img src=\"\(safeLink)\" rel=\"noreferrer\" referrerpolicy=\"no-referrer\" loading=\"lazy\" decoding=\"async\" alt=\"\" width=\"\(values[0])\" height=\"\(values[1])\" />"
-          } else {
-            html =
-              "<img src=\"\(safeLink)\" rel=\"noreferrer\" referrerpolicy=\"no-referrer\" loading=\"lazy\" decoding=\"async\" alt=\"\(n.escapedAttr)\" />"
-          }
+          html =
+            "<img src=\"\(safeLink)\" rel=\"noreferrer\" referrerpolicy=\"no-referrer\" loading=\"lazy\" decoding=\"async\" alt=\"\(n.escapedAttr)\" />"
         }
         return html
       } else {
@@ -300,17 +299,12 @@ var bbcodeHTMLRenderers: [BBCodeTagType: BBCodeHTMLRender] {
         if n.attr.isEmpty {
           html =
             "<img src=\"\(safeLink)\" rel=\"noreferrer\" referrerpolicy=\"no-referrer\" loading=\"lazy\" decoding=\"async\" alt=\"\" />"
+        } else if let dimensions = BBCodeMediaDimensions(rawValue: n.attr) {
+          html =
+            "<img src=\"\(safeLink)\" rel=\"noreferrer\" referrerpolicy=\"no-referrer\" loading=\"lazy\" decoding=\"async\" alt=\"\" width=\"\(dimensions.width)\" height=\"\(dimensions.height)\" />"
         } else {
-          let values = n.attr.components(separatedBy: ",").compactMap { Int($0) }
-          if values.count == 2 && values[0] > 0 && values[0] <= 4096 && values[1] > 0
-            && values[1] <= 4096
-          {
-            html =
-              "<img src=\"\(safeLink)\" rel=\"noreferrer\" referrerpolicy=\"no-referrer\" loading=\"lazy\" decoding=\"async\" alt=\"\" width=\"\(values[0])\" height=\"\(values[1])\" />"
-          } else {
-            html =
-              "<img src=\"\(safeLink)\" rel=\"noreferrer\" referrerpolicy=\"no-referrer\" loading=\"lazy\" decoding=\"async\" alt=\"\(n.escapedAttr)\" />"
-          }
+          html =
+            "<img src=\"\(safeLink)\" rel=\"noreferrer\" referrerpolicy=\"no-referrer\" loading=\"lazy\" decoding=\"async\" alt=\"\(n.escapedAttr)\" />"
         }
         return html
       } else {
@@ -364,9 +358,9 @@ var bbcodeHTMLRenderers: [BBCodeTagType: BBCodeHTMLRender] {
       return html
     },
     .mask: { (n: BBCodeNode, args: [String: Any]?) in
-      var html: String = "<span class=\"mask\">"
+      var html: String = "<span class=\"mask\"><span class=\"inner\">"
       html.append(n.renderInnerHTML(args))
-      html.append("</span>")
+      html.append("</span></span>")
       return html
     },
     .ruby: { (n: BBCodeNode, args: [String: Any]?) in
@@ -467,12 +461,28 @@ func makeBBCodeHTMLDocument(
           span.mask {
             background-color: #555;
             color: #555;
+            border: 1px solid #555;
             border-radius: 2px;
-            box-shadow: #555 0 0 5px;
+            padding: 0 5px;
+            position: relative;
             -webkit-transition: all .5s linear;
           }
+          span.mask > .inner {
+            opacity: 0;
+            -webkit-transition: all .5s linear;
+          }
+          span.mask a {
+            color: #555 !important;
+          }
           span.mask:hover {
-            color: #FFF;
+            color: #FFF !important;
+          }
+          span.mask:hover > .inner {
+            opacity: 1;
+            position: relative;
+          }
+          span.mask:hover a {
+            color: #0084B4 !important;
           }
           pre code {
             border: 1px solid #EEE;

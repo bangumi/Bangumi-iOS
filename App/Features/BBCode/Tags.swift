@@ -284,7 +284,7 @@ let bbcodeTagDefinitions: [BBCodeTagInfo] = [
       allowedChildren: [
         .list, .listitem, .br, .url, .subject, .user,
       ] + BBCodeTagType.unsupported + BBCodeTagType.textStyle,
-      allowAttr: false,
+      allowAttr: true,
       isBlock: true
     )
   ),
@@ -323,7 +323,7 @@ let bbcodeTagDefinitions: [BBCodeTagInfo] = [
     BBCodeTagDescription(
       tagNeeded: true, isSelfClosing: false,
       allowedChildren: [
-        .image, .br,
+        .image, .mask, .br,
       ] + BBCodeTagType.unsupported + BBCodeTagType.textStyle,
       allowAttr: true, isBlock: false
     )
@@ -413,7 +413,7 @@ let bbcodeTagDefinitions: [BBCodeTagInfo] = [
     BBCodeTagDescription(
       tagNeeded: true, isSelfClosing: false,
       allowedChildren: [
-        .br, .subject, .user,
+        .br, .url, .image, .photo, .bgm, .bmo, .subject, .user,
       ] + BBCodeTagType.unsupported + BBCodeTagType.textStyle,
       allowAttr: false,
       isBlock: true

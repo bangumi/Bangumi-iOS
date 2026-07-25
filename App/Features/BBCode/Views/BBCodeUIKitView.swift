@@ -89,6 +89,8 @@ final class BBCodeBlocksContainerView: UIView {
       return BBCodeTextBlockView(attributedText: attributedText)
     case .image(let media):
       return BBCodeMediaBlockView(media: media)
+    case .mask(let blocks):
+      return BBCodeMaskBlockView(blocks: blocks)
     case .quote(let blocks):
       return BBCodeQuoteBlockView(blocks: blocks)
     case .list(let items):
@@ -211,14 +213,16 @@ private final class BBCodeTextBlockView: UITextView, UITextViewDelegate {
         return
       }
 
-      renderedText.addAttribute(.link, value: maskLinkURL, range: range)
+      let maskRange = MaskRangeKey(range)
+      let isRevealed = revealedMasks.contains(maskRange)
       renderedText.addAttribute(.backgroundColor, value: hiddenMaskColor, range: range)
-      renderedText.addAttribute(
-        .foregroundColor,
-        value: revealedMasks.contains(MaskRangeKey(range))
-          ? revealedMaskTextColor : hiddenMaskColor,
-        range: range
-      )
+      if isRevealed {
+        renderedText.addAttribute(.foregroundColor, value: revealedMaskTextColor, range: range)
+      } else {
+        renderedText.addAttribute(.foregroundColor, value: hiddenMaskColor, range: range)
+        hideAttachments(in: range, in: renderedText)
+      }
+      applyLinks(in: range, isRevealed: isRevealed, to: renderedText)
     }
 
     if animated {
@@ -233,6 +237,63 @@ private final class BBCodeTextBlockView: UITextView, UITextViewDelegate {
       super.attributedText = renderedText
     }
     updateAnimatedSmileyOverlays(forceReload: forceReload)
+  }
+
+  private func applyLinks(
+    in range: NSRange,
+    isRevealed: Bool,
+    to renderedText: NSMutableAttributedString
+  ) {
+    guard isRevealed else {
+      renderedText.addAttribute(.link, value: maskLinkURL, range: range)
+      return
+    }
+
+    baseAttributedText.enumerateAttribute(.link, in: range) { value, linkRange, _ in
+      renderedText.addAttribute(
+        .link,
+        value: value ?? maskLinkURL,
+        range: linkRange
+      )
+      guard value != nil else {
+        return
+      }
+
+      baseAttributedText.enumerateAttribute(.foregroundColor, in: linkRange) {
+        color, colorRange, _ in
+        guard let color else {
+          return
+        }
+        renderedText.addAttribute(.foregroundColor, value: color, range: colorRange)
+      }
+    }
+  }
+
+  private func hideAttachments(in range: NSRange, in renderedText: NSMutableAttributedString) {
+    baseAttributedText.enumerateAttribute(.attachment, in: range) { value, attachmentRange, _ in
+      guard let attachment = value as? NSTextAttachment else {
+        return
+      }
+
+      let renderedSize: CGSize
+      if let smiley = attachment as? BBCodeSmileyTextAttachment {
+        renderedSize = smiley.renderedSize
+      } else if let image = attachment as? BBCodeInlineImageTextAttachment {
+        renderedSize = image.renderedSize
+      } else {
+        renderedSize = attachment.bounds.size
+      }
+
+      guard renderedSize.width > 0, renderedSize.height > 0 else {
+        return
+      }
+
+      renderedText.addAttribute(
+        .attachment,
+        value: BBCodeHiddenTextAttachment(renderedSize: renderedSize),
+        range: attachmentRange
+      )
+    }
   }
 
   private func updateAnimatedSmileyOverlays(forceReload: Bool = false) {
@@ -340,7 +401,17 @@ private final class BBCodeTextBlockView: UITextView, UITextViewDelegate {
     }
 
     if url.scheme == maskLinkURL.scheme {
-      let maskRange = MaskRangeKey(textItem.range)
+      var enclosingRange = NSRange()
+      guard
+        baseAttributedText.attribute(
+          .bbcodeMask,
+          at: textItem.range.location,
+          effectiveRange: &enclosingRange
+        ) != nil
+      else {
+        return defaultAction
+      }
+      let maskRange = MaskRangeKey(enclosingRange)
       return UIAction { [weak self] _ in
         self?.toggleMask(maskRange)
       }
@@ -360,6 +431,42 @@ private final class BBCodeAnimatedSmileyImageView: SDAnimatedImageView {
   var resourcePath: String?
 }
 
+private final class BBCodeHiddenTextAttachment: NSTextAttachment {
+  private let renderedSize: CGSize
+
+  init(renderedSize: CGSize) {
+    self.renderedSize = renderedSize
+    super.init(data: nil, ofType: nil)
+
+    let format = UIGraphicsImageRendererFormat.default()
+    format.opaque = false
+    self.image = UIGraphicsImageRenderer(size: renderedSize, format: format).image { _ in }
+    self.bounds = CGRect(origin: .zero, size: renderedSize)
+    allowsTextAttachmentView = false
+  }
+
+  @available(*, unavailable)
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+
+  override func attachmentBounds(
+    for attributes: [NSAttributedString.Key: Any],
+    location: any NSTextLocation,
+    textContainer: NSTextContainer?,
+    proposedLineFragment: CGRect,
+    position: CGPoint
+  ) -> CGRect {
+    let font = (attributes[.font] as? UIFont) ?? .systemFont(ofSize: 16)
+    return CGRect(
+      x: 0,
+      y: BBCodeLayoutMetrics.inlineAttachmentVerticalOffset(for: renderedSize.height, font: font),
+      width: renderedSize.width,
+      height: renderedSize.height
+    )
+  }
+}
+
 private final class BBCodeMediaBlockView: UIView {
   private let media: BBCodePreparedMedia
   private let imageView = SDAnimatedImageView()
@@ -376,7 +483,7 @@ private final class BBCodeMediaBlockView: UIView {
     self.media = media
 
     imageView.translatesAutoresizingMaskIntoConstraints = false
-    imageView.contentMode = .scaleAspectFit
+    imageView.contentMode = media.constrainedSize == nil ? .scaleAspectFit : .scaleToFill
     imageView.clipsToBounds = false
     imageView.sd_imageIndicator = SDWebImageActivityIndicator.gray
 
@@ -536,16 +643,29 @@ private final class BBCodeMediaBlockView: UIView {
     let fallbackSide = min(maxWidth, 160)
     let sourceSize = sourceSize ?? CGSize(width: fallbackSide, height: fallbackSide)
 
-    let maxDisplayWidth = min(maxWidth, media.constrainedSize?.width ?? maxWidth)
-    let maxDisplayHeight = media.constrainedSize?.height ?? CGFloat.greatestFiniteMagnitude
+    if let constrainedSize = media.constrainedSize {
+      let availableScale = min(maxWidth / constrainedSize.width, 1)
+      let sourceScale =
+        self.sourceSize.map {
+          min(
+            $0.width / constrainedSize.width,
+            $0.height / constrainedSize.height,
+            1
+          )
+        } ?? 1
+      let scale = min(availableScale, sourceScale)
 
-    guard sourceSize.width > 0, sourceSize.height > 0 else {
-      return CGSize(width: maxDisplayWidth, height: min(maxDisplayWidth, 120))
+      return CGSize(
+        width: max(1, round(constrainedSize.width * scale)),
+        height: max(1, round(constrainedSize.height * scale))
+      )
     }
 
-    let widthRatio = maxDisplayWidth / sourceSize.width
-    let heightRatio = maxDisplayHeight / sourceSize.height
-    let scale = min(widthRatio, heightRatio, 1)
+    guard sourceSize.width > 0, sourceSize.height > 0 else {
+      return CGSize(width: maxWidth, height: min(maxWidth, 120))
+    }
+
+    let scale = min(maxWidth / sourceSize.width, 1)
 
     return CGSize(
       width: max(1, round(sourceSize.width * scale)),
@@ -604,6 +724,69 @@ private final class BBCodeMediaBlockView: UIView {
     controller.modalTransitionStyle = .crossDissolve
     controller.view.backgroundColor = .clear
     presenter.present(controller, animated: true)
+  }
+}
+
+private final class BBCodeMaskBlockView: UIView {
+  private let contentView = BBCodeBlocksContainerView()
+  private let coverButton = UIButton(type: .custom)
+
+  init(blocks: [BBCodePreparedBlock]) {
+    super.init(frame: .zero)
+    translatesAutoresizingMaskIntoConstraints = false
+    backgroundColor = UIColor(white: 0.35, alpha: 1)
+    layer.cornerRadius = 2
+    clipsToBounds = true
+    directionalLayoutMargins = NSDirectionalEdgeInsets(
+      top: 4,
+      leading: 5,
+      bottom: 4,
+      trailing: 5
+    )
+    setContentCompressionResistancePriority(.required, for: .vertical)
+    setContentHuggingPriority(.required, for: .vertical)
+
+    contentView.update(blocks: blocks)
+    contentView.alpha = 0
+    contentView.accessibilityElementsHidden = true
+
+    coverButton.translatesAutoresizingMaskIntoConstraints = false
+    coverButton.backgroundColor = .clear
+    coverButton.accessibilityLabel = "Reveal hidden content"
+    coverButton.addTarget(self, action: #selector(reveal), for: .touchUpInside)
+
+    addSubview(contentView)
+    addSubview(coverButton)
+    NSLayoutConstraint.activate([
+      contentView.topAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor),
+      contentView.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor),
+      contentView.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor),
+      contentView.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor),
+
+      coverButton.topAnchor.constraint(equalTo: topAnchor),
+      coverButton.leadingAnchor.constraint(equalTo: leadingAnchor),
+      coverButton.trailingAnchor.constraint(equalTo: trailingAnchor),
+      coverButton.bottomAnchor.constraint(equalTo: bottomAnchor),
+    ])
+  }
+
+  @available(*, unavailable)
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+
+  @objc private func reveal() {
+    contentView.accessibilityElementsHidden = false
+    UIView.animate(
+      withDuration: 0.18,
+      animations: {
+        self.contentView.alpha = 1
+        self.coverButton.alpha = 0
+      },
+      completion: { _ in
+        self.coverButton.isHidden = true
+      }
+    )
   }
 }
 
@@ -697,8 +880,24 @@ private final class BBCodeListBlockView: UIView {
     stackView.spacing = 0
     stackView.translatesAutoresizingMaskIntoConstraints = false
 
+    let markerFont = UIFont.preferredFont(forTextStyle: .body)
+    let markerWidths =
+      items
+      .map {
+        ceil(
+          ($0.marker as NSString).size(withAttributes: [.font: markerFont]).width
+        )
+      }
+    let markerWidth = max(10, markerWidths.max() ?? 0)
+
     for item in items {
-      stackView.addArrangedSubview(BBCodeListItemView(item: item))
+      stackView.addArrangedSubview(
+        BBCodeListItemView(
+          item: item,
+          markerFont: markerFont,
+          markerWidth: markerWidth
+        )
+      )
     }
 
     addSubview(stackView)
@@ -717,7 +916,7 @@ private final class BBCodeListBlockView: UIView {
 }
 
 private final class BBCodeListItemView: UIView {
-  init(item: BBCodePreparedListItem) {
+  init(item: BBCodePreparedListItem, markerFont: UIFont, markerWidth: CGFloat) {
     super.init(frame: .zero)
     translatesAutoresizingMaskIntoConstraints = false
     backgroundColor = .clear
@@ -725,7 +924,9 @@ private final class BBCodeListItemView: UIView {
 
     let bulletLabel = UILabel()
     bulletLabel.translatesAutoresizingMaskIntoConstraints = false
-    bulletLabel.text = "\u{2022}"
+    bulletLabel.text = item.marker
+    bulletLabel.font = markerFont
+    bulletLabel.textAlignment = .right
     bulletLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
     bulletLabel.setContentHuggingPriority(.required, for: .horizontal)
 
@@ -744,7 +945,7 @@ private final class BBCodeListItemView: UIView {
       stackView.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor),
       stackView.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor),
       stackView.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor),
-      bulletLabel.widthAnchor.constraint(equalToConstant: 10),
+      bulletLabel.widthAnchor.constraint(equalToConstant: markerWidth),
     ])
   }
 

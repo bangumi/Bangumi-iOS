@@ -412,14 +412,34 @@ actor PostDocumentRenderer {
           }
 
           .mask {
+            border: 1px solid #555;
             border-radius: 2px;
             background: #555;
             color: #555;
-            transition: color 0.18s linear;
+            padding: 0 5px;
+            position: relative;
+          }
+
+          .mask > .inner {
+            opacity: 0;
+            transition: opacity 0.18s linear;
+          }
+
+          .mask a {
+            color: #555 !important;
           }
 
           .mask.revealed {
-            color: #fff;
+            color: #fff !important;
+          }
+
+          .mask.revealed > .inner {
+            opacity: 1;
+            position: relative;
+          }
+
+          .mask.revealed a {
+            color: var(--link) !important;
           }
 
           .reactions {
@@ -532,6 +552,21 @@ actor PostDocumentRenderer {
           (() => {
             const bridge = window.webkit?.messageHandlers?.postAction;
             const post = (payload) => bridge?.postMessage(payload);
+            const previewableImage = (target) => {
+              const image = target.closest('.post-content img');
+              if (
+                !image ||
+                image.closest('a') ||
+                image.classList.contains('smile') ||
+                image.classList.contains('smile-dynamic') ||
+                image.classList.contains('smile-musume') ||
+                image.classList.contains('smile-blake') ||
+                image.currentSrc.startsWith('data:')
+              ) {
+                return null;
+              }
+              return image;
+            };
 
             document.addEventListener('click', (event) => {
               const action = event.target.closest('[data-action]');
@@ -554,22 +589,22 @@ actor PostDocumentRenderer {
               }
 
               const mask = event.target.closest('.mask');
+              const image = previewableImage(event.target);
               if (mask) {
-                event.preventDefault();
-                mask.classList.toggle('revealed');
-                return;
+                if (!mask.classList.contains('revealed')) {
+                  event.preventDefault();
+                  mask.classList.add('revealed');
+                  return;
+                }
+
+                if (!event.target.closest('a') && !image) {
+                  event.preventDefault();
+                  mask.classList.remove('revealed');
+                  return;
+                }
               }
 
-              const image = event.target.closest('.post-content img');
-              if (
-                image &&
-                !image.closest('a') &&
-                !image.classList.contains('smile') &&
-                !image.classList.contains('smile-dynamic') &&
-                !image.classList.contains('smile-musume') &&
-                !image.classList.contains('smile-blake') &&
-                !image.currentSrc.startsWith('data:')
-              ) {
+              if (image) {
                 event.preventDefault();
                 post({ action: 'previewImage', url: image.currentSrc });
               }
@@ -603,12 +638,41 @@ actor PostDocumentRenderer {
                 return;
               }
 
+              if (requestedWidth > 0 && requestedHeight > 0) {
+                const applyRequestedSize = () => {
+                  const sourceScale =
+                    image.naturalWidth > 0 && image.naturalHeight > 0
+                      ? Math.min(
+                          image.naturalWidth / requestedWidth,
+                          image.naturalHeight / requestedHeight,
+                          1
+                        )
+                      : 1;
+                  const targetWidth = Math.max(1, Math.round(requestedWidth * sourceScale));
+
+                  image.style.width = `min(100%, ${targetWidth}px)`;
+                  image.style.height = 'auto';
+                  image.style.maxWidth = 'none';
+                  image.style.maxHeight = 'none';
+                  image.style.aspectRatio = `${requestedWidth} / ${requestedHeight}`;
+                };
+
+                applyRequestedSize();
+                if (!image.complete) {
+                  image.addEventListener('load', applyRequestedSize, { once: true });
+                }
+                return;
+              }
+
               image.style.width = 'auto';
               image.style.height = 'auto';
+              image.style.aspectRatio = '';
               image.style.maxWidth =
                 requestedWidth > 0 ? `min(100%, ${requestedWidth}px)` : '100%';
               if (requestedHeight > 0) {
                 image.style.maxHeight = `${requestedHeight}px`;
+              } else {
+                image.style.maxHeight = '';
               }
             });
           })();
