@@ -6,11 +6,17 @@ import SwiftUI
 import UIKit
 
 public struct ImagePreviewer: View {
+  private enum LoadState {
+    case loading
+    case loaded
+    case failed
+  }
+
   let url: URL
   let zoomID: AnyHashable?
   let zoomNamespace: Namespace.ID?
 
-  @State private var failed = false
+  @State private var loadState = LoadState.loading
   @State private var showControls = true
   @State private var reloadID = UUID()
   @State private var shouldRefresh = false
@@ -39,13 +45,13 @@ public struct ImagePreviewer: View {
           doubleTapScale: 2.5,
           onFailure: {
             DispatchQueue.main.async {
-              failed = true
+              loadState = .failed
               shouldRefresh = false
             }
           },
           onSuccess: { image in
             DispatchQueue.main.async {
-              failed = false
+              loadState = .loaded
               shouldRefresh = false
               loadedImage = image
             }
@@ -57,7 +63,10 @@ public struct ImagePreviewer: View {
           }
         )
 
-        if failed {
+        if loadState == .loading {
+          ProgressView()
+            .tint(.white.opacity(0.8))
+        } else if loadState == .failed {
           VStack(spacing: 12) {
             Image(systemName: "exclamationmark.triangle")
               .font(.title2)
@@ -120,7 +129,7 @@ public struct ImagePreviewer: View {
   }
 
   private func reloadImage() {
-    failed = false
+    loadState = .loading
     shouldRefresh = true
     reloadID = UUID()
   }
