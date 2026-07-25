@@ -22,16 +22,11 @@ enum IndexRepository {
     username: String,
     limit: Int = 100
   ) async throws -> [SlimIndexDTO] {
-    let cacheGeneration = await AppContext.shared.userIndexCacheGeneration(for: userID)
     let response = try await UserService.getUserIndexes(
       username: username,
       limit: limit
     )
-    await saveUserIndexCacheIfPossible(
-      userID: userID,
-      items: response.data,
-      generation: cacheGeneration
-    )
+    await saveUserIndexCacheIfPossible(userID: userID, items: response.data)
     return response.data
   }
 
@@ -73,32 +68,23 @@ enum IndexRepository {
 
   private static func saveUserIndexCacheIfPossible(
     userID: Int,
-    items: [SlimIndexDTO],
-    generation: Int?
+    items: [SlimIndexDTO]
   ) async {
     guard userID > 0,
-      let generation,
-      await AppContext.shared.isUserIndexCacheGenerationCurrent(generation, userID: userID),
+      Profile(rawValue: AppConfig.profile)?.id == userID,
       let db = await AppContext.shared.databaseIfAvailable()
     else {
       return
     }
 
     do {
-      let updatedAt = try await db.saveUserIndexCache(userID: userID, items: items)
-      guard
-        await AppContext.shared.isUserIndexCacheGenerationCurrent(generation, userID: userID)
-      else {
-        try await db.clearUserIndexCache(userID: userID, updatedAt: updatedAt)
-        return
-      }
+      try await db.saveUserIndexCache(userID: userID, items: items)
     } catch {
       Logger.app.error("Failed to save user index cache: \(error)")
     }
   }
 
   private static func invalidateUserIndexCache(userID: Int) async {
-    await AppContext.shared.invalidateUserIndexCache(for: userID)
     guard let db = await AppContext.shared.databaseIfAvailable() else {
       return
     }
