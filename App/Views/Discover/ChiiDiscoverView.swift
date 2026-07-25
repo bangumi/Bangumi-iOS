@@ -6,13 +6,46 @@ struct ChiiDiscoverView: View {
   @State private var searching: Bool = false
   @State private var remote: Bool = false
   @State private var showsSearch = false
+  @State private var didInitialRefresh = false
+  @State private var refreshing = false
+  @State private var calendarReloadToken = 0
+  @State private var trendingReloadToken = 0
 
-  func refresh() async {
+  private func refreshCalendar() async {
     do {
       try await DiscoveryRepository.loadCalendar()
-      try await DiscoveryRepository.loadTrendingSubjects()
+      calendarReloadToken += 1
     } catch {
       Notifier.shared.alert(error: error)
+    }
+  }
+
+  private func refreshTrendingSubjects() async {
+    do {
+      try await DiscoveryRepository.loadTrendingSubjects()
+      trendingReloadToken += 1
+    } catch {
+      Notifier.shared.alert(error: error)
+    }
+  }
+
+  private func refresh() async {
+    guard !refreshing else { return }
+    refreshing = true
+    defer {
+      refreshing = false
+    }
+
+    async let calendar: Void = refreshCalendar()
+    async let trending: Void = refreshTrendingSubjects()
+    _ = await (calendar, trending)
+  }
+
+  private func refreshInitiallyIfNeeded() {
+    guard !didInitialRefresh else { return }
+    didInitialRefresh = true
+    Task {
+      await refresh()
     }
   }
 
@@ -22,8 +55,11 @@ struct ChiiDiscoverView: View {
         if !showsSearch {
           ScrollView {
             VStack {
-              CalendarSlimView()
-              TrendingSubjectView(width: geometry.size.width)
+              CalendarSlimView(reloadToken: calendarReloadToken)
+              TrendingSubjectView(
+                width: geometry.size.width,
+                reloadToken: trendingReloadToken
+              )
             }
           }
         } else {
@@ -44,6 +80,7 @@ struct ChiiDiscoverView: View {
     .searchInputTraits()
     .onAppear {
       showsSearch = !query.isEmpty
+      refreshInitiallyIfNeeded()
     }
     .onChange(of: query) { _, newValue in
       let nextShowsSearch = !newValue.isEmpty
