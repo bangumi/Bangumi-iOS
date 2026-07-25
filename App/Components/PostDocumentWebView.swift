@@ -251,7 +251,7 @@ struct PostDocumentWebView: UIViewRepresentable {
     }
 
     private func perform(_ request: PostDocumentScrollRequest, in webView: WKWebView) {
-      cancelPendingPostAlignment(in: webView)
+      cancelPendingDocumentAlignment(in: webView)
 
       switch request.target {
       case .top:
@@ -260,16 +260,7 @@ struct PostDocumentWebView: UIViewRepresentable {
           animated: request.animated
         )
       case .bottom:
-        let minimumOffset = -webView.scrollView.adjustedContentInset.top
-        let maximumOffset = max(
-          minimumOffset,
-          webView.scrollView.contentSize.height - webView.scrollView.bounds.height
-            + webView.scrollView.adjustedContentInset.bottom
-        )
-        webView.scrollView.setContentOffset(
-          CGPoint(x: 0, y: maximumOffset),
-          animated: request.animated
-        )
+        scrollToBottom(animated: request.animated, in: webView)
       case .post(let postID):
         scrollToPost(
           postID,
@@ -280,11 +271,78 @@ struct PostDocumentWebView: UIViewRepresentable {
       }
     }
 
-    private func cancelPendingPostAlignment(in webView: WKWebView) {
+    private func cancelPendingDocumentAlignment(in webView: WKWebView) {
       webView.evaluateJavaScript(
         """
         window.postDocumentScrollGeneration =
           (window.postDocumentScrollGeneration ?? 0) + 1;
+        window.postDocumentBottomObserver?.disconnect();
+        window.postDocumentBottomObserver = null;
+        """
+      )
+    }
+
+    private func scrollToBottom(animated: Bool, in webView: WKWebView) {
+      webView.evaluateJavaScript(
+        """
+        (() => {
+          window.postDocumentScrollGeneration =
+            (window.postDocumentScrollGeneration ?? 0) + 1;
+          window.postDocumentBottomObserver?.disconnect();
+
+          const generation = window.postDocumentScrollGeneration;
+          const scrollingElement =
+            document.scrollingElement ?? document.documentElement;
+          let userInteracted = false;
+          let lastDocumentHeight = scrollingElement.scrollHeight;
+          let observer = null;
+
+          const stop = () => {
+            userInteracted = true;
+            observer?.disconnect();
+            if (window.postDocumentBottomObserver === observer) {
+              window.postDocumentBottomObserver = null;
+            }
+          };
+          document.addEventListener('touchstart', stop, {once: true, passive: true});
+          document.addEventListener('pointerdown', stop, {once: true, passive: true});
+          document.addEventListener('wheel', stop, {once: true, passive: true});
+
+          const align = (behavior) => {
+            if (
+              !userInteracted
+              && window.postDocumentScrollGeneration === generation
+            ) {
+              window.scrollTo({
+                top: scrollingElement.scrollHeight,
+                behavior,
+              });
+            }
+          };
+
+          align('\(animated ? "smooth" : "auto")');
+          observer = new ResizeObserver(() => {
+            const documentHeight = scrollingElement.scrollHeight;
+            if (documentHeight === lastDocumentHeight) {
+              return;
+            }
+            lastDocumentHeight = documentHeight;
+            window.requestAnimationFrame(() => align('auto'));
+          });
+          observer.observe(document.documentElement);
+          if (document.body) {
+            observer.observe(document.body);
+          }
+          window.postDocumentBottomObserver = observer;
+
+          window.setTimeout(() => {
+            align('auto');
+            observer.disconnect();
+            if (window.postDocumentBottomObserver === observer) {
+              window.postDocumentBottomObserver = null;
+            }
+          }, 3000);
+        })();
         """
       )
     }
@@ -303,6 +361,8 @@ struct PostDocumentWebView: UIViewRepresentable {
             return;
           }
 
+          window.postDocumentBottomObserver?.disconnect();
+          window.postDocumentBottomObserver = null;
           window.postDocumentScrollGeneration =
             (window.postDocumentScrollGeneration ?? 0) + 1;
           const generation = window.postDocumentScrollGeneration;
@@ -446,6 +506,7 @@ struct PostDocumentSurface: View {
           onRefresh: onRefresh,
           onViewportChange: updateViewportState
         )
+        .ignoresSafeArea(.container, edges: .vertical)
 
         PostDocumentNavigatorOverlay(
           items: document.navigationItems,
@@ -464,8 +525,10 @@ struct PostDocumentSurface: View {
         ProgressView()
       }
     }
-    .background(Color(uiColor: .systemBackground))
-    .ignoresSafeArea(.container, edges: .vertical)
+    .background {
+      Color(uiColor: .systemBackground)
+        .ignoresSafeArea(.container, edges: .vertical)
+    }
     .task(id: input) {
       do {
         let document = try await PostDocumentRenderer.shared.render(input)

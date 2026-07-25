@@ -237,14 +237,14 @@ private struct PostDocumentFloorNavigator: View {
         Spacer()
 
         Button {
-          onSelect(.top)
+          selectTop()
         } label: {
           Label("回到顶部", systemImage: "arrow.up.to.line")
             .labelStyle(.iconOnly)
         }
 
         Button {
-          onSelect(.bottom)
+          selectBottom()
         } label: {
           Label("跳到底部", systemImage: "arrow.down.to.line")
             .labelStyle(.iconOnly)
@@ -272,6 +272,16 @@ private struct PostDocumentFloorNavigator: View {
     let index = min(max(index, 0), items.count - 1)
     selectedIndex = Double(index)
     onSelect(.post(items[index].postID))
+  }
+
+  private func selectTop() {
+    selectedIndex = 0
+    onSelect(.top)
+  }
+
+  private func selectBottom() {
+    selectedIndex = Double(items.count - 1)
+    onSelect(.bottom)
   }
 
   private func selectCurrentItem() {

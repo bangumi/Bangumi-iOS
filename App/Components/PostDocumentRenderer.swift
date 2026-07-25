@@ -679,6 +679,7 @@ actor PostDocumentRenderer {
             });
 
             const floorPosts = Array.from(document.querySelectorAll('main > .reply'));
+            let visibleFloorIndex = floorPosts.length > 0 ? 0 : -1;
             let viewportFrame = null;
             let lastViewportState = '';
             const reportViewport = () => {
@@ -686,17 +687,26 @@ actor PostDocumentRenderer {
               const anchorY = Math.min(window.innerHeight * 0.32, 180);
               let visiblePostId = null;
 
-              for (const floorPost of floorPosts) {
+              while (
+                visibleFloorIndex + 1 < floorPosts.length
+                && floorPosts[visibleFloorIndex + 1].getBoundingClientRect().top
+                  <= anchorY
+              ) {
+                visibleFloorIndex += 1;
+              }
+              while (
+                visibleFloorIndex > 0
+                && floorPosts[visibleFloorIndex].getBoundingClientRect().top > anchorY
+              ) {
+                visibleFloorIndex -= 1;
+              }
+
+              if (visibleFloorIndex >= 0) {
+                const floorPost = floorPosts[visibleFloorIndex];
                 const rect = floorPost.getBoundingClientRect();
-                const postId = Number(floorPost.id.slice(5));
-                if (rect.top <= anchorY) {
-                  visiblePostId = postId;
-                  continue;
+                if (rect.top <= anchorY || rect.top < window.innerHeight) {
+                  visiblePostId = Number(floorPost.id.slice(5));
                 }
-                if (visiblePostId === null && rect.top < window.innerHeight) {
-                  visiblePostId = postId;
-                }
-                break;
               }
 
               const canScrollToTop = window.scrollY > 44;
