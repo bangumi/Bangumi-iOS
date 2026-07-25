@@ -49,6 +49,17 @@ enum CommentParentType: Hashable, Sendable {
     }
   }
 
+  var newCommentTitle: String {
+    switch self {
+    case .index:
+      return "添加留言"
+    case .timeline:
+      return "添加回复"
+    default:
+      return "添加吐槽"
+    }
+  }
+
   var parentId: Int {
     switch self {
     case .blog(let id),

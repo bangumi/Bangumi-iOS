@@ -248,19 +248,21 @@ struct CharacterDetailView: View {
         .buttonStyle(.navigation)
         .padding(.vertical, 4)
 
-        Label("\(character.collects)人收藏", systemImage: "heart")
-          .font(.footnote)
-          .foregroundStyle(.secondary)
-          .lineLimit(1)
+        HStack {
+          Label("\(character.collects)人收藏", systemImage: "heart")
+            .foregroundStyle(.secondary)
+            .lineLimit(1)
+          Spacer(minLength: 8)
+          if !isolationMode {
+            CommentListNavigationLink(
+              route: CommentListRoute(parent: .character(character.id)),
+              count: character.comment
+            )
+          }
+        }
+        .font(.footnote)
       }.padding(.leading, 2)
     }.frame(height: 120)
-
-    if !isolationMode {
-      CommentListNavigationLink(
-        route: CommentListRoute(parent: .character(character.id)),
-        count: character.comment
-      )
-    }
 
     /// summary
     BBCodeView(character.summary, textSize: 14)

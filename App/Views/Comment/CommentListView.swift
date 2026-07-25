@@ -243,7 +243,7 @@ struct CommentListView: View {
       Button {
         sheet = .newReply
       } label: {
-        Label("回复", systemImage: "plus.bubble")
+        Label(route.parent.newCommentTitle, systemImage: "plus.bubble")
       }
       .disabled(!canReply)
 
