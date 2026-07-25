@@ -2,6 +2,7 @@ import OSLog
 import SwiftUI
 
 struct CalendarSlimView: View {
+  let reloadToken: Int
 
   private struct CalendarDay: Identifiable {
     let weekday: WeekDay
@@ -24,7 +25,6 @@ struct CalendarSlimView: View {
   @Environment(\.scenePhase) private var scenePhase
 
   @State private var currentDate = Calendar.current.startOfDay(for: Date())
-  @State private var refreshed: Bool = false
   @State private var calendars: [CalendarEntryDTO] = []
   @State private var collectionTypes: [Int: CollectionType] = [:]
 
@@ -116,24 +116,10 @@ struct CalendarSlimView: View {
     }
   }
 
-  func refreshCalendar() async {
-    if refreshed { return }
-    refreshed = true
-    do {
-      try await DiscoveryRepository.loadCalendar()
-      await loadCachedCalendar()
-    } catch {
-      Notifier.shared.alert(error: error)
-    }
-  }
-
   var body: some View {
     VStack {
       if calendars.isEmpty {
-        ProgressView().task {
-          await loadCachedCalendar()
-          await refreshCalendar()
-        }
+        ProgressView()
       } else {
         VStack(alignment: .leading, spacing: 8) {
           HStack(alignment: .bottom) {
@@ -176,6 +162,9 @@ struct CalendarSlimView: View {
     .padding(.horizontal, 8)
     .onAppear {
       updateCurrentDate()
+    }
+    .task(id: reloadToken) {
+      await loadCachedCalendar()
     }
     .onChange(of: scenePhase) {
       if scenePhase == .active {

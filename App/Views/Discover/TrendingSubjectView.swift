@@ -66,45 +66,31 @@ private struct TrendingSubjectCollapseState: Equatable, RawRepresentable {
 
 struct TrendingSubjectView: View {
   let width: CGFloat
+  let reloadToken: Int
 
   @AppStorage("trendingSubjectCollapseState")
   private var collapseState: TrendingSubjectCollapseState = TrendingSubjectCollapseState()
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
 
-  @State private var loaded: Bool = false
-  @State private var reloader: Bool = false
-
-  func load() async {
-    if loaded {
-      return
-    }
-    do {
-      try await DiscoveryRepository.loadTrendingSubjects()
-      withAnimation(.default) {
-        loaded = true
-        reloader.toggle()
-      }
-    } catch {
-      Notifier.shared.alert(error: error)
-    }
-  }
-
   var body: some View {
     VStack(spacing: 24) {
       ForEach(SubjectType.allTypes) { type in
         TrendingSubjectTypeView(
-          type: type, width: width - 16, reloader: reloader, collapseState: $collapseState)
+          type: type,
+          width: width - 16,
+          reloadToken: reloadToken,
+          collapseState: $collapseState
+        )
       }
     }
     .padding(.horizontal, 8)
-    .task(load)
   }
 }
 
 private struct TrendingSubjectTypeView: View {
   let type: SubjectType
   let width: CGFloat
-  let reloader: Bool
+  let reloadToken: Int
   @Binding var collapseState: TrendingSubjectCollapseState
 
   @AppStorage("subjectImageQuality") var subjectImageQuality: ImageQuality = .high
@@ -228,7 +214,7 @@ private struct TrendingSubjectTypeView: View {
         .scrollTargetBehavior(.viewAligned)
       }
     }
-    .task(id: "\(type.rawValue)-\(reloader)") {
+    .task(id: "\(type.rawValue)-\(reloadToken)") {
       await loadCached()
     }
     .onReceive(

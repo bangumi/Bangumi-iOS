@@ -312,6 +312,21 @@ struct ChiiProgressView: View {
     await loadCounts()
   }
 
+  private func loadInitialProgressIfNeeded() {
+    guard !didInitialLoad else { return }
+    didInitialLoad = true
+    withAnimation(.default) {
+      refreshing = true
+    }
+    Task {
+      await loadLocalProgress()
+      withAnimation(.default) {
+        refreshing = false
+      }
+      await refresh(showProgress: false)
+    }
+  }
+
   func refresh(force: Bool = false, showProgress: Bool = true) async {
     let now = Date()
     if force {
@@ -514,18 +529,6 @@ struct ChiiProgressView: View {
       UIImpactFeedbackGenerator(style: .medium).impactOccurred()
       await refresh(showProgress: false)
     }
-    .task {
-      guard !didInitialLoad else { return }
-      didInitialLoad = true
-      withAnimation(.default) {
-        refreshing = true
-      }
-      await loadLocalProgress()
-      withAnimation(.default) {
-        refreshing = false
-      }
-      await refresh(showProgress: false)
-    }
     .searchable(
       text: $search,
       placement: .navigationBarDrawer(displayMode: .always),
@@ -544,6 +547,7 @@ struct ChiiProgressView: View {
       perform: handleProgressSubjectInvalidation
     )
     .onAppear {
+      loadInitialProgressIfNeeded()
       Task {
         await reloadPendingProgressSubjects()
       }

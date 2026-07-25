@@ -82,6 +82,19 @@ struct TimelineListView: View {
     }
   }
 
+  private func loadInitialPageIfNeeded() {
+    guard items.isEmpty, !loading else { return }
+    withAnimation(.default) {
+      loading = true
+    }
+    Task {
+      await reload()
+      withAnimation(.default) {
+        loading = false
+      }
+    }
+  }
+
   var body: some View {
     let rows = items.timelineListRows(lastID: lastID)
 
@@ -152,18 +165,7 @@ struct TimelineListView: View {
         }
       }.padding(.horizontal, 8)
     }
-    .task {
-      if items.count > 0 {
-        return
-      }
-      withAnimation(.default) {
-        loading = true
-      }
-      await reload()
-      withAnimation(.default) {
-        loading = false
-      }
-    }
+    .onAppear(perform: loadInitialPageIfNeeded)
     .refreshable {
       await reload()
     }
