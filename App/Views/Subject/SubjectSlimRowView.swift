@@ -37,13 +37,6 @@ struct SubjectSlimRowView: View {
           }
         }
 
-        if let subtitle = subject.subtitle(with: titlePreference) {
-          Text(subtitle)
-            .font(.subheadline)
-            .foregroundStyle(.secondary)
-            .lineLimit(1)
-        }
-
         if let info = subject.info, !info.isEmpty {
           Text(info)
             .font(.footnote)

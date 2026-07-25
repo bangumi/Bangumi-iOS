@@ -24,12 +24,6 @@ struct CharacterRelationItemView: View {
           VStack(alignment: .leading, spacing: 4) {
             Text(item.character.title(with: titlePreference).withLink(item.character.link))
               .lineLimit(1)
-            if let subtitle = item.character.subtitle(with: titlePreference) {
-              Text(subtitle)
-                .font(.footnote)
-                .foregroundStyle(.secondary)
-                .lineLimit(1)
-            }
 
             HStack(spacing: 4) {
               Label(relationText, systemImage: "link")

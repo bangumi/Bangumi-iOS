@@ -97,12 +97,6 @@ struct IndexRelatedItemView: View {
                     .lineLimit(1)
                   Spacer(minLength: 0)
                 }
-                if let subtitle = character.subtitle(with: titlePreference) {
-                  Text(subtitle)
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
-                }
                 Text(character.info ?? "")
                   .font(.footnote)
                   .foregroundStyle(.secondary)
@@ -144,20 +138,14 @@ struct IndexRelatedItemView: View {
                     .lineLimit(1)
                   Spacer(minLength: 0)
                 }
-                HStack(spacing: 2) {
-                  if let career = person.career, !career.isEmpty {
+                if let career = person.career, !career.isEmpty {
+                  HStack(spacing: 2) {
                     ForEach(career, id: \.self) { career in
                       BadgeView(background: .badge) {
                         Text(career.description)
                           .font(.caption)
                       }
                     }
-                  }
-                  if let subtitle = person.subtitle(with: titlePreference) {
-                    Text(subtitle)
-                      .font(.footnote)
-                      .foregroundStyle(.secondary)
-                      .lineLimit(1)
                   }
                 }
                 Text(person.info ?? "")

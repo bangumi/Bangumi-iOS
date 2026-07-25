@@ -45,12 +45,6 @@ struct IndexRelatedSubjectItemView: View {
           .lineLimit(1)
         Spacer(minLength: 0)
       }
-      if let subtitle = itemSubject.subtitle(with: titlePreference) {
-        Text(subtitle)
-          .font(.footnote)
-          .foregroundStyle(.secondary)
-          .lineLimit(1)
-      }
       Text(itemSubject.info ?? "")
         .font(.footnote)
         .foregroundStyle(.secondary)

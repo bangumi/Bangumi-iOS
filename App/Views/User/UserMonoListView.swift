@@ -18,6 +18,7 @@ struct UserMonoListView: View {
   let user: SlimUserDTO
 
   @AppStorage("profile") var profile: Profile = Profile()
+  @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
 
   @State private var type: MonoType = .character
 
@@ -71,10 +72,7 @@ struct UserMonoListView: View {
                   .imageType(.person)
                   .imageStyle(width: 60, height: 60, alignment: .top)
                 VStack(alignment: .leading) {
-                  Text(item.name.withLink(item.link))
-                  Text(item.nameCN)
-                    .foregroundStyle(.secondary)
-                    .font(.footnote)
+                  Text(item.title(with: titlePreference).withLink(item.link))
                 }
                 Spacer()
               }
@@ -88,10 +86,7 @@ struct UserMonoListView: View {
                   .imageType(.person)
                   .imageStyle(width: 60, height: 60, alignment: .top)
                 VStack(alignment: .leading) {
-                  Text(item.name.withLink(item.link))
-                  Text(item.nameCN)
-                    .foregroundStyle(.secondary)
-                    .font(.footnote)
+                  Text(item.title(with: titlePreference).withLink(item.link))
                 }
                 Spacer()
               }

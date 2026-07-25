@@ -16,12 +16,6 @@ struct PersonCastItemView: View {
         VStack(alignment: .leading) {
           Text(item.character.title(with: titlePreference).withLink(item.character.link))
             .lineLimit(2)
-          if let subtitle = item.character.subtitle(with: titlePreference) {
-            Text(subtitle)
-              .lineLimit(1)
-              .font(.footnote)
-              .foregroundStyle(.secondary)
-          }
         }
 
         Spacer()
@@ -33,16 +27,10 @@ struct PersonCastItemView: View {
                 Text(relation.subject.title(with: titlePreference).withLink(relation.subject.link))
                   .lineLimit(1)
                 HStack {
-                  if let subtitle = relation.subject.subtitle(with: titlePreference) {
-                    Text(subtitle)
-                      .foregroundStyle(.secondary)
-                      .lineLimit(1)
-                  } else {
-                    Text(relation.subject.type.description)
-                      .font(.caption)
-                      .fixedSize(horizontal: true, vertical: true)
-                      .foregroundStyle(.secondary)
-                  }
+                  Text(relation.subject.type.description)
+                    .font(.caption)
+                    .fixedSize(horizontal: true, vertical: true)
+                    .foregroundStyle(.secondary)
                   BorderView {
                     Text(relation.type.description)
                       .font(.caption)

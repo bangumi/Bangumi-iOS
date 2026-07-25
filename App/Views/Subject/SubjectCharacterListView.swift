@@ -94,12 +94,6 @@ struct SubjectCharacterListView: View {
                       .foregroundStyle(.orange)
                   }
                 }
-                if let subtitle = item.character.subtitle(with: titlePreference) {
-                  Text(subtitle)
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
-                }
               }
               HFlow {
                 let sortedCasts = item.casts.sorted {
