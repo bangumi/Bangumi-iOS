@@ -425,7 +425,7 @@ struct PostDocumentWebView: UIViewRepresentable {
 
 struct PostDocumentSurface: View {
   let input: PostDocumentRenderInput
-  let controls: PostDocumentFilterSortConfiguration
+  let controls: PostDocumentControlConfiguration
   let onAction: (PostDocumentAction) -> Void
   let onOpenURL: (URL) -> Void
   let onRefresh: () async -> Void
@@ -452,6 +452,9 @@ struct PostDocumentSurface: View {
           visiblePostID: viewportState.visiblePostID,
           controls: controls,
           canScrollToTop: viewportState.canScrollToTop,
+          onReply: {
+            onAction(.newReply)
+          },
           onSelect: requestScroll
         )
         .id(document.id)

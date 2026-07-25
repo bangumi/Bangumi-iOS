@@ -31,7 +31,8 @@ struct PostDocumentViewportState: Equatable, Sendable {
   )
 }
 
-struct PostDocumentFilterSortConfiguration {
+struct PostDocumentControlConfiguration {
+  let canReply: Bool
   let filterModes: [ReplyFilterMode]
   let filterMode: Binding<ReplyFilterMode>
   let sortOrder: Binding<ReplySortOrder>
@@ -40,8 +41,9 @@ struct PostDocumentFilterSortConfiguration {
 struct PostDocumentNavigatorOverlay: View {
   let items: [PostDocumentNavigationItem]
   let visiblePostID: Int?
-  let controls: PostDocumentFilterSortConfiguration
+  let controls: PostDocumentControlConfiguration
   let canScrollToTop: Bool
+  let onReply: () -> Void
   let onSelect: (PostDocumentScrollTarget) -> Void
 
   @State private var showsFloorNavigator = false
@@ -58,6 +60,13 @@ struct PostDocumentNavigatorOverlay: View {
 
   var body: some View {
     HStack(spacing: 8) {
+      Button(action: onReply) {
+        Label("回复", systemImage: "plus.bubble")
+          .labelStyle(.iconOnly)
+      }
+      .adaptiveButtonStyle(.bordered)
+      .disabled(!controls.canReply)
+
       PostDocumentFilterSortControls(configuration: controls)
 
       if items.count > 1 {
@@ -105,7 +114,7 @@ private struct PostDocumentFilterSortControls: View {
   @Binding var filterMode: ReplyFilterMode
   @Binding var sortOrder: ReplySortOrder
 
-  init(configuration: PostDocumentFilterSortConfiguration) {
+  init(configuration: PostDocumentControlConfiguration) {
     filterModes = configuration.filterModes
     _filterMode = configuration.filterMode
     _sortOrder = configuration.sortOrder

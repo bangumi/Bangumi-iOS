@@ -207,7 +207,8 @@ struct CommentListView: View {
       let presentation = commentPresentation()
       PostDocumentSurface(
         input: renderInput(presentation),
-        controls: PostDocumentFilterSortConfiguration(
+        controls: PostDocumentControlConfiguration(
+          canReply: canReply,
           filterModes: availableFilterModes,
           filterMode: $filterMode,
           sortOrder: $sortSelection[fallback: replySortOrder]
