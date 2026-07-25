@@ -44,6 +44,7 @@ struct PostDocumentRenderInput: Hashable, Sendable {
     let stateDescription: String
     let isBlocked: Bool
     let reactions: [Reaction]
+    let isReactionPending: Bool
     let replies: [Post]
   }
 
@@ -66,6 +67,129 @@ struct PostDocumentRenderInput: Hashable, Sendable {
   let showReactions: Bool
   let avatarIsRound: Bool
   let initialPostID: Int?
+}
+
+extension PostDocumentRenderInput {
+  // Reactions are patched in place so they do not invalidate the whole web document.
+  var documentRenderKey: Self {
+    Self(
+      baseURL: baseURL,
+      domains: domains,
+      parent: parent,
+      title: title,
+      mainPost: mainPost?.withoutReactions,
+      mainActions: mainActions,
+      replies: replies.map(\.withoutReactions),
+      emptyMessage: emptyMessage,
+      canReply: canReply,
+      canReact: canReact,
+      showReactions: showReactions,
+      avatarIsRound: avatarIsRound,
+      initialPostID: initialPostID
+    )
+  }
+
+  var reactionHTMLByPostID: [Int: String] {
+    var result: [Int: String] = [:]
+
+    if let mainPost {
+      mainPost.collectReactionHTML(
+        into: &result,
+        canReact: canReact,
+        showReactions: showReactions
+      )
+    }
+    for reply in replies {
+      reply.collectReactionHTML(
+        into: &result,
+        canReact: canReact,
+        showReactions: showReactions
+      )
+    }
+
+    return result
+  }
+}
+
+private extension PostDocumentRenderInput.Post {
+  var withoutReactions: Self {
+    Self(
+      id: id,
+      floor: floor,
+      createdAt: createdAt,
+      content: content,
+      user: user,
+      isNormal: isNormal,
+      stateDescription: stateDescription,
+      isBlocked: isBlocked,
+      reactions: [],
+      isReactionPending: false,
+      replies: replies.map(\.withoutReactions)
+    )
+  }
+
+  func collectReactionHTML(
+    into result: inout [Int: String],
+    canReact: Bool,
+    showReactions: Bool
+  ) {
+    result[id] =
+      isNormal
+      ? PostDocumentReactionRenderer.render(
+        reactions,
+        postID: id,
+        canReact: canReact,
+        showReactions: showReactions,
+        isPending: isReactionPending
+      ) : ""
+    for reply in replies {
+      reply.collectReactionHTML(
+        into: &result,
+        canReact: canReact,
+        showReactions: showReactions
+      )
+    }
+  }
+}
+
+private enum PostDocumentReactionRenderer {
+  static func render(
+    _ reactions: [PostDocumentRenderInput.Reaction],
+    postID: Int,
+    canReact: Bool,
+    showReactions: Bool,
+    isPending: Bool
+  ) -> String {
+    guard showReactions, !reactions.isEmpty || isPending else {
+      return ""
+    }
+
+    let buttons: String = reactions.map { reaction -> String in
+      let selectedClass = reaction.selected ? " selected" : ""
+      let disabled = canReact && !isPending ? "" : " disabled"
+      let image: String
+      if let item = BBCodeSmileyCatalog.item(for: reaction.smileyCode) {
+        let source = "\(PostDocumentRenderer.stickerURLScheme)://smiley/\(item.code)"
+        image = "<img src=\"\(source.bbcodeHTMLEscaped)\" alt=\"\">"
+      } else {
+        image = "<span>(\(reaction.smileyCode.bbcodeHTMLEscaped))</span>"
+      }
+
+      return """
+        <button class="reaction\(selectedClass)" data-action="reaction" data-post-id="\(postID)" data-value="\(reaction.value)"\(disabled)>
+          \(image)<span>\(reaction.count)</span>
+        </button>
+      """
+    }.joined()
+
+    let pendingClass = isPending ? " pending" : ""
+    let pendingIndicator =
+      isPending
+      ? "<span class=\"reaction-pending\" role=\"status\" aria-label=\"正在更新贴贴\"></span>"
+      : ""
+    return
+      "<div class=\"reactions\(pendingClass)\" aria-busy=\"\(isPending)\">\(buttons)\(pendingIndicator)</div>"
+  }
 }
 
 actor PostDocumentRenderer {
@@ -470,6 +594,63 @@ actor PostDocumentRenderer {
             box-shadow: 0 0 2px var(--link);
           }
 
+          .reactions.pending .reaction {
+            opacity: 0.55;
+          }
+
+          .reaction-pending {
+            width: 14px;
+            height: 14px;
+            flex: 0 0 auto;
+            border: 2px solid var(--separator);
+            border-top-color: var(--link);
+            border-radius: 50%;
+            animation: reaction-spin 0.7s linear infinite;
+          }
+
+          .reaction.changed {
+            animation: reaction-pop 0.28s ease-out;
+          }
+
+          .reactions.removed-reaction {
+            animation: reaction-settle 0.22s ease-out;
+          }
+
+          @keyframes reaction-spin {
+            to {
+              transform: rotate(360deg);
+            }
+          }
+
+          @keyframes reaction-pop {
+            0% {
+              opacity: 0.55;
+              transform: scale(0.82);
+            }
+            65% {
+              opacity: 1;
+              transform: scale(1.08);
+            }
+            100% {
+              transform: scale(1);
+            }
+          }
+
+          @keyframes reaction-settle {
+            from {
+              opacity: 0.55;
+              transform: scale(0.96);
+            }
+          }
+
+          @media (prefers-reduced-motion: reduce) {
+            .reaction-pending,
+            .reaction.changed,
+            .reactions.removed-reaction {
+              animation: none;
+            }
+          }
+
           .reaction img {
             width: 18px;
             height: 18px;
@@ -849,7 +1030,13 @@ actor PostDocumentRenderer {
     }
 
     let reactions =
-      post.isNormal ? try renderReactions(post.reactions, postID: post.id, input: input) : ""
+      post.isNormal
+      ? try renderReactions(
+        post.reactions,
+        postID: post.id,
+        isPending: post.isReactionPending,
+        input: input
+      ) : ""
     try Task.checkCancellation()
 
     return """
@@ -975,35 +1162,17 @@ actor PostDocumentRenderer {
   private func renderReactions(
     _ reactions: [PostDocumentRenderInput.Reaction],
     postID: Int,
+    isPending: Bool,
     input: PostDocumentRenderInput
   ) throws -> String {
-    guard input.showReactions, !reactions.isEmpty else {
-      return ""
-    }
-
-    var buttons = ""
-    for reaction in reactions {
-      try Task.checkCancellation()
-      let selectedClass = reaction.selected ? " selected" : ""
-      let disabled = input.canReact ? "" : " disabled"
-      let image: String
-      if let item = BBCodeSmileyCatalog.item(for: reaction.smileyCode) {
-        let source = "\(Self.stickerURLScheme)://smiley/\(item.code)"
-        image = "<img src=\"\(source.bbcodeHTMLEscaped)\" alt=\"\">"
-      } else {
-        image = "<span>(\(reaction.smileyCode.bbcodeHTMLEscaped))</span>"
-      }
-
-      buttons.append(
-        """
-        <button class="reaction\(selectedClass)" data-action="reaction" data-post-id="\(postID)" data-value="\(reaction.value)"\(disabled)>
-          \(image)<span>\(reaction.count)</span>
-        </button>
-        """
-      )
-    }
-
-    return "<div class=\"reactions\">\(buttons)</div>"
+    try Task.checkCancellation()
+    return PostDocumentReactionRenderer.render(
+      reactions,
+      postID: postID,
+      canReact: input.canReact,
+      showReactions: input.showReactions,
+      isPending: isPending
+    )
   }
 
   private func renderBBCode(_ code: String, domains: BangumiDomains) throws -> String {

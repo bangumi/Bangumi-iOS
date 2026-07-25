@@ -183,6 +183,60 @@ enum TopicDetailData: Hashable {
 
     return nil
   }
+
+  mutating func selectReaction(
+    _ value: Int?,
+    postID: Int,
+    user: SimpleUserDTO
+  ) {
+    updateReactions(postID: postID) { reactions in
+      reactions = reactions.selectingReaction(value, for: user)
+    }
+  }
+
+  private mutating func updateReactions(
+    postID: Int,
+    _ update: (inout [ReactionDTO]) -> Void
+  ) {
+    switch self {
+    case .subject(var topic):
+      guard topic.replies.updateReactions(postID: postID, update) else {
+        return
+      }
+      self = .subject(topic)
+    case .group(var topic):
+      guard topic.replies.updateReactions(postID: postID, update) else {
+        return
+      }
+      self = .group(topic)
+    }
+  }
+}
+
+private extension Array where Element == ReplyDTO {
+  mutating func updateReactions(
+    postID: Int,
+    _ update: (inout [ReactionDTO]) -> Void
+  ) -> Bool {
+    for index in indices {
+      if self[index].id == postID {
+        var reactions = self[index].reactions ?? []
+        update(&reactions)
+        self[index].reactions = reactions
+        return true
+      }
+
+      guard let replyIndex = self[index].replies.firstIndex(where: { $0.id == postID }) else {
+        continue
+      }
+      var reactions = self[index].replies[replyIndex].reactions ?? []
+      update(&reactions)
+      self[index].replies[replyIndex].reactions = reactions
+      return true
+    }
+
+    return false
+  }
 }
 
 private struct TopicPostTarget: Identifiable, Hashable {
@@ -595,31 +649,51 @@ struct TopicDetailView: View {
     value: Int,
     toggle: Bool
   ) async {
-    guard !reactionRequests.contains(target.id) else {
+    guard !reactionRequests.contains(target.id),
+      let currentTarget = data?.postTarget(postID: target.id)
+    else {
       return
     }
+
+    let previousReactions = currentTarget.post.reactions ?? []
+    let previousValue =
+      previousReactions
+      .first(where: { reaction in
+        reaction.users.contains(where: { $0.id == profile.id })
+      })?
+      .value
+    let isSelected = previousValue == value
+    let optimisticValue = toggle && isSelected ? nil : value
 
     reactionRequests.insert(target.id)
     defer {
       reactionRequests.remove(target.id)
     }
-
     let reactionType = source.reactionType(postID: target.id)
-    let selectedValue =
-      target.post.reactions?
-      .first(where: { $0.value == value })?
-      .users
-      .contains(where: { $0.id == profile.id }) ?? false
+    data?.selectReaction(
+      optimisticValue,
+      postID: target.id,
+      user: profile.simple
+    )
+    UIImpactFeedbackGenerator(style: .medium).impactOccurred()
 
     do {
-      if toggle, selectedValue {
+      if toggle, isSelected {
         try await AccountService.unlike(path: reactionType.path)
       } else {
         try await AccountService.like(path: reactionType.path, value: value)
       }
-      UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-      await refresh()
+      data?.selectReaction(
+        optimisticValue,
+        postID: target.id,
+        user: profile.simple
+      )
     } catch {
+      data?.selectReaction(
+        previousValue,
+        postID: target.id,
+        user: profile.simple
+      )
       Notifier.shared.alert(error: error)
     }
   }
@@ -676,6 +750,7 @@ struct TopicDetailView: View {
         stateDescription: reply.state.description,
         isBlocked: !isMain && hideBlocklist && blockedUsers.contains(reply.creatorID),
         reactions: makeReactions(reply.reactions),
+        isReactionPending: reactionRequests.contains(reply.id),
         replies: reply.replies.enumerated().map { subindex, subreply in
           makeSubreply(
             subreply,
@@ -744,6 +819,7 @@ struct TopicDetailView: View {
       stateDescription: reply.state.description,
       isBlocked: hideBlocklist && blockedUsers.contains(reply.creatorID),
       reactions: makeReactions(reply.reactions),
+      isReactionPending: reactionRequests.contains(reply.id),
       replies: []
     )
   }
