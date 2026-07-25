@@ -68,6 +68,7 @@ private final class BBCodePreparedDocumentCache {
 
 struct BBCodePreparedListItem: Identifiable {
   let id: Int
+  let marker: String
   let blocks: [BBCodePreparedBlock]
 }
 
@@ -82,6 +83,7 @@ struct BBCodePreparedBlock: Identifiable {
   enum Payload {
     case text(NSAttributedString)
     case image(BBCodePreparedMedia)
+    case mask([BBCodePreparedBlock])
     case quote([BBCodePreparedBlock])
     case list([BBCodePreparedListItem])
   }
@@ -169,6 +171,55 @@ private struct BBCodeTextKitRenderer {
     }
   }
 
+  private enum ListMarkerStyle {
+    case unordered
+    case decimal
+    case lowercaseAlpha
+    case uppercaseAlpha
+
+    init(attribute: String) {
+      switch attribute {
+      case "1":
+        self = .decimal
+      case "a":
+        self = .lowercaseAlpha
+      case "A":
+        self = .uppercaseAlpha
+      default:
+        self = .unordered
+      }
+    }
+
+    func marker(for index: Int) -> String {
+      switch self {
+      case .unordered:
+        return "\u{2022}"
+      case .decimal:
+        return "\(index + 1)."
+      case .lowercaseAlpha:
+        return Self.alphabeticMarker(for: index, baseScalar: 97)
+      case .uppercaseAlpha:
+        return Self.alphabeticMarker(for: index, baseScalar: 65)
+      }
+    }
+
+    private static func alphabeticMarker(for index: Int, baseScalar: UInt32) -> String {
+      var value = index + 1
+      var marker = ""
+
+      while value > 0 {
+        value -= 1
+        guard let scalar = UnicodeScalar(baseScalar + UInt32(value % 26)) else {
+          return "\(index + 1)."
+        }
+        marker = scalar.description + marker
+        value /= 26
+      }
+
+      return marker + "."
+    }
+  }
+
   let textSize: CGFloat
   let baseFont: UIFont
   let linkColor: UIColor
@@ -245,7 +296,16 @@ private struct BBCodeTextKitRenderer {
       let itemSegments = collectListItemNodes(from: node.children).map {
         renderSegments(children: $0)
       }
-      return [.block(.list(makeListItems(from: itemSegments)))]
+      return [
+        .block(
+          .list(
+            makeListItems(
+              from: itemSegments,
+              markerStyle: ListMarkerStyle(attribute: node.attr)
+            )
+          )
+        )
+      ]
     case .root, .float:
       return renderSegments(children: node.children)
     case .center, .left, .right, .align, .code:
@@ -382,9 +442,7 @@ private struct BBCodeTextKitRenderer {
         }
       }
     case .mask:
-      return mapTextSegments(segments) { attributed in
-        applyAttribute(.bbcodeMask, value: true, to: attributed)
-      }
+      return [.block(.mask(makeBlocks(from: segments)))]
     default:
       return segments
     }
@@ -465,6 +523,15 @@ private struct BBCodeTextKitRenderer {
           alignment: alignment
         )
       )
+    case .mask(let blocks):
+      return .mask(
+        blocks.map { block in
+          BBCodePreparedBlock(
+            id: block.id,
+            payload: alignedPayload(block.payload, alignment: alignment)
+          )
+        }
+      )
     case .quote, .list, .text:
       return payload
     }
@@ -484,6 +551,10 @@ private struct BBCodeTextKitRenderer {
           alignment: media.alignment
         )
       )
+    case .mask(let blocks):
+      return .mask(blocks.map { block in
+        BBCodePreparedBlock(id: block.id, payload: linkedPayload(block.payload, url: url))
+      })
     case .quote(let blocks):
       return .quote(blocks.map { block in
         BBCodePreparedBlock(id: block.id, payload: linkedPayload(block.payload, url: url))
@@ -492,6 +563,7 @@ private struct BBCodeTextKitRenderer {
       return .list(items.map { item in
         BBCodePreparedListItem(
           id: item.id,
+          marker: item.marker,
           blocks: item.blocks.map { block in
             BBCodePreparedBlock(id: block.id, payload: linkedPayload(block.payload, url: url))
           }
@@ -568,14 +640,21 @@ private struct BBCodeTextKitRenderer {
     return normalized
   }
 
-  private func makeListItems(from itemSegments: [[RenderedSegment]]) -> [BBCodePreparedListItem] {
+  private func makeListItems(
+    from itemSegments: [[RenderedSegment]],
+    markerStyle: ListMarkerStyle
+  ) -> [BBCodePreparedListItem] {
     itemSegments.enumerated().compactMap { index, segments in
       let blocks = makeBlocks(from: segments)
       guard !blocks.isEmpty else {
         return nil
       }
 
-      return BBCodePreparedListItem(id: index, blocks: blocks)
+      return BBCodePreparedListItem(
+        id: index,
+        marker: markerStyle.marker(for: index),
+        blocks: blocks
+      )
     }
   }
 
@@ -714,16 +793,11 @@ private struct BBCodeTextKitRenderer {
   }
 
   private func parsedMediaSize(from rawValue: String) -> CGSize? {
-    let values =
-      rawValue
-      .split(separator: ",")
-      .compactMap { Int($0.trimmingCharacters(in: .whitespacesAndNewlines)) }
-
-    guard values.count == 2, values[0] > 0, values[1] > 0 else {
+    guard let dimensions = BBCodeMediaDimensions(rawValue: rawValue) else {
       return nil
     }
 
-    return CGSize(width: values[0], height: values[1])
+    return CGSize(width: dimensions.width, height: dimensions.height)
   }
 
   private func renderChildren(_ children: [BBCodeNode]) -> NSMutableAttributedString {

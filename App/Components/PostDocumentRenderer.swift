@@ -412,14 +412,34 @@ actor PostDocumentRenderer {
           }
 
           .mask {
+            border: 1px solid #555;
             border-radius: 2px;
             background: #555;
             color: #555;
-            transition: color 0.18s linear;
+            padding: 0 5px;
+            position: relative;
+          }
+
+          .mask > .inner {
+            opacity: 0;
+            transition: opacity 0.18s linear;
+          }
+
+          .mask a {
+            color: #555 !important;
           }
 
           .mask.revealed {
-            color: #fff;
+            color: #fff !important;
+          }
+
+          .mask.revealed > .inner {
+            opacity: 1;
+            position: relative;
+          }
+
+          .mask.revealed a {
+            color: var(--link) !important;
           }
 
           .reactions {
@@ -555,9 +575,17 @@ actor PostDocumentRenderer {
 
               const mask = event.target.closest('.mask');
               if (mask) {
-                event.preventDefault();
-                mask.classList.toggle('revealed');
-                return;
+                if (!mask.classList.contains('revealed')) {
+                  event.preventDefault();
+                  mask.classList.add('revealed');
+                  return;
+                }
+
+                if (!event.target.closest('a')) {
+                  event.preventDefault();
+                  mask.classList.remove('revealed');
+                  return;
+                }
               }
 
               const image = event.target.closest('.post-content img');
