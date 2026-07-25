@@ -1,4 +1,5 @@
 import Foundation
+import UIKit
 
 extension BBCode {
   public func html(_ bbcode: String, args: [String: Any]? = nil) throws -> String {
@@ -39,6 +40,49 @@ private func bangumiDomains(from args: [String: Any]?) -> BangumiDomains {
   args?["domains"] as? BangumiDomains ?? .official
 }
 
+private func bbcodeSmileySource(
+  _ smiley: BBCodeSmileyItem,
+  args: [String: Any]?
+) -> String {
+  if let scheme = args?["smileyURLScheme"] as? String {
+    return "\(scheme)://smiley/\(smiley.code)"
+  }
+  return smiley.remoteURLString(domains: bangumiDomains(from: args))
+}
+
+private func bbcodeCSSColorValue(_ rawValue: String) -> String? {
+  let value = rawValue.trimmingCharacters(in: .whitespacesAndNewlines)
+  let scalars = value.unicodeScalars
+  guard !scalars.isEmpty else {
+    return nil
+  }
+
+  if scalars.allSatisfy({
+    ($0.value >= 65 && $0.value <= 90) || ($0.value >= 97 && $0.value <= 122)
+  }) {
+    return value
+  }
+
+  guard scalars.first?.value == 35 else {
+    return nil
+  }
+  let digits = scalars.dropFirst()
+  guard [3, 4, 6, 8].contains(digits.count) else {
+    return nil
+  }
+  guard
+    digits.allSatisfy({
+      ($0.value >= 48 && $0.value <= 57)
+        || ($0.value >= 65 && $0.value <= 70)
+        || ($0.value >= 97 && $0.value <= 102)
+    })
+  else {
+    return nil
+  }
+
+  return value
+}
+
 var bbcodeHTMLRenderers: [BBCodeTagType: BBCodeHTMLRender] {
   return [
     .plain: { (n: BBCodeNode, args: [String: Any]?) in
@@ -64,21 +108,21 @@ var bbcodeHTMLRenderers: [BBCodeTagType: BBCodeHTMLRender] {
     },
     .center: { (n: BBCodeNode, args: [String: Any]?) in
       var html: String
-      html = "<p style=\"text-align: center;\">"
+      html = "<p class=\"bbcode-align-center\" style=\"text-align: center;\">"
       html.append(n.renderInnerHTML(args))
       html.append("</p>")
       return html
     },
     .left: { (n: BBCodeNode, args: [String: Any]?) in
       var html: String
-      html = "<p style=\"text-align: left;\">"
+      html = "<p class=\"bbcode-align-left\" style=\"text-align: left;\">"
       html.append(n.renderInnerHTML(args))
       html.append("</p>")
       return html
     },
     .right: { (n: BBCodeNode, args: [String: Any]?) in
       var html: String
-      html = "<p style=\"text-align: right;\">"
+      html = "<p class=\"bbcode-align-right\" style=\"text-align: right;\">"
       html.append(n.renderInnerHTML(args))
       html.append("</p>")
       return html
@@ -99,7 +143,7 @@ var bbcodeHTMLRenderers: [BBCodeTagType: BBCodeHTMLRender] {
       if align.isEmpty {
         return n.renderInnerHTML(args)
       }
-      html = "<p style=\"text-align: \(align);\">"
+      html = "<p class=\"bbcode-align-\(align)\" style=\"text-align: \(align);\">"
       html.append(n.renderInnerHTML(args))
       html.append("</p>")
       return html
@@ -141,38 +185,38 @@ var bbcodeHTMLRenderers: [BBCodeTagType: BBCodeHTMLRender] {
     .subject: { (n: BBCodeNode, args: [String: Any]?) in
       let domains = bangumiDomains(from: args)
       let host = args?["host"] as? String
-      var html: String
-      var link: String
-      if n.attr.isEmpty {
-        html = n.renderInnerHTML(args)
-      } else {
-        link = domains.mainURLString(path: "/subject/\(n.escapedAttr)")
-        if let safeLink = bbcodeSafeURLString(url: link, defaultScheme: "https", defaultHost: host) {
-          html =
-            "<a href=\"\(safeLink)\" target=\"_blank\" rel=\"nofollow external noopener noreferrer\">\(n.renderInnerHTML(args))</a>"
-        } else {
-          html = n.renderInnerHTML(args)
-        }
+      let innerHTML = n.renderInnerHTML(args)
+      let fallbackTarget = n.renderInnerPlain(args).trimmingCharacters(in: .whitespacesAndNewlines)
+      let attribute = n.attr.trimmingCharacters(in: .whitespacesAndNewlines)
+      let subjectID = attribute.isEmpty ? fallbackTarget : attribute
+      guard !subjectID.isEmpty else {
+        return innerHTML
       }
-      return html
+
+      let link = domains.mainURLString(path: "/subject/\(subjectID)")
+      if let safeLink = bbcodeSafeURLString(url: link, defaultScheme: "https", defaultHost: host) {
+        return
+          "<a href=\"\(safeLink)\" target=\"_blank\" rel=\"nofollow external noopener noreferrer\">\(innerHTML)</a>"
+      }
+      return innerHTML
     },
     .user: { (n: BBCodeNode, args: [String: Any]?) in
       let domains = bangumiDomains(from: args)
       let host = args?["host"] as? String
-      var html: String
-      var link: String
-      if n.attr.isEmpty {
-        html = n.renderInnerHTML(args)
-      } else {
-        link = domains.mainURLString(path: "/user/\(n.escapedAttr)")
-        if let safeLink = bbcodeSafeURLString(url: link, defaultScheme: "https", defaultHost: host) {
-          html =
-            "<a href=\"\(safeLink)\" target=\"_blank\" rel=\"nofollow external noopener noreferrer\">@\(n.renderInnerHTML(args))</a>"
-        } else {
-          html = n.renderInnerHTML(args)
-        }
+      let innerHTML = n.renderInnerHTML(args)
+      let fallbackTarget = n.renderInnerPlain(args).trimmingCharacters(in: .whitespacesAndNewlines)
+      let attribute = n.attr.trimmingCharacters(in: .whitespacesAndNewlines)
+      let username = attribute.isEmpty ? fallbackTarget : attribute
+      guard !username.isEmpty else {
+        return innerHTML
       }
-      return html
+
+      let link = domains.mainURLString(path: "/user/\(username)")
+      if let safeLink = bbcodeSafeURLString(url: link, defaultScheme: "https", defaultHost: host) {
+        return
+          "<a href=\"\(safeLink)\" target=\"_blank\" rel=\"nofollow external noopener noreferrer\">@\(innerHTML)</a>"
+      }
+      return innerHTML
     },
     .url: { (n: BBCodeNode, args: [String: Any]?) in
       let host = args?["host"] as? String
@@ -187,18 +231,33 @@ var bbcodeHTMLRenderers: [BBCodeTagType: BBCodeHTMLRender] {
         }
         if isPlain {
           link = n.renderInnerHTML(args)
-          if let safeLink = bbcodeSafeURLString(url: link, defaultScheme: "https", defaultHost: host) {
+          if let safeLink = bbcodeSafeURLString(
+            url: link, defaultScheme: "https", defaultHost: host)
+          {
             html =
-              "<a href=\"\(link)\" target=\"_blank\" rel=\"nofollow external noopener noreferrer\">\(safeLink)</a>"
+              "<a href=\"\(safeLink)\" target=\"_blank\" rel=\"nofollow external noopener noreferrer\">\(safeLink)</a>"
           } else {
             html = link
+          }
+        } else if n.children.count == 1, let child = n.children.first, child.type == .image {
+          link = child.renderInnerHTML(nil).trimmingCharacters(in: .whitespacesAndNewlines)
+          if let safeLink = bbcodeSafeURLString(
+            url: link,
+            defaultScheme: "https",
+            defaultHost: host
+          ) {
+            html =
+              "<a href=\"\(safeLink)\" target=\"_blank\" rel=\"nofollow external noopener noreferrer\">\(n.renderInnerHTML(args))</a>"
+          } else {
+            html = n.renderInnerHTML(args)
           }
         } else {
           html = n.renderInnerHTML(args)
         }
       } else {
         link = n.escapedAttr
-        if let safeLink = bbcodeSafeURLString(url: link, defaultScheme: "https", defaultHost: host) {
+        if let safeLink = bbcodeSafeURLString(url: link, defaultScheme: "https", defaultHost: host)
+        {
           html =
             "<a href=\"\(safeLink)\" target=\"_blank\" rel=\"nofollow external noopener noreferrer\">\(n.renderInnerHTML(args))</a>"
         } else {
@@ -214,17 +273,17 @@ var bbcodeHTMLRenderers: [BBCodeTagType: BBCodeHTMLRender] {
       if let safeLink = bbcodeSafeURLString(url: link, defaultScheme: "https", defaultHost: host) {
         if n.attr.isEmpty {
           html =
-            "<img src=\"\(safeLink)\" rel=\"noreferrer\" referrerpolicy=\"no-referrer\" alt=\"\" />"
+            "<img src=\"\(safeLink)\" rel=\"noreferrer\" referrerpolicy=\"no-referrer\" loading=\"lazy\" decoding=\"async\" alt=\"\" />"
         } else {
           let values = n.attr.components(separatedBy: ",").compactMap { Int($0) }
           if values.count == 2 && values[0] > 0 && values[0] <= 4096 && values[1] > 0
             && values[1] <= 4096
           {
             html =
-              "<img src=\"\(safeLink)\" rel=\"noreferrer\" referrerpolicy=\"no-referrer\" alt=\"\" width=\"\(values[0])\" height=\"\(values[1])\" />"
+              "<img src=\"\(safeLink)\" rel=\"noreferrer\" referrerpolicy=\"no-referrer\" loading=\"lazy\" decoding=\"async\" alt=\"\" width=\"\(values[0])\" height=\"\(values[1])\" />"
           } else {
             html =
-              "<img src=\"\(safeLink)\" rel=\"noreferrer\" referrerpolicy=\"no-referrer\" alt=\"\(n.escapedAttr)\" />"
+              "<img src=\"\(safeLink)\" rel=\"noreferrer\" referrerpolicy=\"no-referrer\" loading=\"lazy\" decoding=\"async\" alt=\"\(n.escapedAttr)\" />"
           }
         }
         return html
@@ -240,17 +299,17 @@ var bbcodeHTMLRenderers: [BBCodeTagType: BBCodeHTMLRender] {
       if let safeLink = bbcodeSafeURLString(url: link, defaultScheme: "https", defaultHost: host) {
         if n.attr.isEmpty {
           html =
-            "<img src=\"\(safeLink)\" rel=\"noreferrer\" referrerpolicy=\"no-referrer\" alt=\"\" />"
+            "<img src=\"\(safeLink)\" rel=\"noreferrer\" referrerpolicy=\"no-referrer\" loading=\"lazy\" decoding=\"async\" alt=\"\" />"
         } else {
           let values = n.attr.components(separatedBy: ",").compactMap { Int($0) }
           if values.count == 2 && values[0] > 0 && values[0] <= 4096 && values[1] > 0
             && values[1] <= 4096
           {
             html =
-              "<img src=\"\(safeLink)\" rel=\"noreferrer\" referrerpolicy=\"no-referrer\" alt=\"\" width=\"\(values[0])\" height=\"\(values[1])\" />"
+              "<img src=\"\(safeLink)\" rel=\"noreferrer\" referrerpolicy=\"no-referrer\" loading=\"lazy\" decoding=\"async\" alt=\"\" width=\"\(values[0])\" height=\"\(values[1])\" />"
           } else {
             html =
-              "<img src=\"\(safeLink)\" rel=\"noreferrer\" referrerpolicy=\"no-referrer\" alt=\"\(n.escapedAttr)\" />"
+              "<img src=\"\(safeLink)\" rel=\"noreferrer\" referrerpolicy=\"no-referrer\" loading=\"lazy\" decoding=\"async\" alt=\"\(n.escapedAttr)\" />"
           }
         }
         return html
@@ -286,37 +345,10 @@ var bbcodeHTMLRenderers: [BBCodeTagType: BBCodeHTMLRender] {
       var html: String
       if n.attr.isEmpty {
         html = "<span style=\"color: black\">\(n.renderInnerHTML(args))</span>"
+      } else if let color = bbcodeCSSColorValue(n.attr) {
+        html = "<span style=\"color: \(color)\">\(n.renderInnerHTML(args))</span>"
       } else {
-        var valid = false
-        if [
-          "black", "green", "silver", "gray", "olive", "white", "yellow", "orange", "maroon",
-          "navy", "red", "blue", "purple", "teal", "fuchsia", "aqua", "violet", "pink", "lime",
-          "magenta", "brown",
-        ].contains(n.attr) {
-          valid = true
-        } else {
-          if n.attr.unicodeScalars.count == 4 || n.attr.unicodeScalars.count == 7 {
-            var g = n.attr.unicodeScalars.makeIterator()
-            if g.next() == "#" {
-              while let c = g.next() {
-                if (c >= UnicodeScalar("0") && c <= UnicodeScalar("9"))
-                  || (c >= UnicodeScalar("a") && c <= UnicodeScalar("f"))
-                  || (c >= UnicodeScalar("A") && c <= UnicodeScalar("F"))
-                {
-                  valid = true
-                } else {
-                  valid = false
-                  break
-                }
-              }
-            }
-          }
-        }
-        if valid {
-          html = "<span style=\"color: \(n.attr)\">\(n.renderInnerHTML(args))</span>"
-        } else {
-          html = "[color=\(n.escapedAttr)]\(n.renderInnerHTML(args))[/color]"
-        }
+        html = "[color=\(n.escapedAttr)]\(n.renderInnerHTML(args))[/color]"
       }
       return html
     },
@@ -324,17 +356,10 @@ var bbcodeHTMLRenderers: [BBCodeTagType: BBCodeHTMLRender] {
       var html: String
       if n.attr.isEmpty {
         html = "<span style=\"color: black\">\(n.renderInnerHTML(args))</span>"
+      } else if let size = clampedBBCodeFontSize(n.attr) {
+        html = "<span style=\"font-size: \(size)px\">\(n.renderInnerHTML(args))</span>"
       } else {
-        var valid = false
-        let size = Int(n.attr)
-        if size != nil {
-          valid = true
-        }
-        if valid {
-          html = "<span style=\"font-size: \(n.attr)px\">\(n.renderInnerHTML(args))</span>"
-        } else {
-          html = "[size=\(n.escapedAttr)]\(n.renderInnerHTML(args))[/size]"
-        }
+        html = "[size=\(n.escapedAttr)]\(n.renderInnerHTML(args))[/size]"
       }
       return html
     },
@@ -356,36 +381,38 @@ var bbcodeHTMLRenderers: [BBCodeTagType: BBCodeHTMLRender] {
     },
     .bgm: { (n: BBCodeNode, args: [String: Any]?) in
       guard let smiley = BBCodeSmileyCatalog.item(for: n.attr) else {
-        return "(\(n.attr))"
+        return "(\(n.escapedAttr))"
       }
 
       let widthAttribute = smiley.preferredDisplayWidth.map { " width=\"\($0)\"" } ?? ""
-      let src = smiley.remoteURLString(domains: bangumiDomains(from: args))
+      let src = bbcodeSmileySource(smiley, args: args)
       return
         "<img src=\"\(src)\" class=\"\(smiley.htmlClassString)\" alt=\"\(smiley.token)\"\(widthAttribute) />"
     },
     .bmo: { (n: BBCodeNode, args: [String: Any]?) in
       let bmoCode = n.attr
+      let escapedBmoCode = n.escapedAttr
       let textSize = args?["textSize"] as? Int ?? 16
       // Decode the BMO code to get emoji information
       let bmoResult = BBCodeBmoDecoder.decode(bmoCode)
 
       if bmoResult.items.isEmpty {
         // If no items found, return the original code as text
-        return "<span class=\"bmo-placeholder\">(\(bmoCode))</span>"
+        return "<span class=\"bmo-placeholder\">(\(escapedBmoCode))</span>"
       }
 
       // Render the BMO emoji as a data URL
       if let cgImage = BBCodeBmoRenderer.renderCGImage(from: bmoResult, textSize: textSize),
-        let data = cgImage.dataProvider?.data
+        let data = UIImage(cgImage: cgImage).pngData()
       {
-        let base64String = Data(referencing: data).base64EncodedString()
+        let base64String = data.base64EncodedString()
         return
-          "<img src=\"data:image/png;base64,\(base64String)\" alt=\"(\(bmoCode))\" style=\"width: \(textSize)px; height: \(textSize)px;\" />"
+          "<img class=\"bmo-emoji\" src=\"data:image/png;base64,\(base64String)\" alt=\"(\(escapedBmoCode))\" style=\"width: \(textSize)px; height: \(textSize)px;\" />"
       }
 
       // Fallback to placeholder
-      return "<span class=\"bmo-emoji\" data-code=\"\(bmoCode)\">(\(bmoCode))</span>"
+      return
+        "<span class=\"bmo-emoji\" data-code=\"\(escapedBmoCode)\">(\(escapedBmoCode))</span>"
     },
   ]
 }
