@@ -14,22 +14,32 @@ enum PostDocumentAction: Equatable {
 
 struct PostDocumentWebView: UIViewRepresentable {
   let document: PostWebDocument
+  let scrollRequest: PostDocumentScrollRequest?
   let onAction: (PostDocumentAction) -> Void
   let onOpenURL: (URL) -> Void
   let onRefresh: () async -> Void
+  let onViewportChange: (PostDocumentViewportState) -> Void
 
   func makeCoordinator() -> Coordinator {
     Coordinator(
       onAction: onAction,
       onOpenURL: onOpenURL,
-      onRefresh: onRefresh
+      onRefresh: onRefresh,
+      onViewportChange: onViewportChange
     )
   }
 
   func makeUIView(context: Context) -> WKWebView {
     let configuration = WKWebViewConfiguration()
     configuration.defaultWebpagePreferences.allowsContentJavaScript = true
-    configuration.userContentController.add(context.coordinator, name: Coordinator.messageName)
+    configuration.userContentController.add(
+      context.coordinator,
+      name: Coordinator.actionMessageName
+    )
+    configuration.userContentController.add(
+      context.coordinator,
+      name: Coordinator.viewportMessageName
+    )
     configuration.setURLSchemeHandler(
       PostStickerSchemeHandler(),
       forURLScheme: PostDocumentRenderer.stickerURLScheme
@@ -54,6 +64,7 @@ struct PostDocumentWebView: UIViewRepresentable {
 
     context.coordinator.webView = webView
     context.coordinator.update(document: document)
+    context.coordinator.handle(scrollRequest)
     return webView
   }
 
@@ -61,37 +72,48 @@ struct PostDocumentWebView: UIViewRepresentable {
     context.coordinator.onAction = onAction
     context.coordinator.onOpenURL = onOpenURL
     context.coordinator.onRefresh = onRefresh
+    context.coordinator.onViewportChange = onViewportChange
     context.coordinator.update(document: document)
+    context.coordinator.handle(scrollRequest)
   }
 
   static func dismantleUIView(_ webView: WKWebView, coordinator: Coordinator) {
     webView.configuration.userContentController.removeScriptMessageHandler(
-      forName: Coordinator.messageName
+      forName: Coordinator.actionMessageName
+    )
+    webView.configuration.userContentController.removeScriptMessageHandler(
+      forName: Coordinator.viewportMessageName
     )
     webView.navigationDelegate = nil
   }
 
   @MainActor
   final class Coordinator: NSObject, WKNavigationDelegate, WKScriptMessageHandler {
-    static let messageName = "postAction"
+    static let actionMessageName = "postAction"
+    static let viewportMessageName = "postViewport"
 
     weak var webView: WKWebView?
     var onAction: (PostDocumentAction) -> Void
     var onOpenURL: (URL) -> Void
     var onRefresh: () async -> Void
+    var onViewportChange: (PostDocumentViewportState) -> Void
 
     private var currentDocument: PostWebDocument?
     private var pendingScrollOffset: CGPoint?
     private var pendingInitialPostID: Int?
+    private var pendingScrollRequest: PostDocumentScrollRequest?
+    private var handledScrollRequestID: UUID?
 
     init(
       onAction: @escaping (PostDocumentAction) -> Void,
       onOpenURL: @escaping (URL) -> Void,
-      onRefresh: @escaping () async -> Void
+      onRefresh: @escaping () async -> Void,
+      onViewportChange: @escaping (PostDocumentViewportState) -> Void
     ) {
       self.onAction = onAction
       self.onOpenURL = onOpenURL
       self.onRefresh = onRefresh
+      self.onViewportChange = onViewportChange
     }
 
     func update(document: PostWebDocument) {
@@ -110,6 +132,19 @@ struct PostDocumentWebView: UIViewRepresentable {
       webView?.loadHTMLString(document.html, baseURL: document.baseURL)
     }
 
+    func handle(_ request: PostDocumentScrollRequest?) {
+      guard let request, handledScrollRequestID != request.id else {
+        return
+      }
+      handledScrollRequestID = request.id
+
+      guard let webView, !webView.isLoading else {
+        pendingScrollRequest = request
+        return
+      }
+      perform(request, in: webView)
+    }
+
     @objc func refresh() {
       Task {
         await onRefresh()
@@ -121,15 +156,31 @@ struct PostDocumentWebView: UIViewRepresentable {
       _ userContentController: WKUserContentController,
       didReceive message: WKScriptMessage
     ) {
-      guard message.name == Self.messageName,
-        let payload = message.body as? [String: Any],
-        let actionName = payload["action"] as? String,
-        let action = makeAction(name: actionName, payload: payload)
-      else {
+      guard let payload = message.body as? [String: Any] else {
         return
       }
 
-      onAction(action)
+      switch message.name {
+      case Self.actionMessageName:
+        guard let actionName = payload["action"] as? String,
+          let action = makeAction(name: actionName, payload: payload)
+        else {
+          return
+        }
+        onAction(action)
+      case Self.viewportMessageName:
+        guard let canScrollToTop = boolean(payload["canScrollToTop"]) else {
+          return
+        }
+        onViewportChange(
+          PostDocumentViewportState(
+            canScrollToTop: canScrollToTop,
+            visiblePostID: integer(payload["postId"])
+          )
+        )
+      default:
+        return
+      }
     }
 
     func webView(
@@ -149,6 +200,14 @@ struct PostDocumentWebView: UIViewRepresentable {
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation?) {
+      if let pendingScrollRequest {
+        self.pendingScrollRequest = nil
+        pendingScrollOffset = nil
+        pendingInitialPostID = nil
+        perform(pendingScrollRequest, in: webView)
+        return
+      }
+
       if let pendingScrollOffset {
         self.pendingScrollOffset = nil
         let minimumOffset = -webView.scrollView.adjustedContentInset.top
@@ -171,31 +230,11 @@ struct PostDocumentWebView: UIViewRepresentable {
         return
       }
       self.pendingInitialPostID = nil
-      webView.evaluateJavaScript(
-        """
-        (() => {
-          const target = document.getElementById('post_\(pendingInitialPostID)');
-          if (!target) {
-            return;
-          }
-
-          let userInteracted = false;
-          const cancel = () => {
-            userInteracted = true;
-          };
-          document.addEventListener('touchstart', cancel, {once: true, passive: true});
-          document.addEventListener('pointerdown', cancel, {once: true, passive: true});
-
-          const align = () => {
-            if (!userInteracted) {
-              target.scrollIntoView({block: 'start'});
-            }
-          };
-          align();
-          window.setTimeout(align, 250);
-          window.setTimeout(align, 750);
-        })();
-        """
+      scrollToPost(
+        pendingInitialPostID,
+        animated: false,
+        stabilizesPosition: true,
+        in: webView
       )
     }
 
@@ -209,6 +248,90 @@ struct PostDocumentWebView: UIViewRepresentable {
 
     private func captureScrollOffsetIfNeeded(from webView: WKWebView) {
       pendingScrollOffset = pendingScrollOffset ?? webView.scrollView.contentOffset
+    }
+
+    private func perform(_ request: PostDocumentScrollRequest, in webView: WKWebView) {
+      cancelPendingPostAlignment(in: webView)
+
+      switch request.target {
+      case .top:
+        webView.scrollView.setContentOffset(
+          CGPoint(x: 0, y: -webView.scrollView.adjustedContentInset.top),
+          animated: request.animated
+        )
+      case .bottom:
+        let minimumOffset = -webView.scrollView.adjustedContentInset.top
+        let maximumOffset = max(
+          minimumOffset,
+          webView.scrollView.contentSize.height - webView.scrollView.bounds.height
+            + webView.scrollView.adjustedContentInset.bottom
+        )
+        webView.scrollView.setContentOffset(
+          CGPoint(x: 0, y: maximumOffset),
+          animated: request.animated
+        )
+      case .post(let postID):
+        scrollToPost(
+          postID,
+          animated: request.animated,
+          stabilizesPosition: false,
+          in: webView
+        )
+      }
+    }
+
+    private func cancelPendingPostAlignment(in webView: WKWebView) {
+      webView.evaluateJavaScript(
+        """
+        window.postDocumentScrollGeneration =
+          (window.postDocumentScrollGeneration ?? 0) + 1;
+        """
+      )
+    }
+
+    private func scrollToPost(
+      _ postID: Int,
+      animated: Bool,
+      stabilizesPosition: Bool,
+      in webView: WKWebView
+    ) {
+      webView.evaluateJavaScript(
+        """
+        (() => {
+          const target = document.getElementById('post_\(postID)');
+          if (!target) {
+            return;
+          }
+
+          window.postDocumentScrollGeneration =
+            (window.postDocumentScrollGeneration ?? 0) + 1;
+          const generation = window.postDocumentScrollGeneration;
+          const stabilizesPosition = \(stabilizesPosition ? "true" : "false");
+          let userInteracted = false;
+          const cancel = () => {
+            userInteracted = true;
+          };
+          if (stabilizesPosition) {
+            document.addEventListener('touchstart', cancel, {once: true, passive: true});
+            document.addEventListener('pointerdown', cancel, {once: true, passive: true});
+          }
+
+          const align = (behavior) => {
+            if (
+              !userInteracted
+              && window.postDocumentScrollGeneration === generation
+            ) {
+              target.scrollIntoView({block: 'start', behavior});
+            }
+          };
+          align('\(animated ? "smooth" : "auto")');
+          if (stabilizesPosition) {
+            window.setTimeout(() => align('auto'), 250);
+            window.setTimeout(() => align('auto'), 750);
+          }
+        })();
+        """
+      )
     }
 
     private func makeAction(
@@ -287,26 +410,53 @@ struct PostDocumentWebView: UIViewRepresentable {
       return nil
     }
 
+    private func boolean(_ value: Any?) -> Bool? {
+      if let value = value as? Bool {
+        return value
+      }
+      if let number = value as? NSNumber {
+        return number.boolValue
+      }
+      return nil
+    }
+
   }
 }
 
 struct PostDocumentSurface: View {
   let input: PostDocumentRenderInput
+  let controls: PostDocumentFilterSortConfiguration
   let onAction: (PostDocumentAction) -> Void
   let onOpenURL: (URL) -> Void
   let onRefresh: () async -> Void
 
   @State private var document: PostWebDocument?
+  @State private var scrollRequest: PostDocumentScrollRequest?
+  @State private var viewportState = PostDocumentViewportState.top
+  @Environment(\.accessibilityReduceMotion) private var accessibilityReduceMotion
 
   var body: some View {
-    ZStack {
+    ZStack(alignment: .bottomTrailing) {
       if let document {
         PostDocumentWebView(
           document: document,
+          scrollRequest: scrollRequest,
           onAction: onAction,
           onOpenURL: onOpenURL,
-          onRefresh: onRefresh
+          onRefresh: onRefresh,
+          onViewportChange: updateViewportState
         )
+
+        PostDocumentNavigatorOverlay(
+          items: document.navigationItems,
+          visiblePostID: viewportState.visiblePostID,
+          controls: controls,
+          canScrollToTop: viewportState.canScrollToTop,
+          onSelect: requestScroll
+        )
+        .id(document.id)
+        .padding(.trailing, 12)
+        .safeAreaPadding(.bottom, 12)
       } else {
         ProgressView()
       }
@@ -324,6 +474,17 @@ struct PostDocumentSurface: View {
         assertionFailure("Unexpected post document rendering error: \(error)")
       }
     }
+  }
+
+  private func requestScroll(_ target: PostDocumentScrollTarget) {
+    scrollRequest = PostDocumentScrollRequest(
+      target: target,
+      animated: !accessibilityReduceMotion
+    )
+  }
+
+  private func updateViewportState(_ state: PostDocumentViewportState) {
+    viewportState = state
   }
 }
 

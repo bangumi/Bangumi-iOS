@@ -35,4 +35,13 @@ extension View {
       }
     }
   }
+
+  @ViewBuilder
+  func adaptiveFlexibleButtonSizing() -> some View {
+    if #available(iOS 26.0, *) {
+      self.buttonSizing(.flexible)
+    } else {
+      self
+    }
+  }
 }

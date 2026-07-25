@@ -326,6 +326,11 @@ struct TopicDetailView: View {
       let presentation = replyPresentation(data)
       PostDocumentSurface(
         input: renderInput(data, presentation: presentation),
+        controls: PostDocumentFilterSortConfiguration(
+          filterModes: ReplyFilterMode.allCases,
+          filterMode: $filterMode,
+          sortOrder: $sortSelection[fallback: replySortOrder]
+        ),
         onAction: handleDocumentAction,
         onOpenURL: { url in
           openURL(url)

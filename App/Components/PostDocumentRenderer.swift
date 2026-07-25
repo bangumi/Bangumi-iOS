@@ -5,6 +5,7 @@ struct PostWebDocument: Equatable, Sendable {
   let html: String
   let baseURL: URL
   let initialPostID: Int?
+  let navigationItems: [PostDocumentNavigationItem]
 }
 
 struct PostDocumentRenderInput: Hashable, Sendable {
@@ -551,6 +552,7 @@ actor PostDocumentRenderer {
         <script>
           (() => {
             const bridge = window.webkit?.messageHandlers?.postAction;
+            const viewportBridge = window.webkit?.messageHandlers?.postViewport;
             const post = (payload) => bridge?.postMessage(payload);
             const previewableImage = (target) => {
               const image = target.closest('.post-content img');
@@ -675,6 +677,53 @@ actor PostDocumentRenderer {
                 image.style.maxHeight = '';
               }
             });
+
+            const floorPosts = Array.from(document.querySelectorAll('main > .reply'));
+            let viewportFrame = null;
+            let lastViewportState = '';
+            const reportViewport = () => {
+              viewportFrame = null;
+              const anchorY = Math.min(window.innerHeight * 0.32, 180);
+              let visiblePostId = null;
+
+              for (const floorPost of floorPosts) {
+                const rect = floorPost.getBoundingClientRect();
+                const postId = Number(floorPost.id.slice(5));
+                if (rect.top <= anchorY) {
+                  visiblePostId = postId;
+                  continue;
+                }
+                if (visiblePostId === null && rect.top < window.innerHeight) {
+                  visiblePostId = postId;
+                }
+                break;
+              }
+
+              const canScrollToTop = window.scrollY > 44;
+              const state = `${canScrollToTop}:${visiblePostId ?? ''}`;
+              if (state === lastViewportState) {
+                return;
+              }
+              lastViewportState = state;
+              viewportBridge?.postMessage({
+                canScrollToTop,
+                postId: visiblePostId,
+              });
+            };
+            const scheduleViewportReport = () => {
+              if (viewportFrame === null) {
+                viewportFrame = window.requestAnimationFrame(reportViewport);
+              }
+            };
+
+            window.addEventListener('scroll', scheduleViewportReport, {passive: true});
+            window.addEventListener('resize', scheduleViewportReport, {passive: true});
+            document.querySelectorAll('img').forEach((image) => {
+              if (!image.complete) {
+                image.addEventListener('load', scheduleViewportReport, {once: true});
+              }
+            });
+            scheduleViewportReport();
           })();
         </script>
       </body>
@@ -686,7 +735,10 @@ actor PostDocumentRenderer {
       id: UUID(),
       html: html,
       baseURL: input.baseURL,
-      initialPostID: input.initialPostID
+      initialPostID: input.initialPostID,
+      navigationItems: input.replies.map {
+        PostDocumentNavigationItem(postID: $0.id, floor: $0.floor)
+      }
     )
   }
 

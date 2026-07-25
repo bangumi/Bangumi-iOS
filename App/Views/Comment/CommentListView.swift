@@ -207,6 +207,11 @@ struct CommentListView: View {
       let presentation = commentPresentation()
       PostDocumentSurface(
         input: renderInput(presentation),
+        controls: PostDocumentFilterSortConfiguration(
+          filterModes: availableFilterModes,
+          filterMode: $filterMode,
+          sortOrder: $sortSelection[fallback: replySortOrder]
+        ),
         onAction: handleDocumentAction,
         onOpenURL: { url in
           openURL(url)
