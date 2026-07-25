@@ -372,13 +372,13 @@ private struct BBCodeTextKitRenderer {
         applyAttribute(.foregroundColor, value: color, to: attributed)
       }
     case .size:
-      guard let size = clampedFontSize(node.attr) else {
+      guard let size = clampedBBCodeFontSize(node.attr) else {
         return segments
       }
 
       return mapTextSegments(segments) { attributed in
         applyFontTransform(to: attributed) { font in
-          UIFont(descriptor: font.fontDescriptor, size: size)
+          UIFont(descriptor: font.fontDescriptor, size: CGFloat(size))
         }
       }
     case .mask:
@@ -655,11 +655,11 @@ private struct BBCodeTextKitRenderer {
       return inner
     case .size:
       let inner = renderChildren(node.children)
-      guard let size = clampedFontSize(node.attr) else {
+      guard let size = clampedBBCodeFontSize(node.attr) else {
         return inner
       }
       applyFontTransform(to: inner) { font in
-        UIFont(descriptor: font.fontDescriptor, size: size)
+        UIFont(descriptor: font.fontDescriptor, size: CGFloat(size))
       }
       return inner
     case .mask:
@@ -1003,14 +1003,6 @@ private struct BBCodeTextKitRenderer {
         .paragraphStyle: baseParagraphStyle,
       ]
     )
-  }
-
-  private func clampedFontSize(_ rawValue: String) -> CGFloat? {
-    guard let size = Int(rawValue.trimmingCharacters(in: .whitespacesAndNewlines)) else {
-      return nil
-    }
-
-    return CGFloat(min(max(size, 8), 50))
   }
 
   private func applyLinkAttributes(to attributed: NSMutableAttributedString, url: URL) {

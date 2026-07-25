@@ -253,7 +253,7 @@ struct TopicDetailView: View {
   @Environment(\.openURL) private var openURL
 
   @State private var data: TopicDetailData?
-  @State private var refreshed = false
+  @State private var loadFailed = false
   @State private var filterMode: ReplyFilterMode = .all
   @State private var selectedSortOrder: ReplySortOrder?
   @State private var sheet: TopicDetailSheet?
@@ -332,8 +332,12 @@ struct TopicDetailView: View {
         },
         onRefresh: refresh
       )
-    } else if refreshed {
-      NotFoundView()
+    } else if loadFailed {
+      TopicLoadFailureView {
+        Task {
+          await refresh()
+        }
+      }
     } else {
       ProgressView()
     }
@@ -490,12 +494,16 @@ struct TopicDetailView: View {
   }
 
   private func refresh() async {
+    if data == nil {
+      loadFailed = false
+    }
+
     do {
       data = try await source.load()
-      refreshed = true
+      loadFailed = false
     } catch {
       if data == nil {
-        refreshed = true
+        loadFailed = true
       }
       Notifier.shared.alert(error: error)
     }
@@ -793,6 +801,21 @@ private struct TopicImagePreview: Identifiable {
 
   var id: String {
     url.absoluteString
+  }
+}
+
+private struct TopicLoadFailureView: View {
+  let onRetry: () -> Void
+
+  var body: some View {
+    ContentUnavailableView {
+      Label("加载失败", systemImage: "wifi.exclamationmark")
+    } description: {
+      Text("无法加载讨论内容，请检查网络连接后重试。")
+    } actions: {
+      Button("重试", action: onRetry)
+        .buttonStyle(.borderedProminent)
+    }
   }
 }
 

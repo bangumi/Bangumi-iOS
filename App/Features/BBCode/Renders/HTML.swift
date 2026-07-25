@@ -351,17 +351,10 @@ var bbcodeHTMLRenderers: [BBCodeTagType: BBCodeHTMLRender] {
       var html: String
       if n.attr.isEmpty {
         html = "<span style=\"color: black\">\(n.renderInnerHTML(args))</span>"
+      } else if let size = clampedBBCodeFontSize(n.attr) {
+        html = "<span style=\"font-size: \(size)px\">\(n.renderInnerHTML(args))</span>"
       } else {
-        var valid = false
-        let size = Int(n.attr)
-        if size != nil {
-          valid = true
-        }
-        if valid {
-          html = "<span style=\"font-size: \(n.attr)px\">\(n.renderInnerHTML(args))</span>"
-        } else {
-          html = "[size=\(n.escapedAttr)]\(n.renderInnerHTML(args))[/size]"
-        }
+        html = "[size=\(n.escapedAttr)]\(n.renderInnerHTML(args))[/size]"
       }
       return html
     },
