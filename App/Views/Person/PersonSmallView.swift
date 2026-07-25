@@ -1,16 +1,10 @@
 import SwiftUI
 
 struct PersonSmallView: View {
+  @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
+
   let person: SlimPersonDTO
   let isCollected: Bool
-
-  var title: String {
-    if person.nameCN.isEmpty {
-      return person.name
-    } else {
-      return person.nameCN
-    }
-  }
 
   var body: some View {
     BorderView(color: .secondary.opacity(0.2), padding: 4, paddingRatio: 1, cornerRadius: 8) {
@@ -21,7 +15,7 @@ struct PersonSmallView: View {
           .imageNSFW(person.nsfw)
           .imageCollectedStatus(isCollected)
         VStack(alignment: .leading) {
-          Text(title)
+          Text(person.title(with: titlePreference))
           if let info = person.info, !info.isEmpty {
             Text(info)
               .font(.footnote)
