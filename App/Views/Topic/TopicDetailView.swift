@@ -862,12 +862,59 @@ private enum TopicReactionPickerLayout {
 
 private enum TopicMoreMenuLayout {
   static let width: CGFloat = 148
-  static let itemHeight: CGFloat = 40
-  static let spacing: CGFloat = 10
+  static let itemHeight: CGFloat = 44
+  static let spacing: CGFloat = 8
 
   static func height(for itemCount: Int) -> CGFloat {
     CGFloat(itemCount) * itemHeight
       + CGFloat(max(0, itemCount - 1)) * spacing
+  }
+}
+
+private struct TopicFloatingSurfaceModifier<Surface: Shape>: ViewModifier {
+  @Environment(\.colorScheme) private var colorScheme
+
+  let surface: Surface
+  let shadowRadius: CGFloat
+  let shadowY: CGFloat
+
+  func body(content: Content) -> some View {
+    content
+      .background(
+        Color(
+          uiColor: colorScheme == .dark
+            ? .secondarySystemBackground
+            : .systemBackground
+        ),
+        in: surface
+      )
+      .shadow(
+        color: colorScheme == .dark
+          ? Color.white.opacity(0.16)
+          : Color.black.opacity(0.08),
+        radius: colorScheme == .dark ? 2 : 1
+      )
+      .shadow(
+        color: Color.black.opacity(colorScheme == .dark ? 0.6 : 0.2),
+        radius: shadowRadius,
+        y: shadowY
+      )
+  }
+}
+
+extension View {
+  fileprivate func topicFloatingSurface<Surface: Shape>(
+    _ surface: Surface,
+    shadowRadius: CGFloat,
+    shadowY: CGFloat
+  ) -> some View {
+    modifier(
+      TopicFloatingSurfaceModifier(
+        surface: surface,
+        shadowRadius: shadowRadius,
+        shadowY: shadowY
+      )
+    )
   }
 }
 
@@ -1081,20 +1128,11 @@ private struct TopicReactionPickerPanel: View {
       }
     }
     .padding(TopicReactionPickerLayout.contentPadding)
-    .background {
-      ZStack {
-        RoundedRectangle(cornerRadius: 16, style: .continuous)
-          .fill(.regularMaterial)
-        RoundedRectangle(cornerRadius: 16, style: .continuous)
-          .fill(Color.primary.opacity(0.03))
-      }
-      .opacity(0.9)
-    }
-    .overlay {
-      RoundedRectangle(cornerRadius: 16, style: .continuous)
-        .stroke(Color(uiColor: .separator).opacity(0.22), lineWidth: 0.5)
-    }
-    .shadow(color: .black.opacity(0.16), radius: 14, y: 6)
+    .topicFloatingSurface(
+      RoundedRectangle(cornerRadius: 16, style: .continuous),
+      shadowRadius: 16,
+      shadowY: 7
+    )
     .opacity(isVisible ? 1 : 0)
     .scaleEffect(isVisible ? 1 : 0.96, anchor: .trailing)
     .animation(
@@ -1126,7 +1164,7 @@ private struct TopicMoreMenuPanel: View {
   let onSelect: (TopicPostMenuAction) -> Void
 
   var body: some View {
-    VStack(alignment: .trailing, spacing: 10) {
+    VStack(alignment: .trailing, spacing: TopicMoreMenuLayout.spacing) {
       if canEdit {
         menuButton(
           "编辑",
@@ -1138,6 +1176,7 @@ private struct TopicMoreMenuPanel: View {
           "删除",
           systemImage: "trash",
           action: .delete,
+          role: .destructive,
           tint: .red,
           index: 1
         )
@@ -1164,42 +1203,31 @@ private struct TopicMoreMenuPanel: View {
     _ title: String,
     systemImage: String,
     action: TopicPostMenuAction,
+    role: ButtonRole? = nil,
     tint: Color = .primary,
     isEnabled: Bool = true,
     index: Int
   ) -> some View {
-    Button {
+    Button(role: role) {
       onSelect(action)
     } label: {
-      HStack(spacing: 9) {
+      Label {
         Text(title)
           .font(.subheadline)
-          .padding(.horizontal, 9)
-          .frame(height: 28)
-          .background {
-            ZStack {
-              Capsule().fill(.regularMaterial)
-              Capsule().fill(Color.primary.opacity(0.04))
-            }
-          }
-          .shadow(color: .black.opacity(0.14), radius: 9, y: 3)
-
+      } icon: {
         Image(systemName: systemImage)
           .font(.body)
-          .frame(width: 40, height: 40)
-          .background {
-            ZStack {
-              Circle().fill(.regularMaterial)
-              Circle().fill(Color.primary.opacity(0.04))
-            }
-          }
-          .overlay {
-            Circle()
-              .stroke(Color(uiColor: .separator).opacity(0.24), lineWidth: 0.5)
-          }
-          .shadow(color: .black.opacity(0.17), radius: 10, y: 4)
+          .frame(width: 20)
       }
+      .frame(maxWidth: .infinity, alignment: .leading)
+      .padding(.horizontal, 14)
+      .frame(height: TopicMoreMenuLayout.itemHeight)
       .foregroundStyle(tint)
+      .topicFloatingSurface(
+        RoundedRectangle(cornerRadius: 14, style: .continuous),
+        shadowRadius: 10,
+        shadowY: 4
+      )
     }
     .buttonStyle(TopicFloatingActionButtonStyle())
     .disabled(!isEnabled)
@@ -1240,10 +1268,12 @@ private struct TopicReactionChoiceButtonStyle: ButtonStyle {
 }
 
 private struct TopicFloatingActionButtonStyle: ButtonStyle {
+  @Environment(\.isEnabled) private var isEnabled
+
   func makeBody(configuration: Configuration) -> some View {
     configuration.label
       .scaleEffect(configuration.isPressed ? 0.94 : 1, anchor: .trailing)
-      .opacity(configuration.isPressed ? 0.72 : 1)
+      .opacity(isEnabled ? (configuration.isPressed ? 0.72 : 1) : 0.38)
       .animation(
         .snappy(duration: 0.14, extraBounce: 0),
         value: configuration.isPressed
