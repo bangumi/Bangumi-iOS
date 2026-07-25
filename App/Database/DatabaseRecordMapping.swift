@@ -57,6 +57,14 @@ extension Row {
   }
 }
 
+extension UserIndexCache {
+  init(row: Row) {
+    userID = row["user_id"]
+    itemsData = row["items_data"]
+    updatedAt = Date(timeIntervalSince1970: row["updated_at"])
+  }
+}
+
 extension Subject {
   convenience init(row: Row, detail: SubjectDetail? = nil) {
     let typeValue: Int = row["type"]

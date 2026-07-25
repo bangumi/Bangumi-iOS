@@ -5,34 +5,47 @@ struct IndexPickerSheet: View {
   let itemId: Int
   let itemTitle: String
 
-  @AppStorage("profile") var profile: Profile = Profile()
+  @AppStorage("profile") private var profile: Profile = Profile()
   @Environment(\.dismiss) private var dismiss
 
   @State private var indexes: [SlimIndexDTO] = []
-  @State private var loading = false
+  @State private var hasLoaded = false
+  @State private var refreshing = false
   @State private var adding = false
+  @State private var showCreateIndex = false
 
-  func loadUserIndexes() async {
-    withAnimation(.default) {
-      loading = true
+  private func loadUserIndexes() async {
+    if let cachedIndexes = await IndexRepository.loadCachedUserIndexes(userID: profile.id) {
+      indexes = cachedIndexes
+      hasLoaded = true
+      return
     }
+
+    await refreshUserIndexes()
+  }
+
+  private func refreshUserIndexes() async {
+    guard !refreshing else { return }
+    refreshing = true
     do {
-      let resp = try await UserService.getUserIndexes(
+      let refreshedIndexes = try await IndexRepository.refreshUserIndexes(
+        userID: profile.id,
         username: profile.username,
         limit: 100
       )
       withAnimation(.default) {
-        indexes = resp.data
+        indexes = refreshedIndexes
+        hasLoaded = true
       }
+    } catch is CancellationError {
     } catch {
+      hasLoaded = true
       Notifier.shared.alert(error: error)
     }
-    withAnimation(.default) {
-      loading = false
-    }
+    refreshing = false
   }
 
-  func addToIndex(_ index: SlimIndexDTO) async {
+  private func addToIndex(_ index: SlimIndexDTO) async {
     adding = true
     do {
       _ = try await IndexService.putIndexRelated(
@@ -52,9 +65,13 @@ struct IndexPickerSheet: View {
   }
 
   var body: some View {
-    SheetView(title: "选择目录", size: .both) {
+    SheetView(
+      title: "选择目录",
+      size: .both,
+      controlsPlacement: .primaryAction
+    ) {
       VStack {
-        if loading {
+        if !hasLoaded {
           ProgressView("加载目录中...")
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else if indexes.isEmpty {
@@ -65,7 +82,7 @@ struct IndexPickerSheet: View {
             Text("暂无目录")
               .font(.title3)
               .foregroundStyle(.secondary)
-            Text("请先创建目录后再收藏")
+            Text("创建目录后即可添加")
               .font(.caption)
               .foregroundStyle(.secondary)
           }
@@ -73,7 +90,7 @@ struct IndexPickerSheet: View {
         } else {
           ScrollView {
             LazyVStack {
-              ForEach(indexes, id: \.self) { item in
+              ForEach(indexes) { item in
                 Button {
                   Task {
                     await addToIndex(item)
@@ -89,9 +106,36 @@ struct IndexPickerSheet: View {
           }
         }
       }
+    } controls: {
+      if refreshing {
+        ProgressView()
+      } else {
+        Button {
+          Task {
+            await refreshUserIndexes()
+          }
+        } label: {
+          Label("刷新", systemImage: "arrow.clockwise")
+        }
+        .disabled(adding)
+      }
+
+      Button {
+        showCreateIndex = true
+      } label: {
+        Label("创建目录", systemImage: "plus")
+      }
+      .disabled(refreshing || adding)
     }
     .task {
       await loadUserIndexes()
+    }
+    .sheet(isPresented: $showCreateIndex) {
+      IndexEditSheet {
+        Task {
+          await refreshUserIndexes()
+        }
+      }
     }
   }
 }

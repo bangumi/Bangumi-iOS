@@ -12,6 +12,7 @@ enum AccountLocalState {
     try await db.clearPersonCollection()
     try await db.clearCharacterCollection()
     try await db.clearNoticeCache()
+    try await db.clearUserIndexCache()
   }
 
   static func clearIfAccountChanged(to profile: Profile) async throws {
