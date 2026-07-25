@@ -19,7 +19,7 @@ struct CreateCommentBoxSheet: View {
     } else if let comment {
       return "回复 \(comment.user.nickname)"
     } else {
-      return "回复 \(type.title)"
+      return type.newCommentTitle
     }
   }
 

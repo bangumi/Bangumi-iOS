@@ -33,40 +33,18 @@ struct CommentListNavigationLink: View {
 
   var body: some View {
     NavigationLink(value: NavDestination.commentList(route)) {
-      HStack(spacing: 10) {
+      HStack(spacing: 4) {
         Image(systemName: "bubble.left.and.bubble.right")
-          .font(.body)
-          .foregroundStyle(Color.accentColor)
-          .frame(width: 20)
-
-        Text(title)
-          .font(.subheadline.weight(.semibold))
-
-        Spacer(minLength: 6)
+          .accessibilityLabel(Text(title))
 
         if let count {
           Text("\(count)")
-            .font(.footnote)
-            .foregroundStyle(.secondary)
             .monospacedDigit()
         }
-
-        Image(systemName: "chevron.forward")
-          .font(.footnote.weight(.semibold))
-          .foregroundStyle(.tertiary)
       }
-      .padding(.horizontal, 12)
-      .padding(.vertical, 9)
-      .contentShape(Rectangle())
-      .background(
-        Color(uiColor: .secondarySystemBackground),
-        in: RoundedRectangle(cornerRadius: 10, style: .continuous)
-      )
-      .overlay {
-        RoundedRectangle(cornerRadius: 10, style: .continuous)
-          .stroke(Color(uiColor: .separator).opacity(0.22), lineWidth: 0.5)
-      }
+      .font(.footnote)
+      .lineLimit(1)
     }
-    .buttonStyle(.plain)
+    .buttonStyle(.navigation)
   }
 }

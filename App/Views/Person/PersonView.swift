@@ -259,19 +259,21 @@ struct PersonDetailView: View {
         .buttonStyle(.navigation)
         .padding(.vertical, 4)
 
-        Label("\(person.collects)人收藏", systemImage: "heart")
-          .font(.footnote)
-          .foregroundStyle(.secondary)
-          .lineLimit(1)
+        HStack {
+          Label("\(person.collects)人收藏", systemImage: "heart")
+            .foregroundStyle(.secondary)
+            .lineLimit(1)
+          Spacer(minLength: 8)
+          if !isolationMode {
+            CommentListNavigationLink(
+              route: CommentListRoute(parent: .person(person.id)),
+              count: person.comment
+            )
+          }
+        }
+        .font(.footnote)
       }.padding(.leading, 2)
     }.frame(height: 120)
-
-    if !isolationMode {
-      CommentListNavigationLink(
-        route: CommentListRoute(parent: .person(person.id)),
-        count: person.comment
-      )
-    }
 
     /// summary
     BBCodeView(person.summary, textSize: 14)

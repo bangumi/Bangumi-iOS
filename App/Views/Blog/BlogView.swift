@@ -58,6 +58,12 @@ struct BlogView: View {
                   .font(.caption)
                   .foregroundColor(.secondary)
                 Spacer()
+                if !isolationMode {
+                  CommentListNavigationLink(
+                    route: CommentListRoute(parent: .blog(blogId)),
+                    count: blog.replies
+                  )
+                }
                 Button {
                   showSubjects = true
                 } label: {
@@ -67,14 +73,6 @@ struct BlogView: View {
                 }.disabled(subjects.isEmpty)
               }
               Divider()
-
-              if !isolationMode {
-                CommentListNavigationLink(
-                  route: CommentListRoute(parent: .blog(blogId)),
-                  count: blog.replies
-                )
-                .padding(.top, 8)
-              }
 
               BBCodeView(blog.content)
                 .textSelection(.enabled)

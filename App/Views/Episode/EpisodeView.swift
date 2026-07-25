@@ -56,14 +56,7 @@ struct EpisodeView: View {
             SubjectTinyView(subject: subject)
               .padding(.vertical, 8)
           }
-          EpisodeInfoView(episode: episode)
-          if !isolationMode {
-            CommentListNavigationLink(
-              route: CommentListRoute(parent: .episode(episodeId)),
-              count: episode.comment
-            )
-            .padding(.top, 8)
-          }
+          EpisodeInfoView(episode: episode, showsCommentLink: true)
         }
         Divider()
         if let desc = episode?.desc, !desc.isEmpty {

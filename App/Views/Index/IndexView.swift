@@ -118,21 +118,23 @@ struct IndexView: View {
                   Text("创建: \(index.createdAt.datetimeDisplay)")
                     .foregroundStyle(.secondary)
                     .monospacedDigit()
-                  Text("更新: \(index.updatedAt.datetimeDisplay)")
-                    .foregroundStyle(.secondary)
-                    .monospacedDigit()
+                  HStack {
+                    Text("更新: \(index.updatedAt.datetimeDisplay)")
+                      .foregroundStyle(.secondary)
+                      .monospacedDigit()
+                    Spacer(minLength: 8)
+                    if !isolationMode {
+                      CommentListNavigationLink(
+                        route: CommentListRoute(parent: .index(indexId)),
+                        title: "留言",
+                        count: index.replies
+                      )
+                    }
+                  }
                   Spacer(minLength: 0)
                 }
               }.font(.callout)
             }
-          }
-
-          if !isolationMode {
-            CommentListNavigationLink(
-              route: CommentListRoute(parent: .index(indexId)),
-              title: "留言",
-              count: index.replies
-            )
           }
 
           if !index.desc.isEmpty {
