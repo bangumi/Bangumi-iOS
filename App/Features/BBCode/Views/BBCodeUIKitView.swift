@@ -134,6 +134,7 @@ private final class BBCodeTextBlockView: UITextView, UITextViewDelegate {
   }
 
   private let hiddenMaskColor = UIColor(white: 0.35, alpha: 1)
+  private let revealedMaskTextColor = UIColor.white
   private let maskLinkURL = URL(string: "bbcode-mask://toggle")!
   private let baseAttributedText: NSAttributedString
   var openURLHandler: ((URL) -> Void)?
@@ -214,12 +215,14 @@ private final class BBCodeTextBlockView: UITextView, UITextViewDelegate {
 
       let maskRange = MaskRangeKey(range)
       let isRevealed = revealedMasks.contains(maskRange)
-      applyLinks(in: range, isRevealed: isRevealed, to: renderedText)
       renderedText.addAttribute(.backgroundColor, value: hiddenMaskColor, range: range)
-      if !isRevealed {
+      if isRevealed {
+        renderedText.addAttribute(.foregroundColor, value: revealedMaskTextColor, range: range)
+      } else {
         renderedText.addAttribute(.foregroundColor, value: hiddenMaskColor, range: range)
         hideAttachments(in: range, in: renderedText)
       }
+      applyLinks(in: range, isRevealed: isRevealed, to: renderedText)
     }
 
     if animated {
@@ -252,6 +255,17 @@ private final class BBCodeTextBlockView: UITextView, UITextViewDelegate {
         value: value ?? maskLinkURL,
         range: linkRange
       )
+      guard value != nil else {
+        return
+      }
+
+      baseAttributedText.enumerateAttribute(.foregroundColor, in: linkRange) {
+        color, colorRange, _ in
+        guard let color else {
+          return
+        }
+        renderedText.addAttribute(.foregroundColor, value: color, range: colorRange)
+      }
     }
   }
 
@@ -387,7 +401,17 @@ private final class BBCodeTextBlockView: UITextView, UITextViewDelegate {
     }
 
     if url.scheme == maskLinkURL.scheme {
-      let maskRange = MaskRangeKey(textItem.range)
+      var enclosingRange = NSRange()
+      guard
+        baseAttributedText.attribute(
+          .bbcodeMask,
+          at: textItem.range.location,
+          effectiveRange: &enclosingRange
+        ) != nil
+      else {
+        return defaultAction
+      }
+      let maskRange = MaskRangeKey(enclosingRange)
       return UIAction { [weak self] _ in
         self?.toggleMask(maskRange)
       }
