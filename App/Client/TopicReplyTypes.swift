@@ -21,6 +21,19 @@ enum ReplySortOrder: String, Codable, CaseIterable {
   }
 }
 
+struct ReplySortSelection {
+  private var selectedOrder: ReplySortOrder?
+
+  subscript(fallback fallbackOrder: ReplySortOrder) -> ReplySortOrder {
+    get {
+      selectedOrder ?? fallbackOrder
+    }
+    set {
+      selectedOrder = newValue
+    }
+  }
+}
+
 // MARK: - Reply Filter Mode
 
 enum ReplyFilterMode: String, Codable, CaseIterable {
@@ -78,6 +91,38 @@ extension Array where Element == ReplyDTO {
 
   /// Sort replies based on sort order
   func sorted(by order: ReplySortOrder) -> [ReplyDTO] {
+    switch order {
+    case .ascending:
+      return self
+    case .descending:
+      return reversed()
+    }
+  }
+}
+
+extension Array where Element == CommentDTO {
+  func filtered(
+    by mode: ReplyFilterMode,
+    posterID: Int?,
+    friendlist: [Int],
+    myID: Int
+  ) -> [CommentDTO] {
+    switch mode {
+    case .all:
+      return self
+    case .reactions:
+      return filter { !($0.reactions ?? []).isEmpty }
+    case .poster:
+      guard let posterID else { return self }
+      return filter { $0.creatorID == posterID }
+    case .friends:
+      return filter { friendlist.contains($0.creatorID) }
+    case .myself:
+      return filter { $0.creatorID == myID }
+    }
+  }
+
+  func sorted(by order: ReplySortOrder) -> [CommentDTO] {
     switch order {
     case .ascending:
       return self

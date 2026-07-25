@@ -2,7 +2,6 @@ import SwiftUI
 
 struct EpisodeInfoView: View {
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
-  @AppStorage("isolationMode") var isolationMode: Bool = false
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
 
   let episode: EpisodeDTO
@@ -45,21 +44,10 @@ struct EpisodeInfoView: View {
       if episode.disc > 0 {
         Text(field(name: "Disc", value: "\(episode.disc)"))
       }
-      Divider()
-      HStack {
-        if episode.comment > 0 && !isolationMode {
-          Label("讨论", systemImage: "bubble.fill")
-            .font(.footnote)
-            .foregroundStyle(.secondary)
-            .fixedSize()
-          Text("(+\(episode.comment))")
-            .font(.footnote)
-            .foregroundStyle(.red)
-            .monospacedDigit()
-            .fixedSize()
-        }
-        Spacer()
-        if isAuthenticated && episode.collectionTypeEnum != .none && episode.collectedAt > 0 {
+      if isAuthenticated && episode.collectionTypeEnum != .none && episode.collectedAt > 0 {
+        Divider()
+        HStack {
+          Spacer()
           Text(
             "\(episode.collectionTypeEnum.description): \(episode.collectedAt.datetimeDisplay)"
           )

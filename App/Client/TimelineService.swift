@@ -25,6 +25,15 @@ enum TimelineService {
     return resp
   }
 
+  static func getTimelineItem(_ id: Int) async throws -> TimelineDTO? {
+    let exclusiveUpperBound = id == Int.max ? id : id + 1
+    return try await getTimeline(
+      mode: .all,
+      limit: 1,
+      until: exclusiveUpperBound
+    ).first(where: { $0.id == id })
+  }
+
   static func postTimeline(content: String, token: String) async throws {
     let url = BangumiURL.next(path: "p1/timeline")
     let body: [String: Any] = [

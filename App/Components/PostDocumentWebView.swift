@@ -1,7 +1,7 @@
 import SwiftUI
 import WebKit
 
-enum TopicDocumentAction: Equatable {
+enum PostDocumentAction: Equatable {
   case newReply
   case reply(postID: Int)
   case index
@@ -12,9 +12,9 @@ enum TopicDocumentAction: Equatable {
   case previewImage(URL)
 }
 
-struct TopicDocumentWebView: UIViewRepresentable {
-  let document: TopicWebDocument
-  let onAction: (TopicDocumentAction) -> Void
+struct PostDocumentWebView: UIViewRepresentable {
+  let document: PostWebDocument
+  let onAction: (PostDocumentAction) -> Void
   let onOpenURL: (URL) -> Void
   let onRefresh: () async -> Void
 
@@ -31,8 +31,8 @@ struct TopicDocumentWebView: UIViewRepresentable {
     configuration.defaultWebpagePreferences.allowsContentJavaScript = true
     configuration.userContentController.add(context.coordinator, name: Coordinator.messageName)
     configuration.setURLSchemeHandler(
-      TopicStickerSchemeHandler(),
-      forURLScheme: TopicDocumentRenderer.stickerURLScheme
+      PostStickerSchemeHandler(),
+      forURLScheme: PostDocumentRenderer.stickerURLScheme
     )
 
     let webView = WKWebView(frame: .zero, configuration: configuration)
@@ -73,18 +73,19 @@ struct TopicDocumentWebView: UIViewRepresentable {
 
   @MainActor
   final class Coordinator: NSObject, WKNavigationDelegate, WKScriptMessageHandler {
-    static let messageName = "topicAction"
+    static let messageName = "postAction"
 
     weak var webView: WKWebView?
-    var onAction: (TopicDocumentAction) -> Void
+    var onAction: (PostDocumentAction) -> Void
     var onOpenURL: (URL) -> Void
     var onRefresh: () async -> Void
 
-    private var currentDocument: TopicWebDocument?
+    private var currentDocument: PostWebDocument?
     private var pendingScrollOffset: CGPoint?
+    private var pendingInitialPostID: Int?
 
     init(
-      onAction: @escaping (TopicDocumentAction) -> Void,
+      onAction: @escaping (PostDocumentAction) -> Void,
       onOpenURL: @escaping (URL) -> Void,
       onRefresh: @escaping () async -> Void
     ) {
@@ -93,13 +94,16 @@ struct TopicDocumentWebView: UIViewRepresentable {
       self.onRefresh = onRefresh
     }
 
-    func update(document: TopicWebDocument) {
+    func update(document: PostWebDocument) {
       guard currentDocument?.id != document.id else {
         return
       }
 
       if currentDocument != nil, let webView {
         captureScrollOffsetIfNeeded(from: webView)
+        pendingInitialPostID = nil
+      } else {
+        pendingInitialPostID = document.initialPostID
       }
 
       currentDocument = document
@@ -145,23 +149,53 @@ struct TopicDocumentWebView: UIViewRepresentable {
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation?) {
-      guard let pendingScrollOffset else {
+      if let pendingScrollOffset {
+        self.pendingScrollOffset = nil
+        let minimumOffset = -webView.scrollView.adjustedContentInset.top
+        let maximumOffset = max(
+          minimumOffset,
+          webView.scrollView.contentSize.height - webView.scrollView.bounds.height
+            + webView.scrollView.adjustedContentInset.bottom
+        )
+        webView.scrollView.setContentOffset(
+          CGPoint(
+            x: pendingScrollOffset.x,
+            y: min(max(pendingScrollOffset.y, minimumOffset), maximumOffset)
+          ),
+          animated: false
+        )
         return
       }
 
-      self.pendingScrollOffset = nil
-      let minimumOffset = -webView.scrollView.adjustedContentInset.top
-      let maximumOffset = max(
-        minimumOffset,
-        webView.scrollView.contentSize.height - webView.scrollView.bounds.height
-          + webView.scrollView.adjustedContentInset.bottom
-      )
-      webView.scrollView.setContentOffset(
-        CGPoint(
-          x: pendingScrollOffset.x,
-          y: min(max(pendingScrollOffset.y, minimumOffset), maximumOffset)
-        ),
-        animated: false
+      guard let pendingInitialPostID else {
+        return
+      }
+      self.pendingInitialPostID = nil
+      webView.evaluateJavaScript(
+        """
+        (() => {
+          const target = document.getElementById('post_\(pendingInitialPostID)');
+          if (!target) {
+            return;
+          }
+
+          let userInteracted = false;
+          const cancel = () => {
+            userInteracted = true;
+          };
+          document.addEventListener('touchstart', cancel, {once: true, passive: true});
+          document.addEventListener('pointerdown', cancel, {once: true, passive: true});
+
+          const align = () => {
+            if (!userInteracted) {
+              target.scrollIntoView({block: 'start'});
+            }
+          };
+          align();
+          window.setTimeout(align, 250);
+          window.setTimeout(align, 750);
+        })();
+        """
       )
     }
 
@@ -180,12 +214,12 @@ struct TopicDocumentWebView: UIViewRepresentable {
     private func makeAction(
       name: String,
       payload: [String: Any]
-    ) -> TopicDocumentAction? {
+    ) -> PostDocumentAction? {
       switch name {
       case "newReply":
         return .newReply
       case "reply":
-        return postID(from: payload).map(TopicDocumentAction.reply)
+        return postID(from: payload).map(PostDocumentAction.reply)
       case "index":
         return .index
       case "reactionPicker":
@@ -256,7 +290,44 @@ struct TopicDocumentWebView: UIViewRepresentable {
   }
 }
 
-private final class TopicStickerSchemeHandler: NSObject, WKURLSchemeHandler {
+struct PostDocumentSurface: View {
+  let input: PostDocumentRenderInput
+  let onAction: (PostDocumentAction) -> Void
+  let onOpenURL: (URL) -> Void
+  let onRefresh: () async -> Void
+
+  @State private var document: PostWebDocument?
+
+  var body: some View {
+    ZStack {
+      if let document {
+        PostDocumentWebView(
+          document: document,
+          onAction: onAction,
+          onOpenURL: onOpenURL,
+          onRefresh: onRefresh
+        )
+      } else {
+        ProgressView()
+      }
+    }
+    .background(Color(uiColor: .systemBackground))
+    .ignoresSafeArea(.container, edges: .vertical)
+    .task(id: input) {
+      do {
+        let document = try await PostDocumentRenderer.shared.render(input)
+        try Task.checkCancellation()
+        self.document = document
+      } catch is CancellationError {
+        return
+      } catch {
+        assertionFailure("Unexpected post document rendering error: \(error)")
+      }
+    }
+  }
+}
+
+private final class PostStickerSchemeHandler: NSObject, WKURLSchemeHandler {
   private let musumeData = UIImage(named: "Musume")?.pngData()
   private let smileyCache = NSCache<NSString, NSData>()
 

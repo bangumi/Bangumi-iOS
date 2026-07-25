@@ -1,12 +1,13 @@
 import Foundation
 
-struct TopicWebDocument: Equatable, Sendable {
+struct PostWebDocument: Equatable, Sendable {
   let id: UUID
   let html: String
   let baseURL: URL
+  let initialPostID: Int?
 }
 
-struct TopicDocumentRenderInput: Hashable, Sendable {
+struct PostDocumentRenderInput: Hashable, Sendable {
   struct Parent: Hashable, Sendable {
     let title: String
     let link: String
@@ -45,25 +46,32 @@ struct TopicDocumentRenderInput: Hashable, Sendable {
     let replies: [Post]
   }
 
+  struct MainActions: Hashable, Sendable {
+    let replyCount: Int
+    let showsIndex: Bool
+    let showsReaction: Bool
+  }
+
   let baseURL: URL
   let domains: BangumiDomains
-  let parent: Parent
-  let title: String
+  let parent: Parent?
+  let title: String?
   let mainPost: Post?
+  let mainActions: MainActions?
   let replies: [Post]
-  let hasAnyReplies: Bool
-  let replyCount: Int
+  let emptyMessage: String
   let canReply: Bool
   let canReact: Bool
   let showReactions: Bool
   let avatarIsRound: Bool
+  let initialPostID: Int?
 }
 
-actor TopicDocumentRenderer {
-  static let shared = TopicDocumentRenderer()
+actor PostDocumentRenderer {
+  static let shared = PostDocumentRenderer()
   static let stickerURLScheme = "bangumi-sticker"
 
-  func render(_ input: TopicDocumentRenderInput) throws -> TopicWebDocument {
+  func render(_ input: PostDocumentRenderInput) throws -> PostWebDocument {
     try Task.checkCancellation()
     let body = try renderBody(input)
     try Task.checkCancellation()
@@ -522,7 +530,7 @@ actor TopicDocumentRenderer {
         \(body)
         <script>
           (() => {
-            const bridge = window.webkit?.messageHandlers?.topicAction;
+            const bridge = window.webkit?.messageHandlers?.postAction;
             const post = (payload) => bridge?.postMessage(payload);
 
             document.addEventListener('click', (event) => {
@@ -610,22 +618,47 @@ actor TopicDocumentRenderer {
       """
 
     try Task.checkCancellation()
-    return TopicWebDocument(id: UUID(), html: html, baseURL: input.baseURL)
+    return PostWebDocument(
+      id: UUID(),
+      html: html,
+      baseURL: input.baseURL,
+      initialPostID: input.initialPostID
+    )
   }
 
-  private func renderBody(_ input: TopicDocumentRenderInput) throws -> String {
+  private func renderBody(_ input: PostDocumentRenderInput) throws -> String {
     try Task.checkCancellation()
-    let parentIcon =
-      input.parent.iconURL.map {
-        "<img class=\"parent-icon\" src=\"\($0.bbcodeHTMLEscaped)\" alt=\"\" loading=\"lazy\">"
-      } ?? ""
+    let documentHeader: String
+    if let parent = input.parent, let title = input.title {
+      let parentIcon =
+        parent.iconURL.map {
+          "<img class=\"parent-icon\" src=\"\($0.bbcodeHTMLEscaped)\" alt=\"\" loading=\"lazy\">"
+        } ?? ""
+      documentHeader = """
+        <header class="topic-card">
+          <a class="parent" href="\(parent.link.bbcodeHTMLEscaped)">
+            \(parentIcon)
+            <span class="parent-title">\(parent.title.bbcodeHTMLEscaped)</span>
+            <span class="parent-badge">\(parent.badge.bbcodeHTMLEscaped)</span>
+          </a>
+          <h1 class="topic-title">\(title.bbcodeHTMLEscaped)</h1>
+        </header>
+        """
+    } else {
+      documentHeader = ""
+    }
+
     let mainPost: String
     if let post = input.mainPost {
       let renderedPost = try renderPost(post, input: input, isMain: true)
+      let actions =
+        input.mainActions.map {
+          renderMainActions(postID: post.id, actions: $0, input: input)
+        } ?? ""
       mainPost = """
         <section class="main-post">
           \(renderedPost)
-          \(renderMainActions(postID: post.id, input: input))
+          \(actions)
         </section>
         """
     } else {
@@ -634,7 +667,7 @@ actor TopicDocumentRenderer {
 
     let replies: String
     if input.replies.isEmpty {
-      replies = "<div class=\"state\">\(input.hasAnyReplies ? "没有符合条件的回复" : "暂无回复")</div>"
+      replies = "<div class=\"state\">\(input.emptyMessage.bbcodeHTMLEscaped)</div>"
     } else {
       var renderedReplies = ""
       for post in input.replies {
@@ -646,14 +679,7 @@ actor TopicDocumentRenderer {
 
     try Task.checkCancellation()
     return """
-      <header class="topic-card">
-        <a class="parent" href="\(input.parent.link.bbcodeHTMLEscaped)">
-          \(parentIcon)
-          <span class="parent-title">\(input.parent.title.bbcodeHTMLEscaped)</span>
-          <span class="parent-badge">\(input.parent.badge.bbcodeHTMLEscaped)</span>
-        </a>
-        <h1 class="topic-title">\(input.title.bbcodeHTMLEscaped)</h1>
-      </header>
+      \(documentHeader)
       \(mainPost)
       <main>
         \(replies)
@@ -667,8 +693,8 @@ actor TopicDocumentRenderer {
   }
 
   private func renderPost(
-    _ post: TopicDocumentRenderInput.Post,
-    input: TopicDocumentRenderInput,
+    _ post: PostDocumentRenderInput.Post,
+    input: PostDocumentRenderInput,
     isMain: Bool
   ) throws -> String {
     try Task.checkCancellation()
@@ -711,8 +737,8 @@ actor TopicDocumentRenderer {
   }
 
   private func renderHeader(
-    _ post: TopicDocumentRenderInput.Post,
-    input: TopicDocumentRenderInput,
+    _ post: PostDocumentRenderInput.Post,
+    input: PostDocumentRenderInput,
     isMain: Bool
   ) -> String {
     let user = post.user
@@ -757,7 +783,7 @@ actor TopicDocumentRenderer {
       """
   }
 
-  private func renderPostActions(postID: Int, input: TopicDocumentRenderInput) -> String {
+  private func renderPostActions(postID: Int, input: PostDocumentRenderInput) -> String {
     let replyDisabled = input.canReply ? "" : " disabled"
     let reactionButton =
       input.showReactions
@@ -781,7 +807,11 @@ actor TopicDocumentRenderer {
       """
   }
 
-  private func renderMainActions(postID: Int, input: TopicDocumentRenderInput) -> String {
+  private func renderMainActions(
+    postID: Int,
+    actions: PostDocumentRenderInput.MainActions,
+    input: PostDocumentRenderInput
+  ) -> String {
     let replyDisabled = input.canReply ? "" : " disabled"
     let replyIcon = """
       <svg class="button-icon" width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true">
@@ -798,24 +828,28 @@ actor TopicDocumentRenderer {
         <path d="M12.0307 1.69986C11.4024 1.07447 10.5705 0.732655 9.68264 0.732655C8.79479 0.732655 7.96036 1.077 7.332 1.70239L7.00382 2.02901L6.67056 1.69733C6.0422 1.07194 5.20523 0.72506 4.31738 0.72506C3.43207 0.72506 2.59764 1.0694 1.97182 1.69226C1.34346 2.31766 0.997478 3.14814 1.00002 4.03179C1.00002 4.91544 1.34855 5.74339 1.97691 6.36878L6.75451 11.1238C6.82066 11.1896 6.9097 11.2251 6.99619 11.2251C7.08269 11.2251 7.17173 11.1921 7.23787 11.1263L12.0256 6.37891C12.654 5.75351 13 4.92303 13 4.03938C13.0025 3.15573 12.6591 2.32525 12.0307 1.69986ZM11.5423 5.8953L6.99619 10.4022L2.46027 5.88771C1.96165 5.39145 1.6869 4.73314 1.6869 4.03179C1.6869 3.33044 1.9591 2.67213 2.45772 2.1784C2.9538 1.68467 3.61524 1.41122 4.31738 1.41122C5.02206 1.41122 5.68604 1.68467 6.18466 2.18093L6.7596 2.75315C6.89443 2.88735 7.11067 2.88735 7.2455 2.75315L7.81535 2.186C8.31397 1.68973 8.97795 1.41628 9.68009 1.41628C10.3822 1.41628 11.0437 1.68973 11.5423 2.18346C12.0409 2.67973 12.3131 3.33803 12.3131 4.03938C12.3157 4.74073 12.0409 5.39904 11.5423 5.8953Z" fill="#CCCCCC" stroke="#CCCCCC" stroke-width="0.5"/>
       </svg>
       """
+    let indexButton =
+      actions.showsIndex
+      ? "<button class=\"action\" data-action=\"index\"\(input.canReact ? "" : " disabled")>\(indexIcon)收藏</button>"
+      : ""
     let reactionButton =
-      input.showReactions
+      actions.showsReaction && input.showReactions
       ? "<button class=\"action\" data-action=\"reactionPicker\" data-post-id=\"\(postID)\"\(input.canReact ? "" : " disabled")>\(reactionIcon)贴贴</button>"
       : ""
 
     return """
       <div class="main-actions">
-        <button class="action" data-action="newReply"\(replyDisabled)>\(replyIcon)\(input.replyCount) 回复</button>
-        <button class="action" data-action="index"\(input.canReact ? "" : " disabled")>\(indexIcon)收藏</button>
+        <button class="action" data-action="newReply"\(replyDisabled)>\(replyIcon)\(actions.replyCount) 回复</button>
+        \(indexButton)
         \(reactionButton)
       </div>
       """
   }
 
   private func renderReactions(
-    _ reactions: [TopicDocumentRenderInput.Reaction],
+    _ reactions: [PostDocumentRenderInput.Reaction],
     postID: Int,
-    input: TopicDocumentRenderInput
+    input: PostDocumentRenderInput
   ) throws -> String {
     guard input.showReactions, !reactions.isEmpty else {
       return ""

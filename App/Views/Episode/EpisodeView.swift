@@ -11,9 +11,6 @@ struct EpisodeView: View {
   @Environment(\.dismiss) private var dismiss
 
   @State private var episode: EpisodeDTO?
-  @State private var comments: [CommentDTO] = []
-  @State private var loadingComments: Bool = false
-  @State private var showCommentBox: Bool = false
   @State private var showIndexPicker: Bool = false
   @State private var showWikiEdit: Bool = false
 
@@ -33,16 +30,6 @@ struct EpisodeView: View {
     do {
       try await EpisodeRepository.loadEpisode(episodeId)
       await loadCached()
-      if !isolationMode {
-        withAnimation(.default) {
-          loadingComments = true
-        }
-        let fetchedComments = try await EpisodeService.getEpisodeComments(episodeId)
-        withAnimation(.default) {
-          comments = fetchedComments
-          loadingComments = false
-        }
-      }
     } catch let error as ChiiError {
       switch error {
       case .notFound:
@@ -70,31 +57,18 @@ struct EpisodeView: View {
               .padding(.vertical, 8)
           }
           EpisodeInfoView(episode: episode)
+          if !isolationMode {
+            CommentListNavigationLink(
+              route: CommentListRoute(parent: .episode(episodeId)),
+              count: episode.comment
+            )
+            .padding(.top, 8)
+          }
         }
         Divider()
         if let desc = episode?.desc, !desc.isEmpty {
           Text(desc).foregroundStyle(.secondary)
           Divider()
-        }
-        if !isolationMode {
-          VStack(alignment: .leading, spacing: 2) {
-            HStack {
-              Text("吐槽箱").font(.title3)
-              if loadingComments {
-                ProgressView()
-                  .controlSize(.small)
-              }
-            }
-            Divider()
-          }
-          LazyVStack(alignment: .leading, spacing: 8) {
-            ForEach(Array(zip(comments.indices, comments)), id: \.1) { idx, comment in
-              CommentItemView(type: .episode(episodeId), comment: comment, idx: idx)
-              if comment.id != comments.last?.id {
-                Divider()
-              }
-            }
-          }
         }
         Spacer()
       }.padding(.horizontal, 8)
@@ -122,13 +96,6 @@ struct EpisodeView: View {
             Divider()
           }
           Button {
-            showCommentBox = true
-          } label: {
-            Label("吐槽", systemImage: "plus.bubble")
-          }
-          .disabled(!isAuthenticated)
-          Divider()
-          Button {
             showIndexPicker = true
           } label: {
             Label("收藏", systemImage: "book")
@@ -140,11 +107,6 @@ struct EpisodeView: View {
         } label: {
           Image(systemName: "ellipsis")
         }
-      }
-    }
-    .sheet(isPresented: $showCommentBox) {
-      CreateCommentBoxSheet(type: .episode(episodeId)) {
-        Task { await load() }
       }
     }
     .sheet(isPresented: $showIndexPicker) {
