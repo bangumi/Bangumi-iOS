@@ -275,6 +275,10 @@ struct TopicDetailView: View {
     sortSelection[fallback: replySortOrder]
   }
 
+  private var canReply: Bool {
+    isAuthenticated && (data?.state.allowReply ?? true)
+  }
+
   var body: some View {
     content
       .navigationTitle(title)
@@ -326,6 +330,12 @@ struct TopicDetailView: View {
       let presentation = replyPresentation(data)
       PostDocumentSurface(
         input: renderInput(data, presentation: presentation),
+        controls: PostDocumentControlConfiguration(
+          canReply: canReply,
+          filterModes: ReplyFilterMode.allCases,
+          filterMode: $filterMode,
+          sortOrder: $sortSelection[fallback: replySortOrder]
+        ),
         onAction: handleDocumentAction,
         onOpenURL: { url in
           openURL(url)
@@ -372,7 +382,7 @@ struct TopicDetailView: View {
         } label: {
           Label("回复", systemImage: "plus.bubble")
         }
-        .disabled(!isAuthenticated || !(data?.state.allowReply ?? true))
+        .disabled(!canReply)
 
         Button {
           sheet = .index

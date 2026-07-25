@@ -34,7 +34,14 @@ private enum PostReactionPickerLayout {
 private enum PostMoreMenuLayout {
   static let width: CGFloat = 148
   static let itemHeight: CGFloat = 44
-  static let spacing: CGFloat = 8
+
+  static var spacing: CGFloat {
+    if #available(iOS 26.0, *) {
+      0
+    } else {
+      4
+    }
+  }
 
   static func height(for itemCount: Int) -> CGFloat {
     CGFloat(itemCount) * itemHeight
@@ -86,6 +93,23 @@ extension View {
         shadowY: shadowY
       )
     )
+  }
+
+  @ViewBuilder
+  fileprivate func adaptivePostFloatingSurface<Surface: Shape>(
+    _ surface: Surface,
+    shadowRadius: CGFloat,
+    shadowY: CGFloat
+  ) -> some View {
+    if #available(iOS 26.0, *) {
+      self.glassEffect(.regular, in: surface)
+    } else {
+      self.postFloatingSurface(
+        surface,
+        shadowRadius: shadowRadius,
+        shadowY: shadowY
+      )
+    }
   }
 }
 
@@ -300,7 +324,7 @@ private struct PostReactionPickerPanel: View {
       }
     }
     .padding(PostReactionPickerLayout.contentPadding)
-    .postFloatingSurface(
+    .adaptivePostFloatingSurface(
       RoundedRectangle(cornerRadius: 16, style: .continuous),
       shadowRadius: 16,
       shadowY: 7
@@ -398,16 +422,12 @@ private struct PostMoreMenuPanel: View {
           .frame(width: 20)
       }
       .frame(maxWidth: .infinity, alignment: .leading)
-      .padding(.horizontal, 14)
-      .frame(height: PostMoreMenuLayout.itemHeight)
       .foregroundStyle(tint)
-      .postFloatingSurface(
-        RoundedRectangle(cornerRadius: 14, style: .continuous),
-        shadowRadius: 10,
-        shadowY: 4
-      )
     }
-    .buttonStyle(PostFloatingActionButtonStyle())
+    .controlSize(.regular)
+    .adaptiveButtonStyle(.bordered)
+    .adaptiveFlexibleButtonSizing()
+    .frame(height: PostMoreMenuLayout.itemHeight)
     .disabled(!isEnabled)
     .modifier(PostActionEntranceModifier(isVisible: isVisible, index: index))
   }
@@ -438,20 +458,6 @@ private struct PostReactionChoiceButtonStyle: ButtonStyle {
     configuration.label
       .scaleEffect(configuration.isPressed ? 0.88 : 1)
       .opacity(configuration.isPressed ? 0.72 : 1)
-      .animation(
-        .snappy(duration: 0.14, extraBounce: 0),
-        value: configuration.isPressed
-      )
-  }
-}
-
-private struct PostFloatingActionButtonStyle: ButtonStyle {
-  @Environment(\.isEnabled) private var isEnabled
-
-  func makeBody(configuration: Configuration) -> some View {
-    configuration.label
-      .scaleEffect(configuration.isPressed ? 0.94 : 1, anchor: .trailing)
-      .opacity(isEnabled ? (configuration.isPressed ? 0.72 : 1) : 0.38)
       .animation(
         .snappy(duration: 0.14, extraBounce: 0),
         value: configuration.isPressed
