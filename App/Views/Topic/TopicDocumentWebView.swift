@@ -99,7 +99,7 @@ struct TopicDocumentWebView: UIViewRepresentable {
       }
 
       if currentDocument != nil, let webView {
-        pendingScrollOffset = webView.scrollView.contentOffset
+        captureScrollOffsetIfNeeded(from: webView)
       }
 
       currentDocument = document
@@ -169,7 +169,12 @@ struct TopicDocumentWebView: UIViewRepresentable {
       guard let currentDocument else {
         return
       }
+      captureScrollOffsetIfNeeded(from: webView)
       webView.loadHTMLString(currentDocument.html, baseURL: currentDocument.baseURL)
+    }
+
+    private func captureScrollOffsetIfNeeded(from webView: WKWebView) {
+      pendingScrollOffset = pendingScrollOffset ?? webView.scrollView.contentOffset
     }
 
     private func makeAction(

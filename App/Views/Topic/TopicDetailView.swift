@@ -843,11 +843,15 @@ private struct TopicDocumentSurface: View {
     .background(Color(uiColor: .systemBackground))
     .ignoresSafeArea(.container, edges: .vertical)
     .task(id: input) {
-      let document = await TopicDocumentRenderer.shared.render(input)
-      guard !Task.isCancelled else {
+      do {
+        let document = try await TopicDocumentRenderer.shared.render(input)
+        try Task.checkCancellation()
+        self.document = document
+      } catch is CancellationError {
         return
+      } catch {
+        assertionFailure("Unexpected topic document rendering error: \(error)")
       }
-      self.document = document
     }
   }
 }

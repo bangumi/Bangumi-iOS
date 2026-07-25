@@ -1,4 +1,5 @@
 import Foundation
+import UIKit
 
 extension BBCode {
   public func html(_ bbcode: String, args: [String: Any]? = nil) throws -> String {
@@ -402,11 +403,11 @@ var bbcodeHTMLRenderers: [BBCodeTagType: BBCodeHTMLRender] {
 
       // Render the BMO emoji as a data URL
       if let cgImage = BBCodeBmoRenderer.renderCGImage(from: bmoResult, textSize: textSize),
-        let data = cgImage.dataProvider?.data
+        let data = UIImage(cgImage: cgImage).pngData()
       {
-        let base64String = Data(referencing: data).base64EncodedString()
+        let base64String = data.base64EncodedString()
         return
-          "<img src=\"data:image/png;base64,\(base64String)\" alt=\"(\(escapedBmoCode))\" style=\"width: \(textSize)px; height: \(textSize)px;\" />"
+          "<img class=\"bmo-emoji\" src=\"data:image/png;base64,\(base64String)\" alt=\"(\(escapedBmoCode))\" style=\"width: \(textSize)px; height: \(textSize)px;\" />"
       }
 
       // Fallback to placeholder

@@ -63,8 +63,10 @@ actor TopicDocumentRenderer {
   static let shared = TopicDocumentRenderer()
   static let stickerURLScheme = "bangumi-sticker"
 
-  func render(_ input: TopicDocumentRenderInput) -> TopicWebDocument {
-    let body = renderBody(input)
+  func render(_ input: TopicDocumentRenderInput) throws -> TopicWebDocument {
+    try Task.checkCancellation()
+    let body = try renderBody(input)
+    try Task.checkCancellation()
     let html = """
       <!doctype html>
       <html lang="zh-Hans">
@@ -355,6 +357,7 @@ actor TopicDocumentRenderer {
           }
 
           .post-content img.smile,
+          .post-content img.bmo-emoji,
           .post-content img.smile-dynamic,
           .post-content img.smile-musume,
           .post-content img.smile-blake {
@@ -606,31 +609,42 @@ actor TopicDocumentRenderer {
       </html>
       """
 
+    try Task.checkCancellation()
     return TopicWebDocument(id: UUID(), html: html, baseURL: input.baseURL)
   }
 
-  private func renderBody(_ input: TopicDocumentRenderInput) -> String {
+  private func renderBody(_ input: TopicDocumentRenderInput) throws -> String {
+    try Task.checkCancellation()
     let parentIcon =
       input.parent.iconURL.map {
         "<img class=\"parent-icon\" src=\"\($0.bbcodeHTMLEscaped)\" alt=\"\" loading=\"lazy\">"
       } ?? ""
-    let mainPost =
-      input.mainPost.map {
-        """
+    let mainPost: String
+    if let post = input.mainPost {
+      let renderedPost = try renderPost(post, input: input, isMain: true)
+      mainPost = """
         <section class="main-post">
-          \(renderPost($0, input: input, isMain: true))
-          \(renderMainActions(postID: $0.id, input: input))
+          \(renderedPost)
+          \(renderMainActions(postID: post.id, input: input))
         </section>
         """
-      } ?? ""
-    let replies =
-      if input.replies.isEmpty {
-        "<div class=\"state\">\(input.hasAnyReplies ? "没有符合条件的回复" : "暂无回复")</div>"
-      } else {
-        input.replies.map {
-          renderPost($0, input: input, isMain: false)
-        }.joined()
+    } else {
+      mainPost = ""
+    }
+
+    let replies: String
+    if input.replies.isEmpty {
+      replies = "<div class=\"state\">\(input.hasAnyReplies ? "没有符合条件的回复" : "暂无回复")</div>"
+    } else {
+      var renderedReplies = ""
+      for post in input.replies {
+        try Task.checkCancellation()
+        renderedReplies.append(try renderPost(post, input: input, isMain: false))
       }
+      replies = renderedReplies
+    }
+
+    try Task.checkCancellation()
     return """
       <header class="topic-card">
         <a class="parent" href="\(input.parent.link.bbcodeHTMLEscaped)">
@@ -656,7 +670,8 @@ actor TopicDocumentRenderer {
     _ post: TopicDocumentRenderInput.Post,
     input: TopicDocumentRenderInput,
     isMain: Bool
-  ) -> String {
+  ) throws -> String {
+    try Task.checkCancellation()
     if post.isBlocked {
       return isMain ? "" : "<article class=\"reply blocked\" id=\"post_\(post.id)\"></article>"
     }
@@ -664,20 +679,32 @@ actor TopicDocumentRenderer {
     let articleClass = isMain ? "main-content" : "reply"
     let content: String
     if post.isNormal {
-      content = renderBBCode(post.content, domains: input.domains)
+      content = try renderBBCode(post.content, domains: input.domains)
     } else {
       content = "<div class=\"state\">\(post.stateDescription.bbcodeHTMLEscaped)</div>"
     }
-    let replies =
-      post.replies.isEmpty
-      ? ""
-      : "<div class=\"subreplies\">\(post.replies.map { renderPost($0, input: input, isMain: false) }.joined())</div>"
+
+    let replies: String
+    if post.replies.isEmpty {
+      replies = ""
+    } else {
+      var renderedReplies = ""
+      for reply in post.replies {
+        try Task.checkCancellation()
+        renderedReplies.append(try renderPost(reply, input: input, isMain: false))
+      }
+      replies = "<div class=\"subreplies\">\(renderedReplies)</div>"
+    }
+
+    let reactions =
+      post.isNormal ? try renderReactions(post.reactions, postID: post.id, input: input) : ""
+    try Task.checkCancellation()
 
     return """
       <article class="\(articleClass)" id="post_\(post.id)">
         \(renderHeader(post, input: input, isMain: isMain))
         <div class="post-content">\(content)</div>
-        \(post.isNormal ? renderReactions(post.reactions, postID: post.id, input: input) : "")
+        \(reactions)
         \(replies)
       </article>
       """
@@ -789,12 +816,14 @@ actor TopicDocumentRenderer {
     _ reactions: [TopicDocumentRenderInput.Reaction],
     postID: Int,
     input: TopicDocumentRenderInput
-  ) -> String {
+  ) throws -> String {
     guard input.showReactions, !reactions.isEmpty else {
       return ""
     }
 
-    let buttons: String = reactions.map { reaction -> String in
+    var buttons = ""
+    for reaction in reactions {
+      try Task.checkCancellation()
       let selectedClass = reaction.selected ? " selected" : ""
       let disabled = input.canReact ? "" : " disabled"
       let image: String
@@ -805,30 +834,30 @@ actor TopicDocumentRenderer {
         image = "<span>(\(reaction.smileyCode.bbcodeHTMLEscaped))</span>"
       }
 
-      return """
+      buttons.append(
+        """
         <button class="reaction\(selectedClass)" data-action="reaction" data-post-id="\(postID)" data-value="\(reaction.value)"\(disabled)>
           \(image)<span>\(reaction.count)</span>
         </button>
         """
-    }.joined()
+      )
+    }
 
     return "<div class=\"reactions\">\(buttons)</div>"
   }
 
-  private func renderBBCode(_ code: String, domains: BangumiDomains) -> String {
-    guard
-      let html = try? BBCode().html(
-        code,
-        args: [
-          "textSize": 16,
-          "domains": domains,
-          "smileyURLScheme": Self.stickerURLScheme,
-        ]
-      )
-    else {
-      return code.bbcodeHTMLEscaped
-    }
+  private func renderBBCode(_ code: String, domains: BangumiDomains) throws -> String {
+    try Task.checkCancellation()
+    let html = try? BBCode().html(
+      code,
+      args: [
+        "textSize": 16,
+        "domains": domains,
+        "smileyURLScheme": Self.stickerURLScheme,
+      ]
+    )
+    try Task.checkCancellation()
 
-    return html
+    return html ?? code.bbcodeHTMLEscaped
   }
 }
