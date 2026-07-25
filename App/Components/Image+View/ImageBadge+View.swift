@@ -74,7 +74,7 @@ private struct ImageStatusBadge: View {
       .font(.system(size: iconSize, weight: .bold))
       .foregroundStyle(.white)
       .frame(width: size, height: size)
-      .background(background.opacity(0.9))
+      .background(background)
       .clipShape(Circle())
       .overlay {
         Circle()
