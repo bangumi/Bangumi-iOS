@@ -150,15 +150,16 @@ struct TopicDocumentWebView: UIViewRepresentable {
       }
 
       self.pendingScrollOffset = nil
+      let minimumOffset = -webView.scrollView.adjustedContentInset.top
       let maximumOffset = max(
-        -webView.scrollView.adjustedContentInset.top,
+        minimumOffset,
         webView.scrollView.contentSize.height - webView.scrollView.bounds.height
           + webView.scrollView.adjustedContentInset.bottom
       )
       webView.scrollView.setContentOffset(
         CGPoint(
           x: pendingScrollOffset.x,
-          y: min(pendingScrollOffset.y, maximumOffset)
+          y: min(max(pendingScrollOffset.y, minimumOffset), maximumOffset)
         ),
         animated: false
       )

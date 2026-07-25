@@ -184,40 +184,38 @@ var bbcodeHTMLRenderers: [BBCodeTagType: BBCodeHTMLRender] {
     .subject: { (n: BBCodeNode, args: [String: Any]?) in
       let domains = bangumiDomains(from: args)
       let host = args?["host"] as? String
-      var html: String
-      var link: String
-      if n.attr.isEmpty {
-        html = n.renderInnerHTML(args)
-      } else {
-        link = domains.mainURLString(path: "/subject/\(n.escapedAttr)")
-        if let safeLink = bbcodeSafeURLString(url: link, defaultScheme: "https", defaultHost: host)
-        {
-          html =
-            "<a href=\"\(safeLink)\" target=\"_blank\" rel=\"nofollow external noopener noreferrer\">\(n.renderInnerHTML(args))</a>"
-        } else {
-          html = n.renderInnerHTML(args)
-        }
+      let innerHTML = n.renderInnerHTML(args)
+      let fallbackTarget = n.renderInnerPlain(args).trimmingCharacters(in: .whitespacesAndNewlines)
+      let attribute = n.attr.trimmingCharacters(in: .whitespacesAndNewlines)
+      let subjectID = attribute.isEmpty ? fallbackTarget : attribute
+      guard !subjectID.isEmpty else {
+        return innerHTML
       }
-      return html
+
+      let link = domains.mainURLString(path: "/subject/\(subjectID)")
+      if let safeLink = bbcodeSafeURLString(url: link, defaultScheme: "https", defaultHost: host) {
+        return
+          "<a href=\"\(safeLink)\" target=\"_blank\" rel=\"nofollow external noopener noreferrer\">\(innerHTML)</a>"
+      }
+      return innerHTML
     },
     .user: { (n: BBCodeNode, args: [String: Any]?) in
       let domains = bangumiDomains(from: args)
       let host = args?["host"] as? String
-      var html: String
-      var link: String
-      if n.attr.isEmpty {
-        html = n.renderInnerHTML(args)
-      } else {
-        link = domains.mainURLString(path: "/user/\(n.escapedAttr)")
-        if let safeLink = bbcodeSafeURLString(url: link, defaultScheme: "https", defaultHost: host)
-        {
-          html =
-            "<a href=\"\(safeLink)\" target=\"_blank\" rel=\"nofollow external noopener noreferrer\">@\(n.renderInnerHTML(args))</a>"
-        } else {
-          html = n.renderInnerHTML(args)
-        }
+      let innerHTML = n.renderInnerHTML(args)
+      let fallbackTarget = n.renderInnerPlain(args).trimmingCharacters(in: .whitespacesAndNewlines)
+      let attribute = n.attr.trimmingCharacters(in: .whitespacesAndNewlines)
+      let username = attribute.isEmpty ? fallbackTarget : attribute
+      guard !username.isEmpty else {
+        return innerHTML
       }
-      return html
+
+      let link = domains.mainURLString(path: "/user/\(username)")
+      if let safeLink = bbcodeSafeURLString(url: link, defaultScheme: "https", defaultHost: host) {
+        return
+          "<a href=\"\(safeLink)\" target=\"_blank\" rel=\"nofollow external noopener noreferrer\">@\(innerHTML)</a>"
+      }
+      return innerHTML
     },
     .url: { (n: BBCodeNode, args: [String: Any]?) in
       let host = args?["host"] as? String
@@ -392,13 +390,14 @@ var bbcodeHTMLRenderers: [BBCodeTagType: BBCodeHTMLRender] {
     },
     .bmo: { (n: BBCodeNode, args: [String: Any]?) in
       let bmoCode = n.attr
+      let escapedBmoCode = n.escapedAttr
       let textSize = args?["textSize"] as? Int ?? 16
       // Decode the BMO code to get emoji information
       let bmoResult = BBCodeBmoDecoder.decode(bmoCode)
 
       if bmoResult.items.isEmpty {
         // If no items found, return the original code as text
-        return "<span class=\"bmo-placeholder\">(\(bmoCode))</span>"
+        return "<span class=\"bmo-placeholder\">(\(escapedBmoCode))</span>"
       }
 
       // Render the BMO emoji as a data URL
@@ -407,11 +406,12 @@ var bbcodeHTMLRenderers: [BBCodeTagType: BBCodeHTMLRender] {
       {
         let base64String = Data(referencing: data).base64EncodedString()
         return
-          "<img src=\"data:image/png;base64,\(base64String)\" alt=\"(\(bmoCode))\" style=\"width: \(textSize)px; height: \(textSize)px;\" />"
+          "<img src=\"data:image/png;base64,\(base64String)\" alt=\"(\(escapedBmoCode))\" style=\"width: \(textSize)px; height: \(textSize)px;\" />"
       }
 
       // Fallback to placeholder
-      return "<span class=\"bmo-emoji\" data-code=\"\(bmoCode)\">(\(bmoCode))</span>"
+      return
+        "<span class=\"bmo-emoji\" data-code=\"\(escapedBmoCode)\">(\(escapedBmoCode))</span>"
     },
   ]
 }
