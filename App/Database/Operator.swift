@@ -41,6 +41,12 @@ extension DatabaseOperator {
       try db.execute(sql: "DELETE FROM notice_cache_entries")
     }
   }
+
+  public func clearUserIndexCache() throws {
+    try database.write { db in
+      try db.execute(sql: "DELETE FROM user_index_caches")
+    }
+  }
 }
 
 // MARK: - fetch
@@ -224,6 +230,16 @@ extension DatabaseOperator {
         db,
         sql: "SELECT COUNT(*) FROM notice_cache_entries WHERE unread != 0"
       ) ?? 0
+    }
+  }
+
+  public func fetchUserIndexCache(userID: Int) throws -> [SlimIndexDTO]? {
+    try database.read { db in
+      try Row.fetchOne(
+        db,
+        sql: "SELECT * FROM user_index_caches WHERE user_id = ?",
+        arguments: [userID]
+      ).flatMap { UserIndexCache(row: $0).items }
     }
   }
 
@@ -1293,6 +1309,22 @@ extension DatabaseOperator {
       for item in items {
         try upsertNoticeCacheEntry(NoticeCacheEntry(item), in: db)
       }
+    }
+  }
+
+  public func saveUserIndexCache(userID: Int, items: [SlimIndexDTO]) throws {
+    try database.write { db in
+      let cache = UserIndexCache(userID: userID, items: items)
+      try db.execute(
+        sql: """
+          INSERT INTO user_index_caches(user_id, items_data, updated_at)
+          VALUES (?, ?, ?)
+          ON CONFLICT(user_id) DO UPDATE SET
+            items_data = excluded.items_data,
+            updated_at = excluded.updated_at
+          """,
+        arguments: [cache.userID, cache.itemsData, cache.updatedAt.timeIntervalSince1970]
+      )
     }
   }
 

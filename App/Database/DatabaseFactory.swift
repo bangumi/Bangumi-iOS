@@ -61,6 +61,10 @@ enum DatabaseFactory {
       try db.execute(sql: "DROP TABLE IF EXISTS local_migration_markers")
     }
 
+    migrator.registerMigration("00005_create_user_index_caches") { db in
+      try createUserIndexCaches(db)
+    }
+
     return migrator
   }
 
@@ -338,6 +342,17 @@ enum DatabaseFactory {
       sql: """
         CREATE INDEX IF NOT EXISTS notice_cache_entries_created_idx
         ON notice_cache_entries(created_at DESC)
+        """)
+  }
+
+  private static func createUserIndexCaches(_ db: Database) throws {
+    try db.execute(
+      sql: """
+        CREATE TABLE IF NOT EXISTS user_index_caches (
+          user_id INTEGER PRIMARY KEY NOT NULL,
+          items_data BLOB,
+          updated_at REAL NOT NULL
+        )
         """)
   }
 }
