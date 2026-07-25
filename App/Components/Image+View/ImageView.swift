@@ -37,6 +37,7 @@ struct ImageView: View {
             .geometryGroup()
             .frame(width: width, height: height, alignment: style.alignment)
             .applyClipShape(type: type, cornerRadius: style.cornerRadius)
+            .contentShape(Rectangle())
           } else if let aspectRatio = style.aspectRatio {
             AnimatedImage(url: imageURL)
               .onSuccess { _, _, _ in
