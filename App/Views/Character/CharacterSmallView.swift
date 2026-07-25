@@ -1,16 +1,10 @@
 import SwiftUI
 
 struct CharacterSmallView: View {
+  @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
+
   let character: SlimCharacterDTO
   let isCollected: Bool
-
-  var title: String {
-    if character.nameCN.isEmpty {
-      return character.name
-    } else {
-      return character.nameCN
-    }
-  }
 
   var body: some View {
     BorderView(color: .secondary.opacity(0.2), padding: 4, paddingRatio: 1, cornerRadius: 8) {
@@ -21,7 +15,7 @@ struct CharacterSmallView: View {
           .imageNSFW(character.nsfw)
           .imageCollectedStatus(isCollected)
         VStack(alignment: .leading) {
-          Text(title)
+          Text(character.title(with: titlePreference))
           if let info = character.info, !info.isEmpty {
             Text(info)
               .font(.footnote)

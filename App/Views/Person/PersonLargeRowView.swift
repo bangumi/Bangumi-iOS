@@ -17,12 +17,6 @@ struct PersonLargeRowView: View {
         Text(person.title(with: titlePreference))
           .font(.headline)
           .lineLimit(1)
-        if let subtitle = person.subtitle(with: titlePreference) {
-          Text(subtitle)
-            .font(.subheadline)
-            .foregroundStyle(.secondary)
-            .lineLimit(1)
-        }
         Text(person.info)
           .font(.footnote)
           .foregroundStyle(.secondary)

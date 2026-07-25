@@ -30,7 +30,7 @@ extension TimelineDTO {
     return text
   }
 
-  var desc: AttributedString {
+  func desc(with titlePreference: TitlePreference) -> AttributedString {
     var text = AttributedString("")
     if let user = self.user {
       text += user.nickname.withLink(user.link)
@@ -90,7 +90,7 @@ extension TimelineDTO {
     case .wiki:
       text += AttributedString("\(TimelineNewSubjectType(self.type).desc) ")
       if let subject = self.memo.wiki?.subject {
-        text += subject.name.withLink(subject.link)
+        text += subject.title(with: titlePreference).withLink(subject.link)
       } else {
         text += self.unknown("条目")
       }
@@ -98,7 +98,14 @@ extension TimelineDTO {
     case .subject:
       if self.batch {
         text += AttributedString("\(TimelineSubjectActionType(self.type).desc) ")
-        text += genBatch(self.memo.subject?.map(\.subject) ?? [])
+        let subjects =
+          self.memo.subject?.map {
+            LinkableDTO(
+              name: $0.subject.title(with: titlePreference),
+              link: $0.subject.link
+            )
+          } ?? []
+        text += genBatch(subjects)
         let count = self.memo.subject?.count ?? 0
         var typeID = self.memo.subject?.first?.subject.type.rawValue ?? 0
         if typeID == 0 {
@@ -108,7 +115,7 @@ extension TimelineDTO {
       } else {
         text += AttributedString("\(TimelineSubjectActionType(self.type).desc) ")
         if let collect = self.memo.subject?.first {
-          text += collect.subject.name.withLink(collect.subject.link)
+          text += collect.subject.title(with: titlePreference).withLink(collect.subject.link)
         } else {
           text += self.unknown("条目")
         }
@@ -120,7 +127,7 @@ extension TimelineDTO {
         if let batch = self.memo.progress?.batch {
           if batch.subject.type == .book {
             text += AttributedString("读过 ")
-            text += batch.subject.name.withLink(batch.subject.link)
+            text += batch.subject.title(with: titlePreference).withLink(batch.subject.link)
             if let volsUpdate = batch.volsUpdate, volsUpdate > 0 {
               text += AttributedString(" 第\(volsUpdate) 卷")
             }
@@ -129,7 +136,7 @@ extension TimelineDTO {
             }
           } else {
             text += AttributedString("完成了 ")
-            text += batch.subject.name.withLink(batch.subject.link)
+            text += batch.subject.title(with: titlePreference).withLink(batch.subject.link)
             text += AttributedString(" \(batch.epsUpdate ?? 0) of \(batch.epsTotal) 话")
           }
         } else {
@@ -138,7 +145,7 @@ extension TimelineDTO {
       case 1, 2, 3:
         if let episode = self.memo.progress?.single?.episode {
           text += AttributedString("\(EpisodeCollectionType(self.type).description) ")
-          text += episode.title(with: .original).withLink(episode.link)
+          text += episode.title(with: titlePreference).withLink(episode.link)
         } else {
           text += self.unknown("剧集")
         }
@@ -178,11 +185,11 @@ extension TimelineDTO {
         case 0:
           if let character = mono.characters.first {
             text += AttributedString("创建了新角色 ")
-            text += character.name.withLink(character.link)
+            text += character.title(with: titlePreference).withLink(character.link)
           }
           if let person = mono.persons.first {
             text += AttributedString("创建了新人物 ")
-            text += person.name.withLink(person.link)
+            text += person.title(with: titlePreference).withLink(person.link)
           }
         case 1:
           text += AttributedString("收藏了 ")
@@ -190,10 +197,18 @@ extension TimelineDTO {
             if mono.characters.count + mono.persons.count > 0 {
               var items: [LinkableDTO] = []
               for character in mono.characters {
-                items.append(LinkableDTO(name: character.name, link: character.link))
+                items.append(
+                  LinkableDTO(
+                    name: character.title(with: titlePreference),
+                    link: character.link
+                  ))
               }
               for person in mono.persons {
-                items.append(LinkableDTO(name: person.name, link: person.link))
+                items.append(
+                  LinkableDTO(
+                    name: person.title(with: titlePreference),
+                    link: person.link
+                  ))
               }
               text += genBatch(items)
               if mono.persons.count > 0 {
@@ -207,10 +222,10 @@ extension TimelineDTO {
           } else {
             if let character = mono.characters.first {
               text += AttributedString("角色 ")
-              text += character.name.withLink(character.link)
+              text += character.title(with: titlePreference).withLink(character.link)
             } else if let person = mono.persons.first {
               text += AttributedString("人物 ")
-              text += person.name.withLink(person.link)
+              text += person.title(with: titlePreference).withLink(person.link)
             } else {
               text += self.unknown("人物")
             }

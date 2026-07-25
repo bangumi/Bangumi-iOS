@@ -18,12 +18,6 @@ struct PersonWorksItemView: View {
             Text(item.subject.title(with: titlePreference).withLink(item.subject.link))
               .font(.callout)
               .lineLimit(1)
-            if let subtitle = item.subject.subtitle(with: titlePreference) {
-              Text(subtitle)
-                .lineLimit(1)
-                .font(.footnote)
-                .foregroundStyle(.secondary)
-            }
             Label(item.subject.type.description, systemImage: item.subject.type.icon)
               .lineLimit(1)
               .font(.footnote)

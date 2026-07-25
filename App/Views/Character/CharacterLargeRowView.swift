@@ -17,12 +17,6 @@ struct CharacterLargeRowView: View {
         Text(character.title(with: titlePreference))
           .font(.headline)
           .lineLimit(1)
-        if let subtitle = character.subtitle(with: titlePreference) {
-          Text(subtitle)
-            .font(.subheadline)
-            .foregroundStyle(.secondary)
-            .lineLimit(1)
-        }
         Text(character.info)
           .font(.footnote)
           .foregroundStyle(.secondary)

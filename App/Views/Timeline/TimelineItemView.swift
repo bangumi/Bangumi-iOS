@@ -7,6 +7,7 @@ struct TimelineItemView: View {
 
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
   @AppStorage("isolationMode") private var isolationMode = false
+  @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
 
   @State private var reactions: [ReactionDTO]
   @State private var showTime = false
@@ -63,7 +64,7 @@ struct TimelineItemView: View {
       VStack(alignment: .leading) {
         switch item.cat {
         case .daily:
-          Text(item.desc)
+          Text(item.desc(with: titlePreference))
           switch item.type {
           case 2:
             if let users = item.memo.daily?.users, users.count > 0 {
@@ -98,13 +99,13 @@ struct TimelineItemView: View {
           }
 
         case .wiki:
-          Text(item.desc)
+          Text(item.desc(with: titlePreference))
           if let subject = item.memo.wiki?.subject {
             SubjectSmallView(subject: subject)
           }
 
         case .subject:
-          Text(item.desc)
+          Text(item.desc(with: titlePreference))
           if item.batch {
             let subjects = item.memo.subject?.map(\.subject).filter { $0.images != nil } ?? []
             ScrollView(.horizontal, showsIndicators: false) {
@@ -138,7 +139,7 @@ struct TimelineItemView: View {
           }
 
         case .progress:
-          Text(item.desc)
+          Text(item.desc(with: titlePreference))
           switch item.type {
           case 0:
             if let subject = item.memo.progress?.batch?.subject {
@@ -152,7 +153,7 @@ struct TimelineItemView: View {
 
         case .status:
           if item.user != nil {
-            Text(item.desc).textSelection(.enabled)
+            Text(item.desc(with: titlePreference)).textSelection(.enabled)
           }
           switch item.type {
           case 0:
@@ -170,7 +171,7 @@ struct TimelineItemView: View {
           }
 
         case .mono:
-          Text(item.desc)
+          Text(item.desc(with: titlePreference))
           if let mono = item.memo.mono, mono.characters.count + mono.persons.count > 0 {
             ScrollView(.horizontal, showsIndicators: false) {
               HStack {
@@ -192,7 +193,7 @@ struct TimelineItemView: View {
           }
 
         default:
-          Text(item.desc)
+          Text(item.desc(with: titlePreference))
         }
         if showReactions {
           switch item.cat {

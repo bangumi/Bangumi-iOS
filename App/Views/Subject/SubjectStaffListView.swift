@@ -5,6 +5,8 @@ import SwiftUI
 struct SubjectStaffListView: View {
   let subjectId: Int
 
+  @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
+
   @State private var collectionStatuses: [Int: Bool] = [:]
   @State private var loadedPersonIds: Set<Int> = []
 
@@ -55,12 +57,8 @@ struct SubjectStaffListView: View {
               .imageCollectedStatus(collectionStatuses[item.staff.id] ?? false)
               .imageNavLink(item.staff.link)
             VStack(alignment: .leading) {
-              Text(item.staff.name.withLink(item.staff.link))
+              Text(item.staff.title(with: titlePreference).withLink(item.staff.link))
                 .font(.callout)
-                .lineLimit(1)
-              Text(item.staff.nameCN)
-                .font(.footnote)
-                .foregroundStyle(.secondary)
                 .lineLimit(1)
               HFlow {
                 ForEach(item.positions) { position in
