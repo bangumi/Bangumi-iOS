@@ -194,12 +194,6 @@ enum TopicDetailData: Hashable {
     }
   }
 
-  mutating func setReactions(_ reactions: [ReactionDTO], postID: Int) {
-    updateReactions(postID: postID) { currentReactions in
-      currentReactions = reactions
-    }
-  }
-
   private mutating func updateReactions(
     postID: Int,
     _ update: (inout [ReactionDTO]) -> Void
@@ -662,12 +656,14 @@ struct TopicDetailView: View {
     }
 
     let previousReactions = currentTarget.post.reactions ?? []
-    let selectedValue =
+    let previousValue =
       previousReactions
-      .first(where: { $0.value == value })?
-      .users
-      .contains(where: { $0.id == profile.id }) ?? false
-    let optimisticValue = toggle && selectedValue ? nil : value
+      .first(where: { reaction in
+        reaction.users.contains(where: { $0.id == profile.id })
+      })?
+      .value
+    let isSelected = previousValue == value
+    let optimisticValue = toggle && isSelected ? nil : value
 
     reactionRequests.insert(target.id)
     defer {
@@ -682,15 +678,21 @@ struct TopicDetailView: View {
     UIImpactFeedbackGenerator(style: .medium).impactOccurred()
 
     do {
-      if toggle, selectedValue {
+      if toggle, isSelected {
         try await AccountService.unlike(path: reactionType.path)
       } else {
         try await AccountService.like(path: reactionType.path, value: value)
       }
+      data?.selectReaction(
+        optimisticValue,
+        postID: target.id,
+        user: profile.simple
+      )
     } catch {
-      data?.setReactions(
-        previousReactions,
-        postID: target.id
+      data?.selectReaction(
+        previousValue,
+        postID: target.id,
+        user: profile.simple
       )
       Notifier.shared.alert(error: error)
     }

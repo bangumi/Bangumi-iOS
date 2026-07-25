@@ -541,12 +541,14 @@ struct CommentListView: View {
     }
 
     let previousReactions = currentTarget.reactions
-    let selected =
+    let previousValue =
       previousReactions
-      .first(where: { $0.value == value })?
-      .users
-      .contains(where: { $0.id == profile.id }) ?? false
-    let optimisticValue = toggle && selected ? nil : value
+      .first(where: { reaction in
+        reaction.users.contains(where: { $0.id == profile.id })
+      })?
+      .value
+    let isSelected = previousValue == value
+    let optimisticValue = toggle && isSelected ? nil : value
 
     reactionRequests.insert(target.id)
     defer {
@@ -556,13 +558,14 @@ struct CommentListView: View {
     UIImpactFeedbackGenerator(style: .medium).impactOccurred()
 
     do {
-      if toggle, selected {
+      if toggle, isSelected {
         try await AccountService.unlike(path: reactionType.path)
       } else {
         try await AccountService.like(path: reactionType.path, value: value)
       }
+      selectReaction(optimisticValue, postID: target.id)
     } catch {
-      setReactions(previousReactions, postID: target.id)
+      selectReaction(previousValue, postID: target.id)
       Notifier.shared.alert(error: error)
     }
   }
@@ -570,12 +573,6 @@ struct CommentListView: View {
   private func selectReaction(_ value: Int?, postID: Int) {
     updateReactions(postID: postID) { reactions in
       reactions = reactions.selectingReaction(value, for: profile.simple)
-    }
-  }
-
-  private func setReactions(_ reactions: [ReactionDTO], postID: Int) {
-    updateReactions(postID: postID) { currentReactions in
-      currentReactions = reactions
     }
   }
 
