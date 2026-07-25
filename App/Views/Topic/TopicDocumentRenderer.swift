@@ -345,6 +345,15 @@ actor TopicDocumentRenderer {
             margin: 6px 0;
           }
 
+          .post-content .bbcode-align-center img {
+            margin-inline: auto;
+          }
+
+          .post-content .bbcode-align-right img {
+            margin-inline-start: auto;
+            margin-inline-end: 0;
+          }
+
           .post-content img.smile,
           .post-content img.smile-dynamic,
           .post-content img.smile-musume,
@@ -568,9 +577,8 @@ actor TopicDocumentRenderer {
             });
 
             document.querySelectorAll('.post-content img').forEach((image) => {
-              image.loading = 'lazy';
-              image.decoding = 'async';
               const requestedWidth = Number(image.getAttribute('width'));
+              const requestedHeight = Number(image.getAttribute('height'));
 
               if (image.classList.contains('smile-dynamic')) {
                 image.style.width = 'auto';
@@ -588,6 +596,9 @@ actor TopicDocumentRenderer {
               image.style.height = 'auto';
               image.style.maxWidth =
                 requestedWidth > 0 ? `min(100%, ${requestedWidth}px)` : '100%';
+              if (requestedHeight > 0) {
+                image.style.maxHeight = `${requestedHeight}px`;
+              }
             });
           })();
         </script>
