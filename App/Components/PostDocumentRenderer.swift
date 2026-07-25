@@ -133,13 +133,15 @@ private extension PostDocumentRenderInput.Post {
     canReact: Bool,
     showReactions: Bool
   ) {
-    result[id] = PostDocumentReactionRenderer.render(
-      reactions,
-      postID: id,
-      canReact: canReact,
-      showReactions: showReactions,
-      isPending: isReactionPending
-    )
+    result[id] =
+      isNormal
+      ? PostDocumentReactionRenderer.render(
+        reactions,
+        postID: id,
+        canReact: canReact,
+        showReactions: showReactions,
+        isPending: isReactionPending
+      ) : ""
     for reply in replies {
       reply.collectReactionHTML(
         into: &result,
