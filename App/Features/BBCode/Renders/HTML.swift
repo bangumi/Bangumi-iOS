@@ -39,6 +39,16 @@ private func bangumiDomains(from args: [String: Any]?) -> BangumiDomains {
   args?["domains"] as? BangumiDomains ?? .official
 }
 
+private func bbcodeSmileySource(
+  _ smiley: BBCodeSmileyItem,
+  args: [String: Any]?
+) -> String {
+  if let scheme = args?["smileyURLScheme"] as? String {
+    return "\(scheme)://smiley/\(smiley.code)"
+  }
+  return smiley.remoteURLString(domains: bangumiDomains(from: args))
+}
+
 var bbcodeHTMLRenderers: [BBCodeTagType: BBCodeHTMLRender] {
   return [
     .plain: { (n: BBCodeNode, args: [String: Any]?) in
@@ -147,7 +157,8 @@ var bbcodeHTMLRenderers: [BBCodeTagType: BBCodeHTMLRender] {
         html = n.renderInnerHTML(args)
       } else {
         link = domains.mainURLString(path: "/subject/\(n.escapedAttr)")
-        if let safeLink = bbcodeSafeURLString(url: link, defaultScheme: "https", defaultHost: host) {
+        if let safeLink = bbcodeSafeURLString(url: link, defaultScheme: "https", defaultHost: host)
+        {
           html =
             "<a href=\"\(safeLink)\" target=\"_blank\" rel=\"nofollow external noopener noreferrer\">\(n.renderInnerHTML(args))</a>"
         } else {
@@ -165,7 +176,8 @@ var bbcodeHTMLRenderers: [BBCodeTagType: BBCodeHTMLRender] {
         html = n.renderInnerHTML(args)
       } else {
         link = domains.mainURLString(path: "/user/\(n.escapedAttr)")
-        if let safeLink = bbcodeSafeURLString(url: link, defaultScheme: "https", defaultHost: host) {
+        if let safeLink = bbcodeSafeURLString(url: link, defaultScheme: "https", defaultHost: host)
+        {
           html =
             "<a href=\"\(safeLink)\" target=\"_blank\" rel=\"nofollow external noopener noreferrer\">@\(n.renderInnerHTML(args))</a>"
         } else {
@@ -187,18 +199,33 @@ var bbcodeHTMLRenderers: [BBCodeTagType: BBCodeHTMLRender] {
         }
         if isPlain {
           link = n.renderInnerHTML(args)
-          if let safeLink = bbcodeSafeURLString(url: link, defaultScheme: "https", defaultHost: host) {
+          if let safeLink = bbcodeSafeURLString(
+            url: link, defaultScheme: "https", defaultHost: host)
+          {
             html =
-              "<a href=\"\(link)\" target=\"_blank\" rel=\"nofollow external noopener noreferrer\">\(safeLink)</a>"
+              "<a href=\"\(safeLink)\" target=\"_blank\" rel=\"nofollow external noopener noreferrer\">\(safeLink)</a>"
           } else {
             html = link
+          }
+        } else if n.children.count == 1, let child = n.children.first, child.type == .image {
+          link = child.renderInnerHTML(nil).trimmingCharacters(in: .whitespacesAndNewlines)
+          if let safeLink = bbcodeSafeURLString(
+            url: link,
+            defaultScheme: "https",
+            defaultHost: host
+          ) {
+            html =
+              "<a href=\"\(safeLink)\" target=\"_blank\" rel=\"nofollow external noopener noreferrer\">\(n.renderInnerHTML(args))</a>"
+          } else {
+            html = n.renderInnerHTML(args)
           }
         } else {
           html = n.renderInnerHTML(args)
         }
       } else {
         link = n.escapedAttr
-        if let safeLink = bbcodeSafeURLString(url: link, defaultScheme: "https", defaultHost: host) {
+        if let safeLink = bbcodeSafeURLString(url: link, defaultScheme: "https", defaultHost: host)
+        {
           html =
             "<a href=\"\(safeLink)\" target=\"_blank\" rel=\"nofollow external noopener noreferrer\">\(n.renderInnerHTML(args))</a>"
         } else {
@@ -360,7 +387,7 @@ var bbcodeHTMLRenderers: [BBCodeTagType: BBCodeHTMLRender] {
       }
 
       let widthAttribute = smiley.preferredDisplayWidth.map { " width=\"\($0)\"" } ?? ""
-      let src = smiley.remoteURLString(domains: bangumiDomains(from: args))
+      let src = bbcodeSmileySource(smiley, args: args)
       return
         "<img src=\"\(src)\" class=\"\(smiley.htmlClassString)\" alt=\"\(smiley.token)\"\(widthAttribute) />"
     },

@@ -34,6 +34,15 @@ enum TopicParentType {
     }
   }
 
+  func deletePost(postId: Int) async throws {
+    switch self {
+    case .subject:
+      try await TopicService.deleteSubjectPost(postId: postId)
+    case .group:
+      try await TopicService.deleteGroupPost(postId: postId)
+    }
+  }
+
   func editTopic(topicId: Int, title: String, content: String) async throws {
     switch self {
     case .subject:

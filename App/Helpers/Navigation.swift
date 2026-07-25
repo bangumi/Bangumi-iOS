@@ -199,12 +199,12 @@ enum NavDestination: Hashable, View {
     case .groupTopicList(let name):
       GroupTopicListView(name: name)
     case .groupTopicDetail(let topicId):
-      GroupTopicDetailView(topicId: topicId)
+      TopicDetailView(source: .group(topicId))
 
     case .blog(let blogId):
       BlogView(blogId: blogId)
     case .subjectTopicDetail(let topicId):
-      SubjectTopicDetailView(topicId: topicId)
+      TopicDetailView(source: .subject(topicId))
 
     case .rakuenGroupTopics(let mode):
       RakuenGroupTopicView(mode: mode)
