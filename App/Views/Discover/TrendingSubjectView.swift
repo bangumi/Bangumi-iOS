@@ -72,11 +72,14 @@ struct TrendingSubjectView: View {
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
 
   @State private var loaded: Bool = false
+  @State private var loading: Bool = false
   @State private var reloader: Bool = false
 
   func load() async {
-    if loaded {
-      return
+    guard !loaded, !loading else { return }
+    loading = true
+    defer {
+      loading = false
     }
     do {
       try await DiscoveryRepository.loadTrendingSubjects()
@@ -97,7 +100,11 @@ struct TrendingSubjectView: View {
       }
     }
     .padding(.horizontal, 8)
-    .task(load)
+    .onAppear {
+      Task {
+        await load()
+      }
+    }
   }
 }
 

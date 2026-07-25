@@ -25,6 +25,7 @@ struct CalendarSlimView: View {
 
   @State private var currentDate = Calendar.current.startOfDay(for: Date())
   @State private var refreshed: Bool = false
+  @State private var loading: Bool = false
   @State private var calendars: [CalendarEntryDTO] = []
   @State private var collectionTypes: [Int: CollectionType] = [:]
 
@@ -127,13 +128,20 @@ struct CalendarSlimView: View {
     }
   }
 
+  private func loadIfNeeded() async {
+    guard !refreshed, !loading else { return }
+    loading = true
+    defer {
+      loading = false
+    }
+    await loadCachedCalendar()
+    await refreshCalendar()
+  }
+
   var body: some View {
     VStack {
       if calendars.isEmpty {
-        ProgressView().task {
-          await loadCachedCalendar()
-          await refreshCalendar()
-        }
+        ProgressView()
       } else {
         VStack(alignment: .leading, spacing: 8) {
           HStack(alignment: .bottom) {
@@ -176,6 +184,9 @@ struct CalendarSlimView: View {
     .padding(.horizontal, 8)
     .onAppear {
       updateCurrentDate()
+      Task {
+        await loadIfNeeded()
+      }
     }
     .onChange(of: scenePhase) {
       if scenePhase == .active {

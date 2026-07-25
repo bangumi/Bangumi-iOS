@@ -8,8 +8,14 @@ struct ChiiTimelineView: View {
 
   @State private var logoutConfirm: Bool = false
   @State private var noticeUnreadCount: Int = 0
+  @State private var checkingNotice: Bool = false
 
   func checkNotice() async {
+    guard !checkingNotice else { return }
+    checkingNotice = true
+    defer {
+      checkingNotice = false
+    }
     if let cachedUnreadCount = await NoticeRepository.loadCachedUnreadCount() {
       noticeUnreadCount = cachedUnreadCount
     }
@@ -98,7 +104,11 @@ struct ChiiTimelineView: View {
           }
         }
       }
-      .task(checkNotice)
+      .onAppear {
+        Task {
+          await checkNotice()
+        }
+      }
       .onReceive(
         NotificationCenter.default.publisher(
           for: NoticeRepository.unreadCountDidChangeNotification
