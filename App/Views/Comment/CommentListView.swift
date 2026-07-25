@@ -534,21 +534,26 @@ struct CommentListView: View {
     toggle: Bool
   ) async {
     guard let reactionType = route.parent.reactionType(postID: target.id),
-      !reactionRequests.contains(target.id)
+      !reactionRequests.contains(target.id),
+      let currentTarget = postTarget(postID: target.id)
     else {
       return
     }
+
+    let previousReactions = currentTarget.reactions
+    let selected =
+      previousReactions
+      .first(where: { $0.value == value })?
+      .users
+      .contains(where: { $0.id == profile.id }) ?? false
+    let optimisticValue = toggle && selected ? nil : value
 
     reactionRequests.insert(target.id)
     defer {
       reactionRequests.remove(target.id)
     }
-
-    let selected =
-      target.reactions
-      .first(where: { $0.value == value })?
-      .users
-      .contains(where: { $0.id == profile.id }) ?? false
+    selectReaction(optimisticValue, postID: target.id)
+    UIImpactFeedbackGenerator(style: .medium).impactOccurred()
 
     do {
       if toggle, selected {
@@ -556,10 +561,49 @@ struct CommentListView: View {
       } else {
         try await AccountService.like(path: reactionType.path, value: value)
       }
-      UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-      await refresh()
     } catch {
+      setReactions(previousReactions, postID: target.id)
       Notifier.shared.alert(error: error)
+    }
+  }
+
+  private func selectReaction(_ value: Int?, postID: Int) {
+    updateReactions(postID: postID) { reactions in
+      reactions = reactions.selectingReaction(value, for: profile.simple)
+    }
+  }
+
+  private func setReactions(_ reactions: [ReactionDTO], postID: Int) {
+    updateReactions(postID: postID) { currentReactions in
+      currentReactions = reactions
+    }
+  }
+
+  private func updateReactions(
+    postID: Int,
+    _ update: (inout [ReactionDTO]) -> Void
+  ) {
+    var updatedComments = comments
+
+    for index in updatedComments.indices {
+      if updatedComments[index].id == postID {
+        var reactions = updatedComments[index].reactions ?? []
+        update(&reactions)
+        updatedComments[index].reactions = reactions
+        comments = updatedComments
+        return
+      }
+
+      guard
+        let replyIndex = updatedComments[index].replies.firstIndex(where: { $0.id == postID })
+      else {
+        continue
+      }
+      var reactions = updatedComments[index].replies[replyIndex].reactions ?? []
+      update(&reactions)
+      updatedComments[index].replies[replyIndex].reactions = reactions
+      comments = updatedComments
+      return
     }
   }
 
@@ -660,6 +704,7 @@ struct CommentListView: View {
       stateDescription: comment.state.description,
       isBlocked: hideBlocklist && blockedUsers.contains(comment.creatorID),
       reactions: makeReactions(comment.reactions),
+      isReactionPending: reactionRequests.contains(comment.id),
       replies: comment.replies.enumerated().map { subindex, reply in
         makeSubreply(
           reply,
@@ -694,6 +739,7 @@ struct CommentListView: View {
       stateDescription: reply.state.description,
       isBlocked: hideBlocklist && blockedUsers.contains(reply.creatorID),
       reactions: makeReactions(reply.reactions),
+      isReactionPending: reactionRequests.contains(reply.id),
       replies: []
     )
   }
@@ -721,6 +767,7 @@ struct CommentListView: View {
       stateDescription: "",
       isBlocked: false,
       reactions: [],
+      isReactionPending: false,
       replies: []
     )
   }

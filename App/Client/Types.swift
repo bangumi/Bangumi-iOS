@@ -849,6 +849,25 @@ struct ReactionDTO: Codable, Identifiable, Hashable {
   }
 }
 
+extension Array where Element == ReactionDTO {
+  func selectingReaction(_ value: Int?, for user: SimpleUserDTO) -> Self {
+    var reactions = self
+
+    for index in reactions.indices {
+      reactions[index].users.removeAll(where: { $0.id == user.id })
+      if reactions[index].value == value {
+        reactions[index].users.append(user)
+      }
+    }
+
+    if let value, !reactions.contains(where: { $0.value == value }) {
+      reactions.append(ReactionDTO(users: [user], value: value))
+    }
+
+    return reactions.filter { !$0.users.isEmpty }
+  }
+}
+
 struct CommentBaseDTO: Codable, Identifiable, Hashable {
   var id: Int
   var content: String

@@ -14,6 +14,7 @@ enum PostDocumentAction: Equatable {
 
 struct PostDocumentWebView: UIViewRepresentable {
   let document: PostWebDocument
+  let reactionHTMLByPostID: [Int: String]
   let scrollRequest: PostDocumentScrollRequest?
   let onAction: (PostDocumentAction) -> Void
   let onOpenURL: (URL) -> Void
@@ -63,7 +64,10 @@ struct PostDocumentWebView: UIViewRepresentable {
     webView.scrollView.refreshControl = refreshControl
 
     context.coordinator.webView = webView
-    context.coordinator.update(document: document)
+    context.coordinator.update(
+      document: document,
+      reactionHTMLByPostID: reactionHTMLByPostID
+    )
     context.coordinator.handle(scrollRequest)
     return webView
   }
@@ -73,7 +77,10 @@ struct PostDocumentWebView: UIViewRepresentable {
     context.coordinator.onOpenURL = onOpenURL
     context.coordinator.onRefresh = onRefresh
     context.coordinator.onViewportChange = onViewportChange
-    context.coordinator.update(document: document)
+    context.coordinator.update(
+      document: document,
+      reactionHTMLByPostID: reactionHTMLByPostID
+    )
     context.coordinator.handle(scrollRequest)
   }
 
@@ -99,6 +106,7 @@ struct PostDocumentWebView: UIViewRepresentable {
     var onViewportChange: (PostDocumentViewportState) -> Void
 
     private var currentDocument: PostWebDocument?
+    private var currentReactionHTMLByPostID: [Int: String] = [:]
     private var pendingScrollOffset: CGPoint?
     private var pendingInitialPostID: Int?
     private var pendingScrollRequest: PostDocumentScrollRequest?
@@ -116,8 +124,12 @@ struct PostDocumentWebView: UIViewRepresentable {
       self.onViewportChange = onViewportChange
     }
 
-    func update(document: PostWebDocument) {
+    func update(
+      document: PostWebDocument,
+      reactionHTMLByPostID: [Int: String]
+    ) {
       guard currentDocument?.id != document.id else {
+        updateReactions(reactionHTMLByPostID)
         return
       }
 
@@ -129,6 +141,7 @@ struct PostDocumentWebView: UIViewRepresentable {
       }
 
       currentDocument = document
+      currentReactionHTMLByPostID = reactionHTMLByPostID
       webView?.loadHTMLString(document.html, baseURL: document.baseURL)
     }
 
@@ -200,6 +213,12 @@ struct PostDocumentWebView: UIViewRepresentable {
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation?) {
+      applyReactionHTML(
+        currentReactionHTMLByPostID,
+        force: true,
+        in: webView
+      )
+
       if let pendingScrollRequest {
         self.pendingScrollRequest = nil
         pendingScrollOffset = nil
@@ -244,6 +263,111 @@ struct PostDocumentWebView: UIViewRepresentable {
       }
       captureScrollOffsetIfNeeded(from: webView)
       webView.loadHTMLString(currentDocument.html, baseURL: currentDocument.baseURL)
+    }
+
+    private func updateReactions(_ reactionHTMLByPostID: [Int: String]) {
+      guard let webView else {
+        currentReactionHTMLByPostID = reactionHTMLByPostID
+        return
+      }
+      applyReactionHTML(reactionHTMLByPostID, force: false, in: webView)
+    }
+
+    private func applyReactionHTML(
+      _ reactionHTMLByPostID: [Int: String],
+      force: Bool,
+      in webView: WKWebView
+    ) {
+      let updates = reactionHTMLByPostID.compactMap { postID, html -> [String: Any]? in
+        guard force || currentReactionHTMLByPostID[postID] != html else {
+          return nil
+        }
+        return ["postID": postID, "html": html]
+      }
+      currentReactionHTMLByPostID = reactionHTMLByPostID
+
+      guard !updates.isEmpty, !webView.isLoading,
+        let data = try? JSONSerialization.data(withJSONObject: updates),
+        let payload = String(data: data, encoding: .utf8)
+      else {
+        return
+      }
+
+      webView.evaluateJavaScript(
+        """
+        (() => {
+          const updates = \(payload);
+          for (const update of updates) {
+            const article = document.getElementById(`post_${update.postID}`);
+            if (!article) continue;
+
+            const existing = Array.from(article.children).find(
+              (child) => child.classList.contains('reactions')
+            );
+            const previousStates = new Map(
+              Array.from(existing?.querySelectorAll('.reaction') ?? []).map(
+                (reaction) => [
+                  reaction.dataset.value,
+                  `${reaction.classList.contains('selected')}:${reaction.textContent}`,
+                ]
+              )
+            );
+            const previousValues = new Set(previousStates.keys());
+            const template = document.createElement('template');
+            template.innerHTML = update.html.trim();
+            const replacement = template.content.firstElementChild;
+            const nextStates = new Map(
+              Array.from(replacement?.querySelectorAll('.reaction') ?? []).map(
+                (reaction) => [
+                  reaction.dataset.value,
+                  `${reaction.classList.contains('selected')}:${reaction.textContent}`,
+                ]
+              )
+            );
+            for (const reaction of replacement?.querySelectorAll('.reaction') ?? []) {
+              const value = reaction.dataset.value;
+              if (previousStates.get(value) !== nextStates.get(value)) {
+                reaction.classList.add('changed');
+              }
+            }
+            if (
+              replacement
+              && Array.from(previousValues).some((value) => !nextStates.has(value))
+            ) {
+              replacement.classList.add('removed-reaction');
+            }
+
+            const picker = document.querySelector(
+              `[data-action="reactionPicker"][data-post-id="${update.postID}"]`
+            );
+            const isPending = replacement?.classList.contains('pending') ?? false;
+            if (picker && isPending && !picker.disabled) {
+              picker.disabled = true;
+              picker.dataset.reactionPending = 'true';
+            } else if (picker?.dataset.reactionPending === 'true' && !isPending) {
+              picker.disabled = false;
+              delete picker.dataset.reactionPending;
+            }
+
+            if (!update.html) {
+              existing?.remove();
+              continue;
+            }
+            if (existing) {
+              existing.replaceWith(replacement);
+              continue;
+            }
+
+            const content = Array.from(article.children).find(
+              (child) => child.classList.contains('post-content')
+            );
+            if (content && replacement) {
+              content.insertAdjacentElement('afterend', replacement);
+            }
+          }
+        })();
+        """
+      )
     }
 
     private func captureScrollOffsetIfNeeded(from webView: WKWebView) {
@@ -500,6 +624,7 @@ struct PostDocumentSurface: View {
       if let document {
         PostDocumentWebView(
           document: document,
+          reactionHTMLByPostID: input.reactionHTMLByPostID,
           scrollRequest: scrollRequest,
           onAction: onAction,
           onOpenURL: onOpenURL,
@@ -529,7 +654,7 @@ struct PostDocumentSurface: View {
       Color(uiColor: .systemBackground)
         .ignoresSafeArea(.container, edges: .vertical)
     }
-    .task(id: input) {
+    .task(id: input.documentRenderKey) {
       do {
         let document = try await PostDocumentRenderer.shared.render(input)
         try Task.checkCancellation()

@@ -187,9 +187,8 @@ struct PostActionOverlayPresenter<Target: Identifiable>: View {
             canReport: canReport,
             isVisible: controlsVisible,
             onReaction: { target, value in
-              dismiss {
-                onReaction(target, value)
-              }
+              onReaction(target, value)
+              dismiss()
             },
             onMenuAction: { action, target in
               dismiss {
