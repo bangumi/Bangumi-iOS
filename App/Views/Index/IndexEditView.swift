@@ -2,6 +2,7 @@ import SwiftUI
 
 struct IndexEditSheet: View {
   @Environment(\.dismiss) var dismiss
+  @AppStorage("profile") private var profile: Profile = Profile()
 
   let indexId: Int?
   let onSave: () -> Void
@@ -31,15 +32,17 @@ struct IndexEditSheet: View {
     isSubmitting = true
     do {
       if let indexId = indexId {
-        try await IndexService.updateIndex(
-          indexId: indexId,
+        try await IndexRepository.updateIndex(
+          userID: profile.id,
+          indexID: indexId,
           title: title,
           desc: desc,
           private: isPrivate
         )
         Notifier.shared.notify(message: "目录已更新")
       } else {
-        _ = try await IndexService.createIndex(
+        _ = try await IndexRepository.createIndex(
+          userID: profile.id,
           title: title,
           desc: desc,
           private: isPrivate

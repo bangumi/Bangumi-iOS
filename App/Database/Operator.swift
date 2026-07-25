@@ -47,6 +47,24 @@ extension DatabaseOperator {
       try db.execute(sql: "DELETE FROM user_index_caches")
     }
   }
+
+  public func clearUserIndexCache(userID: Int) throws {
+    try database.write { db in
+      try db.execute(
+        sql: "DELETE FROM user_index_caches WHERE user_id = ?",
+        arguments: [userID]
+      )
+    }
+  }
+
+  public func clearUserIndexCache(userID: Int, updatedAt: Date) throws {
+    try database.write { db in
+      try db.execute(
+        sql: "DELETE FROM user_index_caches WHERE user_id = ? AND updated_at = ?",
+        arguments: [userID, updatedAt.timeIntervalSince1970]
+      )
+    }
+  }
 }
 
 // MARK: - fetch
@@ -1312,7 +1330,7 @@ extension DatabaseOperator {
     }
   }
 
-  public func saveUserIndexCache(userID: Int, items: [SlimIndexDTO]) throws {
+  public func saveUserIndexCache(userID: Int, items: [SlimIndexDTO]) throws -> Date {
     try database.write { db in
       let cache = UserIndexCache(userID: userID, items: items)
       try db.execute(
@@ -1325,6 +1343,7 @@ extension DatabaseOperator {
           """,
         arguments: [cache.userID, cache.itemsData, cache.updatedAt.timeIntervalSince1970]
       )
+      return cache.updatedAt
     }
   }
 

@@ -52,7 +52,7 @@ struct IndexView: View {
 
   func deleteIndex(_ indexId: Int) async {
     do {
-      try await IndexService.deleteIndex(indexId: indexId)
+      try await IndexRepository.deleteIndex(userID: profile.id, indexID: indexId)
       Notifier.shared.notify(message: "已删除")
       withAnimation(.default) {
         reloader.toggle()
