@@ -381,7 +381,7 @@ var bbcodeHTMLRenderers: [BBCodeTagType: BBCodeHTMLRender] {
     },
     .bgm: { (n: BBCodeNode, args: [String: Any]?) in
       guard let smiley = BBCodeSmileyCatalog.item(for: n.attr) else {
-        return "(\(n.attr))"
+        return "(\(n.escapedAttr))"
       }
 
       let widthAttribute = smiley.preferredDisplayWidth.map { " width=\"\($0)\"" } ?? ""
