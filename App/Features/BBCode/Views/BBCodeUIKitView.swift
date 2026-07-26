@@ -876,12 +876,11 @@ private final class BBCodeListBlockView: UIView {
     stackView.spacing = 0
     stackView.translatesAutoresizingMaskIntoConstraints = false
 
-    let markerFont = UIFont.preferredFont(forTextStyle: .body)
     let markerWidths =
       items
       .map {
         ceil(
-          ($0.marker as NSString).size(withAttributes: [.font: markerFont]).width
+          ($0.marker as NSString).size(withAttributes: [.font: $0.markerFont]).width
         )
       }
     let markerWidth = max(10, markerWidths.max() ?? 0)
@@ -890,7 +889,7 @@ private final class BBCodeListBlockView: UIView {
       stackView.addArrangedSubview(
         BBCodeListItemView(
           item: item,
-          markerFont: markerFont,
+          markerFont: item.markerFont,
           markerWidth: markerWidth
         )
       )
