@@ -7,7 +7,12 @@ struct SubjectTopicItemView: View {
     CardView {
       VStack(alignment: .leading) {
         NavigationLink(value: NavDestination.subjectTopicDetail(topic.id)) {
-          Text(topic.title)
+          TopicTitleView(
+            title: topic.title,
+            createdAt: topic.createdAt,
+            updatedAt: topic.updatedAt,
+            replyCount: topic.replyCount
+          )
             .font(.callout)
             .multilineTextAlignment(.leading)
         }

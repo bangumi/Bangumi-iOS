@@ -360,7 +360,12 @@ struct GroupRecentTopicView: View {
             VStack {
               HStack {
                 NavigationLink(value: NavDestination.groupTopicDetail(topic.id)) {
-                  Text(topic.title)
+                  TopicTitleView(
+                    title: topic.title,
+                    createdAt: topic.createdAt,
+                    updatedAt: topic.updatedAt,
+                    replyCount: topic.replyCount
+                  )
                     .font(.callout)
                     .lineLimit(1)
                 }.buttonStyle(.navigation)
