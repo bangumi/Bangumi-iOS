@@ -269,7 +269,13 @@ struct IndexRelatedItemView: View {
                   Image(systemName: item.cat.icon)
                     .foregroundStyle(.secondary)
                     .font(.footnote)
-                  Text(topic.title.withLink(topic.link))
+                  TopicTitleView(
+                    title: topic.title,
+                    createdAt: topic.createdAt,
+                    updatedAt: topic.updatedAt,
+                    replyCount: topic.replyCount,
+                    link: topic.link
+                  )
                     .lineLimit(1)
                   Spacer(minLength: 0)
                 }
@@ -320,7 +326,13 @@ struct IndexRelatedItemView: View {
                   Image(systemName: item.cat.icon)
                     .foregroundStyle(.secondary)
                     .font(.footnote)
-                  Text(topic.title.withLink(topic.link))
+                  TopicTitleView(
+                    title: topic.title,
+                    createdAt: topic.createdAt,
+                    updatedAt: topic.updatedAt,
+                    replyCount: topic.replyCount,
+                    link: topic.link
+                  )
                     .lineLimit(1)
                   Spacer(minLength: 0)
                 }

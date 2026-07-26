@@ -10,6 +10,7 @@ struct SettingsView: View {
   @AppStorage("subjectImageQuality") var subjectImageQuality: ImageQuality = .high
   @AppStorage("isolationMode") var isolationMode: Bool = false
   @AppStorage("showNSFWBadge") var showNSFWBadge: Bool = true
+  @AppStorage("showTopicAgeBadge") var showTopicAgeBadge: Bool = true
   @AppStorage("showEpisodeTrends") var showEpisodeTrends: Bool = true
   @AppStorage("hideBlocklist") var hideBlocklist: Bool = false
   @AppStorage("autoCompleteProgress") var autoCompleteProgress: Bool = false
@@ -162,6 +163,10 @@ struct SettingsView: View {
           }
         } label: {
           SettingLabel("回复排序", description: "按发布时间排列话题回复的顺序")
+        }
+
+        Toggle(isOn: $showTopicAgeBadge) {
+          SettingLabel("话题时间标记", description: "在话题列表标题前显示新帖和坟帖标记")
         }
 
         Toggle(isOn: $showSpoilerRelations) {

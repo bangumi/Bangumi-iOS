@@ -28,7 +28,12 @@ struct GroupTopicListView: View {
             VStack(alignment: .leading, spacing: 4) {
               HStack {
                 NavigationLink(value: NavDestination.groupTopicDetail(topic.id)) {
-                  Text(topic.title)
+                  TopicTitleView(
+                    title: topic.title,
+                    createdAt: topic.createdAt,
+                    updatedAt: topic.updatedAt,
+                    replyCount: topic.replyCount
+                  )
                     .font(.headline)
                     .lineLimit(2)
                     .multilineTextAlignment(.leading)

@@ -64,10 +64,16 @@ struct RakuenGroupTopicItemView: View {
           .imageType(.avatar)
           .imageLink(topic.link)
         VStack(alignment: .leading) {
-          Section {
-            Text(topic.title.withLink(topic.link))
+          HStack(alignment: .firstTextBaseline, spacing: 2) {
+            TopicTitleView(
+              title: topic.title,
+              createdAt: topic.createdAt,
+              updatedAt: topic.updatedAt,
+              replyCount: topic.replyCount,
+              link: topic.link
+            )
               .font(.headline)
-              + Text("(+\(topic.replyCount))")
+            Text("(+\(topic.replyCount))")
               .font(.footnote)
               .foregroundStyle(.secondary)
           }
