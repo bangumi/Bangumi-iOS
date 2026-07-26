@@ -402,7 +402,7 @@ let bbcodeTagDefinitions: [BBCodeTagInfo] = [
     BBCodeTagDescription(
       tagNeeded: true, isSelfClosing: false,
       allowedChildren: [
-        .url, .mask, .bgm, .bmo, .br, .subject, .user,
+        .url, .mask, .list, .bgm, .bmo, .br, .subject, .user,
       ] + BBCodeTagType.unsupported + BBCodeTagType.layout + BBCodeTagType.textStyle,
       allowAttr: true,
       isBlock: false

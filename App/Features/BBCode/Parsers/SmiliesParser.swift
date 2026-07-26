@@ -1,5 +1,7 @@
 import Foundation
 
+private let bbcodeSmileyTokenPrefixes = ["bgm", "bmo", "musume_", "blake_"]
+
 func parseBBCodeSmiley(_ g: inout BBCodeScalarIterator, _ worker: BBCodeParserWorker) -> BBCodeParserState? {
   let newNode = BBCodeNode(
     type: .unknown, parent: worker.currentNode, tagManager: worker.tagManager)
@@ -10,12 +12,14 @@ func parseBBCodeSmiley(_ g: inout BBCodeScalarIterator, _ worker: BBCodeParserWo
   while let c = g.next() {
     // If we encounter a newline before closing ')', treat '(' as plain text
     if c == UnicodeScalar(10) || c == UnicodeScalar(13) {  // \n or \r
-      restoreBBCodeSmileyToPlainText(node: newNode, c: c, worker: worker)
+      restoreBBCodeSmileyToPlainText(node: newNode, worker: worker)
+      g.pushBack(c)
       return .content
     }
     if c == UnicodeScalar(")") {
       if newNode.value.isEmpty {
-        restoreBBCodeSmileyToPlainText(node: newNode, c: c, worker: worker)
+        restoreBBCodeSmileyToPlainText(node: newNode, worker: worker)
+        g.pushBack(c)
         return .content
       }
 
@@ -36,13 +40,22 @@ func parseBBCodeSmiley(_ g: inout BBCodeScalarIterator, _ worker: BBCodeParserWo
         return .content
       }
 
-      restoreBBCodeSmileyToPlainText(node: newNode, c: c, worker: worker)
+      restoreBBCodeSmileyToPlainText(node: newNode, worker: worker)
+      g.pushBack(c)
       return .content
     } else {
       if index < maxLength {
-        newNode.value.append(Swift.Character(c))
+        let candidate = newNode.value + String(c)
+        if canStillParseBBCodeSmiley(token: candidate) {
+          newNode.value = candidate
+        } else {
+          restoreBBCodeSmileyToPlainText(node: newNode, worker: worker)
+          g.pushBack(c)
+          return .content
+        }
       } else {
-        restoreBBCodeSmileyToPlainText(node: newNode, c: c, worker: worker)
+        restoreBBCodeSmileyToPlainText(node: newNode, worker: worker)
+        g.pushBack(c)
         return .content
       }
     }
@@ -51,14 +64,22 @@ func parseBBCodeSmiley(_ g: inout BBCodeScalarIterator, _ worker: BBCodeParserWo
 
   // If we reach here, it means we've reached the end of input without finding a closing ')'
   // This happens when text ends with '(' - treat it as plain text
-  restoreBBCodeSmileyToPlainText(node: newNode, c: nil, worker: worker)
+  restoreBBCodeSmileyToPlainText(node: newNode, worker: worker)
   return .content
 }
 
-func restoreBBCodeSmileyToPlainText(node: BBCodeNode, c: UnicodeScalar?, worker: BBCodeParserWorker) {
+private func canStillParseBBCodeSmiley(token: String) -> Bool {
+  let normalizedToken = String(token.drop(while: { $0.isWhitespace })).lowercased()
+  guard !normalizedToken.isEmpty else {
+    return true
+  }
+
+  return bbcodeSmileyTokenPrefixes.contains { prefix in
+    prefix.hasPrefix(normalizedToken) || normalizedToken.hasPrefix(prefix)
+  }
+}
+
+func restoreBBCodeSmileyToPlainText(node: BBCodeNode, worker: BBCodeParserWorker) {
   node.setTag(tag: worker.tagManager.getInfo(type: .plain)!)
   node.value.insert(Swift.Character(UnicodeScalar(40)), at: node.value.startIndex)
-  if let c = c {
-    node.value.append(Swift.Character(c))
-  }
 }
