@@ -9,7 +9,6 @@ enum PostDocumentAction: Equatable {
   case reaction(postID: Int, value: Int)
   case reactionUsers(postID: Int, value: Int)
   case more(postID: Int, anchorY: Double)
-  case previewImage(URL)
 }
 
 struct PostDocumentWebView: UIViewRepresentable {
@@ -111,6 +110,7 @@ struct PostDocumentWebView: UIViewRepresentable {
     private var pendingInitialPostID: Int?
     private var pendingScrollRequest: PostDocumentScrollRequest?
     private var handledScrollRequestID: UUID?
+    private var isPresentingImagePreview = false
 
     init(
       onAction: @escaping (PostDocumentAction) -> Void,
@@ -175,9 +175,16 @@ struct PostDocumentWebView: UIViewRepresentable {
 
       switch message.name {
       case Self.actionMessageName:
-        guard let actionName = payload["action"] as? String,
-          let action = makeAction(name: actionName, payload: payload)
-        else {
+        guard let actionName = payload["action"] as? String else {
+          return
+        }
+
+        if actionName == "previewImage" {
+          presentImagePreview(payload: payload)
+          return
+        }
+
+        guard let action = makeAction(name: actionName, payload: payload) else {
           return
         }
         onAction(action)
@@ -557,16 +564,88 @@ struct PostDocumentWebView: UIViewRepresentable {
           return nil
         }
         return .more(postID: postID, anchorY: anchorY)
-      case "previewImage":
-        guard let rawURL = payload["url"] as? String,
-          let url = URL(string: rawURL),
-          ["http", "https"].contains(url.scheme?.lowercased() ?? "")
-        else {
-          return nil
-        }
-        return .previewImage(url)
       default:
         return nil
+      }
+    }
+
+    private func presentImagePreview(payload: [String: Any]) {
+      guard !isPresentingImagePreview,
+        let webView,
+        let rawURL = payload["url"] as? String,
+        let url = URL(string: rawURL),
+        ["http", "https"].contains(url.scheme?.lowercased() ?? ""),
+        let x = number(payload["x"]),
+        let y = number(payload["y"]),
+        let width = number(payload["width"]),
+        let height = number(payload["height"])
+      else {
+        return
+      }
+
+      isPresentingImagePreview = true
+
+      guard #available(iOS 18.0, *) else {
+        presentImagePreview(url: url, from: webView, zoomSourceView: nil)
+        return
+      }
+
+      let imageFrame = CGRect(x: x, y: y, width: width, height: height)
+        .intersection(webView.bounds)
+      guard !imageFrame.isNull, imageFrame.width > 1, imageFrame.height > 1 else {
+        presentImagePreview(url: url, from: webView, zoomSourceView: nil)
+        return
+      }
+
+      let configuration = WKSnapshotConfiguration()
+      configuration.rect = imageFrame
+      configuration.afterScreenUpdates = false
+      webView.takeSnapshot(with: configuration) { [weak self, weak webView] image, _ in
+        guard let self, let webView else {
+          return
+        }
+
+        guard let image else {
+          self.presentImagePreview(url: url, from: webView, zoomSourceView: nil)
+          return
+        }
+
+        let sourceView = UIImageView(image: image)
+        sourceView.frame = imageFrame
+        sourceView.contentMode = .scaleToFill
+        sourceView.clipsToBounds = true
+        sourceView.isUserInteractionEnabled = false
+        webView.addSubview(sourceView)
+
+        self.presentImagePreview(
+          url: url,
+          from: webView,
+          zoomSourceView: sourceView,
+          onDismiss: {
+            sourceView.removeFromSuperview()
+          }
+        )
+      }
+    }
+
+    private func presentImagePreview(
+      url: URL,
+      from webView: WKWebView,
+      zoomSourceView: UIView?,
+      onDismiss: (() -> Void)? = nil
+    ) {
+      let didPresent = ImagePreviewPresenter.present(
+        url: url,
+        from: webView,
+        zoomSourceView: zoomSourceView,
+        onDismiss: { [weak self] in
+          onDismiss?()
+          self?.isPresentingImagePreview = false
+        }
+      )
+
+      if !didPresent {
+        isPresentingImagePreview = false
       }
     }
 
