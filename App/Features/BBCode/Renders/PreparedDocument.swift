@@ -436,7 +436,7 @@ private struct BBCodeTextKitRenderer {
         return segments
       }
 
-      return mapTextSegments(segments) { attributed in
+      return mapTextSegmentsRecursively(segments) { attributed in
         applyFontTransform(to: attributed) { font in
           UIFont(descriptor: font.fontDescriptor, size: CGFloat(size))
         }
@@ -466,6 +466,66 @@ private struct BBCodeTextKitRenderer {
         }
       }
     )
+  }
+
+  private func mapTextSegmentsRecursively(
+    _ segments: [RenderedSegment],
+    transform: (NSMutableAttributedString) -> Void
+  ) -> [RenderedSegment] {
+    normalizeSegments(
+      segments.map { segment in
+        switch segment {
+        case .text(let attributed):
+          let transformed = NSMutableAttributedString(attributedString: attributed)
+          transform(transformed)
+          return .text(transformed)
+        case .block(let payload):
+          return .block(mapTextPayload(payload, transform: transform))
+        case .separator:
+          return segment
+        }
+      }
+    )
+  }
+
+  private func mapTextPayload(
+    _ payload: BBCodePreparedBlock.Payload,
+    transform: (NSMutableAttributedString) -> Void
+  ) -> BBCodePreparedBlock.Payload {
+    switch payload {
+    case .text(let attributed):
+      let transformed = NSMutableAttributedString(attributedString: attributed)
+      transform(transformed)
+      return .text(transformed)
+    case .image:
+      return payload
+    case .mask(let blocks):
+      return .mask(mapTextBlocks(blocks, transform: transform))
+    case .quote(let blocks):
+      return .quote(mapTextBlocks(blocks, transform: transform))
+    case .list(let items):
+      return .list(
+        items.map { item in
+          BBCodePreparedListItem(
+            id: item.id,
+            marker: item.marker,
+            blocks: mapTextBlocks(item.blocks, transform: transform)
+          )
+        }
+      )
+    }
+  }
+
+  private func mapTextBlocks(
+    _ blocks: [BBCodePreparedBlock],
+    transform: (NSMutableAttributedString) -> Void
+  ) -> [BBCodePreparedBlock] {
+    blocks.map { block in
+      BBCodePreparedBlock(
+        id: block.id,
+        payload: mapTextPayload(block.payload, transform: transform)
+      )
+    }
   }
 
   private func mapLinkedSegments(
