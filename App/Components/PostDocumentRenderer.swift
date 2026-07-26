@@ -789,7 +789,15 @@ actor PostDocumentRenderer {
 
               if (image) {
                 event.preventDefault();
-                post({ action: 'previewImage', url: image.currentSrc });
+                const rect = image.getBoundingClientRect();
+                post({
+                  action: 'previewImage',
+                  url: image.currentSrc,
+                  x: rect.left,
+                  y: rect.top,
+                  width: rect.width,
+                  height: rect.height,
+                });
               }
             });
 

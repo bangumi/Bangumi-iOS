@@ -315,7 +315,6 @@ struct TopicDetailView: View {
   @State private var showDeleteConfirmation = false
   @State private var reactionRequests = Set<Int>()
   @State private var actionOverlay: PostActionOverlay<TopicPostTarget>?
-  @State private var preview: TopicImagePreview?
 
   private var title: String {
     data?.title ?? "讨论详情"
@@ -354,9 +353,6 @@ struct TopicDetailView: View {
           },
           onMenuAction: handlePostMenuAction
         )
-      }
-      .fullScreenCover(item: $preview) { preview in
-        ImagePreviewer(url: preview.url)
       }
       .alert(
         "确认删除",
@@ -608,8 +604,6 @@ struct TopicDetailView: View {
           )
         }
       }
-    case .previewImage(let url):
-      preview = TopicImagePreview(url: url)
     }
   }
 
@@ -880,14 +874,6 @@ struct TopicDetailView: View {
 private struct TopicReplyPresentation {
   let replies: [ReplyDTO]
   let count: Int
-}
-
-private struct TopicImagePreview: Identifiable {
-  let url: URL
-
-  var id: String {
-    url.absoluteString
-  }
 }
 
 private struct TopicLoadFailureView: View {

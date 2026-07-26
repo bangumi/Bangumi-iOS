@@ -715,15 +715,11 @@ private final class BBCodeMediaBlockView: UIView {
   }
 
   private func presentPreview() {
-    guard let presenter = bbcodeNearestViewController()?.bbcodeTopMostPresentedViewController else {
-      return
-    }
-
-    let controller = UIHostingController(rootView: ImagePreviewer(url: media.url))
-    controller.modalPresentationStyle = .overFullScreen
-    controller.modalTransitionStyle = .crossDissolve
-    controller.view.backgroundColor = .clear
-    presenter.present(controller, animated: true)
+    ImagePreviewPresenter.present(
+      url: media.url,
+      from: self,
+      zoomSourceView: imageView
+    )
   }
 }
 
@@ -962,25 +958,5 @@ extension UIStackView {
       removeArrangedSubview(view)
       view.removeFromSuperview()
     }
-  }
-}
-
-extension UIView {
-  fileprivate func bbcodeNearestViewController() -> UIViewController? {
-    var responder: UIResponder? = self
-    while let current = responder {
-      if let viewController = current as? UIViewController {
-        return viewController
-      }
-      responder = current.next
-    }
-
-    return nil
-  }
-}
-
-extension UIViewController {
-  fileprivate var bbcodeTopMostPresentedViewController: UIViewController {
-    presentedViewController?.bbcodeTopMostPresentedViewController ?? self
   }
 }

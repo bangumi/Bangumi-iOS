@@ -57,14 +57,6 @@ private enum CommentListSheet: Identifiable {
   }
 }
 
-private struct CommentImagePreview: Identifiable {
-  let url: URL
-
-  var id: String {
-    url.absoluteString
-  }
-}
-
 private struct CommentListLoadKey: Hashable {
   let route: CommentListRoute
   let isolationMode: Bool
@@ -105,7 +97,6 @@ struct CommentListView: View {
   @State private var showDeleteConfirmation = false
   @State private var reactionRequests = Set<Int>()
   @State private var actionOverlay: PostActionOverlay<CommentPostTarget>?
-  @State private var preview: CommentImagePreview?
 
   init(route: CommentListRoute, timeline: TimelineDTO? = nil) {
     self.route = route
@@ -165,9 +156,6 @@ struct CommentListView: View {
           },
           onMenuAction: handleMenuAction
         )
-      }
-      .fullScreenCover(item: $preview) { preview in
-        ImagePreviewer(url: preview.url)
       }
       .alert(
         "确认删除",
@@ -490,8 +478,6 @@ struct CommentListView: View {
           anchorY: anchorY
         )
       }
-    case .previewImage(let url):
-      preview = CommentImagePreview(url: url)
     }
   }
 
