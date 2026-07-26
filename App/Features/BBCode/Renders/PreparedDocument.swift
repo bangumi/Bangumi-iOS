@@ -68,7 +68,7 @@ private final class BBCodePreparedDocumentCache {
 
 struct BBCodePreparedListItem: Identifiable {
   let id: Int
-  let marker: String
+  let marker: NSAttributedString
   let blocks: [BBCodePreparedBlock]
 }
 
@@ -408,19 +408,19 @@ private struct BBCodeTextKitRenderer {
 
       return mapLinkedSegments(segments, url: url)
     case .bold:
-      return mapTextSegments(segments) { attributed in
+      return mapTextSegmentsRecursively(segments) { attributed in
         applyFontTransform(to: attributed) { makeBoldFont(from: $0) }
       }
     case .italic:
-      return mapTextSegments(segments) { attributed in
+      return mapTextSegmentsRecursively(segments) { attributed in
         applyFontTransform(to: attributed) { makeItalicFont(from: $0) }
       }
     case .underline:
-      return mapTextSegments(segments) { attributed in
+      return mapTextSegmentsRecursively(segments) { attributed in
         applyAttribute(.underlineStyle, value: NSUnderlineStyle.single.rawValue, to: attributed)
       }
     case .delete:
-      return mapTextSegments(segments) { attributed in
+      return mapTextSegmentsRecursively(segments) { attributed in
         applyAttribute(.strikethroughStyle, value: NSUnderlineStyle.single.rawValue, to: attributed)
       }
     case .color:
@@ -428,7 +428,7 @@ private struct BBCodeTextKitRenderer {
         return segments
       }
 
-      return mapTextSegments(segments) { attributed in
+      return mapTextSegmentsRecursively(segments) { attributed in
         applyAttribute(.foregroundColor, value: color, to: attributed)
       }
     case .size:
@@ -436,11 +436,13 @@ private struct BBCodeTextKitRenderer {
         return segments
       }
 
-      return mapTextSegments(segments) { attributed in
+      return mapTextSegmentsRecursively(segments) { attributed in
         applyFontTransform(to: attributed) { font in
           UIFont(descriptor: font.fontDescriptor, size: CGFloat(size))
         }
       }
+    case .ruby:
+      return appendRubyAnnotation(node.attr, to: segments)
     case .mask:
       return [.block(.mask(makeBlocks(from: segments)))]
     default:
@@ -468,22 +470,131 @@ private struct BBCodeTextKitRenderer {
     )
   }
 
-  private func mapLinkedSegments(
+  private func mapTextSegmentsRecursively(
     _ segments: [RenderedSegment],
-    url: URL
+    transform: (NSMutableAttributedString) -> Void
+  ) -> [RenderedSegment] {
+    mapSegmentsRecursively(segments, transformText: transform)
+  }
+
+  private func mapSegmentsRecursively(
+    _ segments: [RenderedSegment],
+    transformMarkers: Bool = true,
+    transformMedia: (BBCodePreparedMedia) -> BBCodePreparedMedia = { $0 },
+    transformText: (NSMutableAttributedString) -> Void
   ) -> [RenderedSegment] {
     normalizeSegments(
       segments.map { segment in
         switch segment {
         case .text(let attributed):
           let transformed = NSMutableAttributedString(attributedString: attributed)
-          applyLinkAttributes(to: transformed, url: url)
+          transformText(transformed)
           return .text(transformed)
         case .block(let payload):
-          return .block(linkedPayload(payload, url: url))
+          return .block(
+            mapPayloadRecursively(
+              payload,
+              transformMarkers: transformMarkers,
+              transformMedia: transformMedia,
+              transformText: transformText
+            )
+          )
         case .separator:
           return segment
         }
+      }
+    )
+  }
+
+  private func mapPayloadRecursively(
+    _ payload: BBCodePreparedBlock.Payload,
+    transformMarkers: Bool,
+    transformMedia: (BBCodePreparedMedia) -> BBCodePreparedMedia,
+    transformText: (NSMutableAttributedString) -> Void
+  ) -> BBCodePreparedBlock.Payload {
+    switch payload {
+    case .text(let attributed):
+      let transformed = NSMutableAttributedString(attributedString: attributed)
+      transformText(transformed)
+      return .text(transformed)
+    case .image(let media):
+      return .image(transformMedia(media))
+    case .mask(let blocks):
+      return .mask(
+        mapBlocksRecursively(
+          blocks,
+          transformMarkers: transformMarkers,
+          transformMedia: transformMedia,
+          transformText: transformText
+        )
+      )
+    case .quote(let blocks):
+      return .quote(
+        mapBlocksRecursively(
+          blocks,
+          transformMarkers: transformMarkers,
+          transformMedia: transformMedia,
+          transformText: transformText
+        )
+      )
+    case .list(let items):
+      return .list(
+        items.map { item in
+          let marker = NSMutableAttributedString(attributedString: item.marker)
+          if transformMarkers {
+            transformText(marker)
+          }
+          return BBCodePreparedListItem(
+            id: item.id,
+            marker: marker,
+            blocks: mapBlocksRecursively(
+              item.blocks,
+              transformMarkers: transformMarkers,
+              transformMedia: transformMedia,
+              transformText: transformText
+            )
+          )
+        }
+      )
+    }
+  }
+
+  private func mapBlocksRecursively(
+    _ blocks: [BBCodePreparedBlock],
+    transformMarkers: Bool,
+    transformMedia: (BBCodePreparedMedia) -> BBCodePreparedMedia,
+    transformText: (NSMutableAttributedString) -> Void
+  ) -> [BBCodePreparedBlock] {
+    blocks.map { block in
+      BBCodePreparedBlock(
+        id: block.id,
+        payload: mapPayloadRecursively(
+          block.payload,
+          transformMarkers: transformMarkers,
+          transformMedia: transformMedia,
+          transformText: transformText
+        )
+      )
+    }
+  }
+
+  private func mapLinkedSegments(
+    _ segments: [RenderedSegment],
+    url: URL
+  ) -> [RenderedSegment] {
+    mapSegmentsRecursively(
+      segments,
+      transformMarkers: false,
+      transformMedia: { media in
+        BBCodePreparedMedia(
+          url: media.url,
+          linkURL: url,
+          constrainedSize: media.constrainedSize,
+          alignment: media.alignment
+        )
+      },
+      transformText: { attributed in
+        applyLinkAttributes(to: attributed, url: url)
       }
     )
   }
@@ -493,86 +604,117 @@ private struct BBCodeTextKitRenderer {
     alignment: NSTextAlignment,
     transform: (NSMutableAttributedString) -> Void
   ) -> [RenderedSegment] {
-    normalizeSegments(
-      segments.map { segment in
-        switch segment {
-        case .text(let attributed):
-          let transformed = NSMutableAttributedString(attributedString: attributed)
-          transform(transformed)
-          return .text(transformed)
-        case .block(let payload):
-          return .block(alignedPayload(payload, alignment: alignment))
-        case .separator:
-          return segment
-        }
-      }
-    )
-  }
-
-  private func alignedPayload(
-    _ payload: BBCodePreparedBlock.Payload,
-    alignment: NSTextAlignment
-  ) -> BBCodePreparedBlock.Payload {
-    switch payload {
-    case .image(let media):
-      return .image(
+    mapSegmentsRecursively(
+      segments,
+      transformMedia: { media in
         BBCodePreparedMedia(
           url: media.url,
           linkURL: media.linkURL,
           constrainedSize: media.constrainedSize,
           alignment: alignment
         )
-      )
-    case .mask(let blocks):
-      return .mask(
-        blocks.map { block in
-          BBCodePreparedBlock(
-            id: block.id,
-            payload: alignedPayload(block.payload, alignment: alignment)
-          )
-        }
-      )
-    case .quote, .list, .text:
-      return payload
-    }
+      },
+      transformText: transform
+    )
   }
 
-  private func linkedPayload(
-    _ payload: BBCodePreparedBlock.Payload,
-    url: URL
-  ) -> BBCodePreparedBlock.Payload {
+  private func appendRubyAnnotation(
+    _ annotation: String,
+    to segments: [RenderedSegment]
+  ) -> [RenderedSegment] {
+    guard !annotation.isEmpty else {
+      return segments
+    }
+
+    let ruby = makeRubyAnnotation(annotation)
+    var transformed = segments
+    if appendAttributedText(ruby, toLastTextIn: &transformed) {
+      return normalizeSegments(transformed)
+    }
+
+    transformed.append(.text(ruby))
+    return normalizeSegments(transformed)
+  }
+
+  private func appendAttributedText(
+    _ appended: NSAttributedString,
+    toLastTextIn segments: inout [RenderedSegment]
+  ) -> Bool {
+    for index in segments.indices.reversed() {
+      switch segments[index] {
+      case .text(let attributed):
+        let transformed = NSMutableAttributedString(attributedString: attributed)
+        transformed.append(appended)
+        segments[index] = .text(transformed)
+        return true
+      case .block(let payload):
+        var transformed = payload
+        if appendAttributedText(appended, toLastTextIn: &transformed) {
+          segments[index] = .block(transformed)
+          return true
+        }
+      case .separator:
+        continue
+      }
+    }
+
+    return false
+  }
+
+  private func appendAttributedText(
+    _ appended: NSAttributedString,
+    toLastTextIn blocks: inout [BBCodePreparedBlock]
+  ) -> Bool {
+    for index in blocks.indices.reversed() {
+      var payload = blocks[index].payload
+      if appendAttributedText(appended, toLastTextIn: &payload) {
+        blocks[index] = BBCodePreparedBlock(id: blocks[index].id, payload: payload)
+        return true
+      }
+    }
+
+    return false
+  }
+
+  private func appendAttributedText(
+    _ appended: NSAttributedString,
+    toLastTextIn payload: inout BBCodePreparedBlock.Payload
+  ) -> Bool {
     switch payload {
-    case .image(let media):
-      return .image(
-        BBCodePreparedMedia(
-          url: media.url,
-          linkURL: url,
-          constrainedSize: media.constrainedSize,
-          alignment: media.alignment
-        )
-      )
-    case .mask(let blocks):
-      return .mask(blocks.map { block in
-        BBCodePreparedBlock(id: block.id, payload: linkedPayload(block.payload, url: url))
-      })
-    case .quote(let blocks):
-      return .quote(blocks.map { block in
-        BBCodePreparedBlock(id: block.id, payload: linkedPayload(block.payload, url: url))
-      })
-    case .list(let items):
-      return .list(items.map { item in
-        BBCodePreparedListItem(
-          id: item.id,
-          marker: item.marker,
-          blocks: item.blocks.map { block in
-            BBCodePreparedBlock(id: block.id, payload: linkedPayload(block.payload, url: url))
-          }
-        )
-      })
     case .text(let attributed):
       let transformed = NSMutableAttributedString(attributedString: attributed)
-      applyLinkAttributes(to: transformed, url: url)
-      return .text(transformed)
+      transformed.append(appended)
+      payload = .text(transformed)
+      return true
+    case .image:
+      return false
+    case .mask(var blocks):
+      guard appendAttributedText(appended, toLastTextIn: &blocks) else {
+        return false
+      }
+      payload = .mask(blocks)
+      return true
+    case .quote(var blocks):
+      guard appendAttributedText(appended, toLastTextIn: &blocks) else {
+        return false
+      }
+      payload = .quote(blocks)
+      return true
+    case .list(var items):
+      for index in items.indices.reversed() {
+        var blocks = items[index].blocks
+        guard appendAttributedText(appended, toLastTextIn: &blocks) else {
+          continue
+        }
+        items[index] = BBCodePreparedListItem(
+          id: items[index].id,
+          marker: items[index].marker,
+          blocks: blocks
+        )
+        payload = .list(items)
+        return true
+      }
+      return false
     }
   }
 
@@ -652,7 +794,13 @@ private struct BBCodeTextKitRenderer {
 
       return BBCodePreparedListItem(
         id: index,
-        marker: markerStyle.marker(for: index),
+        marker: NSAttributedString(
+          string: markerStyle.marker(for: index),
+          attributes: [
+            .font: baseFont,
+            .foregroundColor: UIColor.label,
+          ]
+        ),
         blocks: blocks
       )
     }
@@ -965,11 +1113,15 @@ private struct BBCodeTextKitRenderer {
       return base
     }
 
-    let rubyFont = UIFont.systemFont(ofSize: max(8, textSize * 0.5))
-    let ruby = makeText("(\(node.attr))", font: rubyFont)
-    ruby.addAttribute(.baselineOffset, value: textSize * 0.6, range: ruby.fullRange)
-    base.append(ruby)
+    base.append(makeRubyAnnotation(node.attr))
     return base
+  }
+
+  private func makeRubyAnnotation(_ annotation: String) -> NSMutableAttributedString {
+    let rubyFont = UIFont.systemFont(ofSize: max(8, textSize * 0.5))
+    let ruby = makeText("(\(annotation))", font: rubyFont)
+    ruby.addAttribute(.baselineOffset, value: textSize * 0.6, range: ruby.fullRange)
+    return ruby
   }
 
   private func renderSmiley(_ node: BBCodeNode) -> NSMutableAttributedString {

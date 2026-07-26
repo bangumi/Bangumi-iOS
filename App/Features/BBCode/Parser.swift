@@ -2,7 +2,26 @@ import Foundation
 import OSLog
 import SwiftUI
 
-typealias BBCodeScalarIterator = String.UnicodeScalarView.Iterator
+struct BBCodeScalarIterator {
+  private var iterator: String.UnicodeScalarView.Iterator
+  private var pushedBackScalar: UnicodeScalar?
+
+  init(_ source: String) {
+    self.iterator = source.unicodeScalars.makeIterator()
+  }
+
+  mutating func next() -> UnicodeScalar? {
+    if let pushedBackScalar {
+      self.pushedBackScalar = nil
+      return pushedBackScalar
+    }
+    return iterator.next()
+  }
+
+  mutating func pushBack(_ scalar: UnicodeScalar) {
+    pushedBackScalar = scalar
+  }
+}
 
 enum BBCodeParserState {
   case content
@@ -99,7 +118,7 @@ class BBCodeParserWorker {
   }
 
   func parse(_ bbcode: String) -> BBCodeNode? {
-    var g: BBCodeScalarIterator = bbcode.unicodeScalars.makeIterator()
+    var g = BBCodeScalarIterator(bbcode)
     var parser: BBCodeParserState? = .content
     while let p = parser {
       parser = p.parse(&g, self)

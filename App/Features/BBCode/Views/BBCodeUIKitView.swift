@@ -876,13 +876,10 @@ private final class BBCodeListBlockView: UIView {
     stackView.spacing = 0
     stackView.translatesAutoresizingMaskIntoConstraints = false
 
-    let markerFont = UIFont.preferredFont(forTextStyle: .body)
     let markerWidths =
       items
       .map {
-        ceil(
-          ($0.marker as NSString).size(withAttributes: [.font: markerFont]).width
-        )
+        ceil($0.marker.size().width)
       }
     let markerWidth = max(10, markerWidths.max() ?? 0)
 
@@ -890,7 +887,6 @@ private final class BBCodeListBlockView: UIView {
       stackView.addArrangedSubview(
         BBCodeListItemView(
           item: item,
-          markerFont: markerFont,
           markerWidth: markerWidth
         )
       )
@@ -912,7 +908,7 @@ private final class BBCodeListBlockView: UIView {
 }
 
 private final class BBCodeListItemView: UIView {
-  init(item: BBCodePreparedListItem, markerFont: UIFont, markerWidth: CGFloat) {
+  init(item: BBCodePreparedListItem, markerWidth: CGFloat) {
     super.init(frame: .zero)
     translatesAutoresizingMaskIntoConstraints = false
     backgroundColor = .clear
@@ -920,8 +916,7 @@ private final class BBCodeListItemView: UIView {
 
     let bulletLabel = UILabel()
     bulletLabel.translatesAutoresizingMaskIntoConstraints = false
-    bulletLabel.text = item.marker
-    bulletLabel.font = markerFont
+    bulletLabel.attributedText = item.marker
     bulletLabel.textAlignment = .right
     bulletLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
     bulletLabel.setContentHuggingPriority(.required, for: .horizontal)
