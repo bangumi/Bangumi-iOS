@@ -409,19 +409,19 @@ private struct BBCodeTextKitRenderer {
 
       return mapLinkedSegments(segments, url: url)
     case .bold:
-      return mapTextSegments(segments) { attributed in
+      return mapTextSegmentsRecursively(segments) { attributed in
         applyFontTransform(to: attributed) { makeBoldFont(from: $0) }
       }
     case .italic:
-      return mapTextSegments(segments) { attributed in
+      return mapTextSegmentsRecursively(segments) { attributed in
         applyFontTransform(to: attributed) { makeItalicFont(from: $0) }
       }
     case .underline:
-      return mapTextSegments(segments) { attributed in
+      return mapTextSegmentsRecursively(segments) { attributed in
         applyAttribute(.underlineStyle, value: NSUnderlineStyle.single.rawValue, to: attributed)
       }
     case .delete:
-      return mapTextSegments(segments) { attributed in
+      return mapTextSegmentsRecursively(segments) { attributed in
         applyAttribute(.strikethroughStyle, value: NSUnderlineStyle.single.rawValue, to: attributed)
       }
     case .color:
@@ -429,7 +429,7 @@ private struct BBCodeTextKitRenderer {
         return segments
       }
 
-      return mapTextSegments(segments) { attributed in
+      return mapTextSegmentsRecursively(segments) { attributed in
         applyAttribute(.foregroundColor, value: color, to: attributed)
       }
     case .size:
