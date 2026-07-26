@@ -68,8 +68,7 @@ private final class BBCodePreparedDocumentCache {
 
 struct BBCodePreparedListItem: Identifiable {
   let id: Int
-  let marker: String
-  let markerFont: UIFont
+  let marker: NSAttributedString
   let blocks: [BBCodePreparedBlock]
 }
 
@@ -507,10 +506,11 @@ private struct BBCodeTextKitRenderer {
     case .list(let items):
       return .list(
         items.map { item in
-          BBCodePreparedListItem(
+          let marker = NSMutableAttributedString(attributedString: item.marker)
+          transform(marker)
+          return BBCodePreparedListItem(
             id: item.id,
-            marker: item.marker,
-            markerFont: mapTextFont(item.markerFont, transform: transform),
+            marker: marker,
             blocks: mapTextBlocks(item.blocks, transform: transform)
           )
         }
@@ -528,18 +528,6 @@ private struct BBCodeTextKitRenderer {
         payload: mapTextPayload(block.payload, transform: transform)
       )
     }
-  }
-
-  private func mapTextFont(
-    _ font: UIFont,
-    transform: (NSMutableAttributedString) -> Void
-  ) -> UIFont {
-    let attributed = NSMutableAttributedString(
-      string: " ",
-      attributes: [.font: font]
-    )
-    transform(attributed)
-    return attributed.attribute(.font, at: 0, effectiveRange: nil) as? UIFont ?? font
   }
 
   private func mapLinkedSegments(
@@ -638,7 +626,6 @@ private struct BBCodeTextKitRenderer {
         BBCodePreparedListItem(
           id: item.id,
           marker: item.marker,
-          markerFont: item.markerFont,
           blocks: item.blocks.map { block in
             BBCodePreparedBlock(id: block.id, payload: linkedPayload(block.payload, url: url))
           }
@@ -727,8 +714,13 @@ private struct BBCodeTextKitRenderer {
 
       return BBCodePreparedListItem(
         id: index,
-        marker: markerStyle.marker(for: index),
-        markerFont: baseFont,
+        marker: NSAttributedString(
+          string: markerStyle.marker(for: index),
+          attributes: [
+            .font: baseFont,
+            .foregroundColor: UIColor.label,
+          ]
+        ),
         blocks: blocks
       )
     }
