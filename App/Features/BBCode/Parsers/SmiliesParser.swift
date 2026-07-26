@@ -23,7 +23,7 @@ func parseBBCodeSmiley(_ g: inout BBCodeScalarIterator, _ worker: BBCodeParserWo
         return .content
       }
 
-      let token = newNode.value
+      let token = newNode.value.trimmingCharacters(in: .whitespacesAndNewlines)
 
       if isCompleteBBCodeBmoToken(token) {
         newNode.value = "bmo"
