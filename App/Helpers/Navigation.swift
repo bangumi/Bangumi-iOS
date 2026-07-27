@@ -16,6 +16,7 @@ enum NavDestination: Hashable, View {
   case notice
   case friends
   case settings
+  case profileHome
   case calendar
   case collectionList(_ subjectType: SubjectType)
   case export
@@ -88,6 +89,8 @@ enum NavDestination: Hashable, View {
       NoticeView()
     case .settings:
       SettingsView()
+    case .profileHome:
+      ProfileHomeView()
     case .friends:
       FriendsView()
     case .calendar:
