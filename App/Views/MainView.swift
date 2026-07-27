@@ -10,11 +10,10 @@ struct MainView: View {
   @State private var timelineNav: NavigationPath = NavigationPath()
   @State private var progressNav: NavigationPath = NavigationPath()
   @State private var rakuenNav: NavigationPath = NavigationPath()
-  @State private var meNav: NavigationPath = NavigationPath()
   @State private var discoverNav: NavigationPath = NavigationPath()
 
   private func selectVisibleTabIfNeeded() {
-    if !isAuthenticated, mainTab == .progress || mainTab == .me {
+    if !isAuthenticated, mainTab == .progress {
       mainTab = .timeline
     }
     if isolationMode, mainTab == .rakuen {
@@ -55,27 +54,6 @@ struct MainView: View {
             \.openURL,
             OpenURLAction { url in
               if handleURL(url, nav: $progressNav) {
-                return .handled
-              } else {
-                return .systemAction
-              }
-            }
-          )
-        }
-      }
-
-      if isAuthenticated {
-        Tab(ChiiViewTab.me.title, systemImage: ChiiViewTab.me.icon, value: .me) {
-          ZoomTransitionContainer {
-            NavigationStack(path: $meNav) {
-              ProfileHomeView()
-                .navigationDestination(for: NavDestination.self) { $0 }
-            }
-          }
-          .environment(
-            \.openURL,
-            OpenURLAction { url in
-              if handleURL(url, nav: $meNav) {
                 return .handled
               } else {
                 return .systemAction

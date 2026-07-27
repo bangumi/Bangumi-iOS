@@ -3,6 +3,7 @@ import SwiftUI
 
 struct ChiiTimelineView: View {
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
+  @AppStorage("profile") var profile: Profile = Profile()
   @AppStorage("isolationMode") var isolationMode: Bool = false
 
   @State private var noticeUnreadCount: Int = 0
@@ -39,6 +40,14 @@ struct ChiiTimelineView: View {
       .navigationBarTitleDisplayMode(.inline)
       .toolbar {
         ToolbarItemGroup(placement: .topBarLeading) {
+          if isAuthenticated {
+            NavigationLink(value: NavDestination.profileHome) {
+              ProfileToolbarAvatarView(imageURL: profile.avatar?.large)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("我的")
+          }
+
           if isAuthenticated, !isolationMode {
             NavigationLink(value: NavDestination.notice) {
               Image(systemName: noticeUnreadCount > 0 ? "bell.badge.fill" : "bell")

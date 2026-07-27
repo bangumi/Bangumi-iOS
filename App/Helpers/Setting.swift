@@ -341,7 +341,6 @@ enum ChiiViewTab: String {
   case timeline = "timeline"
   case progress = "progress"
   case rakuen = "rakuen"
-  case me = "me"
   case discover = "discover"
 
   init(_ label: String? = nil) {
@@ -352,8 +351,6 @@ enum ChiiViewTab: String {
       self = .progress
     case "rakuen":
       self = .rakuen
-    case "me":
-      self = .me
     case "discover":
       self = .discover
     default:
@@ -369,8 +366,6 @@ enum ChiiViewTab: String {
       "进度管理"
     case .rakuen:
       "超展开"
-    case .me:
-      "我的"
     case .discover:
       "发现"
     }
@@ -384,8 +379,6 @@ enum ChiiViewTab: String {
       "square.grid.2x2"
     case .rakuen:
       "rectangle.3.group.bubble"
-    case .me:
-      "person.crop.circle"
     case .discover:
       "magnifyingglass"
     }
