@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct ProfileToolbarMenu: View {
+struct ProfilePagesMenu: View {
   let user: SlimUserDTO
 
   var body: some View {
@@ -26,17 +26,9 @@ struct ProfileToolbarMenu: View {
       NavigationLink(value: NavDestination.friends) {
         Label("好友", systemImage: "person.2")
       }
-
-      Divider()
-
-      NavigationLink(value: NavDestination.profilePrivacy) {
-        Label("隐私设置", systemImage: "hand.raised")
-      }
-      NavigationLink(value: NavDestination.export) {
-        Label("导出收藏", systemImage: "square.and.arrow.up")
-      }
     } label: {
-      Image(systemName: "ellipsis")
+      Image(systemName: "person.crop.circle")
+        .accessibilityLabel("我的页面")
     }
   }
 }
