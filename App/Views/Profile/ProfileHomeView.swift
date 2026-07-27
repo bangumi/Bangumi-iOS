@@ -17,21 +17,11 @@ struct ProfileHomeView: View {
         }
       }.padding(.horizontal, 8)
     }
-    .navigationTitle("我的收藏")
+    .navigationTitle("我的")
     .navigationBarTitleDisplayMode(.inline)
     .toolbar {
-      ToolbarItem(placement: .topBarTrailing) {
-        Menu {
-          NavigationLink(value: NavDestination.profilePrivacy) {
-            Label("隐私设置", systemImage: "hand.raised")
-          }
-
-          NavigationLink(value: NavDestination.export) {
-            Label("导出收藏", systemImage: "square.and.arrow.up")
-          }
-        } label: {
-          Image(systemName: "ellipsis")
-        }
+      ToolbarItemGroup(placement: .topBarTrailing) {
+        ProfileToolbarMenu(user: profile.user)
       }
     }
   }
