@@ -84,23 +84,15 @@ struct ChiiTimelineView: View {
             TimelineToolbarAvatarView(imageURL: nil)
           }
         }
-        ToolbarItem(placement: .topBarTrailing) {
-          HStack(spacing: 8) {
-            if isAuthenticated, profile.canAccessWikiTools {
-              NavigationLink(value: NavDestination.wikiHome) {
-                Image(systemName: "pencil.and.list.clipboard")
-              }
+        ToolbarItemGroup(placement: .topBarTrailing) {
+          if isAuthenticated, !isolationMode {
+            NavigationLink(value: NavDestination.notice) {
+              Image(systemName: noticeUnreadCount > 0 ? "bell.badge.fill" : "bell")
             }
+          }
 
-            if isAuthenticated, !isolationMode {
-              NavigationLink(value: NavDestination.notice) {
-                Image(systemName: noticeUnreadCount > 0 ? "bell.badge.fill" : "bell")
-              }
-            }
-
-            NavigationLink(value: NavDestination.settings) {
-              Image(systemName: "gearshape")
-            }
+          NavigationLink(value: NavDestination.settings) {
+            Image(systemName: "gearshape")
           }
         }
       }

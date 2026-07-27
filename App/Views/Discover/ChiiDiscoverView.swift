@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct ChiiDiscoverView: View {
+  @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
+  @AppStorage("profile") var profile: Profile = Profile()
 
   @State private var query: String = ""
   @State private var searching: Bool = false
@@ -78,6 +80,15 @@ struct ChiiDiscoverView: View {
       prompt: "搜索条目，角色，人物"
     )
     .searchInputTraits()
+    .toolbar {
+      ToolbarItemGroup(placement: .topBarTrailing) {
+        if isAuthenticated, profile.canAccessWikiTools {
+          NavigationLink(value: NavDestination.wikiHome) {
+            Image(systemName: "pencil.and.list.clipboard")
+          }
+        }
+      }
+    }
     .onAppear {
       showsSearch = !query.isEmpty
       refreshInitiallyIfNeeded()
