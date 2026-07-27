@@ -38,13 +38,15 @@ struct ChiiTimelineView: View {
       .navigationTitle("时间线")
       .navigationBarTitleDisplayMode(.inline)
       .toolbar {
-        ToolbarItemGroup(placement: .topBarTrailing) {
+        ToolbarItemGroup(placement: .topBarLeading) {
           if isAuthenticated, !isolationMode {
             NavigationLink(value: NavDestination.notice) {
               Image(systemName: noticeUnreadCount > 0 ? "bell.badge.fill" : "bell")
             }
           }
+        }
 
+        ToolbarItemGroup(placement: .topBarTrailing) {
           NavigationLink(value: NavDestination.settings) {
             Image(systemName: "gearshape")
           }
