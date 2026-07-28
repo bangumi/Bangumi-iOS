@@ -47,10 +47,6 @@ struct ChiiTimelineView: View {
             .buttonStyle(.plain)
             .accessibilityLabel("我的")
           }
-
-          NavigationLink(value: NavDestination.settings) {
-            Image(systemName: "gearshape")
-          }
         }
 
         ToolbarItemGroup(placement: .topBarTrailing) {
@@ -58,6 +54,10 @@ struct ChiiTimelineView: View {
             NavigationLink(value: NavDestination.notice) {
               Image(systemName: noticeUnreadCount > 0 ? "bell.badge.fill" : "bell")
             }
+          }
+
+          NavigationLink(value: NavDestination.settings) {
+            Image(systemName: "gearshape")
           }
         }
       }

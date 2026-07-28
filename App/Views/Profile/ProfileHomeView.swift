@@ -20,12 +20,9 @@ struct ProfileHomeView: View {
     .navigationTitle("我的")
     .navigationBarTitleDisplayMode(.inline)
     .toolbar {
-      ToolbarItemGroup(placement: .topBarLeading) {
-        ProfileActionsMenu()
-      }
-
       ToolbarItemGroup(placement: .topBarTrailing) {
         ProfilePagesMenu(user: profile.user)
+        ProfileActionsMenu()
       }
     }
   }
