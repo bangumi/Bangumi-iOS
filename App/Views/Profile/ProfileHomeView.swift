@@ -21,11 +21,11 @@ struct ProfileHomeView: View {
     .navigationBarTitleDisplayMode(.inline)
     .toolbar {
       ToolbarItemGroup(placement: .topBarLeading) {
-        ProfilePagesMenu(user: profile.user)
+        ProfileActionsMenu()
       }
 
       ToolbarItemGroup(placement: .topBarTrailing) {
-        ProfileActionsMenu()
+        ProfilePagesMenu(user: profile.user)
       }
     }
   }

@@ -48,16 +48,16 @@ struct ChiiTimelineView: View {
             .accessibilityLabel("我的")
           }
 
-          if isAuthenticated, !isolationMode {
-            NavigationLink(value: NavDestination.notice) {
-              Image(systemName: noticeUnreadCount > 0 ? "bell.badge.fill" : "bell")
-            }
+          NavigationLink(value: NavDestination.settings) {
+            Image(systemName: "gearshape")
           }
         }
 
         ToolbarItemGroup(placement: .topBarTrailing) {
-          NavigationLink(value: NavDestination.settings) {
-            Image(systemName: "gearshape")
+          if isAuthenticated, !isolationMode {
+            NavigationLink(value: NavDestination.notice) {
+              Image(systemName: noticeUnreadCount > 0 ? "bell.badge.fill" : "bell")
+            }
           }
         }
       }
