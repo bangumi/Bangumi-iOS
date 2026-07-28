@@ -47,15 +47,15 @@ struct ChiiTimelineView: View {
             .buttonStyle(.plain)
             .accessibilityLabel("我的")
           }
+        }
 
+        ToolbarItemGroup(placement: .topBarTrailing) {
           if isAuthenticated, !isolationMode {
             NavigationLink(value: NavDestination.notice) {
               Image(systemName: noticeUnreadCount > 0 ? "bell.badge.fill" : "bell")
             }
           }
-        }
 
-        ToolbarItemGroup(placement: .topBarTrailing) {
           NavigationLink(value: NavDestination.settings) {
             Image(systemName: "gearshape")
           }
