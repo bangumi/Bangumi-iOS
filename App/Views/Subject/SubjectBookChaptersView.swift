@@ -390,7 +390,7 @@ private struct BookProgressCurrentValue: View {
     Text(value, format: .number)
       .font(.subheadline)
       .fontWeight(.medium)
-      .foregroundStyle(Color.linkText.opacity(0.55))
+      .foregroundStyle(.linkText)
       .monospacedDigit()
       .contentTransition(.numericText())
       .animation(.default, value: value)
