@@ -377,17 +377,32 @@ private struct BookProgressMetric: View {
 
   var body: some View {
     HStack(alignment: .firstTextBaseline, spacing: 0) {
-      Text(value, format: .number)
-        .font(.subheadline)
-        .fontWeight(.medium)
-        .foregroundStyle(.linkText)
-        .monospacedDigit()
-
-      Text(verbatim: "/\(total)")
-        .font(.footnote)
-        .foregroundStyle(.secondary)
-        .monospacedDigit()
+      BookProgressCurrentValue(value: value)
+      BookProgressTotal(total: total)
     }
+  }
+}
+
+private struct BookProgressCurrentValue: View {
+  let value: Int
+
+  var body: some View {
+    Text(value, format: .number)
+      .font(.subheadline)
+      .fontWeight(.medium)
+      .foregroundStyle(.linkText)
+      .monospacedDigit()
+  }
+}
+
+private struct BookProgressTotal: View {
+  let total: String
+
+  var body: some View {
+    Text(verbatim: "/\(total)")
+      .font(.footnote)
+      .foregroundStyle(.secondary)
+      .monospacedDigit()
   }
 }
 
@@ -459,40 +474,51 @@ private struct BookProgressTileControls: View {
 
   var body: some View {
     HStack(spacing: 0) {
-      Grid(alignment: .leading, horizontalSpacing: 4, verticalSpacing: 2) {
+      Grid(alignment: .leading, horizontalSpacing: 0, verticalSpacing: 2) {
         GridRow(alignment: .firstTextBaseline) {
           Text(verbatim: "Chap.")
             .font(.footnote)
             .foregroundStyle(.secondary)
+            .padding(.trailing, 4)
             .gridColumnAlignment(.leading)
 
-          BookProgressTileMetricControl(
-            value: chapterValue,
-            total: chapterTotal,
+          BookProgressCurrentValue(value: chapterValue)
+            .gridColumnAlignment(.trailing)
+
+          BookProgressTotal(total: chapterTotal)
+            .gridColumnAlignment(.leading)
+
+          BookProgressQuickUpdateButton(
             accessibilityLabel: "话数加一",
             updating: quickUpdate == .chapters,
             disabled: quickUpdate != nil,
             action: incrementChapters
           )
-          .gridColumnAlignment(.trailing)
+          .padding(.leading, 4)
+          .gridColumnAlignment(.center)
         }
 
         GridRow(alignment: .firstTextBaseline) {
           Text(verbatim: "Vol.")
             .font(.footnote)
             .foregroundStyle(.secondary)
+            .padding(.trailing, 4)
 
-          BookProgressTileMetricControl(
-            value: volumeValue,
-            total: volumeTotal,
+          BookProgressCurrentValue(value: volumeValue)
+
+          BookProgressTotal(total: volumeTotal)
+
+          BookProgressQuickUpdateButton(
             accessibilityLabel: "卷数加一",
             updating: quickUpdate == .volumes,
             disabled: quickUpdate != nil,
             action: incrementVolumes
           )
+          .padding(.leading, 4)
         }
       }
       .lineLimit(1)
+      .layoutPriority(1)
 
       Spacer(minLength: 4)
 
@@ -502,28 +528,6 @@ private struct BookProgressTileControls: View {
       )
     }
     .frame(maxWidth: .infinity, alignment: .leading)
-  }
-}
-
-private struct BookProgressTileMetricControl: View {
-  let value: Int
-  let total: String
-  let accessibilityLabel: LocalizedStringKey
-  let updating: Bool
-  let disabled: Bool
-  let action: () -> Void
-
-  var body: some View {
-    HStack(alignment: .firstTextBaseline, spacing: 4) {
-      BookProgressMetric(value: value, total: total)
-
-      BookProgressQuickUpdateButton(
-        accessibilityLabel: accessibilityLabel,
-        updating: updating,
-        disabled: disabled,
-        action: action
-      )
-    }
   }
 }
 
