@@ -36,35 +36,17 @@ struct ProgressSecondLineView: View {
       }
 
     case .category:
-      switch progressViewMode {
-      case .tile:
-        VStack(alignment: .leading, spacing: 4) {
-          Label(subject.category, systemImage: subject.type.icon)
-          if !subject.airtime.date.isEmpty {
-            Label(subject.airtime.date, systemImage: "calendar")
-              .font(.caption)
-              .foregroundStyle(.secondary)
-              .lineLimit(1)
-          }
+      HStack(spacing: 4) {
+        Text(subject.category)
+        if !subject.airtime.date.isEmpty {
+          Text("·")
+          Text(subject.airtime.date)
         }
-        .labelStyle(.compact)
-        .font(.caption)
-        .foregroundStyle(.secondary)
-      case .list:
-        HStack(spacing: 4) {
-          Label(subject.category, systemImage: subject.type.icon)
-          if !subject.airtime.date.isEmpty {
-            Label(subject.airtime.date, systemImage: "calendar")
-              .font(.caption)
-              .foregroundStyle(.secondary)
-              .lineLimit(1)
-          }
-          Spacer()
-        }
-        .labelStyle(.compact)
-        .font(.caption)
-        .foregroundStyle(.secondary)
+        Spacer()
       }
+      .font(.caption)
+      .foregroundStyle(.secondary)
+      .lineLimit(1)
 
     case .watching:
       let doing = subject.collection.doing
