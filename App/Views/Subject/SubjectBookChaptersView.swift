@@ -308,7 +308,10 @@ private struct BookProgressSummaryView: View {
       switch layout {
       case .row:
         HStack(alignment: .firstTextBaseline, spacing: 4) {
-          BookProgressMetric(value: epStatus, total: subject.epsDesc, unit: "话")
+          Text(verbatim: "Chap.")
+            .font(.footnote)
+            .foregroundStyle(.secondary)
+          BookProgressMetric(value: epStatus, total: subject.epsDesc)
           BookProgressQuickUpdateButton(
             accessibilityLabel: "话数加一",
             updating: quickUpdate == .chapters,
@@ -318,10 +321,13 @@ private struct BookProgressSummaryView: View {
           }
 
           Text("·")
-            .font(.caption)
+            .font(.footnote)
             .foregroundStyle(.secondary)
 
-          BookProgressMetric(value: volStatus, total: subject.volumesDesc, unit: "卷")
+          Text(verbatim: "Vol.")
+            .font(.footnote)
+            .foregroundStyle(.secondary)
+          BookProgressMetric(value: volStatus, total: subject.volumesDesc)
           BookProgressQuickUpdateButton(
             accessibilityLabel: "卷数加一",
             updating: quickUpdate == .volumes,
@@ -340,35 +346,22 @@ private struct BookProgressSummaryView: View {
         }
         .lineLimit(1)
       case .tile:
-        VStack(alignment: .leading, spacing: 6) {
-          HStack(alignment: .firstTextBaseline, spacing: 4) {
-            BookProgressMetric(value: epStatus, total: subject.epsDesc, unit: "话")
-            Text("·")
-              .font(.caption)
-              .foregroundStyle(.secondary)
-            BookProgressMetric(value: volStatus, total: subject.volumesDesc, unit: "卷")
+        BookProgressTileControls(
+          chapterValue: epStatus,
+          chapterTotal: subject.epsDesc,
+          volumeValue: volStatus,
+          volumeTotal: subject.volumesDesc,
+          quickUpdate: quickUpdate,
+          incrementChapters: {
+            increment(.chapters)
+          },
+          incrementVolumes: {
+            increment(.volumes)
+          },
+          edit: {
+            showingEditor = true
           }
-          .lineLimit(1)
-          .accessibilityElement(children: .ignore)
-          .accessibilityLabel(
-            "阅读进度：\(epStatus)/\(subject.epsDesc)话，\(volStatus)/\(subject.volumesDesc)卷"
-          )
-          .frame(maxWidth: .infinity, alignment: .leading)
-
-          BookProgressTileActionBar(
-            quickUpdate: quickUpdate,
-            incrementChapters: {
-              increment(.chapters)
-            },
-            incrementVolumes: {
-              increment(.volumes)
-            },
-            edit: {
-              showingEditor = true
-            }
-          )
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
+        )
       }
     }
     .sheet(isPresented: $showingEditor) {
@@ -381,7 +374,6 @@ private struct BookProgressSummaryView: View {
 private struct BookProgressMetric: View {
   let value: Int
   let total: String
-  let unit: LocalizedStringKey
 
   var body: some View {
     HStack(alignment: .firstTextBaseline, spacing: 0) {
@@ -391,13 +383,10 @@ private struct BookProgressMetric: View {
         .foregroundStyle(.linkText)
         .monospacedDigit()
 
-      HStack(spacing: 0) {
-        Text(verbatim: "/\(total)")
-        Text(unit)
-      }
-      .font(.caption)
-      .foregroundStyle(.secondary)
-      .monospacedDigit()
+      Text(verbatim: "/\(total)")
+        .font(.footnote)
+        .foregroundStyle(.secondary)
+        .monospacedDigit()
     }
   }
 }
@@ -442,7 +431,27 @@ private struct BookProgressEditButton: View {
   }
 }
 
-private struct BookProgressTileActionBar: View {
+private struct BookProgressTileEditButton: View {
+  let disabled: Bool
+  let action: () -> Void
+
+  var body: some View {
+    Button(action: action) {
+      Image(systemName: "plusminus.circle")
+        .imageScale(.large)
+        .progressActionLabelStyle(.inline)
+    }
+    .progressActionButtonStyle()
+    .disabled(disabled)
+    .accessibilityLabel("编辑阅读进度")
+  }
+}
+
+private struct BookProgressTileControls: View {
+  let chapterValue: Int
+  let chapterTotal: String
+  let volumeValue: Int
+  let volumeTotal: String
   let quickUpdate: BookProgressQuickUpdate?
   let incrementChapters: () -> Void
   let incrementVolumes: () -> Void
@@ -450,63 +459,71 @@ private struct BookProgressTileActionBar: View {
 
   var body: some View {
     HStack(spacing: 0) {
-      BookProgressTileQuickUpdateButton(
-        accessibilityLabel: "话数加一",
-        updating: quickUpdate == .chapters,
-        action: incrementChapters
-      )
+      Grid(alignment: .leading, horizontalSpacing: 4, verticalSpacing: 2) {
+        GridRow(alignment: .firstTextBaseline) {
+          Text(verbatim: "Chap.")
+            .font(.footnote)
+            .foregroundStyle(.secondary)
+            .gridColumnAlignment(.leading)
 
-      Divider()
-        .frame(height: 18)
-        .overlay(Color.accentColor.opacity(0.3))
+          BookProgressTileMetricControl(
+            value: chapterValue,
+            total: chapterTotal,
+            accessibilityLabel: "话数加一",
+            updating: quickUpdate == .chapters,
+            disabled: quickUpdate != nil,
+            action: incrementChapters
+          )
+          .gridColumnAlignment(.trailing)
+        }
 
-      Button(action: edit) {
-        Image(systemName: "pencil")
-          .frame(minWidth: 64)
-          .padding(.vertical, 5)
-          .contentShape(Rectangle())
+        GridRow(alignment: .firstTextBaseline) {
+          Text(verbatim: "Vol.")
+            .font(.footnote)
+            .foregroundStyle(.secondary)
+
+          BookProgressTileMetricControl(
+            value: volumeValue,
+            total: volumeTotal,
+            accessibilityLabel: "卷数加一",
+            updating: quickUpdate == .volumes,
+            disabled: quickUpdate != nil,
+            action: incrementVolumes
+          )
+        }
       }
-      .accessibilityLabel("编辑阅读进度")
+      .lineLimit(1)
 
-      Divider()
-        .frame(height: 18)
-        .overlay(Color.accentColor.opacity(0.3))
+      Spacer(minLength: 4)
 
-      BookProgressTileQuickUpdateButton(
-        accessibilityLabel: "卷数加一",
-        updating: quickUpdate == .volumes,
-        action: incrementVolumes
+      BookProgressTileEditButton(
+        disabled: quickUpdate != nil,
+        action: edit
       )
     }
-    .font(.footnote)
-    .foregroundStyle(.accent)
-    .tint(.accent)
-    .buttonStyle(.plain)
-    .disabled(quickUpdate != nil)
-    .overlay {
-      RoundedRectangle(cornerRadius: 8)
-        .strokeBorder(Color.accentColor.opacity(0.3), lineWidth: 1)
-        .allowsHitTesting(false)
-    }
+    .frame(maxWidth: .infinity, alignment: .leading)
   }
 }
 
-private struct BookProgressTileQuickUpdateButton: View {
+private struct BookProgressTileMetricControl: View {
+  let value: Int
+  let total: String
   let accessibilityLabel: LocalizedStringKey
   let updating: Bool
+  let disabled: Bool
   let action: () -> Void
 
   var body: some View {
-    Button(action: action) {
-      Image(systemName: updating ? "ellipsis" : "plus")
-        .contentTransition(.symbolEffect(.replace))
-        .animation(.default, value: updating)
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 5)
-        .contentShape(Rectangle())
+    HStack(alignment: .firstTextBaseline, spacing: 4) {
+      BookProgressMetric(value: value, total: total)
+
+      BookProgressQuickUpdateButton(
+        accessibilityLabel: accessibilityLabel,
+        updating: updating,
+        disabled: disabled,
+        action: action
+      )
     }
-    .accessibilityLabel(accessibilityLabel)
-    .accessibilityValue(updating ? "正在更新" : "")
   }
 }
 
