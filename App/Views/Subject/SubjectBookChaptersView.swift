@@ -390,8 +390,10 @@ private struct BookProgressCurrentValue: View {
     Text(value, format: .number)
       .font(.subheadline)
       .fontWeight(.medium)
-      .foregroundStyle(.linkText)
+      .foregroundStyle(Color.linkText.opacity(0.55))
       .monospacedDigit()
+      .contentTransition(.numericText())
+      .animation(.default, value: value)
   }
 }
 
@@ -532,14 +534,13 @@ private struct BookProgressTileControls: View {
 }
 
 private struct BookProgressEditorSheet: View {
-  let subjectId: Int
-  let epsDesc: String
-  let volumesDesc: String
+  let subject: SubjectDTO
   let initialEps: Int
   let initialVols: Int
   let reload: (() async -> Void)?
 
   @Environment(\.dismiss) private var dismiss
+  @AppStorage("titlePreference") private var titlePreference: TitlePreference = .original
 
   @State private var eps: Int
   @State private var vols: Int
@@ -549,9 +550,7 @@ private struct BookProgressEditorSheet: View {
     let initialEps = subject.interest?.epStatus ?? 0
     let initialVols = subject.interest?.volStatus ?? 0
 
-    subjectId = subject.id
-    epsDesc = subject.epsDesc
-    volumesDesc = subject.volumesDesc
+    self.subject = subject
     self.initialEps = initialEps
     self.initialVols = initialVols
     self.reload = reload
@@ -575,7 +574,7 @@ private struct BookProgressEditorSheet: View {
       }
       do {
         try await SubjectRepository.updateSubjectProgress(
-          subjectId: subjectId,
+          subjectId: subject.id,
           eps: eps == initialEps ? nil : eps,
           vols: vols == initialVols ? nil : vols
         )
@@ -597,8 +596,14 @@ private struct BookProgressEditorSheet: View {
     ) {
       Form {
         Section {
-          BookProgressField(title: "话数", value: $eps, total: epsDesc)
-          BookProgressField(title: "卷数", value: $vols, total: volumesDesc)
+          BookProgressField(title: "话数", value: $eps, total: subject.epsDesc)
+          BookProgressField(title: "卷数", value: $vols, total: subject.volumesDesc)
+        } header: {
+          Text(subject.title(with: titlePreference))
+            .font(.headline)
+            .foregroundStyle(.primary)
+            .textCase(nil)
+            .lineLimit(2)
         }
       }
       .disabled(updating)
