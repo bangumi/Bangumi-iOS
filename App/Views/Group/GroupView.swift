@@ -368,6 +368,7 @@ struct GroupRecentTopicView: View {
                   )
                     .font(.callout)
                     .lineLimit(1)
+                    .truncationMode(.middle)
                 }.buttonStyle(.navigation)
                 Spacer()
               }

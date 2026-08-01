@@ -276,6 +276,7 @@ struct IndexRelatedItemView: View {
                     link: topic.link
                   )
                     .lineLimit(1)
+                    .truncationMode(.middle)
                   Spacer(minLength: 0)
                 }
                 Text(topic.group.title)
@@ -332,6 +333,7 @@ struct IndexRelatedItemView: View {
                     link: topic.link
                   )
                     .lineLimit(1)
+                    .truncationMode(.middle)
                   Spacer(minLength: 0)
                 }
                 HStack {
