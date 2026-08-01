@@ -2,6 +2,7 @@ import SwiftUI
 
 struct EpisodeView: View {
   let episodeId: Int
+  let initialPostID: Int?
 
   @AppStorage("shareDomain") var shareDomain: ShareDomain = .chii
   @AppStorage("isolationMode") var isolationMode: Bool = false
@@ -11,8 +12,17 @@ struct EpisodeView: View {
   @Environment(\.dismiss) private var dismiss
 
   @State private var episode: EpisodeDTO?
+  @State private var episodeLoadFailed: Bool = false
+  @State private var isLoadingEpisode: Bool = false
+  @State private var needsEpisodeReload: Bool = false
+  @State private var showCommentBox: Bool = false
   @State private var showIndexPicker: Bool = false
   @State private var showWikiEdit: Bool = false
+
+  init(episodeId: Int, initialPostID: Int? = nil) {
+    self.episodeId = episodeId
+    self.initialPostID = initialPostID
+  }
 
   private func loadCached() async {
     do {
@@ -20,6 +30,7 @@ struct EpisodeView: View {
       let cachedEpisode = try await db.getEpisodeDTO(episodeId)
       withAnimation(.default) {
         episode = cachedEpisode
+        episodeLoadFailed = false
       }
     } catch {
       Notifier.shared.alert(error: error)
@@ -27,21 +38,51 @@ struct EpisodeView: View {
   }
 
   func load() async {
+    if isLoadingEpisode {
+      needsEpisodeReload = true
+      return
+    }
+    isLoadingEpisode = true
+    defer {
+      isLoadingEpisode = false
+    }
+
+    repeat {
+      needsEpisodeReload = false
+      guard await loadOnce() else {
+        return
+      }
+    } while needsEpisodeReload
+  }
+
+  private func loadOnce() async -> Bool {
+    if episode == nil {
+      episodeLoadFailed = false
+    }
+
     do {
       try await EpisodeRepository.loadEpisode(episodeId)
       await loadCached()
     } catch let error as ChiiError {
       switch error {
       case .notFound:
-        // 404 错误，删除当前 episode
+        // Remove stale local data when the episode no longer exists.
         try? await EpisodeRepository.deleteEpisode(episodeId)
         dismiss()
+        return false
       default:
+        if episode == nil {
+          episodeLoadFailed = true
+        }
         Notifier.shared.alert(error: error)
       }
     } catch {
+      if episode == nil {
+        episodeLoadFailed = true
+      }
       Notifier.shared.alert(error: error)
     }
+    return true
   }
 
   var shareLink: URL {
@@ -49,36 +90,31 @@ struct EpisodeView: View {
   }
 
   var body: some View {
-    ScrollView {
-      VStack(alignment: .leading) {
-        if let episode = episode {
-          if let subject = episode.subject {
-            SubjectTinyView(subject: subject)
-              .padding(.vertical, 8)
-          }
-          EpisodeInfoView(episode: episode, showsCommentLink: true)
-        }
-        Divider()
-        if let desc = episode?.desc, !desc.isEmpty {
-          Text(desc).foregroundStyle(.secondary)
-          Divider()
-        }
-        Spacer()
-      }.padding(.horizontal, 8)
-    }
-    .refreshable {
-      Task {
+    CommentListView(
+      route: CommentListRoute(
+        parent: .episode(episodeId),
+        initialPostID: initialPostID
+      ),
+      episode: episode,
+      episodeLoadFailed: episodeLoadFailed,
+      presentsNewComment: $showCommentBox,
+      onParentRefresh: {
         await load()
       }
-    }
+    )
     .task {
       await loadCached()
       await load()
     }
-    .navigationTitle("章节详情")
-    .navigationBarTitleDisplayMode(.inline)
     .toolbar {
-      ToolbarItem(placement: .topBarTrailing) {
+      ToolbarItemGroup(placement: .topBarTrailing) {
+        Button {
+          showCommentBox = true
+        } label: {
+          Label("添加吐槽", systemImage: "plus.bubble")
+        }
+        .disabled(episode == nil || !isAuthenticated || isolationMode)
+
         Menu {
           if isAuthenticated && profile.groupEnum.canEditEpisodeWiki {
             Button {
@@ -116,6 +152,5 @@ struct EpisodeView: View {
         }
       }
     }
-    .handoff(url: shareLink, title: "章节详情")
   }
 }

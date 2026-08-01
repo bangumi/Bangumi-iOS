@@ -16,6 +16,20 @@ struct PostDocumentRenderInput: Hashable, Sendable {
     let badge: String
   }
 
+  struct Field: Hashable, Sendable {
+    let label: String
+    let value: String
+  }
+
+  struct DetailHeader: Hashable, Sendable {
+    let parent: Parent?
+    let title: String
+    let badge: String?
+    let fields: [Field]
+    let descriptionText: String?
+    let sectionTitle: String
+  }
+
   struct User: Hashable, Sendable {
     let id: Int
     let name: String
@@ -58,6 +72,7 @@ struct PostDocumentRenderInput: Hashable, Sendable {
   let domains: BangumiDomains
   let parent: Parent?
   let title: String?
+  let detailHeader: DetailHeader?
   let mainPost: Post?
   let mainActions: MainActions?
   let replies: [Post]
@@ -77,6 +92,7 @@ extension PostDocumentRenderInput {
       domains: domains,
       parent: parent,
       title: title,
+      detailHeader: detailHeader,
       mainPost: mainPost?.withoutReactions,
       mainActions: mainActions,
       replies: replies.map(\.withoutReactions),
@@ -340,6 +356,100 @@ actor PostDocumentRenderer {
             border-top: 1px solid var(--separator);
             font-size: 1.1em;
             line-height: 1.3;
+          }
+
+          .detail-header {
+            padding: 12px;
+            border-bottom: 1px solid var(--separator);
+            background: var(--background);
+          }
+
+          .detail-parent {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            min-width: 0;
+            margin-bottom: 10px;
+            border: 1px solid var(--separator);
+            border-radius: 8px;
+            padding: 4px;
+            color: var(--primary);
+            font-size: 0.84em;
+          }
+
+          .detail-parent .parent-badge {
+            margin-right: 5px;
+          }
+
+          .detail-title-row {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            min-width: 0;
+          }
+
+          .detail-title {
+            flex: 1;
+            min-width: 0;
+            margin: 0;
+            font-size: 1.22em;
+            line-height: 1.3;
+          }
+
+          .detail-badge {
+            display: inline-flex;
+            align-items: center;
+            flex: 0 0 auto;
+            min-height: 21px;
+            border: 1px solid var(--separator);
+            border-radius: 5px;
+            padding: 2px 6px 3px;
+            color: var(--secondary);
+            font-size: 0.72em;
+            line-height: 1;
+          }
+
+          .detail-fields {
+            display: grid;
+            grid-template-columns: max-content minmax(0, 1fr);
+            column-gap: 8px;
+            row-gap: 5px;
+            margin: 10px 0 0;
+            padding-top: 10px;
+            border-top: 1px solid var(--separator);
+            font-size: 0.9em;
+          }
+
+          .detail-fields dt,
+          .detail-fields dd {
+            margin: 0;
+          }
+
+          .detail-fields dt::after {
+            content: ":";
+          }
+
+          .detail-fields dd {
+            color: var(--secondary);
+          }
+
+          .detail-description {
+            margin: 12px 0 0;
+            padding-top: 12px;
+            border-top: 1px solid var(--separator);
+            color: var(--secondary);
+            line-height: 1.45;
+            white-space: pre-wrap;
+          }
+
+          .reply-section-title {
+            margin: 0;
+            padding: 12px 12px 8px;
+            border-bottom: 1px solid var(--separator);
+            color: var(--primary);
+            background: var(--background);
+            font-size: 0.95em;
+            line-height: 1.2;
           }
 
           .reply {
@@ -945,7 +1055,12 @@ actor PostDocumentRenderer {
   private func renderBody(_ input: PostDocumentRenderInput) throws -> String {
     try Task.checkCancellation()
     let documentHeader: String
-    if let parent = input.parent, let title = input.title {
+    let replySectionTitle: String
+    if let detailHeader = input.detailHeader {
+      documentHeader = renderDetailHeader(detailHeader)
+      replySectionTitle =
+        "<h2 class=\"reply-section-title\">\(detailHeader.sectionTitle.bbcodeHTMLEscaped)</h2>"
+    } else if let parent = input.parent, let title = input.title {
       let parentIcon =
         parent.iconURL.map {
           "<img class=\"parent-icon\" src=\"\($0.bbcodeHTMLEscaped)\" alt=\"\" loading=\"lazy\">"
@@ -960,8 +1075,10 @@ actor PostDocumentRenderer {
           <h1 class="topic-title">\(title.bbcodeHTMLEscaped)</h1>
         </header>
         """
+      replySectionTitle = ""
     } else {
       documentHeader = ""
+      replySectionTitle = ""
     }
 
     let mainPost: String
@@ -997,6 +1114,7 @@ actor PostDocumentRenderer {
     return """
       \(documentHeader)
       \(mainPost)
+      \(replySectionTitle)
       <main>
         \(replies)
       </main>
@@ -1005,6 +1123,57 @@ actor PostDocumentRenderer {
           <img src="\(Self.stickerURLScheme)://asset/musume.png" alt="">
         </div>
       </footer>
+      """
+  }
+
+  private func renderDetailHeader(_ header: PostDocumentRenderInput.DetailHeader) -> String {
+    let parent: String
+    if let parentContext = header.parent {
+      let icon =
+        parentContext.iconURL.map {
+          "<img class=\"parent-icon\" src=\"\($0.bbcodeHTMLEscaped)\" alt=\"\" loading=\"lazy\">"
+        } ?? ""
+      parent = """
+        <a class="detail-parent" href="\(parentContext.link.bbcodeHTMLEscaped)">
+          \(icon)
+          <span class="parent-title">\(parentContext.title.bbcodeHTMLEscaped)</span>
+          <span class="parent-badge">\(parentContext.badge.bbcodeHTMLEscaped)</span>
+        </a>
+        """
+    } else {
+      parent = ""
+    }
+    let badge =
+      header.badge.map {
+        "<span class=\"detail-badge\">\($0.bbcodeHTMLEscaped)</span>"
+      } ?? ""
+    let fields: String
+    if header.fields.isEmpty {
+      fields = ""
+    } else {
+      let items: String = header.fields.map { field -> String in
+        """
+          <dt>\(field.label.bbcodeHTMLEscaped)</dt>
+          <dd>\(field.value.bbcodeHTMLEscaped)</dd>
+        """
+      }.joined()
+      fields = "<dl class=\"detail-fields\">\(items)</dl>"
+    }
+    let description =
+      header.descriptionText.map {
+        "<p class=\"detail-description\">\($0.bbcodeHTMLEscaped)</p>"
+      } ?? ""
+
+    return """
+      <header class="detail-header">
+        \(parent)
+        <div class="detail-title-row">
+          <h1 class="detail-title">\(header.title.bbcodeHTMLEscaped)</h1>
+          \(badge)
+        </div>
+        \(fields)
+        \(description)
+      </header>
       """
   }
 

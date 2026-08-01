@@ -108,6 +108,7 @@ struct PostDocumentWebView: UIViewRepresentable {
     private var currentReactionHTMLByPostID: [Int: String] = [:]
     private var pendingScrollOffset: CGPoint?
     private var pendingInitialPostID: Int?
+    private var handledInitialPostID: Int?
     private var pendingScrollRequest: PostDocumentScrollRequest?
     private var handledScrollRequestID: UUID?
     private var isPresentingImagePreview = false
@@ -133,12 +134,17 @@ struct PostDocumentWebView: UIViewRepresentable {
         return
       }
 
-      if currentDocument != nil, let webView {
-        captureScrollOffsetIfNeeded(from: webView)
-        pendingInitialPostID = nil
-      } else {
-        pendingInitialPostID = document.initialPostID
+      let unhandledInitialPostID = document.initialPostID.flatMap { postID in
+        handledInitialPostID == postID ? nil : postID
       }
+      if currentDocument != nil, let webView {
+        if unhandledInitialPostID == nil {
+          captureScrollOffsetIfNeeded(from: webView)
+        } else {
+          pendingScrollOffset = nil
+        }
+      }
+      pendingInitialPostID = unhandledInitialPostID
 
       currentDocument = document
       currentReactionHTMLByPostID = reactionHTMLByPostID
@@ -150,6 +156,8 @@ struct PostDocumentWebView: UIViewRepresentable {
         return
       }
       handledScrollRequestID = request.id
+      handledInitialPostID = currentDocument?.initialPostID
+      pendingInitialPostID = nil
 
       guard let webView, !webView.isLoading else {
         pendingScrollRequest = request
@@ -229,8 +237,13 @@ struct PostDocumentWebView: UIViewRepresentable {
       if let pendingScrollRequest {
         self.pendingScrollRequest = nil
         pendingScrollOffset = nil
-        pendingInitialPostID = nil
         perform(pendingScrollRequest, in: webView)
+        return
+      }
+
+      if let pendingInitialPostID {
+        pendingScrollOffset = nil
+        alignInitialPost(pendingInitialPostID, in: webView)
         return
       }
 
@@ -251,17 +264,6 @@ struct PostDocumentWebView: UIViewRepresentable {
         )
         return
       }
-
-      guard let pendingInitialPostID else {
-        return
-      }
-      self.pendingInitialPostID = nil
-      scrollToPost(
-        pendingInitialPostID,
-        animated: false,
-        stabilizesPosition: true,
-        in: webView
-      )
     }
 
     func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
@@ -482,14 +484,15 @@ struct PostDocumentWebView: UIViewRepresentable {
       _ postID: Int,
       animated: Bool,
       stabilizesPosition: Bool,
-      in webView: WKWebView
+      in webView: WKWebView,
+      completion: ((Bool) -> Void)? = nil
     ) {
       webView.evaluateJavaScript(
         """
         (() => {
           const target = document.getElementById('post_\(postID)');
           if (!target) {
-            return;
+            return false;
           }
 
           window.postDocumentBottomObserver?.disconnect();
@@ -520,9 +523,35 @@ struct PostDocumentWebView: UIViewRepresentable {
             window.setTimeout(() => align('auto'), 250);
             window.setTimeout(() => align('auto'), 750);
           }
+          return true;
         })();
         """
-      )
+      ) { result, _ in
+        completion?(result as? Bool == true)
+      }
+    }
+
+    private func alignInitialPost(_ postID: Int, in webView: WKWebView) {
+      let documentID = currentDocument?.id
+      scrollToPost(
+        postID,
+        animated: false,
+        stabilizesPosition: true,
+        in: webView
+      ) { [weak self, weak webView] didAlign in
+        guard let self, let webView, self.webView === webView,
+          self.currentDocument?.id == documentID
+        else {
+          return
+        }
+        guard didAlign else {
+          return
+        }
+        self.handledInitialPostID = postID
+        if self.pendingInitialPostID == postID {
+          self.pendingInitialPostID = nil
+        }
+      }
     }
 
     private func makeAction(
@@ -688,7 +717,7 @@ struct PostDocumentWebView: UIViewRepresentable {
 
 struct PostDocumentSurface: View {
   let input: PostDocumentRenderInput
-  let controls: PostDocumentControlConfiguration
+  let controls: PostDocumentControlConfiguration?
   let onAction: (PostDocumentAction) -> Void
   let onOpenURL: (URL) -> Void
   let onRefresh: () async -> Void
@@ -712,19 +741,21 @@ struct PostDocumentSurface: View {
         )
         .ignoresSafeArea(.container, edges: .vertical)
 
-        PostDocumentNavigatorOverlay(
-          items: document.navigationItems,
-          visiblePostID: viewportState.visiblePostID,
-          controls: controls,
-          canScrollToTop: viewportState.canScrollToTop,
-          onReply: {
-            onAction(.newReply)
-          },
-          onSelect: requestScroll
-        )
-        .id(document.id)
-        .padding(.trailing, 12)
-        .safeAreaPadding(.bottom, 12)
+        if let controls {
+          PostDocumentNavigatorOverlay(
+            items: document.navigationItems,
+            visiblePostID: viewportState.visiblePostID,
+            controls: controls,
+            canScrollToTop: viewportState.canScrollToTop,
+            onReply: {
+              onAction(.newReply)
+            },
+            onSelect: requestScroll
+          )
+          .id(document.id)
+          .padding(.trailing, 12)
+          .safeAreaPadding(.bottom, 12)
+        }
       } else {
         ProgressView()
       }
