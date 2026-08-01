@@ -363,18 +363,14 @@ struct GroupRecentTopicView: View {
                   TopicTitleView(
                     title: topic.title,
                     createdAt: topic.createdAt,
-                    updatedAt: topic.updatedAt,
-                    replyCount: topic.replyCount
+                    replyCount: topic.replyCount,
+                    showsReplyCount: true
                   )
                     .font(.callout)
                     .lineLimit(1)
+                    .truncationMode(.middle)
                 }.buttonStyle(.navigation)
                 Spacer()
-                if topic.replyCount ?? 0 > 0 {
-                  Text("(+\(topic.replyCount ?? 0))")
-                    .font(.footnote)
-                    .foregroundStyle(.orange)
-                }
               }
               HStack {
                 Text(topic.createdAt.datetimeDisplay)

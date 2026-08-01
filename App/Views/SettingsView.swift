@@ -166,7 +166,7 @@ struct SettingsView: View {
         }
 
         Toggle(isOn: $showTopicAgeBadge) {
-          SettingLabel("话题时间标记", description: "在话题列表标题前显示新帖和坟帖标记")
+          SettingLabel("话题时间标记", description: "在话题列表标题后显示发帖至今的简短时间")
         }
 
         Toggle(isOn: $showSpoilerRelations) {

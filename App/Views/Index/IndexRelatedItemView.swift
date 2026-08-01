@@ -272,11 +272,11 @@ struct IndexRelatedItemView: View {
                   TopicTitleView(
                     title: topic.title,
                     createdAt: topic.createdAt,
-                    updatedAt: topic.updatedAt,
                     replyCount: topic.replyCount,
                     link: topic.link
                   )
                     .lineLimit(1)
+                    .truncationMode(.middle)
                   Spacer(minLength: 0)
                 }
                 Text(topic.group.title)
@@ -329,11 +329,11 @@ struct IndexRelatedItemView: View {
                   TopicTitleView(
                     title: topic.title,
                     createdAt: topic.createdAt,
-                    updatedAt: topic.updatedAt,
                     replyCount: topic.replyCount,
                     link: topic.link
                   )
                     .lineLimit(1)
+                    .truncationMode(.middle)
                   Spacer(minLength: 0)
                 }
                 HStack {

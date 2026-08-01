@@ -31,19 +31,14 @@ struct GroupTopicListView: View {
                   TopicTitleView(
                     title: topic.title,
                     createdAt: topic.createdAt,
-                    updatedAt: topic.updatedAt,
-                    replyCount: topic.replyCount
+                    replyCount: topic.replyCount,
+                    showsReplyCount: true
                   )
                     .font(.headline)
                     .lineLimit(2)
                     .multilineTextAlignment(.leading)
                 }.buttonStyle(.navigation)
                 Spacer()
-                if topic.replyCount ?? 0 > 0 {
-                  Text("(+\(topic.replyCount ?? 0))")
-                    .font(.footnote)
-                    .foregroundStyle(.orange)
-                }
               }
               Divider()
               HStack {

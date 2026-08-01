@@ -10,7 +10,6 @@ struct SubjectTopicItemView: View {
           TopicTitleView(
             title: topic.title,
             createdAt: topic.createdAt,
-            updatedAt: topic.updatedAt,
             replyCount: topic.replyCount
           )
             .font(.callout)
