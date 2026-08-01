@@ -142,7 +142,11 @@ enum NavDestination: Hashable, View {
         timeline: item
       )
     case .commentList(let route):
-      CommentListView(route: route)
+      if case .episode(let episodeId) = route.parent {
+        EpisodeView(episodeId: episodeId, initialPostID: route.initialPostID)
+      } else {
+        CommentListView(route: route)
+      }
 
     case .infobox(let title, let infobox):
       InfoboxView(title: title, infobox: infobox)

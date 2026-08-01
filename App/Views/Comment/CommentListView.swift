@@ -57,14 +57,31 @@ private enum CommentListSheet: Identifiable {
   }
 }
 
+private enum CommentListPresentation {
+  case standalone
+  case episodeDetail
+}
+
 private struct CommentListLoadKey: Hashable {
   let route: CommentListRoute
   let isolationMode: Bool
-  let titlePreference: TitlePreference
+  let titlePreference: TitlePreference?
+}
+
+private struct CommentDocumentSurfaceID: Hashable {
+  let route: CommentListRoute
+  let isolationMode: Bool
+  let initialPostIsReady: Bool
 }
 
 struct CommentListView: View {
   let route: CommentListRoute
+  private let presentation: CommentListPresentation
+  private let episode: EpisodeDTO?
+  private let episodeLoadFailed: Bool
+  private let onParentRefresh: (() async -> Void)?
+
+  @Binding private var presentsNewComment: Bool
 
   @AppStorage("shareDomain") private var shareDomain: ShareDomain = .chii
   @AppStorage("profile") private var profile: Profile = Profile()
@@ -100,7 +117,28 @@ struct CommentListView: View {
 
   init(route: CommentListRoute, timeline: TimelineDTO? = nil) {
     self.route = route
+    self.presentation = .standalone
+    self.episode = nil
+    self.episodeLoadFailed = false
+    self.onParentRefresh = nil
+    _presentsNewComment = .constant(false)
     _timeline = State(initialValue: timeline)
+  }
+
+  init(
+    route: CommentListRoute,
+    episode: EpisodeDTO?,
+    episodeLoadFailed: Bool,
+    presentsNewComment: Binding<Bool>,
+    onParentRefresh: @escaping () async -> Void
+  ) {
+    self.route = route
+    self.presentation = .episodeDetail
+    self.episode = episode
+    self.episodeLoadFailed = episodeLoadFailed
+    self.onParentRefresh = onParentRefresh
+    _presentsNewComment = presentsNewComment
+    _timeline = State(initialValue: nil)
   }
 
   private var shareURL: URL {
@@ -108,6 +146,21 @@ struct CommentListView: View {
       domain: shareDomain,
       timelineUsername: timelineUsername
     )
+  }
+
+  private var isEpisodeDetail: Bool {
+    presentation == .episodeDetail
+  }
+
+  private var screenTitle: String {
+    isEpisodeDetail ? "章节详情" : route.parent.listTitle
+  }
+
+  private var handoffURL: URL {
+    if isEpisodeDetail {
+      return route.parent.shareURL(domain: shareDomain)
+    }
+    return shareURL
   }
 
   private var canReply: Bool {
@@ -135,15 +188,105 @@ struct CommentListView: View {
     }
   }
 
+  private var episodeDetailHeader: PostDocumentRenderInput.DetailHeader? {
+    guard let episode else {
+      return nil
+    }
+
+    var fields: [PostDocumentRenderInput.Field] = []
+    if !episode.name.isEmpty {
+      fields.append(.init(label: "标题", value: episode.name))
+    }
+    if !episode.nameCN.isEmpty {
+      fields.append(.init(label: "中文标题", value: episode.nameCN))
+    }
+    if !episode.airdate.isEmpty {
+      fields.append(.init(label: "首播时间", value: episode.airdate))
+    }
+    if !episode.duration.isEmpty {
+      fields.append(.init(label: "时长", value: episode.duration))
+    }
+    if episode.disc > 0 {
+      fields.append(.init(label: "Disc", value: "\(episode.disc)"))
+    }
+    if isAuthenticated && episode.collectionTypeEnum != .none && episode.collectedAt > 0 {
+      fields.append(
+        .init(
+          label: episode.collectionTypeEnum.description,
+          value: episode.collectedAt.datetimeDisplay
+        )
+      )
+    }
+
+    let parent = episode.subject.map { subject in
+      PostDocumentRenderInput.Parent(
+        title: subject.title(with: titlePreference),
+        link: subject.link,
+        iconURL: postImageURL(subject.images?.small, domains: domains),
+        badge: subject.type.description
+      )
+    }
+    let descriptionText = episode.desc.flatMap { description in
+      description.isEmpty ? nil : description
+    }
+
+    return PostDocumentRenderInput.DetailHeader(
+      parent: parent,
+      title: episode.title(with: titlePreference),
+      badge: episode.typeEnum.description,
+      fields: fields,
+      descriptionText: descriptionText,
+      sectionTitle: route.parent.listTitle
+    )
+  }
+
+  private var shouldRenderDocument: Bool {
+    guard isEpisodeDetail else {
+      return !isolationMode && hasLoaded
+    }
+    guard episode != nil else {
+      return false
+    }
+    if route.initialPostID != nil, !hasLoaded, !loadFailed, !isolationMode {
+      return false
+    }
+    return true
+  }
+
+  private var documentEmptyMessage: String {
+    if isolationMode {
+      return "关闭隔离模式后可以查看评论。"
+    }
+    if !hasLoaded {
+      return loadFailed ? "评论加载失败，请下拉重试。" : "评论加载中…"
+    }
+    return comments.isEmpty ? "暂无评论" : "没有符合条件的评论"
+  }
+
+  private var documentSurfaceID: CommentDocumentSurfaceID {
+    CommentDocumentSurfaceID(
+      route: route,
+      isolationMode: isolationMode,
+      initialPostIsReady: route.initialPostID != nil && hasLoaded && !isolationMode
+    )
+  }
+
   var body: some View {
     content
-      .navigationTitle(route.parent.listTitle)
+      .navigationTitle(screenTitle)
       .navigationBarTitleDisplayMode(.inline)
       .toolbar {
         toolbar
       }
       .sheet(item: $sheet) { sheet in
         sheetContent(sheet)
+      }
+      .sheet(isPresented: $presentsNewComment) {
+        CreateCommentBoxSheet(type: route.parent) {
+          Task {
+            await refreshDocument()
+          }
+        }
       }
       .overlay {
         PostActionOverlayPresenter(
@@ -175,38 +318,70 @@ struct CommentListView: View {
         id: CommentListLoadKey(
           route: route,
           isolationMode: isolationMode,
-          titlePreference: titlePreference
+          titlePreference: isEpisodeDetail ? nil : titlePreference
         )
       ) {
         await refresh()
       }
-      .handoff(url: shareURL, title: route.parent.listTitle)
+      .onChange(of: isolationMode) { _, isIsolated in
+        guard isIsolated else {
+          return
+        }
+        actionOverlay = nil
+        sheet = nil
+        deleteTarget = nil
+        showDeleteConfirmation = false
+        if isEpisodeDetail {
+          presentsNewComment = false
+        }
+      }
+      .handoff(url: handoffURL, title: screenTitle)
   }
 
   @ViewBuilder
   private var content: some View {
-    if isolationMode {
+    if shouldRenderDocument {
+      let presentation =
+        isolationMode ? CommentPresentation(comments: []) : commentPresentation()
+      let controls: PostDocumentControlConfiguration? =
+        hasLoaded && !isolationMode
+        ? PostDocumentControlConfiguration(
+          canReply: canReply,
+          filterModes: availableFilterModes,
+          filterMode: $filterMode,
+          sortOrder: $sortSelection[fallback: replySortOrder]
+        ) : nil
+      PostDocumentSurface(
+        input: renderInput(presentation, detailHeader: episodeDetailHeader),
+        controls: controls,
+        onAction: handleDocumentAction,
+        onOpenURL: { url in
+          openURL(url)
+        },
+        onRefresh: refreshDocument
+      )
+      .id(documentSurfaceID)
+    } else if isEpisodeDetail && episodeLoadFailed {
+      ContentUnavailableView {
+        Label("加载失败", systemImage: "wifi.exclamationmark")
+      } description: {
+        Text("无法加载章节详情，请检查网络连接后重试。")
+      } actions: {
+        Button("重试") {
+          Task {
+            await onParentRefresh?()
+          }
+        }
+        .buttonStyle(.borderedProminent)
+      }
+    } else if isEpisodeDetail {
+      ProgressView()
+    } else if isolationMode {
       ContentUnavailableView {
         Label("隔离模式", systemImage: "eye.slash")
       } description: {
         Text("关闭隔离模式后可以查看评论。")
       }
-    } else if hasLoaded {
-      let presentation = commentPresentation()
-      PostDocumentSurface(
-        input: renderInput(presentation),
-        controls: PostDocumentControlConfiguration(
-          canReply: canReply,
-          filterModes: availableFilterModes,
-          filterMode: $filterMode,
-          sortOrder: $sortSelection[fallback: replySortOrder]
-        ),
-        onAction: handleDocumentAction,
-        onOpenURL: { url in
-          openURL(url)
-        },
-        onRefresh: refresh
-      )
     } else if loadFailed {
       ContentUnavailableView {
         Label("加载失败", systemImage: "wifi.exclamationmark")
@@ -227,51 +402,53 @@ struct CommentListView: View {
 
   @ToolbarContentBuilder
   private var toolbar: some ToolbarContent {
-    ToolbarItemGroup(placement: .topBarTrailing) {
-      Button {
-        sheet = .newReply
-      } label: {
-        Label(route.parent.newCommentTitle, systemImage: "plus.bubble")
-      }
-      .disabled(!canReply)
-
-      Menu {
-        Picker(selection: $filterMode) {
-          ForEach(availableFilterModes, id: \.self) { mode in
-            Label(mode.description, systemImage: mode.icon).tag(mode)
-          }
+    if !isEpisodeDetail {
+      ToolbarItemGroup(placement: .topBarTrailing) {
+        Button {
+          sheet = .newReply
         } label: {
-          Label("筛选", systemImage: filterMode.icon)
+          Label(route.parent.newCommentTitle, systemImage: "plus.bubble")
         }
-        .pickerStyle(.menu)
+        .disabled(!canReply)
 
-        Picker(selection: $sortSelection[fallback: replySortOrder]) {
-          ForEach(ReplySortOrder.allCases, id: \.self) { order in
-            Label(order.description, systemImage: order.icon).tag(order)
-          }
-        } label: {
-          Label("排序", systemImage: effectiveSortOrder.icon)
-        }
-        .pickerStyle(.menu)
-
-        Divider()
-
-        if case .timeline = route.parent {
-          Button {
-            sheet = .reportTimeline
+        Menu {
+          Picker(selection: $filterMode) {
+            ForEach(availableFilterModes, id: \.self) { mode in
+              Label(mode.description, systemImage: mode.icon).tag(mode)
+            }
           } label: {
-            Label("报告疑虑", systemImage: "exclamationmark.triangle")
+            Label("筛选", systemImage: filterMode.icon)
           }
-          .disabled(!isAuthenticated)
+          .pickerStyle(.menu)
+
+          Picker(selection: $sortSelection[fallback: replySortOrder]) {
+            ForEach(ReplySortOrder.allCases, id: \.self) { order in
+              Label(order.description, systemImage: order.icon).tag(order)
+            }
+          } label: {
+            Label("排序", systemImage: effectiveSortOrder.icon)
+          }
+          .pickerStyle(.menu)
 
           Divider()
-        }
 
-        ShareLink(item: shareURL) {
-          Label("分享", systemImage: "square.and.arrow.up")
+          if case .timeline = route.parent {
+            Button {
+              sheet = .reportTimeline
+            } label: {
+              Label("报告疑虑", systemImage: "exclamationmark.triangle")
+            }
+            .disabled(!isAuthenticated)
+
+            Divider()
+          }
+
+          ShareLink(item: shareURL) {
+            Label("分享", systemImage: "square.and.arrow.up")
+          }
+        } label: {
+          Image(systemName: "ellipsis")
         }
-      } label: {
-        Image(systemName: "ellipsis")
       }
     }
   }
@@ -282,7 +459,7 @@ struct CommentListView: View {
     case .newReply:
       CreateCommentBoxSheet(type: route.parent) {
         Task {
-          await refresh()
+          await refreshDocument()
         }
       }
     case .reply(let target):
@@ -292,7 +469,7 @@ struct CommentListView: View {
         reply: target.reply
       ) {
         Task {
-          await refresh()
+          await refreshDocument()
         }
       }
     case .edit(let target):
@@ -302,7 +479,7 @@ struct CommentListView: View {
         reply: target.reply
       ) {
         Task {
-          await refresh()
+          await refreshDocument()
         }
       }
     case .reportPost(let target):
@@ -328,19 +505,27 @@ struct CommentListView: View {
     }
   }
 
-  private func refresh() async {
+  private func refreshDocument() async {
+    guard await refresh() else {
+      return
+    }
+    await onParentRefresh?()
+  }
+
+  @discardableResult
+  private func refresh() async -> Bool {
     refreshGeneration += 1
     let generation = refreshGeneration
 
     guard !isolationMode else {
-      return
+      return false
     }
 
     if !hasLoaded {
       loadFailed = false
     }
 
-    async let metadata = loadParentMetadata()
+    async let metadata = loadParentMetadataIfNeeded()
     async let timelineContext = loadTimeline()
 
     do {
@@ -348,7 +533,7 @@ struct CommentListView: View {
       let loadedMetadata = await metadata
       let loadedTimeline = await timelineContext
       guard generation == refreshGeneration else {
-        return
+        return false
       }
       comments = loadedComments
       if case .timeline = route.parent {
@@ -366,17 +551,26 @@ struct CommentListView: View {
       self.timeline = loadedTimeline
       hasLoaded = true
       loadFailed = false
+      return true
     } catch is CancellationError {
-      return
+      return false
     } catch {
       guard generation == refreshGeneration else {
-        return
+        return false
       }
       if !hasLoaded {
         loadFailed = true
       }
       Notifier.shared.alert(error: error)
+      return true
     }
+  }
+
+  private func loadParentMetadataIfNeeded() async -> CommentParentMetadata? {
+    guard !isEpisodeDetail else {
+      return nil
+    }
+    return await loadParentMetadata()
   }
 
   private func loadParentMetadata() async -> CommentParentMetadata? {
@@ -427,6 +621,10 @@ struct CommentListView: View {
   }
 
   private func handleDocumentAction(_ action: PostDocumentAction) {
+    guard !isolationMode else {
+      return
+    }
+
     switch action {
     case .newReply:
       guard canReply else {
@@ -485,6 +683,10 @@ struct CommentListView: View {
     _ action: PostMenuAction,
     target: CommentPostTarget
   ) {
+    guard !isolationMode else {
+      return
+    }
+
     switch action {
     case .edit:
       sheet = .edit(target)
@@ -505,10 +707,14 @@ struct CommentListView: View {
   }
 
   private func deletePost(_ target: CommentPostTarget) async {
+    guard !isolationMode else {
+      return
+    }
+
     do {
       try await route.parent.delete(commentId: target.id)
       Notifier.shared.notify(message: "删除成功")
-      await refresh()
+      await refreshDocument()
     } catch {
       Notifier.shared.alert(error: error)
     }
@@ -519,7 +725,8 @@ struct CommentListView: View {
     value: Int,
     toggle: Bool
   ) async {
-    guard let reactionType = route.parent.reactionType(postID: target.id),
+    guard !isolationMode,
+      let reactionType = route.parent.reactionType(postID: target.id),
       !reactionRequests.contains(target.id),
       let currentTarget = postTarget(postID: target.id)
     else {
@@ -624,7 +831,10 @@ struct CommentListView: View {
     )
   }
 
-  private func renderInput(_ presentation: CommentPresentation) -> PostDocumentRenderInput {
+  private func renderInput(
+    _ presentation: CommentPresentation,
+    detailHeader: PostDocumentRenderInput.DetailHeader?
+  ) -> PostDocumentRenderInput {
     let originalIndexes = Dictionary(
       uniqueKeysWithValues: comments.enumerated().map { ($0.element.id, $0.offset) }
     )
@@ -638,28 +848,35 @@ struct CommentListView: View {
         blockedUsers: blockedUsers
       )
     }
+    let documentParent: PostDocumentRenderInput.Parent?
+    if detailHeader == nil {
+      documentParent = parentHeader.map { header in
+        PostDocumentRenderInput.Parent(
+          title: header.title,
+          link: header.link,
+          iconURL: postImageURL(header.iconURL, domains: domains),
+          badge: header.badge
+        )
+      }
+    } else {
+      documentParent = nil
+    }
 
     return PostDocumentRenderInput(
       baseURL: domains.mainURL(),
       domains: domains,
-      parent: parentHeader.map {
-        PostDocumentRenderInput.Parent(
-          title: $0.title,
-          link: $0.link,
-          iconURL: postImageURL($0.iconURL, domains: domains),
-          badge: $0.badge
-        )
-      },
-      title: parentHeader == nil ? nil : route.parent.listTitle,
+      parent: documentParent,
+      title: detailHeader == nil && parentHeader != nil ? route.parent.listTitle : nil,
+      detailHeader: detailHeader,
       mainPost: timeline.flatMap {
         makeTimelinePost($0, friends: friends)
       },
       mainActions: nil,
       replies: posts,
-      emptyMessage: comments.isEmpty ? "暂无评论" : "没有符合条件的评论",
+      emptyMessage: documentEmptyMessage,
       canReply: canReply,
-      canReact: isAuthenticated && route.parent.supportsReactions,
-      showReactions: enableReactions && route.parent.supportsReactions,
+      canReact: !isolationMode && isAuthenticated && route.parent.supportsReactions,
+      showReactions: !isolationMode && enableReactions && route.parent.supportsReactions,
       avatarIsRound: avatarStyle == .round,
       initialPostID: route.initialPostID
     )

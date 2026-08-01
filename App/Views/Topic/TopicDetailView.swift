@@ -774,6 +774,7 @@ struct TopicDetailView: View {
       domains: domains,
       parent: data.parent(titlePreference: titlePreference, domains: domains),
       title: data.title,
+      detailHeader: nil,
       mainPost: mainPost,
       mainActions: PostDocumentRenderInput.MainActions(
         replyCount: presentation.count,

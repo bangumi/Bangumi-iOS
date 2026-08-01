@@ -2,11 +2,9 @@ import SwiftUI
 
 struct EpisodeInfoView: View {
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
-  @AppStorage("isolationMode") var isolationMode: Bool = false
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
 
   let episode: EpisodeDTO
-  var showsCommentLink: Bool = false
 
   func field(name: String, value: String) -> AttributedString {
     var text = AttributedString(name + ": ")
@@ -29,12 +27,6 @@ struct EpisodeInfoView: View {
             .fixedSize()
         }
         Spacer()
-        if showsCommentLink && !isolationMode {
-          CommentListNavigationLink(
-            route: CommentListRoute(parent: .episode(episode.id)),
-            count: episode.comment
-          )
-        }
       }
       Divider()
       if !episode.name.isEmpty {
