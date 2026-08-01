@@ -10,7 +10,12 @@ struct ProgressTileView: View {
 
   @AppStorage("episodeGridInteractionMode") private var episodeGridInteractionMode:
     EpisodeGridInteractionMode = .menu
+  @Environment(\.colorScheme) private var colorScheme
   @State private var prefetchState = NextPagePrefetchState<ProgressSubjectDTO.ID>()
+
+  private var cardShadow: Color? {
+    colorScheme == .dark ? .clear : nil
+  }
 
   private func requestNextPage(for trigger: NextPagePrefetchTaskKey<ProgressSubjectDTO.ID>) {
     if let triggerId = prefetchState.request(
@@ -38,7 +43,7 @@ struct ProgressTileView: View {
             triggerId: nextPageTrigger.triggerId(for: item.id),
             resetToken: paginationResetToken
           )
-          CardView(padding: 8) {
+          CardView(padding: 8, cornerRadius: 12, shadow: cardShadow) {
             ProgressTileItemContentView(
               payload: ProgressSubjectRenderPayload(item),
               interactionMode: episodeGridInteractionMode,

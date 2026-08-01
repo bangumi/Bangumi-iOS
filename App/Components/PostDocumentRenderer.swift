@@ -308,6 +308,7 @@ actor PostDocumentRenderer {
             flex: 0 0 auto;
             border-radius: 4px;
             object-fit: cover;
+            object-position: center top;
           }
 
           .parent-badge,

@@ -36,11 +36,11 @@ extension View {
     modifier(ProgressActionLabelModifier(presentation: presentation))
   }
 
-  func progressActionButtonStyle() -> some View {
+  func progressActionButtonStyle(tint: Color = .accent) -> some View {
     self
       .labelStyle(.compact)
       .font(.footnote)
-      .tint(.accent)
+      .tint(tint)
       .buttonStyle(.borderless)
       .controlSize(.small)
   }
