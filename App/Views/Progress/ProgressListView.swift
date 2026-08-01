@@ -18,7 +18,12 @@ struct ProgressListView: View {
 
   @AppStorage("episodeGridInteractionMode") private var episodeGridInteractionMode:
     EpisodeGridInteractionMode = .menu
+  @Environment(\.colorScheme) private var colorScheme
   @State private var prefetchState = NextPagePrefetchState<ProgressSubjectDTO.ID>()
+
+  private var cardShadow: Color? {
+    colorScheme == .dark ? .clear : nil
+  }
 
   private func requestNextPage(for trigger: NextPagePrefetchTaskKey<ProgressSubjectDTO.ID>) {
     if let triggerId = prefetchState.request(
@@ -39,13 +44,13 @@ struct ProgressListView: View {
   var body: some View {
     let nextPageTrigger = items.nextPagePrefetchTrigger(prefetchWindow: prefetchWindow)
 
-    LazyVStack(alignment: .leading, spacing: 4) {
+    LazyVStack(alignment: .leading, spacing: 8) {
       ForEach(items) { item in
         let trigger = NextPagePrefetchTaskKey(
           triggerId: nextPageTrigger.triggerId(for: item.id),
           resetToken: paginationResetToken
         )
-        CardView {
+        CardView(cornerRadius: 12, shadow: cardShadow) {
           ProgressListItemContentView(
             payload: ProgressSubjectRenderPayload(item),
             interactionMode: episodeGridInteractionMode,
@@ -101,52 +106,50 @@ struct ProgressListItemContentView: View {
 
   var body: some View {
     let subjectId = subject.id
-    VStack(alignment: .leading, spacing: 4) {
-      HStack(alignment: .top, spacing: 8) {
-        ImageView(img: subject.images?.resize(.r200))
-          .imageStyle(width: 72, height: 72)
-          .imageType(.subject)
-          .imageBadge(show: subject.interest?.private ?? false) {
-            Image(systemName: "lock")
-          }
-          .imageNavLink(subject.link)
-        VStack(alignment: .leading, spacing: 0) {
-          NavigationLink(value: NavDestination.subject(subjectId)) {
-            VStack(alignment: .leading, spacing: 4) {
-              Text(subject.title(with: titlePreference))
-                .font(.headline)
-                .lineLimit(1)
-              ProgressSecondLineView(subject: subject)
-            }
-          }.buttonStyle(.scale)
-
-          Spacer(minLength: 4)
-
-          switch subject.type {
-          case .anime, .real:
-            EpisodeRecentView(
-              payload: EpisodeRecentPayload(item),
-              mode: .list,
-              interactionMode: interactionMode,
-              reload: reload
-            )
-
-          case .book:
-            SubjectBookChaptersView(subject: subject, mode: .row, reload: reload)
-
-          default:
-            Label(
-              subject.type.description,
-              systemImage: subject.type.icon
-            )
-            .foregroundStyle(.accent)
-            .font(.callout)
-          }
+    HStack(alignment: .top, spacing: 8) {
+      ImageView(img: subject.images?.resize(.r200))
+        .imageStyle(width: 64, height: 90)
+        .imageType(.subject)
+        .imageBadge(show: subject.interest?.private ?? false) {
+          Image(systemName: "lock")
         }
-        .frame(maxWidth: .infinity, minHeight: 72, alignment: .topLeading)
-      }
+        .imageNavLink(subject.link)
+      VStack(alignment: .leading, spacing: 4) {
+        NavigationLink(value: NavDestination.subject(subjectId)) {
+          VStack(alignment: .leading, spacing: 4) {
+            Text(subject.title(with: titlePreference))
+              .font(.headline)
+              .lineLimit(1)
+            ProgressSecondLineView(subject: subject)
+          }
+        }.buttonStyle(.scale)
 
-      ProgressSubjectLinearBarsView(subject: subject)
+        Spacer(minLength: 0)
+
+        switch subject.type {
+        case .anime, .real:
+          EpisodeRecentView(
+            payload: EpisodeRecentPayload(item),
+            mode: .list,
+            interactionMode: interactionMode,
+            reload: reload
+          )
+
+        case .book:
+          SubjectBookChaptersView(subject: subject, mode: .row, reload: reload)
+
+        default:
+          Label(
+            subject.type.description,
+            systemImage: subject.type.icon
+          )
+          .foregroundStyle(.accent)
+          .font(.callout)
+        }
+
+        ProgressSubjectLinearBarsView(subject: subject)
+      }
+      .frame(maxWidth: .infinity, minHeight: 90, alignment: .topLeading)
     }
   }
 }

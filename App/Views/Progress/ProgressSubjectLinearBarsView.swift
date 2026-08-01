@@ -6,25 +6,28 @@ struct ProgressSubjectLinearBarsView: View {
   var body: some View {
     switch subject.type {
     case .book:
-      VStack(spacing: 1) {
+      VStack(spacing: 2) {
         ProgressLinearBarView(
           value: Double(min(subject.eps, subject.interest?.epStatus ?? 0)),
-          total: Double(subject.eps)
+          total: Double(subject.eps),
+          tint: .accentColor
         )
         ProgressLinearBarView(
           value: Double(min(subject.volumes, subject.interest?.volStatus ?? 0)),
-          total: Double(subject.volumes)
+          total: Double(subject.volumes),
+          tint: .accentColor.opacity(0.45)
         )
       }
 
     case .anime, .real:
       ProgressLinearBarView(
         value: Double(min(subject.eps, subject.interest?.epStatus ?? 0)),
-        total: Double(subject.eps)
+        total: Double(subject.eps),
+        tint: .accentColor
       )
 
     default:
-      ProgressLinearBarView(value: 0, total: 0)
+      ProgressLinearBarView(value: 0, total: 0, tint: .accentColor)
     }
   }
 }
@@ -32,6 +35,7 @@ struct ProgressSubjectLinearBarsView: View {
 private struct ProgressLinearBarView: View {
   let value: Double
   let total: Double
+  let tint: Color
 
   private var fraction: CGFloat {
     guard value.isFinite, total.isFinite, total > 0 else {
@@ -48,7 +52,7 @@ private struct ProgressLinearBarView: View {
 
         if fraction > 0 {
           RoundedRectangle(cornerRadius: 2, style: .continuous)
-            .fill(Color.accentColor)
+            .fill(tint)
             .frame(width: geometry.size.width * fraction)
         }
       }

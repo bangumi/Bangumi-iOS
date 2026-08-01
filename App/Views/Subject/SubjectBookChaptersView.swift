@@ -307,33 +307,35 @@ private struct BookProgressSummaryView: View {
     Group {
       switch layout {
       case .row:
-        HStack(alignment: .firstTextBaseline, spacing: 4) {
-          Text(verbatim: "Chap.")
-            .font(.footnote)
-            .foregroundStyle(.secondary)
-          BookProgressMetric(value: epStatus, total: subject.epsDesc)
-          BookProgressQuickUpdateButton(
-            accessibilityLabel: "话数加一",
-            updating: quickUpdate == .chapters,
-            disabled: quickUpdate != nil
-          ) {
-            increment(.chapters)
-          }
+        HStack(spacing: 4) {
+          HStack(alignment: .firstTextBaseline, spacing: 4) {
+            Text(verbatim: "Chap.")
+              .font(.footnote)
+              .foregroundStyle(.secondary)
+            BookProgressMetric(value: epStatus, total: subject.epsDesc)
+            BookProgressQuickUpdateButton(
+              accessibilityLabel: "话数加一",
+              updating: quickUpdate == .chapters,
+              disabled: quickUpdate != nil
+            ) {
+              increment(.chapters)
+            }
 
-          Text("·")
-            .font(.footnote)
-            .foregroundStyle(.secondary)
+            Text("·")
+              .font(.footnote)
+              .foregroundStyle(.secondary)
 
-          Text(verbatim: "Vol.")
-            .font(.footnote)
-            .foregroundStyle(.secondary)
-          BookProgressMetric(value: volStatus, total: subject.volumesDesc)
-          BookProgressQuickUpdateButton(
-            accessibilityLabel: "卷数加一",
-            updating: quickUpdate == .volumes,
-            disabled: quickUpdate != nil
-          ) {
-            increment(.volumes)
+            Text(verbatim: "Vol.")
+              .font(.footnote)
+              .foregroundStyle(.secondary)
+            BookProgressMetric(value: volStatus, total: subject.volumesDesc)
+            BookProgressQuickUpdateButton(
+              accessibilityLabel: "卷数加一",
+              updating: quickUpdate == .volumes,
+              disabled: quickUpdate != nil
+            ) {
+              increment(.volumes)
+            }
           }
 
           Spacer(minLength: 0)
@@ -401,10 +403,12 @@ private struct BookProgressTotal: View {
   let total: String
 
   var body: some View {
-    Text(verbatim: "/\(total)")
-      .font(.footnote)
-      .foregroundStyle(.secondary)
-      .monospacedDigit()
+    if total != "??" {
+      Text(verbatim: "/\(total)")
+        .font(.footnote)
+        .foregroundStyle(.secondary)
+        .monospacedDigit()
+    }
   }
 }
 
@@ -421,7 +425,7 @@ private struct BookProgressQuickUpdateButton: View {
         .animation(.default, value: updating)
         .progressActionLabelStyle(.inline)
     }
-    .progressActionButtonStyle()
+    .progressActionButtonStyle(tint: .secondary)
     .disabled(disabled)
     .accessibilityLabel(accessibilityLabel)
     .accessibilityValue(updating ? "正在更新" : "")
@@ -434,31 +438,10 @@ private struct BookProgressEditButton: View {
 
   var body: some View {
     Button(action: action) {
-      Label {
-        Text("更新")
-      } icon: {
-        Image(systemName: "pencil")
-          .imageScale(.small)
-      }
-      .progressActionLabelStyle(.inline)
-    }
-    .progressActionButtonStyle()
-    .disabled(disabled)
-    .accessibilityLabel("编辑阅读进度")
-  }
-}
-
-private struct BookProgressTileEditButton: View {
-  let disabled: Bool
-  let action: () -> Void
-
-  var body: some View {
-    Button(action: action) {
-      Image(systemName: "plusminus.circle")
-        .imageScale(.large)
+      Image(systemName: "square.and.pencil")
         .progressActionLabelStyle(.inline)
     }
-    .progressActionButtonStyle()
+    .progressActionButtonStyle(tint: .secondary)
     .disabled(disabled)
     .accessibilityLabel("编辑阅读进度")
   }
@@ -524,7 +507,7 @@ private struct BookProgressTileControls: View {
 
       Spacer(minLength: 4)
 
-      BookProgressTileEditButton(
+      BookProgressEditButton(
         disabled: quickUpdate != nil,
         action: edit
       )
