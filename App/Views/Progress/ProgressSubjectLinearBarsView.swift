@@ -10,12 +10,12 @@ struct ProgressSubjectLinearBarsView: View {
         ProgressLinearBarView(
           value: Double(min(subject.eps, subject.interest?.epStatus ?? 0)),
           total: Double(subject.eps),
-          tint: .accentColor
+          tint: .accentColor.opacity(0.7)
         )
         ProgressLinearBarView(
           value: Double(min(subject.volumes, subject.interest?.volStatus ?? 0)),
           total: Double(subject.volumes),
-          tint: .accentColor.opacity(0.45)
+          tint: .accentColor.opacity(0.35)
         )
       }
 
@@ -23,11 +23,11 @@ struct ProgressSubjectLinearBarsView: View {
       ProgressLinearBarView(
         value: Double(min(subject.eps, subject.interest?.epStatus ?? 0)),
         total: Double(subject.eps),
-        tint: .accentColor
+        tint: .accentColor.opacity(0.7)
       )
 
     default:
-      ProgressLinearBarView(value: 0, total: 0, tint: .accentColor)
+      ProgressLinearBarView(value: 0, total: 0, tint: .accentColor.opacity(0.7))
     }
   }
 }

@@ -113,12 +113,7 @@ struct EpisodeRecentView: View {
   }
 
   private var actionPresentation: ProgressActionPresentation {
-    switch mode {
-    case .tile:
-      .standalone
-    case .list:
-      .inline
-    }
+    .standaloneSubtle
   }
 
   var body: some View {
@@ -151,9 +146,10 @@ struct EpisodeRecentView: View {
                 Image(systemName: progressIcon)
                 Spacer()
               }
-              .progressActionLabelStyle(.standalone)
+              .foregroundStyle(.linkText)
+              .progressActionLabelStyle(.standaloneSubtle)
             }
-            .progressActionButtonStyle()
+            .progressActionButtonStyle(tint: .secondary)
             .sheet(isPresented: $showCollectionBox) {
               SubjectCollectionBoxView(subjectId: subject.id, initialSubject: subject)
                 .onDisappear {
@@ -187,9 +183,10 @@ struct EpisodeRecentView: View {
                 Text(progressText)
                 Image(systemName: progressIcon)
               }
-              .progressActionLabelStyle(.inline)
+              .foregroundStyle(.linkText)
+              .progressActionLabelStyle(.standaloneSubtle)
             }
-            .progressActionButtonStyle()
+            .progressActionButtonStyle(tint: .secondary)
             .sheet(isPresented: $showCollectionBox) {
               SubjectCollectionBoxView(subjectId: subject.id, initialSubject: subject)
                 .onDisappear {
@@ -208,6 +205,7 @@ struct EpisodeRecentView: View {
             Text(progressText)
             Image(systemName: progressIcon)
           }
+          .foregroundStyle(.linkText)
           .opacity(loadingEpisodes ? 0 : 1)
           .accessibilityHidden(loadingEpisodes)
 
@@ -219,7 +217,7 @@ struct EpisodeRecentView: View {
         .frame(maxWidth: actionPresentation.isStandalone ? .infinity : nil)
         .progressActionLabelStyle(actionPresentation)
       }
-      .progressActionButtonStyle()
+      .progressActionButtonStyle(tint: .secondary)
       .disabled(loadingEpisodes)
     }
   }
@@ -283,7 +281,7 @@ struct EpisodeNextView: View {
       updateSingle(episode: episode, type: .collect)
     } label: {
       ZStack {
-        Label(episodeDesc, systemImage: episodeIcon)
+        EpisodeNextLabel(desc: episodeDesc, icon: episodeIcon)
           .opacity(updating ? 0 : 1)
           .accessibilityHidden(updating)
 
@@ -293,9 +291,21 @@ struct EpisodeNextView: View {
         }
       }
       .frame(maxWidth: fillWidth ? .infinity : nil)
-      .progressActionLabelStyle(fillWidth ? .standalone : .inline)
+      .progressActionLabelStyle(.standaloneSubtle)
     }
-    .progressActionButtonStyle()
+    .progressActionButtonStyle(tint: .secondary)
     .disabled(buttonDisabled)
+  }
+}
+
+private struct EpisodeNextLabel: View {
+  let desc: String
+  let icon: String
+
+  @Environment(\.isEnabled) private var isEnabled
+
+  var body: some View {
+    Label(desc, systemImage: icon)
+      .foregroundStyle(isEnabled ? .linkText : .secondary)
   }
 }

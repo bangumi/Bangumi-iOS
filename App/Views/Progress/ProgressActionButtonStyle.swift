@@ -3,9 +3,21 @@ import SwiftUI
 enum ProgressActionPresentation: Equatable {
   case inline
   case standalone
+  case standaloneSubtle
 
   var isStandalone: Bool {
-    self == .standalone
+    self != .inline
+  }
+
+  var borderColor: Color {
+    switch self {
+    case .standalone:
+      Color.accentColor.opacity(0.3)
+    case .standaloneSubtle:
+      Color.secondary.opacity(0.25)
+    case .inline:
+      Color.clear
+    }
   }
 }
 
@@ -22,7 +34,7 @@ private struct ProgressActionLabelModifier: ViewModifier {
       .overlay {
         RoundedRectangle(cornerRadius: 8)
           .strokeBorder(
-            isEnabled ? Color.accentColor.opacity(0.3) : Color.secondary.opacity(0.2),
+            isEnabled ? presentation.borderColor : Color.secondary.opacity(0.2),
             lineWidth: 1
           )
           .opacity(presentation.isStandalone ? 1 : 0)
