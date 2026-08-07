@@ -180,7 +180,7 @@ struct EpisodeRecentView: View {
           }.font(.footnote)
           Spacer(minLength: 0)
           if let episode = recent.nextEpisode {
-            EpisodeNextView(episode: episode, fillWidth: false, reload: reload)
+            EpisodeNextView(episode: episode, fillWidth: false, progress: progressFraction, reload: reload)
           } else {
             Button {
               showCollectionBox = true
@@ -191,6 +191,7 @@ struct EpisodeRecentView: View {
               }
               .foregroundStyle(.linkText)
               .progressActionLabelStyle(.standaloneSubtle)
+              .progressActionFill(progressFraction)
             }
             .progressActionButtonStyle(tint: .secondary)
             .sheet(isPresented: $showCollectionBox) {
@@ -222,7 +223,7 @@ struct EpisodeRecentView: View {
         }
         .frame(maxWidth: actionPresentation.isStandalone ? .infinity : nil)
         .progressActionLabelStyle(actionPresentation)
-        .progressActionFill(mode == .tile ? progressFraction : nil)
+        .progressActionFill(progressFraction)
       }
       .progressActionButtonStyle(tint: .secondary)
       .disabled(loadingEpisodes)
