@@ -324,7 +324,8 @@ private struct BookProgressSummaryView: View {
             value: epStatus,
             total: subject.epsDesc,
             updating: quickUpdate == .chapters,
-            fillWidth: false
+            fillWidth: false,
+            progress: chapterProgress
           ) {
             increment(.chapters)
           }
@@ -335,7 +336,8 @@ private struct BookProgressSummaryView: View {
             value: volStatus,
             total: subject.volumesDesc,
             updating: quickUpdate == .volumes,
-            fillWidth: false
+            fillWidth: false,
+            progress: volumeProgress
           ) {
             increment(.volumes)
           }
@@ -401,7 +403,7 @@ private struct BookProgressTotal: View {
 
   var body: some View {
     if total != "??" {
-      Text(verbatim: "/\(total)")
+      Text(verbatim: "/ \(total)")
         .font(.footnote)
         .foregroundStyle(.secondary)
         .monospacedDigit()

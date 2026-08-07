@@ -108,7 +108,7 @@ struct ProgressListItemContentView: View {
     let subjectId = subject.id
     HStack(alignment: .top, spacing: 8) {
       ImageView(img: subject.images?.resize(.r200))
-        .imageStyle(width: 64, height: 90, cornerRadius: 8)
+        .imageStyle(width: 56, height: 80, cornerRadius: 8)
         .imageType(.subject)
         .imageBadge(show: subject.interest?.private ?? false) {
           Image(systemName: "lock")
@@ -146,10 +146,8 @@ struct ProgressListItemContentView: View {
           .foregroundStyle(.accent)
           .font(.callout)
         }
-
-        ProgressSubjectLinearBarsView(subject: subject)
       }
-      .frame(maxWidth: .infinity, minHeight: 90, alignment: .topLeading)
+      .frame(maxWidth: .infinity, minHeight: 80, alignment: .topLeading)
     }
   }
 }

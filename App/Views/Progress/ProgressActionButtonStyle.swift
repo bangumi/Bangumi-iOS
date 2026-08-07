@@ -53,7 +53,7 @@ extension View {
       if let progress {
         GeometryReader { geometry in
           RoundedRectangle(cornerRadius: 8, style: .continuous)
-            .fill(Color(hex: 0x4897FF).opacity(0.08))
+            .fill(Color(hex: 0x4897FF).opacity(0.15))
             .frame(width: geometry.size.width * min(max(progress, 0), 1))
         }
         .animation(.default, value: progress)
