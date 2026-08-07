@@ -108,7 +108,7 @@ struct ProgressListItemContentView: View {
     let subjectId = subject.id
     HStack(alignment: .top, spacing: 8) {
       ImageView(img: subject.images?.resize(.r200))
-        .imageStyle(width: 64, height: 90)
+        .imageStyle(width: 64, height: 90, cornerRadius: 8)
         .imageType(.subject)
         .imageBadge(show: subject.interest?.private ?? false) {
           Image(systemName: "lock")

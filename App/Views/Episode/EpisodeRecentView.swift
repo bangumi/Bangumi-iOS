@@ -113,12 +113,12 @@ struct EpisodeRecentView: View {
   }
 
   private var actionPresentation: ProgressActionPresentation {
-    switch mode {
-    case .tile:
-      .standalone
-    case .list:
-      .inline
-    }
+    .standaloneSubtle
+  }
+
+  private var progressFraction: Double? {
+    guard subject.eps > 0 else { return nil }
+    return min(Double(subject.interest?.epStatus ?? 0) / Double(subject.eps), 1)
   }
 
   var body: some View {
@@ -140,7 +140,7 @@ struct EpisodeRecentView: View {
           }
           .font(.footnote)
           if let episode = recent.nextEpisode {
-            EpisodeNextView(episode: episode, fillWidth: true, reload: reload)
+            EpisodeNextView(episode: episode, fillWidth: true, progress: progressFraction, reload: reload)
           } else {
             Button {
               showCollectionBox = true
@@ -151,9 +151,11 @@ struct EpisodeRecentView: View {
                 Image(systemName: progressIcon)
                 Spacer()
               }
-              .progressActionLabelStyle(.standalone)
+              .foregroundStyle(.linkText)
+              .progressActionLabelStyle(.standaloneSubtle)
+              .progressActionFill(progressFraction)
             }
-            .progressActionButtonStyle()
+            .progressActionButtonStyle(tint: .secondary)
             .sheet(isPresented: $showCollectionBox) {
               SubjectCollectionBoxView(subjectId: subject.id, initialSubject: subject)
                 .onDisappear {
@@ -187,9 +189,10 @@ struct EpisodeRecentView: View {
                 Text(progressText)
                 Image(systemName: progressIcon)
               }
-              .progressActionLabelStyle(.inline)
+              .foregroundStyle(.linkText)
+              .progressActionLabelStyle(.standaloneSubtle)
             }
-            .progressActionButtonStyle()
+            .progressActionButtonStyle(tint: .secondary)
             .sheet(isPresented: $showCollectionBox) {
               SubjectCollectionBoxView(subjectId: subject.id, initialSubject: subject)
                 .onDisappear {
@@ -208,6 +211,7 @@ struct EpisodeRecentView: View {
             Text(progressText)
             Image(systemName: progressIcon)
           }
+          .foregroundStyle(.linkText)
           .opacity(loadingEpisodes ? 0 : 1)
           .accessibilityHidden(loadingEpisodes)
 
@@ -218,8 +222,9 @@ struct EpisodeRecentView: View {
         }
         .frame(maxWidth: actionPresentation.isStandalone ? .infinity : nil)
         .progressActionLabelStyle(actionPresentation)
+        .progressActionFill(mode == .tile ? progressFraction : nil)
       }
-      .progressActionButtonStyle()
+      .progressActionButtonStyle(tint: .secondary)
       .disabled(loadingEpisodes)
     }
   }
@@ -228,6 +233,7 @@ struct EpisodeRecentView: View {
 struct EpisodeNextView: View {
   let payload: EpisodeRenderPayload
   let fillWidth: Bool
+  var progress: Double? = nil
   var reload: (() async -> Void)? = nil
 
   @State private var updating: Bool = false
@@ -235,10 +241,12 @@ struct EpisodeNextView: View {
   init(
     episode: EpisodeDTO,
     fillWidth: Bool,
+    progress: Double? = nil,
     reload: (() async -> Void)? = nil
   ) {
     self.payload = EpisodeRenderPayload(episode)
     self.fillWidth = fillWidth
+    self.progress = progress
     self.reload = reload
   }
 
@@ -283,7 +291,7 @@ struct EpisodeNextView: View {
       updateSingle(episode: episode, type: .collect)
     } label: {
       ZStack {
-        Label(episodeDesc, systemImage: episodeIcon)
+        EpisodeNextLabel(desc: episodeDesc, icon: episodeIcon)
           .opacity(updating ? 0 : 1)
           .accessibilityHidden(updating)
 
@@ -293,9 +301,22 @@ struct EpisodeNextView: View {
         }
       }
       .frame(maxWidth: fillWidth ? .infinity : nil)
-      .progressActionLabelStyle(fillWidth ? .standalone : .inline)
+      .progressActionLabelStyle(.standaloneSubtle)
+      .progressActionFill(progress)
     }
-    .progressActionButtonStyle()
+    .progressActionButtonStyle(tint: .secondary)
     .disabled(buttonDisabled)
+  }
+}
+
+private struct EpisodeNextLabel: View {
+  let desc: String
+  let icon: String
+
+  @Environment(\.isEnabled) private var isEnabled
+
+  var body: some View {
+    Label(desc, systemImage: icon)
+      .foregroundStyle(isEnabled ? .linkText : .secondary)
   }
 }
