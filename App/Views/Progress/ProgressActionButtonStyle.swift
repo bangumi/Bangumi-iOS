@@ -48,6 +48,19 @@ extension View {
     modifier(ProgressActionLabelModifier(presentation: presentation))
   }
 
+  func progressActionFill(_ progress: Double?) -> some View {
+    background(alignment: .leading) {
+      if let progress {
+        GeometryReader { geometry in
+          RoundedRectangle(cornerRadius: 8, style: .continuous)
+            .fill(Color(hex: 0x4897FF).opacity(0.08))
+            .frame(width: geometry.size.width * min(max(progress, 0), 1))
+        }
+        .animation(.default, value: progress)
+      }
+    }
+  }
+
   func progressActionButtonStyle(tint: Color = .accent) -> some View {
     self
       .labelStyle(.compact)

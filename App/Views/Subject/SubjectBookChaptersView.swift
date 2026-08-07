@@ -270,6 +270,16 @@ private struct BookProgressSummaryView: View {
     subject.interest?.volStatus ?? 0
   }
 
+  private var chapterProgress: Double? {
+    guard subject.eps > 0 else { return nil }
+    return min(Double(epStatus) / Double(subject.eps), 1)
+  }
+
+  private var volumeProgress: Double? {
+    guard subject.volumes > 0 else { return nil }
+    return min(Double(volStatus) / Double(subject.volumes), 1)
+  }
+
   private func increment(_ target: BookProgressQuickUpdate) {
     guard quickUpdate == nil else {
       return
@@ -337,34 +347,29 @@ private struct BookProgressSummaryView: View {
           }
         }
       case .tile:
-        HStack(spacing: 4) {
-          VStack(spacing: 4) {
-            BookProgressQuickUpdateChip(
-              title: "Chap.",
-              accessibilityLabel: "话数加一",
-              value: epStatus,
-              total: subject.epsDesc,
-              updating: quickUpdate == .chapters,
-              fillWidth: true
-            ) {
-              increment(.chapters)
-            }
-
-            BookProgressQuickUpdateChip(
-              title: "Vol.",
-              accessibilityLabel: "卷数加一",
-              value: volStatus,
-              total: subject.volumesDesc,
-              updating: quickUpdate == .volumes,
-              fillWidth: true
-            ) {
-              increment(.volumes)
-            }
+        VStack(spacing: 4) {
+          BookProgressQuickUpdateChip(
+            title: "Chap.",
+            accessibilityLabel: "话数加一",
+            value: epStatus,
+            total: subject.epsDesc,
+            updating: quickUpdate == .chapters,
+            fillWidth: true,
+            progress: chapterProgress
+          ) {
+            increment(.chapters)
           }
-          .layoutPriority(1)
 
-          BookProgressEditButton(fillHeight: true) {
-            showingEditor = true
+          BookProgressQuickUpdateChip(
+            title: "Vol.",
+            accessibilityLabel: "卷数加一",
+            value: volStatus,
+            total: subject.volumesDesc,
+            updating: quickUpdate == .volumes,
+            fillWidth: true,
+            progress: volumeProgress
+          ) {
+            increment(.volumes)
           }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -411,6 +416,7 @@ private struct BookProgressQuickUpdateChip: View {
   let total: String
   let updating: Bool
   let fillWidth: Bool
+  var progress: Double? = nil
   let action: () -> Void
 
   var body: some View {
@@ -418,11 +424,11 @@ private struct BookProgressQuickUpdateChip: View {
       HStack(spacing: 4) {
         Text(verbatim: title)
           .foregroundStyle(.secondary)
-        BookProgressCurrentValue(value: value)
-        BookProgressTotal(total: total)
         if fillWidth {
           Spacer(minLength: 0)
         }
+        BookProgressCurrentValue(value: value)
+        BookProgressTotal(total: total)
         Image(systemName: "plus.circle")
           .foregroundStyle(.secondary)
           .opacity(updating ? 0 : 1)
@@ -436,6 +442,7 @@ private struct BookProgressQuickUpdateChip: View {
       .lineLimit(1)
       .frame(maxWidth: fillWidth ? .infinity : nil, alignment: .leading)
       .progressActionLabelStyle(.standaloneSubtle)
+      .progressActionFill(progress)
       .animation(.default, value: updating)
     }
     .progressActionButtonStyle(tint: .secondary)

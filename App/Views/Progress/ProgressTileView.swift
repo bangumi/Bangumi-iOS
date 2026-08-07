@@ -98,7 +98,7 @@ struct ProgressTileItemContentView: View {
               Image(systemName: "lock")
             }
             .imageNavLink(subject.link)
-            .imageStyle(contentMode: .fill)
+            .imageStyle(cornerRadius: 8, contentMode: .fill)
         )
 
       VStack(alignment: .leading, spacing: 4) {
@@ -132,9 +132,7 @@ struct ProgressTileItemContentView: View {
           )
           .foregroundStyle(.accent)
         }
-
-        ProgressSubjectLinearBarsView(subject: subject)
-      }.frame(height: 124)
+      }.frame(height: 108)
     }
   }
 }
