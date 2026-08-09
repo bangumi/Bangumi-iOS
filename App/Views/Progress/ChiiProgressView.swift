@@ -348,7 +348,6 @@ struct ChiiProgressView: View {
       await loadLocalProgress(animate: true)
       collectionsUpdatedAt = Int(now.timeIntervalSince1970)
     } catch {
-      Notifier.shared.notify(message: "更新失败: \(error)")
       Notifier.shared.alert(error: error)
     }
     withAnimation(.default) {

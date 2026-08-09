@@ -7,37 +7,29 @@ struct ContentView: View {
   @AppStorage("friendlist") var friendlist: [Int] = []
   @AppStorage("blocklist") var blocklist: [Int] = []
 
-  @State var notifier = Notifier.shared
+  @State private var notifier = Notifier.shared
 
-  func refreshProfile() async {
+  private func refreshProfile() async -> Bool {
     if !isAuthenticated {
-      return
+      return false
     }
-    var tries = 0
-    while true {
-      if tries > 3 {
-        break
-      }
-      tries += 1
-      do {
-        profile = try await AuthService.refreshProfile()
-        Logger.api.info("refresh profile success: \(profile.rawValue)")
-        return
-      } catch ChiiError.requireLogin {
-        Notifier.shared.notify(message: "请登录")
-        await AuthService.setAuthStatus(false)
-        return
-      } catch {
-        Notifier.shared.notify(message: "获取当前用户信息失败，重试 \(tries)/3")
-        Logger.api.warning("refresh profile failed: \(error)")
-      }
-      sleep(2)
+    do {
+      profile = try await AuthService.refreshProfile()
+      Logger.api.info("refresh profile success: \(profile.rawValue)")
+      return true
+    } catch ChiiError.requireLogin {
+      Notifier.shared.notify(message: "请登录")
+    } catch let error as ChiiError {
+      Logger.api.warning("refresh profile failed: \(error.diagnosticDescription)")
+      Notifier.shared.alert(error: error)
+    } catch {
+      Logger.api.warning("refresh profile failed: \(error)")
+      Notifier.shared.alert(error: ChiiError(request: "refresh profile failed: \(error)"))
     }
-    Notifier.shared.alert(message: "无法获取当前用户信息，请重新登录")
-    await AuthService.setAuthStatus(false)
+    return false
   }
 
-  func refreshRelationships() async {
+  private func refreshRelationships() async {
     if !isAuthenticated {
       return
     }
@@ -66,12 +58,13 @@ struct ContentView: View {
         Notifier.shared.vanishError()
       }
       Button("Copy") {
-        UIPasteboard.general.string = notifier.currentError?.description
+        UIPasteboard.general.string = notifier.currentError?.diagnosticDescription
+        Notifier.shared.vanishError()
         Notifier.shared.notify(message: "已复制")
       }
     } message: {
       if let error = notifier.currentError {
-        Text(verbatim: String(describing: error))
+        Text(error.userMessage)
       } else {
         Text("Unknown Error")
       }
@@ -81,8 +74,16 @@ struct ContentView: View {
         .allowsHitTesting(false)
         .frame(width: 0, height: 0)
     )
+    .onReceive(
+      NotificationCenter.default.publisher(for: APIClient.authenticationRequiredNotification)
+    ) { notification in
+      guard let generation = (notification.object as? NSNumber)?.uint64Value else { return }
+      Task {
+        await AuthService.invalidateSession(expectedCredentialGeneration: generation)
+      }
+    }
     .task {
-      await refreshProfile()
+      guard await refreshProfile() else { return }
       await refreshRelationships()
     }
   }

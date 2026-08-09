@@ -1,5 +1,4 @@
 import Foundation
-import OSLog
 
 extension APIClient {
   func getOAuthBase() -> String {
@@ -17,20 +16,6 @@ extension APIClient {
     return baseURL.appending(queryItems: queries)
   }
 
-  func logout() async {
-    self.setAuthStatus(false)
-    self.keychain.delete("auth")
-    self.auth = nil
-    self.authorizedSession = nil
-    AppConfig.profile = ""
-    do {
-      try await AccountLocalState.clear()
-      await Notifier.shared.notify(message: "退出登录成功")
-    } catch {
-      await Notifier.shared.alert(error: error)
-    }
-  }
-
   func getAuthFromKeychain() throws -> Auth? {
     if let data = self.keychain.getData("auth") {
       let decoder = JSONDecoder()
@@ -39,18 +24,20 @@ extension APIClient {
     return nil
   }
 
-  func saveAuthResponse(data: Data) throws -> Auth {
+  func saveAuthResponse(data: Data, commit: CredentialCommit) throws -> CredentialSnapshot {
     let resp: TokenResponse = try self.decodeResponse(data)
     let auth = Auth(response: resp)
     let encoder = JSONEncoder()
     let value = try encoder.encode(auth)
-    self.keychain.set(value, forKey: "auth")
-    self.auth = auth
-    self.authorizedSession = nil
-    return auth
+    try Task.checkCancellation()
+    guard let credentials = self.storeCredentials(auth, encodedData: value, commit: commit) else {
+      throw ChiiError(ignore: "Discarded stale token response")
+    }
+    return credentials
   }
 
-  func exchangeForAccessToken(code: String) async throws {
+  func exchangeForAccessToken(code: String) async throws -> UInt64 {
+    let exchangeGeneration = self.beginOAuthExchange()
     let oauthBase = self.getOAuthBase()
     let url = URL(string: "\(oauthBase)/access_token")!
     let body = [
@@ -61,10 +48,16 @@ extension APIClient {
       "redirect_uri": self.appInfo.callbackURL,
     ]
     let data = try await self.request(url: url, method: "POST", body: body, auth: .disabled)
-    _ = try self.saveAuthResponse(data: data)
+    let credentials = try self.saveAuthResponse(
+      data: data,
+      commit: .oauth(exchangeGeneration: exchangeGeneration)
+    )
+    return credentials.generation
   }
 
-  func refreshAccessToken(auth: Auth) async throws -> Auth {
+  func refreshAccessToken(auth: Auth, expectedGeneration: UInt64) async throws
+    -> CredentialSnapshot
+  {
     let oauthBase = self.getOAuthBase()
     let url = URL(string: "\(oauthBase)/access_token")!
     let body = [
@@ -74,9 +67,19 @@ extension APIClient {
       "refresh_token": auth.refreshToken,
       "redirect_uri": self.appInfo.callbackURL,
     ]
-    let data = try await self.request(url: url, method: "POST", body: body, auth: .disabled)
-    let auth = try self.saveAuthResponse(data: data)
-    return auth
+    let data: Data
+    do {
+      data = try await self.request(url: url, method: "POST", body: body, auth: .disabled)
+    } catch let error as ChiiError {
+      if case .ignore = error, Task.isCancelled {
+        throw CancellationError()
+      }
+      throw error
+    }
+    return try self.saveAuthResponse(
+      data: data,
+      commit: .refresh(credentialGeneration: expectedGeneration)
+    )
   }
 
 }

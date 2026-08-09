@@ -24,6 +24,11 @@ enum AppConfig {
     set { UserDefaults.standard.set(newValue, forKey: "profile") }
   }
 
+  static nonisolated var localStateOwnerID: Int {
+    get { UserDefaults.standard.integer(forKey: "localStateOwnerID") }
+    set { UserDefaults.standard.set(newValue, forKey: "localStateOwnerID") }
+  }
+
   static nonisolated var friendlist: [Int] {
     get { [Int](rawValue: UserDefaults.standard.string(forKey: "friendlist") ?? "") ?? [] }
     set { UserDefaults.standard.set(newValue.rawValue, forKey: "friendlist") }

@@ -21,7 +21,44 @@ struct ResponseDetailedError: Codable, CustomStringConvertible {
   }
 }
 
-enum ChiiError: Error, CustomStringConvertible, Sendable {
+struct HTTPErrorDetails: Sendable {
+  private static let responseBodyLimit = 4096
+
+  let statusCode: Int
+  let responseBody: String
+  let requestID: String?
+
+  init(statusCode: Int, responseBody: String, requestID: String?) {
+    self.statusCode = statusCode
+    if responseBody.count > Self.responseBodyLimit {
+      self.responseBody =
+        String(responseBody.prefix(Self.responseBodyLimit)) + "\n[response body truncated]"
+    } else {
+      self.responseBody = responseBody
+    }
+    self.requestID = requestID
+  }
+
+  var userMessage: String {
+    if (500...599).contains(statusCode) {
+      return "服务器暂时不可用（HTTP \(statusCode)），请稍后再试"
+    }
+    return "请求失败（HTTP \(statusCode)），请稍后再试"
+  }
+
+  var diagnosticDescription: String {
+    var text = "code: \(statusCode)"
+    if !responseBody.isEmpty {
+      text += "\nresponse: \(responseBody)"
+    }
+    if let requestID {
+      text += "\nrequestID: \(requestID)"
+    }
+    return text
+  }
+}
+
+enum ChiiError: Error, CustomStringConvertible, LocalizedError, Sendable {
   case uninitialized
   case requireLogin
   case network(String)
@@ -31,6 +68,7 @@ enum ChiiError: Error, CustomStringConvertible, Sendable {
   case forbidden(String)
   case notFound(String)
   case conflict(String)
+  case http(HTTPErrorDetails)
   case generic(String)
   case notice(String)
   case ignore(String)
@@ -74,28 +112,53 @@ enum ChiiError: Error, CustomStringConvertible, Sendable {
   }
 
   init(code: Int, response: String, requestID: String?) {
+    let details = HTTPErrorDetails(
+      statusCode: code,
+      responseBody: response,
+      requestID: requestID
+    )
     switch code {
     case 400:
-      self = .badRequest(response)
+      self = .badRequest(details.responseBody)
     case 401:
-      self = .notAuthorized(response)
+      self = .requireLogin
     case 403:
-      self = .forbidden(response)
+      self = .forbidden(details.responseBody)
     case 404:
-      self = .notFound(response)
+      self = .notFound(details.responseBody)
     case 409:
-      self = .conflict(response)
+      self = .conflict(details.responseBody)
     default:
-      var text = "code: \(code)\n"
-      text += "response: \(response)\n"
-      if let reqID = requestID {
-        text += "requestID: \(reqID)\n"
-      }
-      self = .generic(text)
+      self = .http(details)
     }
   }
 
-  var description: String {
+  var userMessage: String {
+    switch self {
+    case .uninitialized:
+      return "客户端尚未准备好，请稍后再试"
+    case .requireLogin, .notAuthorized:
+      return "登录状态已失效，请重新登录"
+    case .network(let message), .generic(let message), .notice(let message):
+      return message
+    case .request:
+      return "请求处理失败，请稍后再试"
+    case .badRequest:
+      return "请求参数有误，请检查后重试"
+    case .forbidden:
+      return "请求被拒绝，请检查权限"
+    case .notFound:
+      return "请求的内容不存在"
+    case .conflict:
+      return "请求与当前状态冲突，请刷新后重试"
+    case .http(let details):
+      return details.userMessage
+    case .ignore(let message):
+      return message
+    }
+  }
+
+  var diagnosticDescription: String {
     switch self {
     case .uninitialized:
       return "Client not initialized"
@@ -115,6 +178,8 @@ enum ChiiError: Error, CustomStringConvertible, Sendable {
       return "Not Found!\n\(error)"
     case .conflict(let error):
       return "Conflict!\n\(error)"
+    case .http(let details):
+      return details.diagnosticDescription
     case .generic(let message):
       return message
     case .notice(let message):
@@ -124,15 +189,23 @@ enum ChiiError: Error, CustomStringConvertible, Sendable {
     }
   }
 
+  var description: String {
+    diagnosticDescription
+  }
+
+  var errorDescription: String? {
+    userMessage
+  }
+
   var isRetryable: Bool {
     switch self {
     case .network(let msg):
       return msg == "请求超时，请稍后再试" || msg == "无法连接到服务器，请检查网络后重试"
     case .notice(let msg):
       return msg == "请求超时，请稍后再试" || msg == "请求过于频繁，请稍后再试"
-    case .generic(let msg):
-      return msg.hasPrefix("code: 502\n") || msg.hasPrefix("code: 503\n")
-        || msg.hasPrefix("code: 504\n")
+    case .http(let details):
+      return details.statusCode == 502 || details.statusCode == 503
+        || details.statusCode == 504
     default:
       return false
     }

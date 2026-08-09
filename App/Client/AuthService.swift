@@ -1,32 +1,111 @@
 import Foundation
+import OSLog
 
+@MainActor
 enum AuthService {
-  static func setAuthStatus(_ authorized: Bool) async {
-    await APIClient.shared.setAuthStatus(authorized)
-  }
+  private static var operationRevision: UInt64 = 0
 
   static func buildOAuthURL() async -> URL {
     await APIClient.shared.buildOAuthURL()
   }
 
   static func exchangeForAccessToken(code: String) async throws {
-    try await APIClient.shared.exchangeForAccessToken(code: code)
-    _ = try await refreshProfile()
+    let revision = beginOperation()
+    let credentialGeneration = try await APIClient.shared.exchangeForAccessToken(code: code)
+    try ensureCurrentOperation(revision)
+    do {
+      _ = try await refreshProfile(revision: revision)
+    } catch ChiiError.requireLogin {
+      try ensureCurrentOperation(revision)
+      _ = await APIClient.shared.clearCredentials(ifCurrent: credentialGeneration)
+      throw ChiiError.requireLogin
+    }
   }
 
   static func refreshProfile() async throws -> Profile {
-    let profile = try await AccountService.getProfile()
-    try await acceptAuthenticatedProfile(profile)
-    return profile
+    let revision = beginOperation()
+    return try await refreshProfile(revision: revision)
   }
 
   static func logout() async {
-    await APIClient.shared.logout()
+    let revision = beginOperation()
+    AccountLocalState.preserveCurrentOwner()
+    AppConfig.profile = ""
+    AppConfig.isAuthenticated = false
+    let clearedGeneration = await APIClient.shared.clearCredentials()
+    do {
+      try await clearLocalState(
+        revision: revision,
+        clearedGeneration: clearedGeneration
+      )
+      guard revision == operationRevision else { return }
+      Notifier.shared.notify(message: "退出登录成功")
+    } catch {
+      guard revision == operationRevision else { return }
+      Notifier.shared.alert(error: error)
+    }
   }
 
-  private static func acceptAuthenticatedProfile(_ profile: Profile) async throws {
+  static func invalidateSession(expectedCredentialGeneration: UInt64) async {
+    guard AppConfig.isAuthenticated else { return }
+    let observedRevision = operationRevision
+    guard
+      let clearedGeneration = await APIClient.shared.clearCredentials(
+        ifCurrent: expectedCredentialGeneration
+      )
+    else {
+      return
+    }
+    guard observedRevision == operationRevision else { return }
+    guard await APIClient.shared.isCurrentCredentialGeneration(clearedGeneration) else { return }
+    guard observedRevision == operationRevision else { return }
+
+    let revision = beginOperation()
+    AccountLocalState.preserveCurrentOwner()
+    AppConfig.profile = ""
+    AppConfig.isAuthenticated = false
+    do {
+      try await clearLocalState(
+        revision: revision,
+        clearedGeneration: clearedGeneration
+      )
+    } catch {
+      guard revision == operationRevision else { return }
+      Logger.app.error("failed to clear invalid session: \(error)")
+    }
+  }
+
+  private static func refreshProfile(revision: UInt64) async throws -> Profile {
+    let profile = try await AccountService.getProfile()
+    try ensureCurrentOperation(revision)
     try await AccountLocalState.clearIfAccountChanged(to: profile)
+    try ensureCurrentOperation(revision)
+    AppConfig.localStateOwnerID = profile.id
     AppConfig.profile = profile.rawValue
-    await APIClient.shared.setAuthStatus(true)
+    AppConfig.isAuthenticated = true
+    return profile
+  }
+
+  private static func clearLocalState(
+    revision: UInt64,
+    clearedGeneration: UInt64
+  ) async throws {
+    guard revision == operationRevision else { return }
+    try await AccountLocalState.clear()
+    guard revision == operationRevision else { return }
+    guard await APIClient.shared.isCurrentCredentialGeneration(clearedGeneration) else { return }
+    guard revision == operationRevision else { return }
+    AppConfig.localStateOwnerID = 0
+  }
+
+  private static func ensureCurrentOperation(_ revision: UInt64) throws {
+    guard revision == operationRevision else {
+      throw ChiiError(ignore: "Discarded stale authentication operation")
+    }
+  }
+
+  private static func beginOperation() -> UInt64 {
+    operationRevision &+= 1
+    return operationRevision
   }
 }
