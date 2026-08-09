@@ -290,6 +290,12 @@ private enum TopicDetailSheet: Identifiable {
 
 struct TopicDetailView: View {
   let source: TopicDetailSource
+  let initialPostID: Int?
+
+  init(source: TopicDetailSource, initialPostID: Int? = nil) {
+    self.source = source
+    self.initialPostID = initialPostID
+  }
 
   @AppStorage("shareDomain") private var shareDomain: ShareDomain = .chii
   @AppStorage("profile") private var profile: Profile = Profile()
@@ -787,7 +793,7 @@ struct TopicDetailView: View {
       canReact: isAuthenticated,
       showReactions: enableReactions,
       avatarIsRound: avatarStyle == .round,
-      initialPostID: nil
+      initialPostID: initialPostID
     )
   }
 

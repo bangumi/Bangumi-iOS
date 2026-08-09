@@ -4,17 +4,27 @@ struct NoticeView: View {
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
 
   @State private var fetched: Bool = false
-  @State private var updating: Bool = false
+  @State private var refreshing: Bool = false
+  @State private var clearing: Bool = false
   @State private var notices: [NoticeDTO] = []
   @State private var unreadCount: Int = 0
+  @State private var pendingReadNoticeIDs: Set<Int> = []
+  @State private var locallyReadNoticeIDs: Set<Int> = []
 
   func applyNoticeSnapshot(
     _ snapshot: NoticeRepository.NoticeSnapshot,
     fetched nextFetched: Bool = true
   ) {
+    var nextNotices = snapshot.notices
+    var nextUnreadCount = snapshot.unreadCount
+    for index in nextNotices.indices
+    where locallyReadNoticeIDs.contains(nextNotices[index].id) && nextNotices[index].unread {
+      nextNotices[index].unread = false
+      nextUnreadCount = max(0, nextUnreadCount - 1)
+    }
     withAnimation(.default) {
-      notices = snapshot.notices
-      unreadCount = snapshot.unreadCount
+      notices = nextNotices
+      unreadCount = nextUnreadCount
       fetched = nextFetched
     }
   }
@@ -41,8 +51,9 @@ struct NoticeView: View {
   }
 
   func refreshNotice() async {
+    guard !refreshing, !clearing, pendingReadNoticeIDs.isEmpty else { return }
     withAnimation(.default) {
-      updating = true
+      refreshing = true
     }
     do {
       let remoteSnapshot = try await NoticeRepository.refreshNotices()
@@ -52,25 +63,27 @@ struct NoticeView: View {
     }
     withAnimation(.default) {
       fetched = true
-      updating = false
+      refreshing = false
     }
+    submitPendingReadNotices(Array(pendingReadNoticeIDs))
   }
 
   func clearNotice() {
-    if updating { return }
+    if refreshing || clearing { return }
     let ids = notices.filter { $0.unread }.map { $0.id }
     guard !ids.isEmpty else { return }
     withAnimation(.default) {
-      updating = true
+      clearing = true
     }
     Task {
       defer {
         withAnimation(.default) {
-          updating = false
+          clearing = false
         }
       }
       do {
         try await NoticeRepository.markNoticesAsRead(ids: ids)
+        locallyReadNoticeIDs.formUnion(ids)
         applyReadNoticeIDs(ids)
       } catch {
         Notifier.shared.alert(error: error)
@@ -79,19 +92,21 @@ struct NoticeView: View {
   }
 
   func markAsRead(id: Int) {
-    if updating { return }
-    withAnimation(.default) {
-      updating = true
-    }
+    guard pendingReadNoticeIDs.insert(id).inserted else { return }
+    guard !refreshing else { return }
+    submitPendingReadNotices([id])
+  }
+
+  func submitPendingReadNotices(_ ids: [Int]) {
+    guard !ids.isEmpty else { return }
     Task {
       defer {
-        withAnimation(.default) {
-          updating = false
-        }
+        pendingReadNoticeIDs.subtract(ids)
       }
       do {
-        try await NoticeRepository.markNoticesAsRead(ids: [id])
-        applyReadNoticeIDs([id])
+        try await NoticeRepository.markNoticesAsRead(ids: ids)
+        locallyReadNoticeIDs.formUnion(ids)
+        applyReadNoticeIDs(ids)
       } catch {
         Notifier.shared.alert(error: error)
       }
@@ -107,20 +122,27 @@ struct NoticeView: View {
             ProgressView()
             Spacer()
           }
+        } else if notices.isEmpty {
+          ContentUnavailableView("暂无提醒", systemImage: "bell.slash")
+            .listRowSeparator(.hidden)
         } else {
-          ForEach(notices.indices, id: \.self) { index in
-            NoticeRowView(notice: $notices[index])
-              .listRowInsets(.init(top: 12, leading: 16, bottom: 12, trailing: 16))
-              .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                if notices[index].unread {
-                  Button {
-                    markAsRead(id: notices[index].id)
-                  } label: {
-                    Label("已读", systemImage: "checkmark")
-                  }
-                  .tint(.blue)
-                }
+          ForEach(notices) { notice in
+            NoticeRowView(notice: notice) {
+              if notice.unread {
+                markAsRead(id: notice.id)
               }
+            }
+            .listRowInsets(.init(top: 12, leading: 16, bottom: 12, trailing: 16))
+            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+              if notice.unread {
+                Button {
+                  markAsRead(id: notice.id)
+                } label: {
+                  Label("已读", systemImage: "checkmark")
+                }
+                .tint(.blue)
+              }
+            }
           }
         }
       }
@@ -139,7 +161,7 @@ struct NoticeView: View {
             Label("全部已读", systemImage: "checkmark.rectangle.stack")
               .adaptiveButtonStyle(.borderedProminent)
           }
-          .disabled(unreadCount == 0 || updating)
+          .disabled(unreadCount == 0 || refreshing || clearing)
         }
       }
       .task {

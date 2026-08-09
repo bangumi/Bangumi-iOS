@@ -49,7 +49,7 @@ enum NavDestination: Hashable, View {
   case subjectStaffList(_ subjectId: Int)
   case subjectReviewList(_ subjectId: Int)
   case subjectTopicList(_ subjectId: Int)
-  case subjectTopicDetail(_ topicId: Int)
+  case subjectTopicDetail(_ topicId: Int, initialPostID: Int? = nil)
   case subjectCommentList(_ subjectId: Int)
   case subjectCollectsList(_ subjectId: Int)
   case subjectIndexList(_ subjectId: Int)
@@ -76,7 +76,7 @@ enum NavDestination: Hashable, View {
   case groupList(_ mode: GroupFilterMode)
   case groupMemberList(_ name: String)
   case groupTopicList(_ name: String)
-  case groupTopicDetail(_ topicId: Int)
+  case groupTopicDetail(_ topicId: Int, initialPostID: Int? = nil)
 
   case blog(_ blogId: Int)
 
@@ -214,13 +214,13 @@ enum NavDestination: Hashable, View {
       GroupMemberListView(name: name)
     case .groupTopicList(let name):
       GroupTopicListView(name: name)
-    case .groupTopicDetail(let topicId):
-      TopicDetailView(source: .group(topicId))
+    case .groupTopicDetail(let topicId, let initialPostID):
+      TopicDetailView(source: .group(topicId), initialPostID: initialPostID)
 
     case .blog(let blogId):
       BlogView(blogId: blogId)
-    case .subjectTopicDetail(let topicId):
-      TopicDetailView(source: .subject(topicId))
+    case .subjectTopicDetail(let topicId, let initialPostID):
+      TopicDetailView(source: .subject(topicId), initialPostID: initialPostID)
 
     case .rakuenGroupTopics(let mode):
       RakuenGroupTopicView(mode: mode)
@@ -257,7 +257,9 @@ func handleChiiURL(_ url: URL, _ nav: Binding<NavigationPath>) -> Bool {
     switch components.first {
     case "topic":
       if let topicId = components.last.flatMap({ Int($0) }) {
-        nav.wrappedValue.append(NavDestination.subjectTopicDetail(topicId))
+        nav.wrappedValue.append(
+          NavDestination.subjectTopicDetail(topicId, initialPostID: initialPostID)
+        )
       }
     default:
       if let subjectId = components.first.flatMap({ Int($0) }) {
@@ -336,7 +338,9 @@ func handleChiiURL(_ url: URL, _ nav: Binding<NavigationPath>) -> Bool {
     switch components.first {
     case "topic":
       if let topicId = components.last.flatMap({ Int($0) }) {
-        nav.wrappedValue.append(NavDestination.groupTopicDetail(topicId))
+        nav.wrappedValue.append(
+          NavDestination.groupTopicDetail(topicId, initialPostID: initialPostID)
+        )
       }
     default:
       if let groupName = components.first {
@@ -388,35 +392,40 @@ func handleBangumiURL(_ url: URL, _ nav: Binding<NavigationPath>) -> Bool {
       nav.wrappedValue.append(NavDestination.user(username))
     }
   case "subject":
-    guard let subPath = components.dropFirst().first else {
+    let subjectPath = components.dropFirst()
+    guard let subPath = subjectPath.first else {
       return false
     }
     if let subjectId = Int(subPath) {
       nav.wrappedValue.append(NavDestination.subject(subjectId))
+    } else if let topicId = topicID(from: subjectPath) {
+      nav.wrappedValue.append(
+        NavDestination.subjectTopicDetail(topicId, initialPostID: initialPostID)
+      )
+    } else if subPath == "ep", subjectPath.count == 2,
+      let episodeId = subjectPath.dropFirst().first.flatMap({ Int($0) })
+    {
+      nav.wrappedValue.append(
+        episodeDestination(
+          episodeId,
+          initialPostID: initialPostID,
+          opensCommentList: opensCommentList
+        )
+      )
     } else {
-      switch subPath {
-      case "topic":
-        guard let topicId = components.dropFirst().last.flatMap({ Int($0) }) else {
-          return false
-        }
-        nav.wrappedValue.append(NavDestination.subjectTopicDetail(topicId))
-      default:
-        return false
-      }
+      return false
     }
   case "ep":
     guard let episodeId = components.dropFirst().last.flatMap({ Int($0) }) else {
       return false
     }
-    if opensCommentList {
-      nav.wrappedValue.append(
-        NavDestination.commentList(
-          CommentListRoute(parent: .episode(episodeId), initialPostID: initialPostID)
-        )
+    nav.wrappedValue.append(
+      episodeDestination(
+        episodeId,
+        initialPostID: initialPostID,
+        opensCommentList: opensCommentList
       )
-    } else {
-      nav.wrappedValue.append(NavDestination.episode(episodeId))
-    }
+    )
   case "character":
     guard let characterId = components.dropFirst().first.flatMap({ Int($0) }) else {
       return false
@@ -479,22 +488,47 @@ func handleBangumiURL(_ url: URL, _ nav: Binding<NavigationPath>) -> Bool {
       )
     )
   case "group":
-    guard let groupName = components.dropFirst().first else {
+    let groupPath = components.dropFirst()
+    guard let groupName = groupPath.first else {
       return false
     }
-    switch groupName {
-    case "topic":
-      guard let topicId = components.dropFirst().last.flatMap({ Int($0) }) else {
-        return false
-      }
-      nav.wrappedValue.append(NavDestination.groupTopicDetail(topicId))
-    default:
+    if let topicId = topicID(from: groupPath) {
+      nav.wrappedValue.append(
+        NavDestination.groupTopicDetail(topicId, initialPostID: initialPostID)
+      )
+    } else if groupName != "-" && groupName != "topic" {
       nav.wrappedValue.append(NavDestination.group(groupName))
+    } else {
+      return false
     }
   default:
     return false
   }
   return true
+}
+
+private func topicID(from path: ArraySlice<String>) -> Int? {
+  let components = Array(path)
+  if components.count == 2, components[0] == "topic" {
+    return Int(components[1])
+  }
+  if components.count == 3, components[0] == "-", components[1] == "topic" {
+    return Int(components[2])
+  }
+  return nil
+}
+
+private func episodeDestination(
+  _ episodeID: Int,
+  initialPostID: Int?,
+  opensCommentList: Bool
+) -> NavDestination {
+  if opensCommentList {
+    return .commentList(
+      CommentListRoute(parent: .episode(episodeID), initialPostID: initialPostID)
+    )
+  }
+  return .episode(episodeID)
 }
 
 private func commentPostID(from url: URL) -> Int? {

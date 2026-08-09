@@ -1,32 +1,44 @@
 // ref: https://github.com/bangumi/server-private/blob/master/lib/notify.ts
 
-import Foundation
 import SwiftUI
 
 struct NoticeRowView: View {
-  @Binding var notice: NoticeDTO
-
-  var statusColor: Color {
-    notice.unread ? .accent : .secondary.opacity(0.2)
-  }
+  let notice: NoticeDTO
+  let onOpen: () -> Void
 
   var body: some View {
+    ZStack {
+      switch notice.target {
+      case .app(let destination):
+        NavigationLink(value: destination) {
+          rowContent(linksSender: false)
+        }
+        .buttonStyle(.plain)
+        .simultaneousGesture(openGesture)
+      case .external(let url):
+        Link(destination: url) {
+          rowContent(linksSender: false)
+        }
+        .buttonStyle(.plain)
+        .simultaneousGesture(openGesture)
+      case nil:
+        rowContent(linksSender: true)
+      }
+    }
+    .listRowBackground(
+      notice.unread
+        ? Color.accent.opacity(0.05)
+        : Color.clear
+    )
+  }
+
+  private func rowContent(linksSender: Bool) -> some View {
     HStack(alignment: .top, spacing: 12) {
-      ImageView(img: notice.sender.avatar?.large)
-        .imageStyle(width: 48, height: 48)
-        .imageType(.avatar)
-        .imageLink(notice.sender.link)
-        .overlay(
-          RoundedRectangle(cornerRadius: 24)
-            .stroke(notice.unread ? Color.accent.opacity(0.3) : Color.clear, lineWidth: 2)
-        )
+      senderAvatar(linksSender: linksSender)
 
       VStack(alignment: .leading, spacing: 6) {
         HStack(alignment: .center, spacing: 8) {
-          Text(notice.sender.nickname.withLink(notice.sender.link))
-            .font(.subheadline)
-            .fontWeight(notice.unread ? .semibold : .regular)
-            .lineLimit(1)
+          senderName(linksSender: linksSender)
 
           Spacer(minLength: 4)
 
@@ -44,17 +56,55 @@ struct NoticeRowView: View {
           }
         }
 
-        Text(notice.desc)
+        Text(notice.message)
           .font(.body)
           .foregroundColor(notice.unread ? .primary : .secondary)
           .lineLimit(3)
           .fixedSize(horizontal: false, vertical: true)
       }
     }
-    .listRowBackground(
-      notice.unread
-        ? Color.accent.opacity(0.05)
-        : Color.clear
-    )
+  }
+
+  @ViewBuilder
+  private func senderAvatar(linksSender: Bool) -> some View {
+    let avatar = ImageView(img: notice.sender.avatar?.large)
+      .imageStyle(width: 48, height: 48)
+      .imageType(.avatar)
+      .overlay(
+        RoundedRectangle(cornerRadius: 24)
+          .stroke(notice.unread ? Color.accent.opacity(0.3) : Color.clear, lineWidth: 2)
+      )
+    if linksSender && !notice.sender.username.isEmpty {
+      NavigationLink(value: NavDestination.user(notice.sender.username)) {
+        avatar
+      }
+      .buttonStyle(.plain)
+      .simultaneousGesture(openGesture)
+    } else {
+      avatar
+    }
+  }
+
+  @ViewBuilder
+  private func senderName(linksSender: Bool) -> some View {
+    let name = Text(notice.sender.nickname)
+      .font(.subheadline)
+      .fontWeight(notice.unread ? .semibold : .regular)
+      .lineLimit(1)
+    if linksSender && !notice.sender.username.isEmpty {
+      NavigationLink(value: NavDestination.user(notice.sender.username)) {
+        name
+      }
+      .buttonStyle(.plain)
+      .simultaneousGesture(openGesture)
+    } else {
+      name
+    }
+  }
+
+  private var openGesture: some Gesture {
+    TapGesture().onEnded {
+      onOpen()
+    }
   }
 }
