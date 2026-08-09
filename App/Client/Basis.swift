@@ -18,7 +18,7 @@ struct TokenResponse: Codable {
   var refreshToken: String
 }
 
-struct Auth: Codable {
+struct Auth: Codable, Sendable {
   var accessToken: String
   var expiresAt: Date
   var refreshToken: String

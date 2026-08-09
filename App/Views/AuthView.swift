@@ -58,7 +58,7 @@ class SignInViewModel: NSObject, ASWebAuthenticationPresentationContextProviding
       do {
         try await AuthService.exchangeForAccessToken(code: authorizationCode)
       } catch {
-        Notifier.shared.alert(message: "failed to exchange for access token: \(error)")
+        Notifier.shared.alert(error: error)
       }
     }
   }

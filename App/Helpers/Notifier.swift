@@ -15,25 +15,24 @@ class Notifier {
   var hasAlert: Bool = false
   var currentError: ChiiError? = nil
   var notifications: [Notification] = []
+  private var pendingError: ChiiError? = nil
 
   func alert(error: ChiiError) {
     switch error {
-    case .notice:
-      Logger.app.info("notice: \(error)")
-      self.notify(message: error.description)
+    case .notice, .requireLogin:
+      Logger.app.info("notice: \(error.diagnosticDescription)")
+      self.notify(message: error.userMessage)
     case .ignore:
-      Logger.app.warning("ignore error: \(error)")
+      Logger.app.warning("ignore error: \(error.diagnosticDescription)")
     default:
-      Logger.app.error("alert: \(error)")
-      self.currentError = error
-      self.hasAlert = true
+      Logger.app.error("alert: \(error.diagnosticDescription)")
+      self.present(error)
     }
   }
 
   func alert(message: String) {
     Logger.app.error("alert: \(message)")
-    self.currentError = ChiiError(message: message)
-    self.hasAlert = true
+    self.present(ChiiError(message: message))
   }
 
   func alert(error: any Error) {
@@ -45,13 +44,38 @@ class Notifier {
         self.alert(error: ChiiError(networkError: nsError))
         return
       }
-      self.alert(message: "\(error)")
+      self.alert(error: ChiiError(request: String(describing: error)))
     }
   }
 
   func vanishError() {
+    let nextError = self.pendingError
+    self.pendingError = nil
     self.currentError = nil
     self.hasAlert = false
+    if let nextError {
+      DispatchQueue.main.async { [weak self] in
+        self?.present(nextError)
+      }
+    }
+  }
+
+  private func present(_ error: ChiiError) {
+    guard !self.hasAlert else {
+      if self.currentError?.userMessage == error.userMessage
+        || self.pendingError?.userMessage == error.userMessage
+      {
+        Logger.app.warning("coalesced duplicate alert")
+      } else if self.pendingError == nil {
+        self.pendingError = error
+        Logger.app.warning("queued alert while another alert is presented")
+      } else {
+        Logger.app.warning("suppressed alert because the alert queue is full")
+      }
+      return
+    }
+    self.currentError = error
+    self.hasAlert = true
   }
 
   func notify(message: String, duration: TimeInterval = 2) {

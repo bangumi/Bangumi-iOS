@@ -12,38 +12,13 @@ actor DatabaseOperator {
 
 // MARK: - basic
 extension DatabaseOperator {
-  public func clearSubjectInterest() throws {
+  public func clearAccountLocalState() throws {
     try database.write { db in
       try db.execute(sql: "UPDATE subjects SET ctype = 0, collected_at = 0, interest_data = NULL")
-    }
-  }
-
-  public func clearEpisodeCollection() throws {
-    try database.write { db in
       try db.execute(sql: "UPDATE episodes SET status = 0, collected_at = 0")
-    }
-  }
-
-  public func clearPersonCollection() throws {
-    try database.write { db in
       try db.execute(sql: "UPDATE persons SET collected_at = 0")
-    }
-  }
-
-  public func clearCharacterCollection() throws {
-    try database.write { db in
       try db.execute(sql: "UPDATE characters SET collected_at = 0")
-    }
-  }
-
-  public func clearNoticeCache() throws {
-    try database.write { db in
       try db.execute(sql: "DELETE FROM notice_cache_entries")
-    }
-  }
-
-  public func clearUserIndexCache() throws {
-    try database.write { db in
       try db.execute(sql: "DELETE FROM user_index_caches")
     }
   }
