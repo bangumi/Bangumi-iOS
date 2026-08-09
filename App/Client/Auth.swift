@@ -1,5 +1,9 @@
 import Foundation
 
+private struct OAuthErrorResponse: Decodable {
+  let error: String
+}
+
 extension APIClient {
   func getOAuthBase() -> String {
     return BangumiURL.auth(path: "/oauth").absoluteString
@@ -71,6 +75,13 @@ extension APIClient {
     do {
       data = try await self.request(url: url, method: "POST", body: body, auth: .disabled)
     } catch let error as ChiiError {
+      if case .badRequest(let response) = error,
+        let responseData = response.data(using: .utf8),
+        let oauthError = try? JSONDecoder().decode(OAuthErrorResponse.self, from: responseData),
+        oauthError.error == "invalid_grant"
+      {
+        throw ChiiError.requireLogin
+      }
       if case .ignore = error, Task.isCancelled {
         throw CancellationError()
       }
