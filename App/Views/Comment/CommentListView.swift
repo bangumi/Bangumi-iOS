@@ -66,6 +66,7 @@ private struct CommentListLoadKey: Hashable {
   let route: CommentListRoute
   let isolationMode: Bool
   let titlePreference: TitlePreference?
+  let viewerID: Int?
 }
 
 private struct CommentDocumentSurfaceID: Hashable {
@@ -87,7 +88,6 @@ struct CommentListView: View {
   @AppStorage("profile") private var profile: Profile = Profile()
   @AppStorage("replySortOrder") private var replySortOrder: ReplySortOrder = .ascending
   @AppStorage("titlePreference") private var titlePreference: TitlePreference = .original
-  @AppStorage("friendlist") private var friendlist: [Int] = []
   @AppStorage("isAuthenticated") private var isAuthenticated = false
   @AppStorage("isolationMode") private var isolationMode = false
   @AppStorage("anonymizeTopicUsers") private var anonymizeTopicUsers = false
@@ -107,6 +107,7 @@ struct CommentListView: View {
   @State private var parentHeader: CommentParentHeader?
   @State private var refreshGeneration = 0
   @State private var timeline: TimelineDTO?
+  @State private var activeLoadKey: CommentListLoadKey?
   @State private var filterMode: ReplyFilterMode = .all
   @State private var sortSelection = ReplySortSelection()
   @State private var sheet: CommentListSheet?
@@ -272,6 +273,13 @@ struct CommentListView: View {
   }
 
   var body: some View {
+    let loadKey = CommentListLoadKey(
+      route: route,
+      isolationMode: isolationMode,
+      titlePreference: isEpisodeDetail ? nil : titlePreference,
+      viewerID: isAuthenticated && profile.id > 0 ? profile.id : nil
+    )
+
     content
       .navigationTitle(screenTitle)
       .navigationBarTitleDisplayMode(.inline)
@@ -314,13 +322,13 @@ struct CommentListView: View {
       } message: { _ in
         Text("确定要删除这条回复吗？")
       }
-      .task(
-        id: CommentListLoadKey(
-          route: route,
-          isolationMode: isolationMode,
-          titlePreference: isEpisodeDetail ? nil : titlePreference
-        )
-      ) {
+      .task(id: loadKey) {
+        if let activeLoadKey,
+          activeLoadKey.route != loadKey.route || activeLoadKey.viewerID != loadKey.viewerID
+        {
+          timeline = nil
+        }
+        activeLoadKey = loadKey
         await refresh()
       }
       .onChange(of: isolationMode) { _, isIsolated in
@@ -823,7 +831,6 @@ struct CommentListView: View {
     let filtered = comments.filtered(
       by: filterMode,
       posterID: posterID,
-      friendlist: friendlist,
       myID: profile.id
     )
     return CommentPresentation(
@@ -838,13 +845,11 @@ struct CommentListView: View {
     let originalIndexes = Dictionary(
       uniqueKeysWithValues: comments.enumerated().map { ($0.element.id, $0.offset) }
     )
-    let friends = Set(friendlist)
     let blockedUsers = Set(blocklist)
     let posts = presentation.comments.map { comment in
       makePost(
         comment,
         index: originalIndexes[comment.id] ?? 0,
-        friends: friends,
         blockedUsers: blockedUsers
       )
     }
@@ -868,9 +873,7 @@ struct CommentListView: View {
       parent: documentParent,
       title: detailHeader == nil && parentHeader != nil ? route.parent.listTitle : nil,
       detailHeader: detailHeader,
-      mainPost: timeline.flatMap {
-        makeTimelinePost($0, friends: friends)
-      },
+      mainPost: timeline.flatMap(makeTimelinePost),
       mainActions: nil,
       replies: posts,
       emptyMessage: documentEmptyMessage,
@@ -885,7 +888,6 @@ struct CommentListView: View {
   private func makePost(
     _ comment: CommentDTO,
     index: Int,
-    friends: Set<Int>,
     blockedUsers: Set<Int>
   ) -> PostDocumentRenderInput.Post {
     let floor = "#\(index + 1)"
@@ -897,8 +899,7 @@ struct CommentListView: View {
       user: makeUser(
         comment.user,
         creatorID: comment.creatorID,
-        posterID: posterID,
-        friends: friends
+        posterID: posterID
       ),
       isNormal: comment.state == .normal,
       stateDescription: comment.state.description,
@@ -910,7 +911,6 @@ struct CommentListView: View {
           reply,
           parentFloor: floor,
           subindex: subindex,
-          friends: friends,
           blockedUsers: blockedUsers
         )
       }
@@ -921,7 +921,6 @@ struct CommentListView: View {
     _ reply: CommentBaseDTO,
     parentFloor: String,
     subindex: Int,
-    friends: Set<Int>,
     blockedUsers: Set<Int>
   ) -> PostDocumentRenderInput.Post {
     PostDocumentRenderInput.Post(
@@ -932,8 +931,7 @@ struct CommentListView: View {
       user: makeUser(
         reply.user,
         creatorID: reply.creatorID,
-        posterID: posterID,
-        friends: friends
+        posterID: posterID
       ),
       isNormal: reply.state == .normal,
       stateDescription: reply.state.description,
@@ -944,10 +942,7 @@ struct CommentListView: View {
     )
   }
 
-  private func makeTimelinePost(
-    _ item: TimelineDTO,
-    friends: Set<Int>
-  ) -> PostDocumentRenderInput.Post? {
+  private func makeTimelinePost(_ item: TimelineDTO) -> PostDocumentRenderInput.Post? {
     guard let content = item.memo.status?.tsukkomi, !content.isEmpty else {
       return nil
     }
@@ -960,8 +955,7 @@ struct CommentListView: View {
       user: makeUser(
         item.user,
         creatorID: item.uid,
-        posterID: item.uid,
-        friends: friends
+        posterID: item.uid
       ),
       isNormal: true,
       stateDescription: "",
@@ -975,8 +969,7 @@ struct CommentListView: View {
   private func makeUser(
     _ user: SlimUserDTO?,
     creatorID: Int,
-    posterID: Int?,
-    friends: Set<Int>
+    posterID: Int?
   ) -> PostDocumentRenderInput.User {
     let anonymousHash = AnonymizationHelper.generateHash(
       topicId: route.parent.parentId,
@@ -1006,7 +999,7 @@ struct CommentListView: View {
         ? nil
         : postImageURL(user?.avatar?.large, domains: domains),
       isPoster: creatorID == posterID,
-      isFriend: friends.contains(creatorID),
+      isFriend: user?.isFriend == true,
       anonymousColor: anonymizeTopicUsers
         ? AnonymizationHelper.generateCSSColor(from: anonymousHash)
         : nil

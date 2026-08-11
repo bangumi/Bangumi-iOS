@@ -4,7 +4,6 @@ import SwiftUI
 struct ContentView: View {
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
   @AppStorage("profile") var profile: Profile = Profile()
-  @AppStorage("friendlist") var friendlist: [Int] = []
   @AppStorage("blocklist") var blocklist: [Int] = []
 
   @State private var notifier = Notifier.shared
@@ -29,16 +28,15 @@ struct ContentView: View {
     return false
   }
 
-  private func refreshRelationships() async {
+  private func refreshBlocklist() async {
     if !isAuthenticated {
       return
     }
     do {
-      friendlist = try await AccountService.getFriendList()
       blocklist = try await AccountService.getBlockList()
     } catch {
-      Notifier.shared.notify(message: "获取好友/黑名单列表失败")
-      Logger.api.warning("refresh relationships failed: \(error)")
+      Notifier.shared.notify(message: "获取黑名单列表失败")
+      Logger.api.warning("refresh blocklist failed: \(error)")
     }
   }
 
@@ -84,7 +82,7 @@ struct ContentView: View {
     }
     .task {
       guard await refreshProfile() else { return }
-      await refreshRelationships()
+      await refreshBlocklist()
     }
   }
 }

@@ -2464,6 +2464,9 @@ components:
         id:
           example: 1
           type: integer
+        isFriend:
+          description: Whether the authenticated user has added this user as a friend; false when the endpoint does not populate viewer friendship
+          type: boolean
         joinedAt:
           type: integer
         nickname:
@@ -2482,6 +2485,7 @@ components:
         - group
         - sign
         - joinedAt
+        - isFriend
       title: SlimUser
       type: object
     Subject:
@@ -3677,6 +3681,9 @@ components:
         id:
           example: 1
           type: integer
+        isFriend:
+          description: Whether the authenticated user has added this user as a friend; false when unauthenticated
+          type: boolean
         joinedAt:
           type: integer
         location:
@@ -3729,6 +3736,7 @@ components:
         - networkServices
         - homepage
         - stats
+        - isFriend
       title: User
       type: object
     UserCharacterContribution:

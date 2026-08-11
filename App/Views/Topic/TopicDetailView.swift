@@ -288,6 +288,11 @@ private enum TopicDetailSheet: Identifiable {
   }
 }
 
+private struct TopicDetailLoadKey: Hashable {
+  let source: TopicDetailSource
+  let viewerID: Int?
+}
+
 struct TopicDetailView: View {
   let source: TopicDetailSource
   let initialPostID: Int?
@@ -300,7 +305,6 @@ struct TopicDetailView: View {
   @AppStorage("shareDomain") private var shareDomain: ShareDomain = .chii
   @AppStorage("profile") private var profile: Profile = Profile()
   @AppStorage("replySortOrder") private var replySortOrder: ReplySortOrder = .ascending
-  @AppStorage("friendlist") private var friendlist: [Int] = []
   @AppStorage("isAuthenticated") private var isAuthenticated = false
   @AppStorage("titlePreference") private var titlePreference: TitlePreference = .original
   @AppStorage("anonymizeTopicUsers") private var anonymizeTopicUsers = false
@@ -374,7 +378,12 @@ struct TopicDetailView: View {
       } message: { _ in
         Text("确定要删除这条回复吗？")
       }
-      .task(id: source) {
+      .task(
+        id: TopicDetailLoadKey(
+          source: source,
+          viewerID: isAuthenticated && profile.id > 0 ? profile.id : nil
+        )
+      ) {
         await refresh()
       }
       .handoff(url: shareURL, title: title)
@@ -706,7 +715,6 @@ struct TopicDetailView: View {
     let filtered = data.rest.filtered(
       by: filterMode,
       posterID: data.creatorID,
-      friendlist: friendlist,
       myID: profile.id
     )
     let count = filtered.reduce(into: 0) { count, reply in
@@ -726,7 +734,6 @@ struct TopicDetailView: View {
     let originalIndexes = Dictionary(
       uniqueKeysWithValues: data.replies.enumerated().map { ($0.element.id, $0.offset) }
     )
-    let friends = Set(friendlist)
     let blockedUsers = Set(blocklist)
 
     func makePost(
@@ -743,8 +750,7 @@ struct TopicDetailView: View {
         user: makeUser(
           reply.creator,
           creatorID: reply.creatorID,
-          posterID: data.creatorID,
-          friends: friends
+          posterID: data.creatorID
         ),
         isNormal: reply.state == .normal,
         stateDescription: reply.state.description,
@@ -757,7 +763,6 @@ struct TopicDetailView: View {
             parentFloor: floor,
             subindex: subindex,
             data: data,
-            friends: friends,
             blockedUsers: blockedUsers
           )
         }
@@ -802,7 +807,6 @@ struct TopicDetailView: View {
     parentFloor: String,
     subindex: Int,
     data: TopicDetailData,
-    friends: Set<Int>,
     blockedUsers: Set<Int>
   ) -> PostDocumentRenderInput.Post {
     PostDocumentRenderInput.Post(
@@ -813,8 +817,7 @@ struct TopicDetailView: View {
       user: makeUser(
         reply.creator,
         creatorID: reply.creatorID,
-        posterID: data.creatorID,
-        friends: friends
+        posterID: data.creatorID
       ),
       isNormal: reply.state == .normal,
       stateDescription: reply.state.description,
@@ -828,8 +831,7 @@ struct TopicDetailView: View {
   private func makeUser(
     _ user: SlimUserDTO?,
     creatorID: Int,
-    posterID: Int,
-    friends: Set<Int>
+    posterID: Int
   ) -> PostDocumentRenderInput.User {
     let anonymousHash = AnonymizationHelper.generateHash(
       topicId: source.topicID,
@@ -857,7 +859,7 @@ struct TopicDetailView: View {
       link: anonymizeTopicUsers ? nil : user?.link,
       avatarURL: anonymizeTopicUsers ? nil : postImageURL(user?.avatar?.large, domains: domains),
       isPoster: creatorID == posterID,
-      isFriend: friends.contains(creatorID),
+      isFriend: user?.isFriend == true,
       anonymousColor: anonymizeTopicUsers
         ? AnonymizationHelper.generateCSSColor(from: anonymousHash)
         : nil

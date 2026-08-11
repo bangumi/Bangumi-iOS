@@ -1,12 +1,10 @@
 import SwiftUI
 
 struct FriendLabel: View {
-  let uid: Int
-
-  @AppStorage("friendlist") var friendlist: [Int] = []
+  let isFriend: Bool
 
   var body: some View {
-    if friendlist.contains(uid) {
+    if isFriend {
       BorderView(color: .green) {
         Text("好友")
           .font(.caption)
