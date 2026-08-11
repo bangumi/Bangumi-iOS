@@ -1,6 +1,11 @@
 import Flow
 import SwiftUI
 
+private struct UserLoadKey: Hashable {
+  let username: String
+  let viewerID: Int?
+}
+
 struct UserView: View {
   let username: String
 
@@ -15,12 +20,25 @@ struct UserView: View {
 
   @State private var user: UserDTO?
 
+  @State private var loadedKey: UserLoadKey?
+
+  private var loadKey: UserLoadKey {
+    UserLoadKey(
+      username: username,
+      viewerID: isAuthenticated && profile.id > 0 ? profile.id : nil
+    )
+  }
+
+  private var displayedUser: UserDTO? {
+    loadedKey == loadKey ? user : nil
+  }
+
   var shareLink: URL {
     URL(string: "\(shareDomain.url)/user/\(username)")!
   }
 
   var title: String {
-    guard let user = user else {
+    guard let user = displayedUser else {
       return "用户"
     }
     if profile.username == user.username {
@@ -30,53 +48,76 @@ struct UserView: View {
     }
   }
 
-  func refresh() async {
-    if refreshed { return }
+  private func load(_ key: UserLoadKey) async {
+    if loadedKey != key {
+      loadedKey = key
+      refreshed = false
+      user = nil
+    }
+    guard !refreshed else { return }
+
+    await loadCached(for: key)
+    guard loadKey == key, !Task.isCancelled else { return }
+
     do {
-      user = try await UserRepository.loadUser(username)
+      let loadedUser = try await UserRepository.loadUser(username)
+      guard loadKey == key, !Task.isCancelled else { return }
+      user = loadedUser
+    } catch is CancellationError {
+      return
     } catch {
+      guard loadKey == key, !Task.isCancelled else { return }
       Notifier.shared.alert(error: error)
     }
     refreshed = true
   }
 
-  func loadCached() async {
+  private func loadCached(for key: UserLoadKey) async {
     guard let db = await AppContext.shared.databaseIfAvailable() else { return }
     do {
-      user = try await db.getUserDTO(username)
+      let cachedUser = try await db.getUserDTO(username)
+      guard loadKey == key, !Task.isCancelled else { return }
+      user = cachedUser
     } catch {
+      guard loadKey == key, !Task.isCancelled else { return }
       Notifier.shared.alert(error: error)
     }
   }
 
   func addFriend() {
-    guard user != nil else { return }
+    let key = loadKey
+    guard displayedUser != nil else { return }
     Task {
       do {
         try await FriendService.addFriend(username)
+        guard loadKey == key, loadedKey == key else { return }
         user?.isFriend = true
         Notifier.shared.notify(message: "添加好友成功")
       } catch {
+        guard loadKey == key, loadedKey == key else { return }
         Notifier.shared.alert(error: error)
       }
     }
   }
 
   func removeFriend() {
-    guard user != nil else { return }
+    let key = loadKey
+    guard displayedUser != nil else { return }
     Task {
       do {
         try await FriendService.removeFriend(username)
+        guard loadKey == key, loadedKey == key else { return }
         user?.isFriend = false
         Notifier.shared.notify(message: "解除好友成功")
       } catch {
+        guard loadKey == key, loadedKey == key else { return }
         Notifier.shared.alert(error: error)
       }
     }
   }
 
   func blockUser() {
-    guard let user = user else { return }
+    guard let user = displayedUser else { return }
     Task {
       do {
         try await FriendService.blockUser(username)
@@ -89,7 +130,7 @@ struct UserView: View {
   }
 
   func unblockUser() {
-    guard let user = user else { return }
+    guard let user = displayedUser else { return }
     Task {
       do {
         try await FriendService.unblockUser(username)
@@ -102,10 +143,12 @@ struct UserView: View {
   }
 
   var body: some View {
+    let currentLoadKey = loadKey
+
     Section {
-      if let user = user {
+      if let user = displayedUser {
         UserDetailView(user: user)
-      } else if refreshed {
+      } else if loadedKey == currentLoadKey && refreshed {
         NotFoundView()
       } else {
         ProgressView()
@@ -114,7 +157,7 @@ struct UserView: View {
     .navigationTitle(title)
     .navigationBarTitleDisplayMode(.inline)
     .sheet(isPresented: $showReportView) {
-      if let user = user {
+      if let user = displayedUser {
         ReportSheet(
           reportType: .user, itemId: user.id, itemTitle: user.nickname, user: user.slim
         )
@@ -123,7 +166,7 @@ struct UserView: View {
     .toolbar {
       ToolbarItem(placement: .topBarTrailing) {
         Menu {
-          if let user = user?.slim {
+          if let user = displayedUser?.slim {
             NavigationLink(value: NavDestination.userCollection(user, .anime, [:])) {
               Label("收藏", systemImage: "star")
             }
@@ -196,11 +239,8 @@ struct UserView: View {
         }
       }
     }
-    .onAppear {
-      Task {
-        await loadCached()
-        await refresh()
-      }
+    .task(id: currentLoadKey) {
+      await load(currentLoadKey)
     }
     .handoff(url: shareLink, title: title)
   }

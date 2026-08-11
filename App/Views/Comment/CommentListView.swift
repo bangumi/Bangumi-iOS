@@ -107,6 +107,7 @@ struct CommentListView: View {
   @State private var parentHeader: CommentParentHeader?
   @State private var refreshGeneration = 0
   @State private var timeline: TimelineDTO?
+  @State private var activeLoadKey: CommentListLoadKey?
   @State private var filterMode: ReplyFilterMode = .all
   @State private var sortSelection = ReplySortSelection()
   @State private var sheet: CommentListSheet?
@@ -272,6 +273,13 @@ struct CommentListView: View {
   }
 
   var body: some View {
+    let loadKey = CommentListLoadKey(
+      route: route,
+      isolationMode: isolationMode,
+      titlePreference: isEpisodeDetail ? nil : titlePreference,
+      viewerID: isAuthenticated && profile.id > 0 ? profile.id : nil
+    )
+
     content
       .navigationTitle(screenTitle)
       .navigationBarTitleDisplayMode(.inline)
@@ -314,14 +322,13 @@ struct CommentListView: View {
       } message: { _ in
         Text("确定要删除这条回复吗？")
       }
-      .task(
-        id: CommentListLoadKey(
-          route: route,
-          isolationMode: isolationMode,
-          titlePreference: isEpisodeDetail ? nil : titlePreference,
-          viewerID: isAuthenticated && profile.id > 0 ? profile.id : nil
-        )
-      ) {
+      .task(id: loadKey) {
+        if let activeLoadKey,
+          activeLoadKey.route != loadKey.route || activeLoadKey.viewerID != loadKey.viewerID
+        {
+          timeline = nil
+        }
+        activeLoadKey = loadKey
         await refresh()
       }
       .onChange(of: isolationMode) { _, isIsolated in
