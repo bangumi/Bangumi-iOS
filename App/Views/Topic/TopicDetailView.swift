@@ -288,6 +288,11 @@ private enum TopicDetailSheet: Identifiable {
   }
 }
 
+private struct TopicDetailLoadKey: Hashable {
+  let source: TopicDetailSource
+  let viewerID: Int?
+}
+
 struct TopicDetailView: View {
   let source: TopicDetailSource
   let initialPostID: Int?
@@ -373,7 +378,12 @@ struct TopicDetailView: View {
       } message: { _ in
         Text("确定要删除这条回复吗？")
       }
-      .task(id: source) {
+      .task(
+        id: TopicDetailLoadKey(
+          source: source,
+          viewerID: isAuthenticated && profile.id > 0 ? profile.id : nil
+        )
+      ) {
         await refresh()
       }
       .handoff(url: shareURL, title: title)

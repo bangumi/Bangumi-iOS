@@ -66,6 +66,7 @@ private struct CommentListLoadKey: Hashable {
   let route: CommentListRoute
   let isolationMode: Bool
   let titlePreference: TitlePreference?
+  let viewerID: Int?
 }
 
 private struct CommentDocumentSurfaceID: Hashable {
@@ -317,7 +318,8 @@ struct CommentListView: View {
         id: CommentListLoadKey(
           route: route,
           isolationMode: isolationMode,
-          titlePreference: isEpisodeDetail ? nil : titlePreference
+          titlePreference: isEpisodeDetail ? nil : titlePreference,
+          viewerID: isAuthenticated && profile.id > 0 ? profile.id : nil
         )
       ) {
         await refresh()
