@@ -16,10 +16,6 @@ struct IDResponseDTO: Codable, Hashable {
   var id: Int
 }
 
-struct FriendListResponseDTO: Codable, Hashable {
-  var friendlist: [Int]
-}
-
 struct BlockListResponseDTO: Codable, Hashable {
   var blocklist: [Int]
 }
@@ -171,6 +167,7 @@ struct UserDTO: Codable, Identifiable, Hashable, Linkable {
   var networkServices: [UserNetworkServiceDTO]
   var homepage: UserHomepageDTO
   var stats: UserStatsDTO
+  var isFriend: Bool? = nil
 
   var name: String {
     nickname.isEmpty ? "用户\(username)" : nickname
@@ -217,6 +214,7 @@ struct SlimUserDTO: Codable, Identifiable, Hashable, Linkable {
   var avatar: Avatar?
   var sign: String
   var joinedAt: Int?
+  var isFriend: Bool?
 
   init(_ profile: Profile) {
     self.id = profile.id
@@ -225,6 +223,7 @@ struct SlimUserDTO: Codable, Identifiable, Hashable, Linkable {
     self.avatar = profile.avatar
     self.sign = profile.sign
     self.joinedAt = profile.joinedAt
+    self.isFriend = nil
   }
 
   init(_ user: UserDTO) {
@@ -234,6 +233,7 @@ struct SlimUserDTO: Codable, Identifiable, Hashable, Linkable {
     self.avatar = user.avatar
     self.sign = user.sign
     self.joinedAt = user.joinedAt
+    self.isFriend = user.isFriend
   }
 
   init(_ user: User) {
@@ -243,6 +243,7 @@ struct SlimUserDTO: Codable, Identifiable, Hashable, Linkable {
     self.avatar = user.avatar
     self.sign = user.sign
     self.joinedAt = user.joinedAt
+    self.isFriend = nil
   }
 
   var name: String {

@@ -9,7 +9,6 @@ struct PostTopicActionStateView: View {
   let createdAt: Int
   let author: SlimUserDTO?
 
-  @AppStorage("friendlist") var friendlist: [Int] = []
   @AppStorage("anonymizeTopicUsers") var anonymizeTopicUsers: Bool = false
 
   init(
@@ -75,7 +74,7 @@ struct PostTopicActionStateView: View {
       // Username + action description
       HStack(spacing: 4) {
         PosterLabel(uid: creatorID, poster: author?.id)
-        FriendLabel(uid: creatorID)
+        FriendLabel(isFriend: creator?.isFriend == true)
         if anonymizeTopicUsers && topicId != 0 {
           if let creator = creator {
             Text(anonymizedHash.withLink(creator.link)).lineLimit(1)

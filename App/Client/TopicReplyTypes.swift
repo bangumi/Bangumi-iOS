@@ -71,7 +71,6 @@ extension Array where Element == ReplyDTO {
   func filtered(
     by mode: ReplyFilterMode,
     posterID: Int?,
-    friendlist: [Int],
     myID: Int
   ) -> [ReplyDTO] {
     switch mode {
@@ -83,7 +82,7 @@ extension Array where Element == ReplyDTO {
       guard let posterID = posterID else { return self }
       return filter { $0.creatorID == posterID }
     case .friends:
-      return filter { friendlist.contains($0.creatorID) }
+      return filter { $0.creator?.isFriend == true }
     case .myself:
       return filter { $0.creatorID == myID }
     }
@@ -104,7 +103,6 @@ extension Array where Element == CommentDTO {
   func filtered(
     by mode: ReplyFilterMode,
     posterID: Int?,
-    friendlist: [Int],
     myID: Int
   ) -> [CommentDTO] {
     switch mode {
@@ -116,7 +114,7 @@ extension Array where Element == CommentDTO {
       guard let posterID else { return self }
       return filter { $0.creatorID == posterID }
     case .friends:
-      return filter { friendlist.contains($0.creatorID) }
+      return filter { $0.user.isFriend == true }
     case .myself:
       return filter { $0.creatorID == myID }
     }

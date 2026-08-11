@@ -14,7 +14,6 @@ enum AccountLocalState {
 
   static func clear() async throws {
     AppConfig.collectionsUpdatedAt = 0
-    AppConfig.friendlist = []
     AppConfig.blocklist = []
 
     let db = try await AppContext.shared.getDB()

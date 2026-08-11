@@ -7,7 +7,6 @@ struct UserView: View {
   @AppStorage("shareDomain") var shareDomain: ShareDomain = .chii
   @AppStorage("profile") var profile: Profile = Profile()
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
-  @AppStorage("friendlist") var friendlist: [Int] = []
   @AppStorage("blocklist") var blocklist: [Int] = []
 
   @State private var refreshed: Bool = false
@@ -34,8 +33,7 @@ struct UserView: View {
   func refresh() async {
     if refreshed { return }
     do {
-      let _ = try await UserRepository.loadUser(username)
-      await loadCached()
+      user = try await UserRepository.loadUser(username)
     } catch {
       Notifier.shared.alert(error: error)
     }
@@ -52,11 +50,11 @@ struct UserView: View {
   }
 
   func addFriend() {
-    guard let user = user else { return }
+    guard user != nil else { return }
     Task {
       do {
         try await FriendService.addFriend(username)
-        friendlist.append(user.id)
+        user?.isFriend = true
         Notifier.shared.notify(message: "添加好友成功")
       } catch {
         Notifier.shared.alert(error: error)
@@ -65,11 +63,11 @@ struct UserView: View {
   }
 
   func removeFriend() {
-    guard let user = user else { return }
+    guard user != nil else { return }
     Task {
       do {
         try await FriendService.removeFriend(username)
-        friendlist = friendlist.filter { $0 != user.id }
+        user?.isFriend = false
         Notifier.shared.notify(message: "解除好友成功")
       } catch {
         Notifier.shared.alert(error: error)
@@ -154,17 +152,19 @@ struct UserView: View {
             }
             if profile.username != user.username {
               Divider()
-              if friendlist.contains(user.id) {
-                Button(role: .destructive) {
-                  removeFriend()
-                } label: {
-                  Label("解除好友", systemImage: "person.2.slash")
-                }
-              } else {
-                Button {
-                  addFriend()
-                } label: {
-                  Label("加为好友", systemImage: "person.2.badge.plus")
+              if let isFriend = user.isFriend {
+                if isFriend {
+                  Button(role: .destructive) {
+                    removeFriend()
+                  } label: {
+                    Label("解除好友", systemImage: "person.2.slash")
+                  }
+                } else {
+                  Button {
+                    addFriend()
+                  } label: {
+                    Label("加为好友", systemImage: "person.2.badge.plus")
+                  }
                 }
               }
               if blocklist.contains(user.id) {
@@ -208,7 +208,6 @@ struct UserView: View {
 
 struct UserDetailView: View {
   @AppStorage("profile") var profile: Profile = Profile()
-  @AppStorage("friendlist") var friendlist: [Int] = []
   @AppStorage("blocklist") var blocklist: [Int] = []
 
   let user: UserDTO
@@ -234,7 +233,7 @@ struct UserDetailView: View {
                   Text("我自己").font(.caption)
                 }
               }
-              if friendlist.contains(user.id) {
+              if user.isFriend == true {
                 BadgeView {
                   Text("好友").font(.caption)
                 }

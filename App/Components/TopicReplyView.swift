@@ -93,7 +93,6 @@ struct ReplyItemNormalView: View {
   let author: SlimUserDTO?
 
   @AppStorage("profile") var profile: Profile = Profile()
-  @AppStorage("friendlist") var friendlist: [Int] = []
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
   @AppStorage("anonymizeTopicUsers") var anonymizeTopicUsers: Bool = false
 
@@ -151,7 +150,7 @@ struct ReplyItemNormalView: View {
             VStack(alignment: .leading, spacing: 0) {
               HStack(spacing: 4) {
                 PosterLabel(uid: reply.creatorID, poster: author?.id)
-                FriendLabel(uid: reply.creatorID)
+                FriendLabel(isFriend: reply.creator?.isFriend == true)
                 if anonymizeTopicUsers {
                   if let creator = reply.creator {
                     Text(anonymizedHash.withLink(creator.link)).lineLimit(1)
@@ -273,7 +272,6 @@ struct SubReplyNormalView: View {
   let topicId: Int
 
   @AppStorage("profile") var profile: Profile = Profile()
-  @AppStorage("friendlist") var friendlist: [Int] = []
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
   @AppStorage("anonymizeTopicUsers") var anonymizeTopicUsers: Bool = false
 
@@ -337,7 +335,7 @@ struct SubReplyNormalView: View {
           VStack(alignment: .leading, spacing: 0) {
             HStack(spacing: 4) {
               PosterLabel(uid: subreply.creatorID, poster: author?.id)
-              FriendLabel(uid: subreply.creatorID)
+              FriendLabel(isFriend: subreply.creator?.isFriend == true)
               if anonymizeTopicUsers {
                 if let creator = subreply.creator {
                   Text(anonymizedHash.withLink(creator.link)).lineLimit(1)
@@ -788,7 +786,6 @@ struct MainPostContentView: View {
   let author: SlimUserDTO?
   @Binding var reactions: [ReactionDTO]
 
-  @AppStorage("friendlist") var friendlist: [Int] = []
   @AppStorage("anonymizeTopicUsers") var anonymizeTopicUsers: Bool = false
 
   init(
@@ -839,7 +836,7 @@ struct MainPostContentView: View {
           VStack(alignment: .leading, spacing: 0) {
             HStack(spacing: 4) {
               PosterLabel(uid: reply.creatorID, poster: author?.id)
-              FriendLabel(uid: reply.creatorID)
+              FriendLabel(isFriend: reply.creator?.isFriend == true)
               if anonymizeTopicUsers {
                 if let creator = reply.creator {
                   Text(anonymizedHash.withLink(creator.link)).lineLimit(1)

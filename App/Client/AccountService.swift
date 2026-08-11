@@ -10,13 +10,6 @@ enum AccountService {
     return try Profile(from: rawValue)
   }
 
-  static func getFriendList() async throws -> [Int] {
-    let url = BangumiURL.next(path: "p1/friendlist")
-    let data = try await APIClient.shared.request(url: url, method: "GET", auth: .required)
-    let resp: FriendListResponseDTO = try await APIClient.shared.decodeResponse(data)
-    return resp.friendlist
-  }
-
   static func getBlockList() async throws -> [Int] {
     let url = BangumiURL.next(path: "p1/blocklist")
     let data = try await APIClient.shared.request(url: url, method: "GET", auth: .required)
