@@ -14,7 +14,6 @@ Package.resolved
 
 .vscode/
 .claude/
-AGENTS.md
 
 misc/exportOptions.plist
 archives/
