@@ -894,6 +894,69 @@ struct CommentDTO: Codable, Identifiable, Hashable {
   var reactions: [ReactionDTO]?
 }
 
+/// Decode keys shared by the tolerant comment decoders below.
+///
+/// The server currently sends `user` on comment payloads; a planned
+/// server-side change renames it to `creator`. Accepting both keys keeps
+/// decoding working across the transition.
+private enum CommentDecodeKeys: String, CodingKey {
+  case id
+  case content
+  case createdAt
+  case creatorID
+  case mainID
+  case relatedID
+  case state
+  case user
+  case creator
+  case replies
+  case reactions
+}
+
+extension CommentBaseDTO {
+  init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CommentDecodeKeys.self)
+    id = try container.decode(Int.self, forKey: .id)
+    content = try container.decode(String.self, forKey: .content)
+    createdAt = try container.decode(Int.self, forKey: .createdAt)
+    creatorID = try container.decode(Int.self, forKey: .creatorID)
+    mainID = try container.decode(Int.self, forKey: .mainID)
+    relatedID = try container.decode(Int.self, forKey: .relatedID)
+    state = try container.decode(PostState.self, forKey: .state)
+    user = try container.decodeIfPresent(SlimUserDTO.self, forKey: .user)
+      ?? container.decodeIfPresent(SlimUserDTO.self, forKey: .creator)
+    reactions = try container.decodeIfPresent([ReactionDTO].self, forKey: .reactions)
+  }
+}
+
+extension CommentDTO {
+  init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CommentDecodeKeys.self)
+    id = try container.decode(Int.self, forKey: .id)
+    content = try container.decode(String.self, forKey: .content)
+    createdAt = try container.decode(Int.self, forKey: .createdAt)
+    creatorID = try container.decode(Int.self, forKey: .creatorID)
+    mainID = try container.decode(Int.self, forKey: .mainID)
+    relatedID = try container.decode(Int.self, forKey: .relatedID)
+    state = try container.decode(PostState.self, forKey: .state)
+    if let user = try container.decodeIfPresent(SlimUserDTO.self, forKey: .user) {
+      self.user = user
+    } else if let creator = try container.decodeIfPresent(SlimUserDTO.self, forKey: .creator) {
+      self.user = creator
+    } else {
+      throw DecodingError.keyNotFound(
+        CommentDecodeKeys.user,
+        DecodingError.Context(
+          codingPath: container.codingPath,
+          debugDescription: "Expected `user` or `creator` in comment payload"
+        )
+      )
+    }
+    replies = try container.decode([CommentBaseDTO].self, forKey: .replies)
+    reactions = try container.decodeIfPresent([ReactionDTO].self, forKey: .reactions)
+  }
+}
+
 struct SubjectRelationDTO: Codable, Identifiable, Hashable {
   var order: Int
   var subject: SlimSubjectDTO
