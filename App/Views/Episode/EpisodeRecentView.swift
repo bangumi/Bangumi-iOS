@@ -53,7 +53,15 @@ struct EpisodeRecentView: View {
   }
 
   var recentCount: Int {
-    5
+    let maxDisplayWidth = episodes.map { $0.sort.episodeDisplay.count }.max() ?? 0
+    switch maxDisplayWidth {
+    case 4...:
+      return 3
+    case 3:
+      return 4
+    default:
+      return 5
+    }
   }
 
   private var recentEpisodes: RecentEpisodes {
@@ -121,87 +129,80 @@ struct EpisodeRecentView: View {
     return min(Double(subject.interest?.epStatus ?? 0) / Double(subject.eps), 1)
   }
 
+  @ViewBuilder
+  private func recentBadges(_ recent: RecentEpisodes) -> some View {
+    HStack(spacing: 2) {
+      ForEach(recent.episodes) { episode in
+        EpisodeItemView(
+          episode: episode,
+          interactionMode: interactionMode,
+          subjectCollectionType: subject.ctypeEnum,
+          reload: reload
+        )
+      }
+    }
+    .font(.footnote)
+  }
+
+  @ViewBuilder
+  private func nextAction(_ recent: RecentEpisodes, fillWidth: Bool) -> some View {
+    if let episode = recent.nextEpisode {
+      EpisodeNextView(episode: episode, fillWidth: fillWidth, progress: progressFraction, reload: reload)
+    } else {
+      Button {
+        showCollectionBox = true
+      } label: {
+        HStack(spacing: 4) {
+          if fillWidth {
+            Spacer()
+          }
+          Text(progressText)
+          Image(systemName: progressIcon)
+          if fillWidth {
+            Spacer()
+          }
+        }
+        .foregroundStyle(.linkText)
+        .progressActionLabelStyle(.standaloneSubtle)
+        .progressActionFill(progressFraction)
+      }
+      .progressActionButtonStyle(tint: .secondary)
+      .sheet(isPresented: $showCollectionBox) {
+        SubjectCollectionBoxView(subjectId: subject.id, initialSubject: subject)
+          .onDisappear {
+            Task {
+              await reload?()
+            }
+          }
+      }
+    }
+  }
+
   var body: some View {
     let recent = recentEpisodes
     if !recent.episodes.isEmpty {
       switch mode {
       case .tile:
         VStack {
-          HStack(spacing: 2) {
-            ForEach(recent.episodes) { episode in
-              EpisodeItemView(
-                episode: episode,
-                interactionMode: interactionMode,
-                subjectCollectionType: subject.ctypeEnum,
-                reload: reload
-              )
-            }
+          HStack {
+            recentBadges(recent)
             Spacer(minLength: 0)
           }
-          .font(.footnote)
-          if let episode = recent.nextEpisode {
-            EpisodeNextView(episode: episode, fillWidth: true, progress: progressFraction, reload: reload)
-          } else {
-            Button {
-              showCollectionBox = true
-            } label: {
-              HStack(spacing: 4) {
-                Spacer()
-                Text(progressText)
-                Image(systemName: progressIcon)
-                Spacer()
-              }
-              .foregroundStyle(.linkText)
-              .progressActionLabelStyle(.standaloneSubtle)
-              .progressActionFill(progressFraction)
-            }
-            .progressActionButtonStyle(tint: .secondary)
-            .sheet(isPresented: $showCollectionBox) {
-              SubjectCollectionBoxView(subjectId: subject.id, initialSubject: subject)
-                .onDisappear {
-                  Task {
-                    await reload?()
-                  }
-                }
-            }
-          }
+          nextAction(recent, fillWidth: true)
         }
       case .list:
-        HStack(alignment: .bottom) {
-          HStack(spacing: 2) {
-            ForEach(recent.episodes) { episode in
-              EpisodeItemView(
-                episode: episode,
-                interactionMode: interactionMode,
-                subjectCollectionType: subject.ctypeEnum,
-                reload: reload
-              )
+        ViewThatFits(in: .horizontal) {
+          HStack(alignment: .bottom) {
+            recentBadges(recent)
+            Spacer(minLength: 0)
+            nextAction(recent, fillWidth: false)
+          }
+          VStack(alignment: .leading, spacing: 4) {
+            HStack {
+              recentBadges(recent)
+              Spacer(minLength: 0)
             }
-          }.font(.footnote)
-          Spacer(minLength: 0)
-          if let episode = recent.nextEpisode {
-            EpisodeNextView(episode: episode, fillWidth: false, progress: progressFraction, reload: reload)
-          } else {
-            Button {
-              showCollectionBox = true
-            } label: {
-              HStack(spacing: 4) {
-                Text(progressText)
-                Image(systemName: progressIcon)
-              }
-              .foregroundStyle(.linkText)
-              .progressActionLabelStyle(.standaloneSubtle)
-              .progressActionFill(progressFraction)
-            }
-            .progressActionButtonStyle(tint: .secondary)
-            .sheet(isPresented: $showCollectionBox) {
-              SubjectCollectionBoxView(subjectId: subject.id, initialSubject: subject)
-                .onDisappear {
-                  Task {
-                    await reload?()
-                  }
-                }
-            }
+            nextAction(recent, fillWidth: true)
           }
         }
       }
@@ -318,6 +319,7 @@ private struct EpisodeNextLabel: View {
 
   var body: some View {
     Label(desc, systemImage: icon)
+      .lineLimit(1)
       .foregroundStyle(isEnabled ? .linkText : .secondary)
   }
 }
