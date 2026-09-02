@@ -75,6 +75,8 @@ struct GroupDetailView: View {
   @AppStorage("shareDomain") var shareDomain: ShareDomain = .chii
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
 
+  @Environment(\.theme) private var theme
+
   @State private var showCreateTopic: Bool = false
   @State private var pinnedItems: [SlimGroupDTO] = []
 
@@ -140,7 +142,27 @@ struct GroupDetailView: View {
     }
   }
 
+  @ViewBuilder
   var body: some View {
+    if theme.isClassic {
+      classicBody
+    } else {
+      GlassGroupDetailView(
+        group: group,
+        detail: detail,
+        isPinned: isPinned,
+        reload: reload,
+        togglePin: togglePin,
+        joinGroup: joinGroup,
+        leaveGroup: leaveGroup
+      )
+      .task {
+        await loadPinnedItems()
+      }
+    }
+  }
+
+  private var classicBody: some View {
     VStack(alignment: .leading) {
       CardView(background: .introBackground) {
         VStack(alignment: .leading, spacing: 8) {

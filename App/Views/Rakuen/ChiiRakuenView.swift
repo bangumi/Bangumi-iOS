@@ -97,9 +97,20 @@ struct ChiiRakuenView: View {
   @AppStorage("rakuenListMode") var rakuenListMode: RakuenListMode = .subjectTrending
   @AppStorage("isAuthenticated") var isAuthenticated = false
 
+  @Environment(\.theme) private var theme
+
   @State private var reloader = false
 
+  @ViewBuilder
   var body: some View {
+    if theme.isClassic {
+      classicBody
+    } else {
+      GlassRakuenView()
+    }
+  }
+
+  private var classicBody: some View {
     ScrollView {
       VStack(spacing: 0) {
         HotGroupsView()

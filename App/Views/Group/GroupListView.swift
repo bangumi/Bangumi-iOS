@@ -3,6 +3,8 @@ import SwiftUI
 struct GroupListView: View {
   let mode: GroupFilterMode
 
+  @Environment(\.theme) private var theme
+
   @State private var sortMode: GroupSortMode = .members
   @State private var reloader = false
 
@@ -21,7 +23,17 @@ struct GroupListView: View {
     return nil
   }
 
+  @ViewBuilder
   var body: some View {
+    if theme.isClassic {
+      classicBody
+    } else {
+      GlassGroupListView(
+        mode: mode, sortMode: $sortMode, reloader: $reloader, load: load)
+    }
+  }
+
+  private var classicBody: some View {
     ScrollView {
       OffsetPagedView(reloader: reloader, nextPageFunc: load) { (group: SlimGroupDTO) in
         CardView {

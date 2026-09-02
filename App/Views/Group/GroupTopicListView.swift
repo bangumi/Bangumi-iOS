@@ -6,6 +6,8 @@ struct GroupTopicListView: View {
   @AppStorage("hideBlocklist") var hideBlocklist: Bool = false
   @AppStorage("blocklist") var blocklist: [Int] = []
 
+  @Environment(\.theme) private var theme
+
   var title: String {
     "小组话题"
   }
@@ -21,6 +23,21 @@ struct GroupTopicListView: View {
   }
 
   var body: some View {
+    content
+      .navigationTitle(title)
+      .navigationBarTitleDisplayMode(.inline)
+  }
+
+  @ViewBuilder
+  private var content: some View {
+    if theme.isClassic {
+      classicBody
+    } else {
+      GlassGroupTopicListView(loadTopics: loadTopics)
+    }
+  }
+
+  private var classicBody: some View {
     ScrollView {
       OffsetPagedView<TopicDTO, _>(nextPageFunc: loadTopics) { topic in
         if !hideBlocklist || !blocklist.contains(topic.creator?.id ?? 0) {
@@ -58,7 +75,5 @@ struct GroupTopicListView: View {
         }
       }.padding(8)
     }
-    .navigationTitle(title)
-    .navigationBarTitleDisplayMode(.inline)
   }
 }

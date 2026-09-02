@@ -2,6 +2,8 @@ import OSLog
 import SwiftUI
 
 struct HotGroupsView: View {
+  @Environment(\.theme) private var theme
+
   @State private var hotItems: [SlimGroupDTO] = []
   @State private var cachedHotItems: [SlimGroupDTO] = []
   @State private var pinnedItems: [SlimGroupDTO] = []
@@ -83,6 +85,28 @@ struct HotGroupsView: View {
   }
 
   var body: some View {
+    content
+      .onAppear {
+        if !initialized {
+          initialized = true
+          Task {
+            await loadCache()
+            await load()
+          }
+        }
+      }
+  }
+
+  @ViewBuilder
+  private var content: some View {
+    if theme.isClassic {
+      classicBody
+    } else {
+      GlassHotGroupsRow(groups: displayItems, isPinned: isPinned, togglePin: togglePin)
+    }
+  }
+
+  private var classicBody: some View {
     VStack(alignment: .leading) {
       if !displayItems.isEmpty {
         HStack {
@@ -133,15 +157,6 @@ struct HotGroupsView: View {
         }
         .scrollClipDisabled()
         .frame(height: 120)
-      }
-    }
-    .onAppear {
-      if !initialized {
-        initialized = true
-        Task {
-          await loadCache()
-          await load()
-        }
       }
     }
   }
