@@ -69,6 +69,7 @@ private struct ThemedScreenModifier: ViewModifier {
         GlassScreenBackground()
         content
       }
+      .background { HostingBackgroundClearer() }
       .scrollContentBackground(.hidden)
     if #available(iOS 26.0, *) {
       screen
@@ -76,6 +77,30 @@ private struct ThemedScreenModifier: ViewModifier {
       screen.toolbarBackground(.hidden, for: .navigationBar)
     }
   }
+}
+
+private struct HostingBackgroundClearer: UIViewRepresentable {
+  final class ClearingView: UIView {
+    override func didMoveToWindow() {
+      super.didMoveToWindow()
+      var responder: UIResponder? = self
+      while let next = responder?.next {
+        if let controller = next as? UIViewController {
+          controller.view.backgroundColor = .clear
+          return
+        }
+        responder = next
+      }
+    }
+  }
+
+  func makeUIView(context: Context) -> ClearingView {
+    let view = ClearingView()
+    view.isUserInteractionEnabled = false
+    return view
+  }
+
+  func updateUIView(_ uiView: ClearingView, context: Context) {}
 }
 
 private struct ThemedListRowModifier: ViewModifier {
