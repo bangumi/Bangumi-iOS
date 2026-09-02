@@ -46,7 +46,10 @@ struct SubjectTopicsView: View {
         }
         .padding(.top, 5)
       } else {
-        ThemedSectionHeader("讨论版") {
+        ThemedSectionHeader {
+          Text("讨论版")
+            .foregroundStyle(topics.count > 0 ? theme.sectionHeader : theme.tertiaryText)
+        } trailing: {
           if isAuthenticated {
             createTopicButton
           }
@@ -54,7 +57,6 @@ struct SubjectTopicsView: View {
             moreLink
           }
         }
-        .foregroundStyle(topics.count > 0 ? .primary : .secondary)
       }
     }
     .sheet(isPresented: $showCreateTopic) {

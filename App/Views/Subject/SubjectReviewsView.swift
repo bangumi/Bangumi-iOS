@@ -26,14 +26,16 @@ struct SubjectReviewsView: View {
         Divider()
       }.padding(.top, 5)
     } else {
-      ThemedSectionHeader("评论") {
+      ThemedSectionHeader {
+        Text("评论")
+          .foregroundStyle(reviews.count > 0 ? theme.sectionHeader : theme.tertiaryText)
+      } trailing: {
         if reviews.count > 0 {
           NavigationLink(value: NavDestination.subjectReviewList(subjectId)) {
             Text("更多评论 »").font(.caption)
           }.buttonStyle(.navigation)
         }
       }
-      .foregroundStyle(reviews.count > 0 ? .primary : .secondary)
     }
     if reviews.count == 0 {
       HStack {

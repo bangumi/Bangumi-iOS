@@ -44,14 +44,16 @@ struct SubjectRelationsView: View {
           Divider()
         }.padding(.top, 5)
       } else {
-        ThemedSectionHeader("关联条目") {
+        ThemedSectionHeader {
+          Text("关联条目")
+            .foregroundStyle(relations.count > 0 ? theme.sectionHeader : theme.tertiaryText)
+        } trailing: {
           if relations.count > 0 {
             NavigationLink(value: NavDestination.subjectRelationList(subjectId)) {
               Text("更多条目 »").font(.caption)
             }.buttonStyle(.navigation)
           }
         }
-        .foregroundStyle(relations.count > 0 ? .primary : .secondary)
       }
       if relations.count == 0 {
         HStack {

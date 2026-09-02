@@ -15,7 +15,7 @@ struct ReactionsView: View {
 
   func shadowColor(_ reaction: ReactionDTO) -> Color {
     if reaction.users.contains(where: { $0.id == profile.id }) {
-      return .linkText.opacity(0.8)
+      return theme.link.opacity(0.8)
     }
     return .black.opacity(0.2)
   }

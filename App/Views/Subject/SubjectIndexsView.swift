@@ -40,14 +40,16 @@ struct SubjectIndexsView: View {
         Divider()
       }.padding(.top, 5)
     } else {
-      ThemedSectionHeader(title) {
+      ThemedSectionHeader {
+        Text(title)
+          .foregroundStyle(indexes.count > 0 ? theme.sectionHeader : theme.tertiaryText)
+      } trailing: {
         if indexes.count > 0 {
           NavigationLink(value: NavDestination.subjectIndexList(subjectId)) {
             Text(moreText).font(.caption)
           }.buttonStyle(.navigation)
         }
       }
-      .foregroundStyle(indexes.count > 0 ? .primary : .secondary)
     }
 
     if indexes.isEmpty {

@@ -55,14 +55,16 @@ struct SubjectCharactersView: View {
 
         Divider()
       } else {
-        ThemedSectionHeader("角色介绍") {
+        ThemedSectionHeader {
+          Text("角色介绍")
+            .foregroundStyle(characters.count > 0 ? theme.sectionHeader : theme.tertiaryText)
+        } trailing: {
           if characters.count > 0 {
             NavigationLink(value: NavDestination.subjectCharacterList(subjectId)) {
               Text("更多角色 »").font(.caption)
             }.buttonStyle(.navigation)
           }
         }
-        .foregroundStyle(characters.count > 0 ? .primary : .secondary)
       }
 
       if characters.count == 0 {

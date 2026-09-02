@@ -29,7 +29,6 @@ private struct SheetChromeModifier: ViewModifier {
     } else {
       content
         .presentationCornerRadius(theme.metrics.sheetRadius)
-        .presentationBackground(.regularMaterial)
     }
   }
 }

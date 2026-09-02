@@ -179,6 +179,8 @@ struct SubjectCollectionSectionView: View {
   var collectionType: CollectionType? = nil
   var onCollectionSaved: (() async -> Void)? = nil
 
+  @Environment(\.theme) private var theme
+
   private let tileSpacing: CGFloat = 8
   private let headerDividerSpacing: CGFloat = 2
   private let contentInset: CGFloat = 2
@@ -198,7 +200,16 @@ struct SubjectCollectionSectionView: View {
     }
   }
 
+  @ViewBuilder
   private var header: some View {
+    if theme.isClassic {
+      classicHeader
+    } else {
+      glassHeader
+    }
+  }
+
+  private var classicHeader: some View {
     HStack(alignment: .bottom, spacing: 2) {
       NavigationLink(value: destination) {
         Text(title).font(.title3)
@@ -209,6 +220,19 @@ struct SubjectCollectionSectionView: View {
       CollectionTypeChipsView(subjectType: subjectType, counts: counts, selection: $selection)
 
       Spacer(minLength: 0)
+    }
+  }
+
+  private var glassHeader: some View {
+    VStack(alignment: .leading, spacing: 6) {
+      ThemedSectionHeader {
+        NavigationLink(value: destination) {
+          Text(title).font(.title3)
+        }
+        .buttonStyle(.navigation)
+        .padding(.horizontal, 4)
+      }
+      CollectionTypeChipsView(subjectType: subjectType, counts: counts, selection: $selection)
     }
   }
 

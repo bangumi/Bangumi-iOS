@@ -34,8 +34,10 @@ struct SubjectOffprintsView: View {
           Divider()
         }.padding(.top, 5)
       } else {
-        ThemedSectionHeader("单行本")
-          .foregroundStyle(offprints.count > 0 ? .primary : .secondary)
+        ThemedSectionHeader {
+          Text("单行本")
+            .foregroundStyle(offprints.count > 0 ? theme.sectionHeader : theme.tertiaryText)
+        }
       }
       ScrollView(.horizontal, showsIndicators: false) {
         LazyHStack(alignment: .top) {

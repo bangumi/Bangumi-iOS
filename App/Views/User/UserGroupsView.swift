@@ -3,6 +3,8 @@ import SwiftUI
 struct UserGroupsView: View {
   let user: UserDTO
 
+  @Environment(\.theme) private var theme
+
   @State private var refreshing = false
   @State private var groups: [SlimGroupDTO] = []
 
@@ -27,14 +29,26 @@ struct UserGroupsView: View {
 
   var body: some View {
     VStack(alignment: .leading, spacing: 2) {
-      HStack(alignment: .bottom) {
-        NavigationLink(value: NavDestination.userGroup(user.slim)) {
-          Text("小组").font(.title3)
-        }
-        .buttonStyle(.navigation)
-        .padding(.horizontal, 4)
+      Group {
+        if theme.isClassic {
+          HStack(alignment: .bottom) {
+            NavigationLink(value: NavDestination.userGroup(user.slim)) {
+              Text("小组").font(.title3)
+            }
+            .buttonStyle(.navigation)
+            .padding(.horizontal, 4)
 
-        Spacer(minLength: 0)
+            Spacer(minLength: 0)
+          }
+        } else {
+          ThemedSectionHeader {
+            NavigationLink(value: NavDestination.userGroup(user.slim)) {
+              Text("小组").font(.title3)
+            }
+            .buttonStyle(.navigation)
+            .padding(.horizontal, 4)
+          }
+        }
       }
       .padding(.top, 8)
       .task {

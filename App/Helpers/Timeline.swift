@@ -30,10 +30,12 @@ extension TimelineDTO {
     return text
   }
 
-  func desc(with titlePreference: TitlePreference) -> AttributedString {
+  func desc(with titlePreference: TitlePreference, linkColor: Color = .linkText)
+    -> AttributedString
+  {
     var text = AttributedString("")
     if let user = self.user {
-      text += user.nickname.withLink(user.link)
+      text += user.nickname.withLink(user.link, linkColor: linkColor)
       text += AttributedString(" ")
     }
     switch self.cat {
@@ -44,12 +46,12 @@ extension TimelineDTO {
       case 2:
         if self.batch {
           text += AttributedString("将 ")
-          text += genBatch(self.memo.daily?.users ?? [])
+          text += genBatch(self.memo.daily?.users ?? [], linkColor: linkColor)
           text += AttributedString(" \(self.memo.daily?.users?.count ?? 0) 位用户加为了好友")
         } else {
           text += AttributedString("将 ")
           if let user = self.memo.daily?.users?.first {
-            text += user.nickname.withLink(user.link)
+            text += user.nickname.withLink(user.link, linkColor: linkColor)
           } else {
             text += self.unknown("用户")
           }
@@ -58,12 +60,12 @@ extension TimelineDTO {
       case 3:
         if self.batch {
           text += AttributedString("加入了 ")
-          text += genBatch(self.memo.daily?.groups ?? [])
+          text += genBatch(self.memo.daily?.groups ?? [], linkColor: linkColor)
           text += AttributedString(" \(self.memo.daily?.groups?.count ?? 0) 个小组")
         } else {
           text += AttributedString("加入了 ")
           if let group = self.memo.daily?.groups?.first {
-            text += group.title.withLink(group.link)
+            text += group.title.withLink(group.link, linkColor: linkColor)
           } else {
             text += self.unknown("")
           }
@@ -72,12 +74,12 @@ extension TimelineDTO {
       case 4:
         if self.batch {
           text += AttributedString("创建了 ")
-          text += genBatch(self.memo.daily?.groups ?? [])
+          text += genBatch(self.memo.daily?.groups ?? [], linkColor: linkColor)
           text += AttributedString(" \(self.memo.daily?.groups?.count ?? 0) 个小组")
         } else {
           text += AttributedString("创建了 ")
           if let group = self.memo.daily?.groups?.first {
-            text += group.title.withLink(group.link)
+            text += group.title.withLink(group.link, linkColor: linkColor)
           } else {
             text += self.unknown("")
           }
@@ -90,7 +92,7 @@ extension TimelineDTO {
     case .wiki:
       text += AttributedString("\(TimelineNewSubjectType(self.type).desc) ")
       if let subject = self.memo.wiki?.subject {
-        text += subject.title(with: titlePreference).withLink(subject.link)
+        text += subject.title(with: titlePreference).withLink(subject.link, linkColor: linkColor)
       } else {
         text += self.unknown("条目")
       }
@@ -105,7 +107,7 @@ extension TimelineDTO {
               link: $0.subject.link
             )
           } ?? []
-        text += genBatch(subjects)
+        text += genBatch(subjects, linkColor: linkColor)
         let count = self.memo.subject?.count ?? 0
         var typeID = self.memo.subject?.first?.subject.type.rawValue ?? 0
         if typeID == 0 {
@@ -115,7 +117,8 @@ extension TimelineDTO {
       } else {
         text += AttributedString("\(TimelineSubjectActionType(self.type).desc) ")
         if let collect = self.memo.subject?.first {
-          text += collect.subject.title(with: titlePreference).withLink(collect.subject.link)
+          text += collect.subject.title(with: titlePreference)
+            .withLink(collect.subject.link, linkColor: linkColor)
         } else {
           text += self.unknown("条目")
         }
@@ -127,7 +130,8 @@ extension TimelineDTO {
         if let batch = self.memo.progress?.batch {
           if batch.subject.type == .book {
             text += AttributedString("读过 ")
-            text += batch.subject.title(with: titlePreference).withLink(batch.subject.link)
+            text += batch.subject.title(with: titlePreference)
+              .withLink(batch.subject.link, linkColor: linkColor)
             if let volsUpdate = batch.volsUpdate, volsUpdate > 0 {
               text += AttributedString(" 第\(volsUpdate) 卷")
             }
@@ -136,7 +140,8 @@ extension TimelineDTO {
             }
           } else {
             text += AttributedString("完成了 ")
-            text += batch.subject.title(with: titlePreference).withLink(batch.subject.link)
+            text += batch.subject.title(with: titlePreference)
+              .withLink(batch.subject.link, linkColor: linkColor)
             text += AttributedString(" \(batch.epsUpdate ?? 0) of \(batch.epsTotal) 话")
           }
         } else {
@@ -145,7 +150,7 @@ extension TimelineDTO {
       case 1, 2, 3:
         if let episode = self.memo.progress?.single?.episode {
           text += AttributedString("\(EpisodeCollectionType(self.type).description) ")
-          text += episode.title(with: titlePreference).withLink(episode.link)
+          text += episode.title(with: titlePreference).withLink(episode.link, linkColor: linkColor)
         } else {
           text += self.unknown("剧集")
         }
@@ -159,7 +164,7 @@ extension TimelineDTO {
     case .blog:
       if let blog = self.memo.blog {
         text += AttributedString("发表了新日志 ")
-        text += blog.title.withLink(blog.link)
+        text += blog.title.withLink(blog.link, linkColor: linkColor)
       } else {
         text += self.unknown("日志")
       }
@@ -174,7 +179,7 @@ extension TimelineDTO {
         default:
           text += self.unknown("目录")
         }
-        text += index.title.withLink(index.link)
+        text += index.title.withLink(index.link, linkColor: linkColor)
       } else {
         text += self.unknown("目录")
       }
@@ -185,11 +190,12 @@ extension TimelineDTO {
         case 0:
           if let character = mono.characters.first {
             text += AttributedString("创建了新角色 ")
-            text += character.title(with: titlePreference).withLink(character.link)
+            text += character.title(with: titlePreference)
+              .withLink(character.link, linkColor: linkColor)
           }
           if let person = mono.persons.first {
             text += AttributedString("创建了新人物 ")
-            text += person.title(with: titlePreference).withLink(person.link)
+            text += person.title(with: titlePreference).withLink(person.link, linkColor: linkColor)
           }
         case 1:
           text += AttributedString("收藏了 ")
@@ -210,7 +216,7 @@ extension TimelineDTO {
                     link: person.link
                   ))
               }
-              text += genBatch(items)
+              text += genBatch(items, linkColor: linkColor)
               if mono.persons.count > 0 {
                 text += AttributedString(" \(mono.persons.count + mono.characters.count) 个人物")
               } else {
@@ -222,10 +228,12 @@ extension TimelineDTO {
           } else {
             if let character = mono.characters.first {
               text += AttributedString("角色 ")
-              text += character.title(with: titlePreference).withLink(character.link)
+              text += character.title(with: titlePreference)
+                .withLink(character.link, linkColor: linkColor)
             } else if let person = mono.persons.first {
               text += AttributedString("人物 ")
-              text += person.title(with: titlePreference).withLink(person.link)
+              text += person.title(with: titlePreference)
+                .withLink(person.link, linkColor: linkColor)
             } else {
               text += self.unknown("人物")
             }
@@ -268,7 +276,9 @@ extension TimelineBatchProgressDTO {
   }
 }
 
-func genBatch<T: Linkable>(_ items: [T], limit: Int = 5) -> AttributedString {
+func genBatch<T: Linkable>(
+  _ items: [T], limit: Int = 5, linkColor: Color = .linkText
+) -> AttributedString {
   var text = AttributedString()
   for (idx, item) in items.enumerated() {
     if idx >= limit {
@@ -278,7 +288,7 @@ func genBatch<T: Linkable>(_ items: [T], limit: Int = 5) -> AttributedString {
     if idx > 0 {
       text += AttributedString("、")
     }
-    text += item.name.withLink(item.link)
+    text += item.name.withLink(item.link, linkColor: linkColor)
   }
   return text
 }

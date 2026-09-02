@@ -387,11 +387,13 @@ private struct BookProgressSummaryView: View {
 private struct BookProgressCurrentValue: View {
   let value: Int
 
+  @Environment(\.theme) private var theme
+
   var body: some View {
     Text(value, format: .number)
       .font(.subheadline)
       .fontWeight(.medium)
-      .foregroundStyle(.linkText)
+      .foregroundStyle(theme.link)
       .monospacedDigit()
       .contentTransition(.numericText())
       .animation(.default, value: value)

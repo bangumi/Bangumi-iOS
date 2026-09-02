@@ -27,14 +27,16 @@ struct SubjectCommentsView: View {
         Divider()
       }.padding(.top, 5)
     } else {
-      ThemedSectionHeader("吐槽箱") {
+      ThemedSectionHeader {
+        Text("吐槽箱")
+          .foregroundStyle(comments.count > 0 ? theme.sectionHeader : theme.tertiaryText)
+      } trailing: {
         if comments.count > 0 {
           NavigationLink(value: NavDestination.subjectCommentList(subjectId)) {
             Text("更多吐槽 »").font(.caption)
           }.buttonStyle(.navigation)
         }
       }
-      .foregroundStyle(comments.count > 0 ? .primary : .secondary)
     }
     if comments.count == 0 {
       HStack {

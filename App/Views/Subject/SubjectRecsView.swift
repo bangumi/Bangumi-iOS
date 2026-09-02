@@ -39,8 +39,10 @@ struct SubjectRecsView: View {
           Divider()
         }.padding(.top, 5)
       } else {
-        ThemedSectionHeader("猜你喜欢")
-          .foregroundStyle(recs.count > 0 ? .primary : .secondary)
+        ThemedSectionHeader {
+          Text("猜你喜欢")
+            .foregroundStyle(recs.count > 0 ? theme.sectionHeader : theme.tertiaryText)
+        }
       }
       if recs.count == 0 {
         HStack {

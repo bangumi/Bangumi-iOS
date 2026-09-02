@@ -23,11 +23,21 @@ struct UserBlogsView: View {
   var body: some View {
     VStack {
       VStack(spacing: 2) {
-        HStack(alignment: .bottom) {
-          NavigationLink(value: NavDestination.userBlog(user.slim)) {
-            Text("日志").font(.title3)
-          }.buttonStyle(.navigation)
-          Spacer()
+        Group {
+          if theme.isClassic {
+            HStack(alignment: .bottom) {
+              NavigationLink(value: NavDestination.userBlog(user.slim)) {
+                Text("日志").font(.title3)
+              }.buttonStyle(.navigation)
+              Spacer()
+            }
+          } else {
+            ThemedSectionHeader {
+              NavigationLink(value: NavDestination.userBlog(user.slim)) {
+                Text("日志").font(.title3)
+              }.buttonStyle(.navigation)
+            }
+          }
         }
         .padding(.top, 8)
         .task(refresh)

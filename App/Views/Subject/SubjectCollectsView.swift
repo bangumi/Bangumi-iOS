@@ -120,7 +120,10 @@ struct SubjectCollectsView: View {
           Divider()
         }.padding(.top, 5)
       } else {
-        ThemedSectionHeader(title) {
+        ThemedSectionHeader {
+          Text(title)
+            .foregroundStyle(collects.count > 0 ? theme.sectionHeader : theme.tertiaryText)
+        } trailing: {
           if isAuthenticated {
             filterPicker
           }
@@ -128,7 +131,6 @@ struct SubjectCollectsView: View {
             moreLink
           }
         }
-        .foregroundStyle(collects.count > 0 ? .primary : .secondary)
       }
 
       if collects.isEmpty {

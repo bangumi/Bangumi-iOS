@@ -4,6 +4,8 @@ struct UserIndexesView: View {
 
   let user: UserDTO
 
+  @Environment(\.theme) private var theme
+
   @State private var indexes: [SlimIndexDTO] = []
 
   func refresh() async {
@@ -21,11 +23,21 @@ struct UserIndexesView: View {
   var body: some View {
     VStack {
       VStack(spacing: 2) {
-        HStack(alignment: .bottom) {
-          NavigationLink(value: NavDestination.userIndex(user.slim)) {
-            Text("目录").font(.title3)
-          }.buttonStyle(.navigation)
-          Spacer()
+        Group {
+          if theme.isClassic {
+            HStack(alignment: .bottom) {
+              NavigationLink(value: NavDestination.userIndex(user.slim)) {
+                Text("目录").font(.title3)
+              }.buttonStyle(.navigation)
+              Spacer()
+            }
+          } else {
+            ThemedSectionHeader {
+              NavigationLink(value: NavDestination.userIndex(user.slim)) {
+                Text("目录").font(.title3)
+              }.buttonStyle(.navigation)
+            }
+          }
         }
         .padding(.top, 8)
         .task(refresh)

@@ -63,6 +63,8 @@ struct PostDocumentNavigatorOverlay: View {
   var body: some View {
     if theme.isClassic {
       controlBar
+    } else if #available(iOS 26.0, *) {
+      controlBar
     } else {
       controlBar
         .padding(6)

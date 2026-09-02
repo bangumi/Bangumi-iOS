@@ -77,7 +77,7 @@ struct TimelineItemView: View {
       VStack(alignment: .leading) {
         switch item.cat {
         case .daily:
-          Text(item.desc(with: titlePreference))
+          Text(item.desc(with: titlePreference, linkColor: theme.link))
           switch item.type {
           case 2:
             if let users = item.memo.daily?.users, users.count > 0 {
@@ -112,13 +112,13 @@ struct TimelineItemView: View {
           }
 
         case .wiki:
-          Text(item.desc(with: titlePreference))
+          Text(item.desc(with: titlePreference, linkColor: theme.link))
           if let subject = item.memo.wiki?.subject {
             SubjectSmallView(subject: subject)
           }
 
         case .subject:
-          Text(item.desc(with: titlePreference))
+          Text(item.desc(with: titlePreference, linkColor: theme.link))
           if item.batch {
             let subjects = item.memo.subject?.map(\.subject).filter { $0.images != nil } ?? []
             ScrollView(.horizontal, showsIndicators: false) {
@@ -152,7 +152,7 @@ struct TimelineItemView: View {
           }
 
         case .progress:
-          Text(item.desc(with: titlePreference))
+          Text(item.desc(with: titlePreference, linkColor: theme.link))
           switch item.type {
           case 0:
             if let batch = item.memo.progress?.batch {
@@ -175,7 +175,7 @@ struct TimelineItemView: View {
 
         case .status:
           if item.user != nil {
-            Text(item.desc(with: titlePreference)).textSelection(.enabled)
+            Text(item.desc(with: titlePreference, linkColor: theme.link)).textSelection(.enabled)
           }
           switch item.type {
           case 0:
@@ -193,7 +193,7 @@ struct TimelineItemView: View {
           }
 
         case .mono:
-          Text(item.desc(with: titlePreference))
+          Text(item.desc(with: titlePreference, linkColor: theme.link))
           if let mono = item.memo.mono, mono.characters.count + mono.persons.count > 0 {
             ScrollView(.horizontal, showsIndicators: false) {
               HStack {
@@ -215,7 +215,7 @@ struct TimelineItemView: View {
           }
 
         default:
-          Text(item.desc(with: titlePreference))
+          Text(item.desc(with: titlePreference, linkColor: theme.link))
         }
         if showReactions {
           switch item.cat {

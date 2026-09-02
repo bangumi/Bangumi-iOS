@@ -4,21 +4,26 @@ struct ThemedSectionHeader<Title: View, Trailing: View>: View {
   let title: Title
   let systemImage: String?
   let classicFont: Font?
+  let tintsTitle: Bool
   let trailing: Trailing
 
   @Environment(\.theme) private var theme
 
   fileprivate init(
-    title: Title, systemImage: String?, classicFont: Font?, trailing: Trailing
+    title: Title, systemImage: String?, classicFont: Font?, tintsTitle: Bool,
+    trailing: Trailing
   ) {
     self.title = title
     self.systemImage = systemImage
     self.classicFont = classicFont
+    self.tintsTitle = tintsTitle
     self.trailing = trailing
   }
 
   init(@ViewBuilder title: () -> Title, @ViewBuilder trailing: () -> Trailing) {
-    self.init(title: title(), systemImage: nil, classicFont: nil, trailing: trailing())
+    self.init(
+      title: title(), systemImage: nil, classicFont: nil, tintsTitle: false,
+      trailing: trailing())
   }
 
   @ViewBuilder
@@ -47,6 +52,17 @@ struct ThemedSectionHeader<Title: View, Trailing: View>: View {
     }
   }
 
+  @ViewBuilder
+  private var glassTitle: some View {
+    if tintsTitle {
+      title
+        .font(.subheadline.weight(.heavy))
+        .foregroundStyle(theme.sectionHeader)
+    } else {
+      title.font(.subheadline.weight(.heavy))
+    }
+  }
+
   private var glassBody: some View {
     HStack(alignment: .firstTextBaseline, spacing: 6) {
       if let systemImage {
@@ -54,13 +70,17 @@ struct ThemedSectionHeader<Title: View, Trailing: View>: View {
           .font(.caption.weight(.bold))
           .foregroundStyle(theme.accent)
       }
-      title
-        .font(.subheadline.weight(.heavy))
-        .foregroundStyle(theme.sectionHeader)
+      glassTitle
       Spacer(minLength: 0)
       trailing
     }
     .padding(.horizontal, 2)
+  }
+}
+
+extension ThemedSectionHeader where Trailing == EmptyView {
+  init(@ViewBuilder title: () -> Title) {
+    self.init(title: title) { EmptyView() }
   }
 }
 
@@ -71,7 +91,7 @@ extension ThemedSectionHeader where Title == Text {
     @ViewBuilder trailing: () -> Trailing
   ) {
     self.init(
-      title: Text(title), systemImage: systemImage, classicFont: .title3,
+      title: Text(title), systemImage: systemImage, classicFont: .title3, tintsTitle: true,
       trailing: trailing())
   }
 }
