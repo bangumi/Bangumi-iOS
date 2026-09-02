@@ -65,6 +65,7 @@ enum WeekDay: Int, CaseIterable {
 struct CalendarView: View {
 
   @Environment(\.scenePhase) private var scenePhase
+  @Environment(\.theme) private var theme
 
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
 
@@ -175,7 +176,16 @@ struct CalendarView: View {
     }
   }
 
+  @ViewBuilder
   var body: some View {
+    if theme.isClassic {
+      classicBody
+    } else {
+      GlassCalendarView()
+    }
+  }
+
+  private var classicBody: some View {
     Group {
       if calendars.isEmpty {
         ProgressView().task {
