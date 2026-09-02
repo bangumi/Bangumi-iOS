@@ -865,6 +865,7 @@ struct ProgressEpisodeChip: View {
   var reload: (() async -> Void)? = nil
 
   @Environment(\.theme) private var theme
+  @AppStorage("showEpisodeTrends") var showEpisodeTrends: Bool = true
 
   var body: some View {
     let label = chipLabel
@@ -940,6 +941,14 @@ struct ProgressEpisodeChip: View {
         }
       }
       .strikethrough(cell.strikethrough)
-      .episodeTrend(episode)
+      .overlay(alignment: .bottom) {
+        if showEpisodeTrends {
+          Capsule()
+            .fill(episode.trendColor)
+            .frame(height: size > 22 ? 3 : 2)
+            .padding(.horizontal, cornerRadius * 0.7)
+            .padding(.bottom, size > 22 ? 4 : 3)
+        }
+      }
   }
 }
