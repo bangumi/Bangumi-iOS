@@ -65,8 +65,10 @@ private struct ThemedScreenModifier: ViewModifier {
   @ViewBuilder
   private func glassBody(_ content: Content) -> some View {
     let screen =
-      content
-      .background { GlassScreenBackground() }
+      ZStack {
+        GlassScreenBackground()
+        content
+      }
       .scrollContentBackground(.hidden)
     if #available(iOS 26.0, *) {
       screen
