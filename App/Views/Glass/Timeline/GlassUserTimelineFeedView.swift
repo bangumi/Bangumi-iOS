@@ -1,17 +1,17 @@
 import SwiftUI
 
-struct UserTimelineView: View {
+struct GlassUserTimelineFeedView: View {
   let user: SlimUserDTO
 
-  @AppStorage("profile") var profile: Profile = Profile()
-
-  @Environment(\.theme) private var theme
+  @AppStorage("profile") private var profile: Profile = Profile()
 
   @State private var exhausted: Bool = false
   @State private var loading: Bool = false
   @State private var lastID: Int?
   @State private var fetched: [Int: Bool] = [:]
   @State private var items: [TimelineDTO] = []
+
+  @Environment(\.theme) private var theme
 
   var title: String {
     if user.id == profile.id {
@@ -72,24 +72,20 @@ struct UserTimelineView: View {
       loading = false
     }
   }
-  @ViewBuilder
-  private var classicBody: some View {
+
+  var body: some View {
     let rows = items.timelineListRows(lastID: lastID)
 
     ScrollView {
-      UserSmallView(user: user)
-        .padding(.top, 8)
-        .padding(.horizontal, 8)
-      LazyVStack(alignment: .leading) {
+      LazyVStack(alignment: .leading, spacing: theme.metrics.listSpacing) {
+        header
         ForEach(rows) { row in
-          TimelineItemView(
-            item: row.item,
-            previousUID: row.previousUID
-          ).task(id: row.nextPageTriggerID) {
-            if let triggerID = row.nextPageTriggerID {
-              await loadNextPage(triggerID: triggerID)
+          GlassTimelineItemView(item: row.item)
+            .task(id: row.nextPageTriggerID) {
+              if let triggerID = row.nextPageTriggerID {
+                await loadNextPage(triggerID: triggerID)
+              }
             }
-          }
         }
         if loading {
           HStack {
@@ -97,8 +93,23 @@ struct UserTimelineView: View {
             ProgressView()
             Spacer()
           }
+          .padding(.vertical, 18)
+        } else if items.isEmpty {
+          GlassEmptyCard(
+            systemImage: "clock.arrow.circlepath",
+            title: "暂无动态",
+            description: "下拉可以刷新时间线")
+        } else if exhausted {
+          Text("没有更多动态了")
+            .font(.caption)
+            .foregroundStyle(theme.tertiaryText)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 18)
         }
-      }.padding(.horizontal, 8)
+      }
+      .padding(.horizontal, theme.metrics.screenPadding)
+      .padding(.top, 4)
+      .padding(.bottom, 26)
     }
     .navigationTitle(title)
     .navigationBarTitleDisplayMode(.inline)
@@ -119,12 +130,29 @@ struct UserTimelineView: View {
     }
   }
 
-  @ViewBuilder
-  var body: some View {
-    if theme.isClassic {
-      classicBody
-    } else {
-      GlassUserTimelineFeedView(user: user)
+  private var header: some View {
+    CardView(
+      padding: theme.metrics.cardPadding,
+      cornerRadius: theme.metrics.cardRadius,
+      role: .strong
+    ) {
+      HStack(spacing: 11) {
+        ImageView(img: user.avatar?.large)
+          .imageStyle(width: 44, height: 44, alignment: .center)
+          .imageType(.avatar)
+          .imageLink(user.link)
+        VStack(alignment: .leading, spacing: 3) {
+          Text(user.nickname.withLink(user.link, linkColor: theme.link))
+            .font(.headline)
+            .foregroundStyle(theme.cardTitle)
+            .lineLimit(1)
+          Text("@\(user.username)")
+            .font(.footnote)
+            .foregroundStyle(theme.secondaryText)
+            .lineLimit(1)
+        }
+        Spacer(minLength: 0)
+      }
     }
   }
 }

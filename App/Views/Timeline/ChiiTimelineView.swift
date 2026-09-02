@@ -6,6 +6,8 @@ struct ChiiTimelineView: View {
   @AppStorage("profile") var profile: Profile = Profile()
   @AppStorage("isolationMode") var isolationMode: Bool = false
 
+  @Environment(\.theme) private var theme
+
   @State private var noticeUnreadCount: Int = 0
   @State private var checkingNotice: Bool = false
 
@@ -34,7 +36,7 @@ struct ChiiTimelineView: View {
     noticeUnreadCount = unreadCount
   }
 
-  var body: some View {
+  private var classicBody: some View {
     TimelineListView()
       .navigationTitle("时间线")
       .navigationBarTitleDisplayMode(.inline)
@@ -73,5 +75,14 @@ struct ChiiTimelineView: View {
       ) { notification in
         handleNoticeUnreadCountChange(notification)
       }
+  }
+
+  @ViewBuilder
+  var body: some View {
+    if theme.isClassic {
+      classicBody
+    } else {
+      GlassTimelineView()
+    }
   }
 }

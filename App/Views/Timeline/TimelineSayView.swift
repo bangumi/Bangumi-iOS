@@ -4,6 +4,8 @@ import WebKit
 struct TimelineSayView: View {
   @Environment(\.dismiss) private var dismiss
 
+  @Environment(\.theme) private var theme
+
   @State private var content: String = ""
   @State private var token: String = ""
   @State private var showTurnstile: Bool = false
@@ -22,7 +24,7 @@ struct TimelineSayView: View {
     }
   }
 
-  var body: some View {
+  private var classicBody: some View {
     SheetView(title: "吐槽", closeDisabled: updating) {
       ScrollView {
         VStack {
@@ -46,6 +48,15 @@ struct TimelineSayView: View {
         Label("发送", systemImage: "paperplane")
       }
       .disabled(content.isEmpty || updating || content.count > 380)
+    }
+  }
+
+  @ViewBuilder
+  var body: some View {
+    if theme.isClassic {
+      classicBody
+    } else {
+      GlassTimelineSayView()
     }
   }
 }
