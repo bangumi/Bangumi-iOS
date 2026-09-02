@@ -115,8 +115,7 @@ struct GlassTimelineListView: View {
           GlassLoginCard(
             title: "登录 Bangumi 番组计划",
             subtitle: "管理你的收藏与追番进度，关注好友动态，加入超展开的讨论。",
-            buttonTitle: "登录 / 注册",
-            footnote: "未登录也可以浏览全站公开动态"
+            buttonTitle: "登录 / 注册"
           )
         }
 
