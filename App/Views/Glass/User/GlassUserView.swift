@@ -122,7 +122,6 @@ struct GlassUserView: View {
           } label: {
             ToolbarCircle {
               Image(systemName: "ellipsis")
-                .accessibilityLabel("更多")
             }
           }
           .buttonStyle(.plain)

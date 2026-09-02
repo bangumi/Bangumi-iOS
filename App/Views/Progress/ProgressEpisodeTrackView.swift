@@ -658,7 +658,7 @@ struct ProgressEpisodeTicksView: View {
             )
         } else if focus {
           shape
-            .strokeBorder(theme.controlFill, lineWidth: 2.5)
+            .strokeBorder(theme.imageBorder, lineWidth: 2.5)
         }
       }
       .frame(maxWidth: tickWidth(distance: distance) == nil ? .infinity : nil)

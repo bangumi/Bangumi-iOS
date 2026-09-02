@@ -136,7 +136,7 @@ struct SettingsView: View {
               Text(theme.desc).tag(theme)
             }
           } label: {
-            SettingLabel("主题外观", description: "经典或玻璃风格，仅改变视觉")
+            SettingLabel("主题外观", description: "经典或玻璃风格")
           }
 
           Picker(selection: appIconSelection) {

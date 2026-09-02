@@ -87,9 +87,11 @@ struct GlassUserHeader: View {
   private var identity: some View {
     HStack(alignment: .top, spacing: 14) {
       ImageView(img: user.avatar?.large)
-        .imageStyle(width: avatarSize, height: avatarSize, cornerRadius: 22, alignment: .center)
+        .imageStyle(
+          width: avatarSize, height: avatarSize, cornerRadius: theme.metrics.cardRadius,
+          alignment: .center)
         .imageType(.avatar)
-        .glassAvatarRing(lineWidth: 3, cornerRadius: 22)
+        .glassAvatarRing(lineWidth: 3, cornerRadius: theme.metrics.cardRadius)
       VStack(alignment: .leading, spacing: 6) {
         Text(user.name)
           .font(.title3.weight(.heavy))

@@ -121,7 +121,6 @@ struct GlassDiscoverView: View {
             ProfileToolbarAvatarView(imageURL: profile.avatar?.large)
           }
           .buttonStyle(.plain)
-          .accessibilityLabel("我的")
         }
       }
       ToolbarItemGroup(placement: .topBarTrailing) {
@@ -132,7 +131,6 @@ struct GlassDiscoverView: View {
             }
           }
           .buttonStyle(.plain)
-          .accessibilityLabel("维基工具")
         }
       }
     }

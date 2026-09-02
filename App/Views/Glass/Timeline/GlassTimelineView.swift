@@ -75,7 +75,6 @@ struct GlassTimelineView: View {
               }
             }
             .buttonStyle(.plain)
-            .accessibilityLabel("通知")
           }
 
           NavigationLink(value: NavDestination.settings) {
@@ -84,7 +83,6 @@ struct GlassTimelineView: View {
             }
           }
           .buttonStyle(.plain)
-          .accessibilityLabel("设置")
         }
       }
       .onAppear {
@@ -110,13 +108,12 @@ struct GlassTimelineView: View {
       .buttonStyle(.plain)
       .accessibilityLabel("我的")
     } else {
-      NavigationLink(value: NavDestination.settings) {
+      GlassAuthButton {
         ToolbarCircle {
           Image(systemName: "person.crop.circle")
         }
       }
       .buttonStyle(.plain)
-      .accessibilityLabel("设置")
     }
   }
 

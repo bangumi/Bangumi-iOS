@@ -55,6 +55,7 @@ struct GlassModeTabs<Value: Hashable>: View {
           if item.isLocked {
             Image(systemName: "lock.fill")
               .font(.system(size: 10, weight: .semibold))
+              .foregroundStyle(theme.tertiaryText)
           }
         }
         Capsule()

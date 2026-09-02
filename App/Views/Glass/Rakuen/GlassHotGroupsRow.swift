@@ -85,7 +85,8 @@ struct GlassHotGroupsRow: View {
       .overlay {
         Circle().strokeBorder(theme.badgeRing, lineWidth: 1)
       }
-      .shadow(color: theme.cardShadow.color, radius: 4, y: 2)
+      .shadow(
+        color: theme.cardShadow.color, radius: theme.chipShadow.radius, y: theme.chipShadow.y)
       .offset(x: 5, y: -5)
   }
 }

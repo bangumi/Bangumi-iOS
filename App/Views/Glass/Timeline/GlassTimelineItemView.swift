@@ -276,10 +276,12 @@ struct GlassTimelineItemView: View {
               .font(.subheadline.weight(.semibold))
               .foregroundStyle(theme.cardTitle)
               .lineLimit(2)
-            Text(progressCaption(batch))
-              .font(.caption)
-              .foregroundStyle(theme.tertiaryText)
-              .lineLimit(2)
+            if let caption = progressCaption(batch) {
+              Text(caption)
+                .font(.caption)
+                .foregroundStyle(theme.tertiaryText)
+                .lineLimit(2)
+            }
           }
           .frame(maxWidth: .infinity, alignment: .leading)
           ProgressRing(current: batch.ringCurrent, total: batch.ringTotal)
@@ -325,8 +327,7 @@ struct GlassTimelineItemView: View {
     .subjectPreview(single.subject, eps: true)
   }
 
-  private func progressCaption(_ batch: TimelineBatchProgressDTO) -> String {
-    let status = CollectionType.doing.description(batch.subject.type)
+  private func progressCaption(_ batch: TimelineBatchProgressDTO) -> String? {
     if batch.subject.type == .book {
       var parts: [String] = []
       if let volsUpdate = batch.volsUpdate, volsUpdate > 0 {
@@ -336,11 +337,11 @@ struct GlassTimelineItemView: View {
         parts.append("第\(epsUpdate) 话")
       }
       if parts.isEmpty {
-        return status
+        return nil
       }
-      return parts.joined(separator: " · ") + " · " + status
+      return parts.joined(separator: " · ")
     }
-    return "看到 第 \(batch.epsUpdate ?? 0) 话 · \(status)"
+    return "看到 第 \(batch.epsUpdate ?? 0) 话"
   }
 
   @ViewBuilder

@@ -72,7 +72,7 @@ struct GlassFillButton<Content: View>: View {
     case .accent:
       .white
     case .muted:
-      theme.disabled
+      theme.tertiaryText
     case .complete:
       theme.successText
     case .glass:
@@ -190,7 +190,7 @@ struct GlassSyncBanner: View {
       Text("\(current)")
         .foregroundStyle(theme.accentDeep)
       Text("/\(total)")
-        .foregroundStyle(theme.disabled)
+        .foregroundStyle(theme.tertiaryText)
     }
     .font(.system(size: 13, weight: .bold, design: .monospaced))
   }
@@ -222,7 +222,7 @@ struct GlassSkeletonCard: View {
   }
 
   var body: some View {
-    CardView(padding: 14) {
+    CardView(padding: theme.metrics.cardPadding) {
       HStack(alignment: .top, spacing: 12) {
         RoundedRectangle(cornerRadius: theme.metrics.cellRadius, style: .continuous)
           .fill(theme.track)

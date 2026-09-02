@@ -110,7 +110,7 @@ struct GlassCollectionBadge: View {
             startPoint: .topLeading, endPoint: .bottomTrailing),
           in: RoundedRectangle(cornerRadius: theme.metrics.badgeRadius, style: .continuous)
         )
-        .shadow(color: shadowColor, radius: 4, y: 2)
+        .shadow(color: shadowColor, radius: theme.chipShadow.radius, y: theme.chipShadow.y)
     }
   }
 

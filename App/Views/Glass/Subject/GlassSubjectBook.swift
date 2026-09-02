@@ -138,7 +138,7 @@ struct GlassSubjectBookProgress: View {
         Text(verbatim: "/\(total)")
           .font(.caption2)
           .monospaced()
-          .foregroundStyle(theme.disabled)
+          .foregroundStyle(theme.tertiaryText)
       }
       Button(action: action) {
         Image(systemName: "plus")
@@ -339,7 +339,7 @@ struct GlassSubjectDiscs: View {
         Text(episode.sort.episodeDisplay)
           .font(.caption.weight(.bold))
           .monospaced()
-          .foregroundStyle(theme.disabled)
+          .foregroundStyle(theme.tertiaryText)
           .frame(width: 26, alignment: .trailing)
         VStack(alignment: .leading, spacing: 2) {
           Text(episode.name)

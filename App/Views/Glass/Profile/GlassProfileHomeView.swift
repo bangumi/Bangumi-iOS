@@ -37,7 +37,6 @@ struct GlassProfileHomeView: View {
         } label: {
           ToolbarCircle {
             Image(systemName: "gearshape")
-              .accessibilityLabel("设置与更多")
           }
         }
       }

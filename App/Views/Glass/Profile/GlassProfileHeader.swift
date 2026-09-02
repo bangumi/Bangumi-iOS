@@ -195,9 +195,11 @@ struct GlassProfileHeader: View {
     CardView(padding: theme.metrics.cardPadding, role: .strong) {
       HStack(alignment: .center, spacing: 14) {
         ImageView(img: isAuthenticated ? profile.avatar?.large : nil)
-          .imageStyle(width: avatarSize, height: avatarSize, cornerRadius: 20, alignment: .center)
+          .imageStyle(
+            width: avatarSize, height: avatarSize, cornerRadius: theme.metrics.cardRadius,
+            alignment: .center)
           .imageType(.avatar)
-          .glassAvatarRing(lineWidth: 3, cornerRadius: 20)
+          .glassAvatarRing(lineWidth: 3, cornerRadius: theme.metrics.cardRadius)
         VStack(alignment: .leading, spacing: 6) {
           nameLine
           handleLine

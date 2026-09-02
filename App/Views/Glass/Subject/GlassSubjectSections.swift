@@ -518,7 +518,7 @@ struct GlassSubjectIndexRow: View {
           }
           .font(.caption2)
           .monospacedDigit()
-          .foregroundStyle(theme.disabled)
+          .foregroundStyle(theme.tertiaryText)
         }
         Spacer(minLength: 0)
         Image(systemName: "chevron.right")
@@ -882,7 +882,6 @@ struct GlassSubjectTopics: View {
                 .foregroundStyle(theme.accent)
             }
             .buttonStyle(.plain)
-            .accessibilityLabel("添加新讨论")
           }
           if topics.count > 0 {
             NavigationLink(value: NavDestination.subjectTopicList(subjectId)) {
@@ -1038,7 +1037,7 @@ struct GlassSubjectCommentRow: View {
           Text(comment.updatedAt.relativeDisplay)
             .font(.caption2)
             .monospacedDigit()
-            .foregroundStyle(theme.disabled)
+            .foregroundStyle(theme.tertiaryText)
             .lineLimit(1)
           ReactionButton(type: .subjectCollect(comment.id), reactions: $reactions)
             .font(.caption)
@@ -1069,7 +1068,7 @@ struct GlassSubjectFooter: View {
     Text(verbatim: "— 到底了 · subject/\(subjectId) —")
       .font(.caption2.weight(.semibold))
       .monospaced()
-      .foregroundStyle(theme.disabled)
+      .foregroundStyle(theme.placeholder)
       .frame(maxWidth: .infinity)
       .padding(.top, 6)
   }
