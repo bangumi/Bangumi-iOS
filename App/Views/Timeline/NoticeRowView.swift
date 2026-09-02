@@ -6,6 +6,8 @@ struct NoticeRowView: View {
   let notice: NoticeDTO
   let onOpen: () -> Void
 
+  @Environment(\.theme) private var theme
+
   var body: some View {
     ZStack {
       switch notice.target {
@@ -27,7 +29,7 @@ struct NoticeRowView: View {
     }
     .listRowBackground(
       notice.unread
-        ? Color.accent.opacity(0.05)
+        ? theme.accent.opacity(0.05)
         : Color.clear
     )
   }
@@ -45,7 +47,7 @@ struct NoticeRowView: View {
           HStack(spacing: 4) {
             if notice.unread {
               Circle()
-                .fill(Color.accent)
+                .fill(theme.accent)
                 .frame(width: 6, height: 6)
             }
 
@@ -58,7 +60,7 @@ struct NoticeRowView: View {
 
         Text(notice.message)
           .font(.body)
-          .foregroundColor(notice.unread ? .primary : .secondary)
+          .foregroundColor(notice.unread ? theme.body : theme.secondaryText)
           .lineLimit(3)
           .fixedSize(horizontal: false, vertical: true)
       }
@@ -72,7 +74,7 @@ struct NoticeRowView: View {
       .imageType(.avatar)
       .overlay(
         RoundedRectangle(cornerRadius: 24)
-          .stroke(notice.unread ? Color.accent.opacity(0.3) : Color.clear, lineWidth: 2)
+          .stroke(notice.unread ? theme.accent.opacity(0.3) : Color.clear, lineWidth: 2)
       )
     if linksSender && !notice.sender.username.isEmpty {
       NavigationLink(value: NavDestination.user(notice.sender.username)) {

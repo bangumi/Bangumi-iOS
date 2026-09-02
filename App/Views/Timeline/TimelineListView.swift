@@ -6,6 +6,8 @@ struct TimelineListView: View {
   @AppStorage("profile") var profile: Profile = Profile()
   @AppStorage("timelineViewMode") var timelineViewMode: TimelineViewMode = .friends
 
+  @Environment(\.theme) private var theme
+
   @State private var showInput = false
 
   @State private var exhausted: Bool = false
@@ -95,55 +97,68 @@ struct TimelineListView: View {
     }
   }
 
+  @ViewBuilder
+  private var hiRow: some View {
+    HStack {
+      Text("Hi! \(profile.nickname.withLink(profile.link, linkColor: theme.link))")
+        .font(.title3)
+        .lineLimit(1)
+      Spacer()
+      if loading, items.count > 0 {
+        ProgressView()
+      }
+      Picker("", selection: $timelineViewMode.animated()) {
+        ForEach(TimelineViewMode.allCases, id: \.self) { mode in
+          Text(mode.desc).tag(mode)
+        }
+      }
+      .disabled(loading)
+      .onChange(of: timelineViewMode) {
+        Task {
+          withAnimation(.default) {
+            loading = true
+          }
+          await reload()
+          withAnimation(.default) {
+            loading = false
+          }
+        }
+      }
+      Button {
+        showInput = true
+      } label: {
+        Label("吐槽", systemImage: "square.and.pencil")
+          .font(.footnote)
+      }
+      .adaptiveButtonStyle(.borderedProminent)
+      .disabled(showInput)
+      .sheet(isPresented: $showInput) {
+        TimelineSayView()
+      }
+    }
+  }
+
   var body: some View {
     let rows = items.timelineListRows(lastID: lastID)
 
     ScrollView {
       VStack {
         if isAuthenticated {
-          HStack {
-            Text("Hi! \(profile.nickname.withLink(profile.link))")
-              .font(.title3)
-              .lineLimit(1)
-            Spacer()
-            if loading, items.count > 0 {
-              ProgressView()
-            }
-            Picker("", selection: $timelineViewMode.animated()) {
-              ForEach(TimelineViewMode.allCases, id: \.self) { mode in
-                Text(mode.desc).tag(mode)
-              }
-            }
-            .disabled(loading)
-            .onChange(of: timelineViewMode) {
-              Task {
-                withAnimation(.default) {
-                  loading = true
-                }
-                await reload()
-                withAnimation(.default) {
-                  loading = false
-                }
-              }
-            }
-            Button {
-              showInput = true
-            } label: {
-              Label("吐槽", systemImage: "square.and.pencil")
-                .font(.footnote)
-            }
-            .adaptiveButtonStyle(.borderedProminent)
-            .disabled(showInput)
-            .sheet(isPresented: $showInput) {
-              TimelineSayView()
+          if theme.isClassic {
+            hiRow
+          } else {
+            CardView {
+              hiRow
             }
           }
         } else {
           AuthView(slogan: "Bangumi 让你的 ACG 生活更美好")
-            .frame(height: 100)
+            .frame(minHeight: 100)
         }
-      }.padding(8)
-      LazyVStack(alignment: .leading) {
+      }.padding(theme.metrics.screenPadding)
+      LazyVStack(
+        alignment: .leading, spacing: theme.isClassic ? nil : theme.metrics.listSpacing
+      ) {
         ForEach(rows) { row in
           TimelineItemView(
             item: row.item,
@@ -163,7 +178,7 @@ struct TimelineListView: View {
             Spacer()
           }
         }
-      }.padding(.horizontal, 8)
+      }.padding(.horizontal, theme.metrics.screenPadding)
     }
     .onAppear(perform: loadInitialPageIfNeeded)
     .refreshable {

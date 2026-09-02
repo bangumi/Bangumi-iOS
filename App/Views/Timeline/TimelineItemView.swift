@@ -9,6 +9,8 @@ struct TimelineItemView: View {
   @AppStorage("isolationMode") private var isolationMode = false
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
 
+  @Environment(\.theme) private var theme
+
   @State private var reactions: [ReactionDTO]
   @State private var showTime = false
 
@@ -50,6 +52,17 @@ struct TimelineItemView: View {
   }
 
   var body: some View {
+    if theme.isClassic {
+      itemRow
+    } else {
+      CardView {
+        itemRow
+      }
+    }
+  }
+
+  @ViewBuilder
+  private var itemRow: some View {
     HStack(alignment: .top) {
       if let user = item.user {
         if user.id != previousUID {
@@ -142,8 +155,17 @@ struct TimelineItemView: View {
           Text(item.desc(with: titlePreference))
           switch item.type {
           case 0:
-            if let subject = item.memo.progress?.batch?.subject {
-              SubjectTinyView(subject: subject)
+            if let batch = item.memo.progress?.batch {
+              if theme.isClassic {
+                SubjectTinyView(subject: batch.subject)
+              } else {
+                SubjectTinyView(
+                  subject: batch.subject,
+                  accessory: {
+                    AnyView(ProgressRing(current: batch.ringCurrent, total: batch.ringTotal))
+                  }
+                )
+              }
             }
           default:
             if let subject = item.memo.progress?.single?.subject {
@@ -160,7 +182,7 @@ struct TimelineItemView: View {
             Text("**更新了签名:** \(item.memo.status?.sign ?? "")").textSelection(.enabled)
           case 1:
             BBCodeView(item.memo.status?.tsukkomi ?? "")
-              .tint(.linkText)
+              .tint(theme.link)
               .textSelection(.enabled)
           case 2:
             Text(
@@ -236,7 +258,7 @@ struct TimelineItemView: View {
             showTime = true
           } label: {
             Text(item.createdAt.relativeDisplay).monospacedDigit()
-              + Text(" · \(item.source.name.withLink(item.source.url))")
+              + Text(" · \(item.source.name.withLink(item.source.url, linkColor: theme.link))")
           }
           .buttonStyle(.scale)
           .popover(isPresented: $showTime) {
@@ -248,7 +270,7 @@ struct TimelineItemView: View {
         }
         .foregroundStyle(.secondary)
         .font(.footnote)
-        Divider()
+        ThemedDivider()
       }
       Spacer(minLength: 0)
     }

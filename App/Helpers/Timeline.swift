@@ -244,6 +244,30 @@ extension TimelineDTO {
   }
 }
 
+extension TimelineBatchProgressDTO {
+  var parsedEpsTotal: Int? {
+    Int(epsTotal)
+  }
+
+  var parsedVolsTotal: Int? {
+    Int(volsTotal)
+  }
+
+  var ringCurrent: Int {
+    if subject.type == .book, let volsUpdate, volsUpdate > 0 {
+      return volsUpdate
+    }
+    return epsUpdate ?? 0
+  }
+
+  var ringTotal: Int? {
+    if subject.type == .book, (volsUpdate ?? 0) > 0 {
+      return parsedVolsTotal
+    }
+    return parsedEpsTotal
+  }
+}
+
 func genBatch<T: Linkable>(_ items: [T], limit: Int = 5) -> AttributedString {
   var text = AttributedString()
   for (idx, item) in items.enumerated() {
