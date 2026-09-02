@@ -11,6 +11,8 @@ struct SearchView: View {
   @Binding var text: String
   @Binding var remote: Bool
 
+  @Environment(\.theme) private var theme
+
   @State private var searchType: SearchType = .subject
   @State private var subjectType: SubjectType = .none
   @State private var showsResults = false
@@ -25,7 +27,7 @@ struct SearchView: View {
             Text("人物").tag(SearchType.person)
           }.pickerStyle(.segmented)
           Image(systemName: remote ? "globe" : "internaldrive")
-            .foregroundColor(remote ? .blue : .green)
+            .foregroundColor(remote ? .blue : theme.success)
             .frame(width: 20)
             .padding(.horizontal, 4)
         }
@@ -40,7 +42,11 @@ struct SearchView: View {
       }.padding(.horizontal, 8)
       if !showsResults {
         Text("输入关键字搜索")
-          .foregroundStyle(.secondary)
+          .foregroundStyle(
+            theme.isClassic
+              ? AnyShapeStyle(HierarchicalShapeStyle.secondary)
+              : AnyShapeStyle(theme.secondaryText)
+          )
           .padding(8)
       } else {
         VStack {

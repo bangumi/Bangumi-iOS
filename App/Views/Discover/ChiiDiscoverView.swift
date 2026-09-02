@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct ChiiDiscoverView: View {
+  @Environment(\.theme) private var theme
+
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
   @AppStorage("profile") var profile: Profile = Profile()
 
@@ -56,7 +58,7 @@ struct ChiiDiscoverView: View {
       VStack {
         if !showsSearch {
           ScrollView {
-            VStack {
+            VStack(spacing: theme.isClassic ? nil : theme.metrics.listSpacing) {
               CalendarSlimView(reloadToken: calendarReloadToken)
               TrendingSubjectView(
                 width: geometry.size.width,
@@ -84,7 +86,9 @@ struct ChiiDiscoverView: View {
       ToolbarItemGroup(placement: .topBarTrailing) {
         if isAuthenticated, profile.canAccessWikiTools {
           NavigationLink(value: NavDestination.wikiHome) {
-            Image(systemName: "pencil.and.list.clipboard")
+            ToolbarCircle {
+              Image(systemName: "pencil.and.list.clipboard")
+            }
           }
         }
       }

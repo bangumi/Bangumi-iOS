@@ -239,6 +239,7 @@ struct CalendarWeekdayView: View {
   let collectionTypes: [Int: CollectionType]
   let reloadCollectionType: (Int) async -> Void
 
+  @Environment(\.theme) private var theme
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
 
   var weekday: WeekDay {
@@ -257,7 +258,13 @@ struct CalendarWeekdayView: View {
       .padding(.horizontal, 10)
       .font(.title3)
       .foregroundStyle(.white)
-      .background(weekday.color)
+      .background(
+        theme.isClassic
+          ? AnyShapeStyle(weekday.color)
+          : AnyShapeStyle(
+            LinearGradient(
+              colors: theme.weekdayBanner(weekday), startPoint: .leading, endPoint: .trailing))
+      )
       .cornerRadius(10)
       .shadow(radius: 5)
 
