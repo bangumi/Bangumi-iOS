@@ -11,6 +11,15 @@ enum PostDocumentAction: Equatable {
   case more(postID: Int, anchorY: Double)
 }
 
+final class PostDocumentScrollWebView: WKWebView {
+  override func safeAreaInsetsDidChange() {
+    super.safeAreaInsetsDidChange()
+    if #available(iOS 26, *) {
+      obscuredContentInsets = safeAreaInsets
+    }
+  }
+}
+
 struct PostDocumentWebView: UIViewRepresentable {
   let document: PostWebDocument
   let reactionHTMLByPostID: [Int: String]
@@ -45,7 +54,7 @@ struct PostDocumentWebView: UIViewRepresentable {
       forURLScheme: PostDocumentRenderer.stickerURLScheme
     )
 
-    let webView = WKWebView(frame: .zero, configuration: configuration)
+    let webView = PostDocumentScrollWebView(frame: .zero, configuration: configuration)
     webView.isOpaque = false
     applyBackground(webView)
     webView.scrollView.alwaysBounceVertical = true
