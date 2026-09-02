@@ -99,10 +99,9 @@ struct GlassRakuenView: View {
       }
       .buttonStyle(.plain)
     } else {
-      NavigationLink(value: NavDestination.settings) {
+      GlassAuthButton {
         ToolbarCircle {
-          Image(systemName: "person.fill")
-            .font(.footnote)
+          Image(systemName: "person.crop.circle")
         }
       }
       .buttonStyle(.plain)
