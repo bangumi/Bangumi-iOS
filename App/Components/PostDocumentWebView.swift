@@ -113,6 +113,9 @@ struct PostDocumentWebView: UIViewRepresentable {
     private var currentDocument: PostWebDocument?
     private var currentReactionHTMLByPostID: [Int: String] = [:]
     private var pendingScrollOffset: CGPoint?
+    private var hasFinishedLoad = false
+    private var topOffsetObservation: NSKeyValueObservation?
+    private var guardsTopUntil: Date?
     private var pendingInitialPostID: Int?
     private var handledInitialPostID: Int?
     private var pendingScrollRequest: PostDocumentScrollRequest?
@@ -144,13 +147,14 @@ struct PostDocumentWebView: UIViewRepresentable {
         handledInitialPostID == postID ? nil : postID
       }
       if currentDocument != nil, let webView {
-        if unhandledInitialPostID == nil {
+        if unhandledInitialPostID == nil, hasFinishedLoad {
           captureScrollOffsetIfNeeded(from: webView)
         } else {
           pendingScrollOffset = nil
         }
       }
       pendingInitialPostID = unhandledInitialPostID
+      hasFinishedLoad = false
 
       currentDocument = document
       currentReactionHTMLByPostID = reactionHTMLByPostID
@@ -234,6 +238,7 @@ struct PostDocumentWebView: UIViewRepresentable {
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation?) {
+      hasFinishedLoad = true
       applyReactionHTML(
         currentReactionHTMLByPostID,
         force: true,
@@ -270,6 +275,30 @@ struct PostDocumentWebView: UIViewRepresentable {
         )
         return
       }
+
+      guardTopOffset(in: webView)
+    }
+
+    private func guardTopOffset(in webView: WKWebView) {
+      let scrollView = webView.scrollView
+      guard abs(scrollView.contentOffset.y + scrollView.adjustedContentInset.top) < 1 else {
+        return
+      }
+      guardsTopUntil = Date().addingTimeInterval(1.5)
+      topOffsetObservation =
+        topOffsetObservation
+        ?? scrollView.observe(\.contentOffset, options: [.new]) { [weak self] scrollView, _ in
+          guard let self, let until = guardsTopUntil else { return }
+          guard Date() < until else {
+            guardsTopUntil = nil
+            return
+          }
+          let top = -scrollView.adjustedContentInset.top
+          guard top < 0, scrollView.contentOffset.y == 0,
+            !scrollView.isDragging, !scrollView.isDecelerating
+          else { return }
+          scrollView.contentOffset.y = top
+        }
     }
 
     func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
