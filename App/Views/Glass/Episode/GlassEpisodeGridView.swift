@@ -99,15 +99,6 @@ struct GlassEpisodeGridView: View {
               }
             }
           }
-
-          ThemedDivider()
-
-          Text(
-            "粉=看过 · 描边=下一集 · 白=已播未看 · 虚线=未播；"
-              + "点击/长按弹出 看过 / 想看 / 抛弃 / 看到 / 进讨论"
-          )
-            .font(.caption2)
-            .foregroundStyle(theme.tertiaryText)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
       }
