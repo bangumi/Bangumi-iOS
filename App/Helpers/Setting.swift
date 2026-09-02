@@ -42,6 +42,29 @@ enum AppearanceType: String, CaseIterable {
   }
 }
 
+enum AppTheme: String, CaseIterable, Sendable {
+  case classic = "classic"
+  case glass = "glass"
+
+  init(_ label: String? = nil) {
+    switch label {
+    case "glass":
+      self = .glass
+    default:
+      self = .classic
+    }
+  }
+
+  var desc: String {
+    switch self {
+    case .classic:
+      "经典"
+    case .glass:
+      "玻璃"
+    }
+  }
+}
+
 enum ShareDomain: String, CaseIterable {
   case chii = "chii.in"
   case bgm = "bgm.tv"

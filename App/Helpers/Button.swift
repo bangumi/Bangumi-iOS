@@ -1,11 +1,13 @@
 import SwiftUI
 
 struct NavigationButtonStyle: ButtonStyle {
+  @Environment(\.theme) private var theme
+
   func makeBody(configuration: Configuration) -> some View {
     configuration.label
       .compositingGroup()
-      .foregroundColor(.linkText)
-      .underline(configuration.isPressed, color: .linkText)
+      .foregroundColor(theme.link)
+      .underline(configuration.isPressed, color: theme.link)
       .scaleEffect(configuration.isPressed ? 0.9 : 1)
       .shadow(radius: configuration.isPressed ? 1 : 0)
       .animation(.spring(response: 0.2, dampingFraction: 0.4), value: configuration.isPressed)

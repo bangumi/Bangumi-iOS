@@ -84,6 +84,11 @@ enum NavDestination: Hashable, View {
   case rakuenSubjectTopics(_ mode: SubjectTopicFilterMode)
 
   var body: some View {
+    destination.themedScreen()
+  }
+
+  @ViewBuilder
+  private var destination: some View {
     switch self {
     case .notice:
       NoticeView()

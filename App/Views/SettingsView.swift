@@ -4,6 +4,7 @@ import SwiftUI
 struct SettingsView: View {
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
   @AppStorage("appearance") var appearance: AppearanceType = .system
+  @AppStorage("appTheme") var appTheme: AppTheme = .classic
   @AppStorage("shareDomain") var shareDomain: ShareDomain = .chii
   @AppStorage("authDomain") var authDomain: AuthDomain = .next
   @AppStorage("mirrorRootDomain") var mirrorRootDomain: String = ""
@@ -107,6 +108,16 @@ struct SettingsView: View {
     }
   }
 
+  private var themeSelection: Binding<AppTheme> {
+    Binding {
+      appTheme
+    } set: { value in
+      withAnimation(.easeInOut(duration: 0.35)) {
+        appTheme = value
+      }
+    }
+  }
+
   var body: some View {
     Form {
       // MARK: - 外观
@@ -116,7 +127,15 @@ struct SettingsView: View {
             Text(appearance.desc).tag(appearance)
           }
         } label: {
-          SettingLabel("主题", description: "选择浅色、深色或跟随系统外观")
+          SettingLabel("外观", description: "选择浅色、深色或跟随系统外观")
+        }
+
+        Picker(selection: themeSelection) {
+          ForEach(AppTheme.allCases, id: \.self) { theme in
+            Text(theme.desc).tag(theme)
+          }
+        } label: {
+          SettingLabel("主题外观", description: "经典或玻璃风格，仅改变视觉")
         }
 
         Picker(selection: appIconSelection) {

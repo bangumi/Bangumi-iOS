@@ -27,6 +27,7 @@ struct MainView: View {
         ZoomTransitionContainer {
           NavigationStack(path: $timelineNav) {
             ChiiTimelineView()
+              .themedScreen()
               .navigationDestination(for: NavDestination.self) { $0 }
           }
         }
@@ -47,6 +48,7 @@ struct MainView: View {
           ZoomTransitionContainer {
             NavigationStack(path: $progressNav) {
               ChiiProgressView()
+                .themedScreen()
                 .navigationDestination(for: NavDestination.self) { $0 }
             }
           }
@@ -68,6 +70,7 @@ struct MainView: View {
           ZoomTransitionContainer {
             NavigationStack(path: $rakuenNav) {
               ChiiRakuenView()
+                .themedScreen()
                 .navigationDestination(for: NavDestination.self) { $0 }
             }
           }
@@ -91,6 +94,7 @@ struct MainView: View {
         ZoomTransitionContainer {
           NavigationStack(path: $discoverNav) {
             ChiiDiscoverView()
+              .themedScreen()
               .navigationDestination(for: NavDestination.self) { $0 }
           }
         }
