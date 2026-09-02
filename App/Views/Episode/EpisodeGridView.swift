@@ -11,19 +11,9 @@ struct EpisodeGridView: View {
   @AppStorage("episodeGridInteractionMode") var episodeGridInteractionMode:
     EpisodeGridInteractionMode = .menu
 
-  @Environment(\.theme) private var theme
-
   @State private var refreshed: Bool = false
   @State private var episodeMains: [EpisodeDTO] = []
   @State private var episodeSps: [EpisodeDTO] = []
-
-  private var nextMainId: Int? {
-    episodeMains.first(where: { $0.collectionTypeEnum == .none })?.id
-  }
-
-  private var leadingBorderColor: Color {
-    theme.isClassic ? .leadingBorder : .clear
-  }
 
   private func loadCached() async {
     do {
@@ -72,54 +62,38 @@ struct EpisodeGridView: View {
       }.onAppear(perform: refresh)
       Divider()
     }.padding(.top, 5)
-    Group {
-      if theme.isClassic {
-        episodeFlow
-      } else {
-        CardView(padding: theme.metrics.cardPadding) {
-          episodeFlow
-        }
-      }
-    }
-    .task {
-      await loadCached()
-      refresh()
-    }
-  }
-
-  private func episodeItem(_ episode: EpisodeDTO, isNext: Bool) -> some View {
-    EpisodeItemView(
-      episode: episode,
-      interactionMode: episodeGridInteractionMode,
-      subjectCollectionType: subjectCollectionType,
-      isNext: isNext
-    ) {
-      await loadCached()
-    }
-  }
-
-  private var episodeFlow: some View {
-    let nextId = theme.isClassic ? nil : nextMainId
-    return HFlow(alignment: .center, spacing: theme.isClassic ? 2 : 6) {
+    HFlow(alignment: .center, spacing: 2) {
       ForEach(episodeMains) { episode in
-        episodeItem(episode, isNext: episode.id == nextId)
+        EpisodeItemView(
+          episode: episode,
+          interactionMode: episodeGridInteractionMode,
+          subjectCollectionType: subjectCollectionType
+        ) {
+          await loadCached()
+        }
       }
       if !episodeSps.isEmpty {
         Text("SP")
-          .foregroundStyle(theme.isClassic ? .leadingBorder : theme.tertiaryText)
+          .foregroundStyle(.leadingBorder)
           .padding(.vertical, 3)
           .padding(.leading, 5)
           .padding(.trailing, 1)
           .overlay(
             RoundedRectangle(cornerRadius: 4)
               .frame(width: 4)
-              .foregroundStyle(leadingBorderColor)
+              .foregroundStyle(.leadingBorder)
               .offset(x: -12, y: 0)
           )
           .padding(2)
           .bold()
         ForEach(episodeSps) { episode in
-          episodeItem(episode, isNext: false)
+          EpisodeItemView(
+            episode: episode,
+            interactionMode: episodeGridInteractionMode,
+            subjectCollectionType: subjectCollectionType
+          ) {
+            await loadCached()
+          }
         }
       }
     }
@@ -128,10 +102,14 @@ struct EpisodeGridView: View {
       HStack {
         RoundedRectangle(cornerRadius: 4)
           .frame(width: 4)
-          .foregroundStyle(leadingBorderColor)
+          .foregroundStyle(.leadingBorder)
           .offset(x: 0, y: 0)
         Spacer()
       }
     )
+    .task {
+      await loadCached()
+      refresh()
+    }
   }
 }

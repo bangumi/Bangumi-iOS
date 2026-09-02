@@ -19,8 +19,6 @@ struct SubjectRatingSheet: View {
 struct SubjectRatingView: View {
   var subject: SubjectDTO
 
-  @Environment(\.theme) private var theme
-
   var scoreInfo: ScoreInfo {
     let score = Int(subject.rating.score.rounded())
     let offset = score >= 4 ? Int(score - 4) : 0
@@ -42,8 +40,7 @@ struct SubjectRatingView: View {
           MusumeView(index: scoreInfo.offset, width: 40, height: 55)
           VStack(alignment: .leading) {
             HStack(alignment: .center) {
-              Text("\(subject.rating.score.rateDisplay)").font(.title)
-                .foregroundStyle(theme.accent)
+              Text("\(subject.rating.score.rateDisplay)").font(.title).foregroundStyle(.accent)
               if subject.rating.score > 0 {
                 Text(scoreInfo.desc)
               }
@@ -70,7 +67,7 @@ struct SubjectRatingView: View {
             height: 320
           )
           .frame(width: geometry.size.width, height: 320)
-          .background(theme.secondaryText.opacity(0.02))
+          .background(Color.secondary.opacity(0.02))
           .clipShape(RoundedRectangle(cornerRadius: 10))
         }
         .frame(height: 320)

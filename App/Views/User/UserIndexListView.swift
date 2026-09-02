@@ -19,8 +19,6 @@ struct UserIndexListView: View {
 
   @AppStorage("profile") var profile: Profile = Profile()
 
-  @Environment(\.theme) private var theme
-
   @State private var reloader = false
   @State private var type: IndexListType = .created
   @State private var showCreateIndex = false
@@ -61,7 +59,7 @@ struct UserIndexListView: View {
         }
       }
       .pickerStyle(.segmented)
-      .padding(.horizontal, theme.metrics.screenPadding)
+      .padding(.horizontal, 8)
       .onChange(of: type) { _, _ in
         withAnimation(.default) {
           reloader.toggle()
@@ -70,7 +68,7 @@ struct UserIndexListView: View {
       ScrollView {
         OffsetPagedView<SlimIndexDTO, _>(reloader: reloader, nextPageFunc: load) { item in
           IndexItemView(index: item)
-        }.padding(theme.metrics.screenPadding)
+        }.padding(8)
       }
     }
     .navigationTitle(title)

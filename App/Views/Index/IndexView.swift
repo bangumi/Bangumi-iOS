@@ -3,8 +3,6 @@ import SwiftUI
 struct IndexView: View {
   let indexId: Int
 
-  @Environment(\.theme) private var theme
-
   @AppStorage("profile") var profile: Profile = Profile()
   @AppStorage("shareDomain") var shareDomain: ShareDomain = .chii
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
@@ -141,7 +139,7 @@ struct IndexView: View {
 
           if !index.desc.isEmpty {
             BBCodeView(index.desc)
-              .tint(theme.link)
+              .tint(.linkText)
           }
 
           ScrollView(.horizontal, showsIndicators: false) {
@@ -155,111 +153,69 @@ struct IndexView: View {
                 .adaptiveButtonStyle(.borderedProminent)
               }
 
-              if theme.isClassic {
-                HStack {
+              HStack {
+                Button {
+                  withAnimation(.default) {
+                    selectedCategory = nil
+                    selectedSubjectType = nil
+                    reloader.toggle()
+                  }
+                } label: {
+                  Text("全部 \(index.total)")
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 3)
+                    .background(
+                      selectedCategory == nil ? Color.accentColor : Color.clear
+                    )
+                    .foregroundColor(selectedCategory == nil ? .white : .linkText)
+                    .cornerRadius(20)
+                }
+
+                ForEach(availableSubjectTypes) { item in
                   Button {
                     withAnimation(.default) {
-                      selectedCategory = nil
-                      selectedSubjectType = nil
+                      selectedCategory = .subject
+                      selectedSubjectType = item.type
                       reloader.toggle()
                     }
                   } label: {
-                    Text("全部 \(index.total)")
+                    Text("\(item.type.description) \(item.count)")
                       .padding(.horizontal, 6)
                       .padding(.vertical, 3)
                       .background(
-                        selectedCategory == nil ? Color.accentColor : Color.clear
+                        selectedSubjectType == item.type
+                          ? Color.accentColor : Color.clear
                       )
-                      .foregroundColor(selectedCategory == nil ? .white : .linkText)
+                      .foregroundColor(selectedSubjectType == item.type ? .white : .linkText)
                       .cornerRadius(20)
                   }
-
-                  ForEach(availableSubjectTypes) { item in
-                    Button {
-                      withAnimation(.default) {
-                        selectedCategory = .subject
-                        selectedSubjectType = item.type
-                        reloader.toggle()
-                      }
-                    } label: {
-                      Text("\(item.type.description) \(item.count)")
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 3)
-                        .background(
-                          selectedSubjectType == item.type
-                            ? Color.accentColor : Color.clear
-                        )
-                        .foregroundColor(selectedSubjectType == item.type ? .white : .linkText)
-                        .cornerRadius(20)
-                    }
-                  }
-
-                  ForEach(availableCategories) { item in
-                    Button {
-                      withAnimation(.default) {
-                        selectedCategory = item.category
-                        selectedSubjectType = nil
-                        reloader.toggle()
-                      }
-                    } label: {
-                      Text("\(item.category.title) \(item.count)")
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 3)
-                        .background(
-                          selectedCategory == item.category
-                            ? Color.accentColor : Color.clear
-                        )
-                        .foregroundColor(selectedCategory == item.category ? .white : .linkText)
-                        .cornerRadius(20)
-                    }
-                  }
                 }
-                .padding(2)
-                .background {
-                  Capsule()
-                    .fill(.ultraThinMaterial)
-                    .shadow(color: .primary.opacity(0.3), radius: 2)
-                }
-              } else {
-                HStack {
+
+                ForEach(availableCategories) { item in
                   Button {
                     withAnimation(.default) {
-                      selectedCategory = nil
+                      selectedCategory = item.category
                       selectedSubjectType = nil
                       reloader.toggle()
                     }
                   } label: {
-                    Text("全部 \(index.total)")
-                  }
-                  .buttonStyle(ThemedChipStyle(isSelected: selectedCategory == nil))
-
-                  ForEach(availableSubjectTypes) { item in
-                    Button {
-                      withAnimation(.default) {
-                        selectedCategory = .subject
-                        selectedSubjectType = item.type
-                        reloader.toggle()
-                      }
-                    } label: {
-                      Text("\(item.type.description) \(item.count)")
-                    }
-                    .buttonStyle(ThemedChipStyle(isSelected: selectedSubjectType == item.type))
-                  }
-
-                  ForEach(availableCategories) { item in
-                    Button {
-                      withAnimation(.default) {
-                        selectedCategory = item.category
-                        selectedSubjectType = nil
-                        reloader.toggle()
-                      }
-                    } label: {
-                      Text("\(item.category.title) \(item.count)")
-                    }
-                    .buttonStyle(ThemedChipStyle(isSelected: selectedCategory == item.category))
+                    Text("\(item.category.title) \(item.count)")
+                      .padding(.horizontal, 6)
+                      .padding(.vertical, 3)
+                      .background(
+                        selectedCategory == item.category
+                          ? Color.accentColor : Color.clear
+                      )
+                      .foregroundColor(selectedCategory == item.category ? .white : .linkText)
+                      .cornerRadius(20)
                   }
                 }
-                .padding(2)
+              }
+              .padding(2)
+              .background {
+                Capsule()
+                  .fill(.ultraThinMaterial)
+                  .shadow(color: .primary.opacity(0.3), radius: 2)
               }
             }
             .font(.footnote)

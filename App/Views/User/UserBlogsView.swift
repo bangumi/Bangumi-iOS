@@ -4,8 +4,6 @@ struct UserBlogsView: View {
 
   let user: UserDTO
 
-  @Environment(\.theme) private var theme
-
   @State private var blogs: [SlimBlogEntryDTO] = []
 
   func refresh() async {
@@ -23,25 +21,15 @@ struct UserBlogsView: View {
   var body: some View {
     VStack {
       VStack(spacing: 2) {
-        Group {
-          if theme.isClassic {
-            HStack(alignment: .bottom) {
-              NavigationLink(value: NavDestination.userBlog(user.slim)) {
-                Text("日志").font(.title3)
-              }.buttonStyle(.navigation)
-              Spacer()
-            }
-          } else {
-            ThemedSectionHeader {
-              NavigationLink(value: NavDestination.userBlog(user.slim)) {
-                Text("日志").font(.title3)
-              }.buttonStyle(.navigation)
-            }
-          }
+        HStack(alignment: .bottom) {
+          NavigationLink(value: NavDestination.userBlog(user.slim)) {
+            Text("日志").font(.title3)
+          }.buttonStyle(.navigation)
+          Spacer()
         }
         .padding(.top, 8)
         .task(refresh)
-        ThemedDivider()
+        Divider()
       }
 
       ForEach(blogs) { blog in
@@ -59,14 +47,14 @@ struct UserBlogsView: View {
                   .lineLimit(1)
                   .foregroundStyle(.secondary)
                 Text("(+\(blog.replies))")
-                  .foregroundStyle(theme.warn)
+                  .foregroundStyle(.orange)
               }.font(.footnote)
               Text(AttributedString("\(blog.summary)...") + " 更多 »".withLink(blog.link))
                 .font(.caption)
             }
             Spacer()
           }
-          ThemedDivider()
+          Divider()
         }
       }
     }

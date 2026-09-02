@@ -7,8 +7,6 @@ struct SubjectSlimRowView: View {
   let subject: SlimSubjectDTO
   let collectionType: CollectionType
 
-  @Environment(\.theme) private var theme
-
   var body: some View {
     HStack {
       ImageView(img: subject.images?.resize(.r200))
@@ -34,7 +32,7 @@ struct SubjectSlimRowView: View {
           Spacer(minLength: 0)
           if let rating = subject.rating, rating.rank > 0 {
             Label(String(rating.rank), systemImage: "chart.bar.xaxis")
-              .foregroundStyle(theme.accent)
+              .foregroundStyle(.accent)
               .font(.footnote)
           }
         }
@@ -71,7 +69,7 @@ struct SubjectSlimRowView: View {
               StarsView(score: rating.score, size: 12)
               Text("\(rating.score.rateDisplay)")
                 .font(.callout)
-                .foregroundStyle(theme.star)
+                .foregroundStyle(.orange)
               Text("(\(rating.total)人评分)")
                 .foregroundStyle(.secondary)
             } else {

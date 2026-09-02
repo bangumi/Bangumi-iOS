@@ -52,16 +52,12 @@ struct ChiiTimelineView: View {
         ToolbarItemGroup(placement: .topBarTrailing) {
           if isAuthenticated, !isolationMode {
             NavigationLink(value: NavDestination.notice) {
-              ToolbarCircle {
-                Image(systemName: noticeUnreadCount > 0 ? "bell.badge.fill" : "bell")
-              }
+              Image(systemName: noticeUnreadCount > 0 ? "bell.badge.fill" : "bell")
             }
           }
 
           NavigationLink(value: NavDestination.settings) {
-            ToolbarCircle {
-              Image(systemName: "gearshape")
-            }
+            Image(systemName: "gearshape")
           }
         }
       }

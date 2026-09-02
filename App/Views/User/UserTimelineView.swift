@@ -5,8 +5,6 @@ struct UserTimelineView: View {
 
   @AppStorage("profile") var profile: Profile = Profile()
 
-  @Environment(\.theme) private var theme
-
   @State private var exhausted: Bool = false
   @State private var loading: Bool = false
   @State private var lastID: Int?
@@ -77,11 +75,9 @@ struct UserTimelineView: View {
 
     ScrollView {
       UserSmallView(user: user)
-        .padding(.top, theme.metrics.screenPadding)
-        .padding(.horizontal, theme.metrics.screenPadding)
-      LazyVStack(
-        alignment: .leading, spacing: theme.isClassic ? nil : theme.metrics.listSpacing
-      ) {
+        .padding(.top, 8)
+        .padding(.horizontal, 8)
+      LazyVStack(alignment: .leading) {
         ForEach(rows) { row in
           TimelineItemView(
             item: row.item,
@@ -99,7 +95,7 @@ struct UserTimelineView: View {
             Spacer()
           }
         }
-      }.padding(.horizontal, theme.metrics.screenPadding)
+      }.padding(.horizontal, 8)
     }
     .navigationTitle(title)
     .navigationBarTitleDisplayMode(.inline)

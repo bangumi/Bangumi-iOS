@@ -20,8 +20,6 @@ struct UserMonoListView: View {
   @AppStorage("profile") var profile: Profile = Profile()
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
 
-  @Environment(\.theme) private var theme
-
   @State private var type: MonoType = .character
 
   var title: String {
@@ -62,7 +60,7 @@ struct UserMonoListView: View {
         }
       }
       .pickerStyle(.segmented)
-      .padding(.horizontal, theme.metrics.screenPadding)
+      .padding(.horizontal, 8)
 
       ScrollView {
         switch type {
@@ -79,7 +77,7 @@ struct UserMonoListView: View {
                 Spacer()
               }
             }
-          }.padding(theme.metrics.screenPadding)
+          }.padding(8)
         case .person:
           OffsetPagedView<SlimPersonDTO, _>(nextPageFunc: loadPersons) { item in
             CardView {
@@ -93,7 +91,7 @@ struct UserMonoListView: View {
                 Spacer()
               }
             }
-          }.padding(theme.metrics.screenPadding)
+          }.padding(8)
         }
       }
     }

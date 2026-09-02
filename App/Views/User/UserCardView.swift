@@ -3,12 +3,6 @@ import SwiftUI
 struct UserSmallView: View {
   let user: SlimUserDTO
 
-  @Environment(\.theme) private var theme
-
-  private var embedShapeStyle: RoundedCornerStyle {
-    theme.isClassic ? .circular : .continuous
-  }
-
   var body: some View {
     HStack {
       ImageView(img: user.avatar?.large)
@@ -26,12 +20,11 @@ struct UserSmallView: View {
     }
     .padding(5)
     .overlay {
-      RoundedRectangle(cornerRadius: theme.metrics.embedRadius, style: embedShapeStyle)
+      RoundedRectangle(cornerRadius: 8)
         .inset(by: 1)
-        .stroke(theme.embedBorder, lineWidth: 1)
+        .stroke(.secondary.opacity(0.2), lineWidth: 1)
     }
-    .background(theme.embedFill)
-    .clipShape(
-      RoundedRectangle(cornerRadius: theme.metrics.embedRadius, style: embedShapeStyle))
+    .background(.secondary.opacity(0.01))
+    .clipShape(RoundedRectangle(cornerRadius: 8))
   }
 }

@@ -5,12 +5,10 @@ struct RakuenGroupTopicView: View {
 
   @State private var reloader = false
 
-  @Environment(\.theme) private var theme
-
   var body: some View {
     ScrollView {
       RakuenGroupTopicListView(mode: mode, reloader: $reloader)
-        .padding(.horizontal, theme.metrics.screenPadding)
+        .padding(.horizontal, 8)
     }
     .navigationTitle(mode.title)
     .navigationBarTitleDisplayMode(.inline)
@@ -108,8 +106,6 @@ struct CachedGroupTopicListView: View {
   @State private var initialized = false
   @State private var prefetchState = NextPagePrefetchState<GroupTopicDTO.ID>()
 
-  @Environment(\.theme) private var theme
-
   private var displayItems: [GroupTopicDTO] {
     items.isEmpty ? cachedItems : items
   }
@@ -193,7 +189,7 @@ struct CachedGroupTopicListView: View {
   var body: some View {
     let visibleItems = displayItems.filter(isVisible)
 
-    LazyVStack(alignment: .leading, spacing: theme.isClassic ? nil : theme.metrics.listSpacing) {
+    LazyVStack(alignment: .leading) {
       ForEach(visibleItems) { item in
         RakuenGroupTopicItemView(topic: item)
           .transition(.opacity)

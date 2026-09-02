@@ -8,57 +8,31 @@ struct SubjectTopicsView: View {
   @AppStorage("blocklist") var blocklist: [Int] = []
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
 
-  @Environment(\.theme) private var theme
-
   @State private var showCreateTopic: Bool = false
 
-  private var createTopicButton: some View {
-    Button {
-      showCreateTopic = true
-    } label: {
-      Image(systemName: "plus.bubble")
-    }.buttonStyle(.borderless)
-  }
-
-  private var moreLink: some View {
-    NavigationLink(value: NavDestination.subjectTopicList(subjectId)) {
-      Text("更多讨论 »").font(.caption)
-    }.buttonStyle(.navigation)
-  }
-
   var body: some View {
-    Group {
-      if theme.isClassic {
-        VStack(spacing: 2) {
-          HStack(alignment: .bottom) {
-            Text("讨论版")
-              .foregroundStyle(topics.count > 0 ? .primary : .secondary)
-              .font(.title3)
-            if isAuthenticated {
-              createTopicButton
-            }
-            Spacer()
-            if topics.count > 0 {
-              moreLink
-            }
-          }
-          Divider()
+    VStack(spacing: 2) {
+      HStack(alignment: .bottom) {
+        Text("讨论版")
+          .foregroundStyle(topics.count > 0 ? .primary : .secondary)
+          .font(.title3)
+        if isAuthenticated {
+          Button {
+            showCreateTopic = true
+          } label: {
+            Image(systemName: "plus.bubble")
+          }.buttonStyle(.borderless)
         }
-        .padding(.top, 5)
-      } else {
-        ThemedSectionHeader {
-          Text("讨论版")
-            .foregroundStyle(topics.count > 0 ? theme.sectionHeader : theme.tertiaryText)
-        } trailing: {
-          if isAuthenticated {
-            createTopicButton
-          }
-          if topics.count > 0 {
-            moreLink
-          }
+        Spacer()
+        if topics.count > 0 {
+          NavigationLink(value: NavDestination.subjectTopicList(subjectId)) {
+            Text("更多讨论 »").font(.caption)
+          }.buttonStyle(.navigation)
         }
       }
+      Divider()
     }
+    .padding(.top, 5)
     .sheet(isPresented: $showCreateTopic) {
       CreateTopicBoxSheet(type: .subject(subjectId)) {
         Task {

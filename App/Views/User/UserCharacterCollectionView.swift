@@ -5,8 +5,6 @@ struct UserCharacterCollectionView: View {
 
   let user: UserDTO
 
-  @Environment(\.theme) private var theme
-
   @State private var refreshing = false
   @State private var characters: [SlimCharacterDTO] = []
 
@@ -31,26 +29,14 @@ struct UserCharacterCollectionView: View {
 
   var body: some View {
     VStack(alignment: .leading, spacing: 2) {
-      Group {
-        if theme.isClassic {
-          HStack(alignment: .bottom) {
-            NavigationLink(value: NavDestination.userMono(user.slim)) {
-              Text("角色").font(.title3)
-            }
-            .buttonStyle(.navigation)
-            .padding(.horizontal, 4)
-
-            Spacer(minLength: 0)
-          }
-        } else {
-          ThemedSectionHeader {
-            NavigationLink(value: NavDestination.userMono(user.slim)) {
-              Text("角色").font(.title3)
-            }
-            .buttonStyle(.navigation)
-            .padding(.horizontal, 4)
-          }
+      HStack(alignment: .bottom) {
+        NavigationLink(value: NavDestination.userMono(user.slim)) {
+          Text("角色").font(.title3)
         }
+        .buttonStyle(.navigation)
+        .padding(.horizontal, 4)
+
+        Spacer(minLength: 0)
       }
       .padding(.top, 8)
       .task {
@@ -59,7 +45,7 @@ struct UserCharacterCollectionView: View {
         }
         await refresh()
       }
-      ThemedDivider()
+      Divider()
 
       if refreshing {
         HStack {

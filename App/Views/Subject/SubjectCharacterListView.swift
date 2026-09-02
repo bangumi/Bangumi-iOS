@@ -8,8 +8,6 @@ struct SubjectCharacterListView: View {
   @AppStorage("isolationMode") var isolationMode: Bool = false
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
 
-  @Environment(\.theme) private var theme
-
   @State private var castType: CastType = .none
   @State private var reloader = false
   @State private var characterCollectionStatuses: [Int: Bool] = [:]
@@ -87,13 +85,13 @@ struct SubjectCharacterListView: View {
                     item.character.title(with: titlePreference)
                       .withLink(item.character.link)
                   )
-                  .foregroundStyle(theme.link)
+                  .foregroundStyle(.linkText)
                   .lineLimit(1)
                   Spacer()
                   if let comment = item.character.comment, comment > 0, !isolationMode {
                     Text("(+\(comment))")
                       .font(.caption)
-                      .foregroundStyle(theme.star)
+                      .foregroundStyle(.orange)
                   }
                 }
               }
@@ -112,7 +110,7 @@ struct SubjectCharacterListView: View {
                       .imageNavLink(cast.person.link)
                     VStack(alignment: .leading, spacing: 2) {
                       Text(cast.person.title(with: titlePreference).withLink(cast.person.link))
-                        .foregroundStyle(theme.link)
+                        .foregroundStyle(.linkText)
                         .font(.footnote)
                         .lineLimit(1)
                       HStack(spacing: 4) {

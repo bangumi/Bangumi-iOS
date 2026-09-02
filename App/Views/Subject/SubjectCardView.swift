@@ -4,10 +4,9 @@ struct SubjectTinyView: View {
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
 
   let subject: SlimSubjectDTO
-  var accessory: (() -> AnyView)? = nil
 
   var body: some View {
-    EmbedCard {
+    BorderView(color: .secondary.opacity(0.2), padding: 4, paddingRatio: 1, cornerRadius: 8) {
       HStack {
         ImageView(img: subject.images?.small)
           .imageStyle(width: 32, height: 32)
@@ -17,12 +16,11 @@ struct SubjectTinyView: View {
             .lineLimit(1)
         }
         Spacer(minLength: 0)
-        if let accessory {
-          accessory()
-        }
       }
     }
-    .frame(height: accessory == nil ? 40 : 64)
+    .background(.secondary.opacity(0.01))
+    .clipShape(RoundedRectangle(cornerRadius: 8))
+    .frame(height: 40)
     .subjectPreview(subject)
   }
 }
@@ -53,7 +51,7 @@ struct SubjectSmallView: View {
   }
 
   var body: some View {
-    EmbedCard {
+    BorderView(color: .secondary.opacity(0.2), padding: 4, paddingRatio: 1, cornerRadius: 8) {
       HStack {
         ImageView(img: subject.images?.resize(.r200))
           .imageStyle(width: 60, height: 72)
@@ -71,6 +69,8 @@ struct SubjectSmallView: View {
         Spacer(minLength: 0)
       }
     }
+    .background(.secondary.opacity(0.01))
+    .clipShape(RoundedRectangle(cornerRadius: 8))
     .frame(height: 80)
     .subjectPreview(subject, eps: true)
   }
@@ -114,8 +114,6 @@ struct CollectionTypeChipsView: View {
   let counts: [CollectionType: Int]
   @Binding var selection: CollectionType
 
-  @Environment(\.theme) private var theme
-
   private var visibleTypes: [CollectionType] {
     let types = CollectionType.allTypes().filter { counts[$0, default: 0] > 0 }
     return types.isEmpty ? CollectionType.allTypes() : types
@@ -129,14 +127,11 @@ struct CollectionTypeChipsView: View {
             selection == type
             ? Color.linkText
             : Color.secondary.opacity(0.2)
-          BorderView(
-            color: borderColor, padding: 3, cornerRadius: 16,
-            role: selection == type ? .accent : .neutral
-          ) {
+          BorderView(color: borderColor, padding: 3, cornerRadius: 16) {
             Text("\(type.description(subjectType)) \(counts[type, default: 0])")
               .lineLimit(1)
               .font(.footnote)
-              .foregroundStyle(theme.link)
+              .foregroundStyle(.linkText)
           }
           .padding(1)
           .onTapGesture {
@@ -179,8 +174,6 @@ struct SubjectCollectionSectionView: View {
   var collectionType: CollectionType? = nil
   var onCollectionSaved: (() async -> Void)? = nil
 
-  @Environment(\.theme) private var theme
-
   private let tileSpacing: CGFloat = 8
   private let headerDividerSpacing: CGFloat = 2
   private let contentInset: CGFloat = 2
@@ -196,20 +189,11 @@ struct SubjectCollectionSectionView: View {
     VStack(alignment: .leading, spacing: headerDividerSpacing) {
       header
         .padding(.top, 8)
-      ThemedDivider()
+      Divider()
     }
   }
 
-  @ViewBuilder
   private var header: some View {
-    if theme.isClassic {
-      classicHeader
-    } else {
-      glassHeader
-    }
-  }
-
-  private var classicHeader: some View {
     HStack(alignment: .bottom, spacing: 2) {
       NavigationLink(value: destination) {
         Text(title).font(.title3)
@@ -220,19 +204,6 @@ struct SubjectCollectionSectionView: View {
       CollectionTypeChipsView(subjectType: subjectType, counts: counts, selection: $selection)
 
       Spacer(minLength: 0)
-    }
-  }
-
-  private var glassHeader: some View {
-    VStack(alignment: .leading, spacing: 6) {
-      ThemedSectionHeader {
-        NavigationLink(value: destination) {
-          Text(title).font(.title3)
-        }
-        .buttonStyle(.navigation)
-        .padding(.horizontal, 4)
-      }
-      CollectionTypeChipsView(subjectType: subjectType, counts: counts, selection: $selection)
     }
   }
 

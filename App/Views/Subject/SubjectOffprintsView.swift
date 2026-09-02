@@ -6,8 +6,6 @@ struct SubjectOffprintsView: View {
   let subjectId: Int
   let offprints: [SubjectRelationDTO]
 
-  @Environment(\.theme) private var theme
-
   @State private var collections: [Int: CollectionType] = [:]
   @State private var activeSubject: SlimSubjectDTO? = nil
 
@@ -26,19 +24,12 @@ struct SubjectOffprintsView: View {
 
   var body: some View {
     VStack {
-      if theme.isClassic {
-        VStack(alignment: .leading, spacing: 2) {
-          Text("单行本")
-            .foregroundStyle(offprints.count > 0 ? .primary : .secondary)
-            .font(.title3)
-          Divider()
-        }.padding(.top, 5)
-      } else {
-        ThemedSectionHeader {
-          Text("单行本")
-            .foregroundStyle(offprints.count > 0 ? theme.sectionHeader : theme.tertiaryText)
-        }
-      }
+      VStack(alignment: .leading, spacing: 2) {
+        Text("单行本")
+          .foregroundStyle(offprints.count > 0 ? .primary : .secondary)
+          .font(.title3)
+        Divider()
+      }.padding(.top, 5)
       ScrollView(.horizontal, showsIndicators: false) {
         LazyHStack(alignment: .top) {
           ForEach(offprints) { offprint in

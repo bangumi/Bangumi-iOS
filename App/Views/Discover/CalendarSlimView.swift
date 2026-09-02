@@ -23,7 +23,6 @@ struct CalendarSlimView: View {
   }
 
   @Environment(\.scenePhase) private var scenePhase
-  @Environment(\.theme) private var theme
 
   @State private var currentDate = Calendar.current.startOfDay(for: Date())
   @State private var calendars: [CalendarEntryDTO] = []
@@ -123,24 +122,16 @@ struct CalendarSlimView: View {
         ProgressView()
       } else {
         VStack(alignment: .leading, spacing: 8) {
-          if theme.isClassic {
-            HStack(alignment: .bottom) {
-              Text("每日放送: \(currentDate.formatted(date: .long, time: .omitted))")
-              Spacer()
-              NavigationLink(value: NavDestination.calendar) {
-                Text("更多 »").font(.caption)
-              }.buttonStyle(.navigation)
-            }
-          } else {
-            ThemedSectionHeader("每日放送: \(currentDate.formatted(date: .long, time: .omitted))") {
-              NavigationLink(value: NavDestination.calendar) {
-                Text("更多 »").font(.caption)
-              }.buttonStyle(.navigation)
-            }
+          HStack(alignment: .bottom) {
+            Text("每日放送: \(currentDate.formatted(date: .long, time: .omitted))")
+            Spacer()
+            NavigationLink(value: NavDestination.calendar) {
+              Text("更多 »").font(.caption)
+            }.buttonStyle(.navigation)
           }
           ForEach(dates) { item in
             VStack(alignment: .leading, spacing: 6) {
-              let banner = HStack(spacing: 4) {
+              HStack(spacing: 4) {
                 Text(item.desc)
                 Text("·")
                 Text(item.weekday.cn)
@@ -155,23 +146,8 @@ struct CalendarSlimView: View {
               .foregroundStyle(.white)
               .padding(.horizontal, 8)
               .padding(.vertical, 3)
-              if theme.isClassic {
-                banner
-                  .background(item.weekday.color)
-                  .cornerRadius(5)
-              } else {
-                let colors = theme.weekdayBanner(item.weekday)
-                banner
-                  .background {
-                    RoundedRectangle(cornerRadius: theme.metrics.controlRadius, style: .continuous)
-                      .fill(
-                        LinearGradient(
-                          colors: colors, startPoint: .leading, endPoint: .trailing)
-                      )
-                      .shadow(
-                        color: (colors.last ?? .clear).opacity(0.28), radius: 8, y: 4)
-                  }
-              }
+              .background(item.weekday.color)
+              .cornerRadius(5)
               CalendarWeekdaySlimView(
                 calendar: item.calendar,
                 collectionTypes: collectionTypes,

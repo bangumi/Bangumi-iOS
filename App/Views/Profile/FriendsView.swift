@@ -18,8 +18,6 @@ struct FriendsView: View {
   @State private var reloader = false
   @State private var type: FriendType = .friends
 
-  @Environment(\.theme) private var theme
-
   func load(limit: Int, offset: Int) async -> PagedDTO<FriendDTO>? {
     do {
       let resp = try await {
@@ -44,7 +42,7 @@ struct FriendsView: View {
         Text("关注我的").tag(FriendType.followers)
       }
       .pickerStyle(.segmented)
-      .padding(.horizontal, theme.metrics.screenPadding)
+      .padding(.horizontal, 8)
       .onChange(of: type) { _, _ in
         withAnimation(.default) {
           reloader.toggle()
@@ -82,7 +80,7 @@ struct FriendsView: View {
               }.padding(.leading, 4)
             }
           }
-        }.padding(theme.metrics.screenPadding)
+        }.padding(8)
       }
     }
     .navigationTitle(type.title)

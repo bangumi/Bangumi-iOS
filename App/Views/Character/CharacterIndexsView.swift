@@ -4,8 +4,6 @@ struct CharacterIndexsView: View {
   let characterId: Int
   let indexes: [SlimIndexDTO]
 
-  @Environment(\.theme) private var theme
-
   init(characterId: Int, indexes: [SlimIndexDTO]) {
     self.characterId = characterId
     self.indexes = indexes
@@ -24,33 +22,20 @@ struct CharacterIndexsView: View {
   }
 
   var body: some View {
-    if theme.isClassic {
-      VStack(spacing: 2) {
-        HStack(alignment: .bottom) {
-          Text(title)
-            .foregroundStyle(indexes.count > 0 ? .primary : .secondary)
-            .font(.title3)
-          Spacer()
-          if indexes.count > 0 {
-            NavigationLink(value: NavDestination.characterIndexList(characterId)) {
-              Text(moreText).font(.caption)
-            }.buttonStyle(.navigation)
-          }
+    VStack(spacing: 2) {
+      HStack(alignment: .bottom) {
+        Text(title)
+          .foregroundStyle(indexes.count > 0 ? .primary : .secondary)
+          .font(.title3)
+        Spacer()
+        if indexes.count > 0 {
+          NavigationLink(value: NavDestination.characterIndexList(characterId)) {
+            Text(moreText).font(.caption)
+          }.buttonStyle(.navigation)
         }
-        Divider()
-      }.padding(.top, 5)
-    } else {
-      VStack(spacing: 2) {
-        ThemedSectionHeader(title) {
-          if indexes.count > 0 {
-            NavigationLink(value: NavDestination.characterIndexList(characterId)) {
-              Text(moreText).font(.caption)
-            }.buttonStyle(.navigation)
-          }
-        }
-        ThemedDivider()
-      }.padding(.top, 5)
-    }
+      }
+      Divider()
+    }.padding(.top, 5)
 
     if indexes.isEmpty {
       HStack {

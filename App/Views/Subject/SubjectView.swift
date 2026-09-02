@@ -94,8 +94,6 @@ struct SubjectDetailView: View {
   let detail: SubjectDetailDTO
   let reload: () async -> Void
 
-  @Environment(\.theme) private var theme
-
   @State private var showCreateTopic: Bool = false
   @State private var showIndexPicker: Bool = false
   @State private var showRatingSheet: Bool = false
@@ -109,7 +107,7 @@ struct SubjectDetailView: View {
 
   var body: some View {
     ScrollView(showsIndicators: false) {
-      VStack(alignment: .leading, spacing: theme.isClassic ? nil : theme.metrics.listSpacing) {
+      VStack(alignment: .leading) {
         SubjectHeaderView(subject: subject) {
           showRatingSheet = true
         }
@@ -152,7 +150,7 @@ struct SubjectDetailView: View {
         }
 
         Spacer()
-      }.padding(.horizontal, theme.metrics.screenPadding)
+      }.padding(.horizontal, 8)
     }
     .sheet(isPresented: $showCreateTopic) {
       CreateTopicBoxSheet(type: .subject(subject.id)) {
@@ -275,9 +273,7 @@ struct SubjectDetailView: View {
             Label("分享", systemImage: "square.and.arrow.up")
           }
         } label: {
-          ToolbarCircle {
-            Image(systemName: "ellipsis")
-          }
+          Image(systemName: "ellipsis")
         }
       }
     }

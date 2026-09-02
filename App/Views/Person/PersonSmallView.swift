@@ -7,7 +7,7 @@ struct PersonSmallView: View {
   let isCollected: Bool
 
   var body: some View {
-    EmbedCard {
+    BorderView(color: .secondary.opacity(0.2), padding: 4, paddingRatio: 1, cornerRadius: 8) {
       HStack {
         ImageView(img: person.images?.resize(.r200))
           .imageStyle(width: 50, height: 50, alignment: .top)
@@ -25,6 +25,8 @@ struct PersonSmallView: View {
         Spacer(minLength: 0)
       }
     }
+    .background(.secondary.opacity(0.01))
+    .clipShape(RoundedRectangle(cornerRadius: 8))
     .frame(height: 58)
   }
 

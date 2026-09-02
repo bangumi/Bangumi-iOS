@@ -3,8 +3,6 @@ import SwiftUI
 struct BlogView: View {
   let blogId: Int
 
-  @Environment(\.theme) private var theme
-
   @AppStorage("shareDomain") var shareDomain: ShareDomain = .chii
   @AppStorage("isolationMode") var isolationMode: Bool = false
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
@@ -58,7 +56,7 @@ struct BlogView: View {
               HStack {
                 Text(blog.createdAt.datetimeDisplay)
                   .font(.caption)
-                  .foregroundColor(theme.secondaryText)
+                  .foregroundColor(.secondary)
                 Spacer()
                 if !isolationMode {
                   CommentListNavigationLink(
@@ -71,10 +69,10 @@ struct BlogView: View {
                 } label: {
                   Text(subjects.isEmpty ? "" : "关联条目+")
                     .font(.caption)
-                    .foregroundStyle(theme.accent)
+                    .foregroundStyle(.accent)
                 }.disabled(subjects.isEmpty)
               }
-              ThemedDivider()
+              Divider()
 
               BBCodeView(blog.content)
                 .textSelection(.enabled)

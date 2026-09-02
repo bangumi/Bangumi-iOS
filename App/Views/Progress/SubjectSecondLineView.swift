@@ -5,8 +5,6 @@ struct ProgressSecondLineView: View {
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
   @AppStorage("progressViewMode") var progressViewMode: ProgressViewMode = .tile
 
-  @Environment(\.theme) private var theme
-
   let subject: SubjectDTO
 
   var tagsCount: Int {
@@ -75,7 +73,7 @@ struct ProgressSecondLineView: View {
               StarsView(score: score, size: 12)
               Text("\(score.rateDisplay)")
                 .font(.footnote)
-                .foregroundStyle(theme.star)
+                .foregroundStyle(.orange)
             }
           } else {
             Text("(少于10人评分)")

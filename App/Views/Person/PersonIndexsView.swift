@@ -4,8 +4,6 @@ struct PersonIndexsView: View {
   let personId: Int
   let indexes: [SlimIndexDTO]
 
-  @Environment(\.theme) private var theme
-
   init(personId: Int, indexes: [SlimIndexDTO]) {
     self.personId = personId
     self.indexes = indexes
@@ -24,33 +22,20 @@ struct PersonIndexsView: View {
   }
 
   var body: some View {
-    if theme.isClassic {
-      VStack(spacing: 2) {
-        HStack(alignment: .bottom) {
-          Text(title)
-            .foregroundStyle(indexes.count > 0 ? .primary : .secondary)
-            .font(.title3)
-          Spacer()
-          if indexes.count > 0 {
-            NavigationLink(value: NavDestination.personIndexList(personId)) {
-              Text(moreText).font(.caption)
-            }.buttonStyle(.navigation)
-          }
+    VStack(spacing: 2) {
+      HStack(alignment: .bottom) {
+        Text(title)
+          .foregroundStyle(indexes.count > 0 ? .primary : .secondary)
+          .font(.title3)
+        Spacer()
+        if indexes.count > 0 {
+          NavigationLink(value: NavDestination.personIndexList(personId)) {
+            Text(moreText).font(.caption)
+          }.buttonStyle(.navigation)
         }
-        Divider()
-      }.padding(.top, 5)
-    } else {
-      VStack(spacing: 2) {
-        ThemedSectionHeader(title) {
-          if indexes.count > 0 {
-            NavigationLink(value: NavDestination.personIndexList(personId)) {
-              Text(moreText).font(.caption)
-            }.buttonStyle(.navigation)
-          }
-        }
-        ThemedDivider()
-      }.padding(.top, 5)
-    }
+      }
+      Divider()
+    }.padding(.top, 5)
 
     if indexes.isEmpty {
       HStack {

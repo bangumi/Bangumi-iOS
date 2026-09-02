@@ -3,8 +3,6 @@ import SwiftUI
 struct UserFriendsView: View {
   let user: UserDTO
 
-  @Environment(\.theme) private var theme
-
   @State private var refreshing = false
   @State private var users: [SlimUserDTO] = []
 
@@ -29,26 +27,14 @@ struct UserFriendsView: View {
 
   var body: some View {
     VStack(alignment: .leading, spacing: 2) {
-      Group {
-        if theme.isClassic {
-          HStack(alignment: .bottom) {
-            NavigationLink(value: NavDestination.userFriend(user.slim)) {
-              Text("好友").font(.title3)
-            }
-            .buttonStyle(.navigation)
-            .padding(.horizontal, 4)
-
-            Spacer(minLength: 0)
-          }
-        } else {
-          ThemedSectionHeader {
-            NavigationLink(value: NavDestination.userFriend(user.slim)) {
-              Text("好友").font(.title3)
-            }
-            .buttonStyle(.navigation)
-            .padding(.horizontal, 4)
-          }
+      HStack(alignment: .bottom) {
+        NavigationLink(value: NavDestination.userFriend(user.slim)) {
+          Text("好友").font(.title3)
         }
+        .buttonStyle(.navigation)
+        .padding(.horizontal, 4)
+
+        Spacer(minLength: 0)
       }
       .padding(.top, 8)
       .task {
@@ -57,7 +43,7 @@ struct UserFriendsView: View {
         }
         await refresh()
       }
-      ThemedDivider()
+      Divider()
 
       if refreshing {
         HStack {

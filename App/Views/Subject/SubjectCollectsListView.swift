@@ -129,7 +129,7 @@ struct SubjectCollectRowView: View {
           }
 
           if !collect.interest.comment.isEmpty {
-            ThemedDivider()
+            Divider()
             Text(collect.interest.comment)
               .font(.caption)
               .foregroundStyle(.secondary)

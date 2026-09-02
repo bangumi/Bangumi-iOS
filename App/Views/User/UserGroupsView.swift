@@ -3,8 +3,6 @@ import SwiftUI
 struct UserGroupsView: View {
   let user: UserDTO
 
-  @Environment(\.theme) private var theme
-
   @State private var refreshing = false
   @State private var groups: [SlimGroupDTO] = []
 
@@ -29,26 +27,14 @@ struct UserGroupsView: View {
 
   var body: some View {
     VStack(alignment: .leading, spacing: 2) {
-      Group {
-        if theme.isClassic {
-          HStack(alignment: .bottom) {
-            NavigationLink(value: NavDestination.userGroup(user.slim)) {
-              Text("小组").font(.title3)
-            }
-            .buttonStyle(.navigation)
-            .padding(.horizontal, 4)
-
-            Spacer(minLength: 0)
-          }
-        } else {
-          ThemedSectionHeader {
-            NavigationLink(value: NavDestination.userGroup(user.slim)) {
-              Text("小组").font(.title3)
-            }
-            .buttonStyle(.navigation)
-            .padding(.horizontal, 4)
-          }
+      HStack(alignment: .bottom) {
+        NavigationLink(value: NavDestination.userGroup(user.slim)) {
+          Text("小组").font(.title3)
         }
+        .buttonStyle(.navigation)
+        .padding(.horizontal, 4)
+
+        Spacer(minLength: 0)
       }
       .padding(.top, 8)
       .task {
@@ -57,7 +43,7 @@ struct UserGroupsView: View {
         }
         await refresh()
       }
-      ThemedDivider()
+      Divider()
 
       if refreshing {
         HStack {
@@ -78,7 +64,7 @@ struct UserGroupsView: View {
                   Text(group.title.withLink(group.link))
                     .lineLimit(1)
                     .font(.footnote)
-                  ThemedDivider()
+                  Divider()
                   Text("\(group.members ?? 0) 位成员")
                     .foregroundStyle(.secondary)
                     .font(.caption)

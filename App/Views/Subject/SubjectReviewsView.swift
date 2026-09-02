@@ -7,36 +7,21 @@ struct SubjectReviewsView: View {
   @AppStorage("hideBlocklist") var hideBlocklist: Bool = false
   @AppStorage("blocklist") var blocklist: [Int] = []
 
-  @Environment(\.theme) private var theme
-
   var body: some View {
-    if theme.isClassic {
-      VStack(spacing: 2) {
-        HStack(alignment: .bottom) {
-          Text("评论")
-            .foregroundStyle(reviews.count > 0 ? .primary : .secondary)
-            .font(.title3)
-          Spacer()
-          if reviews.count > 0 {
-            NavigationLink(value: NavDestination.subjectReviewList(subjectId)) {
-              Text("更多评论 »").font(.caption)
-            }.buttonStyle(.navigation)
-          }
-        }
-        Divider()
-      }.padding(.top, 5)
-    } else {
-      ThemedSectionHeader {
+    VStack(spacing: 2) {
+      HStack(alignment: .bottom) {
         Text("评论")
-          .foregroundStyle(reviews.count > 0 ? theme.sectionHeader : theme.tertiaryText)
-      } trailing: {
+          .foregroundStyle(reviews.count > 0 ? .primary : .secondary)
+          .font(.title3)
+        Spacer()
         if reviews.count > 0 {
           NavigationLink(value: NavDestination.subjectReviewList(subjectId)) {
             Text("更多评论 »").font(.caption)
           }.buttonStyle(.navigation)
         }
       }
-    }
+      Divider()
+    }.padding(.top, 5)
     if reviews.count == 0 {
       HStack {
         Spacer()

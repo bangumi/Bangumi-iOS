@@ -6,8 +6,6 @@ struct GroupTopicListView: View {
   @AppStorage("hideBlocklist") var hideBlocklist: Bool = false
   @AppStorage("blocklist") var blocklist: [Int] = []
 
-  @Environment(\.theme) private var theme
-
   var title: String {
     "小组话题"
   }
@@ -42,7 +40,7 @@ struct GroupTopicListView: View {
                 }.buttonStyle(.navigation)
                 Spacer()
               }
-              ThemedDivider()
+              Divider()
               HStack {
                 ImageView(img: topic.creator?.avatar?.large)
                   .imageStyle(width: 24, height: 24)
@@ -58,7 +56,7 @@ struct GroupTopicListView: View {
             }
           }
         }
-      }.padding(theme.metrics.screenPadding)
+      }.padding(8)
     }
     .navigationTitle(title)
     .navigationBarTitleDisplayMode(.inline)

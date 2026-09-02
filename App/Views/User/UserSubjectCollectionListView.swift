@@ -10,8 +10,6 @@ struct UserSubjectCollectionListView: View {
   @State private var reloader = false
   @State private var ctype: CollectionType = .collect
 
-  @Environment(\.theme) private var theme
-
   var title: String {
     if user.username == profile.username {
       return "我的\(stype.description)"
@@ -44,8 +42,8 @@ struct UserSubjectCollectionListView: View {
         OffsetPagedView<SlimSubjectDTO, _>(limit: 20, reloader: reloader, nextPageFunc: load) {
           item in
           SubjectCollectionRowContentView(subject: item)
-          ThemedDivider()
-        }.padding(theme.metrics.screenPadding)
+          Divider()
+        }.padding(8)
       }
     }
     .navigationTitle(title)

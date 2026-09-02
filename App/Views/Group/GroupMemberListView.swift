@@ -7,8 +7,6 @@ struct GroupMemberListView: View {
   @State private var moderators: [GroupMemberDTO] = []
   @State private var loadedModerators = false
 
-  @Environment(\.theme) private var theme
-
   var title: String {
     "小组成员"
   }
@@ -45,7 +43,7 @@ struct GroupMemberListView: View {
             VStack(alignment: .leading, spacing: 4) {
               Text("小组长")
                 .font(.title3)
-              ThemedDivider()
+              Divider()
               ForEach(creators) { member in
                 GroupMemberItemView(member: member)
               }
@@ -58,7 +56,7 @@ struct GroupMemberListView: View {
             VStack(alignment: .leading, spacing: 4) {
               Text("管理员")
                 .font(.title3)
-              ThemedDivider()
+              Divider()
               ForEach(moderators) { member in
                 GroupMemberItemView(member: member)
               }
@@ -70,13 +68,13 @@ struct GroupMemberListView: View {
           VStack(alignment: .leading, spacing: 4) {
             Text("成员")
               .font(.title3)
-            ThemedDivider()
+            Divider()
             OffsetPagedView<GroupMemberDTO, _>(nextPageFunc: loadMembers) { member in
               GroupMemberItemView(member: member)
             }
           }
         }
-      }.padding(theme.metrics.screenPadding)
+      }.padding(8)
     }
     .navigationTitle(title)
     .navigationBarTitleDisplayMode(.inline)
@@ -103,7 +101,7 @@ struct GroupMemberItemView: View {
             VStack(alignment: .leading) {
               Text(member.user?.header ?? "")
                 .lineLimit(1)
-              ThemedDivider()
+              Divider()
               Text("@\(member.user?.username ?? "")")
                 .font(.footnote)
                 .foregroundStyle(.secondary)

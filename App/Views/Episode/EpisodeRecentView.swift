@@ -33,12 +33,8 @@ struct EpisodeRecentView: View {
   let interactionMode: EpisodeGridInteractionMode
   var reload: (() async -> Void)? = nil
 
-  @Environment(\.theme) private var theme
-
   @State private var showCollectionBox: Bool = false
   @State private var loadingEpisodes: Bool = false
-  @State private var scrub: ProgressTickScrubState?
-  @State private var committingScrub: Bool = false
 
   private var subject: SubjectDTO {
     payload.subject
@@ -135,34 +131,17 @@ struct EpisodeRecentView: View {
 
   @ViewBuilder
   private func recentBadges(_ recent: RecentEpisodes) -> some View {
-    if theme.isClassic {
-      HStack(spacing: 2) {
-        ForEach(recent.episodes) { episode in
-          EpisodeItemView(
-            episode: episode,
-            interactionMode: interactionMode,
-            subjectCollectionType: subject.ctypeEnum,
-            reload: reload
-          )
-        }
-      }
-      .font(.footnote)
-    } else {
-      HStack(spacing: 6) {
-        ForEach(recent.episodes) { episode in
-          ProgressEpisodeChip(
-            episode: episode,
-            kind: ProgressEpisodeTickKind(
-              episode: episode, isNext: episode.id == recent.nextEpisode?.id),
-            size: 20,
-            cornerRadius: theme.metrics.badgeRadius,
-            interactionMode: interactionMode,
-            subjectCollectionType: subject.ctypeEnum,
-            reload: reload
-          )
-        }
+    HStack(spacing: 2) {
+      ForEach(recent.episodes) { episode in
+        EpisodeItemView(
+          episode: episode,
+          interactionMode: interactionMode,
+          subjectCollectionType: subject.ctypeEnum,
+          reload: reload
+        )
       }
     }
+    .font(.footnote)
   }
 
   @ViewBuilder
@@ -183,7 +162,7 @@ struct EpisodeRecentView: View {
             Spacer()
           }
         }
-        .foregroundStyle(theme.link)
+        .foregroundStyle(.linkText)
         .progressActionLabelStyle(.standaloneSubtle)
         .progressActionFill(progressFraction)
       }
@@ -195,100 +174,6 @@ struct EpisodeRecentView: View {
               await reload?()
             }
           }
-      }
-    }
-  }
-
-  @ViewBuilder
-  private func scrubHint(_ state: ProgressTickScrubState) -> some View {
-    switch state.phase {
-    case .preview:
-      let number = state.target.sort.episodeDisplay
-      let text =
-        state.canCommit
-        ? "松手标记「看到 EP.\(number)」 · 上滑取消"
-        : "未播出 · 不可提交 · 上滑取消"
-      scrubHintLabel(
-        text,
-        systemImage: nil,
-        color: theme.secondaryText,
-        fill: theme.controlFill
-      )
-    case .cancel:
-      let number = state.restore.sort.episodeDisplay
-      scrubHintLabel(
-        "松开取消 · 回到 EP.\(number)",
-        systemImage: "arrow.uturn.backward",
-        color: theme.danger,
-        fill: theme.danger.opacity(0.12)
-      )
-    }
-  }
-
-  private func scrubHintLabel(
-    _ text: String, systemImage: String?, color: Color, fill: Color
-  ) -> some View {
-    HStack(spacing: 6) {
-      if let systemImage {
-        Image(systemName: systemImage)
-      }
-      Text(text)
-        .lineLimit(1)
-      Spacer(minLength: 0)
-    }
-    .font(.footnote.weight(.semibold))
-    .foregroundStyle(color)
-    .padding(.horizontal, 8)
-    .padding(.vertical, 5)
-    .background {
-      RoundedRectangle(cornerRadius: theme.metrics.controlRadius, style: .continuous)
-        .fill(fill)
-    }
-  }
-
-  private func commitWatchUntil(_ episode: EpisodeDTO) {
-    guard !committingScrub else { return }
-    committingScrub = true
-    Task {
-      defer { committingScrub = false }
-      do {
-        try await EpisodeRepository.updateEpisodeCollection(
-          episodeId: episode.id, type: .collect, batch: true)
-        await reload?()
-        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-      } catch {
-        Notifier.shared.alert(error: error)
-      }
-    }
-  }
-
-  @ViewBuilder
-  private func episodeTrack(_ recent: RecentEpisodes) -> some View {
-    VStack(spacing: 8) {
-      ProgressEpisodeTrackView(
-        episodes: episodes,
-        totalEpisodes: subject.eps,
-        interactionMode: interactionMode,
-        subjectCollectionType: subject.ctypeEnum,
-        reload: reload,
-        onScrubChange: { state in
-          guard scrub != state else { return }
-          if scrub?.phase != state?.phase {
-            withAnimation(.spring(response: 0.28, dampingFraction: 0.86)) {
-              scrub = state
-            }
-          } else {
-            scrub = state
-          }
-        },
-        onScrubCommit: { episode in
-          commitWatchUntil(episode)
-        }
-      )
-      if let scrub {
-        scrubHint(scrub)
-      } else {
-        nextAction(recent, fillWidth: true)
       }
     }
   }
@@ -306,23 +191,19 @@ struct EpisodeRecentView: View {
           nextAction(recent, fillWidth: true)
         }
       case .list:
-        if theme.isClassic {
-          ViewThatFits(in: .horizontal) {
-            HStack(alignment: .bottom) {
+        ViewThatFits(in: .horizontal) {
+          HStack(alignment: .bottom) {
+            recentBadges(recent)
+            Spacer(minLength: 0)
+            nextAction(recent, fillWidth: false)
+          }
+          VStack(alignment: .leading, spacing: 4) {
+            HStack {
               recentBadges(recent)
               Spacer(minLength: 0)
-              nextAction(recent, fillWidth: false)
             }
-            VStack(alignment: .leading, spacing: 4) {
-              HStack {
-                recentBadges(recent)
-                Spacer(minLength: 0)
-              }
-              nextAction(recent, fillWidth: true)
-            }
+            nextAction(recent, fillWidth: true)
           }
-        } else {
-          episodeTrack(recent)
         }
       }
     } else {
@@ -332,7 +213,7 @@ struct EpisodeRecentView: View {
             Text(progressText)
             Image(systemName: progressIcon)
           }
-          .foregroundStyle(theme.link)
+          .foregroundStyle(.linkText)
           .opacity(loadingEpisodes ? 0 : 1)
           .accessibilityHidden(loadingEpisodes)
 
@@ -435,11 +316,10 @@ private struct EpisodeNextLabel: View {
   let icon: String
 
   @Environment(\.isEnabled) private var isEnabled
-  @Environment(\.theme) private var theme
 
   var body: some View {
     Label(desc, systemImage: icon)
       .lineLimit(1)
-      .foregroundStyle(isEnabled ? theme.link : .secondary)
+      .foregroundStyle(isEnabled ? .linkText : .secondary)
   }
 }

@@ -3,8 +3,6 @@ import SwiftUI
 struct SearchSubjectPickerView: View {
   let onSelect: (Int) -> Void
 
-  @Environment(\.theme) private var theme
-
   @State private var searchText: String = ""
   @State private var searching: Bool = false
   @State private var remote: Bool = false
@@ -24,11 +22,7 @@ struct SearchSubjectPickerView: View {
 
           if !showsResults {
             Text("输入关键字搜索")
-              .foregroundStyle(
-                theme.isClassic
-                  ? AnyShapeStyle(HierarchicalShapeStyle.secondary)
-                  : AnyShapeStyle(theme.secondaryText)
-              )
+              .foregroundStyle(.secondary)
               .padding(8)
           } else {
             if remote {
@@ -73,7 +67,7 @@ struct SearchSubjectPickerView: View {
       }
     } controls: {
       Image(systemName: remote ? "globe" : "internaldrive")
-        .foregroundColor(remote ? .blue : theme.success)
+        .foregroundColor(remote ? .blue : .green)
     }
   }
 }

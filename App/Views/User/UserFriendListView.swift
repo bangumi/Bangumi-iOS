@@ -5,8 +5,6 @@ struct UserFriendListView: View {
 
   @AppStorage("profile") var profile: Profile = Profile()
 
-  @Environment(\.theme) private var theme
-
   var title: String {
     if user.username == profile.username {
       return "我的好友"
@@ -40,7 +38,7 @@ struct UserFriendListView: View {
                 VStack(alignment: .leading) {
                   Text(item.nickname.withLink(item.link))
                     .lineLimit(1)
-                  ThemedDivider()
+                  Divider()
                   Text("@\(item.username)")
                     .font(.footnote)
                     .foregroundStyle(.secondary)
@@ -51,7 +49,7 @@ struct UserFriendListView: View {
             }.padding(.leading, 4)
           }
         }
-      }.padding(theme.metrics.screenPadding)
+      }.padding(8)
     }
     .navigationTitle(title)
     .navigationBarTitleDisplayMode(.inline)

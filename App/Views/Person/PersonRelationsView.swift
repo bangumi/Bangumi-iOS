@@ -5,7 +5,6 @@ struct PersonRelationsView: View {
   let personId: Int
   let relations: [PersonRelationDTO]
 
-  @Environment(\.theme) private var theme
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
   @State private var collectionStatuses: [Int: Bool] = [:]
 
@@ -35,35 +34,21 @@ struct PersonRelationsView: View {
 
   var body: some View {
     VStack(spacing: 2) {
-      if theme.isClassic {
-        HStack(alignment: .bottom) {
-          Text("关联人物")
-            .foregroundStyle(relations.count > 0 ? .primary : .secondary)
-            .font(.title3)
-          Spacer()
-          if relations.count > 0 {
-            NavigationLink(value: NavDestination.personRelationList(personId)) {
-              Text("更多人物 »").font(.caption)
-            }
-            .buttonStyle(.navigation)
+      HStack(alignment: .bottom) {
+        Text("关联人物")
+          .foregroundStyle(relations.count > 0 ? .primary : .secondary)
+          .font(.title3)
+        Spacer()
+        if relations.count > 0 {
+          NavigationLink(value: NavDestination.personRelationList(personId)) {
+            Text("更多人物 »").font(.caption)
           }
+          .buttonStyle(.navigation)
         }
-        .padding(.top, 5)
-
-        Divider()
-      } else {
-        ThemedSectionHeader("关联人物") {
-          if relations.count > 0 {
-            NavigationLink(value: NavDestination.personRelationList(personId)) {
-              Text("更多人物 »").font(.caption)
-            }
-            .buttonStyle(.navigation)
-          }
-        }
-        .padding(.top, 5)
-
-        ThemedDivider()
       }
+      .padding(.top, 5)
+
+      Divider()
 
       if relations.isEmpty {
         HStack {

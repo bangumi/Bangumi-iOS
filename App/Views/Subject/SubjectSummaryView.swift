@@ -4,8 +4,6 @@ import SwiftUI
 struct SubjectSummaryView: View {
   let subject: SubjectDTO
 
-  @Environment(\.theme) private var theme
-
   var metaTags: [Tag] {
     var result: [Tag] = []
     for name in subject.metaTags {
@@ -28,15 +26,14 @@ struct SubjectSummaryView: View {
   private func tagLink(
     _ tag: Tag,
     color: Color,
-    role: BorderRole = .neutral,
     tagsCat: SubjectTagsCategory
   ) -> some View {
     NavigationLink(value: NavDestination.subjectTagBrowsing(subject.type, tag.name, tagsCat)) {
-      BorderView(color: color, padding: 3, cornerRadius: 16, role: role) {
+      BorderView(color: color, padding: 3, cornerRadius: 16) {
         HStack(spacing: 2) {
           Text(tag.name)
             .font(.footnote)
-            .foregroundStyle(theme.link)
+            .foregroundStyle(.linkText)
             .lineLimit(1)
           Text("\(tag.count)")
             .font(.caption)
@@ -54,12 +51,12 @@ struct SubjectSummaryView: View {
       BBCodeView(subject.summary, textSize: 14)
         .textSelection(.enabled)
         .padding(2)
-        .tint(theme.link)
+        .tint(.linkText)
       CardView {
         HStack {
           HFlow(alignment: .center, spacing: 3) {
             ForEach(metaTags, id: \.name) { tag in
-              tagLink(tag, color: theme.link, role: .accent, tagsCat: .meta)
+              tagLink(tag, color: .linkText, tagsCat: .meta)
             }
             ForEach(tags, id: \.name) { tag in
               tagLink(tag, color: .secondary.opacity(0.2), tagsCat: .subject)

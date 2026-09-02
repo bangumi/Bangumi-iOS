@@ -7,9 +7,6 @@ struct SubjectCharactersView: View {
 
   @AppStorage("isolationMode") var isolationMode: Bool = false
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
-
-  @Environment(\.theme) private var theme
-
   @State private var collectionStatuses: [Int: Bool] = [:]
 
   private var collectionCharacterIds: [Int] {
@@ -39,33 +36,20 @@ struct SubjectCharactersView: View {
 
   var body: some View {
     VStack(spacing: 2) {
-      if theme.isClassic {
-        HStack(alignment: .bottom) {
-          Text("角色介绍")
-            .foregroundStyle(characters.count > 0 ? .primary : .secondary)
-            .font(.title3)
-          Spacer()
-          if characters.count > 0 {
-            NavigationLink(value: NavDestination.subjectCharacterList(subjectId)) {
-              Text("更多角色 »").font(.caption)
-            }.buttonStyle(.navigation)
-          }
-        }
-        .padding(.top, 5)
-
-        Divider()
-      } else {
-        ThemedSectionHeader {
-          Text("角色介绍")
-            .foregroundStyle(characters.count > 0 ? theme.sectionHeader : theme.tertiaryText)
-        } trailing: {
-          if characters.count > 0 {
-            NavigationLink(value: NavDestination.subjectCharacterList(subjectId)) {
-              Text("更多角色 »").font(.caption)
-            }.buttonStyle(.navigation)
-          }
+      HStack(alignment: .bottom) {
+        Text("角色介绍")
+          .foregroundStyle(characters.count > 0 ? .primary : .secondary)
+          .font(.title3)
+        Spacer()
+        if characters.count > 0 {
+          NavigationLink(value: NavDestination.subjectCharacterList(subjectId)) {
+            Text("更多角色 »").font(.caption)
+          }.buttonStyle(.navigation)
         }
       }
+      .padding(.top, 5)
+
+      Divider()
 
       if characters.count == 0 {
         HStack {
@@ -112,19 +96,7 @@ struct CharacterCard: View {
 
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
 
-  @Environment(\.theme) private var theme
-
   var body: some View {
-    if theme.isClassic {
-      content
-    } else {
-      EmbedCard {
-        content
-      }
-    }
-  }
-
-  private var content: some View {
     VStack(alignment: .leading, spacing: 2) {
       ImageView(img: item.character.images?.medium)
         .imageStyle(width: 72, height: 108, cornerRadius: 8, alignment: .top)
@@ -147,7 +119,7 @@ struct CharacterCard: View {
         if let comment = item.character.comment, comment > 0, !isolationMode {
           Text("(+\(comment))")
             .lineLimit(1)
-            .foregroundStyle(theme.accent)
+            .foregroundStyle(.accent)
         }
       }.font(.caption)
 

@@ -63,17 +63,17 @@ struct EpisodeDiscView: View {
           .onAppear(perform: refresh)
         Spacer()
       }
-      ThemedDivider()
+      Divider()
     }.padding(.top, 5)
     VStack(alignment: .leading) {
       ForEach(Array(discs.keys.sorted()), id: \.self) { disc in
         Text("Disc \(disc)")
           .foregroundStyle(.secondary)
           .padding(.top, 5)
-        ThemedDivider()
+        Divider()
         ForEach(discs[disc] ?? []) { episode in
           Text(episodeLine(episode)).lineLimit(1)
-          ThemedDivider()
+          Divider()
         }
       }
     }.task {

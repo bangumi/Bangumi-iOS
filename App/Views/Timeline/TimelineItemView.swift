@@ -9,8 +9,6 @@ struct TimelineItemView: View {
   @AppStorage("isolationMode") private var isolationMode = false
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
 
-  @Environment(\.theme) private var theme
-
   @State private var reactions: [ReactionDTO]
   @State private var showTime = false
 
@@ -52,17 +50,6 @@ struct TimelineItemView: View {
   }
 
   var body: some View {
-    if theme.isClassic {
-      itemRow
-    } else {
-      CardView {
-        itemRow
-      }
-    }
-  }
-
-  @ViewBuilder
-  private var itemRow: some View {
     HStack(alignment: .top) {
       if let user = item.user {
         if user.id != previousUID {
@@ -77,7 +64,7 @@ struct TimelineItemView: View {
       VStack(alignment: .leading) {
         switch item.cat {
         case .daily:
-          Text(item.desc(with: titlePreference, linkColor: theme.link))
+          Text(item.desc(with: titlePreference))
           switch item.type {
           case 2:
             if let users = item.memo.daily?.users, users.count > 0 {
@@ -112,13 +99,13 @@ struct TimelineItemView: View {
           }
 
         case .wiki:
-          Text(item.desc(with: titlePreference, linkColor: theme.link))
+          Text(item.desc(with: titlePreference))
           if let subject = item.memo.wiki?.subject {
             SubjectSmallView(subject: subject)
           }
 
         case .subject:
-          Text(item.desc(with: titlePreference, linkColor: theme.link))
+          Text(item.desc(with: titlePreference))
           if item.batch {
             let subjects = item.memo.subject?.map(\.subject).filter { $0.images != nil } ?? []
             ScrollView(.horizontal, showsIndicators: false) {
@@ -152,20 +139,11 @@ struct TimelineItemView: View {
           }
 
         case .progress:
-          Text(item.desc(with: titlePreference, linkColor: theme.link))
+          Text(item.desc(with: titlePreference))
           switch item.type {
           case 0:
-            if let batch = item.memo.progress?.batch {
-              if theme.isClassic {
-                SubjectTinyView(subject: batch.subject)
-              } else {
-                SubjectTinyView(
-                  subject: batch.subject,
-                  accessory: {
-                    AnyView(ProgressRing(current: batch.ringCurrent, total: batch.ringTotal))
-                  }
-                )
-              }
+            if let subject = item.memo.progress?.batch?.subject {
+              SubjectTinyView(subject: subject)
             }
           default:
             if let subject = item.memo.progress?.single?.subject {
@@ -175,14 +153,14 @@ struct TimelineItemView: View {
 
         case .status:
           if item.user != nil {
-            Text(item.desc(with: titlePreference, linkColor: theme.link)).textSelection(.enabled)
+            Text(item.desc(with: titlePreference)).textSelection(.enabled)
           }
           switch item.type {
           case 0:
             Text("**更新了签名:** \(item.memo.status?.sign ?? "")").textSelection(.enabled)
           case 1:
             BBCodeView(item.memo.status?.tsukkomi ?? "")
-              .tint(theme.link)
+              .tint(.linkText)
               .textSelection(.enabled)
           case 2:
             Text(
@@ -193,7 +171,7 @@ struct TimelineItemView: View {
           }
 
         case .mono:
-          Text(item.desc(with: titlePreference, linkColor: theme.link))
+          Text(item.desc(with: titlePreference))
           if let mono = item.memo.mono, mono.characters.count + mono.persons.count > 0 {
             ScrollView(.horizontal, showsIndicators: false) {
               HStack {
@@ -215,7 +193,7 @@ struct TimelineItemView: View {
           }
 
         default:
-          Text(item.desc(with: titlePreference, linkColor: theme.link))
+          Text(item.desc(with: titlePreference))
         }
         if showReactions {
           switch item.cat {
@@ -258,7 +236,7 @@ struct TimelineItemView: View {
             showTime = true
           } label: {
             Text(item.createdAt.relativeDisplay).monospacedDigit()
-              + Text(" · \(item.source.name.withLink(item.source.url, linkColor: theme.link))")
+              + Text(" · \(item.source.name.withLink(item.source.url))")
           }
           .buttonStyle(.scale)
           .popover(isPresented: $showTime) {
@@ -270,7 +248,7 @@ struct TimelineItemView: View {
         }
         .foregroundStyle(.secondary)
         .font(.footnote)
-        ThemedDivider()
+        Divider()
       }
       Spacer(minLength: 0)
     }
