@@ -112,7 +112,7 @@ struct GlassTimelineItemView: View {
   }
 
   private var headerRow: some View {
-    HStack(alignment: .top, spacing: 11) {
+    HStack(alignment: ratingCollect == nil && item.cat != .status ? .center : .top, spacing: 11) {
       if let user = item.user {
         ImageView(img: user.avatar?.large)
           .imageStyle(width: 40, height: 40, alignment: .center)
