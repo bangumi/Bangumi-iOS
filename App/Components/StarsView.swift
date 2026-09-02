@@ -11,18 +11,30 @@ struct StarsView: View {
   }
 
   var body: some View {
-    HStack {
-      ForEach(1..<6) { idx in
-        Image(
-          systemName: idx * 2 <= rate
-            ? "star.fill"
-            : idx * 2 - 1 == rate ? "star.leadinghalf.fill" : "star"
-        )
-        .resizable()
-        .foregroundStyle(theme.star)
-        .frame(width: size, height: size)
-        .padding(.horizontal, -3)
+    if theme.isClassic {
+      HStack {
+        ForEach(1..<6) { idx in
+          star(idx)
+            .padding(.horizontal, -3)
+        }
+      }
+    } else {
+      HStack(spacing: 2) {
+        ForEach(1..<6) { idx in
+          star(idx)
+        }
       }
     }
+  }
+
+  private func star(_ idx: Int) -> some View {
+    Image(
+      systemName: idx * 2 <= rate
+        ? "star.fill"
+        : idx * 2 - 1 == rate ? "star.leadinghalf.fill" : "star"
+    )
+    .resizable()
+    .foregroundStyle(theme.star)
+    .frame(width: size, height: size)
   }
 }
