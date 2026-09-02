@@ -4,6 +4,8 @@ struct ProfileHeaderView: View {
   let profile: Profile
   let isAuthenticated: Bool
 
+  @Environment(\.theme) private var theme
+
   private let avatarSize: CGFloat = 92
 
   private var displayName: String {
@@ -57,7 +59,18 @@ struct ProfileHeaderView: View {
     Notifier.shared.notify(message: "已复制用户 ID")
   }
 
+  @ViewBuilder
   var body: some View {
+    if theme.isClassic {
+      content
+    } else {
+      CardView(padding: theme.metrics.cardPadding, role: .strong) {
+        content
+      }
+    }
+  }
+
+  private var content: some View {
     VStack(spacing: 12) {
       ImageView(img: isAuthenticated ? profile.avatar?.large : nil)
         .imageStyle(width: avatarSize, height: avatarSize, cornerRadius: 18, alignment: .center)
@@ -79,6 +92,7 @@ struct ProfileHeaderView: View {
               Image(systemName: "doc.on.doc")
                 .font(.caption2)
             }
+            .modifier(ProfileUserIDChrome())
           }
           .buttonStyle(.plain)
           .font(.subheadline)
@@ -116,16 +130,47 @@ struct ProfileHeaderView: View {
   }
 }
 
+private struct ProfileUserIDChrome: ViewModifier {
+  @Environment(\.theme) private var theme
+
+  @ViewBuilder
+  func body(content: Content) -> some View {
+    if theme.isClassic {
+      content
+    } else {
+      content
+        .monospaced()
+        .padding(.horizontal, 10)
+        .padding(.vertical, 3)
+        .background(theme.controlFill, in: .capsule)
+        .overlay {
+          Capsule().strokeBorder(theme.controlBorder, lineWidth: 1)
+        }
+    }
+  }
+}
+
 private struct ProfileRoleBadge: View {
   let title: String
+
+  @Environment(\.theme) private var theme
+
+  private var foreground: AnyShapeStyle {
+    theme.isClassic
+      ? AnyShapeStyle(HierarchicalShapeStyle.secondary) : AnyShapeStyle(theme.onTintText)
+  }
+
+  private var background: Color {
+    theme.isClassic ? Color(uiColor: .tertiarySystemFill) : theme.tint
+  }
 
   var body: some View {
     Text(verbatim: title)
       .font(.caption2.weight(.medium))
-      .foregroundStyle(.secondary)
+      .foregroundStyle(foreground)
       .lineLimit(1)
       .padding(.horizontal, 8)
       .padding(.vertical, 4)
-      .background(Color(uiColor: .tertiarySystemFill), in: .capsule)
+      .background(background, in: .capsule)
   }
 }

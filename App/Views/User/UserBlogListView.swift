@@ -5,6 +5,8 @@ struct UserBlogListView: View {
 
   @AppStorage("profile") var profile: Profile = Profile()
 
+  @Environment(\.theme) private var theme
+
   var title: String {
     if user.username == profile.username {
       return "我的日志"
@@ -40,16 +42,16 @@ struct UserBlogListView: View {
                   .lineLimit(1)
                   .foregroundStyle(.secondary)
                 Text("(+\(item.replies))")
-                  .foregroundStyle(.orange)
+                  .foregroundStyle(theme.warn)
               }.font(.footnote)
               Text(AttributedString("\(item.summary)...") + " 更多 »".withLink(item.link))
                 .font(.caption)
             }
             Spacer()
           }
-          Divider()
+          ThemedDivider()
         }
-      }.padding(8)
+      }.padding(theme.metrics.screenPadding)
     }
     .navigationTitle(title)
     .navigationBarTitleDisplayMode(.inline)

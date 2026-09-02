@@ -29,7 +29,7 @@ struct UserIndexesView: View {
         }
         .padding(.top, 8)
         .task(refresh)
-        Divider()
+        ThemedDivider()
       }
 
       ForEach(indexes) { index in

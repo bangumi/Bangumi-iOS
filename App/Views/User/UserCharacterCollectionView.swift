@@ -45,7 +45,7 @@ struct UserCharacterCollectionView: View {
         }
         await refresh()
       }
-      Divider()
+      ThemedDivider()
 
       if refreshing {
         HStack {

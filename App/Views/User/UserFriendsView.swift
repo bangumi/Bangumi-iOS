@@ -43,7 +43,7 @@ struct UserFriendsView: View {
         }
         await refresh()
       }
-      Divider()
+      ThemedDivider()
 
       if refreshing {
         HStack {

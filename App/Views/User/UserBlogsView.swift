@@ -4,6 +4,8 @@ struct UserBlogsView: View {
 
   let user: UserDTO
 
+  @Environment(\.theme) private var theme
+
   @State private var blogs: [SlimBlogEntryDTO] = []
 
   func refresh() async {
@@ -29,7 +31,7 @@ struct UserBlogsView: View {
         }
         .padding(.top, 8)
         .task(refresh)
-        Divider()
+        ThemedDivider()
       }
 
       ForEach(blogs) { blog in
@@ -47,14 +49,14 @@ struct UserBlogsView: View {
                   .lineLimit(1)
                   .foregroundStyle(.secondary)
                 Text("(+\(blog.replies))")
-                  .foregroundStyle(.orange)
+                  .foregroundStyle(theme.warn)
               }.font(.footnote)
               Text(AttributedString("\(blog.summary)...") + " 更多 »".withLink(blog.link))
                 .font(.caption)
             }
             Spacer()
           }
-          Divider()
+          ThemedDivider()
         }
       }
     }

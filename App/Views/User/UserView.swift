@@ -250,59 +250,23 @@ struct UserDetailView: View {
   @AppStorage("profile") var profile: Profile = Profile()
   @AppStorage("blocklist") var blocklist: [Int] = []
 
+  @Environment(\.theme) private var theme
+
   let user: UserDTO
 
   var body: some View {
     ScrollView {
       VStack(alignment: .leading) {
-        HStack(alignment: .top) {
-          ImageView(img: user.avatar?.large)
-            .imageStyle(width: 100, height: 100)
-            .imageType(.avatar)
-          VStack(alignment: .leading) {
-            Text(user.nickname)
-              .font(.title3)
-              .fontWeight(.bold)
-              .padding(.top, 8)
-            HStack(spacing: 5) {
-              BadgeView {
-                Text(user.group.description).font(.caption)
-              }
-              if profile.username == user.username {
-                BadgeView {
-                  Text("我自己").font(.caption)
-                }
-              }
-              if user.isFriend == true {
-                BadgeView {
-                  Text("好友").font(.caption)
-                }
-              }
-              if blocklist.contains(user.id) {
-                BadgeView(background: .secondary) {
-                  Text("已绝交").font(.caption)
-                }
-              }
-              Text("@\(user.username)")
-                .font(.footnote)
-                .foregroundStyle(.secondary)
-                .textSelection(.enabled)
-            }
-            Divider()
-            Text(user.sign)
-              .font(.footnote)
-              .textSelection(.enabled)
-          }
-        }.frame(minHeight: 100)
+        header
 
         if user.bio.isEmpty {
-          Divider()
+          ThemedDivider()
         } else {
           CardView(background: .bioBackground) {
             HStack {
               BBCodeView(user.bio, textSize: 12)
                 .textSelection(.enabled)
-                .tint(.linkText)
+                .tint(theme.link)
                 .fixedSize(horizontal: false, vertical: true)
               Spacer(minLength: 0)
             }
@@ -347,7 +311,60 @@ struct UserDetailView: View {
         }
 
         UserHomeView(user: user)
-      }.padding(.horizontal, 8)
+      }.padding(.horizontal, theme.metrics.screenPadding)
     }
+  }
+
+  @ViewBuilder
+  private var header: some View {
+    if theme.isClassic {
+      headerContent
+    } else {
+      CardView(padding: theme.metrics.cardPadding, role: .strong) {
+        headerContent
+      }
+    }
+  }
+
+  private var headerContent: some View {
+    HStack(alignment: .top) {
+      ImageView(img: user.avatar?.large)
+        .imageStyle(width: 100, height: 100)
+        .imageType(.avatar)
+      VStack(alignment: .leading) {
+        Text(user.nickname)
+          .font(.title3)
+          .fontWeight(.bold)
+          .padding(.top, 8)
+        HStack(spacing: 5) {
+          BadgeView {
+            Text(user.group.description).font(.caption)
+          }
+          if profile.username == user.username {
+            BadgeView {
+              Text("我自己").font(.caption)
+            }
+          }
+          if user.isFriend == true {
+            BadgeView {
+              Text("好友").font(.caption)
+            }
+          }
+          if blocklist.contains(user.id) {
+            BadgeView(background: .secondary) {
+              Text("已绝交").font(.caption)
+            }
+          }
+          Text("@\(user.username)")
+            .font(.footnote)
+            .foregroundStyle(.secondary)
+            .textSelection(.enabled)
+        }
+        ThemedDivider()
+        Text(user.sign)
+          .font(.footnote)
+          .textSelection(.enabled)
+      }
+    }.frame(minHeight: 100)
   }
 }

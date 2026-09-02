@@ -5,6 +5,8 @@ struct UserGroupListView: View {
 
   @AppStorage("profile") var profile: Profile = Profile()
 
+  @Environment(\.theme) private var theme
+
   var title: String {
     if user.username == profile.username {
       return "我参加的小组"
@@ -36,14 +38,14 @@ struct UserGroupListView: View {
             VStack(alignment: .leading) {
               Text(item.title.withLink(item.link))
                 .lineLimit(1)
-              Divider()
+              ThemedDivider()
               Text("\(item.members ?? 0) 位成员")
                 .font(.footnote)
                 .foregroundStyle(.secondary)
             }.padding(.leading, 4)
           }
         }
-      }.padding(8)
+      }.padding(theme.metrics.screenPadding)
     }
     .navigationTitle(title)
     .navigationBarTitleDisplayMode(.inline)

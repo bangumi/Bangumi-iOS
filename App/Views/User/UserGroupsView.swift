@@ -43,7 +43,7 @@ struct UserGroupsView: View {
         }
         await refresh()
       }
-      Divider()
+      ThemedDivider()
 
       if refreshing {
         HStack {
@@ -64,7 +64,7 @@ struct UserGroupsView: View {
                   Text(group.title.withLink(group.link))
                     .lineLimit(1)
                     .font(.footnote)
-                  Divider()
+                  ThemedDivider()
                   Text("\(group.members ?? 0) 位成员")
                     .foregroundStyle(.secondary)
                     .font(.caption)
