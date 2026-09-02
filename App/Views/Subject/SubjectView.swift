@@ -94,6 +94,8 @@ struct SubjectDetailView: View {
   let detail: SubjectDetailDTO
   let reload: () async -> Void
 
+  @Environment(\.theme) private var theme
+
   @State private var showCreateTopic: Bool = false
   @State private var showIndexPicker: Bool = false
   @State private var showRatingSheet: Bool = false
@@ -105,7 +107,16 @@ struct SubjectDetailView: View {
     URL(string: "\(shareDomain.url)/subject/\(subject.id)")!
   }
 
+  @ViewBuilder
   var body: some View {
+    if theme.isClassic {
+      classicBody
+    } else {
+      GlassSubjectDetailView(subject: subject, detail: detail, reload: reload)
+    }
+  }
+
+  private var classicBody: some View {
     ScrollView(showsIndicators: false) {
       VStack(alignment: .leading) {
         SubjectHeaderView(subject: subject) {
