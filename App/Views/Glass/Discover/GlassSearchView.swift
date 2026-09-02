@@ -232,7 +232,7 @@ private struct GlassSearchSubjectRow: View {
   }
 
   var body: some View {
-    NavigationLink(value: NavDestination.subject(subject.id)) {
+    NavigationLink(value: NavDestination.subject(subject.id, zoom: true)) {
       CardView(padding: 12) {
         HStack(alignment: .top, spacing: 12) {
           ImageView(img: subject.images?.resize(.r200))
@@ -267,6 +267,7 @@ private struct GlassSearchSubjectRow: View {
       }
     }
     .buttonStyle(.plain)
+    .zoomSource(ZoomNavigationID(type: .subject, id: subject.id))
     .subjectPreview(subject, collectionType: collectionType) {
       await reload?()
       await loadCollectionType()

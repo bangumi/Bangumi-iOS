@@ -3,6 +3,7 @@ import SwiftUI
 
 struct CharacterView: View {
   var characterId: Int
+  var zoom = false
 
   @AppStorage("shareDomain") var shareDomain: ShareDomain = .chii
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
@@ -194,7 +195,12 @@ struct CharacterView: View {
       }
     }
     .handoff(url: shareLink, title: title)
-    .modifier(ZoomTransitionModifier(zoomID: ZoomNavigationID(type: .character, id: characterId)))
+    .modifier(
+      ZoomTransitionModifier(
+        zoomID: ZoomNavigationID(type: .character, id: characterId),
+        enabled: zoom || theme.isClassic
+      )
+    )
   }
 }
 

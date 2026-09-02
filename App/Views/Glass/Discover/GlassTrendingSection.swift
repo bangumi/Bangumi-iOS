@@ -183,7 +183,7 @@ private struct GlassTrendingTypeSection: View {
     ) {
       ForEach(largeItems) { item in
         let ctype = collectionTypes[item.subject.id] ?? CollectionType.none
-        NavigationLink(value: NavDestination.subject(item.subject.id)) {
+        NavigationLink(value: NavDestination.subject(item.subject.id, zoom: true)) {
           CardView(padding: theme.metrics.cardPadding) {
             VStack(alignment: .leading, spacing: 8) {
               ImageView(img: item.subject.images?.resize(subjectImageQuality.largeSize))
@@ -213,6 +213,7 @@ private struct GlassTrendingTypeSection: View {
           }
         }
         .buttonStyle(.plain)
+        .zoomSource(ZoomNavigationID(type: .subject, id: item.subject.id))
         .subjectPreview(item.subject, collectionType: ctype) {
           await reloadCollectionType(subjectId: item.subject.id)
         }

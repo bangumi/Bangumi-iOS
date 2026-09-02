@@ -200,7 +200,7 @@ struct GlassCharacterCard: View {
   @Environment(\.theme) private var theme
 
   var body: some View {
-    NavigationLink(value: NavDestination.character(item.character.id)) {
+    NavigationLink(value: NavDestination.character(item.character.id, zoom: true)) {
       CardView(padding: 11) {
         ZStack(alignment: .topTrailing) {
           VStack(spacing: 6) {
@@ -246,6 +246,7 @@ struct GlassCharacterCard: View {
       }
     }
     .buttonStyle(.plain)
+    .zoomSource(ZoomNavigationID(type: .character, id: item.character.id))
     .frame(width: 96)
   }
 }

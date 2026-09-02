@@ -81,15 +81,15 @@ private struct ImageNavLinkModifier: ViewModifier {
     switch url.host {
     case "subject":
       if let idStr = components.first, let id = Int(idStr) {
-        return (.subject(id), ZoomNavigationID(type: .subject, id: id))
+        return (.subject(id, zoom: true), ZoomNavigationID(type: .subject, id: id))
       }
     case "character":
       if let idStr = components.first, let id = Int(idStr) {
-        return (.character(id), ZoomNavigationID(type: .character, id: id))
+        return (.character(id, zoom: true), ZoomNavigationID(type: .character, id: id))
       }
     case "person":
       if let idStr = components.first, let id = Int(idStr) {
-        return (.person(id), ZoomNavigationID(type: .person, id: id))
+        return (.person(id, zoom: true), ZoomNavigationID(type: .person, id: id))
       }
     default:
       break
@@ -118,15 +118,36 @@ extension View {
 /// Applies navigationTransition(.zoom) to destination views on iOS 18+
 struct ZoomTransitionModifier: ViewModifier {
   let zoomID: ZoomNavigationID
+  var enabled = true
 
   @Environment(\.zoomNamespace) private var namespace
 
   func body(content: Content) -> some View {
-    if #available(iOS 18.0, *), let namespace = namespace {
+    if #available(iOS 18.0, *), enabled, let namespace = namespace {
       content
         .navigationTransition(.zoom(sourceID: zoomID, in: namespace))
     } else {
       content
     }
+  }
+}
+
+private struct ZoomSourceModifier: ViewModifier {
+  let zoomID: ZoomNavigationID
+
+  @Environment(\.zoomNamespace) private var namespace
+
+  func body(content: Content) -> some View {
+    if #available(iOS 18.0, *), let namespace = namespace {
+      content.matchedTransitionSource(id: zoomID, in: namespace)
+    } else {
+      content
+    }
+  }
+}
+
+extension View {
+  func zoomSource(_ zoomID: ZoomNavigationID) -> some View {
+    modifier(ZoomSourceModifier(zoomID: zoomID))
   }
 }

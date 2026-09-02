@@ -43,7 +43,7 @@ enum NavDestination: Hashable, View {
 
   case infobox(_ title: String, _ infobox: Infobox)
 
-  case subject(_ subjectId: Int)
+  case subject(_ subjectId: Int, zoom: Bool = false)
   case subjectRelationList(_ subjectId: Int)
   case subjectCharacterList(_ subjectId: Int)
   case subjectStaffList(_ subjectId: Int)
@@ -60,11 +60,11 @@ enum NavDestination: Hashable, View {
 
   case episode(_ episodeId: Int)
   case episodeList(_ subjectId: Int)
-  case character(_ characterId: Int)
+  case character(_ characterId: Int, zoom: Bool = false)
   case characterCastList(_ characterId: Int)
   case characterRelationList(_ characterId: Int)
   case characterIndexList(_ characterId: Int)
-  case person(_ personId: Int)
+  case person(_ personId: Int, zoom: Bool = false)
   case personCastList(_ personId: Int)
   case personWorkList(_ personId: Int)
   case personRelationList(_ personId: Int)
@@ -156,8 +156,8 @@ enum NavDestination: Hashable, View {
     case .infobox(let title, let infobox):
       InfoboxView(title: title, infobox: infobox)
 
-    case .subject(let subjectId):
-      SubjectView(subjectId: subjectId)
+    case .subject(let subjectId, let zoom):
+      SubjectView(subjectId: subjectId, zoom: zoom)
     case .subjectRelationList(let subjectId):
       SubjectRelationListView(subjectId: subjectId)
     case .subjectCharacterList(let subjectId):
@@ -188,8 +188,8 @@ enum NavDestination: Hashable, View {
     case .episodeList(let subjectId):
       EpisodeListView(subjectId: subjectId)
 
-    case .character(let characterId):
-      CharacterView(characterId: characterId)
+    case .character(let characterId, let zoom):
+      CharacterView(characterId: characterId, zoom: zoom)
     case .characterCastList(let characterId):
       CharacterCastListView(characterId: characterId)
     case .characterRelationList(let characterId):
@@ -197,8 +197,8 @@ enum NavDestination: Hashable, View {
     case .characterIndexList(let characterId):
       CharacterIndexListView(characterId: characterId)
 
-    case .person(let personId):
-      PersonView(personId: personId)
+    case .person(let personId, let zoom):
+      PersonView(personId: personId, zoom: zoom)
     case .personCastList(let personId):
       PersonCastListView(personId: personId)
     case .personWorkList(let personId):
