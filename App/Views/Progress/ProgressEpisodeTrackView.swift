@@ -930,17 +930,21 @@ struct ProgressEpisodeChip: View {
           )
         )
       }
-      .overlay(alignment: .bottom) {
+      .overlay {
         if showEpisodeTrends, episode.comment > 0 {
-          GeometryReader { proxy in
-            Rectangle()
-              .fill(Color(hex: 0xFF8040, opacity: 0.85))
-              .frame(width: proxy.size.width * episode.trendLevel)
-          }
-          .frame(height: size > 22 ? 3 : 2)
+          shape.fill(
+            LinearGradient(
+              stops: [
+                .init(color: .clear, location: 0.55),
+                .init(color: Color(hex: 0xFF8040, opacity: 0.55 * episode.trendLevel), location: 1),
+              ],
+              startPoint: .top,
+              endPoint: .bottom
+            )
+          )
+          .allowsHitTesting(false)
         }
       }
-      .clipShape(shape)
       .overlay {
         if cell.dashed {
           shape.strokeBorder(
