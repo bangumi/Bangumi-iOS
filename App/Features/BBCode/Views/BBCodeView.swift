@@ -6,6 +6,7 @@ public struct BBCodeView: View {
 
   @Environment(\.bangumiDomains) private var domains
   @Environment(\.openURL) private var openURL
+  @Environment(\.theme) private var theme
   @State private var document: BBCodePreparedDocument?
 
   public init(_ code: String, textSize: Int = 16) {
@@ -18,7 +19,7 @@ public struct BBCodeView: View {
       if let document {
         BBCodeDocumentView(
           document: document,
-          renderID: "\(domains.cacheKey)|\(textSize)|\(code)",
+          renderID: renderID,
           openURLHandler: { url in
             openURL(url)
           }
@@ -28,13 +29,18 @@ public struct BBCodeView: View {
           .font(.system(size: CGFloat(textSize)))
       }
     }
-    .task(id: "\(domains.cacheKey)|\(textSize)|\(code)") {
+    .task(id: renderID) {
       document = await BBCode().preparedDocument(
         code,
         textSize: textSize,
-        domains: domains
+        domains: domains,
+        palette: theme.bbcodePalette
       )
     }
+  }
+
+  private var renderID: String {
+    "\(domains.cacheKey)|\(textSize)|\(theme.kind.rawValue)|\(code)"
   }
 }
 
@@ -45,12 +51,22 @@ struct BBCodeDocumentView: UIViewRepresentable {
 
   func makeUIView(context: Context) -> BBCodeBlocksContainerView {
     let view = BBCodeBlocksContainerView()
-    view.update(blocks: document.blocks, renderID: renderID, openURLHandler: openURLHandler)
+    view.update(
+      blocks: document.blocks,
+      palette: document.palette,
+      renderID: renderID,
+      openURLHandler: openURLHandler
+    )
     return view
   }
 
   func updateUIView(_ uiView: BBCodeBlocksContainerView, context: Context) {
-    uiView.update(blocks: document.blocks, renderID: renderID, openURLHandler: openURLHandler)
+    uiView.update(
+      blocks: document.blocks,
+      palette: document.palette,
+      renderID: renderID,
+      openURLHandler: openURLHandler
+    )
   }
 
   func sizeThatFits(

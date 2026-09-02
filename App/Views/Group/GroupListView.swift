@@ -6,6 +6,8 @@ struct GroupListView: View {
   @State private var sortMode: GroupSortMode = .members
   @State private var reloader = false
 
+  @Environment(\.theme) private var theme
+
   private func load(limit: Int, offset: Int) async -> PagedDTO<SlimGroupDTO>? {
     do {
       let resp = try await GroupService.getGroups(
@@ -47,7 +49,7 @@ struct GroupListView: View {
             Spacer()
           }
         }
-      }.padding(.horizontal, 8)
+      }.padding(.horizontal, theme.metrics.screenPadding)
     }
     .navigationTitle(mode.title)
     .toolbar {

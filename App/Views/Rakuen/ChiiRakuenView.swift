@@ -99,16 +99,18 @@ struct ChiiRakuenView: View {
 
   @State private var reloader = false
 
+  @Environment(\.theme) private var theme
+
   var body: some View {
     ScrollView {
       VStack(spacing: 0) {
         HotGroupsView()
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: theme.metrics.listSpacing) {
           modeSelectorView.padding(4)
           contentView
         }
-        .padding(.top, 8)
-      }.padding(.horizontal, 8)
+        .padding(.top, theme.metrics.listSpacing)
+      }.padding(.horizontal, theme.metrics.screenPadding)
     }
     .refreshable {
       withAnimation(.default) {
@@ -155,7 +157,9 @@ struct ChiiRakuenView: View {
             Text("浏览小组")
           }
         } label: {
-          Image(systemName: "ellipsis")
+          ToolbarCircle {
+            Image(systemName: "ellipsis")
+          }
         }
       }
     }
@@ -192,15 +196,25 @@ struct ChiiRakuenView: View {
           .padding(.trailing, 4)
 
         ForEach(availableModes, id: \.self) { mode in
-          Button {
-            withAnimation(.default) {
-              rakuenListMode = mode
-            }
-          } label: {
-            Text(mode.description)
-          }.adaptiveButtonStyle(rakuenListMode == mode ? .borderedProminent : .bordered)
+          modeButton(mode)
         }
       })
+  }
+
+  @ViewBuilder
+  private func modeButton(_ mode: RakuenListMode) -> some View {
+    let button = Button {
+      withAnimation(.default) {
+        rakuenListMode = mode
+      }
+    } label: {
+      Text(mode.description)
+    }
+    if theme.isClassic {
+      button.adaptiveButtonStyle(rakuenListMode == mode ? .borderedProminent : .bordered)
+    } else {
+      button.buttonStyle(ThemedChipStyle(isSelected: rakuenListMode == mode))
+    }
   }
 
   @ViewBuilder

@@ -98,6 +98,7 @@ struct CommentListView: View {
 
   @Environment(\.bangumiDomains) private var domains
   @Environment(\.openURL) private var openURL
+  @Environment(\.theme) private var theme
 
   @State private var comments: [CommentDTO] = []
   @State private var hasLoaded = false
@@ -881,6 +882,7 @@ struct CommentListView: View {
       canReact: !isolationMode && isAuthenticated && route.parent.supportsReactions,
       showReactions: !isolationMode && enableReactions && route.parent.supportsReactions,
       avatarIsRound: avatarStyle == .round,
+      theme: theme.kind,
       initialPostID: route.initialPostID
     )
   }

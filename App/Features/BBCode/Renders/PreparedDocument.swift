@@ -3,6 +3,7 @@ import UIKit
 
 struct BBCodePreparedDocument {
   let blocks: [BBCodePreparedBlock]
+  let palette: BBCodePalette
 }
 
 @MainActor
@@ -13,6 +14,7 @@ private final class BBCodePreparedDocumentCache {
     let bbcode: String
     let textSize: Int
     let domainsCacheKey: String
+    let palette: BBCodePalette
   }
 
   private let limit = 256
@@ -22,12 +24,14 @@ private final class BBCodePreparedDocumentCache {
   func document(
     for bbcode: String,
     textSize: Int,
-    domains: BangumiDomains
+    domains: BangumiDomains,
+    palette: BBCodePalette
   ) -> BBCodePreparedDocument? {
     let key = Key(
       bbcode: bbcode,
       textSize: textSize,
-      domainsCacheKey: domains.cacheKey
+      domainsCacheKey: domains.cacheKey,
+      palette: palette
     )
     guard let document = documents[key] else {
       return nil
@@ -41,12 +45,14 @@ private final class BBCodePreparedDocumentCache {
     _ document: BBCodePreparedDocument,
     for bbcode: String,
     textSize: Int,
-    domains: BangumiDomains
+    domains: BangumiDomains,
+    palette: BBCodePalette
   ) {
     let key = Key(
       bbcode: bbcode,
       textSize: textSize,
-      domainsCacheKey: domains.cacheKey
+      domainsCacheKey: domains.cacheKey,
+      palette: palette
     )
     documents[key] = document
     markRecentlyUsed(key)
@@ -111,12 +117,14 @@ extension BBCode {
   func preparedDocument(
     _ bbcode: String,
     textSize: Int,
-    domains: BangumiDomains = .official
+    domains: BangumiDomains = .official,
+    palette: BBCodePalette = .classic
   ) async -> BBCodePreparedDocument {
     if let cachedDocument = BBCodePreparedDocumentCache.shared.document(
       for: bbcode,
       textSize: textSize,
-      domains: domains
+      domains: domains,
+      palette: palette
     ) {
       return cachedDocument
     }
@@ -124,29 +132,34 @@ extension BBCode {
     let worker = BBCodeParserWorker(tagManager: tagManager)
 
     guard let tree = worker.parse(bbcode) else {
-      let renderer = BBCodeTextKitRenderer(textSize: textSize)
+      let renderer = BBCodeTextKitRenderer(textSize: textSize, palette: palette)
       let document = BBCodePreparedDocument(
         blocks: [
           BBCodePreparedBlock(id: 0, payload: .text(renderer.makePlainText(bbcode)))
-        ]
+        ],
+        palette: palette
       )
       BBCodePreparedDocumentCache.shared.store(
         document,
         for: bbcode,
         textSize: textSize,
-        domains: domains
+        domains: domains,
+        palette: palette
       )
       return document
     }
 
     normalizeBBCodeLineBreaksAndParagraphs(node: tree, tagManager: tagManager)
-    let renderer = BBCodeTextKitRenderer(textSize: textSize, domains: domains)
-    let document = BBCodePreparedDocument(blocks: renderer.renderBlocks(root: tree))
+    let renderer = BBCodeTextKitRenderer(
+      textSize: textSize, domains: domains, palette: palette)
+    let document = BBCodePreparedDocument(
+      blocks: renderer.renderBlocks(root: tree), palette: palette)
     BBCodePreparedDocumentCache.shared.store(
       document,
       for: bbcode,
       textSize: textSize,
-      domains: domains
+      domains: domains,
+      palette: palette
     )
     return document
   }
@@ -226,12 +239,14 @@ private struct BBCodeTextKitRenderer {
   let secondaryColor: UIColor
   let baseParagraphStyle: NSParagraphStyle
   let domains: BangumiDomains
+  let palette: BBCodePalette
 
-  init(textSize: Int, domains: BangumiDomains = .official) {
+  init(textSize: Int, domains: BangumiDomains = .official, palette: BBCodePalette = .classic) {
     self.textSize = CGFloat(textSize)
     self.domains = domains
+    self.palette = palette
     self.baseFont = .systemFont(ofSize: CGFloat(textSize))
-    self.linkColor = UIColor(named: "LinkTextColor") ?? .systemBlue
+    self.linkColor = palette.link
     self.secondaryColor = .secondaryLabel
     let paragraphStyle = NSMutableParagraphStyle()
     paragraphStyle.lineHeightMultiple = BBCodeLayoutMetrics.lineHeightMultiple
@@ -366,7 +381,7 @@ private struct BBCodeTextKitRenderer {
         applyFontTransform(to: attributed) { font in
           .monospacedSystemFont(ofSize: font.pointSize, weight: .regular)
         }
-        applyAttribute(.backgroundColor, value: UIColor.secondarySystemBackground, to: attributed)
+        applyAttribute(.backgroundColor, value: palette.codeBackground, to: attributed)
         applyParagraphStyle(to: attributed) { style in
           style.firstLineHeadIndent = 8
           style.headIndent = 8
@@ -1022,7 +1037,7 @@ private struct BBCodeTextKitRenderer {
     applyFontTransform(to: inner) { font in
       .monospacedSystemFont(ofSize: font.pointSize, weight: .regular)
     }
-    applyAttribute(.backgroundColor, value: UIColor.secondarySystemBackground, to: inner)
+    applyAttribute(.backgroundColor, value: palette.codeBackground, to: inner)
     applyParagraphStyle(to: inner) { style in
       style.firstLineHeadIndent = 8
       style.headIndent = 8

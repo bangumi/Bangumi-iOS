@@ -104,6 +104,8 @@ struct ReplyItemNormalView: View {
 
   @State private var reactions: [ReactionDTO]
 
+  @Environment(\.theme) private var theme
+
   init(type: TopicParentType, topicId: Int, idx: Int, reply: ReplyDTO, author: SlimUserDTO?) {
     self.type = type
     self.topicId = topicId
@@ -191,7 +193,7 @@ struct ReplyItemNormalView: View {
             )
           }
           BBCodeView(reply.content)
-            .tint(.linkText)
+            .tint(theme.link)
             .textSelection(.enabled)
             .fixedSize(horizontal: false, vertical: true)
           if !reactions.isEmpty {
@@ -204,7 +206,7 @@ struct ReplyItemNormalView: View {
           }
           ForEach(Array(zip(reply.replies.indices, reply.replies)), id: \.1) { subidx, subreply in
             VStack(alignment: .leading) {
-              Divider()
+              ThemedDivider()
               switch subreply.state {
               case .normal:
                 SubReplyNormalView(
@@ -282,6 +284,8 @@ struct SubReplyNormalView: View {
   @State private var showReportView: Bool = false
 
   @State private var reactions: [ReactionDTO]
+
+  @Environment(\.theme) private var theme
 
   init(
     type: TopicParentType,
@@ -377,7 +381,7 @@ struct SubReplyNormalView: View {
           )
         }
         BBCodeView(subreply.content)
-          .tint(.linkText)
+          .tint(theme.link)
           .textSelection(.enabled)
           .fixedSize(horizontal: false, vertical: true)
         if !reactions.isEmpty {
@@ -788,6 +792,8 @@ struct MainPostContentView: View {
 
   @AppStorage("anonymizeTopicUsers") var anonymizeTopicUsers: Bool = false
 
+  @Environment(\.theme) private var theme
+
   init(
     type: TopicParentType, topicId: Int, idx: Int, reply: ReplyDTO, author: SlimUserDTO?,
     reactions: Binding<[ReactionDTO]>
@@ -856,7 +862,7 @@ struct MainPostContentView: View {
               .foregroundStyle(.secondary)
           }
           BBCodeView(reply.content)
-            .tint(.linkText)
+            .tint(theme.link)
             .textSelection(.enabled)
             .fixedSize(horizontal: false, vertical: true)
           if !reactions.isEmpty {
@@ -869,7 +875,7 @@ struct MainPostContentView: View {
           }
           ForEach(Array(zip(reply.replies.indices, reply.replies)), id: \.1) { subidx, subreply in
             VStack(alignment: .leading) {
-              Divider()
+              ThemedDivider()
               switch subreply.state {
               case .normal:
                 SubReplyNormalView(

@@ -47,8 +47,7 @@ struct PostDocumentWebView: UIViewRepresentable {
 
     let webView = WKWebView(frame: .zero, configuration: configuration)
     webView.isOpaque = false
-    webView.backgroundColor = .systemBackground
-    webView.scrollView.backgroundColor = .systemBackground
+    applyBackground(webView)
     webView.scrollView.alwaysBounceVertical = true
     webView.scrollView.contentInsetAdjustmentBehavior = .automatic
     webView.scrollView.keyboardDismissMode = .interactive
@@ -81,6 +80,13 @@ struct PostDocumentWebView: UIViewRepresentable {
       reactionHTMLByPostID: reactionHTMLByPostID
     )
     context.coordinator.handle(scrollRequest)
+    applyBackground(webView)
+  }
+
+  private func applyBackground(_ webView: WKWebView) {
+    let color: UIColor = document.theme == .classic ? .systemBackground : .clear
+    webView.backgroundColor = color
+    webView.scrollView.backgroundColor = color
   }
 
   static func dismantleUIView(_ webView: WKWebView, coordinator: Coordinator) {
@@ -726,6 +732,7 @@ struct PostDocumentSurface: View {
   @State private var scrollRequest: PostDocumentScrollRequest?
   @State private var viewportState = PostDocumentViewportState.top
   @Environment(\.accessibilityReduceMotion) private var accessibilityReduceMotion
+  @Environment(\.theme) private var theme
 
   var body: some View {
     ZStack(alignment: .bottomTrailing) {
@@ -761,8 +768,12 @@ struct PostDocumentSurface: View {
       }
     }
     .background {
-      Color(uiColor: .systemBackground)
-        .ignoresSafeArea(.container, edges: .vertical)
+      if theme.isClassic {
+        Color(uiColor: .systemBackground)
+          .ignoresSafeArea(.container, edges: .vertical)
+      } else {
+        GlassScreenBackground()
+      }
     }
     .task(id: input.documentRenderKey) {
       do {

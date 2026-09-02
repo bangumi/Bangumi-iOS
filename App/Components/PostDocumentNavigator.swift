@@ -48,6 +48,8 @@ struct PostDocumentNavigatorOverlay: View {
 
   @State private var showsFloorNavigator = false
 
+  @Environment(\.theme) private var theme
+
   private var visibleItem: PostDocumentNavigationItem? {
     items.first { $0.postID == visiblePostID }
   }
@@ -59,6 +61,16 @@ struct PostDocumentNavigatorOverlay: View {
   }
 
   var body: some View {
+    if theme.isClassic {
+      controlBar
+    } else {
+      controlBar
+        .padding(6)
+        .glassEffectIfAvailable(shape: Capsule())
+    }
+  }
+
+  private var controlBar: some View {
     HStack(spacing: 8) {
       Button(action: onReply) {
         Label("回复", systemImage: "plus.bubble")

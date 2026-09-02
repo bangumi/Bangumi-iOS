@@ -78,6 +78,8 @@ struct GroupDetailView: View {
   @State private var showCreateTopic: Bool = false
   @State private var pinnedItems: [SlimGroupDTO] = []
 
+  @Environment(\.theme) private var theme
+
   private var isPinned: Bool {
     pinnedItems.contains { $0.id == group.id }
   }
@@ -155,7 +157,7 @@ struct GroupDetailView: View {
               Text(group.title)
                 .font(.title2.bold())
                 .multilineTextAlignment(.leading)
-              Divider()
+              ThemedDivider()
               Spacer(minLength: 0)
               Section {
                 Label("\(group.members) 位成员", systemImage: "person")
@@ -167,15 +169,15 @@ struct GroupDetailView: View {
             }
           }
           if !group.description.isEmpty {
-            Divider()
+            ThemedDivider()
             HStack {
               BBCodeView(group.description)
-                .tint(.linkText)
+                .tint(theme.link)
                 .fixedSize(horizontal: false, vertical: true)
               Spacer(minLength: 0)
             }
           }
-          Divider()
+          ThemedDivider()
           HStack {
             Text("创建于 \(group.createdAt.datetimeDisplay)")
               .font(.footnote)
@@ -192,7 +194,7 @@ struct GroupDetailView: View {
       GroupRecentMemberView(group: group, members: detail.recentMembers, width: width)
       GroupRecentTopicView(group: group, topics: detail.recentTopics, reload: reload)
     }
-    .padding(.horizontal, 8)
+    .padding(.horizontal, theme.metrics.screenPadding)
     .navigationTitle(group.title)
     .navigationBarTitleDisplayMode(.inline)
     .sheet(isPresented: $showCreateTopic) {
@@ -295,7 +297,7 @@ struct GroupRecentMemberView: View {
               .font(.caption)
           }.buttonStyle(.navigation)
         }
-        Divider()
+        ThemedDivider()
       }
       LazyVGrid(columns: columns) {
         ForEach(members.prefix(limit)) { member in
@@ -344,7 +346,7 @@ struct GroupRecentTopicView: View {
               .font(.caption)
           }.buttonStyle(.navigation)
         }
-        Divider()
+        ThemedDivider()
       }
       .sheet(isPresented: $showCreateTopic) {
         CreateTopicBoxSheet(type: .group(group.name)) {
@@ -382,7 +384,7 @@ struct GroupRecentTopicView: View {
                     .lineLimit(1)
                 }
               }.font(.footnote)
-              Divider()
+              ThemedDivider()
             }.padding(.top, 2)
           }
         }

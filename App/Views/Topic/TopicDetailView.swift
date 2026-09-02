@@ -315,6 +315,7 @@ struct TopicDetailView: View {
 
   @Environment(\.bangumiDomains) private var domains
   @Environment(\.openURL) private var openURL
+  @Environment(\.theme) private var theme
 
   @State private var data: TopicDetailData?
   @State private var loadFailed = false
@@ -798,6 +799,7 @@ struct TopicDetailView: View {
       canReact: isAuthenticated,
       showReactions: enableReactions,
       avatarIsRound: avatarStyle == .round,
+      theme: theme.kind,
       initialPostID: initialPostID
     )
   }
