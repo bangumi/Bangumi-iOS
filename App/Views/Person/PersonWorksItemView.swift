@@ -26,7 +26,7 @@ struct PersonWorksItemView: View {
               .font(.caption)
               .lineLimit(1)
               .foregroundStyle(.secondary)
-            Divider()
+            ThemedDivider()
           }
           HFlow {
             ForEach(item.positions) { position in

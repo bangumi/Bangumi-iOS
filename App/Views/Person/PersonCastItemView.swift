@@ -38,7 +38,7 @@ struct PersonCastItemView: View {
                       .foregroundStyle(.secondary)
                   }
                 }
-                Divider()
+                ThemedDivider()
               }.font(.footnote)
               ImageView(img: relation.subject.images?.small)
                 .imageStyle(width: 40, height: 40, alignment: .top)

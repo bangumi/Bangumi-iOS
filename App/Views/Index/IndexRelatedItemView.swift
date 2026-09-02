@@ -378,7 +378,7 @@ struct IndexRelatedItemView: View {
         }
 
         if isOwner {
-          Divider()
+          ThemedDivider()
           HStack {
             Button {
               showEditRelated = true

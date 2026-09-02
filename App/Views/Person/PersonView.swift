@@ -166,6 +166,7 @@ struct PersonDetailView: View {
   let detail: PersonDetailDTO
   let reload: () async -> Void
 
+  @Environment(\.theme) private var theme
   @AppStorage("isolationMode") private var isolationMode = false
   @State private var updating: Bool = false
 
@@ -279,7 +280,7 @@ struct PersonDetailView: View {
     BBCodeView(person.summary, textSize: 14)
       .textSelection(.enabled)
       .padding(2)
-      .tint(.linkText)
+      .tint(theme.link)
 
     /// casts
     PersonCastsView(personId: person.id, casts: detail.casts)
