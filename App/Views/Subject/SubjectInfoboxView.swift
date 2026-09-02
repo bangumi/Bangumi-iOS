@@ -103,6 +103,8 @@ struct SubjectInfoboxDetailView: View {
 
   @AppStorage("titlePreference") private var titlePreference: TitlePreference = .original
 
+  @Environment(\.theme) private var theme
+
   @State private var showVersion: [String: Bool] = [:]
   @State private var showFolded: Bool = false
 
@@ -430,7 +432,7 @@ struct SubjectInfoboxDetailView: View {
     VStack(alignment: .leading) {
       ForEach(pinnedItems, id: \.self) { item in
         Text(item)
-          .tint(.linkText)
+          .tint(theme.link)
           .textSelection(.enabled)
         Divider()
       }
@@ -451,7 +453,7 @@ struct SubjectInfoboxDetailView: View {
       }
       ForEach(items, id: \.self) { item in
         Text(item)
-          .tint(.linkText)
+          .tint(theme.link)
           .textSelection(.enabled)
         Divider()
       }
@@ -471,7 +473,7 @@ struct SubjectInfoboxDetailView: View {
         Divider()
         if showVersion[key] ?? false {
           Text(versionItems[key] ?? AttributedString(""))
-            .tint(.linkText)
+            .tint(theme.link)
             .textSelection(.enabled)
           Divider()
         }
@@ -480,7 +482,7 @@ struct SubjectInfoboxDetailView: View {
         if showFolded {
           ForEach(foldedItems, id: \.self) { item in
             Text(item)
-              .tint(.linkText)
+              .tint(theme.link)
               .textSelection(.enabled)
             Divider()
           }

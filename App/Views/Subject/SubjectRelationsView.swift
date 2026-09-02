@@ -8,6 +8,8 @@ struct SubjectRelationsView: View {
 
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
 
+  @Environment(\.theme) private var theme
+
   @State private var collections: [Int: CollectionType] = [:]
   @State private var activeSubject: SlimSubjectDTO? = nil
 
@@ -26,20 +28,31 @@ struct SubjectRelationsView: View {
 
   var body: some View {
     Group {
-      VStack(spacing: 2) {
-        HStack(alignment: .bottom) {
-          Text("关联条目")
-            .foregroundStyle(relations.count > 0 ? .primary : .secondary)
-            .font(.title3)
-          Spacer()
+      if theme.isClassic {
+        VStack(spacing: 2) {
+          HStack(alignment: .bottom) {
+            Text("关联条目")
+              .foregroundStyle(relations.count > 0 ? .primary : .secondary)
+              .font(.title3)
+            Spacer()
+            if relations.count > 0 {
+              NavigationLink(value: NavDestination.subjectRelationList(subjectId)) {
+                Text("更多条目 »").font(.caption)
+              }.buttonStyle(.navigation)
+            }
+          }
+          Divider()
+        }.padding(.top, 5)
+      } else {
+        ThemedSectionHeader("关联条目") {
           if relations.count > 0 {
             NavigationLink(value: NavDestination.subjectRelationList(subjectId)) {
               Text("更多条目 »").font(.caption)
             }.buttonStyle(.navigation)
           }
         }
-        Divider()
-      }.padding(.top, 5)
+        .foregroundStyle(relations.count > 0 ? .primary : .secondary)
+      }
       if relations.count == 0 {
         HStack {
           Spacer()

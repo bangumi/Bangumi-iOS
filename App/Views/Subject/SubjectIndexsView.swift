@@ -4,6 +4,8 @@ struct SubjectIndexsView: View {
   let subjectId: Int
   let indexes: [SlimIndexDTO]
 
+  @Environment(\.theme) private var theme
+
   init(subjectId: Int, indexes: [SlimIndexDTO]) {
     self.subjectId = subjectId
     self.indexes = indexes
@@ -22,20 +24,31 @@ struct SubjectIndexsView: View {
   }
 
   var body: some View {
-    VStack(spacing: 2) {
-      HStack(alignment: .bottom) {
-        Text(title)
-          .foregroundStyle(indexes.count > 0 ? .primary : .secondary)
-          .font(.title3)
-        Spacer()
+    if theme.isClassic {
+      VStack(spacing: 2) {
+        HStack(alignment: .bottom) {
+          Text(title)
+            .foregroundStyle(indexes.count > 0 ? .primary : .secondary)
+            .font(.title3)
+          Spacer()
+          if indexes.count > 0 {
+            NavigationLink(value: NavDestination.subjectIndexList(subjectId)) {
+              Text(moreText).font(.caption)
+            }.buttonStyle(.navigation)
+          }
+        }
+        Divider()
+      }.padding(.top, 5)
+    } else {
+      ThemedSectionHeader(title) {
         if indexes.count > 0 {
           NavigationLink(value: NavDestination.subjectIndexList(subjectId)) {
             Text(moreText).font(.caption)
           }.buttonStyle(.navigation)
         }
       }
-      Divider()
-    }.padding(.top, 5)
+      .foregroundStyle(indexes.count > 0 ? .primary : .secondary)
+    }
 
     if indexes.isEmpty {
       HStack {

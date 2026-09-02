@@ -115,6 +115,8 @@ private struct SubjectBrowsingOptionsState: Equatable, RawRepresentable {
 struct SubjectBrowsingView: View {
   let type: SubjectType
 
+  @Environment(\.theme) private var theme
+
   @State private var showFilter: Bool = false
   @State private var filterExpand: FilterExpand? = nil
   @AppStorage("subjectBrowsingOptionsState")
@@ -232,7 +234,7 @@ struct SubjectBrowsingView: View {
       Divider()
     }
     .padding(.vertical, 4)
-    .background(Color(uiColor: .systemBackground))
+    .background(theme.isClassic ? Color(uiColor: .systemBackground) : .clear)
     .zIndex(1)
   }
 

@@ -6,13 +6,15 @@ struct SubjectCollectionView: View {
   let subject: SubjectDTO
   let reload: () async -> Void
 
+  @Environment(\.theme) private var theme
+
   @State private var edit: Bool = false
 
   var body: some View {
     Section {
       if let interest = subject.interest {
         VStack(alignment: .leading) {
-          BorderView(color: .linkText, padding: 5) {
+          BorderView(color: theme.link, padding: 5, role: .accent) {
             HStack {
               Spacer()
               if interest.private {
@@ -24,7 +26,7 @@ struct SubjectCollectionView: View {
               )
               StarsView(score: Float(interest.rate), size: 16)
               Spacer()
-            }.foregroundStyle(.linkText)
+            }.foregroundStyle(theme.link)
           }
           .padding(5)
           .onTapGesture {
@@ -68,13 +70,13 @@ struct SubjectCollectionView: View {
         }
       } else {
         VStack {
-          BorderView(color: .linkText, padding: 5) {
+          BorderView(color: theme.link, padding: 5, role: .accent) {
             HStack {
               Spacer()
               Label("未收藏", systemImage: "plus")
                 .foregroundStyle(.secondary)
               Spacer()
-            }.foregroundStyle(.linkText)
+            }.foregroundStyle(theme.link)
           }
           .padding(5)
           .onTapGesture {

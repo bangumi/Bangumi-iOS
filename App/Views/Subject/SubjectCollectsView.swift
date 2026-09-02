@@ -7,6 +7,8 @@ struct SubjectCollectsView: View {
   let subject: SubjectDTO
   let latestCollects: [SubjectCollectDTO]
 
+  @Environment(\.theme) private var theme
+
   @State private var isLoading: Bool = false
   @State private var collects: [SubjectCollectDTO]
 
@@ -81,33 +83,53 @@ struct SubjectCollectsView: View {
     }
   }
 
+  private var filterPicker: some View {
+    Picker("", selection: $subjectCollectsFilterMode.animated()) {
+      ForEach(FilterMode.allCases, id: \.self) { mode in
+        Text(mode.description).tag(mode)
+      }
+    }
+    .disabled(isLoading)
+    .pickerStyle(.segmented)
+    .frame(width: 80)
+    .scaleEffect(0.8)
+  }
+
+  private var moreLink: some View {
+    NavigationLink(value: NavDestination.subjectCollectsList(subject.id)) {
+      Text(moreText).font(.caption)
+    }.buttonStyle(.navigation)
+  }
+
   var body: some View {
     VStack(alignment: .leading) {
-      VStack(spacing: 2) {
-        HStack(alignment: .bottom) {
-          Text(title)
-            .foregroundStyle(collects.count > 0 ? .primary : .secondary)
-            .font(.title3)
-          if isAuthenticated {
-            Picker("", selection: $subjectCollectsFilterMode.animated()) {
-              ForEach(FilterMode.allCases, id: \.self) { mode in
-                Text(mode.description).tag(mode)
-              }
+      if theme.isClassic {
+        VStack(spacing: 2) {
+          HStack(alignment: .bottom) {
+            Text(title)
+              .foregroundStyle(collects.count > 0 ? .primary : .secondary)
+              .font(.title3)
+            if isAuthenticated {
+              filterPicker
             }
-            .disabled(isLoading)
-            .pickerStyle(.segmented)
-            .frame(width: 80)
-            .scaleEffect(0.8)
+            Spacer()
+            if collects.count > 0 {
+              moreLink
+            }
           }
-          Spacer()
+          Divider()
+        }.padding(.top, 5)
+      } else {
+        ThemedSectionHeader(title) {
+          if isAuthenticated {
+            filterPicker
+          }
           if collects.count > 0 {
-            NavigationLink(value: NavDestination.subjectCollectsList(subject.id)) {
-              Text(moreText).font(.caption)
-            }.buttonStyle(.navigation)
+            moreLink
           }
         }
-        Divider()
-      }.padding(.top, 5)
+        .foregroundStyle(collects.count > 0 ? .primary : .secondary)
+      }
 
       if collects.isEmpty {
         HStack {

@@ -9,6 +9,7 @@ struct SubjectCollectionBoxView: View {
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
 
   @Environment(\.dismiss) private var dismiss
+  @Environment(\.theme) private var theme
 
   @State private var subject: SubjectDTO? = nil
   @State private var ctype: CollectionType = .none
@@ -185,7 +186,7 @@ struct SubjectCollectionBoxView: View {
             HStack(alignment: .top) {
               Text("我的评价:")
               Text(ratingComment)
-                .foregroundStyle(rate > 0 ? .red : .secondary)
+                .foregroundStyle(rate > 0 ? theme.danger : .secondary)
             }
             HStack {
               Image(systemName: "star.slash")
@@ -200,7 +201,7 @@ struct SubjectCollectionBoxView: View {
               ForEach(1..<11) { idx in
                 Image(systemName: rate >= idx ? "star.fill" : "star")
                   .resizable()
-                  .foregroundStyle(.orange)
+                  .foregroundStyle(theme.star)
                   .frame(width: 20, height: 20)
                   .onTapGesture {
                     withAnimation(.default) {

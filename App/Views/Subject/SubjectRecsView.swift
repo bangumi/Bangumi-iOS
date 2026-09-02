@@ -8,6 +8,8 @@ struct SubjectRecsView: View {
 
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
 
+  @Environment(\.theme) private var theme
+
   @State private var collections: [Int: CollectionType] = [:]
   @State private var activeSubject: SlimSubjectDTO? = nil
 
@@ -26,15 +28,20 @@ struct SubjectRecsView: View {
 
   var body: some View {
     Group {
-      VStack(spacing: 2) {
-        HStack(alignment: .bottom) {
-          Text("猜你喜欢")
-            .foregroundStyle(recs.count > 0 ? .primary : .secondary)
-            .font(.title3)
-          Spacer()
-        }
-        Divider()
-      }.padding(.top, 5)
+      if theme.isClassic {
+        VStack(spacing: 2) {
+          HStack(alignment: .bottom) {
+            Text("猜你喜欢")
+              .foregroundStyle(recs.count > 0 ? .primary : .secondary)
+              .font(.title3)
+            Spacer()
+          }
+          Divider()
+        }.padding(.top, 5)
+      } else {
+        ThemedSectionHeader("猜你喜欢")
+          .foregroundStyle(recs.count > 0 ? .primary : .secondary)
+      }
       if recs.count == 0 {
         HStack {
           Spacer()
