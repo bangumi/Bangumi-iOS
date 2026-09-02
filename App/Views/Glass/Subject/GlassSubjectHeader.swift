@@ -222,7 +222,10 @@ struct GlassSubjectRankPill: View {
 
   var body: some View {
     HStack(spacing: 8) {
-      Text("№ \(rank)")
+      Image(systemName: "trophy.fill")
+        .font(.caption2.weight(.bold))
+        .foregroundStyle(theme.rank)
+      Text(verbatim: "#\(rank)")
         .font(.caption.weight(.heavy))
         .monospaced()
         .foregroundStyle(theme.rank)
