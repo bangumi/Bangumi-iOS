@@ -7,6 +7,8 @@ struct TopicTitleView: View {
 
   @AppStorage("showTopicAgeBadge") private var showTopicAgeBadge = true
 
+  @Environment(\.theme) private var theme
+
   let title: String
   let createdAt: Int
   let replyCount: Int?
@@ -45,7 +47,7 @@ struct TopicTitleView: View {
         text
         + Text(" (+\(replyCount))")
         .font(.footnote)
-        .foregroundColor(.secondary)
+        .foregroundColor(theme.secondaryText)
     }
 
     return text

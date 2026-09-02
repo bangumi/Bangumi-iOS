@@ -88,6 +88,27 @@ private struct ThemedListRowModifier: ViewModifier {
   }
 }
 
+private struct ThemedFieldChromeModifier: ViewModifier {
+  @Environment(\.theme) private var theme
+
+  @ViewBuilder
+  func body(content: Content) -> some View {
+    if theme.isClassic {
+      content
+    } else {
+      content
+        .background {
+          RoundedRectangle(cornerRadius: theme.metrics.controlRadius, style: .continuous)
+            .fill(theme.controlFill)
+        }
+        .overlay {
+          RoundedRectangle(cornerRadius: theme.metrics.controlRadius, style: .continuous)
+            .strokeBorder(theme.controlBorder, lineWidth: 1)
+        }
+    }
+  }
+}
+
 extension View {
   func themedScreen() -> some View {
     modifier(ThemedScreenModifier())
@@ -95,5 +116,9 @@ extension View {
 
   func themedListRow() -> some View {
     modifier(ThemedListRowModifier())
+  }
+
+  func themedFieldChrome() -> some View {
+    modifier(ThemedFieldChromeModifier())
   }
 }

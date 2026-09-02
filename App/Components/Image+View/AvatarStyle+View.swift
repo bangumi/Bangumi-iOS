@@ -22,16 +22,18 @@ struct AvatarBorderModifier: ViewModifier {
   let cornerRadius: CGFloat
   let isLoaded: Bool
 
+  @Environment(\.theme) private var theme
+
   func body(content: Content) -> some View {
     content.overlay {
       if isLoaded {
         switch avatarStyle {
         case .round:
           Circle()
-            .stroke(Color.primary.opacity(0.15), lineWidth: 0.5)
+            .stroke(theme.imageBorder, lineWidth: 0.5)
         case .classic:
           RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-            .stroke(Color.primary.opacity(0.15), lineWidth: 0.5)
+            .stroke(theme.imageBorder, lineWidth: 0.5)
         }
       }
     }

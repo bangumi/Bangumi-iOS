@@ -11,6 +11,8 @@ struct ReactionsView: View {
 
   @State private var updating = false
 
+  @Environment(\.theme) private var theme
+
   func shadowColor(_ reaction: ReactionDTO) -> Color {
     if reaction.users.contains(where: { $0.id == profile.id }) {
       return .linkText.opacity(0.8)
@@ -19,10 +21,44 @@ struct ReactionsView: View {
   }
 
   func textColor(_ reaction: ReactionDTO) -> Color {
-    if reaction.users.contains(where: { $0.id == profile.id }) {
-      return .linkText
+    if isMine(reaction) {
+      return theme.link
     }
-    return .secondary
+    return theme.secondaryText
+  }
+
+  func isMine(_ reaction: ReactionDTO) -> Bool {
+    reaction.users.contains(where: { $0.id == profile.id })
+  }
+
+  @ViewBuilder
+  func reactionLabel(_ reaction: ReactionDTO) -> some View {
+    if theme.isClassic {
+      CardView(padding: 2, cornerRadius: 10, shadow: shadowColor(reaction)) {
+        reactionContent(reaction)
+      }
+    } else {
+      reactionContent(reaction)
+        .padding(2)
+        .background {
+          Capsule().fill(isMine(reaction) ? theme.tint : theme.controlFill)
+        }
+        .overlay {
+          Capsule()
+            .strokeBorder(
+              isMine(reaction) ? theme.accent : theme.controlBorder, lineWidth: 1)
+        }
+    }
+  }
+
+  func reactionContent(_ reaction: ReactionDTO) -> some View {
+    HStack(alignment: .center, spacing: 4) {
+      SmileyReactionImage(code: reaction.smileyCode, size: 16)
+      Text("\(reaction.users.count)")
+        .font(.callout)
+        .monospacedDigit()
+        .foregroundStyle(textColor(reaction))
+    }.padding(.horizontal, 4)
   }
 
   func onClick(_ reaction: ReactionDTO) {
@@ -82,15 +118,7 @@ struct ReactionsView: View {
           Button {
             onClick(reaction)
           } label: {
-            CardView(padding: 2, cornerRadius: 10, shadow: shadowColor(reaction)) {
-              HStack(alignment: .center, spacing: 4) {
-                SmileyReactionImage(code: reaction.smileyCode, size: 16)
-                Text("\(reaction.users.count)")
-                  .font(.callout)
-                  .monospacedDigit()
-                  .foregroundStyle(textColor(reaction))
-              }.padding(.horizontal, 4)
-            }
+            reactionLabel(reaction)
           }
           .buttonStyle(.plain)
           .disabled(!isAuthenticated || updating)

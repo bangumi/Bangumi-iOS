@@ -4,6 +4,8 @@ struct StarsView: View {
   let score: Float
   let size: CGFloat
 
+  @Environment(\.theme) private var theme
+
   var rate: Int {
     Int(score.rounded())
   }
@@ -17,7 +19,7 @@ struct StarsView: View {
             : idx * 2 - 1 == rate ? "star.leadinghalf.fill" : "star"
         )
         .resizable()
-        .foregroundStyle(.orange)
+        .foregroundStyle(theme.star)
         .frame(width: size, height: size)
         .padding(.horizontal, -3)
       }
