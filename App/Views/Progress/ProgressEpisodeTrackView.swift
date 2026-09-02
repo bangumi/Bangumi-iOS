@@ -930,6 +930,17 @@ struct ProgressEpisodeChip: View {
           )
         )
       }
+      .overlay(alignment: .bottom) {
+        if showEpisodeTrends, episode.comment > 0 {
+          GeometryReader { proxy in
+            Rectangle()
+              .fill(Color(hex: 0xFF8040, opacity: 0.85))
+              .frame(width: proxy.size.width * episode.trendLevel)
+          }
+          .frame(height: size > 22 ? 3 : 2)
+        }
+      }
+      .clipShape(shape)
       .overlay {
         if cell.dashed {
           shape.strokeBorder(
@@ -941,14 +952,5 @@ struct ProgressEpisodeChip: View {
         }
       }
       .strikethrough(cell.strikethrough)
-      .overlay(alignment: .bottom) {
-        if showEpisodeTrends {
-          Capsule()
-            .fill(episode.trendColor)
-            .frame(height: size > 22 ? 3 : 2)
-            .padding(.horizontal, cornerRadius * 0.7)
-            .padding(.bottom, size > 22 ? 4 : 3)
-        }
-      }
   }
 }
