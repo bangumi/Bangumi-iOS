@@ -17,6 +17,7 @@ struct TimelineSayView: View {
       Notifier.shared.notify(message: "发送成功")
       dismiss()
     } catch {
+      updating = false
       Notifier.shared.alert(error: error)
     }
   }
