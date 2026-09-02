@@ -111,7 +111,13 @@ struct EpisodeView: View {
         Button {
           showCommentBox = true
         } label: {
-          Label("添加吐槽", systemImage: "plus.bubble")
+          Label {
+            Text("添加吐槽")
+          } icon: {
+            ToolbarCircle {
+              Image(systemName: "plus.bubble")
+            }
+          }
         }
         .disabled(episode == nil || !isAuthenticated || isolationMode)
 
@@ -134,7 +140,9 @@ struct EpisodeView: View {
             Label("分享", systemImage: "square.and.arrow.up")
           }
         } label: {
-          Image(systemName: "ellipsis")
+          ToolbarCircle {
+            Image(systemName: "ellipsis")
+          }
         }
       }
     }

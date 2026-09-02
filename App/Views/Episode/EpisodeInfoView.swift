@@ -28,7 +28,7 @@ struct EpisodeInfoView: View {
         }
         Spacer()
       }
-      Divider()
+      ThemedDivider()
       if !episode.name.isEmpty {
         Text(field(name: "标题", value: episode.name))
       }
@@ -45,7 +45,7 @@ struct EpisodeInfoView: View {
         Text(field(name: "Disc", value: "\(episode.disc)"))
       }
       if isAuthenticated && episode.collectionTypeEnum != .none && episode.collectedAt > 0 {
-        Divider()
+        ThemedDivider()
         HStack {
           Spacer()
           Text(

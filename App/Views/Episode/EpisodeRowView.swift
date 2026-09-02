@@ -5,9 +5,33 @@ struct EpisodeRowView: View {
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
 
+  @Environment(\.theme) private var theme
+
   let episode: EpisodeDTO
   let subjectCollectionType: CollectionType
   var reload: (() async -> Void)? = nil
+
+  private var cellStyle: EpisodeCellStyle {
+    switch episode.collectionTypeEnum {
+    case .collect:
+      return theme.episodeCell(.watched)
+    case .dropped:
+      return theme.episodeCell(.dropped)
+    case .wish:
+      return theme.episodeCell(.wish)
+    case .none:
+      return theme.episodeCell(episode.aired ? .aired : .unaired)
+    }
+  }
+
+  private var cellFill: AnyShapeStyle {
+    let colors = cellStyle.fill
+    if theme.isClassic {
+      return AnyShapeStyle(colors.first ?? .clear)
+    }
+    return AnyShapeStyle(
+      LinearGradient(colors: colors, startPoint: .topLeading, endPoint: .bottomTrailing))
+  }
 
   var body: some View {
     VStack(alignment: .leading) {
@@ -16,16 +40,16 @@ struct EpisodeRowView: View {
         .lineLimit(1)
       HStack {
         if isAuthenticated && episode.collectionTypeEnum != .none {
-          let colors = episode.badgeColors
-          BorderView(color: colors.border, padding: 4) {
+          let style = cellStyle
+          BorderView(color: style.border, padding: 4) {
             Text("\(episode.collectionTypeEnum.description)")
-              .foregroundStyle(colors.foreground)
+              .foregroundStyle(style.foreground)
               .font(.footnote)
           }
           .strikethrough(episode.status == EpisodeCollectionType.dropped.rawValue)
           .background {
-            RoundedRectangle(cornerRadius: 5)
-              .fill(colors.background)
+            RoundedRectangle(cornerRadius: theme.metrics.badgeRadius)
+              .fill(cellFill)
           }
         } else {
           Menu {
@@ -74,7 +98,7 @@ struct EpisodeRowView: View {
           }
           .font(.footnote)
           .foregroundStyle(.secondary)
-          Divider()
+          ThemedDivider()
         }
         Spacer()
       }

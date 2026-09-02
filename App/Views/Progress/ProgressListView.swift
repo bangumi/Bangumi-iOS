@@ -19,6 +19,7 @@ struct ProgressListView: View {
   @AppStorage("episodeGridInteractionMode") private var episodeGridInteractionMode:
     EpisodeGridInteractionMode = .menu
   @Environment(\.colorScheme) private var colorScheme
+  @Environment(\.theme) private var theme
   @State private var prefetchState = NextPagePrefetchState<ProgressSubjectDTO.ID>()
 
   private var cardShadow: Color? {
@@ -44,7 +45,7 @@ struct ProgressListView: View {
   var body: some View {
     let nextPageTrigger = items.nextPagePrefetchTrigger(prefetchWindow: prefetchWindow)
 
-    LazyVStack(alignment: .leading, spacing: 8) {
+    LazyVStack(alignment: .leading, spacing: theme.metrics.listSpacing) {
       ForEach(items) { item in
         let trigger = NextPagePrefetchTaskKey(
           triggerId: nextPageTrigger.triggerId(for: item.id),
@@ -68,7 +69,7 @@ struct ProgressListView: View {
         ProgressPageFooterView()
       }
     }
-    .padding(.horizontal, 8)
+    .padding(.horizontal, theme.metrics.screenPadding)
     .onChange(of: paginationResetToken) { _, _ in
       prefetchState.reset()
     }
@@ -96,6 +97,8 @@ struct ProgressListItemContentView: View {
 
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
 
+  @Environment(\.theme) private var theme
+
   private var item: ProgressSubjectDTO {
     payload.item
   }
@@ -106,7 +109,7 @@ struct ProgressListItemContentView: View {
 
   var body: some View {
     let subjectId = subject.id
-    HStack(alignment: .top, spacing: 8) {
+    HStack(alignment: .top, spacing: theme.metrics.listSpacing) {
       ImageView(img: subject.images?.resize(.r200))
         .imageStyle(width: 56, height: 80, cornerRadius: 8)
         .imageType(.subject)
@@ -143,7 +146,7 @@ struct ProgressListItemContentView: View {
             subject.type.description,
             systemImage: subject.type.icon
           )
-          .foregroundStyle(.accent)
+          .foregroundStyle(theme.accent)
           .font(.callout)
         }
       }

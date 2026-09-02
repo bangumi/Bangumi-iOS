@@ -4,6 +4,8 @@ import SwiftUI
 struct EpisodeListView: View {
   let subjectId: Int
 
+  @Environment(\.theme) private var theme
+
   @State private var refreshed: Bool = false
   @State private var reloadToken = 0
   @State private var countMain: Int = 0
@@ -39,7 +41,7 @@ struct EpisodeListView: View {
   var body: some View {
     HStack {
       Image(systemName: filterCollection ? "eye.slash.circle.fill" : "eye.circle.fill")
-        .foregroundStyle(filterCollection ? .accent : .secondary)
+        .foregroundStyle(filterCollection ? theme.accent : .secondary)
         .font(.title)
         .sensoryFeedback(.selection, trigger: filterCollection)
         .onTapGesture {
@@ -55,7 +57,7 @@ struct EpisodeListView: View {
       .pickerStyle(.segmented)
       Spacer()
       Image(systemName: sortDesc ? "arrow.down.circle.fill" : "arrow.up.circle.fill")
-        .foregroundStyle(sortDesc ? .accent : .secondary)
+        .foregroundStyle(sortDesc ? theme.accent : .secondary)
         .font(.title)
         .sensoryFeedback(.selection, trigger: sortDesc)
         .onTapGesture {
@@ -63,7 +65,7 @@ struct EpisodeListView: View {
             self.sortDesc.toggle()
           }
         }
-    }.padding(.horizontal, 8)
+    }.padding(.horizontal, theme.metrics.screenPadding)
     EpisodeListDetailView(
       subjectId: subjectId, sortDesc: sortDesc,
       main: main, filterCollection: filterCollection,
@@ -87,6 +89,8 @@ struct EpisodeListDetailView: View {
   let main: Bool
   let filterCollection: Bool
   let reloadToken: Int
+
+  @Environment(\.theme) private var theme
 
   @State private var episodes: [EpisodeDTO] = []
   @State private var subjectCollectionType: CollectionType = .none
@@ -122,7 +126,7 @@ struct EpisodeListDetailView: View {
             await load()
           }
         }
-      }.padding(.horizontal, 8)
+      }.padding(.horizontal, theme.metrics.screenPadding)
     }
     .task(id: "\(subjectId)-\(sortDesc)-\(main)-\(filterCollection)-\(reloadToken)") {
       await load()

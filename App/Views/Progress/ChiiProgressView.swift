@@ -9,6 +9,8 @@ struct ChiiProgressView: View {
   @AppStorage("progressSecondLineMode") var secondLineMode: ProgressSecondLineMode = .info
   @AppStorage("progressTab") var progressTab: SubjectType = .none
 
+  @Environment(\.theme) private var theme
+
   @State private var refreshing: Bool = true
   @State private var refreshProgress: CGFloat = 0
   @State private var showRefreshAll: Bool = false
@@ -32,7 +34,7 @@ struct ChiiProgressView: View {
   }
 
   private var progressEpisodeWindowSize: Int {
-    5
+    theme.isClassic || progressViewMode == .tile ? 5 : 80
   }
 
   private var progressPagePrefetchWindow: Int {
@@ -438,26 +440,42 @@ struct ChiiProgressView: View {
         ProgressView()
           .padding()
       } else {
-        ContentUnavailableView {
-          Label("没有条目", systemImage: "tray")
-        } description: {
-          Text("当前列表为空，或是搜索无结果")
-        }
+        ThemedEmptyState(
+          systemImage: "tray",
+          title: "没有条目",
+          description: "当前列表为空，或是搜索无结果"
+        )
       }
     } else {
       if refreshing {
-        HStack {
-          ProgressView(value: refreshProgress)
-            .progressViewStyle(.linear)
-        }.padding()
+        progressSyncBar
       } else {
-        ContentUnavailableView {
-          Label("没有收藏数据", systemImage: "tray")
-        } description: {
-          Text("下拉刷新以获取正在观看的条目")
-        }
+        ThemedEmptyState(
+          systemImage: "tray",
+          title: "没有收藏数据",
+          description: "下拉刷新以获取正在观看的条目"
+        )
       }
     }
+  }
+
+  @ViewBuilder
+  private var progressSyncBar: some View {
+    if theme.isClassic {
+      progressSyncIndicator
+    } else {
+      CardView(padding: theme.metrics.cardPadding) {
+        progressSyncIndicator
+      }
+      .padding(.horizontal, theme.metrics.screenPadding)
+    }
+  }
+
+  private var progressSyncIndicator: some View {
+    HStack {
+      ProgressView(value: refreshProgress)
+        .progressViewStyle(.linear)
+    }.padding()
   }
 
   private var progressTypePicker: some View {
@@ -466,7 +484,7 @@ struct ChiiProgressView: View {
         Text(typeDesc(stype: type)).tag(type)
       }
     }
-    .padding(.horizontal, 8)
+    .padding(.horizontal, theme.metrics.screenPadding)
     .pickerStyle(.segmented)
   }
 
@@ -496,7 +514,9 @@ struct ChiiProgressView: View {
         showRefreshAll = true
       }
     } label: {
-      Image(systemName: "ellipsis")
+      ToolbarCircle {
+        Image(systemName: "ellipsis")
+      }
     }
     .pickerStyle(.menu)
   }
@@ -541,6 +561,7 @@ struct ChiiProgressView: View {
     .onChange(of: search) { Task { await reloadProgressPages(animate: true) } }
     .onChange(of: progressSortMode) { Task { await reloadProgressPages(animate: true) } }
     .onChange(of: progressViewMode) { Task { await reloadProgressPages(animate: true) } }
+    .onChange(of: theme.kind) { Task { await reloadProgressPages(animate: true) } }
     .onReceive(
       NotificationCenter.default.publisher(for: ProgressSubjectInvalidation.notificationName),
       perform: handleProgressSubjectInvalidation
