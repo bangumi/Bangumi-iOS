@@ -65,25 +65,29 @@ struct IndexEditSheet: View {
     ) {
       Form {
         Section {
-          TextField("标题", text: $title)
-            .textInputAutocapitalization(.never)
+          Group {
+            TextField("标题", text: $title)
+              .textInputAutocapitalization(.never)
 
-          TextEditor(text: $desc)
-            .frame(minHeight: 100)
-            .overlay(alignment: .topLeading) {
-              if desc.isEmpty {
-                Text("描述")
-                  .foregroundColor(.secondary.opacity(0.5))
-                  .padding(.top, 8)
-                  .padding(.leading, 4)
+            TextEditor(text: $desc)
+              .frame(minHeight: 100)
+              .overlay(alignment: .topLeading) {
+                if desc.isEmpty {
+                  Text("描述")
+                    .foregroundColor(.secondary.opacity(0.5))
+                    .padding(.top, 8)
+                    .padding(.leading, 4)
+                }
               }
-            }
+          }
+          .themedListRow()
         } header: {
           Text("内容")
         }
 
         Section {
           Toggle("仅自己可见", isOn: $isPrivate)
+            .themedListRow()
         } header: {
           Text("隐私设置")
         }

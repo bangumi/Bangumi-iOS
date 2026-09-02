@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct BBCodeEditor: View {
+  @Environment(\.theme) private var theme
   @Binding var text: String
 
   private let minHeight: CGFloat = 80
@@ -342,7 +343,8 @@ struct BBCodeEditor: View {
     .frame(maxWidth: .infinity)
     .background(.clear)
 
-    let hostingController = UIHostingController(rootView: AnyView(toolbarView))
+    let hostingController = UIHostingController(
+      rootView: AnyView(toolbarView.environment(\.theme, theme)))
     hostingController.view.backgroundColor = .clear
     keyboardToolbarHostingController = hostingController
   }

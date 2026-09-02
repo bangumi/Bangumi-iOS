@@ -532,8 +532,11 @@ private struct BookProgressEditorSheet: View {
     ) {
       Form {
         Section {
-          BookProgressField(title: "话数", value: $eps, total: subject.epsDesc)
-          BookProgressField(title: "卷数", value: $vols, total: subject.volumesDesc)
+          Group {
+            BookProgressField(title: "话数", value: $eps, total: subject.epsDesc)
+            BookProgressField(title: "卷数", value: $vols, total: subject.volumesDesc)
+          }
+          .themedListRow()
         } header: {
           Text(subject.title(with: titlePreference))
             .font(.headline)

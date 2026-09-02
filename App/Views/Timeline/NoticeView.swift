@@ -122,9 +122,11 @@ struct NoticeView: View {
             ProgressView()
             Spacer()
           }
+          .themedListRow()
         } else if notices.isEmpty {
           ContentUnavailableView("暂无提醒", systemImage: "bell.slash")
             .listRowSeparator(.hidden)
+            .themedListRow()
         } else {
           ForEach(notices) { notice in
             NoticeRowView(notice: notice) {
@@ -143,6 +145,7 @@ struct NoticeView: View {
                 .tint(.blue)
               }
             }
+            .themedListRow()
           }
         }
       }

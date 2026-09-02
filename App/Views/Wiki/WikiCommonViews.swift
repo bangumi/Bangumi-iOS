@@ -16,36 +16,42 @@ struct WikiHomeView: View {
     List {
       if canAccessWikiTools {
         Section("最近更新") {
-          NavigationLink(value: NavDestination.wikiRecent(.subject)) {
-            Label("最近条目 Wiki", systemImage: WikiEntityKind.subject.icon)
+          Group {
+            NavigationLink(value: NavDestination.wikiRecent(.subject)) {
+              Label("最近条目 Wiki", systemImage: WikiEntityKind.subject.icon)
+            }
+            NavigationLink(value: NavDestination.wikiRecent(.person)) {
+              Label("最近人物 Wiki", systemImage: WikiEntityKind.person.icon)
+            }
+            NavigationLink(value: NavDestination.wikiRecent(.character)) {
+              Label("最近角色 Wiki", systemImage: WikiEntityKind.character.icon)
+            }
+            NavigationLink(value: NavDestination.wikiRecent(.episode)) {
+              Label("最近章节 Wiki", systemImage: WikiEntityKind.episode.icon)
+            }
           }
-          NavigationLink(value: NavDestination.wikiRecent(.person)) {
-            Label("最近人物 Wiki", systemImage: WikiEntityKind.person.icon)
-          }
-          NavigationLink(value: NavDestination.wikiRecent(.character)) {
-            Label("最近角色 Wiki", systemImage: WikiEntityKind.character.icon)
-          }
-          NavigationLink(value: NavDestination.wikiRecent(.episode)) {
-            Label("最近章节 Wiki", systemImage: WikiEntityKind.episode.icon)
-          }
+          .themedListRow()
         }
         .buttonStyle(.plain)
 
         if canCreateWikiEntities {
           Section("创建") {
-            if profile.canEditSubjectWiki {
-              NavigationLink(value: NavDestination.wikiCreate(.subject)) {
-                Label("创建条目", systemImage: "plus.rectangle.on.rectangle")
+            Group {
+              if profile.canEditSubjectWiki {
+                NavigationLink(value: NavDestination.wikiCreate(.subject)) {
+                  Label("创建条目", systemImage: "plus.rectangle.on.rectangle")
+                }
+              }
+              if profile.groupEnum.canEditMonoWiki {
+                NavigationLink(value: NavDestination.wikiCreate(.person)) {
+                  Label("创建人物", systemImage: "person.badge.plus")
+                }
+                NavigationLink(value: NavDestination.wikiCreate(.character)) {
+                  Label("创建角色", systemImage: "theatermasks.circle")
+                }
               }
             }
-            if profile.groupEnum.canEditMonoWiki {
-              NavigationLink(value: NavDestination.wikiCreate(.person)) {
-                Label("创建人物", systemImage: "person.badge.plus")
-              }
-              NavigationLink(value: NavDestination.wikiCreate(.character)) {
-                Label("创建角色", systemImage: "theatermasks.circle")
-              }
-            }
+            .themedListRow()
           }
           .buttonStyle(.plain)
         }
@@ -55,6 +61,7 @@ struct WikiHomeView: View {
             NavigationLink(value: NavDestination.wikiUserContributions(profile.user)) {
               Label("Wiki 编辑记录", systemImage: "clock.arrow.circlepath")
             }
+            .themedListRow()
           }
           .buttonStyle(.plain)
         }
@@ -62,6 +69,7 @@ struct WikiHomeView: View {
         Section {
           Text("当前账号没有 Wiki 权限")
             .foregroundStyle(.secondary)
+            .themedListRow()
         }
       }
     }
@@ -111,16 +119,19 @@ struct WikiRecentView: View {
           ForEach(Array(subjectItems.enumerated()), id: \.offset) { _, item in
             WikiRecentRowView(kind: .subject, item: item)
           }
+          .themedListRow()
         }
         Section("人物") {
           ForEach(Array(personItems.enumerated()), id: \.offset) { _, item in
             WikiRecentRowView(kind: .person, item: item)
           }
+          .themedListRow()
         }
       } else {
         ForEach(Array(items.enumerated()), id: \.offset) { _, item in
           WikiRecentRowView(kind: kind, item: item)
         }
+        .themedListRow()
       }
     }
     .overlay {

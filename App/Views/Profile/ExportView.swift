@@ -17,26 +17,29 @@ struct ExportView: View {
   var body: some View {
     Form {
       Section(header: Text("筛选条件")) {
-        Picker("条目类型", selection: $subjectType) {
-          Text("全部").tag(nil as SubjectType?)
-          ForEach(SubjectType.allTypes) { type in
-            Text(type.description).tag(type as SubjectType?)
+        Group {
+          Picker("条目类型", selection: $subjectType) {
+            Text("全部").tag(nil as SubjectType?)
+            ForEach(SubjectType.allTypes) { type in
+              Text(type.description).tag(type as SubjectType?)
+            }
+          }
+
+          Picker("收藏状态", selection: $collectionType) {
+            Text("全部").tag(nil as CollectionType?)
+            ForEach(CollectionType.allTypes()) { type in
+              Text(type.description(subjectType)).tag(type as CollectionType?)
+            }
+          }
+
+          HStack {
+            Text("符合条件的条目")
+            Spacer()
+            Text("\(subjectCount) 个")
+              .foregroundStyle(.secondary)
           }
         }
-
-        Picker("收藏状态", selection: $collectionType) {
-          Text("全部").tag(nil as CollectionType?)
-          ForEach(CollectionType.allTypes()) { type in
-            Text(type.description(subjectType)).tag(type as CollectionType?)
-          }
-        }
-
-        HStack {
-          Text("符合条件的条目")
-          Spacer()
-          Text("\(subjectCount) 个")
-            .foregroundStyle(.secondary)
-        }
+        .themedListRow()
       }
 
       Section(header: Text("导出字段（\(selectedFields.count)/\(ExportableField.allCases.count)）")) {
@@ -56,6 +59,7 @@ struct ExportView: View {
               }
             ))
         }
+        .themedListRow()
       }
 
       if showCoverSizePicker {
@@ -65,6 +69,7 @@ struct ExportView: View {
               Text(size.label).tag(size)
             }
           }
+          .themedListRow()
         }
       }
 
@@ -87,6 +92,7 @@ struct ExportView: View {
           }
         }
         .disabled(selectedFields.isEmpty || subjectCount == 0 || isExporting)
+        .themedListRow()
       }
     }
     .disabled(isExporting)

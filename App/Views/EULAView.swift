@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct EULAView: View {
+  @Environment(\.theme) private var theme
   @Binding var isPresented: Bool
   @AppStorage("eulaAgreed") private var hasAgreed: Bool = false
   let showLoginButton: Bool
@@ -31,7 +32,7 @@ struct EULAView: View {
             Text("/ Bangumi 鼓励")
               .font(.title2)
               .fontWeight(.semibold)
-              .foregroundColor(.accentColor)
+              .foregroundColor(theme.accent)
 
             VStack(alignment: .leading, spacing: 8) {
               EULARuleItem(number: "1", text: "鼓励分享、互助和开放；")
@@ -49,7 +50,7 @@ struct EULAView: View {
             Text("/ Bangumi 不提倡")
               .font(.title2)
               .fontWeight(.semibold)
-              .foregroundColor(.orange)
+              .foregroundColor(theme.star)
 
             VStack(alignment: .leading, spacing: 8) {
               EULARuleItem(number: "1", text: "针对种族、国家、民族、宗教、性别、年龄、地缘、性取向、生理特征的歧视和仇恨言论；")
@@ -69,7 +70,7 @@ struct EULAView: View {
             Text("/ Bangumi 禁止")
               .font(.title2)
               .fontWeight(.semibold)
-              .foregroundColor(.red)
+              .foregroundColor(theme.danger)
 
             Text("以下行为视情况**直接删除、锁定或删除ID、批量删除而不予通知**；")
               .font(.subheadline)

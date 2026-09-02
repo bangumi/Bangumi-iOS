@@ -50,39 +50,45 @@ struct IndexRelatedAddSheet: View {
     SheetView(title: "添加关联内容", closeDisabled: isSubmitting, applyFormStyle: true) {
       Form {
         Section {
-          Picker("类型", selection: $selectedCategory) {
-            ForEach(IndexRelatedCategory.allCases, id: \.self) { cat in
-              Text(cat.title).tag(cat)
+          Group {
+            Picker("类型", selection: $selectedCategory) {
+              ForEach(IndexRelatedCategory.allCases, id: \.self) { cat in
+                Text(cat.title).tag(cat)
+              }
             }
-          }
-          HStack {
-            TextField("ID", text: $relatedId)
-              .keyboardType(.numberPad)
-            if supportsSearch {
-              Button {
-                showSearch = true
-              } label: {
-                Image(systemName: "magnifyingglass")
+            HStack {
+              TextField("ID", text: $relatedId)
+                .keyboardType(.numberPad)
+              if supportsSearch {
+                Button {
+                  showSearch = true
+                } label: {
+                  Image(systemName: "magnifyingglass")
+                }
               }
             }
           }
+          .themedListRow()
         } header: {
           Text("必填")
         }
 
         Section {
-          TextField("排序", text: $order)
-            .keyboardType(.numberPad)
-          TextEditor(text: $comment)
-            .frame(minHeight: 60)
-            .overlay(alignment: .topLeading) {
-              if comment.isEmpty {
-                Text("评价")
-                  .foregroundColor(.secondary.opacity(0.5))
-                  .padding(.top, 8)
-                  .padding(.leading, 4)
+          Group {
+            TextField("排序", text: $order)
+              .keyboardType(.numberPad)
+            TextEditor(text: $comment)
+              .frame(minHeight: 60)
+              .overlay(alignment: .topLeading) {
+                if comment.isEmpty {
+                  Text("评价")
+                    .foregroundColor(.secondary.opacity(0.5))
+                    .padding(.top, 8)
+                    .padding(.leading, 4)
+                }
               }
-            }
+          }
+          .themedListRow()
         } header: {
           Text("可选")
         }
@@ -90,6 +96,7 @@ struct IndexRelatedAddSheet: View {
         if let rid = Int(relatedId), !relatedId.isEmpty {
           Section {
             IndexRelatedPreviewView(category: selectedCategory, relatedId: rid)
+              .themedListRow()
           } header: {
             Text("预览")
           }
@@ -174,19 +181,22 @@ struct IndexRelatedEditSheet: View {
   var body: some View {
     SheetView(title: "编辑关联内容", closeDisabled: isSubmitting, applyFormStyle: true) {
       Form {
-        TextField("排序", text: $order)
-          .keyboardType(.numberPad)
+        Group {
+          TextField("排序", text: $order)
+            .keyboardType(.numberPad)
 
-        TextEditor(text: $comment)
-          .frame(minHeight: 100)
-          .overlay(alignment: .topLeading) {
-            if comment.isEmpty {
-              Text("评价")
-                .foregroundColor(.secondary.opacity(0.5))
-                .padding(.top, 8)
-                .padding(.leading, 4)
+          TextEditor(text: $comment)
+            .frame(minHeight: 100)
+            .overlay(alignment: .topLeading) {
+              if comment.isEmpty {
+                Text("评价")
+                  .foregroundColor(.secondary.opacity(0.5))
+                  .padding(.top, 8)
+                  .padding(.leading, 4)
+              }
             }
-          }
+        }
+        .themedListRow()
       }
     } controls: {
       Button {

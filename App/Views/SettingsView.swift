@@ -122,228 +122,247 @@ struct SettingsView: View {
     Form {
       // MARK: - 外观
       Section {
-        Picker(selection: $appearance) {
-          ForEach(AppearanceType.allCases, id: \.self) { appearance in
-            Text(appearance.desc).tag(appearance)
+        Group {
+          Picker(selection: $appearance) {
+            ForEach(AppearanceType.allCases, id: \.self) { appearance in
+              Text(appearance.desc).tag(appearance)
+            }
+          } label: {
+            SettingLabel("外观", description: "选择浅色、深色或跟随系统外观")
           }
-        } label: {
-          SettingLabel("外观", description: "选择浅色、深色或跟随系统外观")
-        }
 
-        Picker(selection: themeSelection) {
-          ForEach(AppTheme.allCases, id: \.self) { theme in
-            Text(theme.desc).tag(theme)
+          Picker(selection: themeSelection) {
+            ForEach(AppTheme.allCases, id: \.self) { theme in
+              Text(theme.desc).tag(theme)
+            }
+          } label: {
+            SettingLabel("主题外观", description: "经典或玻璃风格，仅改变视觉")
           }
-        } label: {
-          SettingLabel("主题外观", description: "经典或玻璃风格，仅改变视觉")
-        }
 
-        Picker(selection: appIconSelection) {
-          ForEach(AlternateAppIcon.allCases, id: \.self) { icon in
-            Text(icon.title).tag(icon)
+          Picker(selection: appIconSelection) {
+            ForEach(AlternateAppIcon.allCases, id: \.self) { icon in
+              Text(icon.title).tag(icon)
+            }
+          } label: {
+            SettingLabel("应用图标", description: "更换应用主屏幕图标")
           }
-        } label: {
-          SettingLabel("应用图标", description: "更换应用主屏幕图标")
-        }
-        .disabled(!appIconController.isAvailable || appIconController.isUpdating)
+          .disabled(!appIconController.isAvailable || appIconController.isUpdating)
 
-        Picker(selection: $avatarStyle) {
-          ForEach(AvatarStyle.allCases, id: \.self) { style in
-            Text(style.desc).tag(style)
+          Picker(selection: $avatarStyle) {
+            ForEach(AvatarStyle.allCases, id: \.self) { style in
+              Text(style.desc).tag(style)
+            }
+          } label: {
+            SettingLabel("头像样式", description: "圆形或经典方形头像样式")
           }
-        } label: {
-          SettingLabel("头像样式", description: "圆形或经典方形头像样式")
         }
+        .themedListRow()
       } header: {
         Text("外观")
       }
 
       // MARK: - 显示
       Section {
-        Picker(selection: $titlePreference) {
-          ForEach(TitlePreference.allCases, id: \.self) { preference in
-            Text(preference.desc).tag(preference)
+        Group {
+          Picker(selection: $titlePreference) {
+            ForEach(TitlePreference.allCases, id: \.self) { preference in
+              Text(preference.desc).tag(preference)
+            }
+          } label: {
+            SettingLabel("标题显示", description: "在列表和详情页优先显示中文名或原名")
           }
-        } label: {
-          SettingLabel("标题显示", description: "在列表和详情页优先显示中文名或原名")
-        }
 
-        Picker(selection: $subjectImageQuality) {
-          ForEach(ImageQuality.allCases, id: \.self) { quality in
-            Text(quality.desc).tag(quality)
+          Picker(selection: $subjectImageQuality) {
+            ForEach(ImageQuality.allCases, id: \.self) { quality in
+              Text(quality.desc).tag(quality)
+            }
+          } label: {
+            SettingLabel("封面画质", description: "高质量图片更清晰，但消耗更多流量")
           }
-        } label: {
-          SettingLabel("封面画质", description: "高质量图片更清晰，但消耗更多流量")
-        }
 
-        Picker(selection: $replySortOrder) {
-          ForEach(ReplySortOrder.allCases, id: \.self) { order in
-            Text(order.description).tag(order)
+          Picker(selection: $replySortOrder) {
+            ForEach(ReplySortOrder.allCases, id: \.self) { order in
+              Text(order.description).tag(order)
+            }
+          } label: {
+            SettingLabel("回复排序", description: "按发布时间排列话题回复的顺序")
           }
-        } label: {
-          SettingLabel("回复排序", description: "按发布时间排列话题回复的顺序")
-        }
 
-        Toggle(isOn: $showTopicAgeBadge) {
-          SettingLabel("话题时间标记", description: "在话题列表标题后显示发帖至今的简短时间")
-        }
+          Toggle(isOn: $showTopicAgeBadge) {
+            SettingLabel("话题时间标记", description: "在话题列表标题后显示发帖至今的简短时间")
+          }
 
-        Toggle(isOn: $showSpoilerRelations) {
-          SettingLabel("剧透关联", description: "直接展示被标记为剧透的角色/人物关联，不再模糊遮挡")
-        }
+          Toggle(isOn: $showSpoilerRelations) {
+            SettingLabel("剧透关联", description: "直接展示被标记为剧透的角色/人物关联，不再模糊遮挡")
+          }
 
-        Toggle(isOn: $showNSFWBadge) {
-          SettingLabel("NSFW 标记", description: "在标记为 NSFW 的条目封面上显示 R18 角标")
-        }
+          Toggle(isOn: $showNSFWBadge) {
+            SettingLabel("NSFW 标记", description: "在标记为 NSFW 的条目封面上显示 R18 角标")
+          }
 
-        Toggle(isOn: $showEpisodeTrends) {
-          SettingLabel("章节热度", description: "在章节格子底部显示热度指示条")
+          Toggle(isOn: $showEpisodeTrends) {
+            SettingLabel("章节热度", description: "在章节格子底部显示热度指示条")
+          }
         }
+        .themedListRow()
       } header: {
         Text("显示")
       }
 
       // MARK: - 交互
       Section {
-        Picker(selection: $episodeGridInteractionMode) {
-          ForEach(EpisodeGridInteractionMode.allCases, id: \.self) { mode in
-            Text(mode.desc).tag(mode)
+        Group {
+          Picker(selection: $episodeGridInteractionMode) {
+            ForEach(EpisodeGridInteractionMode.allCases, id: \.self) { mode in
+              Text(mode.desc).tag(mode)
+            }
+          } label: {
+            SettingLabel("章节菜单", description: "长按或点击章节格子打开操作菜单")
           }
-        } label: {
-          SettingLabel("章节菜单", description: "长按或点击章节格子打开操作菜单")
-        }
 
-        Toggle(isOn: $enableShakeTitleToggle) {
-          SettingLabel("摇一摇切换标题", description: "摇动设备快速切换中文名和原名显示")
-        }
+          Toggle(isOn: $enableShakeTitleToggle) {
+            SettingLabel("摇一摇切换标题", description: "摇动设备快速切换中文名和原名显示")
+          }
 
-        Toggle(isOn: $enableReactions) {
-          SettingLabel("启用贴贴", description: "在话题和讨论中启用表情贴贴功能")
-        }
+          Toggle(isOn: $enableReactions) {
+            SettingLabel("启用贴贴", description: "在话题和讨论中启用表情贴贴功能")
+          }
 
-        Toggle(isOn: $autoCompleteProgress) {
-          SettingLabel("自动完成进度", description: "收藏条目为「看过」时，自动将所有章节标记为完成")
+          Toggle(isOn: $autoCompleteProgress) {
+            SettingLabel("自动完成进度", description: "收藏条目为「看过」时，自动将所有章节标记为完成")
+          }
         }
+        .themedListRow()
       } header: {
         Text("交互")
       }
 
       // MARK: - 隐私
       Section {
-        Toggle(isOn: $isolationMode) {
-          SettingLabel("单机模式", description: "不加载讨论、评论、收藏等社交模块，仅展示条目内容")
-        }
+        Group {
+          Toggle(isOn: $isolationMode) {
+            SettingLabel("单机模式", description: "不加载讨论、评论、收藏等社交模块，仅展示条目内容")
+          }
 
-        Toggle(isOn: $anonymizeTopicUsers) {
-          SettingLabel("匿名讨论", description: "在讨论中隐藏其他用户的头像和昵称，以颜色和哈希值替代")
-        }
+          Toggle(isOn: $anonymizeTopicUsers) {
+            SettingLabel("匿名讨论", description: "在讨论中隐藏其他用户的头像和昵称，以颜色和哈希值替代")
+          }
 
-        Toggle(isOn: $hideBlocklist) {
-          SettingLabel("屏蔽绝交用户", description: "隐藏已加入绝交列表用户的发言和评论")
+          Toggle(isOn: $hideBlocklist) {
+            SettingLabel("屏蔽绝交用户", description: "隐藏已加入绝交列表用户的发言和评论")
+          }
         }
+        .themedListRow()
       } header: {
         Text("隐私")
       }
 
       // MARK: - 网络
       Section {
-        Picker(selection: $shareDomain) {
-          ForEach(ShareDomain.allCases, id: \.self) { domain in
-            Text(domain.title).tag(domain)
+        Group {
+          Picker(selection: $shareDomain) {
+            ForEach(ShareDomain.allCases, id: \.self) { domain in
+              Text(domain.title).tag(domain)
+            }
+          } label: {
+            SettingLabel("分享域名", description: "\(shareDomainDescription)")
           }
-        } label: {
-          SettingLabel("分享域名", description: "\(shareDomainDescription)")
-        }
 
-        Picker(selection: $authDomain) {
-          ForEach(AuthDomain.allCases, id: \.self) { domain in
-            Text(domain.title).tag(domain)
+          Picker(selection: $authDomain) {
+            ForEach(AuthDomain.allCases, id: \.self) { domain in
+              Text(domain.title).tag(domain)
+            }
+          } label: {
+            SettingLabel("认证域名", description: "\(authDomainDescription)")
           }
-        } label: {
-          SettingLabel("认证域名", description: "\(authDomainDescription)")
-        }
 
-        Button {
-          showMirrorDomainSettings = true
-        } label: {
-          HStack {
-            SettingLabel("镜像站", description: "\(mirrorStatusDescription)")
-            Spacer()
-            Image(systemName: "chevron.right")
-              .font(.caption)
-              .foregroundStyle(.tertiary)
+          Button {
+            showMirrorDomainSettings = true
+          } label: {
+            HStack {
+              SettingLabel("镜像站", description: "\(mirrorStatusDescription)")
+              Spacer()
+              Image(systemName: "chevron.right")
+                .font(.caption)
+                .foregroundStyle(.tertiary)
+            }
+            .contentShape(Rectangle())
           }
-          .contentShape(Rectangle())
+          .buttonStyle(.plain)
         }
-        .buttonStyle(.plain)
+        .themedListRow()
       } header: {
         Text("网络")
       }
 
       // MARK: - 关于
       Section(header: Text("关于")) {
-        Button {
-          showEULA = true
-        } label: {
-          Label("社区指导原则", systemImage: "doc.text")
-        }
-        Link(destination: URL(string: privacyPolicyURL)!) {
+        Group {
+          Button {
+            showEULA = true
+          } label: {
+            Label("社区指导原则", systemImage: "doc.text")
+          }
+          Link(destination: URL(string: privacyPolicyURL)!) {
+            HStack {
+              Label("隐私政策", systemImage: "hand.raised")
+              Spacer()
+              Image(systemName: "arrow.up.right.square")
+                .foregroundColor(.secondary)
+                .font(.caption)
+            }
+          }
+          Link(
+            destination: URL(
+              string: "https://apps.apple.com/app/id6499502714?action=write-review")!
+          ) {
+            HStack {
+              Label("评价此应用", systemImage: "star")
+              Spacer()
+              Image(systemName: "arrow.up.right.square")
+                .foregroundColor(.secondary)
+                .font(.caption)
+            }
+          }
+          Link(destination: URL(string: "https://discord.gg/prAUbRaWwE")!) {
+            HStack {
+              Label("问题反馈", systemImage: "exclamationmark.bubble")
+              Spacer()
+              Image(systemName: "arrow.up.right.square")
+                .foregroundColor(.secondary)
+                .font(.caption)
+            }
+          }
+          Link(destination: URL(string: "https://testflight.apple.com/join/qq79EyFs")!) {
+            HStack {
+              Label("加入 Beta", systemImage: "sparkles")
+              Spacer()
+              Image(systemName: "arrow.up.right.square")
+                .foregroundColor(.secondary)
+                .font(.caption)
+            }
+          }
+          Link(destination: URL(string: "https://github.com/bangumi/Bangumi-iOS")!) {
+            HStack {
+              Label("查看源码", systemImage: "chevron.left.forwardslash.chevron.right")
+              Spacer()
+              Image(systemName: "arrow.up.right.square")
+                .foregroundColor(.secondary)
+                .font(.caption)
+            }
+          }
+          NavigationLink {
+            OpenSourceLicensesView()
+          } label: {
+            Label("开源许可", systemImage: "doc.plaintext")
+          }
           HStack {
-            Label("隐私政策", systemImage: "hand.raised")
             Spacer()
-            Image(systemName: "arrow.up.right.square")
-              .foregroundColor(.secondary)
-              .font(.caption)
+            Text(AppMetadata.version).foregroundStyle(.secondary)
+            Spacer()
           }
         }
-        Link(
-          destination: URL(string: "https://apps.apple.com/app/id6499502714?action=write-review")!
-        ) {
-          HStack {
-            Label("评价此应用", systemImage: "star")
-            Spacer()
-            Image(systemName: "arrow.up.right.square")
-              .foregroundColor(.secondary)
-              .font(.caption)
-          }
-        }
-        Link(destination: URL(string: "https://discord.gg/prAUbRaWwE")!) {
-          HStack {
-            Label("问题反馈", systemImage: "exclamationmark.bubble")
-            Spacer()
-            Image(systemName: "arrow.up.right.square")
-              .foregroundColor(.secondary)
-              .font(.caption)
-          }
-        }
-        Link(destination: URL(string: "https://testflight.apple.com/join/qq79EyFs")!) {
-          HStack {
-            Label("加入 Beta", systemImage: "sparkles")
-            Spacer()
-            Image(systemName: "arrow.up.right.square")
-              .foregroundColor(.secondary)
-              .font(.caption)
-          }
-        }
-        Link(destination: URL(string: "https://github.com/bangumi/Bangumi-iOS")!) {
-          HStack {
-            Label("查看源码", systemImage: "chevron.left.forwardslash.chevron.right")
-            Spacer()
-            Image(systemName: "arrow.up.right.square")
-              .foregroundColor(.secondary)
-              .font(.caption)
-          }
-        }
-        NavigationLink {
-          OpenSourceLicensesView()
-        } label: {
-          Label("开源许可", systemImage: "doc.plaintext")
-        }
-        HStack {
-          Spacer()
-          Text(AppMetadata.version).foregroundStyle(.secondary)
-          Spacer()
-        }
+        .themedListRow()
       }
     }
     .contentMargins(.top, 0, for: .scrollContent)
@@ -454,27 +473,33 @@ private struct MirrorDomainSettingsView: View {
     NavigationStack {
       Form {
         Section {
-          TextField("根域名", text: $draftRootDomain, prompt: Text("example.com"))
-            .keyboardType(.URL)
-            .textInputAutocapitalization(.never)
-            .autocorrectionDisabled()
-            .focused($isDomainFieldFocused)
+          Group {
+            TextField("根域名", text: $draftRootDomain, prompt: Text("example.com"))
+              .keyboardType(.URL)
+              .textInputAutocapitalization(.never)
+              .autocorrectionDisabled()
+              .focused($isDomainFieldFocused)
 
-          if !isDraftValid {
-            Text("请输入有效域名，例如 example.com。")
-              .font(.caption)
-              .foregroundStyle(.red)
+            if !isDraftValid {
+              Text("请输入有效域名，例如 example.com。")
+                .font(.caption)
+                .foregroundStyle(.red)
+            }
           }
+          .themedListRow()
         } footer: {
           Text("仅在你信任该镜像站时填写。登录、请求、图片、BBCode 生成链接和镜像分享链接会发送到该站点；使用风险自负。")
         }
 
         if isDraftValid {
           Section {
-            MirrorDomainPreviewRow(title: "主站", host: previewMainHost)
-            MirrorDomainPreviewRow(title: "Next/API", host: previewNextHost)
-            MirrorDomainPreviewRow(title: "图片", host: previewImageHost)
-            MirrorDomainPreviewRow(title: "分享镜像", host: previewMainHost)
+            Group {
+              MirrorDomainPreviewRow(title: "主站", host: previewMainHost)
+              MirrorDomainPreviewRow(title: "Next/API", host: previewNextHost)
+              MirrorDomainPreviewRow(title: "图片", host: previewImageHost)
+              MirrorDomainPreviewRow(title: "分享镜像", host: previewMainHost)
+            }
+            .themedListRow()
           } header: {
             Text("生效域名")
           } footer: {
@@ -488,6 +513,7 @@ private struct MirrorDomainSettingsView: View {
               mirrorRootDomain = ""
               dismiss()
             }
+            .themedListRow()
           }
         }
       }

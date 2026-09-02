@@ -195,52 +195,62 @@ struct SubjectWikiEditSheet: View {
       Form {
         if loading {
           ProgressView()
+            .themedListRow()
         }
 
         Section("基本信息") {
-          TextField("标题", text: $edit.name)
-            .textInputAutocapitalization(.never)
+          Group {
+            TextField("标题", text: $edit.name)
+              .textInputAutocapitalization(.never)
 
-          Picker("平台", selection: $edit.platform) {
-            if let info, !info.availablePlatform.isEmpty {
-              ForEach(info.availablePlatform) { platform in
-                Text(platform.text).tag(platform.id)
+            Picker("平台", selection: $edit.platform) {
+              if let info, !info.availablePlatform.isEmpty {
+                ForEach(info.availablePlatform) { platform in
+                  Text(platform.text).tag(platform.id)
+                }
+              } else {
+                Text("默认").tag(0)
               }
-            } else {
-              Text("默认").tag(0)
             }
-          }
 
-          if info?.typeID == .book {
-            Toggle("系列条目", isOn: Binding(
-              get: { edit.series ?? false },
-              set: { edit.series = $0 }
-            ))
-          }
+            if info?.typeID == .book {
+              Toggle("系列条目", isOn: Binding(
+                get: { edit.series ?? false },
+                set: { edit.series = $0 }
+              ))
+            }
 
-          Toggle("NSFW", isOn: $edit.nsfw)
-          TextField("公共标签", text: $tagsText)
-            .textInputAutocapitalization(.never)
+            Toggle("NSFW", isOn: $edit.nsfw)
+            TextField("公共标签", text: $tagsText)
+              .textInputAutocapitalization(.never)
+          }
+          .themedListRow()
         }
 
         Section("内容") {
-          PlaceholderTextEditor(placeholder: "简介", text: $edit.summary, minHeight: 100)
-          PlaceholderTextEditor(
-            placeholder: "Infobox",
-            text: $edit.infobox,
-            minHeight: 220,
-            monospaced: true
-          )
+          Group {
+            PlaceholderTextEditor(placeholder: "简介", text: $edit.summary, minHeight: 100)
+            PlaceholderTextEditor(
+              placeholder: "Infobox",
+              text: $edit.infobox,
+              minHeight: 220,
+              monospaced: true
+            )
+          }
+          .themedListRow()
         }
 
         Section("提交") {
-          Picker("保存方式", selection: $mode) {
-            ForEach(SubjectWikiUpdateMode.allCases) { item in
-              Text(item.title).tag(item)
+          Group {
+            Picker("保存方式", selection: $mode) {
+              ForEach(SubjectWikiUpdateMode.allCases) { item in
+                Text(item.title).tag(item)
+              }
             }
+            TextField("编辑摘要", text: $commitMessage)
+              .textInputAutocapitalization(.never)
           }
-          TextField("编辑摘要", text: $commitMessage)
-            .textInputAutocapitalization(.never)
+          .themedListRow()
         }
       }
       .task {
@@ -340,32 +350,39 @@ struct PersonWikiEditSheet: View {
       Form {
         if loading {
           ProgressView()
+            .themedListRow()
         }
 
         Section("基本信息") {
           TextField("姓名", text: $edit.name)
             .textInputAutocapitalization(.never)
+            .themedListRow()
         }
 
         Section("职业") {
           ForEach(PersonCareer.allCases.filter { $0 != .none }, id: \.self) { career in
             Toggle(career.description, isOn: professionBinding(career))
           }
+          .themedListRow()
         }
 
         Section("内容") {
-          PlaceholderTextEditor(placeholder: "简介", text: $edit.summary, minHeight: 100)
-          PlaceholderTextEditor(
-            placeholder: "Infobox",
-            text: $edit.infobox,
-            minHeight: 220,
-            monospaced: true
-          )
+          Group {
+            PlaceholderTextEditor(placeholder: "简介", text: $edit.summary, minHeight: 100)
+            PlaceholderTextEditor(
+              placeholder: "Infobox",
+              text: $edit.infobox,
+              minHeight: 220,
+              monospaced: true
+            )
+          }
+          .themedListRow()
         }
 
         Section("提交") {
           TextField("编辑摘要", text: $commitMessage)
             .textInputAutocapitalization(.never)
+            .themedListRow()
         }
       }
       .task {
@@ -448,26 +465,32 @@ struct CharacterWikiEditSheet: View {
       Form {
         if loading {
           ProgressView()
+            .themedListRow()
         }
 
         Section("基本信息") {
           TextField("名称", text: $edit.name)
             .textInputAutocapitalization(.never)
+            .themedListRow()
         }
 
         Section("内容") {
-          PlaceholderTextEditor(placeholder: "简介", text: $edit.summary, minHeight: 100)
-          PlaceholderTextEditor(
-            placeholder: "Infobox",
-            text: $edit.infobox,
-            minHeight: 220,
-            monospaced: true
-          )
+          Group {
+            PlaceholderTextEditor(placeholder: "简介", text: $edit.summary, minHeight: 100)
+            PlaceholderTextEditor(
+              placeholder: "Infobox",
+              text: $edit.infobox,
+              minHeight: 220,
+              monospaced: true
+            )
+          }
+          .themedListRow()
         }
 
         Section("提交") {
           TextField("编辑摘要", text: $commitMessage)
             .textInputAutocapitalization(.never)
+            .themedListRow()
         }
       }
       .task {
@@ -591,6 +614,7 @@ struct EpisodeWikiEditSheet: View {
       Form {
         if loading {
           ProgressView()
+            .themedListRow()
         }
 
         EpisodeWikiFields(
@@ -607,6 +631,7 @@ struct EpisodeWikiEditSheet: View {
         Section("提交") {
           TextField("编辑摘要", text: $commitMessage)
             .textInputAutocapitalization(.never)
+            .themedListRow()
         }
       }
       .task {
@@ -665,6 +690,7 @@ struct SubjectWikiLockSheet: View {
       Form {
         Section("原因") {
           PlaceholderTextEditor(placeholder: "请输入操作原因", text: $reason, minHeight: 100)
+            .themedListRow()
         }
       }
     } controls: {
@@ -844,41 +870,45 @@ struct SubjectEpisodeWikiSheet: View {
     SheetView(title: "章节 Wiki", closeDisabled: submitting, applyFormStyle: true) {
       Form {
         Section("操作") {
-          Picker("模式", selection: $mode) {
-            ForEach(EpisodeWikiBatchMode.allCases) { item in
-              Text(item.title).tag(item)
-            }
-          }
-          .onChange(of: mode) { _, newMode in
-            switch newMode {
-            case .create:
-              resetEpisodeCreateFields()
-            case .edit:
-              resetLoadedEpisode()
-            }
-          }
-
-          if mode == .edit {
-            HStack {
-              TextField("章节 ID", text: $episodeIdText)
-                .keyboardType(.numberPad)
-              Button {
-                Task {
-                  await loadEpisode()
-                }
-              } label: {
-                Image(systemName: "arrow.down.doc")
+          Group {
+            Picker("模式", selection: $mode) {
+              ForEach(EpisodeWikiBatchMode.allCases) { item in
+                Text(item.title).tag(item)
               }
-              .disabled(parsedEpisodeId == nil || loadingEpisode)
             }
-            .onChange(of: episodeIdText) {
-              resetLoadedEpisode()
+            .onChange(of: mode) { _, newMode in
+              switch newMode {
+              case .create:
+                resetEpisodeCreateFields()
+              case .edit:
+                resetLoadedEpisode()
+              }
+            }
+
+            if mode == .edit {
+              HStack {
+                TextField("章节 ID", text: $episodeIdText)
+                  .keyboardType(.numberPad)
+                Button {
+                  Task {
+                    await loadEpisode()
+                  }
+                } label: {
+                  Image(systemName: "arrow.down.doc")
+                }
+                .disabled(parsedEpisodeId == nil || loadingEpisode)
+              }
+              .onChange(of: episodeIdText) {
+                resetLoadedEpisode()
+              }
             }
           }
+          .themedListRow()
         }
 
         if loadingEpisode {
           ProgressView()
+            .themedListRow()
         }
 
         EpisodeWikiFields(
@@ -896,6 +926,7 @@ struct SubjectEpisodeWikiSheet: View {
           Section("提交") {
             TextField("编辑摘要", text: $commitMessage)
               .textInputAutocapitalization(.never)
+              .themedListRow()
           }
         }
       }
@@ -924,27 +955,33 @@ private struct EpisodeWikiFields: View {
 
   var body: some View {
     Section("基本信息") {
-      TextField("标题", text: $name)
-        .textInputAutocapitalization(.never)
-      TextField("中文标题", text: $nameCN)
-        .textInputAutocapitalization(.never)
-      TextField("章节序号", text: $epText)
-        .keyboardType(.decimalPad)
-      TextField("碟片序号", text: $discText)
-        .keyboardType(.decimalPad)
-      Picker("类型", selection: $type) {
-        ForEach(EpisodeType.allCases) { item in
-          Text(item.description).tag(item)
+      Group {
+        TextField("标题", text: $name)
+          .textInputAutocapitalization(.never)
+        TextField("中文标题", text: $nameCN)
+          .textInputAutocapitalization(.never)
+        TextField("章节序号", text: $epText)
+          .keyboardType(.decimalPad)
+        TextField("碟片序号", text: $discText)
+          .keyboardType(.decimalPad)
+        Picker("类型", selection: $type) {
+          ForEach(EpisodeType.allCases) { item in
+            Text(item.description).tag(item)
+          }
         }
       }
+      .themedListRow()
     }
 
     Section("内容") {
-      TextField("日期 YYYY-MM-DD", text: $date)
-        .textInputAutocapitalization(.never)
-      TextField("时长", text: $duration)
-        .textInputAutocapitalization(.never)
-      PlaceholderTextEditor(placeholder: "简介", text: $summary, minHeight: 100)
+      Group {
+        TextField("日期 YYYY-MM-DD", text: $date)
+          .textInputAutocapitalization(.never)
+        TextField("时长", text: $duration)
+          .textInputAutocapitalization(.never)
+        PlaceholderTextEditor(placeholder: "简介", text: $summary, minHeight: 100)
+      }
+      .themedListRow()
     }
   }
 }

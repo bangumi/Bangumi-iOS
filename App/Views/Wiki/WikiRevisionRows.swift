@@ -180,15 +180,18 @@ struct WikiUserContributionsView: View {
   var body: some View {
     List {
       Section {
-        NavigationLink(value: NavDestination.wikiContributionList(user, .subject)) {
-          Label("条目编辑", systemImage: WikiEntityKind.subject.icon)
+        Group {
+          NavigationLink(value: NavDestination.wikiContributionList(user, .subject)) {
+            Label("条目编辑", systemImage: WikiEntityKind.subject.icon)
+          }
+          NavigationLink(value: NavDestination.wikiContributionList(user, .person)) {
+            Label("人物编辑", systemImage: WikiEntityKind.person.icon)
+          }
+          NavigationLink(value: NavDestination.wikiContributionList(user, .character)) {
+            Label("角色编辑", systemImage: WikiEntityKind.character.icon)
+          }
         }
-        NavigationLink(value: NavDestination.wikiContributionList(user, .person)) {
-          Label("人物编辑", systemImage: WikiEntityKind.person.icon)
-        }
-        NavigationLink(value: NavDestination.wikiContributionList(user, .character)) {
-          Label("角色编辑", systemImage: WikiEntityKind.character.icon)
-        }
+        .themedListRow()
       }
       .buttonStyle(.plain)
     }

@@ -92,11 +92,13 @@ struct SubjectWikiCoversView: View {
     List {
       if loading {
         ProgressView()
+          .themedListRow()
       }
 
       if let current = coverList?.current {
         Section("当前封面") {
           SubjectCoverRowView(cover: current, isUpdating: false, onVote: nil)
+            .themedListRow()
         }
       }
 
@@ -114,6 +116,7 @@ struct SubjectWikiCoversView: View {
               : nil
           )
         }
+        .themedListRow()
       }
     }
     .task {
@@ -276,14 +279,17 @@ struct WikiPortraitUploadSheet: View {
     SheetView(title: title, closeDisabled: submitting, applyFormStyle: true) {
       Form {
         Section {
-          PhotosPicker(selection: $selectedPhoto, matching: .images) {
-            Label("选择图片", systemImage: "photo")
+          Group {
+            PhotosPicker(selection: $selectedPhoto, matching: .images) {
+              Label("选择图片", systemImage: "photo")
+            }
+            if loadingImage {
+              ProgressView()
+            } else if imageBase64 != nil {
+              Label("图片已准备好", systemImage: "checkmark.circle")
+            }
           }
-          if loadingImage {
-            ProgressView()
-          } else if imageBase64 != nil {
-            Label("图片已准备好", systemImage: "checkmark.circle")
-          }
+          .themedListRow()
         }
       }
       .onChange(of: selectedPhoto) { _, newValue in

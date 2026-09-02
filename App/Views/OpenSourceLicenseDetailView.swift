@@ -6,28 +6,32 @@ struct OpenSourceLicenseDetailView: View {
   var body: some View {
     List {
       Section {
-        HStack {
-          Text("许可")
-          Spacer()
-          Text(license.license)
-            .foregroundStyle(.secondary)
-        }
-
-        Link(destination: license.sourceURL) {
+        Group {
           HStack {
-            Label("源代码", systemImage: "chevron.left.forwardslash.chevron.right")
+            Text("许可")
             Spacer()
-            Image(systemName: "arrow.up.right.square")
-              .font(.caption)
+            Text(license.license)
               .foregroundStyle(.secondary)
           }
+
+          Link(destination: license.sourceURL) {
+            HStack {
+              Label("源代码", systemImage: "chevron.left.forwardslash.chevron.right")
+              Spacer()
+              Image(systemName: "arrow.up.right.square")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            }
+          }
         }
+        .themedListRow()
       }
 
       Section(header: Text("许可声明")) {
         Text(license.notice)
           .font(.footnote.monospaced())
           .textSelection(.enabled)
+          .themedListRow()
       }
     }
     .navigationTitle(license.name)
