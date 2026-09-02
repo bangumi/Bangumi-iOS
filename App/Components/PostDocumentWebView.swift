@@ -264,7 +264,7 @@ struct PostDocumentWebView: UIViewRepresentable {
         webView.scrollView.setContentOffset(
           CGPoint(
             x: pendingScrollOffset.x,
-            y: min(max(pendingScrollOffset.y, minimumOffset), maximumOffset)
+            y: min(max(minimumOffset + pendingScrollOffset.y, minimumOffset), maximumOffset)
           ),
           animated: false
         )
@@ -386,7 +386,12 @@ struct PostDocumentWebView: UIViewRepresentable {
     }
 
     private func captureScrollOffsetIfNeeded(from webView: WKWebView) {
-      pendingScrollOffset = pendingScrollOffset ?? webView.scrollView.contentOffset
+      guard pendingScrollOffset == nil else { return }
+      let offset = webView.scrollView.contentOffset
+      pendingScrollOffset = CGPoint(
+        x: offset.x,
+        y: offset.y + webView.scrollView.adjustedContentInset.top
+      )
     }
 
     private func perform(_ request: PostDocumentScrollRequest, in webView: WKWebView) {
