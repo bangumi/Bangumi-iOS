@@ -539,11 +539,10 @@ struct ProgressEpisodeTicksView: View {
 
   private var trailingCaption: String {
     guard let last = visibleEpisodes.last else { return "" }
-    let lastNumber = last.sort.episodeDisplay
     if totalEpisodes > 0, Int(last.sort.rounded()) < totalEpisodes {
-      return "EP.\(lastNumber) / \(totalEpisodes)"
+      return "\(totalEpisodes) 话 ▸"
     }
-    return "EP.\(lastNumber)"
+    return "EP.\(last.sort.episodeDisplay)"
   }
 
   private var captionAnchorIndex: Int {
@@ -561,7 +560,7 @@ struct ProgressEpisodeTicksView: View {
       episode = currentEpisode
     }
     guard let episode else { return "" }
-    return "看到 \(episode.sort.episodeDisplay)"
+    return "看到 \(episode.sort.progressEpisodeNumber)"
   }
 
   private var centerCaptionColor: Color {
@@ -666,12 +665,10 @@ struct ProgressEpisodeTicksView: View {
       .frame(width: tickWidth(distance: distance), height: height)
       .shadow(
         color: tickShadowColor(index: index, focus: focus),
-        radius: focus ? theme.ctaShadow.radius : 4,
-        y: focus ? theme.ctaShadow.y : 2
+        radius: focus ? theme.ctaShadow.radius : theme.chipShadow.radius,
+        y: focus ? theme.ctaShadow.y : theme.chipShadow.y
       )
       .animation(.spring(response: 0.18, dampingFraction: 0.55), value: playheadIndex)
-      .animation(.spring(response: 0.22, dampingFraction: 0.72), value: isCancelling)
-      .animation(.spring(response: 0.22, dampingFraction: 0.72), value: isDragging)
   }
 
   private func tickWidth(distance: Int) -> CGFloat? {
@@ -807,9 +804,9 @@ private struct ProgressTickBubble: View {
         in: RoundedRectangle(cornerRadius: theme.metrics.controlRadius, style: .continuous)
       )
       .shadow(
-        color: (isCancelling ? theme.danger : Color.black).opacity(0.35),
-        radius: 12,
-        y: 8
+        color: isCancelling ? theme.danger.opacity(0.35) : theme.heroShadow.color,
+        radius: theme.heroShadow.radius,
+        y: theme.heroShadow.y
       )
 
       if showsArrow {

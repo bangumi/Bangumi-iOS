@@ -1,7 +1,7 @@
 import OSLog
 import SwiftUI
 
-struct ChiiProgressView: View {
+struct GlassProgressView: View {
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
   @AppStorage("collectionsUpdatedAt") var collectionsUpdatedAt: Int = 0
   @AppStorage("progressViewMode") var progressViewMode: ProgressViewMode = .tile
@@ -13,7 +13,11 @@ struct ChiiProgressView: View {
 
   @State private var refreshing: Bool = true
   @State private var refreshProgress: CGFloat = 0
+  @State private var refreshCurrent: Int = 0
+  @State private var refreshTotal: Int = 0
   @State private var showRefreshAll: Bool = false
+  @State private var showOptions: Bool = false
+  @State private var pendingRefreshAll: Bool = false
   @State private var didInitialLoad: Bool = false
 
   @State private var search: String = ""
@@ -23,6 +27,8 @@ struct ChiiProgressView: View {
   @State private var progressOffset: Int = 0
   @State private var progressPageLoading: Bool = false
   @State private var progressLoadGeneration: Int = 0
+
+  @FocusState private var searchFocused: Bool
 
   private var progressPageLimit: Int {
     switch progressViewMode {
@@ -34,7 +40,12 @@ struct ChiiProgressView: View {
   }
 
   private var progressEpisodeWindowSize: Int {
-    5
+    switch progressViewMode {
+    case .list:
+      80
+    case .tile:
+      5
+    }
   }
 
   private var progressPagePrefetchWindow: Int {
@@ -329,7 +340,7 @@ struct ChiiProgressView: View {
     }
   }
 
-  func refresh(force: Bool = false, showProgress: Bool = true) async {
+  private func refresh(force: Bool = false, showProgress: Bool = true) async {
     let now = Date()
     if force {
       collectionsUpdatedAt = 0
@@ -357,9 +368,11 @@ struct ChiiProgressView: View {
     }
   }
 
-  func refreshCollections(since: Int = 0) async throws -> Int {
+  private func refreshCollections(since: Int = 0) async throws -> Int {
     let db = try await AppContext.shared.getDB()
     refreshProgress = 0
+    refreshCurrent = 0
+    refreshTotal = 0
     let limit: Int = 100
     var offset: Int = 0
     var count: Int = 0
@@ -375,6 +388,8 @@ struct ChiiProgressView: View {
         count += 1
         loaded[item.id] = item.type
         refreshProgress = CGFloat(count) / CGFloat(resp.total)
+        refreshCurrent = count
+        refreshTotal = resp.total
       }
       await SearchIndexing.index(resp.data.map { $0.searchable() })
       offset += limit
@@ -388,7 +403,7 @@ struct ChiiProgressView: View {
     return count
   }
 
-  func checkLoadEpisodes(_ subjects: [Int: SubjectType]) {
+  private func checkLoadEpisodes(_ subjects: [Int: SubjectType]) {
     Task.detached {
       let subjectIds = subjects.filter {
         $0.value == .anime || $0.value == .music || $0.value == .real
@@ -403,12 +418,58 @@ struct ChiiProgressView: View {
     }
   }
 
-  func typeDesc(stype: SubjectType) -> String {
-    let count = counts[stype, default: 0]
-    if count == 0 {
-      return stype.description
+  private var isFirstFullSync: Bool {
+    collectionsUpdatedAt == 0 && refreshing
+  }
+
+  @ViewBuilder
+  private var syncSection: some View {
+    if isFirstFullSync {
+      VStack(spacing: theme.metrics.listSpacing) {
+        GlassSyncBanner(
+          progress: Double(refreshProgress),
+          current: refreshTotal > 0 ? refreshCurrent : nil,
+          total: refreshTotal > 0 ? refreshTotal : nil
+        )
+        GlassSkeletonCard()
+        GlassSkeletonCard(opacity: 0.7)
+        GlassSkeletonCard(opacity: 0.4)
+      }
+      .padding(.horizontal, theme.metrics.screenPadding)
+    } else if refreshing {
+      HStack(spacing: 8) {
+        ProgressView()
+        Text("正在同步收藏…")
+          .font(.caption)
+          .foregroundStyle(theme.tertiaryText)
+      }
+      .frame(maxWidth: .infinity)
+      .padding(.vertical, 6)
+    }
+  }
+
+  @ViewBuilder
+  private var emptySection: some View {
+    if collectionsUpdatedAt > 0 {
+      if progressPageLoading {
+        ProgressView()
+          .frame(maxWidth: .infinity)
+          .padding()
+      } else {
+        GlassEmptyCard(
+          systemImage: "leaf",
+          title: "这个分类下暂时是空的",
+          description: "去发现页找点想看的吧"
+        )
+        .padding(.horizontal, theme.metrics.screenPadding)
+      }
     } else {
-      return "\(stype.description)(\(count))"
+      GlassEmptyCard(
+        systemImage: "cloud",
+        title: "还没有同步过收藏",
+        description: "下拉即可同步你的 Bangumi 收藏"
+      )
+      .padding(.horizontal, theme.metrics.screenPadding)
     }
   }
 
@@ -417,7 +478,7 @@ struct ChiiProgressView: View {
     if !progressSubjects.isEmpty {
       switch progressViewMode {
       case .list:
-        ProgressListView(
+        GlassProgressListSection(
           items: progressSubjects,
           hasMore: hasMoreProgress,
           prefetchWindow: progressPagePrefetchWindow,
@@ -426,7 +487,7 @@ struct ChiiProgressView: View {
           reloadSubject: reloadLoadedProgressSubject
         )
       case .tile:
-        ProgressTileView(
+        GlassProgressGridSection(
           items: progressSubjects,
           hasMore: hasMoreProgress,
           prefetchWindow: progressPagePrefetchWindow,
@@ -435,110 +496,69 @@ struct ChiiProgressView: View {
           reloadSubject: reloadLoadedProgressSubject
         )
       }
-    } else if collectionsUpdatedAt > 0 {
-      if refreshing || progressPageLoading {
-        ProgressView()
-          .padding()
-      } else {
-        ContentUnavailableView {
-          Label("没有条目", systemImage: "tray")
-        } description: {
-          Text("当前列表为空，或是搜索无结果")
-        }
-      }
-    } else {
-      if refreshing {
-        HStack {
-          ProgressView(value: refreshProgress)
-            .progressViewStyle(.linear)
-        }.padding()
-      } else {
-        ContentUnavailableView {
-          Label("没有收藏数据", systemImage: "tray")
-        } description: {
-          Text("下拉刷新以获取正在观看的条目")
-        }
-      }
-    }
-  }
-
-  private var progressTypePicker: some View {
-    Picker("SubjectType", selection: $progressTab.animated()) {
-      ForEach(SubjectType.progressTypes) { type in
-        Text(typeDesc(stype: type)).tag(type)
-      }
-    }
-    .padding(.horizontal, 8)
-    .pickerStyle(.segmented)
-  }
-
-  private var progressOptionsMenu: some View {
-    Menu {
-      Picker("显示模式", selection: $progressViewMode.animated()) {
-        ForEach(ProgressViewMode.allCases, id: \.self) { mode in
-          Label(mode.desc, systemImage: mode.icon).tag(mode)
-        }
-      }
-
-      Picker("排序方式", selection: $progressSortMode.animated()) {
-        ForEach(ProgressSortMode.allCases, id: \.self) { mode in
-          Text(mode.desc).tag(mode)
-        }
-      }
-
-      Picker("副标题内容", selection: $secondLineMode.animated()) {
-        ForEach(ProgressSecondLineMode.allCases, id: \.self) { mode in
-          Label(mode.desc, systemImage: mode.icon).tag(mode)
-        }
-      }
-
-      Divider()
-
-      Button("刷新所有收藏", role: .destructive) {
-        showRefreshAll = true
-      }
-    } label: {
-      Image(systemName: "ellipsis")
-    }
-    .pickerStyle(.menu)
-  }
-
-  @ViewBuilder
-  private var progressToolbarContent: some View {
-    if refreshing {
-      ProgressView()
-    } else {
-      progressOptionsMenu
-    }
-  }
-
-  @ToolbarContentBuilder
-  private var progressToolbar: some ToolbarContent {
-    ToolbarItem(placement: .topBarTrailing) {
-      progressToolbarContent
+    } else if !isFirstFullSync && !refreshing {
+      emptySection
     }
   }
 
   private var authenticatedBody: some View {
     ScrollView {
-      VStack {
-        progressTypePicker
+      LazyVStack(spacing: theme.metrics.listSpacing) {
+        GlassSearchField(
+          text: $search,
+          prompt: "搜索正在看的条目",
+          isFocused: $searchFocused
+        )
+        .padding(.horizontal, theme.metrics.screenPadding)
+
+        GlassTypeChips(selection: $progressTab, counts: counts)
+
+        syncSection
         progressSubjectsView
+
+        if !progressSubjects.isEmpty && !hasMoreProgress {
+          GlassProgressFooter()
+            .padding(.horizontal, theme.metrics.screenPadding)
+        }
       }
+      .padding(.top, 4)
+      .padding(.bottom, theme.metrics.screenPadding)
     }
     .refreshable {
       UIImpactFeedbackGenerator(style: .medium).impactOccurred()
       await refresh(showProgress: false)
     }
-    .searchable(
-      text: $search,
-      placement: .navigationBarDrawer(displayMode: .always),
-      prompt: "搜索正在观看的条目"
-    )
-    .searchInputTraits()
-    .navigationTitle("进度管理")
-    .navigationBarTitleDisplayMode(.inline)
-    .toolbar { progressToolbar }
+    .navigationTitle("进度")
+    .navigationBarTitleDisplayMode(.large)
+    .toolbar {
+      ToolbarItem(placement: .topBarTrailing) {
+        Button {
+          showOptions = true
+        } label: {
+          ToolbarCircle {
+            Image(systemName: "ellipsis")
+          }
+        }
+        .buttonStyle(.plain)
+      }
+    }
+    .sheet(
+      isPresented: $showOptions,
+      onDismiss: {
+        if pendingRefreshAll {
+          pendingRefreshAll = false
+          showRefreshAll = true
+        }
+      }
+    ) {
+      GlassOptionsSheet(
+        viewMode: $progressViewMode.animated(),
+        sortMode: $progressSortMode.animated(),
+        secondLineMode: $secondLineMode.animated()
+      ) {
+        pendingRefreshAll = true
+      }
+    }
     .onChange(of: progressTab) { Task { await reloadProgressPages(animate: true) } }
     .onChange(of: search) { Task { await reloadProgressPages(animate: true) } }
     .onChange(of: progressSortMode) { Task { await reloadProgressPages(animate: true) } }
@@ -553,37 +573,185 @@ struct ChiiProgressView: View {
         await reloadPendingProgressSubjects()
       }
     }
-    .alert("刷新所有收藏", isPresented: $showRefreshAll) {
+    .alert("刷新所有收藏？", isPresented: $showRefreshAll) {
       Button("取消", role: .cancel) {}
-      Button("确定", role: .destructive) {
+      Button("刷新", role: .destructive) {
         Task { await refresh(force: true) }
       }
     } message: {
-      Text("将从服务器重新下载所有收藏数据，可能需要较长时间")
+      Text(refreshAllMessage)
     }
   }
 
-  private var unauthenticatedBody: some View {
-    AuthView(slogan: "使用 Bangumi 管理观看进度")
-      .navigationTitle("进度管理")
-      .navigationBarTitleDisplayMode(.inline)
+  private var refreshAllMessage: String {
+    let total = counts[.none, default: 0]
+    if total > 0 {
+      return "将清除本地缓存并重新下载全部 \(total) 个条目，可能消耗较多流量。"
+    }
+    return "将清除本地缓存并重新下载全部收藏，可能消耗较多流量。"
   }
 
-  @ViewBuilder
-  private var classicBody: some View {
+  private var unauthenticatedBody: some View {
+    ScrollView {
+      GlassLoginCard(
+        title: "登录后管理追番进度",
+        subtitle: "同步你的收藏，标记每一集，随时接着上次看到的地方。",
+        buttonTitle: "登录 / 注册"
+      )
+      .padding(.horizontal, 24)
+      .padding(.top, 60)
+    }
+    .navigationTitle("进度")
+    .navigationBarTitleDisplayMode(.large)
+  }
+
+  var body: some View {
     if isAuthenticated {
       authenticatedBody
     } else {
       unauthenticatedBody
     }
   }
+}
 
-  @ViewBuilder
+struct GlassProgressFooter: View {
+  @Environment(\.theme) private var theme
+
   var body: some View {
-    if theme.isClassic {
-      classicBody
-    } else {
-      GlassProgressView()
+    HStack(spacing: 12) {
+      Rectangle()
+        .fill(theme.separator)
+        .frame(height: 1)
+      Text("没有更多了")
+        .font(.caption)
+        .foregroundStyle(theme.placeholder)
+        .fixedSize()
+      Rectangle()
+        .fill(theme.separator)
+        .frame(height: 1)
+    }
+    .padding(.vertical, 16)
+  }
+}
+
+private struct GlassProgressListSection: View {
+  let items: [ProgressSubjectDTO]
+  let hasMore: Bool
+  let prefetchWindow: Int
+  let paginationResetToken: Int
+  let loadNextPage: () async -> Bool
+  let reloadSubject: (Int) async -> Void
+
+  @AppStorage("episodeGridInteractionMode") private var episodeGridInteractionMode:
+    EpisodeGridInteractionMode = .menu
+
+  @Environment(\.theme) private var theme
+
+  @State private var prefetchState = NextPagePrefetchState<ProgressSubjectDTO.ID>()
+
+  private func requestNextPage(for trigger: NextPagePrefetchTaskKey<ProgressSubjectDTO.ID>) {
+    if let triggerId = prefetchState.request(
+      trigger: trigger,
+      isLoading: false,
+      canLoadMore: hasMore
+    ) {
+      Task {
+        if await loadNextPage() {
+          prefetchState.completeLoading(canLoadMore: hasMore)
+        } else {
+          prefetchState.cancelRequest(triggerId: triggerId)
+        }
+      }
+    }
+  }
+
+  var body: some View {
+    let nextPageTrigger = items.nextPagePrefetchTrigger(prefetchWindow: prefetchWindow)
+
+    LazyVStack(spacing: theme.metrics.listSpacing) {
+      ForEach(items) { item in
+        let trigger = NextPagePrefetchTaskKey(
+          triggerId: nextPageTrigger.triggerId(for: item.id),
+          resetToken: paginationResetToken
+        )
+        GlassProgressCard(
+          payload: ProgressSubjectRenderPayload(item),
+          interactionMode: episodeGridInteractionMode,
+          reload: {
+            await reloadSubject(item.id)
+          }
+        )
+        .task(id: trigger) {
+          requestNextPage(for: trigger)
+        }
+      }
+    }
+    .padding(.horizontal, theme.metrics.screenPadding)
+    .onChange(of: paginationResetToken) { _, _ in
+      prefetchState.reset()
+    }
+  }
+}
+
+private struct GlassProgressGridSection: View {
+  let items: [ProgressSubjectDTO]
+  let hasMore: Bool
+  let prefetchWindow: Int
+  let paginationResetToken: Int
+  let loadNextPage: () async -> Bool
+  let reloadSubject: (Int) async -> Void
+
+  @AppStorage("episodeGridInteractionMode") private var episodeGridInteractionMode:
+    EpisodeGridInteractionMode = .menu
+
+  @Environment(\.theme) private var theme
+
+  @State private var prefetchState = NextPagePrefetchState<ProgressSubjectDTO.ID>()
+
+  private var columns: [GridItem] {
+    Array(repeating: GridItem(.flexible(), spacing: 10), count: 3)
+  }
+
+  private func requestNextPage(for trigger: NextPagePrefetchTaskKey<ProgressSubjectDTO.ID>) {
+    if let triggerId = prefetchState.request(
+      trigger: trigger,
+      isLoading: false,
+      canLoadMore: hasMore
+    ) {
+      Task {
+        if await loadNextPage() {
+          prefetchState.completeLoading(canLoadMore: hasMore)
+        } else {
+          prefetchState.cancelRequest(triggerId: triggerId)
+        }
+      }
+    }
+  }
+
+  var body: some View {
+    let nextPageTrigger = items.nextPagePrefetchTrigger(prefetchWindow: prefetchWindow)
+
+    LazyVGrid(columns: columns, alignment: .leading, spacing: 14) {
+      ForEach(items) { item in
+        let trigger = NextPagePrefetchTaskKey(
+          triggerId: nextPageTrigger.triggerId(for: item.id),
+          resetToken: paginationResetToken
+        )
+        GlassProgressTile(
+          payload: ProgressSubjectRenderPayload(item),
+          interactionMode: episodeGridInteractionMode,
+          reload: {
+            await reloadSubject(item.id)
+          }
+        )
+        .task(id: trigger) {
+          requestNextPage(for: trigger)
+        }
+      }
+    }
+    .padding(.horizontal, theme.metrics.screenPadding)
+    .onChange(of: paginationResetToken) { _, _ in
+      prefetchState.reset()
     }
   }
 }
