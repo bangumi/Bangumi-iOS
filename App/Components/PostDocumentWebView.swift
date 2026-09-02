@@ -772,6 +772,7 @@ struct PostDocumentSurface: View {
   let onRefresh: () async -> Void
 
   @State private var document: PostWebDocument?
+  @State private var renderedKey: PostDocumentRenderInput?
   @State private var scrollRequest: PostDocumentScrollRequest?
   @State private var viewportState = PostDocumentViewportState.top
   @Environment(\.accessibilityReduceMotion) private var accessibilityReduceMotion
@@ -819,9 +820,12 @@ struct PostDocumentSurface: View {
       }
     }
     .task(id: input.documentRenderKey) {
+      let key = input.documentRenderKey
+      guard renderedKey != key else { return }
       do {
         let document = try await PostDocumentRenderer.shared.render(input)
         try Task.checkCancellation()
+        renderedKey = key
         self.document = document
       } catch is CancellationError {
         return
