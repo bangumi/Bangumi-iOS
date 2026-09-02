@@ -23,6 +23,8 @@ struct UserIndexListView: View {
   @State private var type: IndexListType = .created
   @State private var showCreateIndex = false
 
+  @Environment(\.theme) private var theme
+
   var title: String {
     if user.username == profile.username {
       return "我\(type.title)"
@@ -52,6 +54,46 @@ struct UserIndexListView: View {
   }
 
   var body: some View {
+    if theme.isClassic {
+      classicBody
+    } else {
+      glassBody
+    }
+  }
+
+  private var glassBody: some View {
+    GlassUserIndexListView(user: user, type: $type, reloader: reloader)
+      .onChange(of: type) { _, _ in
+        withAnimation(.default) {
+          reloader.toggle()
+        }
+      }
+      .navigationTitle(title)
+      .navigationBarTitleDisplayMode(.inline)
+      .toolbar {
+        if user.username == profile.username && type == .created {
+          ToolbarItem(placement: .primaryAction) {
+            Button {
+              showCreateIndex = true
+            } label: {
+              ToolbarCircle {
+                Image(systemName: "plus")
+              }
+            }
+            .buttonStyle(.plain)
+          }
+        }
+      }
+      .sheet(isPresented: $showCreateIndex) {
+        IndexEditSheet {
+          withAnimation(.default) {
+            reloader.toggle()
+          }
+        }
+      }
+  }
+
+  private var classicBody: some View {
     VStack {
       Picker("Type", selection: $type.animated()) {
         ForEach(IndexListType.allCases, id: \.self) { type in

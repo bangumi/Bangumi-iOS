@@ -22,6 +22,8 @@ struct UserView: View {
 
   @State private var loadedKey: UserLoadKey?
 
+  @Environment(\.theme) private var theme
+
   private var loadKey: UserLoadKey {
     UserLoadKey(
       username: username,
@@ -143,9 +145,36 @@ struct UserView: View {
   }
 
   var body: some View {
+    if theme.isClassic {
+      classicBody
+    } else {
+      glassBody
+    }
+  }
+
+  private var glassBody: some View {
+    GlassUserView(
+      username: username,
+      user: displayedUser,
+      notFound: loadedKey == loadKey && refreshed,
+      shareLink: shareLink,
+      onAddFriend: addFriend,
+      onRemoveFriend: removeFriend,
+      onBlock: blockUser,
+      onUnblock: unblockUser
+    )
+    .navigationTitle(title)
+    .navigationBarTitleDisplayMode(.inline)
+    .task(id: loadKey) {
+      await load(loadKey)
+    }
+    .handoff(url: shareLink, title: title)
+  }
+
+  private var classicBody: some View {
     let currentLoadKey = loadKey
 
-    Section {
+    return Section {
       if let user = displayedUser {
         UserDetailView(user: user)
       } else if loadedKey == currentLoadKey && refreshed {
@@ -252,7 +281,17 @@ struct UserDetailView: View {
 
   let user: UserDTO
 
+  @Environment(\.theme) private var theme
+
   var body: some View {
+    if theme.isClassic {
+      classicBody
+    } else {
+      GlassUserDetailView(user: user)
+    }
+  }
+
+  private var classicBody: some View {
     ScrollView {
       VStack(alignment: .leading) {
         HStack(alignment: .top) {

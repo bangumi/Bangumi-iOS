@@ -3,7 +3,17 @@ import SwiftUI
 struct ProfileHomeView: View {
   @AppStorage("profile") var profile: Profile = Profile()
 
+  @Environment(\.theme) private var theme
+
   var body: some View {
+    if theme.isClassic {
+      classicBody
+    } else {
+      GlassProfileHomeView(profile: profile)
+    }
+  }
+
+  private var classicBody: some View {
     ScrollView(showsIndicators: false) {
       VStack(alignment: .leading, spacing: 10) {
         ProfileHeaderView(profile: profile, isAuthenticated: true)

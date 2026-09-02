@@ -22,6 +22,8 @@ struct UserMonoListView: View {
 
   @State private var type: MonoType = .character
 
+  @Environment(\.theme) private var theme
+
   var title: String {
     if user.username == profile.username {
       return "我收藏的\(type.title)"
@@ -53,6 +55,16 @@ struct UserMonoListView: View {
   }
 
   var body: some View {
+    if theme.isClassic {
+      classicBody
+    } else {
+      GlassUserMonoListView(user: user, type: $type)
+        .navigationTitle(title)
+        .navigationBarTitleDisplayMode(.inline)
+    }
+  }
+
+  private var classicBody: some View {
     VStack {
       Picker("Type", selection: $type.animated()) {
         ForEach(MonoType.allCases, id: \.self) { type in

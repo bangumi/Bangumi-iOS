@@ -7,6 +7,8 @@ struct CollectionListView: View {
   @State private var reloader = false
   @State private var counts: [CollectionType: Int] = [:]
 
+  @Environment(\.theme) private var theme
+
   func loadCounts() async {
     do {
       let db = try await AppContext.shared.getDB()
@@ -48,6 +50,14 @@ struct CollectionListView: View {
   }
 
   var body: some View {
+    if theme.isClassic {
+      classicBody
+    } else {
+      GlassCollectionListView(subjectType: subjectType)
+    }
+  }
+
+  private var classicBody: some View {
     Section {
       if counts.isEmpty {
         ProgressView()

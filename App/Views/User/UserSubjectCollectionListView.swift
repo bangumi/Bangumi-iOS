@@ -10,6 +10,8 @@ struct UserSubjectCollectionListView: View {
   @State private var reloader = false
   @State private var ctype: CollectionType = .collect
 
+  @Environment(\.theme) private var theme
+
   var title: String {
     if user.username == profile.username {
       return "我的\(stype.description)"
@@ -30,6 +32,16 @@ struct UserSubjectCollectionListView: View {
   }
 
   var body: some View {
+    if theme.isClassic {
+      classicBody
+    } else {
+      GlassUserSubjectCollectionListView(user: user, stype: stype, ctypes: ctypes)
+        .navigationTitle(title)
+        .navigationBarTitleDisplayMode(.inline)
+    }
+  }
+
+  private var classicBody: some View {
     VStack {
       CollectionTypeSegmentedPickerView(subjectType: stype, counts: ctypes, selection: $ctype)
         .onChange(of: ctype) { _, _ in
