@@ -16,6 +16,8 @@ struct PersonView: View {
   @State private var showWikiEdit: Bool = false
   @State private var showPortraitUpload: Bool = false
 
+  @Environment(\.theme) private var theme
+
   var shareLink: URL {
     URL(string: "\(shareDomain.url)/person/\(personId)")!
   }
@@ -62,7 +64,7 @@ struct PersonView: View {
     }
   }
 
-  var body: some View {
+  private var classicBody: some View {
     Section {
       if let person = person {
         ScrollView {
@@ -88,6 +90,41 @@ struct PersonView: View {
         NotFoundView()
       } else {
         ProgressView()
+      }
+    }
+  }
+
+  @ViewBuilder
+  private var glassBody: some View {
+    if let person = person {
+      GlassPersonDetailView(person: person, detail: detail) {
+        await loadCached()
+      }
+      .refreshable {
+        Task {
+          await refresh()
+        }
+      }
+      .sheet(isPresented: $showIndexPicker) {
+        IndexPickerSheet(
+          category: .person,
+          itemId: personId,
+          itemTitle: title
+        )
+      }
+    } else if refreshed {
+      NotFoundView()
+    } else {
+      ProgressView()
+    }
+  }
+
+  var body: some View {
+    Group {
+      if theme.isClassic {
+        classicBody
+      } else {
+        glassBody
       }
     }
     .task {

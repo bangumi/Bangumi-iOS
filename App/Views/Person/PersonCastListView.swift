@@ -6,6 +6,8 @@ struct PersonCastListView: View {
   @State private var type: CastType = .none
   @State private var reloader = false
 
+  @Environment(\.theme) private var theme
+
   func load(limit: Int, offset: Int) async -> PagedDTO<PersonCastDTO>? {
     do {
       let resp = try await PersonService.getPersonCasts(
@@ -17,7 +19,8 @@ struct PersonCastListView: View {
     return nil
   }
 
-  var body: some View {
+  @ViewBuilder
+  private var classicBody: some View {
     Picker("Cast Type", selection: $type.animated()) {
       ForEach(CastType.allCases) { ct in
         Text(ct.description).tag(ct)
@@ -37,6 +40,16 @@ struct PersonCastListView: View {
       .padding(8)
     }
     .buttonStyle(.navigation)
+  }
+
+  var body: some View {
+    Group {
+      if theme.isClassic {
+        classicBody
+      } else {
+        GlassPersonCastListView(personId: personId)
+      }
+    }
     .navigationTitle("出演角色")
     .navigationBarTitleDisplayMode(.inline)
   }

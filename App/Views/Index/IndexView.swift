@@ -21,6 +21,8 @@ struct IndexView: View {
   @State private var showAddRelated = false
   @State private var showReportView = false
 
+  @Environment(\.theme) private var theme
+
   var shareLink: URL {
     URL(string: "\(shareDomain.url)/index/\(indexId)")!
   }
@@ -88,7 +90,7 @@ struct IndexView: View {
     return index.user.username == profile.username
   }
 
-  var body: some View {
+  private var classicBody: some View {
     ScrollView {
       if let index = index {
         VStack(alignment: .leading) {
@@ -235,6 +237,37 @@ struct IndexView: View {
         }.padding(8)
       } else {
         ProgressView()
+      }
+    }
+  }
+
+  @ViewBuilder
+  private var glassBody: some View {
+    if let index = index {
+      GlassIndexView(
+        index: index,
+        isOwner: isOwner,
+        availableCategories: availableCategories,
+        availableSubjectTypes: availableSubjectTypes,
+        selectedCategory: $selectedCategory,
+        selectedSubjectType: $selectedSubjectType,
+        reloader: $reloader,
+        onAddRelated: {
+          showAddRelated = true
+        },
+        loadRelated: loadRelated
+      )
+    } else {
+      ProgressView()
+    }
+  }
+
+  var body: some View {
+    Group {
+      if theme.isClassic {
+        classicBody
+      } else {
+        glassBody
       }
     }
     .navigationTitle("目录")

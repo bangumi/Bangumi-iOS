@@ -14,6 +14,8 @@ struct BlogView: View {
   @State private var showIndexPicker: Bool = false
   @State private var showReportView: Bool = false
 
+  @Environment(\.theme) private var theme
+
   var title: String {
     guard let blog = blog else {
       return "日志"
@@ -41,7 +43,7 @@ struct BlogView: View {
     }
   }
 
-  var body: some View {
+  private var classicBody: some View {
     Section {
       if let blog = blog {
         ScrollView {
@@ -100,6 +102,39 @@ struct BlogView: View {
         NotFoundView()
       } else {
         ProgressView()
+      }
+    }
+  }
+
+  @ViewBuilder
+  private var glassBody: some View {
+    if let blog = blog {
+      GlassBlogView(blog: blog, subjects: subjects)
+        .refreshable {
+          Task {
+            await load()
+          }
+        }
+        .sheet(isPresented: $showIndexPicker) {
+          IndexPickerSheet(
+            category: .blog,
+            itemId: blogId,
+            itemTitle: title
+          )
+        }
+    } else if refreshed {
+      NotFoundView()
+    } else {
+      ProgressView()
+    }
+  }
+
+  var body: some View {
+    Group {
+      if theme.isClassic {
+        classicBody
+      } else {
+        glassBody
       }
     }
     .navigationTitle(title)

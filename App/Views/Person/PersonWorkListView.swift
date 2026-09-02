@@ -7,6 +7,8 @@ struct PersonWorkListView: View {
   @State private var subjectType: SubjectType = .none
   @State private var reloader = false
 
+  @Environment(\.theme) private var theme
+
   func load(limit: Int, offset: Int) async -> PagedDTO<PersonWorkDTO>? {
     do {
       let resp = try await PersonService.getPersonWorks(
@@ -18,7 +20,8 @@ struct PersonWorkListView: View {
     return nil
   }
 
-  var body: some View {
+  @ViewBuilder
+  private var classicBody: some View {
     Picker("Subject Type", selection: $subjectType.animated()) {
       ForEach(SubjectType.allCases) { type in
         Text(type.description).tag(type)
@@ -38,6 +41,16 @@ struct PersonWorkListView: View {
       .padding(8)
     }
     .buttonStyle(.navigation)
+  }
+
+  var body: some View {
+    Group {
+      if theme.isClassic {
+        classicBody
+      } else {
+        GlassPersonWorkListView(personId: personId)
+      }
+    }
     .navigationTitle("参与作品")
     .navigationBarTitleDisplayMode(.inline)
   }
