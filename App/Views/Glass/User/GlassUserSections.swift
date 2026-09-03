@@ -144,7 +144,7 @@ struct GlassUserSubjectSection: View {
         .padding(.vertical, 2)
       }
       .scrollClipDisabled()
-      .glassHorizontalFade()
+      .glassHorizontalClip()
     }
   }
 }
@@ -275,7 +275,7 @@ struct GlassUserFriendsSection: View {
         .padding(.vertical, 2)
       }
       .scrollClipDisabled()
-      .glassHorizontalFade()
+      .glassHorizontalClip()
     }
   }
 }
@@ -338,7 +338,7 @@ struct GlassUserGroupsSection: View {
         .padding(.vertical, 2)
       }
       .scrollClipDisabled()
-      .glassHorizontalFade()
+      .glassHorizontalClip()
     }
   }
 
@@ -424,7 +424,7 @@ struct GlassUserCharactersSection: View {
         .padding(.vertical, 2)
       }
       .scrollClipDisabled()
-      .glassHorizontalFade()
+      .glassHorizontalClip()
     }
   }
 }
@@ -491,7 +491,7 @@ struct GlassUserPersonsSection: View {
         .padding(.vertical, 2)
       }
       .scrollClipDisabled()
-      .glassHorizontalFade()
+      .glassHorizontalClip()
     }
   }
 }

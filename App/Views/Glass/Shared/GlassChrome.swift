@@ -158,33 +158,10 @@ func glassCompactCount(_ value: Int) -> String {
   return "\(value)"
 }
 
-private struct GlassHorizontalFade: ViewModifier {
-  let inset: CGFloat
-
-  private var fadeWidth: CGFloat { inset - 4 }
-
-  func body(content: Content) -> some View {
-    content.mask {
-      HStack(spacing: 0) {
-        Color.clear.frame(width: 6)
-        LinearGradient(
-          colors: [.clear, .black], startPoint: .leading, endPoint: .trailing
-        )
-        .frame(width: fadeWidth)
-        Color.black
-        LinearGradient(
-          colors: [.black, .clear], startPoint: .leading, endPoint: .trailing
-        )
-        .frame(width: fadeWidth)
-        Color.clear.frame(width: 6)
-      }
-      .padding(.vertical, -24)
-    }
-  }
-}
-
 extension View {
-  func glassHorizontalFade(inset: CGFloat = 14) -> some View {
-    modifier(GlassHorizontalFade(inset: inset))
+  func glassHorizontalClip() -> some View {
+    mask {
+      Rectangle().padding(.vertical, -24)
+    }
   }
 }
