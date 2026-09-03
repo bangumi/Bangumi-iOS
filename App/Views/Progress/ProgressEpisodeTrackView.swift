@@ -796,49 +796,38 @@ private struct ProgressTickBubble: View {
 
   var body: some View {
     VStack(spacing: 0) {
-      HStack(spacing: 9) {
-        if isCancelling {
+      VStack(alignment: .leading, spacing: 2) {
+        HStack(alignment: .firstTextBaseline, spacing: 8) {
           if let systemImage {
             Image(systemName: systemImage)
               .font(.subheadline.weight(.heavy))
               .foregroundStyle(theme.toastText)
           }
           Text(title)
-            .font(.subheadline.weight(.heavy))
+            .font(.system(size: 15, weight: .heavy, design: .monospaced))
             .foregroundStyle(theme.toastText)
-          Text(subtitle)
-            .font(.caption2.weight(.semibold))
-            .foregroundStyle(theme.toastText.opacity(0.75))
-        } else {
-          Text(title)
-            .font(.system(size: 13, weight: .heavy, design: .monospaced))
-            .foregroundStyle(.white)
             .contentTransition(.numericText())
-            .padding(.horizontal, 8)
-            .frame(height: 24)
-            .background(
-              LinearGradient(
-                colors: theme.ctaGradient, startPoint: .topLeading, endPoint: .bottomTrailing),
-              in: Capsule()
-            )
-          VStack(alignment: .leading, spacing: 1) {
-            if let detail, !detail.isEmpty {
-              Text(detail)
-                .font(.footnote.weight(.semibold))
-                .foregroundStyle(theme.toastText)
-                .lineLimit(1)
-            }
+          if let detail, !detail.isEmpty {
+            Text(detail)
+              .font(.footnote.weight(.semibold))
+              .foregroundStyle(theme.toastText)
+              .lineLimit(1)
+          } else if isCancelling {
             Text(subtitle)
               .font(.caption2.weight(.semibold))
-              .foregroundStyle(theme.toastText.opacity(0.6))
+              .foregroundStyle(theme.toastText.opacity(0.75))
           }
-          .frame(maxWidth: 200, alignment: .leading)
-          .fixedSize(horizontal: true, vertical: false)
+        }
+        if !isCancelling {
+          Text(subtitle)
+            .font(.caption2.weight(.semibold))
+            .foregroundStyle(theme.toastText.opacity(0.6))
         }
       }
-      .padding(.leading, isCancelling ? 13 : 7)
-      .padding(.trailing, 13)
-      .padding(.vertical, 7)
+      .frame(maxWidth: 240, alignment: .leading)
+      .fixedSize(horizontal: true, vertical: false)
+      .padding(.horizontal, 13)
+      .padding(.vertical, 8)
       .background(
         bubbleColor,
         in: RoundedRectangle(cornerRadius: theme.metrics.controlRadius, style: .continuous)
