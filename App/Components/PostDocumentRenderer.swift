@@ -386,6 +386,12 @@ enum PostDocumentThemeCSS {
             text-align: center;
           }
 
+          html.theme-glass .post-content,
+          html.theme-glass .main-content {
+            font-size: 15px;
+            line-height: 1.5;
+          }
+
           html.theme-glass .timestamp {
             font: 600 10.5px ui-monospace, Menlo, monospace;
             color: #c9bcc6;
