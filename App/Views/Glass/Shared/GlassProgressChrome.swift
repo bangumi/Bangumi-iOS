@@ -362,47 +362,41 @@ struct GlassOptionsSheet: View {
   }
 
   var body: some View {
-    VStack(alignment: .leading, spacing: 8) {
-      sectionLabel("显示模式")
-      GlassSegmented(selection: $viewMode, items: ProgressViewMode.allCases) { mode in
-        Label(mode.desc, systemImage: mode.icon)
-      }
-      sectionLabel("排序方式")
-        .padding(.top, 8)
-      GlassSegmented(selection: $sortMode, items: ProgressSortMode.allCases) { mode in
-        Text(mode.desc)
-      }
-      sectionLabel("副标题内容")
-        .padding(.top, 8)
-      HFlow(spacing: 7) {
-        ForEach(ProgressSecondLineMode.allCases, id: \.self) { mode in
-          GlassChip(title: mode.desc, isSelected: secondLineMode == mode) {
-            withAnimation(.easeInOut(duration: 0.18)) {
-              secondLineMode = mode
+    ScrollView(showsIndicators: false) {
+      VStack(alignment: .leading, spacing: GlassForm.blockSpacing) {
+        GlassFormSection(title: "显示模式") {
+          GlassSegmented(selection: $viewMode, items: ProgressViewMode.allCases) { mode in
+            Label(mode.desc, systemImage: mode.icon)
+          }
+        }
+        GlassFormSection(title: "排序方式") {
+          GlassSegmented(selection: $sortMode, items: ProgressSortMode.allCases) { mode in
+            Text(mode.desc)
+          }
+        }
+        GlassFormSection(title: "副标题内容") {
+          HFlow(spacing: 7) {
+            ForEach(ProgressSecondLineMode.allCases, id: \.self) { mode in
+              GlassChip(title: mode.desc, isSelected: secondLineMode == mode) {
+                withAnimation(.easeInOut(duration: 0.18)) {
+                  secondLineMode = mode
+                }
+              }
             }
           }
         }
+        refreshRow
       }
-      refreshRow
-        .padding(.top, 10)
+      .padding(.horizontal, theme.metrics.screenPadding)
+      .padding(.top, 28)
+      .padding(.bottom, theme.metrics.screenPadding)
     }
-    .padding(.horizontal, theme.metrics.screenPadding)
-    .padding(.top, 18)
-    .padding(.bottom, 26)
-    .frame(maxHeight: .infinity, alignment: .top)
-    .presentationDetents([.medium])
+    .presentationDetents([.height(420)])
     .presentationDragIndicator(.visible)
   }
 
-  private func sectionLabel(_ text: String) -> some View {
-    Text(text)
-      .font(.caption.weight(.bold))
-      .foregroundStyle(theme.tertiaryText)
-      .padding(.horizontal, 4)
-  }
-
   private var refreshRow: some View {
-    let shape = RoundedRectangle(cornerRadius: theme.metrics.embedRadius, style: .continuous)
+    let shape = RoundedRectangle(cornerRadius: theme.metrics.controlRadius, style: .continuous)
     return Button {
       dismiss()
       onRefreshAll()
@@ -417,7 +411,8 @@ struct GlassOptionsSheet: View {
           .foregroundStyle(theme.disabled)
       }
       .foregroundStyle(theme.onTintText)
-      .padding(14)
+      .padding(.horizontal, 14)
+      .frame(height: GlassForm.controlHeight)
       .background {
         shape
           .fill(theme.tint)

@@ -528,8 +528,8 @@ struct GlassProgressView: View {
       UIImpactFeedbackGenerator(style: .medium).impactOccurred()
       await refresh(showProgress: false)
     }
-    .navigationTitle("进度")
-    .navigationBarTitleDisplayMode(.large)
+    .navigationTitle("进度管理")
+    .navigationBarTitleDisplayMode(.inline)
     .toolbar {
       ToolbarItem(placement: .topBarTrailing) {
         Button {
@@ -601,8 +601,8 @@ struct GlassProgressView: View {
       .padding(.horizontal, 24)
       .padding(.top, 60)
     }
-    .navigationTitle("进度")
-    .navigationBarTitleDisplayMode(.large)
+    .navigationTitle("进度管理")
+    .navigationBarTitleDisplayMode(.inline)
   }
 
   var body: some View {
