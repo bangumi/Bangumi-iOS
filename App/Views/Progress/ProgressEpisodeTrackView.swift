@@ -166,6 +166,7 @@ struct ProgressEpisodeTicksView: View {
   @State private var isCancelling = false
   @State private var fingerX: CGFloat = 0
   @State private var lift: CGFloat = 0
+  @State private var bubbleHeight: CGFloat = 0
   @State private var edgeHoldTask: Task<Void, Never>?
   @State private var edgeHoldDirection: Int = 0
   @State private var gearHaptic = GearHaptic()
@@ -289,7 +290,11 @@ struct ProgressEpisodeTicksView: View {
           .frame(width: 2, height: dashHeight)
         }
       }
-      .alignmentGuide(.top) { $0[.bottom] }
+      .onGeometryChange(for: CGFloat.self) { proxy in
+        proxy.size.height
+      } action: { height in
+        bubbleHeight = height
+      }
       .offset(x: bubbleX, y: bubbleY)
       .allowsHitTesting(false)
       .transition(
@@ -422,7 +427,9 @@ struct ProgressEpisodeTicksView: View {
   private func applyPlayhead(_ index: Int) {
     let clamped = min(max(index, 0), max(episodes.count - 1, 0))
     if scrubIndex != clamped {
-      scrubIndex = clamped
+      withAnimation(.snappy(duration: 0.16)) {
+        scrubIndex = clamped
+      }
       if let episode = playheadEpisode {
         gearHaptic.play(episode.id)
       }
@@ -534,7 +541,7 @@ struct ProgressEpisodeTicksView: View {
 
   private var bubbleY: CGFloat {
     let detached = isCancelling ? min(max(lift - 12, 15), 36) : 0
-    return -8 - detached
+    return -bubbleHeight - 8 - detached
   }
 
   private var leadingCaption: String {
