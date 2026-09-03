@@ -1342,7 +1342,7 @@ private struct ProgressTickFanItem: View {
       Circle()
         .fill(fill)
         .overlay {
-          Circle().strokeBorder(theme.imageBorder, lineWidth: 1)
+          Circle().strokeBorder(theme.controlBorder, lineWidth: 1)
         }
         .shadow(
           color: selected ? theme.ctaShadow.color : theme.heroShadow.color,
@@ -1351,7 +1351,7 @@ private struct ProgressTickFanItem: View {
         )
       Image(systemName: action.icon)
         .font(.system(size: 16, weight: .bold))
-        .foregroundStyle(selected ? .white : theme.toastText)
+        .foregroundStyle(selected ? .white : theme.body)
     }
     .frame(width: ProgressTickMetrics.fanItem, height: ProgressTickMetrics.fanItem)
     .scaleEffect(selected ? 1.18 : 1)
@@ -1359,10 +1359,10 @@ private struct ProgressTickFanItem: View {
       if selected {
         Text(action.title)
           .font(.caption2.weight(.bold))
-          .foregroundStyle(theme.toastText)
+          .foregroundStyle(theme.body)
           .padding(.horizontal, 8)
           .padding(.vertical, 3)
-          .background(theme.toastFill, in: Capsule())
+          .background(theme.controlFillOpaque, in: Capsule())
           .fixedSize()
           .offset(y: -ProgressTickMetrics.fanLabelRoom)
           .transition(.scale(scale: 0.6, anchor: .bottom).combined(with: .opacity))
@@ -1372,7 +1372,7 @@ private struct ProgressTickFanItem: View {
   }
 
   private var fill: AnyShapeStyle {
-    guard selected else { return AnyShapeStyle(theme.toastFill) }
+    guard selected else { return AnyShapeStyle(theme.controlFillOpaque) }
     if destructive {
       return AnyShapeStyle(theme.danger)
     }
