@@ -63,13 +63,115 @@ struct PostDocumentNavigatorOverlay: View {
   var body: some View {
     if theme.isClassic {
       controlBar
-    } else if #available(iOS 26.0, *) {
-      controlBar
     } else {
-      controlBar
-        .padding(6)
-        .glassEffectIfAvailable(shape: Capsule())
+      glassControlBar
     }
+  }
+
+  private var glassControlBar: some View {
+    HStack(spacing: 10) {
+      HStack(spacing: 0) {
+        Menu {
+          Picker("筛选", selection: controls.filterMode) {
+            ForEach(controls.filterModes, id: \.self) { mode in
+              Label(mode.description, systemImage: mode.icon).tag(mode)
+            }
+          }
+          Picker("排序", selection: controls.sortOrder) {
+            ForEach(ReplySortOrder.allCases, id: \.self) { order in
+              Label(order.description, systemImage: order.icon).tag(order)
+            }
+          }
+        } label: {
+          glassBarIcon("line.3.horizontal.decrease")
+        }
+        .tint(.primary)
+        .accessibilityLabel("筛选与排序")
+
+        if items.count > 1 {
+          glassBarDivider
+          Button {
+            showsFloorNavigator = true
+          } label: {
+            HStack(spacing: 5) {
+              Image(systemName: "list.number")
+              ZStack(alignment: .leading) {
+                Text("楼层")
+                  .hidden()
+                Text(widestFloor)
+                  .hidden()
+                Text(visibleItem?.floor ?? "楼层")
+              }
+              .monospacedDigit()
+            }
+            .font(.subheadline.weight(.semibold))
+            .foregroundStyle(.primary)
+            .padding(.horizontal, 14)
+            .frame(height: 42)
+            .contentShape(Rectangle())
+          }
+          .buttonStyle(.plain)
+          .accessibilityHint("选择要跳转的楼层")
+          .popover(isPresented: $showsFloorNavigator) {
+            PostDocumentFloorNavigator(
+              items: items,
+              visiblePostID: visiblePostID,
+              onSelect: onSelect
+            )
+            .presentationCompactAdaptation(.sheet)
+          }
+        }
+
+        glassBarDivider
+        Button {
+          onSelect(.top)
+        } label: {
+          glassBarIcon("arrow.up")
+        }
+        .buttonStyle(.plain)
+        .disabled(!canScrollToTop)
+        .opacity(canScrollToTop ? 1 : 0.35)
+        .accessibilityLabel("回到顶部")
+      }
+      .glassEffectIfAvailable(shape: Capsule())
+
+      Button(action: onReply) {
+        Image(systemName: "plus.bubble.fill")
+          .font(.system(size: 17, weight: .semibold))
+          .foregroundStyle(.white)
+          .frame(width: 44, height: 44)
+          .background {
+            Circle()
+              .fill(
+                LinearGradient(
+                  colors: theme.ctaGradient,
+                  startPoint: .topLeading, endPoint: .bottomTrailing)
+              )
+              .shadow(
+                color: theme.ctaShadow.color,
+                radius: theme.ctaShadow.radius, y: theme.ctaShadow.y)
+          }
+          .contentShape(Circle())
+      }
+      .buttonStyle(.plain)
+      .disabled(!controls.canReply)
+      .opacity(controls.canReply ? 1 : 0.4)
+      .accessibilityLabel("回复")
+    }
+  }
+
+  private func glassBarIcon(_ name: String) -> some View {
+    Image(systemName: name)
+      .font(.system(size: 16, weight: .semibold))
+      .foregroundStyle(.primary)
+      .frame(width: 44, height: 42)
+      .contentShape(Rectangle())
+  }
+
+  private var glassBarDivider: some View {
+    Rectangle()
+      .fill(theme.separator)
+      .frame(width: 1, height: 18)
   }
 
   private var controlBar: some View {

@@ -247,9 +247,12 @@ enum PostDocumentThemeCSS {
 
           html.theme-glass .parent-badge {
             border: none;
-            border-radius: 9px;
+            border-radius: 999px;
+            padding: 4px 10px;
             background: rgba(126, 200, 227, 0.16);
             color: #3e7fa8;
+            font-size: 12px;
+            line-height: 1.25;
             font-weight: 700;
           }
 
@@ -260,10 +263,14 @@ enum PostDocumentThemeCSS {
           }
 
           html.theme-glass .detail-badge {
+            min-height: 24px;
             border: none;
-            border-radius: 9px;
+            border-radius: 999px;
+            padding: 4px 11px;
             background: linear-gradient(135deg, #f2758b, #e85f86);
             color: #fff;
+            font-size: 12px;
+            line-height: 1.25;
             font-weight: 700;
             box-shadow: 0 4px 10px rgba(232, 95, 134, 0.3);
           }
@@ -307,44 +314,76 @@ enum PostDocumentThemeCSS {
 
       """
     css += """
-          html.theme-glass .reply {
+          html.theme-glass main {
             margin: 10px 16px 0;
-            padding: 13px 14px;
+            padding: 2px 14px;
             border: 1px solid var(--card-border);
-            border-radius: 20px;
+            border-radius: 22px;
             background: var(--card);
             -webkit-backdrop-filter: blur(18px) saturate(160%);
             backdrop-filter: blur(18px) saturate(160%);
             box-shadow: 0 8px 22px rgba(180, 120, 140, 0.11);
           }
 
-          html.theme-glass main > .reply:nth-child(even) {
-            background: var(--card);
-          }
-
-          html.theme-glass .subreplies {
-            margin: 11px 0 0 24px;
-            padding: 10px 12px;
-            border: 1px solid rgba(180, 140, 160, 0.1);
-            border-radius: 14px;
-            background: rgba(180, 140, 160, 0.07);
-          }
-
-          html.theme-glass .subreplies .reply {
+          html.theme-glass .reply {
             margin: 0;
-            padding: 0;
+            padding: 14px 0;
             border: none;
+            border-bottom: 1px solid rgba(180, 140, 160, 0.14);
             border-radius: 0;
             background: transparent;
             box-shadow: none;
           }
 
+          html.theme-glass main > .reply:nth-child(even) {
+            background: transparent;
+          }
+
+          html.theme-glass main > .reply:last-child {
+            border-bottom: none;
+          }
+
+          html.theme-glass .reply.blocked {
+            height: 6px;
+            margin: 10px 0;
+            padding: 0;
+            border: none;
+            border-radius: 3px;
+            background: linear-gradient(90deg, rgba(180, 140, 160, 0.35), transparent);
+          }
+
+          html.theme-glass .subreplies {
+            margin: 10px 0 0 48px;
+            padding: 0 0 0 12px;
+            border: none;
+            border-left: 2px solid rgba(242, 117, 139, 0.28);
+            border-radius: 0;
+            background: transparent;
+          }
+
+          html.theme-glass .subreplies .reply {
+            padding: 10px 0;
+            border-bottom: 1px dashed rgba(180, 140, 160, 0.16);
+          }
+
+          html.theme-glass .subreplies > .reply:last-child {
+            padding-bottom: 2px;
+            border-bottom: none;
+          }
+
           html.theme-glass .state {
-            margin: 10px 16px 0;
-            padding: 12px 14px;
-            border-radius: 20px;
-            background: var(--card);
-            border: 1px solid var(--card-border);
+            margin: 8px 0;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 12px;
+            background: rgba(180, 140, 160, 0.1);
+            color: var(--secondary);
+            font-size: 12.5px;
+          }
+
+          html.theme-glass main > .state {
+            margin: 10px 0;
+            text-align: center;
           }
 
           html.theme-glass .timestamp {
