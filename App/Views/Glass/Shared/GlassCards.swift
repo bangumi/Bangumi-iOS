@@ -169,3 +169,61 @@ struct GlassRenameEmbed: View {
     }
   }
 }
+
+struct GlassCollectButton: View {
+  let subjectId: Int
+  let subjectType: SubjectType
+  let collectionType: CollectionType
+  var reload: (() async -> Void)? = nil
+
+  @AppStorage("isAuthenticated") private var isAuthenticated: Bool = false
+
+  @Environment(\.theme) private var theme
+  @State private var showCollectionBox = false
+
+  private var isCollected: Bool {
+    collectionType != .none
+  }
+
+  private var title: String {
+    isCollected ? collectionType.description(subjectType) : "收藏"
+  }
+
+  private var icon: String {
+    isCollected ? collectionType.icon : "plus"
+  }
+
+  private var shape: RoundedRectangle {
+    RoundedRectangle(cornerRadius: theme.metrics.badgeRadius, style: .continuous)
+  }
+
+  var body: some View {
+    if isAuthenticated || isCollected {
+      Button {
+        showCollectionBox = true
+      } label: {
+        VStack(spacing: 3) {
+          Image(systemName: icon)
+            .font(.caption.weight(.bold))
+          Text(title)
+            .font(.caption2.weight(.semibold))
+            .lineLimit(1)
+        }
+        .foregroundStyle(theme.accentDeep)
+        .frame(width: 44)
+        .padding(.vertical, 8)
+        .background(theme.tint, in: shape)
+        .overlay {
+          shape.strokeBorder(theme.accent.opacity(0.35), lineWidth: 1)
+        }
+        .contentShape(shape)
+      }
+      .buttonStyle(.plain)
+      .disabled(!isAuthenticated)
+      .accessibilityLabel(isCollected ? "编辑收藏状态：\(title)" : "添加收藏")
+      .sheet(isPresented: $showCollectionBox) {
+        SubjectCollectionBoxView(subjectId: subjectId, onSaved: reload)
+      }
+    }
+  }
+}
