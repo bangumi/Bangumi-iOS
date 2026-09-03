@@ -41,13 +41,7 @@ private struct ThemedListRowBackground: View {
   @Environment(\.theme) private var theme
 
   var body: some View {
-    RoundedRectangle(cornerRadius: theme.metrics.embedRadius, style: .continuous)
-      .fill(theme.cardFill)
-      .overlay {
-        RoundedRectangle(cornerRadius: theme.metrics.embedRadius, style: .continuous)
-          .strokeBorder(theme.cardBorder, lineWidth: 1)
-      }
-      .padding(.vertical, 3)
+    Rectangle().fill(theme.cardFill)
   }
 }
 
@@ -71,6 +65,7 @@ private struct ThemedScreenModifier: ViewModifier {
       }
       .background { HostingBackgroundClearer() }
       .scrollContentBackground(.hidden)
+      .listSectionSpacing(theme.metrics.listSpacing)
     if #available(iOS 26.0, *) {
       screen
     } else {
@@ -110,7 +105,9 @@ private struct ThemedListRowModifier: ViewModifier {
     if theme.isClassic {
       content
     } else {
-      content.listRowBackground(ThemedListRowBackground())
+      content
+        .listRowBackground(ThemedListRowBackground())
+        .listRowSeparatorTint(theme.separator)
     }
   }
 }
