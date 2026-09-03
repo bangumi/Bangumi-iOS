@@ -43,10 +43,54 @@ enum ProgressEpisodeTickKind {
   }
 }
 
+enum ProgressTickAction: Equatable, Identifiable {
+  case cancel
+  case status(EpisodeCollectionType)
+  case discuss
+
+  var id: String {
+    switch self {
+    case .cancel:
+      "cancel"
+    case .status(let type):
+      "status.\(type.rawValue)"
+    case .discuss:
+      "discuss"
+    }
+  }
+
+  var title: String {
+    switch self {
+    case .cancel:
+      "取消"
+    case .status(let type):
+      type.action
+    case .discuss:
+      "讨论"
+    }
+  }
+
+  var icon: String {
+    switch self {
+    case .cancel:
+      "xmark"
+    case .status(let type):
+      type.icon
+    case .discuss:
+      "bubble"
+    }
+  }
+}
+
+enum ProgressTickCommit: Equatable {
+  case watchUntil
+  case status(EpisodeCollectionType)
+}
+
 struct ProgressTickScrubState: Equatable {
   enum Phase: Equatable {
     case preview
-    case cancel
+    case rail(ProgressTickAction)
   }
 
   var phase: Phase
@@ -62,7 +106,7 @@ struct ProgressEpisodeTrackView: View {
   let subjectCollectionType: CollectionType
   var reload: (() async -> Void)? = nil
   var onScrubChange: ((ProgressTickScrubState?) -> Void)? = nil
-  var onScrubCommit: ((EpisodeDTO) -> Void)? = nil
+  var onScrubCommit: ((EpisodeDTO, ProgressTickCommit) async -> Bool)? = nil
 
   private var usesSquares: Bool {
     let total = totalEpisodes > 0 ? totalEpisodes : episodes.count
@@ -119,20 +163,98 @@ struct ProgressEpisodeSquaresView: View {
 }
 
 @MainActor
-private final class GearHaptic {
+private final class ScrubHaptics {
+  enum Tick {
+    case regular
+    case soft
+    case home
+    case detent
+  }
+
   private let selection = UISelectionFeedbackGenerator()
+  private let soft = UIImpactFeedbackGenerator(style: .soft)
+  private let light = UIImpactFeedbackGenerator(style: .light)
+  private let medium = UIImpactFeedbackGenerator(style: .medium)
+  private let rigid = UIImpactFeedbackGenerator(style: .rigid)
+  private let heavy = UIImpactFeedbackGenerator(style: .heavy)
+  private let notification = UINotificationFeedbackGenerator()
   private var lastID: Int?
+  private var lastTickAt: TimeInterval = 0
 
   func prepare() {
     lastID = nil
     selection.prepare()
+    medium.prepare()
   }
 
-  func play(_ id: Int) {
+  func arm() {
+    medium.impactOccurred()
+    selection.prepare()
+    soft.prepare()
+    light.prepare()
+    rigid.prepare()
+    heavy.prepare()
+  }
+
+  func tick(_ id: Int, kind: Tick) {
     guard id != lastID else { return }
     lastID = id
-    selection.selectionChanged()
-    selection.prepare()
+    let now = Date().timeIntervalSinceReferenceDate
+    switch kind {
+    case .regular, .soft:
+      guard now - lastTickAt >= ProgressTickMetrics.tickHapticInterval else { return }
+      if kind == .soft {
+        soft.impactOccurred(intensity: 0.55)
+        soft.prepare()
+      } else {
+        selection.selectionChanged()
+        selection.prepare()
+      }
+    case .home:
+      medium.impactOccurred(intensity: 0.75)
+      medium.prepare()
+    case .detent:
+      rigid.impactOccurred(intensity: 0.9)
+      rigid.prepare()
+    }
+    lastTickAt = now
+  }
+
+  func boundary() {
+    rigid.impactOccurred(intensity: 1)
+    rigid.prepare()
+  }
+
+  func railMove() {
+    rigid.impactOccurred(intensity: 0.8)
+    rigid.prepare()
+  }
+
+  func tearOff() {
+    heavy.impactOccurred()
+    light.prepare()
+  }
+
+  func reattach() {
+    light.impactOccurred(intensity: 0.7)
+    heavy.prepare()
+  }
+
+  func release(committed: Bool) {
+    if committed {
+      light.impactOccurred()
+      notification.prepare()
+    } else {
+      soft.impactOccurred(intensity: 0.6)
+    }
+  }
+
+  func success() {
+    notification.notificationOccurred(.success)
+  }
+
+  func failure() {
+    notification.notificationOccurred(.error)
   }
 }
 
@@ -141,47 +263,96 @@ private enum ProgressTickMetrics {
   static let gap: CGFloat = 2
   static let idleHeight: CGFloat = 12
   static let currentHeight: CGFloat = 16
+  static let pressHeight: CGFloat = 18
   static let lensOuter: CGFloat = 13
   static let lensNear: CGFloat = 15
   static let lensFocus: CGFloat = 22
   static let reservedHeight: CGFloat = 22
-  static let cancelEnter: CGFloat = 32
-  static let cancelExit: CGFloat = 20
+  static let hitSlop: CGFloat = 8
+  static let railEnter: CGFloat = 26
+  static let railExit: CGFloat = 8
+  static let fanRadius: CGFloat = 100
+  static let fanLift: CGFloat = 20
+  static let fanItem: CGFloat = 42
+  static let fanDeadZone: CGFloat = 16
+  static let fanHysteresis: CGFloat = 4 * .pi / 180
+  static let fanLabelRoom: CGFloat = 28
+  static let fanStartAngle: CGFloat = 160 * .pi / 180
+  static let fanEndAngle: CGFloat = 20 * .pi / 180
+  static let fanEdgeRadius: CGFloat = 140
+  static let fanEdgeEndAngle: CGFloat = 10 * .pi / 180
+
+  static func fanEdgeAngles(count: Int, trailing: Bool) -> [CGFloat] {
+    guard count > 1 else { return [.pi / 2] }
+    let sweep = .pi / 2 - fanEdgeEndAngle
+    return (0..<count).map {
+      let delta = sweep * CGFloat($0) / CGFloat(count - 1)
+      return trailing ? .pi / 2 + delta : .pi / 2 - delta
+    }
+  }
+
+  static func fanAngles(count: Int) -> [CGFloat] {
+    guard count > 1 else { return [.pi / 2] }
+    return (0..<count).map {
+      fanStartAngle - (fanStartAngle - fanEndAngle) * CGFloat($0) / CGFloat(count - 1)
+    }
+  }
+  static let pullLimit: CGFloat = 14
   static let edgeHot: CGFloat = 26
+  static let rubberLimit: CGFloat = 16
+  static let boundaryTrigger: CGFloat = 6
+  static let tickHapticInterval: TimeInterval = 0.045
 }
 
 struct ProgressEpisodeTicksView: View {
   let episodes: [EpisodeDTO]
   let totalEpisodes: Int
   var onScrubChange: ((ProgressTickScrubState?) -> Void)? = nil
-  var onScrubCommit: ((EpisodeDTO) -> Void)? = nil
+  var onScrubCommit: ((EpisodeDTO, ProgressTickCommit) async -> Bool)? = nil
 
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
   @Environment(\.theme) private var theme
+  @Environment(\.openURL) private var openURL
 
   @State private var barWidth: CGFloat = 0
   @State private var windowStart: Int = 0
   @State private var scrubIndex: Int?
+  @State private var pendingIndex: Int?
+  @State private var pendingCommit: ProgressTickCommit?
+  @State private var pressing = false
   @State private var isDragging = false
-  @State private var isCancelling = false
+  @State private var onRail = false
+  @State private var railIndex = 0
+  @State private var railOrigin: CGPoint = .zero
+  @State private var fingerY: CGFloat = 0
   @State private var fingerX: CGFloat = 0
   @State private var lift: CGFloat = 0
+  @State private var overshoot: CGFloat = 0
   @State private var bubbleSize: CGSize = .zero
   @GestureState private var touchActive = false
   @State private var edgeHoldTask: Task<Void, Never>?
   @State private var edgeHoldDirection: Int = 0
-  @State private var gearHaptic = GearHaptic()
+  @State private var haptics = ScrubHaptics()
 
   private var currentIndex: Int {
     episodes.lastIndex(where: { $0.collectionTypeEnum == .collect }) ?? 0
   }
 
+  private var anchorIndex: Int {
+    let index = pendingCommit == .watchUntil ? pendingIndex ?? currentIndex : currentIndex
+    return min(max(index, 0), max(episodes.count - 1, 0))
+  }
+
   private var playheadIndex: Int {
-    min(max(scrubIndex ?? currentIndex, 0), max(episodes.count - 1, 0))
+    min(max(scrubIndex ?? anchorIndex, 0), max(episodes.count - 1, 0))
   }
 
   private var currentEpisode: EpisodeDTO? {
     episodes.indices.contains(currentIndex) ? episodes[currentIndex] : nil
+  }
+
+  private var anchorEpisode: EpisodeDTO? {
+    episodes.indices.contains(anchorIndex) ? episodes[anchorIndex] : currentEpisode
   }
 
   private var playheadEpisode: EpisodeDTO? {
@@ -199,7 +370,89 @@ struct ProgressEpisodeTicksView: View {
   }
 
   private var magnifying: Bool {
-    isDragging && !isCancelling
+    isDragging
+  }
+
+  private var previewing: Bool {
+    isDragging && !onRail
+  }
+
+  private var liftProgress: CGFloat {
+    onRail ? 1 : min(lift / ProgressTickMetrics.railEnter, 1)
+  }
+
+  private struct FanPlan {
+    var originX: CGFloat
+    var radius: CGFloat
+    var actions: [ProgressTickAction]
+    var angles: [CGFloat]
+  }
+
+  private var baseActions: [ProgressTickAction] {
+    guard let episode = playheadEpisode else { return [.cancel, .discuss] }
+    let others = episode.collectionTypeEnum.otherTypes()
+    guard others.count == 3 else { return [.cancel] + others.map { .status($0) } + [.discuss] }
+    return [.status(others[1]), .status(others[0]), .cancel, .discuss, .status(others[2])]
+  }
+
+  private var fanPlan: FanPlan {
+    let actions = baseActions
+    let tickX = tickCenterX(for: playheadIndex)
+    let reach =
+      ProgressTickMetrics.fanRadius * abs(cos(ProgressTickMetrics.fanStartAngle))
+      + ProgressTickMetrics.fanItem / 2 + 2
+    let cancelAt = actions.firstIndex(of: .cancel) ?? actions.count / 2
+    let leading = Array(actions[..<cancelAt])
+    let trailing = Array(actions[(cancelAt + 1)...])
+    if tickX < reach, tickX < barWidth - reach {
+      let ordered = [ProgressTickAction.cancel] + trailing + leading
+      return FanPlan(
+        originX: tickX,
+        radius: ProgressTickMetrics.fanEdgeRadius,
+        actions: ordered,
+        angles: ProgressTickMetrics.fanEdgeAngles(count: ordered.count, trailing: false)
+      )
+    }
+    if tickX > barWidth - reach, tickX > reach {
+      let ordered = [ProgressTickAction.cancel] + leading.reversed() + trailing.reversed()
+      return FanPlan(
+        originX: tickX,
+        radius: ProgressTickMetrics.fanEdgeRadius,
+        actions: ordered,
+        angles: ProgressTickMetrics.fanEdgeAngles(count: ordered.count, trailing: true)
+      )
+    }
+    return FanPlan(
+      originX: min(max(tickX, reach), max(barWidth - reach, reach)),
+      radius: ProgressTickMetrics.fanRadius,
+      actions: actions,
+      angles: ProgressTickMetrics.fanAngles(count: actions.count)
+    )
+  }
+
+  private var railActions: [ProgressTickAction] {
+    fanPlan.actions
+  }
+
+  private var railDefaultIndex: Int {
+    railActions.firstIndex(of: .cancel) ?? railActions.count / 2
+  }
+
+  private var railAction: ProgressTickAction {
+    let actions = railActions
+    return actions[min(max(railIndex, 0), actions.count - 1)]
+  }
+
+  private var edgeDepth: CGFloat {
+    guard barWidth > 0 else { return 0 }
+    let distance = min(fingerX, barWidth - fingerX)
+    return min(max(1 - distance / ProgressTickMetrics.edgeHot, 0), 1)
+  }
+
+  private var bandOffset: CGFloat {
+    overshoot < 0
+      ? -rubber(-overshoot, limit: ProgressTickMetrics.rubberLimit)
+      : rubber(overshoot, limit: ProgressTickMetrics.rubberLimit)
   }
 
   var body: some View {
@@ -208,22 +461,32 @@ struct ProgressEpisodeTicksView: View {
         .overlay(alignment: .top) {
           bubbleOverlay
         }
+        .overlay(alignment: .top) {
+          fanOverlay
+        }
         .zIndex(isDragging ? 2 : 0)
 
+      let placement = captionPlacement(width: barWidth)
       HStack {
         Text(leadingCaption)
+          .contentTransition(.numericText())
+          .opacity(placement?.hidesLeading == true ? 0 : 1)
         Spacer(minLength: 0)
         Text(trailingCaption)
+          .contentTransition(.numericText())
+          .opacity(placement?.hidesTrailing == true ? 0 : 1)
       }
       .font(.system(size: 10, weight: .semibold, design: .monospaced))
       .foregroundStyle(theme.tertiaryText)
+      .animation(.easeOut(duration: 0.15), value: placement?.hidesLeading)
+      .animation(.easeOut(duration: 0.15), value: placement?.hidesTrailing)
       .overlay {
         playheadCaption
       }
     }
     .onAppear {
       recenterWindow()
-      gearHaptic.prepare()
+      haptics.prepare()
     }
     .onChange(of: episodes.map(\.id)) { _, _ in
       resetScrub()
@@ -241,6 +504,7 @@ struct ProgressEpisodeTicksView: View {
         tick(episode, index: index, offset: offset)
       }
     }
+    .offset(x: bandOffset)
     .frame(height: ProgressTickMetrics.reservedHeight, alignment: .bottom)
     .background {
       GeometryReader { geo in
@@ -256,10 +520,17 @@ struct ProgressEpisodeTicksView: View {
         edgeGlow
       }
     }
+    .padding(.vertical, ProgressTickMetrics.hitSlop)
     .contentShape(Rectangle())
     .gesture(scrubGesture)
+    .padding(.vertical, -ProgressTickMetrics.hitSlop)
     .onChange(of: touchActive) { _, active in
       guard !active else { return }
+      if pressing {
+        withAnimation(.spring(response: 0.24, dampingFraction: 0.8)) {
+          pressing = false
+        }
+      }
       Task { @MainActor in
         try? await Task.sleep(for: .milliseconds(150))
         if !touchActive, isDragging {
@@ -271,34 +542,27 @@ struct ProgressEpisodeTicksView: View {
 
   @ViewBuilder
   private var bubbleOverlay: some View {
-    if isDragging, let episode = playheadEpisode, let restore = currentEpisode {
-      let dashHeight = isCancelling ? max(10, min(lift - 8, 22)) : 0
+    if previewing, let episode = playheadEpisode {
+      let tether = tetherHeight
       VStack(spacing: 0) {
         ProgressTickBubble(
-          title: isCancelling ? "松开取消" : "EP.\(episode.sort.episodeDisplay)",
-          subtitle: isCancelling
-            ? "回到 EP.\(restore.sort.episodeDisplay)"
-            : episode.tickAirCaption,
-          detail: isCancelling
-            ? nil
-            : titlePreference.title(name: episode.name, nameCN: episode.nameCN),
-          systemImage: isCancelling ? "arrow.uturn.backward" : nil,
-          isCancelling: isCancelling,
-          showsArrow: !isCancelling,
+          title: "EP.\(episode.sort.episodeDisplay)",
+          subtitle: episode.tickAirCaption,
+          detail: titlePreference.title(name: episode.name, nameCN: episode.nameCN),
           arrowOffset: bubbleArrowOffset
         )
-        if isCancelling {
+        if tether > 0 {
           Canvas { context, size in
             var path = Path()
             path.move(to: CGPoint(x: size.width / 2, y: 0))
             path.addLine(to: CGPoint(x: size.width / 2, y: size.height))
             context.stroke(
               path,
-              with: .color(theme.danger.opacity(0.5)),
+              with: .color(theme.accent.opacity(0.45)),
               style: StrokeStyle(lineWidth: 1.5, dash: [3, 3])
             )
           }
-          .frame(width: 2, height: dashHeight)
+          .frame(width: 2, height: tether)
         }
       }
       .onGeometryChange(for: CGSize.self) { proxy in
@@ -315,38 +579,72 @@ struct ProgressEpisodeTicksView: View {
     }
   }
 
+  private var fanHeight: CGFloat {
+    ProgressTickMetrics.fanLift + ProgressTickMetrics.fanEdgeRadius
+      + ProgressTickMetrics.fanItem / 2 + ProgressTickMetrics.fanLabelRoom
+  }
+
   @ViewBuilder
+  private var fanOverlay: some View {
+    if isDragging, barWidth > 0 {
+      let height = fanHeight
+      let plan = fanPlan
+      let originX = plan.originX
+      let originY = height - ProgressTickMetrics.fanLift
+      let radius = plan.radius
+      ZStack {
+        ForEach(Array(plan.actions.enumerated()), id: \.element.id) { offset, action in
+          let angle = plan.angles[offset]
+          let target = CGPoint(
+            x: originX + radius * cos(angle), y: originY - radius * sin(angle))
+          ProgressTickFanItem(action: action, selected: onRail && action == railAction)
+            .position(onRail ? target : CGPoint(x: originX, y: height))
+            .scaleEffect(onRail ? 1 : 0.35)
+            .opacity(onRail ? 1 : 0)
+            .animation(
+              .spring(response: 0.36, dampingFraction: 0.72)
+                .delay(onRail ? Double(offset) * 0.028 : 0),
+              value: onRail
+            )
+        }
+      }
+      .frame(width: barWidth, height: height)
+      .offset(y: -height)
+      .allowsHitTesting(false)
+    }
+  }
+
   private var edgeGlow: some View {
     let leading = fingerX < ProgressTickMetrics.edgeHot && windowStart > 0
     let trailing =
       fingerX > barWidth - ProgressTickMetrics.edgeHot
       && windowStart + visibleCount < episodes.count
-    ZStack {
-      if leading {
-        LinearGradient(
-          colors: [theme.accent.opacity(0.28), .clear],
-          startPoint: .leading,
-          endPoint: .trailing
-        )
-        .frame(width: ProgressTickMetrics.edgeHot)
-        .frame(maxWidth: .infinity, alignment: .leading)
-      }
-      if trailing {
-        LinearGradient(
-          colors: [.clear, theme.accent.opacity(0.28)],
-          startPoint: .leading,
-          endPoint: .trailing
-        )
-        .frame(width: ProgressTickMetrics.edgeHot)
-        .frame(maxWidth: .infinity, alignment: .trailing)
-      }
+    let strength = 0.16 + 0.24 * edgeDepth
+    return ZStack {
+      LinearGradient(
+        colors: [theme.accent.opacity(strength), .clear],
+        startPoint: .leading,
+        endPoint: .trailing
+      )
+      .frame(width: ProgressTickMetrics.edgeHot)
+      .frame(maxWidth: .infinity, alignment: .leading)
+      .opacity(leading ? 1 : 0)
+
+      LinearGradient(
+        colors: [.clear, theme.accent.opacity(strength)],
+        startPoint: .leading,
+        endPoint: .trailing
+      )
+      .frame(width: ProgressTickMetrics.edgeHot)
+      .frame(maxWidth: .infinity, alignment: .trailing)
+      .opacity(trailing ? 1 : 0)
     }
     .padding(.vertical, -4)
     .allowsHitTesting(false)
   }
 
   private var scrubGesture: some Gesture {
-    LongPressGesture(minimumDuration: 0.3)
+    LongPressGesture(minimumDuration: 0.2)
       .sequenced(
         before: DragGesture(minimumDistance: 0, coordinateSpace: .local)
       )
@@ -356,7 +654,7 @@ struct ProgressEpisodeTicksView: View {
       .onChanged { value in
         switch value {
         case .first(true):
-          armScrub()
+          beginPress()
         case .second(true, let drag):
           armScrub()
           if let drag {
@@ -371,43 +669,38 @@ struct ProgressEpisodeTicksView: View {
       }
   }
 
+  private func beginPress() {
+    guard !pressing, !isDragging, pendingIndex == nil else { return }
+    withAnimation(.spring(response: 0.24, dampingFraction: 0.8)) {
+      pressing = true
+    }
+    haptics.prepare()
+  }
+
   private func armScrub() {
-    guard !isDragging else { return }
+    guard !isDragging, pendingIndex == nil else { return }
+    scrubIndex = anchorIndex
     withAnimation(.spring(response: 0.32, dampingFraction: 0.72)) {
+      pressing = false
       isDragging = true
-      isCancelling = false
+      onRail = false
       lift = 0
+      overshoot = 0
     }
-    if scrubIndex == nil {
-      scrubIndex = currentIndex
-    }
-    UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-    gearHaptic.prepare()
+    haptics.arm()
     reportScrub()
   }
 
   private func handleDrag(_ drag: DragGesture.Value) {
-    fingerX = min(max(0, drag.location.x), max(barWidth, 1))
+    guard isDragging else { return }
+    let rawX = drag.location.x
+    fingerX = min(max(0, rawX), max(barWidth, 1))
+    fingerY = drag.location.y - ProgressTickMetrics.hitSlop
     lift = max(0, -drag.translation.height)
+    updateRailPhase()
 
-    let wasCancelling = isCancelling
-    let nowCancelling =
-      isCancelling
-      ? lift > ProgressTickMetrics.cancelExit
-      : lift > ProgressTickMetrics.cancelEnter
-    if nowCancelling != wasCancelling {
-      withAnimation(.spring(response: 0.22, dampingFraction: 0.78)) {
-        isCancelling = nowCancelling
-      }
-      if nowCancelling {
-        UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
-        stopEdgeHold()
-      } else {
-        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-      }
-    }
-
-    if isCancelling {
+    if onRail {
+      moveRail(to: CGPoint(x: rawX, y: fingerY))
       reportScrub()
       return
     }
@@ -416,26 +709,99 @@ struct ProgressEpisodeTicksView: View {
     let trailingHot =
       fingerX > barWidth - ProgressTickMetrics.edgeHot
       && windowStart + visibleCount < episodes.count
-    if trailingHot && playheadIndex >= windowStart + visibleCount - 1 {
+    if trailingHot {
+      applyPlayhead(windowStart + visibleCount - 1)
       startEdgeHold(+1)
-    } else if leadingHot && playheadIndex <= windowStart {
+    } else if leadingHot {
+      applyPlayhead(windowStart)
       startEdgeHold(-1)
     } else {
       stopEdgeHold()
-      movePlayhead(to: fingerX)
+      if let index = tickIndex(at: fingerX) {
+        applyPlayhead(index)
+      }
     }
+    updateOvershoot(rawX)
     reportScrub()
   }
 
-  private func movePlayhead(to x: CGFloat) {
-    guard barWidth > 0, visibleCount > 0 else { return }
-    let clampedX = min(max(0, x), barWidth)
-    let offset = min(
-      Int((clampedX / barWidth) * CGFloat(visibleCount)),
-      visibleCount - 1
-    )
-    let index = windowStart + offset
-    applyPlayhead(index)
+  private func updateRailPhase() {
+    let nowOnRail =
+      onRail
+      ? fingerY < ProgressTickMetrics.railExit
+      : lift > ProgressTickMetrics.railEnter
+    guard nowOnRail != onRail else { return }
+    if nowOnRail {
+      stopEdgeHold()
+      railOrigin = CGPoint(x: fingerX, y: fingerY + lift)
+      railIndex = railDefaultIndex
+    }
+    withAnimation(.spring(response: 0.26, dampingFraction: 0.8)) {
+      onRail = nowOnRail
+      if nowOnRail {
+        overshoot = 0
+      }
+    }
+    if nowOnRail {
+      haptics.tearOff()
+    } else {
+      haptics.reattach()
+    }
+  }
+
+  private func moveRail(to location: CGPoint) {
+    let count = railActions.count
+    guard count > 0 else { return }
+    let dx = location.x - railOrigin.x
+    let dy = railOrigin.y - location.y
+    guard hypot(dx, dy) >= ProgressTickMetrics.fanDeadZone else { return }
+    var angle = atan2(dy, dx)
+    if angle < 0 {
+      angle = dx < 0 ? .pi : 0
+    }
+    let angles = fanPlan.angles
+    let current = angles[min(max(railIndex, 0), count - 1)]
+    let half = count > 1 ? abs(angles[0] - angles[1]) / 2 : .pi
+    guard abs(angle - current) > half + ProgressTickMetrics.fanHysteresis else { return }
+    guard
+      let candidate = angles.indices.min(by: { abs(angles[$0] - angle) < abs(angles[$1] - angle) }),
+      candidate != railIndex
+    else { return }
+    withAnimation(.spring(response: 0.22, dampingFraction: 0.72)) {
+      railIndex = candidate
+    }
+    haptics.railMove()
+  }
+
+  private func updateOvershoot(_ rawX: CGFloat) {
+    let atStart = windowStart == 0 && playheadIndex == 0
+    let atEnd =
+      windowStart + visibleCount >= episodes.count && playheadIndex == episodes.count - 1
+    var over: CGFloat = 0
+    if rawX < 0, atStart {
+      over = rawX
+    } else if rawX > barWidth, atEnd {
+      over = rawX - barWidth
+    }
+    if abs(over) >= ProgressTickMetrics.boundaryTrigger,
+      abs(overshoot) < ProgressTickMetrics.boundaryTrigger
+    {
+      haptics.boundary()
+    }
+    overshoot = over
+  }
+
+  private func tickIndex(at x: CGFloat) -> Int? {
+    guard let layout = tickLayout() else { return nil }
+    var cursor: CGFloat = 0
+    for offset in 0..<visibleCount {
+      let width = layout.unit * layout.flexes[offset]
+      if x < cursor + width + ProgressTickMetrics.gap / 2 {
+        return windowStart + offset
+      }
+      cursor += width + ProgressTickMetrics.gap
+    }
+    return windowStart + visibleCount - 1
   }
 
   private func applyPlayhead(_ index: Int) {
@@ -443,14 +809,35 @@ struct ProgressEpisodeTicksView: View {
     if scrubIndex != clamped {
       withAnimation(.snappy(duration: 0.16)) {
         scrubIndex = clamped
+        clampWindow(to: clamped)
       }
-      if let episode = playheadEpisode {
-        gearHaptic.play(episode.id)
+      if episodes.indices.contains(clamped) {
+        haptics.tick(episodes[clamped].id, kind: tickKind(at: clamped))
       }
     } else if edgeHoldDirection != 0, clamped == 0 || clamped == episodes.count - 1 {
       stopEdgeHold()
     }
-    clampWindow(to: clamped)
+  }
+
+  private func tickKind(at index: Int) -> ScrubHaptics.Tick {
+    if index == 0 || index == episodes.count - 1 {
+      return .detent
+    }
+    if !episodes[index].aired {
+      return .soft
+    }
+    if index == currentIndex {
+      return .home
+    }
+    if episodes.indices.contains(index + 1), !episodes[index + 1].aired {
+      return .detent
+    }
+    return .regular
+  }
+
+  private func canCommit(_ index: Int) -> Bool {
+    guard episodes.indices.contains(index), episodes[index].aired else { return false }
+    return episodes[...index].contains { $0.collectionTypeEnum != .collect }
   }
 
   private func startEdgeHold(_ direction: Int) {
@@ -461,16 +848,10 @@ struct ProgressEpisodeTicksView: View {
     edgeHoldTask = Task { @MainActor in
       while !Task.isCancelled {
         let elapsed = Date().timeIntervalSince(startedAt)
-        let rate: Double
-        if elapsed > 1.5 {
-          rate = 48
-        } else if elapsed > 0.5 {
-          rate = 12
-        } else {
-          rate = 6
-        }
-        let delay = UInt64(1_000_000_000 / rate)
-        try? await Task.sleep(nanoseconds: delay)
+        let ramp = min(max((elapsed - 0.4) / 1.8, 0), 1)
+        let base = 6 + 42 * ramp * ramp * (3 - 2 * ramp)
+        let rate = base * (0.75 + 0.5 * Double(edgeDepth))
+        try? await Task.sleep(for: .milliseconds(Int(1000 / rate)))
         guard !Task.isCancelled else { return }
         applyPlayhead(playheadIndex + direction)
         reportScrub()
@@ -486,32 +867,65 @@ struct ProgressEpisodeTicksView: View {
 
   private func finishScrub() {
     stopEdgeHold()
+    let wasDragging = isDragging
+    let index = playheadIndex
     let target = playheadEpisode
-    let canCommit = target?.aired == true && !isCancelling
-    let shouldCommit = isDragging && canCommit
+    let action: ProgressTickAction? = wasDragging && onRail ? railAction : nil
+    var commit: ProgressTickCommit?
+    if wasDragging, !onRail, canCommit(index) {
+      commit = .watchUntil
+    } else if case .status(let type) = action {
+      commit = .status(type)
+    }
     withAnimation(.spring(response: 0.28, dampingFraction: 0.78)) {
+      pressing = false
       isDragging = false
-      isCancelling = false
+      onRail = false
       lift = 0
-      if !shouldCommit {
-        scrubIndex = nil
+      overshoot = 0
+      scrubIndex = nil
+      if commit != nil {
+        pendingIndex = index
+        pendingCommit = commit
       }
     }
-    if shouldCommit, let target {
-      onScrubCommit?(target)
-    }
     onScrubChange?(nil)
-    gearHaptic.prepare()
+    if let commit, let target {
+      haptics.release(committed: true)
+      Task { @MainActor in
+        await runCommit(target, commit)
+      }
+    } else if action == .discuss, let target, let url = URL(string: target.link) {
+      haptics.release(committed: true)
+      openURL(url)
+    } else if wasDragging {
+      haptics.release(committed: false)
+    }
+  }
+
+  private func runCommit(_ target: EpisodeDTO, _ commit: ProgressTickCommit) async {
+    let committed = await onScrubCommit?(target, commit) ?? false
+    withAnimation(.spring(response: 0.3, dampingFraction: 0.85)) {
+      pendingIndex = nil
+      pendingCommit = nil
+    }
+    if committed {
+      haptics.success()
+    } else {
+      haptics.failure()
+    }
   }
 
   private func resetScrub() {
     stopEdgeHold()
     scrubIndex = nil
+    pressing = false
     isDragging = false
-    isCancelling = false
+    onRail = false
     lift = 0
+    overshoot = 0
     onScrubChange?(nil)
-    gearHaptic.prepare()
+    haptics.prepare()
   }
 
   private func reportScrub() {
@@ -521,10 +935,10 @@ struct ProgressEpisodeTicksView: View {
     }
     onScrubChange?(
       ProgressTickScrubState(
-        phase: isCancelling ? .cancel : .preview,
+        phase: onRail ? .rail(railAction) : .preview,
         target: target,
         restore: restore,
-        canCommit: target.aired && !isCancelling
+        canCommit: !onRail && canCommit(playheadIndex)
       )
     )
   }
@@ -549,6 +963,16 @@ struct ProgressEpisodeTicksView: View {
     windowStart = min(max(windowStart, 0), max(episodes.count - size, 0))
   }
 
+  private func rubber(_ value: CGFloat, limit: CGFloat) -> CGFloat {
+    guard value > 0 else { return 0 }
+    return limit * value / (value + limit)
+  }
+
+  private var tetherHeight: CGFloat {
+    let pull = rubber(lift, limit: ProgressTickMetrics.pullLimit)
+    return pull > 1 ? pull : 0
+  }
+
   private var bubbleCenterX: CGFloat {
     let half = bubbleSize.width / 2
     let overhang: CGFloat = 20
@@ -568,8 +992,7 @@ struct ProgressEpisodeTicksView: View {
   }
 
   private var bubbleY: CGFloat {
-    let detached = isCancelling ? min(max(lift - 12, 15), 36) : 0
-    return -bubbleSize.height - 8 - detached
+    return -bubbleSize.height - 8
   }
 
   private var leadingCaption: String {
@@ -586,67 +1009,78 @@ struct ProgressEpisodeTicksView: View {
   }
 
   private var captionAnchorIndex: Int {
-    if isDragging && !isCancelling {
-      return playheadIndex
-    }
-    return currentIndex
+    previewing ? playheadIndex : anchorIndex
   }
 
   private var playheadCaptionText: String {
-    let episode: EpisodeDTO?
-    if isDragging && !isCancelling {
-      episode = playheadEpisode
-    } else {
-      episode = currentEpisode
-    }
-    guard let episode else { return "" }
+    guard let episode = previewing ? playheadEpisode : anchorEpisode else { return "" }
     return "看到 \(episode.sort.progressEpisodeNumber)"
   }
 
   private var centerCaptionColor: Color {
-    isCancelling ? theme.secondaryText : theme.accent
+    onRail ? theme.secondaryText : theme.accent
+  }
+
+  private struct CaptionPlacement {
+    var tickX: CGFloat
+    var textCenterX: CGFloat
+    var hidesLeading: Bool
+    var hidesTrailing: Bool
+  }
+
+  private func captionPlacement(width: CGFloat) -> CaptionPlacement? {
+    let text = playheadCaptionText
+    guard width > 0, !text.isEmpty else { return nil }
+    let tickX = tickCenterX(for: captionAnchorIndex, width: width)
+    let arrowW: CGFloat = 7
+    let gap: CGFloat = 3
+    let margin: CGFloat = 4
+    let textW = monospacedCaptionWidth(text)
+    let leadingEnd = monospacedCaptionWidth(leadingCaption) + margin
+    let trailingStart = width - monospacedCaptionWidth(trailingCaption) - margin
+    let rightStart = tickX + arrowW / 2 + gap
+    let leftEnd = tickX - arrowW / 2 - gap
+    let fitsRight = rightStart + textW <= trailingStart
+    let fitsLeft = leftEnd - textW >= leadingEnd
+    let placeRight = fitsRight || (!fitsLeft && rightStart + textW <= width)
+    let textCenterX = placeRight ? rightStart + textW / 2 : leftEnd - textW / 2
+    let minX = min(tickX - arrowW / 2, textCenterX - textW / 2)
+    let maxX = max(tickX + arrowW / 2, textCenterX + textW / 2)
+    return CaptionPlacement(
+      tickX: tickX,
+      textCenterX: textCenterX,
+      hidesLeading: minX < leadingEnd,
+      hidesTrailing: maxX > trailingStart
+    )
   }
 
   @ViewBuilder
   private var playheadCaption: some View {
     let text = playheadCaptionText
     GeometryReader { geo in
-      let width = geo.size.width
-      let tickX = tickCenterX(for: captionAnchorIndex, width: width)
-      let arrowW: CGFloat = 7
-      let gap: CGFloat = 3
-      let textW = monospacedCaptionWidth(text)
-      let trailingReserve = monospacedCaptionWidth(trailingCaption) + 4
-      let fitsRight = tickX + arrowW / 2 + gap + textW <= width - trailingReserve
-      let textCenterX =
-        fitsRight
-        ? tickX + arrowW / 2 + gap + textW / 2
-        : tickX - arrowW / 2 - gap - textW / 2
-      let y = geo.size.height / 2
-      ZStack {
-        Image(systemName: "arrowtriangle.up.fill")
-          .font(.system(size: 7, weight: .bold))
-          .foregroundStyle(centerCaptionColor)
-          .position(x: tickX, y: y)
-        Text(text)
-          .font(.system(size: 10, weight: .semibold, design: .monospaced))
-          .foregroundStyle(centerCaptionColor)
-          .fixedSize()
-          .position(x: textCenterX, y: y)
+      if let placement = captionPlacement(width: geo.size.width) {
+        let y = geo.size.height / 2
+        ZStack {
+          Image(systemName: "arrowtriangle.up.fill")
+            .font(.system(size: 7, weight: .bold))
+            .foregroundStyle(centerCaptionColor)
+            .position(x: placement.tickX, y: y)
+          Text(text)
+            .font(.system(size: 10, weight: .semibold, design: .monospaced))
+            .foregroundStyle(centerCaptionColor)
+            .fixedSize()
+            .position(x: placement.textCenterX, y: y)
+        }
+        .frame(width: geo.size.width, height: geo.size.height)
       }
-      .frame(width: width, height: geo.size.height)
     }
     .allowsHitTesting(false)
-    .opacity(barWidth > 0 && !text.isEmpty ? 1 : 0)
     .animation(.snappy(duration: 0.16), value: captionAnchorIndex)
   }
 
-  private func tickCenterX(for index: Int, width: CGFloat? = nil) -> CGFloat {
+  private func tickLayout(width: CGFloat? = nil) -> (unit: CGFloat, flexes: [CGFloat])? {
     let width = width ?? barWidth
-    guard width > 0, visibleCount > 0 else { return 0 }
-    let local = index - windowStart
-    guard local >= 0, local < visibleCount else { return 0 }
-    let gaps = ProgressTickMetrics.gap * CGFloat(visibleCount - 1)
+    guard width > 0, visibleCount > 0 else { return nil }
     var flexes: [CGFloat] = []
     flexes.reserveCapacity(visibleCount)
     var totalFlex: CGFloat = 0
@@ -655,12 +1089,19 @@ struct ProgressEpisodeTicksView: View {
       flexes.append(flex)
       totalFlex += flex
     }
-    let unit = (width - gaps) / max(totalFlex, 1)
+    let gaps = ProgressTickMetrics.gap * CGFloat(visibleCount - 1)
+    return ((width - gaps) / max(totalFlex, 1), flexes)
+  }
+
+  private func tickCenterX(for index: Int, width: CGFloat? = nil) -> CGFloat {
+    guard let layout = tickLayout(width: width) else { return 0 }
+    let local = index - windowStart
+    guard local >= 0, local < visibleCount else { return 0 }
     var x: CGFloat = 0
     for offset in 0..<local {
-      x += unit * flexes[offset] + ProgressTickMetrics.gap
+      x += layout.unit * layout.flexes[offset] + ProgressTickMetrics.gap
     }
-    return x + unit * flexes[local] / 2
+    return x + layout.unit * layout.flexes[local] / 2
   }
 
   private func monospacedCaptionWidth(_ text: String) -> CGFloat {
@@ -674,9 +1115,8 @@ struct ProgressEpisodeTicksView: View {
     let height = tickHeight(index: index, distance: distance)
     let isFirst = offset == 0
     let isLast = offset == visibleCount - 1
-    let preview = isPreviewTick(index)
     let focus = magnifying && distance == 0
-    let dashed = isCancelling && preview
+    let dashed = onRail && focus && railAction == .status(.none)
     let shape = UnevenRoundedRectangle(
       cornerRadii: RectangleCornerRadii(
         topLeading: isFirst || focus ? 3 : 0,
@@ -693,8 +1133,8 @@ struct ProgressEpisodeTicksView: View {
         if dashed {
           shape
             .strokeBorder(
-              theme.accent.opacity(0.4),
-              style: StrokeStyle(lineWidth: 1, dash: [3, 2])
+              theme.accent.opacity(0.5),
+              style: StrokeStyle(lineWidth: 1.5, dash: [3, 2])
             )
         } else if focus {
           shape
@@ -708,18 +1148,14 @@ struct ProgressEpisodeTicksView: View {
         radius: focus ? theme.ctaShadow.radius : theme.chipShadow.radius,
         y: focus ? theme.ctaShadow.y : theme.chipShadow.y
       )
-      .animation(.spring(response: 0.18, dampingFraction: 0.55), value: playheadIndex)
+      .animation(.spring(response: 0.2, dampingFraction: 0.68), value: playheadIndex)
+      .animation(.smooth(duration: 0.28), value: currentIndex)
+      .animation(.smooth(duration: 0.2), value: railAction)
   }
 
   private func tickWidth(distance: Int) -> CGFloat? {
-    guard barWidth > 0, visibleCount > 0 else { return nil }
-    let gaps = ProgressTickMetrics.gap * CGFloat(visibleCount - 1)
-    var totalFlex: CGFloat = 0
-    for offset in 0..<visibleCount {
-      totalFlex += tickFlex(abs((windowStart + offset) - playheadIndex))
-    }
-    let unit = (barWidth - gaps) / max(totalFlex, 1)
-    return unit * tickFlex(distance)
+    guard let layout = tickLayout() else { return nil }
+    return layout.unit * tickFlex(distance)
   }
 
   private func tickFlex(_ distance: Int) -> CGFloat {
@@ -736,9 +1172,8 @@ struct ProgressEpisodeTicksView: View {
 
   private func tickHeight(index: Int, distance: Int) -> CGFloat {
     if !magnifying {
-      return index == currentIndex
-        ? ProgressTickMetrics.currentHeight
-        : ProgressTickMetrics.idleHeight
+      guard index == anchorIndex else { return ProgressTickMetrics.idleHeight }
+      return pressing ? ProgressTickMetrics.pressHeight : ProgressTickMetrics.currentHeight
     }
     switch distance {
     case 0:
@@ -752,18 +1187,12 @@ struct ProgressEpisodeTicksView: View {
     }
   }
 
-  private func isPreviewTick(_ index: Int) -> Bool {
-    let low = min(currentIndex, playheadIndex)
-    let high = max(currentIndex, playheadIndex)
-    return index != currentIndex && index >= low && index <= high
-  }
-
   private func tickShadowColor(index: Int, focus: Bool) -> Color {
     if focus {
       return theme.ctaShadow.color
     }
-    if !isDragging, index == currentIndex {
-      return theme.accent.opacity(0.4)
+    if !isDragging, index == anchorIndex {
+      return theme.accent.opacity(pressing ? 0.55 : 0.4)
     }
     return .clear
   }
@@ -773,6 +1202,9 @@ struct ProgressEpisodeTicksView: View {
   ) -> AnyShapeStyle {
     if dashed {
       return AnyShapeStyle(theme.accent.opacity(0.18))
+    }
+    if focus, onRail {
+      return AnyShapeStyle(railFocusFill(episode, index: index))
     }
     if focus {
       return AnyShapeStyle(
@@ -785,11 +1217,23 @@ struct ProgressEpisodeTicksView: View {
   private func tickFill(_ episode: EpisodeDTO, index: Int) -> Color {
     let wish = theme.subjectTint(.book).text.opacity(0.5)
     let dropped = theme.episodeCell(.dropped).fill.first ?? theme.track
-    if magnifying {
+    if previewing {
       let low = min(currentIndex, playheadIndex)
       let high = max(currentIndex, playheadIndex)
       if index > low && index < high {
-        return theme.accent.opacity(0.5)
+        return theme.accent.opacity(0.5 - 0.22 * liftProgress)
+      }
+    }
+    if let pendingIndex, let pendingCommit {
+      switch pendingCommit {
+      case .watchUntil:
+        if index > currentIndex, index <= pendingIndex {
+          return theme.accent.opacity(0.55)
+        }
+      case .status(let type):
+        if index == pendingIndex {
+          return statusFill(type, episode: episode).opacity(0.7)
+        }
       }
     }
     if index <= currentIndex {
@@ -810,15 +1254,34 @@ struct ProgressEpisodeTicksView: View {
     }
     return episode.aired ? theme.accentDeep.opacity(0.32) : theme.track
   }
+
+  private func statusFill(_ type: EpisodeCollectionType, episode: EpisodeDTO) -> Color {
+    switch type {
+    case .collect:
+      return theme.accent
+    case .wish:
+      return theme.subjectTint(.book).text.opacity(0.8)
+    case .dropped:
+      return theme.episodeCell(.dropped).fill.first ?? theme.track
+    case .none:
+      return episode.aired ? theme.accentDeep.opacity(0.32) : theme.track
+    }
+  }
+
+  private func railFocusFill(_ episode: EpisodeDTO, index: Int) -> Color {
+    switch railAction {
+    case .cancel, .discuss:
+      return tickFill(episode, index: index)
+    case .status(let type):
+      return statusFill(type, episode: episode)
+    }
+  }
 }
 
 private struct ProgressTickBubble: View {
   let title: String
   let subtitle: String
   var detail: String? = nil
-  var systemImage: String? = nil
-  let isCancelling: Bool
-  let showsArrow: Bool
   var arrowOffset: CGFloat = 0
 
   @Environment(\.theme) private var theme
@@ -827,11 +1290,6 @@ private struct ProgressTickBubble: View {
     VStack(spacing: 0) {
       VStack(alignment: .leading, spacing: 2) {
         HStack(alignment: .firstTextBaseline, spacing: 8) {
-          if let systemImage {
-            Image(systemName: systemImage)
-              .font(.subheadline.weight(.heavy))
-              .foregroundStyle(theme.toastText)
-          }
           Text(title)
             .font(.system(size: 15, weight: .heavy, design: .monospaced))
             .foregroundStyle(theme.toastText)
@@ -841,43 +1299,85 @@ private struct ProgressTickBubble: View {
               .font(.footnote.weight(.semibold))
               .foregroundStyle(theme.toastText)
               .lineLimit(1)
-          } else if isCancelling {
-            Text(subtitle)
-              .font(.caption2.weight(.semibold))
-              .foregroundStyle(theme.toastText.opacity(0.75))
           }
         }
-        if !isCancelling {
-          Text(subtitle)
-            .font(.caption2.weight(.semibold))
-            .foregroundStyle(theme.toastText.opacity(0.6))
-        }
+        Text(subtitle)
+          .font(.caption2.weight(.semibold))
+          .foregroundStyle(theme.toastText.opacity(0.6))
       }
       .frame(maxWidth: 240, alignment: .leading)
       .fixedSize(horizontal: true, vertical: false)
       .padding(.horizontal, 13)
       .padding(.vertical, 8)
       .background(
-        bubbleColor,
+        theme.toastFill,
         in: RoundedRectangle(cornerRadius: theme.metrics.controlRadius, style: .continuous)
       )
       .shadow(
-        color: isCancelling ? theme.danger.opacity(0.35) : theme.heroShadow.color,
+        color: theme.heroShadow.color,
         radius: theme.heroShadow.radius,
         y: theme.heroShadow.y
       )
 
-      if showsArrow {
-        ProgressTickBubbleArrow()
-          .fill(bubbleColor)
-          .frame(width: 12, height: 6)
-          .offset(x: arrowOffset)
-      }
+      ProgressTickBubbleArrow()
+        .fill(theme.toastFill)
+        .frame(width: 12, height: 6)
+        .offset(x: arrowOffset)
     }
   }
+}
 
-  private var bubbleColor: Color {
-    isCancelling ? theme.danger.opacity(0.92) : theme.toastFill
+private struct ProgressTickFanItem: View {
+  let action: ProgressTickAction
+  let selected: Bool
+
+  @Environment(\.theme) private var theme
+
+  private var destructive: Bool {
+    action == .cancel || action == .status(.dropped)
+  }
+
+  var body: some View {
+    ZStack {
+      Circle()
+        .fill(fill)
+        .overlay {
+          Circle().strokeBorder(theme.imageBorder, lineWidth: 1)
+        }
+        .shadow(
+          color: selected ? theme.ctaShadow.color : theme.heroShadow.color,
+          radius: theme.heroShadow.radius,
+          y: theme.heroShadow.y
+        )
+      Image(systemName: action.icon)
+        .font(.system(size: 16, weight: .bold))
+        .foregroundStyle(selected ? .white : theme.toastText)
+    }
+    .frame(width: ProgressTickMetrics.fanItem, height: ProgressTickMetrics.fanItem)
+    .scaleEffect(selected ? 1.18 : 1)
+    .overlay(alignment: .top) {
+      if selected {
+        Text(action.title)
+          .font(.caption2.weight(.bold))
+          .foregroundStyle(theme.toastText)
+          .padding(.horizontal, 8)
+          .padding(.vertical, 3)
+          .background(theme.toastFill, in: Capsule())
+          .fixedSize()
+          .offset(y: -ProgressTickMetrics.fanLabelRoom)
+          .transition(.scale(scale: 0.6, anchor: .bottom).combined(with: .opacity))
+      }
+    }
+    .animation(.spring(response: 0.24, dampingFraction: 0.7), value: selected)
+  }
+
+  private var fill: AnyShapeStyle {
+    guard selected else { return AnyShapeStyle(theme.toastFill) }
+    if destructive {
+      return AnyShapeStyle(theme.danger)
+    }
+    return AnyShapeStyle(
+      LinearGradient(colors: theme.ctaGradient, startPoint: .top, endPoint: .bottom))
   }
 }
 

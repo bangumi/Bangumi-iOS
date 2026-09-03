@@ -62,7 +62,7 @@ struct GlassProgressCard: View {
         }
         .buttonStyle(.plain)
 
-        ProgressSecondLineView(subject: subject)
+        ProgressSecondLineView(subject: subject, lineLimit: 2)
       }
       .frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -99,7 +99,6 @@ private struct GlassProgressEpisodeSection: View {
   @Environment(\.theme) private var theme
 
   @State private var scrub: ProgressTickScrubState?
-  @State private var committing: Bool = false
   @State private var updating: Bool = false
   @State private var loadingEpisodes: Bool = false
   @State private var showCollectionBox: Bool = false
@@ -150,19 +149,21 @@ private struct GlassProgressEpisodeSection: View {
     }
   }
 
-  private func commitWatchUntil(_ episode: EpisodeDTO) {
-    guard !committing else { return }
-    Task {
-      committing = true
-      defer { committing = false }
-      do {
+  private func commitScrub(_ episode: EpisodeDTO, _ commit: ProgressTickCommit) async -> Bool {
+    do {
+      switch commit {
+      case .watchUntil:
         try await EpisodeRepository.updateEpisodeCollection(
           episodeId: episode.id, type: .collect, batch: true)
-        await reload()
-        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-      } catch {
-        Notifier.shared.alert(error: error)
+      case .status(let type):
+        try await EpisodeRepository.updateEpisodeCollection(
+          episodeId: episode.id, type: type)
       }
+      await reload()
+      return true
+    } catch {
+      Notifier.shared.alert(error: error)
+      return false
     }
   }
 
@@ -225,23 +226,52 @@ private struct GlassProgressEpisodeSection: View {
     }
   }
 
+  private func previewHint(_ state: ProgressTickScrubState) -> String {
+    if state.canCommit {
+      return "松手标记「看到 第 \(state.target.sort.progressEpisodeNumber) 话」 · 上滑取消"
+    }
+    if !state.target.aired {
+      return "未播出 · 不可提交 · 上滑取消"
+    }
+    return "已看到这里 · 松手不做更改"
+  }
+
+  private func railKind(_ action: ProgressTickAction) -> GlassFillKind {
+    switch action {
+    case .cancel, .status(.dropped):
+      .cancel
+    case .status:
+      .accent
+    case .discuss:
+      .glass
+    }
+  }
+
+  private func railHint(_ action: ProgressTickAction, _ state: ProgressTickScrubState) -> String {
+    let number = state.target.sort.progressEpisodeNumber
+    switch action {
+    case .cancel:
+      return "松开取消 · 保持 第 \(state.restore.sort.progressEpisodeNumber) 话"
+    case .status(let type):
+      return "松开 · 第 \(number) 话 \(type.action)"
+    case .discuss:
+      return "松开 · 打开 第 \(number) 话 讨论"
+    }
+  }
+
   @ViewBuilder
   private func scrubHint(_ state: ProgressTickScrubState) -> some View {
     switch state.phase {
     case .preview:
       GlassFillButton(kind: state.canCommit ? .glass : .muted) {
-        Text(
-          state.canCommit
-            ? "松手标记「看到 第 \(state.target.sort.progressEpisodeNumber) 话」 · 上滑取消"
-            : "未播出 · 不可提交 · 上滑取消"
-        )
-        .lineLimit(1)
+        Text(previewHint(state))
+          .lineLimit(1)
       }
-    case .cancel:
-      GlassFillButton(kind: .cancel) {
+    case .rail(let action):
+      GlassFillButton(kind: railKind(action)) {
         HStack(spacing: 6) {
-          Image(systemName: "arrow.uturn.backward")
-          Text("松开取消 · 回到 第 \(state.restore.sort.progressEpisodeNumber) 话")
+          Image(systemName: action.icon)
+          Text(railHint(action, state))
             .lineLimit(1)
         }
       }
@@ -283,7 +313,7 @@ private struct GlassProgressEpisodeSection: View {
           subjectCollectionType: subject.ctypeEnum,
           reload: reload,
           onScrubChange: handleScrubChange,
-          onScrubCommit: commitWatchUntil
+          onScrubCommit: commitScrub
         )
 
         HStack(spacing: 8) {
