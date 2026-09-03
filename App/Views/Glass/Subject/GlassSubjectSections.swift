@@ -205,7 +205,7 @@ struct GlassCharacterCard: View {
         ZStack(alignment: .topTrailing) {
           VStack(spacing: 6) {
             ImageView(img: item.character.images?.medium)
-              .imageStyle(width: 52, height: 52, cornerRadius: 26, alignment: .center)
+              .imageStyle(width: 52, height: 52, cornerRadius: 26, alignment: .top)
               .imageType(.avatar)
               .imageNSFW(item.character.nsfw)
 

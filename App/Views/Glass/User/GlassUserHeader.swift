@@ -141,20 +141,37 @@ struct GlassUserHeader: View {
         Text("\(user.joinedAt.dateDisplay)加入")
       }
       if !user.site.isEmpty {
-        GlassInfoChip(systemImage: "link", tint: theme.link) {
-          Text(user.site.withLink(user.site, linkColor: theme.link))
-            .textSelection(.enabled)
-        }
-      }
-      ForEach(user.networkServices) { service in
-        GlassInfoChip(tint: Color(service.color)) {
-          HStack(spacing: 5) {
-            Text(service.title).fontWeight(.heavy)
-            Text(service.account.withLink(service.link, linkColor: Color(service.color)))
-              .textSelection(.enabled)
+        linkChip(user.site) {
+          GlassInfoChip(systemImage: "link", tint: theme.link) {
+            Text(user.site)
           }
         }
       }
+      ForEach(user.networkServices) { service in
+        linkChip(service.link) {
+          GlassInfoChip(tint: Color(service.color)) {
+            HStack(spacing: 5) {
+              Text(service.title).fontWeight(.heavy)
+              if !service.account.isEmpty {
+                Text(service.account)
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  @ViewBuilder
+  private func linkChip<Chip: View>(_ link: String, @ViewBuilder chip: () -> Chip) -> some View {
+    if let url = URL(string: link), !link.isEmpty {
+      Link(destination: url) {
+        chip()
+      }
+      .buttonStyle(.plain)
+    } else {
+      chip()
+        .textSelection(.enabled)
     }
   }
 }
