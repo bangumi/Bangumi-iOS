@@ -60,6 +60,9 @@ private struct ImageStatusBadge: View {
   let icon: String
   let background: Color
   let size: CGFloat
+  var ctype: CollectionType? = nil
+
+  @Environment(\.theme) private var theme
 
   private var iconSize: CGFloat {
     size * 0.46
@@ -69,16 +72,33 @@ private struct ImageStatusBadge: View {
     max(2, size * 0.11)
   }
 
+  private var foreground: Color {
+    guard let ctype else {
+      return .white
+    }
+    return theme.collectionBadgeText(ctype)
+  }
+
+  private var fill: AnyShapeStyle {
+    guard let ctype, !theme.isClassic else {
+      return AnyShapeStyle(background)
+    }
+    return AnyShapeStyle(
+      LinearGradient(
+        colors: theme.collectionBadge(ctype), startPoint: .topLeading,
+        endPoint: .bottomTrailing))
+  }
+
   var body: some View {
     Image(systemName: icon)
       .font(.system(size: iconSize, weight: .bold))
-      .foregroundStyle(.white)
+      .foregroundStyle(foreground)
       .frame(width: size, height: size)
-      .background(background)
+      .background(fill)
       .clipShape(Circle())
       .overlay {
         Circle()
-          .stroke(Color(uiColor: .systemBackground), lineWidth: strokeWidth)
+          .stroke(theme.badgeRing, lineWidth: strokeWidth)
       }
       .allowsHitTesting(false)
   }
@@ -122,7 +142,8 @@ struct ImageCollectionStatus: View {
   var body: some View {
     if let ctype, ctype != .none {
       ImageStatusBadgePlacement { badgeSize in
-        ImageStatusBadge(icon: ctype.icon, background: ctype.color, size: badgeSize)
+        ImageStatusBadge(
+          icon: ctype.icon, background: ctype.color, size: badgeSize, ctype: ctype)
       }
     }
   }

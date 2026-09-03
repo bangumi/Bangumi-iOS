@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct BBCodeEditor: View {
+  @Environment(\.theme) private var theme
   @Binding var text: String
 
   private let minHeight: CGFloat = 80
@@ -342,12 +343,33 @@ struct BBCodeEditor: View {
     .frame(maxWidth: .infinity)
     .background(.clear)
 
-    let hostingController = UIHostingController(rootView: AnyView(toolbarView))
+    let hostingController = UIHostingController(
+      rootView: AnyView(toolbarView.environment(\.theme, theme)))
     hostingController.view.backgroundColor = .clear
     keyboardToolbarHostingController = hostingController
   }
 
-  var body: some View {
+  private var resizeMinHeight: CGFloat {
+    theme.isClassic ? minHeight : GlassForm.editorMinHeight
+  }
+
+  private var resizeGesture: some Gesture {
+    DragGesture()
+      .onChanged { value in
+        let newHeight = height + value.translation.height
+        height = max(resizeMinHeight, newHeight)
+      }
+  }
+
+  private var textView: BBCodeTextView {
+    BBCodeTextView(
+      text: $text,
+      bridge: textViewBridge,
+      inputAccessoryViewController: keyboardToolbarHostingController
+    )
+  }
+
+  private var classicBody: some View {
     VStack {
       Button {
         withAnimation(.default) {
@@ -363,19 +385,15 @@ struct BBCodeEditor: View {
       if preview {
         BorderView(color: .secondary.opacity(0.2), padding: 4) {
           HStack {
-            BBCodeView(text).tint(.linkText)
+            BBCodeView(text).tint(theme.link)
               .fixedSize(horizontal: false, vertical: true)
             Spacer(minLength: 0)
           }
         }
       } else {
         BorderView(color: .secondary.opacity(0.2), padding: 0) {
-          BBCodeTextView(
-            text: $text,
-            bridge: textViewBridge,
-            inputAccessoryViewController: keyboardToolbarHostingController
-          )
-          .frame(height: height)
+          textView
+            .frame(height: height)
         }
         .onAppear {
           setupKeyboardToolbar()
@@ -385,13 +403,54 @@ struct BBCodeEditor: View {
           .frame(height: 4)
           .cornerRadius(2)
           .frame(width: 40)
-          .gesture(
-            DragGesture()
-              .onChanged { value in
-                let newHeight = height + value.translation.height
-                height = max(minHeight, newHeight)
-              }
-          ).padding(.vertical, 2)
+          .gesture(resizeGesture)
+          .padding(.vertical, 2)
+      }
+    }
+  }
+
+  private var glassBody: some View {
+    VStack(alignment: .leading, spacing: GlassForm.blockSpacing) {
+      Button {
+        withAnimation(.default) {
+          preview.toggle()
+        }
+      } label: {
+        Label(preview ? "返回编辑" : "预览", systemImage: preview ? "eye.slash" : "eye")
+      }
+      .buttonStyle(.themedSecondary)
+
+      if preview {
+        HStack {
+          BBCodeView(text).tint(theme.link)
+            .fixedSize(horizontal: false, vertical: true)
+          Spacer(minLength: 0)
+        }
+        .frame(minHeight: GlassForm.editorMinHeight, alignment: .topLeading)
+        .themedEditorChrome(
+          insets: EdgeInsets(top: 12, leading: 12, bottom: 12, trailing: 12))
+      } else {
+        VStack(spacing: GlassForm.metaSpacing) {
+          textView
+            .frame(height: max(height, GlassForm.editorMinHeight))
+            .themedEditorChrome(
+              insets: EdgeInsets(top: 4, leading: 8, bottom: 4, trailing: 8))
+            .onAppear {
+              setupKeyboardToolbar()
+            }
+          GlassResizeHandle()
+            .gesture(resizeGesture)
+        }
+      }
+    }
+  }
+
+  var body: some View {
+    Group {
+      if theme.isClassic {
+        classicBody
+      } else {
+        glassBody
       }
     }
     .alert("插入图片", isPresented: $showingImageInput) {

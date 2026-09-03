@@ -115,30 +115,33 @@ private struct ProfilePrivacyInteractionSection: View {
 
   var body: some View {
     Section {
-      ProfilePrivacyValuePicker(
-        title: "发送短信",
-        description: "谁可以向你发送站内短信",
-        selection: $settings.privateMessage,
-        values: ProfilePrivacyValue.allCases
-      )
-      ProfilePrivacyValuePicker(
-        title: "回复时间线吐槽",
-        description: "谁可以回复你的时间线吐槽",
-        selection: $settings.timelineReply,
-        values: ProfilePrivacyValue.allCases
-      )
-      ProfilePrivacyValuePicker(
-        title: "回复时间线收藏",
-        description: "谁可以回复你的时间线收藏动态",
-        selection: $settings.timelineCollectReply,
-        values: ProfilePrivacyValue.allCases
-      )
-      ProfilePrivacyValuePicker(
-        title: "加我好友",
-        description: "是否允许其他用户向你发送好友请求",
-        selection: $settings.follow,
-        values: ProfilePrivacyValue.binaryValues
-      )
+      Group {
+        ProfilePrivacyValuePicker(
+          title: "发送短信",
+          description: "谁可以向你发送站内短信",
+          selection: $settings.privateMessage,
+          values: ProfilePrivacyValue.allCases
+        )
+        ProfilePrivacyValuePicker(
+          title: "回复时间线吐槽",
+          description: "谁可以回复你的时间线吐槽",
+          selection: $settings.timelineReply,
+          values: ProfilePrivacyValue.allCases
+        )
+        ProfilePrivacyValuePicker(
+          title: "回复时间线收藏",
+          description: "谁可以回复你的时间线收藏动态",
+          selection: $settings.timelineCollectReply,
+          values: ProfilePrivacyValue.allCases
+        )
+        ProfilePrivacyValuePicker(
+          title: "加我好友",
+          description: "是否允许其他用户向你发送好友请求",
+          selection: $settings.follow,
+          values: ProfilePrivacyValue.binaryValues
+        )
+      }
+      .themedListRow()
     } header: {
       Text("谁可以")
     }
@@ -152,24 +155,27 @@ private struct ProfilePrivacyNotificationSection: View {
 
   var body: some View {
     Section {
-      ProfilePrivacyValuePicker(
-        title: "@ 提醒",
-        description: "谁的 @ 提醒会发送给你",
-        selection: $settings.mentionNotification,
-        values: ProfilePrivacyValue.allCases
-      )
-      ProfilePrivacyValuePicker(
-        title: "评论提醒",
-        description: "谁的评论回复会发送提醒",
-        selection: $settings.commentNotification,
-        values: ProfilePrivacyValue.allCases
-      )
-      ProfilePrivacyValuePicker(
-        title: "加好友提醒",
-        description: "是否接收好友请求相关提醒",
-        selection: $settings.friendNotification,
-        values: ProfilePrivacyValue.binaryValues
-      )
+      Group {
+        ProfilePrivacyValuePicker(
+          title: "@ 提醒",
+          description: "谁的 @ 提醒会发送给你",
+          selection: $settings.mentionNotification,
+          values: ProfilePrivacyValue.allCases
+        )
+        ProfilePrivacyValuePicker(
+          title: "评论提醒",
+          description: "谁的评论回复会发送提醒",
+          selection: $settings.commentNotification,
+          values: ProfilePrivacyValue.allCases
+        )
+        ProfilePrivacyValuePicker(
+          title: "加好友提醒",
+          description: "是否接收好友请求相关提醒",
+          selection: $settings.friendNotification,
+          values: ProfilePrivacyValue.binaryValues
+        )
+      }
+      .themedListRow()
     } header: {
       Text("提醒")
     }
@@ -188,17 +194,20 @@ private struct ProfilePrivacyPreferenceSection: View {
 
   var body: some View {
     Section {
-      Toggle(isOn: $showNsfwSubject) {
-        SettingLabel("显示 NSFW 条目", description: "允许搜索、浏览和推荐展示已标记为 NSFW 的条目")
-      }
-      .disabled(disabled)
+      Group {
+        Toggle(isOn: $showNsfwSubject) {
+          SettingLabel("显示 NSFW 条目", description: "允许搜索、浏览和推荐展示已标记为 NSFW 的条目")
+        }
+        .disabled(disabled)
 
-      HStack {
-        Text("当前状态")
-        Spacer()
-        Text(statusText)
-          .foregroundStyle(.secondary)
+        HStack {
+          Text("当前状态")
+          Spacer()
+          Text(statusText)
+            .foregroundStyle(.secondary)
+        }
       }
+      .themedListRow()
 
     } header: {
       Text("内容偏好")
@@ -231,6 +240,7 @@ private struct ProfilePrivacyLoadingSection: View {
         ProgressView()
         Spacer()
       }
+      .themedListRow()
     }
   }
 }

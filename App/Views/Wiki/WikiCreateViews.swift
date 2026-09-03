@@ -39,6 +39,7 @@ struct WikiCreateEntityView: View {
       List {
         Text("当前账号没有 Wiki 权限")
           .foregroundStyle(.secondary)
+          .themedListRow()
       }
       .navigationTitle("创建\(kind.title)")
       .navigationBarTitleDisplayMode(.inline)
@@ -109,43 +110,49 @@ private struct SubjectWikiCreateView: View {
   var body: some View {
     Form {
       Section("基本信息") {
-        Picker("类型", selection: $type) {
-          ForEach(SubjectType.allTypes) { item in
-            Text(item.description).tag(item)
-          }
-        }
-        .onChange(of: type) {
-          ensurePlatform()
-        }
-
-        TextField("标题", text: $name)
-          .textInputAutocapitalization(.never)
-
-        if !platforms.isEmpty {
-          Picker("平台", selection: $platform) {
-            ForEach(platforms) { item in
-              Text(item.typeCN).tag(item.id)
+        Group {
+          Picker("类型", selection: $type) {
+            ForEach(SubjectType.allTypes) { item in
+              Text(item.description).tag(item)
             }
           }
-        }
+          .onChange(of: type) {
+            ensurePlatform()
+          }
 
-        if type == .book {
-          Toggle("系列条目", isOn: $series)
-        }
+          TextField("标题", text: $name)
+            .textInputAutocapitalization(.never)
 
-        Toggle("NSFW", isOn: $nsfw)
-        TextField("公共标签", text: $tagsText)
-          .textInputAutocapitalization(.never)
+          if !platforms.isEmpty {
+            Picker("平台", selection: $platform) {
+              ForEach(platforms) { item in
+                Text(item.typeCN).tag(item.id)
+              }
+            }
+          }
+
+          if type == .book {
+            Toggle("系列条目", isOn: $series)
+          }
+
+          Toggle("NSFW", isOn: $nsfw)
+          TextField("公共标签", text: $tagsText)
+            .textInputAutocapitalization(.never)
+        }
+        .themedListRow()
       }
 
       Section("内容") {
-        PlaceholderTextEditor(placeholder: "简介", text: $summary, minHeight: 100)
-        PlaceholderTextEditor(
-          placeholder: "Infobox",
-          text: $infobox,
-          minHeight: 260,
-          monospaced: true
-        )
+        Group {
+          PlaceholderTextEditor(placeholder: "简介", text: $summary, minHeight: 100)
+          PlaceholderTextEditor(
+            placeholder: "Infobox",
+            text: $infobox,
+            minHeight: 260,
+            monospaced: true
+          )
+        }
+        .themedListRow()
       }
     }
     .formStyle(.grouped)
@@ -217,29 +224,36 @@ private struct PersonWikiCreateView: View {
   var body: some View {
     Form {
       Section("基本信息") {
-        Picker("类型", selection: $type) {
-          ForEach(PersonType.allCases.filter { $0 != .none }) { item in
-            Text(item.description).tag(item)
+        Group {
+          Picker("类型", selection: $type) {
+            ForEach(PersonType.allCases.filter { $0 != .none }) { item in
+              Text(item.description).tag(item)
+            }
           }
+          TextField("姓名", text: $name)
+            .textInputAutocapitalization(.never)
         }
-        TextField("姓名", text: $name)
-          .textInputAutocapitalization(.never)
+        .themedListRow()
       }
 
       Section("职业") {
         ForEach(PersonCareer.allCases.filter { $0 != .none }, id: \.self) { career in
           Toggle(career.description, isOn: professionBinding(career))
         }
+        .themedListRow()
       }
 
       Section("内容") {
-        PlaceholderTextEditor(placeholder: "简介", text: $summary, minHeight: 100)
-        PlaceholderTextEditor(
-          placeholder: "Infobox",
-          text: $infobox,
-          minHeight: 260,
-          monospaced: true
-        )
+        Group {
+          PlaceholderTextEditor(placeholder: "简介", text: $summary, minHeight: 100)
+          PlaceholderTextEditor(
+            placeholder: "Infobox",
+            text: $infobox,
+            minHeight: 260,
+            monospaced: true
+          )
+        }
+        .themedListRow()
       }
     }
     .formStyle(.grouped)
@@ -300,23 +314,29 @@ private struct CharacterWikiCreateView: View {
   var body: some View {
     Form {
       Section("基本信息") {
-        Picker("类型", selection: $type) {
-          ForEach(supportedTypes) { item in
-            Text(item.description).tag(item)
+        Group {
+          Picker("类型", selection: $type) {
+            ForEach(supportedTypes) { item in
+              Text(item.description).tag(item)
+            }
           }
+          TextField("名称", text: $name)
+            .textInputAutocapitalization(.never)
         }
-        TextField("名称", text: $name)
-          .textInputAutocapitalization(.never)
+        .themedListRow()
       }
 
       Section("内容") {
-        PlaceholderTextEditor(placeholder: "简介", text: $summary, minHeight: 100)
-        PlaceholderTextEditor(
-          placeholder: "Infobox",
-          text: $infobox,
-          minHeight: 260,
-          monospaced: true
-        )
+        Group {
+          PlaceholderTextEditor(placeholder: "简介", text: $summary, minHeight: 100)
+          PlaceholderTextEditor(
+            placeholder: "Infobox",
+            text: $infobox,
+            minHeight: 260,
+            monospaced: true
+          )
+        }
+        .themedListRow()
       }
     }
     .formStyle(.grouped)

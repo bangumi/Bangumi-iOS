@@ -3,6 +3,16 @@ import SwiftUI
 struct NotificationOverlayView: View {
   @State private var notifier = Notifier.shared
 
+  @Environment(\.theme) private var theme
+
+  private var toastShape: AnyShape {
+    if theme.isClassic {
+      return AnyShape(Capsule())
+    }
+    return AnyShape(
+      RoundedRectangle(cornerRadius: theme.metrics.controlRadius, style: .continuous))
+  }
+
   var body: some View {
     ZStack(alignment: .bottom) {
       VStack(spacing: 8) {
@@ -10,9 +20,9 @@ struct NotificationOverlayView: View {
           Text(notification.message)
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
-            .foregroundStyle(.white)
-            .background(.accent)
-            .clipShape(Capsule())
+            .foregroundStyle(theme.toastText)
+            .background(theme.toastFill)
+            .clipShape(toastShape)
             .shadow(color: .black.opacity(0.15), radius: 8, x: 0, y: 4)
             .transition(
               .asymmetric(

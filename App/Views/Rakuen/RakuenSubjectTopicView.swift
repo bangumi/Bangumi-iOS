@@ -5,9 +5,22 @@ struct RakuenSubjectTopicView: View {
 
   @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
 
+  @Environment(\.theme) private var theme
+
   @State private var reloader = false
 
+  @ViewBuilder
   var body: some View {
+    if theme.isClassic {
+      classicBody
+    } else {
+      GlassRakuenTopicPage(title: mode.title, reloader: $reloader) {
+        RakuenSubjectTopicListView(mode: mode, reloader: $reloader)
+      }
+    }
+  }
+
+  private var classicBody: some View {
     ScrollView {
       RakuenSubjectTopicListView(mode: mode, reloader: $reloader)
         .padding(.horizontal, 8)
@@ -29,6 +42,8 @@ struct RakuenSubjectTopicListView: View {
   @AppStorage("hideBlocklist") var hideBlocklist: Bool = false
   @AppStorage("blocklist") var blocklist: [Int] = []
 
+  @Environment(\.theme) private var theme
+
   private func load(limit: Int, offset: Int) async -> PagedDTO<SubjectTopicDTO>? {
     do {
       switch mode {
@@ -45,7 +60,22 @@ struct RakuenSubjectTopicListView: View {
     }
   }
 
+  @ViewBuilder
   var body: some View {
+    if theme.isClassic {
+      classicBody
+    } else {
+      GlassPagedTopicCard(
+        reloader: reloader,
+        isIncluded: isVisible,
+        nextPageFunc: load
+      ) { topic in
+        GlassRakuenSubjectTopicRow(topic: topic)
+      }
+    }
+  }
+
+  private var classicBody: some View {
     OffsetPagedView<SubjectTopicDTO, _>(
       reloader: reloader,
       isIncluded: isVisible,
@@ -114,6 +144,8 @@ struct CachedSubjectTopicListView: View {
   @State private var exhausted = false
   @State private var initialized = false
   @State private var prefetchState = NextPagePrefetchState<SubjectTopicDTO.ID>()
+
+  @Environment(\.theme) private var theme
 
   private var displayItems: [SubjectTopicDTO] {
     items.isEmpty ? cachedItems : items
@@ -214,6 +246,62 @@ struct CachedSubjectTopicListView: View {
   var body: some View {
     let visibleItems = displayItems.filter(isVisible)
 
+    content(visibleItems)
+      .onAppear {
+        if !initialized {
+          initialized = true
+          Task {
+            await loadCache()
+            await loadFirstPage()
+          }
+        }
+      }
+      .onChange(of: mode) { _, _ in
+        withAnimation(.default) {
+          items = []
+          offset = 0
+          exhausted = false
+          loading = false
+          prefetchState.reset()
+        }
+        Task {
+          await loadCache()
+          await loadFirstPage()
+        }
+      }
+      .onChange(of: reloader) { _, _ in
+        withAnimation(.default) {
+          exhausted = false
+          offset = 0
+          initialized = false
+          prefetchState.reset()
+        }
+        Task {
+          await loadCache()
+          await loadFirstPage()
+        }
+      }
+  }
+
+  @ViewBuilder
+  private func content(_ visibleItems: [SubjectTopicDTO]) -> some View {
+    if theme.isClassic {
+      classicBody(visibleItems)
+    } else {
+      GlassTopicListCard(
+        items: visibleItems,
+        loading: loading,
+        exhausted: exhausted,
+        onRowAppear: { item in
+          requestNextPage(for: item, in: visibleItems)
+        }
+      ) { item in
+        GlassRakuenSubjectTopicRow(topic: item)
+      }
+    }
+  }
+
+  private func classicBody(_ visibleItems: [SubjectTopicDTO]) -> some View {
     LazyVStack(alignment: .leading) {
       ForEach(visibleItems) { item in
         RakuenSubjectTopicItemView(topic: item)
@@ -240,40 +328,6 @@ struct CachedSubjectTopicListView: View {
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical)
-      }
-    }
-    .onAppear {
-      if !initialized {
-        initialized = true
-        Task {
-          await loadCache()
-          await loadFirstPage()
-        }
-      }
-    }
-    .onChange(of: mode) { _, _ in
-      withAnimation(.default) {
-        items = []
-        offset = 0
-        exhausted = false
-        loading = false
-        prefetchState.reset()
-      }
-      Task {
-        await loadCache()
-        await loadFirstPage()
-      }
-    }
-    .onChange(of: reloader) { _, _ in
-      withAnimation(.default) {
-        exhausted = false
-        offset = 0
-        initialized = false
-        prefetchState.reset()
-      }
-      Task {
-        await loadCache()
-        await loadFirstPage()
       }
     }
   }

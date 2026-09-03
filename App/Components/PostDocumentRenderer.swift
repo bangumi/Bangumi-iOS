@@ -6,6 +6,7 @@ struct PostWebDocument: Equatable, Sendable {
   let baseURL: URL
   let initialPostID: Int?
   let navigationItems: [PostDocumentNavigationItem]
+  let theme: AppTheme
 }
 
 struct PostDocumentRenderInput: Hashable, Sendable {
@@ -81,6 +82,7 @@ struct PostDocumentRenderInput: Hashable, Sendable {
   let canReact: Bool
   let showReactions: Bool
   let avatarIsRound: Bool
+  let theme: AppTheme
   let initialPostID: Int?
 }
 
@@ -101,6 +103,7 @@ extension PostDocumentRenderInput {
       canReact: canReact,
       showReactions: showReactions,
       avatarIsRound: avatarIsRound,
+      theme: theme,
       initialPostID: initialPostID
     )
   }
@@ -168,6 +171,241 @@ private extension PostDocumentRenderInput.Post {
   }
 }
 
+enum PostDocumentThemeCSS {
+  static func htmlClass(_ theme: AppTheme) -> String {
+    switch theme {
+    case .classic:
+      return "theme-classic"
+    case .glass:
+      return "theme-glass"
+    }
+  }
+
+  static func variables(_ theme: AppTheme) -> String {
+    guard theme == .glass else {
+      return ""
+    }
+    var css: String = "\n\n"
+    css += """
+          html.theme-glass {
+            --background: transparent;
+            --card: rgba(255, 255, 255, 0.72);
+            --card-border: rgba(255, 255, 255, 0.6);
+            --link: #d14e6c;
+            --accent: #e85f86;
+            --field-label: #b49aa8;
+            --primary: #26232b;
+            --secondary: #6e6672;
+            --row-alternate: transparent;
+          }
+
+          @media (prefers-color-scheme: dark) {
+            html.theme-glass {
+              --card: rgba(255, 255, 255, 0.1);
+              --card-border: rgba(255, 255, 255, 0.12);
+              --link: #f08aa3;
+              --primary: #f4eef6;
+              --secondary: #b7acba;
+              --field-label: #a99ea8;
+            }
+          }
+
+          html.theme-glass,
+          html.theme-glass body {
+            background: transparent;
+            padding: 0 0 calc(26px + env(safe-area-inset-bottom));
+          }
+
+      """
+    css += """
+          html.theme-glass .detail-header {
+            margin: 8px 16px 0;
+            padding: 14px;
+            border: 1px solid var(--card-border);
+            border-radius: 22px;
+            background: var(--card);
+            -webkit-backdrop-filter: blur(18px) saturate(160%);
+            backdrop-filter: blur(18px) saturate(160%);
+            box-shadow: 0 10px 28px rgba(180, 120, 140, 0.13);
+          }
+
+          html.theme-glass .detail-parent {
+            margin: 0 0 12px;
+            padding: 0 0 12px;
+            border: none;
+            border-bottom: 1px solid rgba(180, 140, 160, 0.14);
+            border-radius: 0;
+            font-size: 13.5px;
+            font-weight: 700;
+          }
+
+          html.theme-glass .parent-icon {
+            width: 30px;
+            height: 42px;
+            border-radius: 7px;
+          }
+
+          html.theme-glass .parent-badge {
+            border: none;
+            border-radius: 999px;
+            padding: 4px 10px;
+            background: rgba(126, 200, 227, 0.16);
+            color: #3e7fa8;
+            font-size: 12px;
+            line-height: 1.25;
+            font-weight: 700;
+          }
+
+          html.theme-glass .detail-title {
+            font-size: 17px;
+            font-weight: 800;
+            line-height: 1.4;
+          }
+
+          html.theme-glass .detail-badge {
+            min-height: 24px;
+            border: none;
+            border-radius: 999px;
+            padding: 4px 11px;
+            background: linear-gradient(135deg, #f2758b, #e85f86);
+            color: #fff;
+            font-size: 12px;
+            line-height: 1.25;
+            font-weight: 700;
+            box-shadow: 0 4px 10px rgba(232, 95, 134, 0.3);
+          }
+
+      """
+    css += """
+          html.theme-glass .detail-fields {
+            border-top: none;
+            padding-top: 0;
+          }
+
+          html.theme-glass .detail-fields dt::after {
+            content: none;
+          }
+
+          html.theme-glass .detail-fields dt {
+            width: 58px;
+            color: var(--field-label);
+            font: 600 11px ui-monospace, Menlo, monospace;
+          }
+
+          html.theme-glass .detail-fields dd {
+            color: var(--primary);
+            font-size: 12.5px;
+          }
+
+          html.theme-glass .detail-description {
+            color: var(--secondary);
+            font-size: 12.5px;
+            line-height: 1.75;
+          }
+
+          html.theme-glass .reply-section-title {
+            margin: 18px 18px 0;
+            padding: 0 2px;
+            border: none;
+            background: transparent;
+            font-size: 14px;
+            font-weight: 800;
+          }
+
+      """
+    css += """
+          html.theme-glass main {
+            margin: 10px 16px 0;
+            padding: 2px 14px;
+            border: 1px solid var(--card-border);
+            border-radius: 22px;
+            background: var(--card);
+            -webkit-backdrop-filter: blur(18px) saturate(160%);
+            backdrop-filter: blur(18px) saturate(160%);
+            box-shadow: 0 8px 22px rgba(180, 120, 140, 0.11);
+          }
+
+          html.theme-glass .reply {
+            margin: 0;
+            padding: 14px 0;
+            border: none;
+            border-bottom: 1px solid rgba(180, 140, 160, 0.14);
+            border-radius: 0;
+            background: transparent;
+            box-shadow: none;
+          }
+
+          html.theme-glass main > .reply:nth-child(even) {
+            background: transparent;
+          }
+
+          html.theme-glass main > .reply:last-child {
+            border-bottom: none;
+          }
+
+          html.theme-glass .reply.blocked {
+            height: 6px;
+            margin: 10px 0;
+            padding: 0;
+            border: none;
+            border-radius: 3px;
+            background: linear-gradient(90deg, rgba(180, 140, 160, 0.35), transparent);
+          }
+
+          html.theme-glass .subreplies {
+            margin: 10px 0 0 48px;
+            padding: 0 0 0 12px;
+            border: none;
+            border-left: 2px solid rgba(242, 117, 139, 0.28);
+            border-radius: 0;
+            background: transparent;
+          }
+
+          html.theme-glass .subreplies .reply {
+            padding: 10px 0;
+            border-bottom: 1px dashed rgba(180, 140, 160, 0.16);
+          }
+
+          html.theme-glass .subreplies > .reply:last-child {
+            padding-bottom: 2px;
+            border-bottom: none;
+          }
+
+          html.theme-glass .state {
+            margin: 8px 0;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 12px;
+            background: rgba(180, 140, 160, 0.1);
+            color: var(--secondary);
+            font-size: 12.5px;
+          }
+
+          html.theme-glass main > .state {
+            margin: 10px 0;
+            text-align: center;
+          }
+
+          html.theme-glass .post-content,
+          html.theme-glass .main-content {
+            font-size: 15px;
+            line-height: 1.5;
+          }
+
+          html.theme-glass .timestamp {
+            font: 600 10.5px ui-monospace, Menlo, monospace;
+            color: #c9bcc6;
+          }
+
+          html.theme-glass .user-name {
+            font-size: 13px;
+            font-weight: 700;
+          }
+      """
+    return css
+  }
+}
+
 private enum PostDocumentReactionRenderer {
   static func render(
     _ reactions: [PostDocumentRenderInput.Reaction],
@@ -218,7 +456,7 @@ actor PostDocumentRenderer {
     try Task.checkCancellation()
     let html = """
       <!doctype html>
-      <html lang="zh-Hans">
+      <html lang="zh-Hans" class="\(PostDocumentThemeCSS.htmlClass(input.theme))">
       <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
@@ -250,7 +488,7 @@ actor PostDocumentRenderer {
               --reaction-background: rgba(255, 255, 255, 0.05);
               --avatar-border: rgba(242, 242, 247, 0.15);
             }
-          }
+          }\(PostDocumentThemeCSS.variables(input.theme))
 
           * {
             box-sizing: border-box;
@@ -1048,7 +1286,8 @@ actor PostDocumentRenderer {
       initialPostID: input.initialPostID,
       navigationItems: input.replies.map {
         PostDocumentNavigationItem(postID: $0.id, floor: $0.floor)
-      }
+      },
+      theme: input.theme
     )
   }
 

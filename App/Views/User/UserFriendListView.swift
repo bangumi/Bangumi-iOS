@@ -5,6 +5,8 @@ struct UserFriendListView: View {
 
   @AppStorage("profile") var profile: Profile = Profile()
 
+  @Environment(\.theme) private var theme
+
   var title: String {
     if user.username == profile.username {
       return "我的好友"
@@ -25,6 +27,16 @@ struct UserFriendListView: View {
   }
 
   var body: some View {
+    if theme.isClassic {
+      classicBody
+    } else {
+      GlassUserFriendListView(user: user)
+        .navigationTitle(title)
+        .navigationBarTitleDisplayMode(.inline)
+    }
+  }
+
+  private var classicBody: some View {
     ScrollView {
       OffsetPagedView<SlimUserDTO, _>(nextPageFunc: load) { item in
         CardView {

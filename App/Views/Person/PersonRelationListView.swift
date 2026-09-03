@@ -8,6 +8,8 @@ struct PersonRelationListView: View {
   @State private var collectionStatuses: [Int: Bool] = [:]
   @State private var loadedPersonIds: Set<Int> = []
 
+  @Environment(\.theme) private var theme
+
   private func loadCollectionStatuses(personIds: [Int]) async {
     guard !personIds.isEmpty else { return }
     do {
@@ -44,7 +46,8 @@ struct PersonRelationListView: View {
     return nil
   }
 
-  var body: some View {
+  @ViewBuilder
+  private var classicBody: some View {
     ScrollView {
       OffsetPagedView<PersonRelationDTO, _>(reloader: reloader, nextPageFunc: load) { item in
         PersonRelationItemView(
@@ -61,6 +64,16 @@ struct PersonRelationListView: View {
     .onAppear {
       Task {
         await loadCollectionStatuses(personIds: Array(loadedPersonIds))
+      }
+    }
+  }
+
+  var body: some View {
+    Group {
+      if theme.isClassic {
+        classicBody
+      } else {
+        GlassPersonRelationListView(personId: personId)
       }
     }
     .navigationTitle("关联人物")

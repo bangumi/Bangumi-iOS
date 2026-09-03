@@ -5,6 +5,8 @@ struct UserTimelineView: View {
 
   @AppStorage("profile") var profile: Profile = Profile()
 
+  @Environment(\.theme) private var theme
+
   @State private var exhausted: Bool = false
   @State private var loading: Bool = false
   @State private var lastID: Int?
@@ -70,7 +72,8 @@ struct UserTimelineView: View {
       loading = false
     }
   }
-  var body: some View {
+  @ViewBuilder
+  private var classicBody: some View {
     let rows = items.timelineListRows(lastID: lastID)
 
     ScrollView {
@@ -113,6 +116,15 @@ struct UserTimelineView: View {
     }
     .refreshable {
       await reload()
+    }
+  }
+
+  @ViewBuilder
+  var body: some View {
+    if theme.isClassic {
+      classicBody
+    } else {
+      GlassUserTimelineFeedView(user: user)
     }
   }
 }

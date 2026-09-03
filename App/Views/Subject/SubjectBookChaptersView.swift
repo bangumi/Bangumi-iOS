@@ -387,11 +387,13 @@ private struct BookProgressSummaryView: View {
 private struct BookProgressCurrentValue: View {
   let value: Int
 
+  @Environment(\.theme) private var theme
+
   var body: some View {
     Text(value, format: .number)
       .font(.subheadline)
       .fontWeight(.medium)
-      .foregroundStyle(.linkText)
+      .foregroundStyle(theme.link)
       .monospacedDigit()
       .contentTransition(.numericText())
       .animation(.default, value: value)
@@ -532,8 +534,11 @@ private struct BookProgressEditorSheet: View {
     ) {
       Form {
         Section {
-          BookProgressField(title: "话数", value: $eps, total: subject.epsDesc)
-          BookProgressField(title: "卷数", value: $vols, total: subject.volumesDesc)
+          Group {
+            BookProgressField(title: "话数", value: $eps, total: subject.epsDesc)
+            BookProgressField(title: "卷数", value: $vols, total: subject.volumesDesc)
+          }
+          .themedListRow()
         } header: {
           Text(subject.title(with: titlePreference))
             .font(.headline)

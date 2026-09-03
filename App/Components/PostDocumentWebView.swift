@@ -11,6 +11,15 @@ enum PostDocumentAction: Equatable {
   case more(postID: Int, anchorY: Double)
 }
 
+final class PostDocumentScrollWebView: WKWebView {
+  override func safeAreaInsetsDidChange() {
+    super.safeAreaInsetsDidChange()
+    if #available(iOS 26, *) {
+      obscuredContentInsets = safeAreaInsets
+    }
+  }
+}
+
 struct PostDocumentWebView: UIViewRepresentable {
   let document: PostWebDocument
   let reactionHTMLByPostID: [Int: String]
@@ -45,10 +54,9 @@ struct PostDocumentWebView: UIViewRepresentable {
       forURLScheme: PostDocumentRenderer.stickerURLScheme
     )
 
-    let webView = WKWebView(frame: .zero, configuration: configuration)
+    let webView = PostDocumentScrollWebView(frame: .zero, configuration: configuration)
     webView.isOpaque = false
-    webView.backgroundColor = .systemBackground
-    webView.scrollView.backgroundColor = .systemBackground
+    applyBackground(webView)
     webView.scrollView.alwaysBounceVertical = true
     webView.scrollView.contentInsetAdjustmentBehavior = .automatic
     webView.scrollView.keyboardDismissMode = .interactive
@@ -81,6 +89,13 @@ struct PostDocumentWebView: UIViewRepresentable {
       reactionHTMLByPostID: reactionHTMLByPostID
     )
     context.coordinator.handle(scrollRequest)
+    applyBackground(webView)
+  }
+
+  private func applyBackground(_ webView: WKWebView) {
+    let color: UIColor = document.theme == .classic ? .systemBackground : .clear
+    webView.backgroundColor = color
+    webView.scrollView.backgroundColor = color
   }
 
   static func dismantleUIView(_ webView: WKWebView, coordinator: Coordinator) {
@@ -107,6 +122,9 @@ struct PostDocumentWebView: UIViewRepresentable {
     private var currentDocument: PostWebDocument?
     private var currentReactionHTMLByPostID: [Int: String] = [:]
     private var pendingScrollOffset: CGPoint?
+    private var hasFinishedLoad = false
+    private var topOffsetObservation: NSKeyValueObservation?
+    private var guardsTopUntil: Date?
     private var pendingInitialPostID: Int?
     private var handledInitialPostID: Int?
     private var pendingScrollRequest: PostDocumentScrollRequest?
@@ -138,13 +156,14 @@ struct PostDocumentWebView: UIViewRepresentable {
         handledInitialPostID == postID ? nil : postID
       }
       if currentDocument != nil, let webView {
-        if unhandledInitialPostID == nil {
+        if unhandledInitialPostID == nil, hasFinishedLoad {
           captureScrollOffsetIfNeeded(from: webView)
         } else {
           pendingScrollOffset = nil
         }
       }
       pendingInitialPostID = unhandledInitialPostID
+      hasFinishedLoad = false
 
       currentDocument = document
       currentReactionHTMLByPostID = reactionHTMLByPostID
@@ -228,6 +247,7 @@ struct PostDocumentWebView: UIViewRepresentable {
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation?) {
+      hasFinishedLoad = true
       applyReactionHTML(
         currentReactionHTMLByPostID,
         force: true,
@@ -258,12 +278,36 @@ struct PostDocumentWebView: UIViewRepresentable {
         webView.scrollView.setContentOffset(
           CGPoint(
             x: pendingScrollOffset.x,
-            y: min(max(pendingScrollOffset.y, minimumOffset), maximumOffset)
+            y: min(max(minimumOffset + pendingScrollOffset.y, minimumOffset), maximumOffset)
           ),
           animated: false
         )
         return
       }
+
+      guardTopOffset(in: webView)
+    }
+
+    private func guardTopOffset(in webView: WKWebView) {
+      let scrollView = webView.scrollView
+      guard abs(scrollView.contentOffset.y + scrollView.adjustedContentInset.top) < 1 else {
+        return
+      }
+      guardsTopUntil = Date().addingTimeInterval(1.5)
+      topOffsetObservation =
+        topOffsetObservation
+        ?? scrollView.observe(\.contentOffset, options: [.new]) { [weak self] scrollView, _ in
+          guard let self, let until = guardsTopUntil else { return }
+          guard Date() < until else {
+            guardsTopUntil = nil
+            return
+          }
+          let top = -scrollView.adjustedContentInset.top
+          guard top < 0, scrollView.contentOffset.y == 0,
+            !scrollView.isDragging, !scrollView.isDecelerating
+          else { return }
+          scrollView.contentOffset.y = top
+        }
     }
 
     func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
@@ -380,7 +424,12 @@ struct PostDocumentWebView: UIViewRepresentable {
     }
 
     private func captureScrollOffsetIfNeeded(from webView: WKWebView) {
-      pendingScrollOffset = pendingScrollOffset ?? webView.scrollView.contentOffset
+      guard pendingScrollOffset == nil else { return }
+      let offset = webView.scrollView.contentOffset
+      pendingScrollOffset = CGPoint(
+        x: offset.x,
+        y: offset.y + webView.scrollView.adjustedContentInset.top
+      )
     }
 
     private func perform(_ request: PostDocumentScrollRequest, in webView: WKWebView) {
@@ -723,9 +772,11 @@ struct PostDocumentSurface: View {
   let onRefresh: () async -> Void
 
   @State private var document: PostWebDocument?
+  @State private var renderedKey: PostDocumentRenderInput?
   @State private var scrollRequest: PostDocumentScrollRequest?
   @State private var viewportState = PostDocumentViewportState.top
   @Environment(\.accessibilityReduceMotion) private var accessibilityReduceMotion
+  @Environment(\.theme) private var theme
 
   var body: some View {
     ZStack(alignment: .bottomTrailing) {
@@ -761,13 +812,20 @@ struct PostDocumentSurface: View {
       }
     }
     .background {
-      Color(uiColor: .systemBackground)
-        .ignoresSafeArea(.container, edges: .vertical)
+      if theme.isClassic {
+        Color(uiColor: .systemBackground)
+          .ignoresSafeArea(.container, edges: .vertical)
+      } else {
+        GlassScreenBackground()
+      }
     }
     .task(id: input.documentRenderKey) {
+      let key = input.documentRenderKey
+      guard renderedKey != key else { return }
       do {
         let document = try await PostDocumentRenderer.shared.render(input)
         try Task.checkCancellation()
+        renderedKey = key
         self.document = document
       } catch is CancellationError {
         return

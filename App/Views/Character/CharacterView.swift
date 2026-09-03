@@ -3,6 +3,7 @@ import SwiftUI
 
 struct CharacterView: View {
   var characterId: Int
+  var zoom = false
 
   @AppStorage("shareDomain") var shareDomain: ShareDomain = .chii
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
@@ -15,6 +16,8 @@ struct CharacterView: View {
   @State private var showIndexPicker: Bool = false
   @State private var showWikiEdit: Bool = false
   @State private var showPortraitUpload: Bool = false
+
+  @Environment(\.theme) private var theme
 
   var shareLink: URL {
     URL(string: "\(shareDomain.url)/character/\(characterId)")!
@@ -62,7 +65,7 @@ struct CharacterView: View {
     }
   }
 
-  var body: some View {
+  private var classicBody: some View {
     Section {
       if let character = character {
         ScrollView {
@@ -88,6 +91,41 @@ struct CharacterView: View {
         NotFoundView()
       } else {
         ProgressView()
+      }
+    }
+  }
+
+  @ViewBuilder
+  private var glassBody: some View {
+    if let character = character {
+      GlassCharacterDetailView(character: character, detail: detail) {
+        await loadCached()
+      }
+      .refreshable {
+        Task {
+          await refresh()
+        }
+      }
+      .sheet(isPresented: $showIndexPicker) {
+        IndexPickerSheet(
+          category: .character,
+          itemId: characterId,
+          itemTitle: title
+        )
+      }
+    } else if refreshed {
+      NotFoundView()
+    } else {
+      ProgressView()
+    }
+  }
+
+  var body: some View {
+    Group {
+      if theme.isClassic {
+        classicBody
+      } else {
+        glassBody
       }
     }
     .task {
@@ -157,7 +195,12 @@ struct CharacterView: View {
       }
     }
     .handoff(url: shareLink, title: title)
-    .modifier(ZoomTransitionModifier(zoomID: ZoomNavigationID(type: .character, id: characterId)))
+    .modifier(
+      ZoomTransitionModifier(
+        zoomID: ZoomNavigationID(type: .character, id: characterId),
+        enabled: zoom || theme.isClassic
+      )
+    )
   }
 }
 

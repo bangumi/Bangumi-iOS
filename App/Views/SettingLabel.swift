@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct SettingLabel: View {
+  @Environment(\.theme) private var theme
   let title: LocalizedStringKey
   let description: LocalizedStringKey
 
@@ -14,7 +15,7 @@ struct SettingLabel: View {
       Text(title)
       Text(description)
         .font(.caption)
-        .foregroundColor(.secondary)
+        .foregroundColor(theme.secondaryText)
     }
   }
 }

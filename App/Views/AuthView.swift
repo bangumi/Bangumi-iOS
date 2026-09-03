@@ -7,20 +7,15 @@ struct AuthView: View {
   @State private var showEULA = false
   @AppStorage("eulaAgreed") private var eulaAgreed: Bool = false
 
+  @Environment(\.theme) private var theme
+
   var body: some View {
-    VStack {
-      Text(slogan)
-      Button {
-        if eulaAgreed {
-          Task {
-            await signInView.signIn()
-          }
-        } else {
-          showEULA = true
-        }
-      } label: {
-        Text("登录")
-      }.adaptiveButtonStyle(.borderedProminent)
+    Group {
+      if theme.isClassic {
+        classicBody
+      } else {
+        glassBody
+      }
     }
     .fullScreenCover(isPresented: $showEULA) {
       EULAView(isPresented: $showEULA)
@@ -31,6 +26,46 @@ struct AuthView: View {
           await signInView.signIn()
         }
       }
+    }
+  }
+
+  private var classicBody: some View {
+    VStack {
+      Text(slogan)
+      Button {
+        startAuth()
+      } label: {
+        Text("登录")
+      }.adaptiveButtonStyle(.borderedProminent)
+    }
+  }
+
+  private var glassBody: some View {
+    CardView(role: .strong) {
+      VStack(spacing: 12) {
+        Image("BangumiMark")
+          .resizable()
+          .scaledToFit()
+          .frame(width: 72, height: 72)
+        Text(slogan)
+          .multilineTextAlignment(.center)
+        Button {
+          startAuth()
+        } label: {
+          Text("登录")
+        }.buttonStyle(.themedProminent)
+      }
+      .frame(maxWidth: .infinity)
+    }
+  }
+
+  private func startAuth() {
+    if eulaAgreed {
+      Task {
+        await signInView.signIn()
+      }
+    } else {
+      showEULA = true
     }
   }
 

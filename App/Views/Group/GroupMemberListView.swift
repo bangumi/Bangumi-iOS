@@ -3,6 +3,8 @@ import SwiftUI
 struct GroupMemberListView: View {
   let name: String
 
+  @Environment(\.theme) private var theme
+
   @State private var creators: [GroupMemberDTO] = []
   @State private var moderators: [GroupMemberDTO] = []
   @State private var loadedModerators = false
@@ -36,6 +38,28 @@ struct GroupMemberListView: View {
   }
 
   var body: some View {
+    content
+      .onAppear {
+        Task {
+          await loadModerators()
+        }
+      }
+  }
+
+  @ViewBuilder
+  private var content: some View {
+    if theme.isClassic {
+      classicBody
+    } else {
+      GlassGroupMemberListView(
+        title: title,
+        creators: creators,
+        moderators: moderators,
+        loadMembers: loadMembers)
+    }
+  }
+
+  private var classicBody: some View {
     ScrollView {
       VStack(spacing: 8) {
         if !creators.isEmpty {
@@ -78,11 +102,6 @@ struct GroupMemberListView: View {
     }
     .navigationTitle(title)
     .navigationBarTitleDisplayMode(.inline)
-    .onAppear {
-      Task {
-        await loadModerators()
-      }
-    }
   }
 }
 

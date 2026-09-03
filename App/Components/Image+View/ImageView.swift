@@ -8,7 +8,18 @@ struct ImageView: View {
   @Environment(\.imageStyle) var style
   @Environment(\.imageType) var type
   @Environment(\.displayScale) private var displayScale
+  @Environment(\.theme) private var theme
   @State private var isLoaded = false
+
+  private var cornerRadius: CGFloat {
+    if theme.isClassic || type == .avatar {
+      return style.cornerRadius
+    }
+    guard let width = style.width else {
+      return theme.metrics.coverRadius
+    }
+    return width < 70 ? theme.metrics.badgeRadius : theme.metrics.coverRadius
+  }
 
   init(img: String?) {
     if let img = img, !img.isEmpty {
@@ -36,7 +47,7 @@ struct ImageView: View {
             .scaledToFill()
             .geometryGroup()
             .frame(width: width, height: height, alignment: style.alignment)
-            .applyClipShape(type: type, cornerRadius: style.cornerRadius)
+            .applyClipShape(type: type, cornerRadius: cornerRadius)
             .contentShape(Rectangle())
           } else if let aspectRatio = style.aspectRatio {
             AnimatedImage(url: imageURL)
@@ -47,7 +58,7 @@ struct ImageView: View {
               .transition(.fade(duration: 0.25))
               .aspectRatio(aspectRatio, contentMode: .fill)
               .frame(alignment: style.alignment)
-              .applyClipShape(type: type, cornerRadius: style.cornerRadius)
+              .applyClipShape(type: type, cornerRadius: cornerRadius)
           } else if style.contentMode == .fill {
             GeometryReader { geometry in
               AnimatedImage(
@@ -64,7 +75,7 @@ struct ImageView: View {
                 .clipped()
             }
             .frame(alignment: style.alignment)
-            .applyClipShape(type: type, cornerRadius: style.cornerRadius)
+            .applyClipShape(type: type, cornerRadius: cornerRadius)
           } else {
             AnimatedImage(url: imageURL)
               .onSuccess { _, _, _ in
@@ -74,10 +85,10 @@ struct ImageView: View {
               .transition(.fade(duration: 0.25))
               .aspectRatio(contentMode: .fit)
               .frame(alignment: style.alignment)
-              .applyClipShape(type: type, cornerRadius: style.cornerRadius)
+              .applyClipShape(type: type, cornerRadius: cornerRadius)
           }
         }
-        .applyBorder(type: type, cornerRadius: style.cornerRadius, isLoaded: isLoaded)
+        .applyBorder(type: type, cornerRadius: cornerRadius, isLoaded: isLoaded)
       } else {
         if style.width != nil, style.height != nil {
           ZStack {
@@ -111,12 +122,12 @@ struct ImageView: View {
             }
           }
           .frame(width: style.width, height: style.height, alignment: style.alignment)
-          .applyClipShape(type: type, cornerRadius: style.cornerRadius)
+          .applyClipShape(type: type, cornerRadius: cornerRadius)
         } else {
           Color.secondary.opacity(0.2)
             .aspectRatio(style.aspectRatio, contentMode: .fit)
             .frame(alignment: style.alignment)
-            .applyClipShape(type: type, cornerRadius: style.cornerRadius)
+            .applyClipShape(type: type, cornerRadius: cornerRadius)
         }
       }
     }
@@ -154,17 +165,29 @@ extension View {
     }
   }
 
-  @ViewBuilder
   fileprivate func applyBorder(type: ImageType, cornerRadius: CGFloat, isLoaded: Bool = true)
     -> some View
   {
+    modifier(ImageBorderModifier(type: type, cornerRadius: cornerRadius, isLoaded: isLoaded))
+  }
+}
+
+private struct ImageBorderModifier: ViewModifier {
+  let type: ImageType
+  let cornerRadius: CGFloat
+  let isLoaded: Bool
+
+  @Environment(\.theme) private var theme
+
+  @ViewBuilder
+  func body(content: Content) -> some View {
     if type == .avatar {
-      self.avatarBorder(cornerRadius: cornerRadius, isLoaded: isLoaded)
+      content.avatarBorder(cornerRadius: cornerRadius, isLoaded: isLoaded)
     } else {
-      self.overlay {
+      content.overlay {
         if isLoaded {
           RoundedRectangle(cornerRadius: cornerRadius)
-            .stroke(Color.primary.opacity(0.15), lineWidth: 0.5)
+            .stroke(theme.imageBorder, lineWidth: 0.5)
         }
       }
     }

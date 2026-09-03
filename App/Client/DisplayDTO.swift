@@ -372,12 +372,13 @@ extension EpisodeDTO {
     )
   }
 
+  var trendLevel: Double {
+    guard comment > 0 else { return 0 }
+    return 0.1 + 0.9 * (1.0 - exp(-Double(comment - 1) / 200.0))
+  }
+
   var trendColor: Color {
-    var opacity = 0.0
-    if comment > 0 {
-      opacity = 0.1 + 0.9 * (1.0 - exp(-Double(comment - 1) / 200.0))
-    }
-    return Color(hex: 0xFF8040, opacity: opacity)
+    Color(hex: 0xFF8040, opacity: trendLevel)
   }
 
   func titleLink(with preference: TitlePreference) -> AttributedString {

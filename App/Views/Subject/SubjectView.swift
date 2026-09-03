@@ -3,6 +3,7 @@ import SwiftUI
 
 struct SubjectView: View {
   let subjectId: Int
+  var zoom = false
 
   @AppStorage("isolationMode") var isolationMode: Bool = false
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
@@ -10,6 +11,8 @@ struct SubjectView: View {
 
   @State private var refreshed: Bool = false
   @State private var refreshing: Bool = false
+
+  @Environment(\.theme) private var theme
   @State private var subject: SubjectDTO?
   @State private var detail: SubjectDetailDTO = SubjectDetailDTO()
 
@@ -79,7 +82,12 @@ struct SubjectView: View {
       await loadCached()
       await refresh()
     }
-    .modifier(ZoomTransitionModifier(zoomID: ZoomNavigationID(type: .subject, id: subjectId)))
+    .modifier(
+      ZoomTransitionModifier(
+        zoomID: ZoomNavigationID(type: .subject, id: subjectId),
+        enabled: zoom || theme.isClassic
+      )
+    )
   }
 }
 
@@ -94,6 +102,8 @@ struct SubjectDetailView: View {
   let detail: SubjectDetailDTO
   let reload: () async -> Void
 
+  @Environment(\.theme) private var theme
+
   @State private var showCreateTopic: Bool = false
   @State private var showIndexPicker: Bool = false
   @State private var showRatingSheet: Bool = false
@@ -105,7 +115,16 @@ struct SubjectDetailView: View {
     URL(string: "\(shareDomain.url)/subject/\(subject.id)")!
   }
 
+  @ViewBuilder
   var body: some View {
+    if theme.isClassic {
+      classicBody
+    } else {
+      GlassSubjectDetailView(subject: subject, detail: detail, reload: reload)
+    }
+  }
+
+  private var classicBody: some View {
     ScrollView(showsIndicators: false) {
       VStack(alignment: .leading) {
         SubjectHeaderView(subject: subject) {

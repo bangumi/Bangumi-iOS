@@ -34,6 +34,7 @@ struct TextInputView: View {
   @Binding var text: String
 
   @Environment(\.textInputStyle) var style
+  @Environment(\.theme) private var theme
 
   @FocusState private var isEditing: Bool
   @State private var showingBBCodeMenu = false
@@ -108,34 +109,11 @@ struct TextInputView: View {
   }
 
   var body: some View {
-    VStack {
-      if style.bbcode {
-        BBCodeEditor(text: $text)
+    Group {
+      if theme.isClassic {
+        classicBody
       } else {
-        PlainTextEditor(text: $text)
-      }
-
-      HStack {
-        Button(action: { showingDrafts = true }) {
-          Label(draftDesc, systemImage: "doc.text.fill")
-            .font(.footnote)
-            .foregroundStyle(drafts.count == 0 ? .secondary : .primary)
-        }
-        .sheet(isPresented: $showingDrafts) {
-          DraftBoxView(
-            currentID: currentDraftID,
-            drafts: drafts,
-            onLoad: loadDraft,
-            onDelete: loadDrafts,
-            isPresented: $showingDrafts
-          )
-        }
-        Spacer()
-        if let wordLimit = style.wordLimit {
-          Text("\(text.count) / \(wordLimit)")
-            .monospacedDigit()
-            .foregroundStyle(text.count > wordLimit ? .red : .secondary)
-        }
+        glassBody
       }
     }
     .onChange(of: text) { _, newValue in
@@ -146,15 +124,107 @@ struct TextInputView: View {
       await loadDrafts()
     }
   }
+
+  @ViewBuilder
+  private var editor: some View {
+    if style.bbcode {
+      BBCodeEditor(text: $text)
+    } else {
+      PlainTextEditor(text: $text)
+    }
+  }
+
+  private var draftsSheet: some View {
+    DraftBoxView(
+      currentID: currentDraftID,
+      drafts: drafts,
+      onLoad: loadDraft,
+      onDelete: loadDrafts,
+      isPresented: $showingDrafts
+    )
+  }
+
+  private var classicBody: some View {
+    VStack {
+      editor
+
+      HStack {
+        Button(action: { showingDrafts = true }) {
+          Label(draftDesc, systemImage: "doc.text.fill")
+            .font(.footnote)
+            .foregroundStyle(drafts.count == 0 ? .secondary : .primary)
+        }
+        .sheet(isPresented: $showingDrafts) {
+          draftsSheet
+        }
+        Spacer()
+        if let wordLimit = style.wordLimit {
+          Text("\(text.count) / \(wordLimit)")
+            .monospacedDigit()
+            .foregroundStyle(text.count > wordLimit ? .red : .secondary)
+        }
+      }
+    }
+  }
+
+  private var glassBody: some View {
+    VStack(alignment: .leading, spacing: GlassForm.metaSpacing) {
+      editor
+
+      GlassFormMetaRow {
+        Button(action: { showingDrafts = true }) {
+          Label(draftDesc, systemImage: "doc.text.fill")
+            .foregroundStyle(drafts.count == 0 ? theme.tertiaryText : theme.link)
+        }
+        .buttonStyle(.plain)
+        .sheet(isPresented: $showingDrafts) {
+          draftsSheet
+        }
+        Spacer(minLength: 0)
+        if let wordLimit = style.wordLimit {
+          Text("\(text.count) / \(wordLimit)")
+            .monospacedDigit()
+            .foregroundStyle(text.count > wordLimit ? theme.danger : theme.tertiaryText)
+        }
+      }
+    }
+  }
 }
 
 private struct PlainTextEditor: View {
   @Binding var text: String
 
+  @Environment(\.theme) private var theme
+
+  @FocusState private var isEditing: Bool
   @State private var height: CGFloat = 120
   private let minHeight: CGFloat = 80
 
+  private var glassHeight: CGFloat {
+    max(height, GlassForm.editorMinHeight)
+  }
+
   var body: some View {
+    if theme.isClassic {
+      classicBody
+    } else {
+      glassBody
+    }
+  }
+
+  private var resizeMinHeight: CGFloat {
+    theme.isClassic ? minHeight : GlassForm.editorMinHeight
+  }
+
+  private var resizeGesture: some Gesture {
+    DragGesture()
+      .onChanged { value in
+        let newHeight = height + value.translation.height
+        height = max(resizeMinHeight, newHeight)
+      }
+  }
+
+  private var classicBody: some View {
     VStack {
       BorderView(color: .secondary.opacity(0.2), padding: 0) {
         TextEditor(text: $text)
@@ -167,13 +237,24 @@ private struct PlainTextEditor: View {
         .frame(height: 4)
         .cornerRadius(2)
         .frame(width: 40)
-        .gesture(
-          DragGesture()
-            .onChanged { value in
-              let newHeight = height + value.translation.height
-              height = max(minHeight, newHeight)
-            }
-        ).padding(.vertical, 2)
+        .gesture(resizeGesture)
+        .padding(.vertical, 2)
+    }
+  }
+
+  private var glassBody: some View {
+    VStack(spacing: GlassForm.metaSpacing) {
+      TextEditor(text: $text)
+        .scrollContentBackground(.hidden)
+        .focused($isEditing)
+        .frame(height: glassHeight)
+        .autocorrectionDisabled()
+        .textInputAutocapitalization(.never)
+        .themedEditorChrome(
+          focused: isEditing,
+          insets: EdgeInsets(top: 4, leading: 7, bottom: 4, trailing: 7))
+      GlassResizeHandle()
+        .gesture(resizeGesture)
     }
   }
 }

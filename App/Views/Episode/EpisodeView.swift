@@ -10,6 +10,7 @@ struct EpisodeView: View {
   @AppStorage("profile") var profile: Profile = Profile()
 
   @Environment(\.dismiss) private var dismiss
+  @Environment(\.theme) private var theme
 
   @State private var episode: EpisodeDTO?
   @State private var episodeLoadFailed: Bool = false
@@ -89,7 +90,7 @@ struct EpisodeView: View {
     URL(string: "\(shareDomain.url)/ep/\(episodeId)")!
   }
 
-  var body: some View {
+  private var classicBody: some View {
     CommentListView(
       route: CommentListRoute(
         parent: .episode(episodeId),
@@ -151,6 +152,15 @@ struct EpisodeView: View {
           await loadCached()
         }
       }
+    }
+  }
+
+  @ViewBuilder
+  var body: some View {
+    if theme.isClassic {
+      classicBody
+    } else {
+      GlassEpisodeView(episodeId: episodeId, initialPostID: initialPostID)
     }
   }
 }

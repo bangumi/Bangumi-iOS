@@ -4,6 +4,8 @@ import SwiftUI
 struct EpisodeListView: View {
   let subjectId: Int
 
+  @Environment(\.theme) private var theme
+
   @State private var refreshed: Bool = false
   @State private var reloadToken = 0
   @State private var countMain: Int = 0
@@ -36,7 +38,8 @@ struct EpisodeListView: View {
     }
   }
 
-  var body: some View {
+  @ViewBuilder
+  private var classicBody: some View {
     HStack {
       Image(systemName: filterCollection ? "eye.slash.circle.fill" : "eye.circle.fill")
         .foregroundStyle(filterCollection ? .accent : .secondary)
@@ -77,6 +80,15 @@ struct EpisodeListView: View {
         await refresh()
         await loadCounts()
       }
+    }
+  }
+
+  @ViewBuilder
+  var body: some View {
+    if theme.isClassic {
+      classicBody
+    } else {
+      GlassEpisodeListView(subjectId: subjectId)
     }
   }
 }

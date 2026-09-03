@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct ChiiDiscoverView: View {
+  @Environment(\.theme) private var theme
+
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
   @AppStorage("profile") var profile: Profile = Profile()
 
@@ -51,7 +53,16 @@ struct ChiiDiscoverView: View {
     }
   }
 
+  @ViewBuilder
   var body: some View {
+    if theme.isClassic {
+      classicBody
+    } else {
+      GlassDiscoverView()
+    }
+  }
+
+  private var classicBody: some View {
     GeometryReader { geometry in
       VStack {
         if !showsSearch {

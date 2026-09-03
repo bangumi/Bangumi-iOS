@@ -11,6 +11,8 @@ struct EpisodeGridView: View {
   @AppStorage("episodeGridInteractionMode") var episodeGridInteractionMode:
     EpisodeGridInteractionMode = .menu
 
+  @Environment(\.theme) private var theme
+
   @State private var refreshed: Bool = false
   @State private var episodeMains: [EpisodeDTO] = []
   @State private var episodeSps: [EpisodeDTO] = []
@@ -47,7 +49,8 @@ struct EpisodeGridView: View {
     }
   }
 
-  var body: some View {
+  @ViewBuilder
+  private var classicBody: some View {
     VStack(spacing: 2) {
       HStack(alignment: .bottom) {
         if isAuthenticated {
@@ -110,6 +113,18 @@ struct EpisodeGridView: View {
     .task {
       await loadCached()
       refresh()
+    }
+  }
+
+  @ViewBuilder
+  var body: some View {
+    if theme.isClassic {
+      classicBody
+    } else {
+      GlassEpisodeGridView(
+        subjectId: subjectId,
+        subjectCollectionType: subjectCollectionType
+      )
     }
   }
 }

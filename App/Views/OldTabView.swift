@@ -24,6 +24,7 @@ struct OldTabView: View {
     TabView(selection: $mainTab) {
       NavigationStack(path: $timelineNav) {
         ChiiTimelineView()
+          .themedScreen()
           .navigationDestination(for: NavDestination.self) { $0 }
       }
       .tag(ChiiViewTab.timeline)
@@ -44,6 +45,7 @@ struct OldTabView: View {
       if isAuthenticated {
         NavigationStack(path: $progressNav) {
           ChiiProgressView()
+            .themedScreen()
             .navigationDestination(for: NavDestination.self) { $0 }
         }
         .tag(ChiiViewTab.progress)
@@ -65,6 +67,7 @@ struct OldTabView: View {
       if !isolationMode {
         NavigationStack(path: $rakuenNav) {
           ChiiRakuenView()
+            .themedScreen()
             .navigationDestination(for: NavDestination.self) { $0 }
         }
         .tag(ChiiViewTab.rakuen)
@@ -85,6 +88,7 @@ struct OldTabView: View {
 
       NavigationStack(path: $discoverNav) {
         ChiiDiscoverView()
+          .themedScreen()
           .navigationDestination(for: NavDestination.self) { $0 }
       }
       .tag(ChiiViewTab.discover)

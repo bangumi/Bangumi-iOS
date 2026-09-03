@@ -6,6 +6,7 @@ struct MainApp: App {
   @State private var bootstrapState: BootstrapState = .migrating
 
   @AppStorage("appearance") var appearance: AppearanceType = .system
+  @AppStorage("appTheme") var appTheme: AppTheme = .classic
   @AppStorage("mirrorRootDomain") var mirrorRootDomain: String = ""
 
   init() {
@@ -29,6 +30,7 @@ struct MainApp: App {
         await bootstrap()
       }
       .environment(\.bangumiDomains, BangumiDomains(mirrorRootDomain: mirrorRootDomain))
+      .environment(\.theme, ThemeTokens(appTheme))
       .preferredColorScheme(appearance.colorScheme)
     }
   }

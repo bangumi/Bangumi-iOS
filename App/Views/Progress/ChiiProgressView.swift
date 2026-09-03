@@ -9,6 +9,8 @@ struct ChiiProgressView: View {
   @AppStorage("progressSecondLineMode") var secondLineMode: ProgressSecondLineMode = .info
   @AppStorage("progressTab") var progressTab: SubjectType = .none
 
+  @Environment(\.theme) private var theme
+
   @State private var refreshing: Bool = true
   @State private var refreshProgress: CGFloat = 0
   @State private var showRefreshAll: Bool = false
@@ -567,11 +569,21 @@ struct ChiiProgressView: View {
       .navigationBarTitleDisplayMode(.inline)
   }
 
-  var body: some View {
+  @ViewBuilder
+  private var classicBody: some View {
     if isAuthenticated {
       authenticatedBody
     } else {
       unauthenticatedBody
+    }
+  }
+
+  @ViewBuilder
+  var body: some View {
+    if theme.isClassic {
+      classicBody
+    } else {
+      GlassProgressView()
     }
   }
 }

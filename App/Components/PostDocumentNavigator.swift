@@ -48,6 +48,8 @@ struct PostDocumentNavigatorOverlay: View {
 
   @State private var showsFloorNavigator = false
 
+  @Environment(\.theme) private var theme
+
   private var visibleItem: PostDocumentNavigationItem? {
     items.first { $0.postID == visiblePostID }
   }
@@ -59,6 +61,120 @@ struct PostDocumentNavigatorOverlay: View {
   }
 
   var body: some View {
+    if theme.isClassic {
+      controlBar
+    } else {
+      glassControlBar
+    }
+  }
+
+  private var glassControlBar: some View {
+    HStack(spacing: 10) {
+      HStack(spacing: 0) {
+        Menu {
+          Picker("筛选", selection: controls.filterMode) {
+            ForEach(controls.filterModes, id: \.self) { mode in
+              Label(mode.description, systemImage: mode.icon).tag(mode)
+            }
+          }
+          Picker("排序", selection: controls.sortOrder) {
+            ForEach(ReplySortOrder.allCases, id: \.self) { order in
+              Label(order.description, systemImage: order.icon).tag(order)
+            }
+          }
+        } label: {
+          glassBarIcon("line.3.horizontal.decrease")
+        }
+        .tint(.primary)
+        .accessibilityLabel("筛选与排序")
+
+        if items.count > 1 {
+          glassBarDivider
+          Button {
+            showsFloorNavigator = true
+          } label: {
+            HStack(spacing: 5) {
+              Image(systemName: "list.number")
+              ZStack(alignment: .leading) {
+                Text("楼层")
+                  .hidden()
+                Text(widestFloor)
+                  .hidden()
+                Text(visibleItem?.floor ?? "楼层")
+              }
+              .monospacedDigit()
+            }
+            .font(.subheadline.weight(.semibold))
+            .foregroundStyle(.primary)
+            .padding(.horizontal, 14)
+            .frame(height: 42)
+            .contentShape(Rectangle())
+          }
+          .buttonStyle(.plain)
+          .accessibilityHint("选择要跳转的楼层")
+          .popover(isPresented: $showsFloorNavigator) {
+            PostDocumentFloorNavigator(
+              items: items,
+              visiblePostID: visiblePostID,
+              onSelect: onSelect
+            )
+            .presentationCompactAdaptation(.sheet)
+          }
+        }
+
+        glassBarDivider
+        Button {
+          onSelect(.top)
+        } label: {
+          glassBarIcon("arrow.up")
+        }
+        .buttonStyle(.plain)
+        .disabled(!canScrollToTop)
+        .opacity(canScrollToTop ? 1 : 0.35)
+        .accessibilityLabel("回到顶部")
+      }
+      .glassEffectIfAvailable(shape: Capsule())
+
+      Button(action: onReply) {
+        Image(systemName: "plus.bubble.fill")
+          .font(.system(size: 17, weight: .semibold))
+          .foregroundStyle(.white)
+          .frame(width: 44, height: 44)
+          .background {
+            Circle()
+              .fill(
+                LinearGradient(
+                  colors: theme.ctaGradient,
+                  startPoint: .topLeading, endPoint: .bottomTrailing)
+              )
+              .shadow(
+                color: theme.ctaShadow.color,
+                radius: theme.ctaShadow.radius, y: theme.ctaShadow.y)
+          }
+          .contentShape(Circle())
+      }
+      .buttonStyle(.plain)
+      .disabled(!controls.canReply)
+      .opacity(controls.canReply ? 1 : 0.4)
+      .accessibilityLabel("回复")
+    }
+  }
+
+  private func glassBarIcon(_ name: String) -> some View {
+    Image(systemName: name)
+      .font(.system(size: 16, weight: .semibold))
+      .foregroundStyle(.primary)
+      .frame(width: 44, height: 42)
+      .contentShape(Rectangle())
+  }
+
+  private var glassBarDivider: some View {
+    Rectangle()
+      .fill(theme.separator)
+      .frame(width: 1, height: 18)
+  }
+
+  private var controlBar: some View {
     HStack(spacing: 8) {
       Button(action: onReply) {
         Label("回复", systemImage: "plus.bubble")
@@ -156,6 +272,7 @@ private struct PostDocumentFloorNavigator: View {
   let onSelect: (PostDocumentScrollTarget) -> Void
 
   @Environment(\.dismiss) private var dismiss
+  @Environment(\.theme) private var theme
   @State private var selectedIndex: Double
 
   init(
@@ -180,6 +297,113 @@ private struct PostDocumentFloorNavigator: View {
   }
 
   var body: some View {
+    if theme.isClassic {
+      classicBody
+    } else {
+      glassBody
+    }
+  }
+
+  private var slider: some View {
+    Slider(
+      value: $selectedIndex,
+      in: 0...Double(items.count - 1),
+      step: 1,
+      label: {
+        Text("楼层")
+      },
+      minimumValueLabel: {
+        Text(items[0].floor)
+          .font(.caption)
+          .monospacedDigit()
+      },
+      maximumValueLabel: {
+        Text(items[items.count - 1].floor)
+          .font(.caption)
+          .monospacedDigit()
+      },
+      onEditingChanged: { isEditing in
+        if !isEditing {
+          selectCurrentItem()
+        }
+      }
+    )
+    .accessibilityValue(Text(selectedItem.floor))
+  }
+
+  private var glassBody: some View {
+    VStack(alignment: .leading, spacing: GlassForm.blockSpacing) {
+      HStack(spacing: 10) {
+        Text("楼层电梯")
+          .font(.headline)
+          .foregroundStyle(theme.title)
+        Spacer(minLength: 0)
+        Text(selectedItem.floor)
+          .font(.headline.monospacedDigit())
+          .foregroundStyle(theme.accentDeep)
+        Button {
+          dismiss()
+        } label: {
+          Image(systemName: "xmark")
+            .font(.footnote.weight(.bold))
+            .foregroundStyle(theme.secondaryText)
+            .frame(width: 32, height: 32)
+            .background(theme.controlFill, in: Circle())
+            .overlay {
+              Circle().strokeBorder(theme.controlBorder, lineWidth: 1)
+            }
+            .frame(width: GlassForm.controlHeight, height: GlassForm.controlHeight)
+            .contentShape(Circle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("完成")
+      }
+      .frame(height: GlassForm.controlHeight)
+
+      slider
+        .tint(theme.accent)
+        .foregroundStyle(theme.tertiaryText)
+        .frame(height: GlassForm.controlHeight)
+
+      HStack(spacing: GlassForm.buttonSpacing) {
+        Button {
+          select(index: clampedIndex - 1)
+        } label: {
+          Text("上一层")
+        }
+        .disabled(clampedIndex == 0)
+
+        Button {
+          selectTop()
+        } label: {
+          Text("回到顶部")
+        }
+
+        Button {
+          selectBottom()
+        } label: {
+          Text("跳到底部")
+        }
+
+        Button {
+          select(index: clampedIndex + 1)
+        } label: {
+          Text("下一层")
+        }
+        .disabled(clampedIndex == items.count - 1)
+      }
+      .buttonStyle(.themedSecondary)
+    }
+    .padding(.horizontal, theme.metrics.screenPadding)
+    .padding(.top, GlassForm.topInset)
+    .padding(.bottom, theme.metrics.screenPadding)
+    .frame(maxWidth: .infinity, alignment: .leading)
+    .themedScreen()
+    .presentationDetents([.height(228)])
+    .presentationDragIndicator(.visible)
+  }
+
+  private var classicBody: some View {
     VStack(alignment: .leading, spacing: 20) {
       HStack {
         Text("楼层电梯")
@@ -200,30 +424,7 @@ private struct PostDocumentFloorNavigator: View {
         .buttonStyle(.bordered)
       }
 
-      Slider(
-        value: $selectedIndex,
-        in: 0...Double(items.count - 1),
-        step: 1,
-        label: {
-          Text("楼层")
-        },
-        minimumValueLabel: {
-          Text(items[0].floor)
-            .font(.caption)
-            .monospacedDigit()
-        },
-        maximumValueLabel: {
-          Text(items[items.count - 1].floor)
-            .font(.caption)
-            .monospacedDigit()
-        },
-        onEditingChanged: { isEditing in
-          if !isEditing {
-            selectCurrentItem()
-          }
-        }
-      )
-      .accessibilityValue(Text(selectedItem.floor))
+      slider
 
       HStack {
         Button {

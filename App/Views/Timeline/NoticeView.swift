@@ -11,6 +11,8 @@ struct NoticeView: View {
   @State private var pendingReadNoticeIDs: Set<Int> = []
   @State private var locallyReadNoticeIDs: Set<Int> = []
 
+  @Environment(\.theme) private var theme
+
   func applyNoticeSnapshot(
     _ snapshot: NoticeRepository.NoticeSnapshot,
     fetched nextFetched: Bool = true
@@ -113,40 +115,55 @@ struct NoticeView: View {
     }
   }
 
+  private var classicBody: some View {
+    List {
+      if !fetched {
+        HStack {
+          Spacer()
+          ProgressView()
+          Spacer()
+        }
+        .themedListRow()
+      } else if notices.isEmpty {
+        ContentUnavailableView("暂无提醒", systemImage: "bell.slash")
+          .listRowSeparator(.hidden)
+          .themedListRow()
+      } else {
+        ForEach(notices) { notice in
+          NoticeRowView(notice: notice) {
+            if notice.unread {
+              markAsRead(id: notice.id)
+            }
+          }
+          .listRowInsets(.init(top: 12, leading: 16, bottom: 12, trailing: 16))
+          .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+            if notice.unread {
+              Button {
+                markAsRead(id: notice.id)
+              } label: {
+                Label("已读", systemImage: "checkmark")
+              }
+              .tint(.blue)
+            }
+          }
+          .themedListRow()
+        }
+      }
+    }
+    .listStyle(.plain)
+  }
+
   var body: some View {
     if isAuthenticated {
-      List {
-        if !fetched {
-          HStack {
-            Spacer()
-            ProgressView()
-            Spacer()
-          }
-        } else if notices.isEmpty {
-          ContentUnavailableView("暂无提醒", systemImage: "bell.slash")
-            .listRowSeparator(.hidden)
+      Group {
+        if theme.isClassic {
+          classicBody
         } else {
-          ForEach(notices) { notice in
-            NoticeRowView(notice: notice) {
-              if notice.unread {
-                markAsRead(id: notice.id)
-              }
-            }
-            .listRowInsets(.init(top: 12, leading: 16, bottom: 12, trailing: 16))
-            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-              if notice.unread {
-                Button {
-                  markAsRead(id: notice.id)
-                } label: {
-                  Label("已读", systemImage: "checkmark")
-                }
-                .tint(.blue)
-              }
-            }
+          GlassNoticeView(notices: notices, fetched: fetched) { id in
+            markAsRead(id: id)
           }
         }
       }
-      .listStyle(.plain)
       .refreshable {
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
         await refreshNotice()

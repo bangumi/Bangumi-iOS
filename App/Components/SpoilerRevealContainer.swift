@@ -8,6 +8,8 @@ struct SpoilerRevealContainer<Content: View>: View {
   @AppStorage("showSpoilerRelations") var showSpoilerRelations: Bool = false
   @State private var revealed: Bool = false
 
+  @Environment(\.theme) private var theme
+
   private var shouldMask: Bool {
     isSpoiler && !showSpoilerRelations && !revealed
   }
@@ -20,6 +22,14 @@ struct SpoilerRevealContainer<Content: View>: View {
     self.isSpoiler = isSpoiler
     self.cornerRadius = cornerRadius
     self.content = content()
+  }
+
+  private var maskRadius: CGFloat {
+    theme.isClassic ? cornerRadius : theme.metrics.embedRadius
+  }
+
+  private var maskShapeStyle: RoundedCornerStyle {
+    theme.isClassic ? .circular : .continuous
   }
 
   var body: some View {
@@ -35,8 +45,8 @@ struct SpoilerRevealContainer<Content: View>: View {
           }
         } label: {
           ZStack {
-            RoundedRectangle(cornerRadius: cornerRadius)
-              .fill(.black.opacity(0.55))
+            RoundedRectangle(cornerRadius: maskRadius, style: maskShapeStyle)
+              .fill(theme.maskFill)
             VStack(spacing: 4) {
               Label("含剧透", systemImage: "eye.slash.fill")
                 .font(.caption.bold())

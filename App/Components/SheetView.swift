@@ -4,6 +4,7 @@ enum SheetPresentationSize {
   case medium
   case large
   case both
+  case height(CGFloat)
 
   var detents: Set<PresentationDetent> {
     switch self {
@@ -13,6 +14,24 @@ enum SheetPresentationSize {
       [.large]
     case .both:
       [.medium, .large]
+    case .height(let value):
+      [.height(value)]
+    }
+  }
+}
+
+private struct SheetChromeModifier: ViewModifier {
+  @Environment(\.theme) private var theme
+
+  @ViewBuilder
+  func body(content: Content) -> some View {
+    if theme.isClassic {
+      content
+    } else if #available(iOS 26.0, *) {
+      content
+    } else {
+      content
+        .presentationCornerRadius(theme.metrics.sheetRadius)
     }
   }
 }
@@ -80,6 +99,7 @@ struct SheetView<Content: View, Controls: View>: View {
   var body: some View {
     NavigationStack {
       sheetContent
+        .themedScreen()
         .navigationTitle(title ?? "")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -102,6 +122,7 @@ struct SheetView<Content: View, Controls: View>: View {
         }
     }
     .presentationDetents(size.detents)
+    .modifier(SheetChromeModifier())
   }
 
   @ViewBuilder

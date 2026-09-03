@@ -6,6 +6,7 @@ final class BBCodeBlocksContainerView: UIView {
   private let stackView = UIStackView()
   private var widthConstraint: NSLayoutConstraint?
   private var lastRenderID: String?
+  private var palette: BBCodePalette = .classic
   private var openURLHandler: ((URL) -> Void)?
 
   override init(frame: CGRect) {
@@ -35,10 +36,12 @@ final class BBCodeBlocksContainerView: UIView {
 
   func update(
     blocks: [BBCodePreparedBlock],
+    palette: BBCodePalette = .classic,
     renderID: String? = nil,
     openURLHandler: ((URL) -> Void)? = nil
   ) {
     self.openURLHandler = openURLHandler
+    self.palette = palette
 
     if let renderID, lastRenderID == renderID {
       applyOpenURLHandlerToDescendants()
@@ -86,15 +89,15 @@ final class BBCodeBlocksContainerView: UIView {
   private func makeView(for block: BBCodePreparedBlock) -> UIView {
     switch block.payload {
     case .text(let attributedText):
-      return BBCodeTextBlockView(attributedText: attributedText)
+      return BBCodeTextBlockView(attributedText: attributedText, palette: palette)
     case .image(let media):
       return BBCodeMediaBlockView(media: media)
     case .mask(let blocks):
-      return BBCodeMaskBlockView(blocks: blocks)
+      return BBCodeMaskBlockView(blocks: blocks, palette: palette)
     case .quote(let blocks):
-      return BBCodeQuoteBlockView(blocks: blocks)
+      return BBCodeQuoteBlockView(blocks: blocks, palette: palette)
     case .list(let items):
-      return BBCodeListBlockView(items: items)
+      return BBCodeListBlockView(items: items, palette: palette)
     }
   }
 
@@ -133,8 +136,8 @@ private final class BBCodeTextBlockView: UITextView, UITextViewDelegate {
     }
   }
 
-  private let hiddenMaskColor = UIColor(white: 0.35, alpha: 1)
-  private let revealedMaskTextColor = UIColor.white
+  private let hiddenMaskColor: UIColor
+  private let revealedMaskTextColor: UIColor
   private let maskLinkURL = URL(string: "bbcode-mask://toggle")!
   private let baseAttributedText: NSAttributedString
   var openURLHandler: ((URL) -> Void)?
@@ -142,8 +145,10 @@ private final class BBCodeTextBlockView: UITextView, UITextViewDelegate {
   private var animatedSmileyViews: [Int: BBCodeAnimatedSmileyImageView] = [:]
   private var revealedMasks = Set<MaskRangeKey>()
 
-  init(attributedText: NSAttributedString) {
+  init(attributedText: NSAttributedString, palette: BBCodePalette = .classic) {
     self.baseAttributedText = attributedText
+    self.hiddenMaskColor = palette.maskFill
+    self.revealedMaskTextColor = palette.maskRevealedText
     let textStorage = NSTextStorage()
     let layoutManager = NSLayoutManager()
     let textContainer = NSTextContainer(size: .zero)
@@ -727,10 +732,10 @@ private final class BBCodeMaskBlockView: UIView {
   private let contentView = BBCodeBlocksContainerView()
   private let coverButton = UIButton(type: .custom)
 
-  init(blocks: [BBCodePreparedBlock]) {
+  init(blocks: [BBCodePreparedBlock], palette: BBCodePalette = .classic) {
     super.init(frame: .zero)
     translatesAutoresizingMaskIntoConstraints = false
-    backgroundColor = UIColor(white: 0.35, alpha: 1)
+    backgroundColor = palette.maskFill
     layer.cornerRadius = 2
     clipsToBounds = true
     directionalLayoutMargins = NSDirectionalEdgeInsets(
@@ -742,7 +747,7 @@ private final class BBCodeMaskBlockView: UIView {
     setContentCompressionResistancePriority(.required, for: .vertical)
     setContentHuggingPriority(.required, for: .vertical)
 
-    contentView.update(blocks: blocks)
+    contentView.update(blocks: blocks, palette: palette)
     contentView.alpha = 0
     contentView.accessibilityElementsHidden = true
 
@@ -787,7 +792,7 @@ private final class BBCodeMaskBlockView: UIView {
 }
 
 private final class BBCodeQuoteBlockView: UIView {
-  init(blocks: [BBCodePreparedBlock]) {
+  init(blocks: [BBCodePreparedBlock], palette: BBCodePalette = .classic) {
     super.init(frame: .zero)
     translatesAutoresizingMaskIntoConstraints = false
     backgroundColor = .clear
@@ -796,7 +801,7 @@ private final class BBCodeQuoteBlockView: UIView {
     setContentHuggingPriority(.required, for: .vertical)
 
     let contentView = BBCodeBlocksContainerView()
-    contentView.update(blocks: blocks)
+    contentView.update(blocks: blocks, palette: palette)
     contentView.alpha = 0.56
 
     let quoteContainer = UIView()
@@ -836,7 +841,7 @@ private final class BBCodeQuoteBlockView: UIView {
 
     let barView = UIView()
     barView.translatesAutoresizingMaskIntoConstraints = false
-    barView.backgroundColor = UIColor.secondaryLabel.withAlphaComponent(0.35)
+    barView.backgroundColor = palette.quoteBar
     barView.layer.cornerRadius = 1.5
 
     let stackView = UIStackView(arrangedSubviews: [barView, quoteContainer])
@@ -862,7 +867,7 @@ private final class BBCodeQuoteBlockView: UIView {
 }
 
 private final class BBCodeListBlockView: UIView {
-  init(items: [BBCodePreparedListItem]) {
+  init(items: [BBCodePreparedListItem], palette: BBCodePalette = .classic) {
     super.init(frame: .zero)
     translatesAutoresizingMaskIntoConstraints = false
     backgroundColor = .clear
@@ -887,7 +892,8 @@ private final class BBCodeListBlockView: UIView {
       stackView.addArrangedSubview(
         BBCodeListItemView(
           item: item,
-          markerWidth: markerWidth
+          markerWidth: markerWidth,
+          palette: palette
         )
       )
     }
@@ -908,7 +914,7 @@ private final class BBCodeListBlockView: UIView {
 }
 
 private final class BBCodeListItemView: UIView {
-  init(item: BBCodePreparedListItem, markerWidth: CGFloat) {
+  init(item: BBCodePreparedListItem, markerWidth: CGFloat, palette: BBCodePalette = .classic) {
     super.init(frame: .zero)
     translatesAutoresizingMaskIntoConstraints = false
     backgroundColor = .clear
@@ -922,7 +928,7 @@ private final class BBCodeListItemView: UIView {
     bulletLabel.setContentHuggingPriority(.required, for: .horizontal)
 
     let contentView = BBCodeBlocksContainerView()
-    contentView.update(blocks: item.blocks)
+    contentView.update(blocks: item.blocks, palette: palette)
 
     let stackView = UIStackView(arrangedSubviews: [bulletLabel, contentView])
     stackView.axis = .horizontal

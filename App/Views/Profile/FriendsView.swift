@@ -18,6 +18,8 @@ struct FriendsView: View {
   @State private var reloader = false
   @State private var type: FriendType = .friends
 
+  @Environment(\.theme) private var theme
+
   func load(limit: Int, offset: Int) async -> PagedDTO<FriendDTO>? {
     do {
       let resp = try await {
@@ -36,6 +38,14 @@ struct FriendsView: View {
   }
 
   var body: some View {
+    if theme.isClassic {
+      classicBody
+    } else {
+      GlassFriendsView()
+    }
+  }
+
+  private var classicBody: some View {
     VStack {
       Picker("Type", selection: $type.animated()) {
         Text("我的关注").tag(FriendType.friends)

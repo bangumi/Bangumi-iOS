@@ -3,11 +3,11 @@ import OSLog
 import SwiftUI
 
 extension String {
-  func withLink(_ link: String?) -> AttributedString {
+  func withLink(_ link: String?, linkColor: Color = .linkText) -> AttributedString {
     var str = AttributedString(self)
     if let url = URL(string: link ?? "") {
       str.link = url
-      str.foregroundColor = .linkText
+      str.foregroundColor = linkColor
     }
     return str
   }

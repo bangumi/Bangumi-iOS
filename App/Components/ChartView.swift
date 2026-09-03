@@ -31,6 +31,8 @@ struct ChartView: View {
 
   @State private var tappedItem: BarItem? = nil
 
+  @Environment(\.theme) private var theme
+
   var show: Bool {
     if data.count == 0 {
       return false
@@ -80,6 +82,39 @@ struct ChartView: View {
     }
   }
 
+  @ViewBuilder
+  func bar(_ item: BarItem) -> some View {
+    if theme.isClassic {
+      Rectangle()
+        .fill(.secondary)
+    } else {
+      Rectangle()
+        .fill(glassBarStyle(item))
+    }
+  }
+
+  func glassBarStyle(_ item: BarItem) -> AnyShapeStyle {
+    if let maxValue = data.values.max(), maxValue > 0, item.value == maxValue {
+      return AnyShapeStyle(
+        LinearGradient(colors: theme.ctaGradient, startPoint: .bottom, endPoint: .top))
+    }
+    return AnyShapeStyle(theme.accent.opacity(barOpacity(item)))
+  }
+
+  func barOpacity(_ item: BarItem) -> Double {
+    guard let maxValue = data.values.max(), maxValue > 0 else {
+      return 0.35
+    }
+    return 0.35 + 0.45 * Double(item.value) / Double(maxValue)
+  }
+
+  func trackColor(tapped: Bool) -> Color {
+    if theme.isClassic {
+      return tapped ? Color.secondary.opacity(0.2) : Color.secondary.opacity(0.01)
+    }
+    return tapped ? theme.tint : theme.accent.opacity(0.01)
+  }
+
   var body: some View {
     VStack {
       Spacer()
@@ -96,16 +131,12 @@ struct ChartView: View {
               ZStack {
                 VStack {
                   Spacer()
-                  Rectangle()
-                    .fill(.secondary)
+                  bar(item)
                     .frame(width: barWidth, height: item.height)
                     .clipShape(RoundedRectangle(cornerRadius: 2))
                 }
                 Rectangle()
-                  .fill(
-                    tappedItem?.name == item.name
-                      ? Color.secondary.opacity(0.2) : Color.secondary.opacity(0.01)
-                  )
+                  .fill(trackColor(tapped: tappedItem?.name == item.name))
                   .frame(width: barWidth, height: height - 60)
                   .clipShape(RoundedRectangle(cornerRadius: 2))
               }
