@@ -95,7 +95,7 @@ struct ProgressTickScrubState: Equatable {
 
   var phase: Phase
   var target: EpisodeDTO
-  var restore: EpisodeDTO
+  var restore: EpisodeDTO?
   var canCommit: Bool
 }
 
@@ -335,12 +335,12 @@ struct ProgressEpisodeTicksView: View {
   @State private var haptics = ScrubHaptics()
 
   private var currentIndex: Int {
-    episodes.lastIndex(where: { $0.collectionTypeEnum == .collect }) ?? 0
+    episodes.lastIndex(where: { $0.collectionTypeEnum == .collect }) ?? -1
   }
 
   private var anchorIndex: Int {
     let index = pendingCommit == .watchUntil ? pendingIndex ?? currentIndex : currentIndex
-    return min(max(index, 0), max(episodes.count - 1, 0))
+    return min(max(index, -1), max(episodes.count - 1, 0))
   }
 
   private var playheadIndex: Int {
@@ -679,7 +679,7 @@ struct ProgressEpisodeTicksView: View {
 
   private func armScrub() {
     guard !isDragging, pendingIndex == nil else { return }
-    scrubIndex = anchorIndex
+    scrubIndex = max(anchorIndex, 0)
     withAnimation(.spring(response: 0.32, dampingFraction: 0.72)) {
       pressing = false
       isDragging = true
@@ -929,7 +929,7 @@ struct ProgressEpisodeTicksView: View {
   }
 
   private func reportScrub() {
-    guard isDragging, let target = playheadEpisode, let restore = currentEpisode else {
+    guard isDragging, let target = playheadEpisode else {
       onScrubChange?(nil)
       return
     }
@@ -937,7 +937,7 @@ struct ProgressEpisodeTicksView: View {
       ProgressTickScrubState(
         phase: onRail ? .rail(railAction) : .preview,
         target: target,
-        restore: restore,
+        restore: currentEpisode,
         canCommit: !onRail && canCommit(playheadIndex)
       )
     )

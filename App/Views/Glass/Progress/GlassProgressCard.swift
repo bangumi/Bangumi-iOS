@@ -9,6 +9,21 @@ extension Float {
   }
 }
 
+@MainActor
+enum GlassProgressEpisodeSync {
+  static var synced = Set<Int>()
+
+  static func needsSync(subject: SubjectDTO, episodes: [EpisodeDTO]) -> Bool {
+    if episodes.isEmpty {
+      return true
+    }
+    guard (subject.interest?.epStatus ?? 0) > 0, !synced.contains(subject.id) else {
+      return false
+    }
+    return !episodes.contains { $0.collectionTypeEnum == .collect }
+  }
+}
+
 struct GlassProgressCard: View {
   let payload: ProgressSubjectRenderPayload
   let interactionMode: EpisodeGridInteractionMode
@@ -101,6 +116,7 @@ private struct GlassProgressEpisodeSection: View {
   @State private var scrub: ProgressTickScrubState?
   @State private var updating: Bool = false
   @State private var loadingEpisodes: Bool = false
+  @State private var autoSyncRequested: Bool = false
   @State private var showCollectionBox: Bool = false
 
   private var subject: SubjectDTO {
@@ -119,6 +135,10 @@ private struct GlassProgressEpisodeSection: View {
     "\(subject.interest?.epStatus ?? 0)/\(subject.eps)"
   }
 
+  private var needsEpisodeSync: Bool {
+    GlassProgressEpisodeSync.needsSync(subject: subject, episodes: episodes)
+  }
+
   private func loadEpisodes() {
     guard !loadingEpisodes else { return }
     Task {
@@ -126,6 +146,7 @@ private struct GlassProgressEpisodeSection: View {
       defer { loadingEpisodes = false }
       do {
         try await EpisodeRepository.loadEpisodes(subject.id)
+        GlassProgressEpisodeSync.synced.insert(subject.id)
         await reload()
       } catch {
         Notifier.shared.alert(error: error)
@@ -251,7 +272,10 @@ private struct GlassProgressEpisodeSection: View {
     let number = state.target.sort.progressEpisodeNumber
     switch action {
     case .cancel:
-      return "松开取消 · 保持 第 \(state.restore.sort.progressEpisodeNumber) 话"
+      if let restore = state.restore {
+        return "松开取消 · 保持 第 \(restore.sort.progressEpisodeNumber) 话"
+      }
+      return "松开取消"
     case .status(let type):
       return "松开 · 第 \(number) 话 \(type.action)"
     case .discuss:
@@ -290,10 +314,10 @@ private struct GlassProgressEpisodeSection: View {
   }
 
   var body: some View {
-    if episodes.isEmpty {
+    if needsEpisodeSync {
       Button(action: loadEpisodes) {
         GlassFillButton(kind: .glass) {
-          Text(loadingEpisodes ? "加载中…" : "加载剧集")
+          Text(loadingEpisodes ? "同步剧集中…" : "同步剧集")
         }
         .opacity(loadingEpisodes ? 0.6 : 1)
         .overlay {
@@ -304,6 +328,11 @@ private struct GlassProgressEpisodeSection: View {
       }
       .buttonStyle(.plain)
       .disabled(loadingEpisodes)
+      .task(id: subject.id) {
+        guard !autoSyncRequested else { return }
+        autoSyncRequested = true
+        loadEpisodes()
+      }
     } else {
       VStack(spacing: 11) {
         ProgressEpisodeTrackView(

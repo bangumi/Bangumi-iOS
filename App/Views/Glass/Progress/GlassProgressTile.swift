@@ -12,6 +12,7 @@ struct GlassProgressTile: View {
 
   @State private var updating: Bool = false
   @State private var loadingEpisodes: Bool = false
+  @State private var autoSyncRequested: Bool = false
   @State private var showCollectionBox: Bool = false
 
   private var subject: SubjectDTO {
@@ -57,6 +58,10 @@ struct GlassProgressTile: View {
     }
   }
 
+  private var needsEpisodeSync: Bool {
+    GlassProgressEpisodeSync.needsSync(subject: subject, episodes: episodes)
+  }
+
   private func loadEpisodes() {
     guard !loadingEpisodes else { return }
     Task {
@@ -64,6 +69,7 @@ struct GlassProgressTile: View {
       defer { loadingEpisodes = false }
       do {
         try await EpisodeRepository.loadEpisodes(subject.id)
+        GlassProgressEpisodeSync.synced.insert(subject.id)
         await reload()
       } catch {
         Notifier.shared.alert(error: error)
@@ -105,7 +111,7 @@ struct GlassProgressTile: View {
 
   @ViewBuilder
   private var cells: some View {
-    if episodes.isEmpty {
+    if needsEpisodeSync {
       HStack(spacing: 3) {
         ForEach(0..<5, id: \.self) { _ in
           RoundedRectangle(cornerRadius: theme.metrics.cellRadius / 2, style: .continuous)
@@ -135,15 +141,20 @@ struct GlassProgressTile: View {
 
   @ViewBuilder
   private var action: some View {
-    if episodes.isEmpty {
+    if needsEpisodeSync {
       Button(action: loadEpisodes) {
         GlassFillButton(kind: .glass) {
-          Text(loadingEpisodes ? "加载中…" : "↓ 加载")
+          Text(loadingEpisodes ? "同步中…" : "↓ 同步")
             .lineLimit(1)
         }
       }
       .buttonStyle(.plain)
       .disabled(loadingEpisodes)
+      .task(id: subject.id) {
+        guard !autoSyncRequested else { return }
+        autoSyncRequested = true
+        loadEpisodes()
+      }
     } else if let episode = nextEpisode {
       Button {
         markWatched(episode)
