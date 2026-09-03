@@ -31,6 +31,8 @@ struct GlassTypeChips: View {
       .padding(.vertical, 2)
     }
     .scrollClipDisabled()
+    .glassHorizontalFade(
+      leading: theme.metrics.screenPadding, trailing: theme.metrics.screenPadding + 14)
   }
 }
 

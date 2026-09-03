@@ -163,6 +163,7 @@ struct GlassCollectionChips: View {
       .padding(.vertical, 2)
     }
     .scrollClipDisabled()
+    .glassHorizontalFade()
   }
 }
 
@@ -283,6 +284,7 @@ struct GlassCollectionSection: View {
         .padding(.vertical, 2)
       }
       .scrollClipDisabled()
+      .glassHorizontalFade()
     }
   }
 }
