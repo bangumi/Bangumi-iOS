@@ -372,7 +372,7 @@ struct SettingsView: View {
 
   private var glassBody: some View {
     ScrollView(showsIndicators: false) {
-      VStack(alignment: .leading, spacing: theme.metrics.listSpacing) {
+      VStack(alignment: .leading, spacing: 22) {
         glassAppearanceSection
         glassDisplaySection
         glassInteractionSection
@@ -827,7 +827,7 @@ private struct MirrorDomainSettingsView: View {
 
   private var glassBody: some View {
     ScrollView(showsIndicators: false) {
-      VStack(alignment: .leading, spacing: theme.metrics.listSpacing) {
+      VStack(alignment: .leading, spacing: 22) {
         GlassSettingsSection(
           footer: "仅在你信任该镜像站时填写。登录、请求、图片、BBCode 生成链接和镜像分享链接会发送到该站点；使用风险自负。"
         ) {

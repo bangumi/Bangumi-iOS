@@ -17,7 +17,7 @@ struct GlassSettingsSection<Content: View>: View {
   }
 
   var body: some View {
-    VStack(alignment: .leading, spacing: 10) {
+    VStack(alignment: .leading, spacing: 14) {
       if let title {
         Text(title)
           .font(.subheadline.weight(.bold))
