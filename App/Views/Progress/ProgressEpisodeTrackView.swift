@@ -289,6 +289,7 @@ struct ProgressEpisodeTicksView: View {
           .frame(width: 2, height: dashHeight)
         }
       }
+      .alignmentGuide(.top) { $0[.bottom] }
       .offset(x: bubbleX, y: bubbleY)
       .allowsHitTesting(false)
       .transition(
@@ -329,7 +330,7 @@ struct ProgressEpisodeTicksView: View {
   }
 
   private var scrubGesture: some Gesture {
-    LongPressGesture(minimumDuration: 0.14)
+    LongPressGesture(minimumDuration: 0.3)
       .sequenced(
         before: DragGesture(minimumDistance: 0, coordinateSpace: .local)
       )
@@ -533,7 +534,7 @@ struct ProgressEpisodeTicksView: View {
 
   private var bubbleY: CGFloat {
     let detached = isCancelling ? min(max(lift - 12, 15), 36) : 0
-    return -36 - detached
+    return -8 - detached
   }
 
   private var leadingCaption: String {
@@ -788,8 +789,8 @@ private struct ProgressTickBubble: View {
 
   var body: some View {
     VStack(spacing: 0) {
-      VStack(alignment: .leading, spacing: 2) {
-        HStack(spacing: 6) {
+      HStack(spacing: 9) {
+        if isCancelling {
           if let systemImage {
             Image(systemName: systemImage)
               .font(.subheadline.weight(.heavy))
@@ -798,22 +799,39 @@ private struct ProgressTickBubble: View {
           Text(title)
             .font(.subheadline.weight(.heavy))
             .foregroundStyle(theme.toastText)
-            .contentTransition(.numericText())
           Text(subtitle)
             .font(.caption2.weight(.semibold))
-            .foregroundStyle(theme.toastText.opacity(isCancelling ? 0.75 : 0.55))
-        }
-        if let detail, !detail.isEmpty {
-          Text(detail)
-            .font(.caption.weight(.semibold))
-            .foregroundStyle(theme.toastText.opacity(0.85))
-            .lineLimit(1)
+            .foregroundStyle(theme.toastText.opacity(0.75))
+        } else {
+          Text(title)
+            .font(.system(size: 13, weight: .heavy, design: .monospaced))
+            .foregroundStyle(.white)
+            .contentTransition(.numericText())
+            .padding(.horizontal, 8)
+            .frame(height: 24)
+            .background(
+              LinearGradient(
+                colors: theme.ctaGradient, startPoint: .topLeading, endPoint: .bottomTrailing),
+              in: Capsule()
+            )
+          VStack(alignment: .leading, spacing: 1) {
+            if let detail, !detail.isEmpty {
+              Text(detail)
+                .font(.footnote.weight(.semibold))
+                .foregroundStyle(theme.toastText)
+                .lineLimit(1)
+            }
+            Text(subtitle)
+              .font(.caption2.weight(.semibold))
+              .foregroundStyle(theme.toastText.opacity(0.6))
+          }
+          .frame(maxWidth: 200, alignment: .leading)
+          .fixedSize(horizontal: true, vertical: false)
         }
       }
-      .frame(maxWidth: 240, alignment: .leading)
-      .fixedSize(horizontal: true, vertical: false)
-      .padding(.horizontal, 13)
-      .padding(.vertical, 8)
+      .padding(.leading, isCancelling ? 13 : 7)
+      .padding(.trailing, 13)
+      .padding(.vertical, 7)
       .background(
         bubbleColor,
         in: RoundedRectangle(cornerRadius: theme.metrics.controlRadius, style: .continuous)
