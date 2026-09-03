@@ -284,11 +284,11 @@ struct GlassSegmented<Value: Hashable, Label: View>: View {
   }
 
   private var trackShape: RoundedRectangle {
-    RoundedRectangle(cornerRadius: theme.metrics.embedRadius, style: .continuous)
+    RoundedRectangle(cornerRadius: theme.metrics.controlRadius, style: .continuous)
   }
 
   private var itemShape: RoundedRectangle {
-    RoundedRectangle(cornerRadius: theme.metrics.coverRadius, style: .continuous)
+    RoundedRectangle(cornerRadius: theme.metrics.controlRadius - 4, style: .continuous)
   }
 
   var body: some View {
@@ -298,6 +298,7 @@ struct GlassSegmented<Value: Hashable, Label: View>: View {
       }
     }
     .padding(4)
+    .frame(height: GlassForm.controlHeight)
     .background {
       trackShape
         .fill(theme.controlFill)
@@ -318,8 +319,8 @@ struct GlassSegmented<Value: Hashable, Label: View>: View {
         .labelStyle(.titleAndIcon)
         .font(.footnote.weight(selected ? .heavy : .semibold))
         .foregroundStyle(selected ? Color.white : theme.secondaryText)
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 7)
+        .lineLimit(1)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background {
           if selected {
             itemShape

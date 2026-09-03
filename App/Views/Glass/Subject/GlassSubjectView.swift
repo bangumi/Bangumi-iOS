@@ -90,7 +90,7 @@ struct GlassSubjectDetailView: View {
       )
     }
     .sheet(isPresented: $showRatingSheet) {
-      SubjectRatingSheet(subject: subject)
+      GlassSubjectRatingSheet(subject: subject)
     }
     .sheet(isPresented: $showWikiEdit) {
       SubjectWikiEditSheet(subjectId: subject.id) {

@@ -4,6 +4,7 @@ enum SheetPresentationSize {
   case medium
   case large
   case both
+  case height(CGFloat)
 
   var detents: Set<PresentationDetent> {
     switch self {
@@ -13,6 +14,8 @@ enum SheetPresentationSize {
       [.large]
     case .both:
       [.medium, .large]
+    case .height(let value):
+      [.height(value)]
     }
   }
 }

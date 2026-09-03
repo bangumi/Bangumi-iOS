@@ -1,5 +1,21 @@
 import SwiftUI
 
+struct SheetFormPadding: ViewModifier {
+  @Environment(\.theme) private var theme
+
+  @ViewBuilder
+  func body(content: Content) -> some View {
+    if theme.isClassic {
+      content.padding()
+    } else {
+      content
+        .padding(.horizontal, theme.metrics.screenPadding)
+        .padding(.top, GlassForm.topInset)
+        .padding(.bottom, theme.metrics.screenPadding)
+    }
+  }
+}
+
 struct CreateCommentBoxSheet: View {
   let type: CommentParentType
   let comment: CommentDTO?
@@ -51,7 +67,7 @@ struct CreateCommentBoxSheet: View {
               }
             )
           }
-          .padding()
+          .modifier(SheetFormPadding())
       }
     } controls: {
       if updating {
@@ -136,7 +152,7 @@ struct EditCommentBoxSheet: View {
         TextInputView(type: "回复", text: $content)
           .textInputStyle(bbcode: true)
           .disabled(updating)
-          .padding()
+          .modifier(SheetFormPadding())
       }
     } controls: {
       if updating {

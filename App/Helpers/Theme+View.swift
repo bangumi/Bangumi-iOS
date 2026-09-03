@@ -116,7 +116,15 @@ private struct ThemedListRowModifier: ViewModifier {
 }
 
 private struct ThemedFieldChromeModifier: ViewModifier {
+  let focused: Bool
+  let height: CGFloat?
+  let insets: EdgeInsets
+
   @Environment(\.theme) private var theme
+
+  private var shape: RoundedRectangle {
+    RoundedRectangle(cornerRadius: theme.metrics.controlRadius, style: .continuous)
+  }
 
   @ViewBuilder
   func body(content: Content) -> some View {
@@ -124,13 +132,14 @@ private struct ThemedFieldChromeModifier: ViewModifier {
       content
     } else {
       content
+        .padding(insets)
+        .frame(height: height)
         .background {
-          RoundedRectangle(cornerRadius: theme.metrics.controlRadius, style: .continuous)
-            .fill(theme.controlFill)
+          shape.fill(theme.controlFill)
         }
         .overlay {
-          RoundedRectangle(cornerRadius: theme.metrics.controlRadius, style: .continuous)
-            .strokeBorder(theme.controlBorder, lineWidth: 1)
+          shape.strokeBorder(
+            focused ? theme.accent : theme.controlBorder, lineWidth: focused ? 1.5 : 1)
         }
     }
   }
@@ -145,7 +154,21 @@ extension View {
     modifier(ThemedListRowModifier())
   }
 
-  func themedFieldChrome() -> some View {
-    modifier(ThemedFieldChromeModifier())
+  func themedFieldChrome(focused: Bool = false) -> some View {
+    modifier(
+      ThemedFieldChromeModifier(
+        focused: focused, height: nil,
+        insets: EdgeInsets(top: 12, leading: 12, bottom: 12, trailing: 12)))
+  }
+
+  func themedFieldChrome(focused: Bool = false, height: CGFloat) -> some View {
+    modifier(
+      ThemedFieldChromeModifier(
+        focused: focused, height: height,
+        insets: EdgeInsets(top: 0, leading: 12, bottom: 0, trailing: 12)))
+  }
+
+  func themedEditorChrome(focused: Bool = false, insets: EdgeInsets) -> some View {
+    modifier(ThemedFieldChromeModifier(focused: focused, height: nil, insets: insets))
   }
 }

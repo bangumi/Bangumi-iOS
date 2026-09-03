@@ -31,7 +31,7 @@ struct GlassTimelineSayView: View {
   var body: some View {
     SheetView(title: "发吐槽", size: .both, closeDisabled: updating) {
       ScrollView {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: GlassForm.blockSpacing) {
           HStack(alignment: .top, spacing: 11) {
             ImageView(img: profile.avatar?.large)
               .imageStyle(width: 38, height: 38, alignment: .center)
@@ -51,7 +51,9 @@ struct GlassTimelineSayView: View {
           .buttonStyle(.themedProminent)
           .disabled(!canSend)
         }
-        .padding(theme.metrics.screenPadding)
+        .padding(.horizontal, theme.metrics.screenPadding)
+        .padding(.top, GlassForm.topInset)
+        .padding(.bottom, theme.metrics.screenPadding)
       }
       .scrollDismissesKeyboard(.interactively)
       .sheet(isPresented: $showTurnstile) {
@@ -74,19 +76,18 @@ struct GlassTimelineSayView: View {
   }
 
   private var turnstileHint: some View {
-    GlassEmbedCard {
-      HStack(spacing: 10) {
-        Image(systemName: "checkmark.shield")
-          .font(.callout)
-          .foregroundStyle(theme.accent)
-        Text("发送前需要完成人机验证")
-          .font(.caption)
-          .foregroundStyle(theme.secondaryText)
-        Spacer(minLength: 0)
-        Text("TURNSTILE")
-          .font(.system(size: 10, weight: .semibold, design: .monospaced))
-          .foregroundStyle(theme.tertiaryText)
-      }
+    HStack(spacing: 10) {
+      Image(systemName: "checkmark.shield")
+        .font(.callout)
+        .foregroundStyle(theme.accent)
+      Text("发送前需要完成人机验证")
+        .font(.caption)
+        .foregroundStyle(theme.secondaryText)
+      Spacer(minLength: 0)
+      Text("TURNSTILE")
+        .font(.system(size: 10, weight: .semibold, design: .monospaced))
+        .foregroundStyle(theme.tertiaryText)
     }
+    .themedFieldChrome(height: GlassForm.controlHeight)
   }
 }
