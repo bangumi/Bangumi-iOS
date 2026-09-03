@@ -52,8 +52,8 @@ struct GlassSettingsRow<Content: View>: View {
       content
     }
     .padding(.horizontal, 16)
-    .padding(.vertical, 12)
-    .frame(minHeight: 52)
+    .padding(.vertical, 10)
+    .frame(minHeight: 64)
   }
 }
 
