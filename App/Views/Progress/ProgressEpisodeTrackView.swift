@@ -167,6 +167,7 @@ struct ProgressEpisodeTicksView: View {
   @State private var fingerX: CGFloat = 0
   @State private var lift: CGFloat = 0
   @State private var bubbleSize: CGSize = .zero
+  @GestureState private var touchActive = false
   @State private var edgeHoldTask: Task<Void, Never>?
   @State private var edgeHoldDirection: Int = 0
   @State private var gearHaptic = GearHaptic()
@@ -257,6 +258,15 @@ struct ProgressEpisodeTicksView: View {
     }
     .contentShape(Rectangle())
     .gesture(scrubGesture)
+    .onChange(of: touchActive) { _, active in
+      guard !active else { return }
+      Task { @MainActor in
+        try? await Task.sleep(for: .milliseconds(150))
+        if !touchActive, isDragging {
+          resetScrub()
+        }
+      }
+    }
   }
 
   @ViewBuilder
@@ -340,6 +350,9 @@ struct ProgressEpisodeTicksView: View {
       .sequenced(
         before: DragGesture(minimumDistance: 0, coordinateSpace: .local)
       )
+      .updating($touchActive) { _, state, _ in
+        state = true
+      }
       .onChanged { value in
         switch value {
         case .first(true):
