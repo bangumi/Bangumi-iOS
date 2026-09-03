@@ -6,6 +6,7 @@ struct ProgressSecondLineView: View {
   @AppStorage("progressViewMode") var progressViewMode: ProgressViewMode = .tile
 
   let subject: SubjectDTO
+  var lineLimit: Int? = nil
 
   var tagsCount: Int {
     switch progressViewMode {
@@ -17,6 +18,9 @@ struct ProgressSecondLineView: View {
   }
 
   var infoLine: Int {
+    if let lineLimit {
+      return lineLimit
+    }
     switch progressViewMode {
     case .tile:
       return 2
@@ -32,7 +36,7 @@ struct ProgressSecondLineView: View {
         Text(subtitle)
           .foregroundStyle(.secondary)
           .font(.footnote)
-          .lineLimit(1)
+          .lineLimit(lineLimit ?? 1)
       }
 
     case .category:
