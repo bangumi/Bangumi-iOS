@@ -64,7 +64,7 @@ struct GlassSubjectRatingSheet: View {
 
   private var header: some View {
     HStack(alignment: .center, spacing: 12) {
-      MusumeView(index: scoreInfo.offset, width: 40, height: 55)
+      MusumeView(index: scoreInfo.offset, width: 40, height: 65)
       VStack(alignment: .leading, spacing: 4) {
         HStack(alignment: .firstTextBaseline, spacing: 8) {
           Text(subject.rating.score.rateDisplay)
