@@ -156,6 +156,7 @@ struct ProgressEpisodeTicksView: View {
   var onScrubChange: ((ProgressTickScrubState?) -> Void)? = nil
   var onScrubCommit: ((EpisodeDTO) -> Void)? = nil
 
+  @AppStorage("titlePreference") var titlePreference: TitlePreference = .original
   @Environment(\.theme) private var theme
 
   @State private var barWidth: CGFloat = 0
@@ -267,6 +268,9 @@ struct ProgressEpisodeTicksView: View {
           subtitle: isCancelling
             ? "回到 EP.\(restore.sort.episodeDisplay)"
             : episode.tickAirCaption,
+          detail: isCancelling
+            ? nil
+            : titlePreference.title(name: episode.name, nameCN: episode.nameCN),
           systemImage: isCancelling ? "arrow.uturn.backward" : nil,
           isCancelling: isCancelling,
           showsArrow: !isCancelling
@@ -775,6 +779,7 @@ struct ProgressEpisodeTicksView: View {
 private struct ProgressTickBubble: View {
   let title: String
   let subtitle: String
+  var detail: String? = nil
   var systemImage: String? = nil
   let isCancelling: Bool
   let showsArrow: Bool
@@ -783,22 +788,32 @@ private struct ProgressTickBubble: View {
 
   var body: some View {
     VStack(spacing: 0) {
-      HStack(spacing: 6) {
-        if let systemImage {
-          Image(systemName: systemImage)
+      VStack(alignment: .leading, spacing: 2) {
+        HStack(spacing: 6) {
+          if let systemImage {
+            Image(systemName: systemImage)
+              .font(.subheadline.weight(.heavy))
+              .foregroundStyle(theme.toastText)
+          }
+          Text(title)
             .font(.subheadline.weight(.heavy))
             .foregroundStyle(theme.toastText)
+            .contentTransition(.numericText())
+          Text(subtitle)
+            .font(.caption2.weight(.semibold))
+            .foregroundStyle(theme.toastText.opacity(isCancelling ? 0.75 : 0.55))
         }
-        Text(title)
-          .font(.subheadline.weight(.heavy))
-          .foregroundStyle(theme.toastText)
-          .contentTransition(.numericText())
-        Text(subtitle)
-          .font(.caption2.weight(.semibold))
-          .foregroundStyle(theme.toastText.opacity(isCancelling ? 0.75 : 0.55))
+        if let detail, !detail.isEmpty {
+          Text(detail)
+            .font(.caption.weight(.semibold))
+            .foregroundStyle(theme.toastText.opacity(0.85))
+            .lineLimit(1)
+        }
       }
+      .frame(maxWidth: 240, alignment: .leading)
+      .fixedSize(horizontal: true, vertical: false)
       .padding(.horizontal, 13)
-      .padding(.vertical, 7)
+      .padding(.vertical, 8)
       .background(
         bubbleColor,
         in: RoundedRectangle(cornerRadius: theme.metrics.controlRadius, style: .continuous)
