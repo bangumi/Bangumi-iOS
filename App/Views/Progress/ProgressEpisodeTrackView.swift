@@ -166,7 +166,7 @@ struct ProgressEpisodeTicksView: View {
   @State private var isCancelling = false
   @State private var fingerX: CGFloat = 0
   @State private var lift: CGFloat = 0
-  @State private var bubbleHeight: CGFloat = 0
+  @State private var bubbleSize: CGSize = .zero
   @State private var edgeHoldTask: Task<Void, Never>?
   @State private var edgeHoldDirection: Int = 0
   @State private var gearHaptic = GearHaptic()
@@ -274,7 +274,8 @@ struct ProgressEpisodeTicksView: View {
             : titlePreference.title(name: episode.name, nameCN: episode.nameCN),
           systemImage: isCancelling ? "arrow.uturn.backward" : nil,
           isCancelling: isCancelling,
-          showsArrow: !isCancelling
+          showsArrow: !isCancelling,
+          arrowOffset: bubbleArrowOffset
         )
         if isCancelling {
           Canvas { context, size in
@@ -290,10 +291,10 @@ struct ProgressEpisodeTicksView: View {
           .frame(width: 2, height: dashHeight)
         }
       }
-      .onGeometryChange(for: CGFloat.self) { proxy in
-        proxy.size.height
-      } action: { height in
-        bubbleHeight = height
+      .onGeometryChange(for: CGSize.self) { proxy in
+        proxy.size
+      } action: { size in
+        bubbleSize = size
       }
       .offset(x: bubbleX, y: bubbleY)
       .allowsHitTesting(false)
@@ -535,13 +536,27 @@ struct ProgressEpisodeTicksView: View {
     windowStart = min(max(windowStart, 0), max(episodes.count - size, 0))
   }
 
+  private var bubbleCenterX: CGFloat {
+    let half = bubbleSize.width / 2
+    let overhang: CGFloat = 20
+    let lower = half - overhang
+    let upper = barWidth - half + overhang
+    guard lower < upper else { return barWidth / 2 }
+    return min(max(tickCenterX(for: playheadIndex), lower), upper)
+  }
+
+  private var bubbleArrowOffset: CGFloat {
+    let limit = max(bubbleSize.width / 2 - 16, 0)
+    return min(max(tickCenterX(for: playheadIndex) - bubbleCenterX, -limit), limit)
+  }
+
   private var bubbleX: CGFloat {
-    tickCenterX(for: playheadIndex) - barWidth / 2
+    bubbleCenterX - barWidth / 2
   }
 
   private var bubbleY: CGFloat {
     let detached = isCancelling ? min(max(lift - 12, 15), 36) : 0
-    return -bubbleHeight - 8 - detached
+    return -bubbleSize.height - 8 - detached
   }
 
   private var leadingCaption: String {
@@ -791,6 +806,7 @@ private struct ProgressTickBubble: View {
   var systemImage: String? = nil
   let isCancelling: Bool
   let showsArrow: Bool
+  var arrowOffset: CGFloat = 0
 
   @Environment(\.theme) private var theme
 
@@ -842,6 +858,7 @@ private struct ProgressTickBubble: View {
         ProgressTickBubbleArrow()
           .fill(bubbleColor)
           .frame(width: 12, height: 6)
+          .offset(x: arrowOffset)
       }
     }
   }
