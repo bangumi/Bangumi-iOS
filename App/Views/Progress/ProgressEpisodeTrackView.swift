@@ -1419,6 +1419,7 @@ struct ProgressEpisodeChip: View {
   let kind: ProgressEpisodeTickKind
   var size: CGFloat = 34
   var cornerRadius: CGFloat = 10
+  var compact: Bool = false
   let interactionMode: EpisodeGridInteractionMode
   let subjectCollectionType: CollectionType
   var reload: (() async -> Void)? = nil
@@ -1475,11 +1476,12 @@ struct ProgressEpisodeChip: View {
   private var chipLabel: some View {
     let cell = style
     return Text(verbatim: episode.sort.episodeDisplay)
-      .font(.system(size: size > 22 ? 12 : 8.5, weight: .bold, design: .monospaced))
+      .font(.system(size: compact ? 10 : size > 22 ? 12 : 8.5, weight: .bold, design: .monospaced))
       .lineLimit(1)
+      .minimumScaleFactor(0.7)
       .foregroundStyle(cell.foreground)
       .padding(.horizontal, 2)
-      .frame(minWidth: size, minHeight: size)
+      .frame(minWidth: size, maxWidth: compact ? .infinity : nil, minHeight: size)
       .background {
         shape.fill(
           LinearGradient(
@@ -1505,13 +1507,13 @@ struct ProgressEpisodeChip: View {
         }
       }
       .overlay {
-        if cell.dashed {
+        if cell.dashed, !compact {
           shape.strokeBorder(
             cell.border,
             style: StrokeStyle(lineWidth: cell.borderWidth, dash: [4, 3])
           )
         } else {
-          shape.strokeBorder(cell.border, lineWidth: cell.borderWidth)
+          shape.strokeBorder(cell.border, lineWidth: cell.dashed ? 1 : cell.borderWidth)
         }
       }
       .strikethrough(cell.strikethrough)

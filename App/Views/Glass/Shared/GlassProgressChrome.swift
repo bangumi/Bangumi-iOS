@@ -44,19 +44,22 @@ enum GlassFillKind {
 
 struct GlassFillButton<Content: View>: View {
   let kind: GlassFillKind
+  var compact: Bool = false
+  var cornerRadius: CGFloat? = nil
   @ViewBuilder var content: Content
 
   @Environment(\.theme) private var theme
 
   private var shape: RoundedRectangle {
-    RoundedRectangle(cornerRadius: theme.metrics.controlRadius, style: .continuous)
+    RoundedRectangle(
+      cornerRadius: cornerRadius ?? theme.metrics.controlRadius, style: .continuous)
   }
 
   var body: some View {
     content
-      .font(.subheadline.weight(.bold))
+      .font(compact ? .caption.weight(.bold) : .subheadline.weight(.bold))
       .frame(maxWidth: .infinity)
-      .padding(.vertical, 9)
+      .padding(.vertical, compact ? 6 : 9)
       .foregroundStyle(foreground)
       .background(fill, in: shape)
       .overlay {
