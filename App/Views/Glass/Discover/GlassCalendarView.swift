@@ -195,32 +195,39 @@ private struct GlassCalendarWeekdayView: View {
         subtitle: subtitle,
         colors: theme.weekdayBanner(weekday)
       )
-      LazyVGrid(columns: [GridItem(.adaptive(minimum: 96), spacing: 12)], spacing: 14) {
+      LazyVGrid(columns: [GridItem(.adaptive(minimum: 96), spacing: 12, alignment: .top)], spacing: 14) {
         ForEach(calendar.items) { item in
           let ctype = collectionTypes[item.subject.id] ?? CollectionType.none
           VStack(alignment: .leading, spacing: 5) {
-            ImageView(img: item.subject.images?.resize(.r200))
-              .imageStyle(aspectRatio: 0.707)
-              .imageType(.subject)
+            Color.clear
+              .aspectRatio(0.707, contentMode: .fit)
+              .overlay {
+                ImageView(img: item.subject.images?.resize(.r200))
+                  .imageStyle(contentMode: .fill)
+                  .imageType(.subject)
+                  .imageNavLink(item.subject.link)
+                  .subjectPreview(item.subject, collectionType: ctype) {
+                    await reloadCollectionType(item.subject.id)
+                  }
+              }
               .overlay(alignment: .topTrailing) {
                 GlassCollectionBadge(type: ctype, subjectType: item.subject.type)
                   .padding(5)
               }
-              .imageNavLink(item.subject.link)
-              .subjectPreview(item.subject, collectionType: ctype) {
-                await reloadCollectionType(item.subject.id)
+            VStack(alignment: .leading, spacing: 5) {
+              Text(item.subject.title(with: titlePreference))
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(theme.cardTitle)
+                .multilineTextAlignment(.leading)
+                .lineLimit(2)
+              if item.watchers > 10 {
+                Text("\(glassCompactCount(item.watchers)) 人在追")
+                  .font(.caption2.weight(.semibold).monospaced())
+                  .foregroundStyle(theme.tertiaryText)
+                  .lineLimit(1)
               }
-            Text(item.subject.title(with: titlePreference))
-              .font(.caption.weight(.semibold))
-              .foregroundStyle(theme.cardTitle)
-              .multilineTextAlignment(.leading)
-              .lineLimit(2)
-            if item.watchers > 10 {
-              Text("\(glassCompactCount(item.watchers)) 人在追")
-                .font(.caption2.weight(.semibold).monospaced())
-                .foregroundStyle(theme.tertiaryText)
-                .lineLimit(1)
             }
+            .glassReservedCaption(title: .caption, detail: .caption2, spacing: 5)
           }
           .frame(maxWidth: .infinity, alignment: .leading)
         }
