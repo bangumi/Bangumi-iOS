@@ -9,7 +9,6 @@ struct GlassTimelineView: View {
 
   @State private var noticeUnreadCount: Int = 0
   @State private var checkingNotice: Bool = false
-  @State private var showInput = false
 
   @Environment(\.theme) private var theme
 
@@ -55,37 +54,8 @@ struct GlassTimelineView: View {
     }
   }
 
-  private var availableModes: [TimelineViewMode] {
-    isAuthenticated ? TimelineViewMode.allCases : [.all]
-  }
-
-  private var pages: some View {
-    let selection = modeSelection
-    return TabView(selection: selection) {
-      ForEach(availableModes, id: \.self) { mode in
-        GlassTimelineListView(mode: mode, isActive: selection.wrappedValue == mode)
-          .tag(mode)
-      }
-    }
-    .tabViewStyle(.page(indexDisplayMode: .never))
-    .id(isAuthenticated)
-    .overlay(alignment: .bottomTrailing) {
-      if isAuthenticated {
-        GlassComposeFAB {
-          showInput = true
-        }
-        .disabled(showInput)
-        .padding(.trailing, 18)
-        .padding(.bottom, 16)
-      }
-    }
-    .sheet(isPresented: $showInput) {
-      GlassTimelineSayView()
-    }
-  }
-
   var body: some View {
-    pages
+    GlassTimelineListView()
       .navigationTitle("时间线")
       .navigationBarTitleDisplayMode(.inline)
       .toolbar {

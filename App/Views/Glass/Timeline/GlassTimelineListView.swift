@@ -1,11 +1,11 @@
 import SwiftUI
 
 struct GlassTimelineListView: View {
-  let mode: TimelineViewMode
-  let isActive: Bool
-
   @AppStorage("isAuthenticated") private var isAuthenticated: Bool = false
   @AppStorage("profile") private var profile: Profile = Profile()
+  @AppStorage("timelineViewMode") private var timelineViewMode: TimelineViewMode = .friends
+
+  @State private var showInput = false
 
   @State private var exhausted: Bool = false
   @State private var loading: Bool = false
@@ -15,8 +15,12 @@ struct GlassTimelineListView: View {
 
   @Environment(\.theme) private var theme
 
+  private var activeMode: TimelineViewMode {
+    isAuthenticated ? timelineViewMode : .all
+  }
+
   private func fetchPage(until: Int?) async throws -> [TimelineDTO] {
-    switch mode {
+    switch activeMode {
     case .all:
       return try await TimelineService.getTimeline(mode: .all, limit: 20, until: until)
     case .friends:
@@ -90,6 +94,18 @@ struct GlassTimelineListView: View {
     }
   }
 
+  private func reloadForModeChange() {
+    Task {
+      withAnimation(.default) {
+        loading = true
+      }
+      await reload()
+      withAnimation(.default) {
+        loading = false
+      }
+    }
+  }
+
   var body: some View {
     let rows = items.timelineListRows(lastID: lastID)
 
@@ -135,10 +151,26 @@ struct GlassTimelineListView: View {
       .padding(.top, 4)
       .padding(.bottom, isAuthenticated ? 88 : 26)
     }
-    .onChange(of: isActive, initial: true) {
-      if isActive {
-        loadInitialPageIfNeeded()
+    .overlay(alignment: .bottomTrailing) {
+      if isAuthenticated {
+        GlassComposeFAB {
+          showInput = true
+        }
+        .disabled(showInput)
+        .padding(.trailing, 18)
+        .padding(.bottom, 16)
       }
+    }
+    .sheet(isPresented: $showInput) {
+      GlassTimelineSayView()
+    }
+    .onAppear(perform: loadInitialPageIfNeeded)
+    .onChange(of: timelineViewMode) {
+      guard isAuthenticated else { return }
+      reloadForModeChange()
+    }
+    .onChange(of: isAuthenticated) {
+      reloadForModeChange()
     }
     .refreshable {
       await reload()

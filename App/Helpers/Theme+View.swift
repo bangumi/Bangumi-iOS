@@ -2,6 +2,7 @@ import SwiftUI
 
 struct GlassScreenBackground: View {
   @Environment(\.theme) private var theme
+  @Environment(\.colorScheme) private var colorScheme
   @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
 
   var body: some View {
@@ -10,7 +11,7 @@ struct GlassScreenBackground: View {
         theme.pageGradient.first ?? Color(uiColor: .systemBackground)
       } else {
         LinearGradient(colors: theme.pageGradient, startPoint: .top, endPoint: .bottom)
-        ForEach(theme.pageBlobs) { blob in
+        ForEach(colorScheme == .dark ? [] : theme.pageBlobs) { blob in
           RadialGradient(
             colors: [blob.color, .clear],
             center: blob.center,
