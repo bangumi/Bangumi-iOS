@@ -122,6 +122,8 @@ struct SubjectBrowsingView: View {
 
   @State private var reloader: Bool = false
 
+  @Environment(\.theme) private var theme
+
   private var options: SubjectBrowsingOptions {
     optionsState[type]
   }
@@ -236,7 +238,7 @@ struct SubjectBrowsingView: View {
     .zIndex(1)
   }
 
-  var body: some View {
+  private var classicBody: some View {
     ScrollView {
       VStack(alignment: .leading, spacing: 8) {
         browseHeader
@@ -247,6 +249,27 @@ struct SubjectBrowsingView: View {
         .zIndex(0)
 
       }.padding(.horizontal, 8)
+    }
+  }
+
+  private var glassBody: some View {
+    ScrollView(showsIndicators: false) {
+      PageNumberPagedView(reloader: reloader, nextPageFunc: fetchPage) { item in
+        GlassSubjectBrowseRow(subject: item.subject, collectionType: item.collectionType)
+      }
+      .padding(.horizontal, theme.metrics.screenPadding)
+      .padding(.top, 4)
+      .padding(.bottom, 26)
+    }
+  }
+
+  var body: some View {
+    Group {
+      if theme.isClassic {
+        classicBody
+      } else {
+        glassBody
+      }
     }
     .onChange(of: options.sort) { _, _ in
       withAnimation(.default) {
