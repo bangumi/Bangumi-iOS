@@ -194,18 +194,21 @@ struct GlassMonoPortraitTile: View {
         .imageNSFW(nsfw)
         .imageCollectedStatus(isCollected)
         .imageNavLink(link)
-      Text(title)
-        .font(.caption.weight(.bold))
-        .foregroundStyle(theme.cardTitle)
-        .multilineTextAlignment(.center)
-        .truncationMode(.middle)
-        .lineLimit(2)
-      if let footnote {
-        Text(footnote)
-          .font(.caption2)
-          .foregroundStyle(theme.tertiaryText)
-          .lineLimit(1)
+      VStack(spacing: 6) {
+        Text(title)
+          .font(.caption.weight(.bold))
+          .foregroundStyle(theme.cardTitle)
+          .multilineTextAlignment(.center)
+          .truncationMode(.middle)
+          .lineLimit(2)
+        if let footnote {
+          Text(footnote)
+            .font(.caption2)
+            .foregroundStyle(theme.tertiaryText)
+            .lineLimit(1)
+        }
       }
+      .glassReservedCaption(title: .caption, detail: .caption2, spacing: 6, alignment: .top)
     }
     .frame(width: 96)
     .padding(.vertical, 11)

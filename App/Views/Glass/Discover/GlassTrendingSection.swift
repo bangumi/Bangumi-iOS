@@ -178,7 +178,7 @@ private struct GlassTrendingTypeSection: View {
   private var largeGrid: some View {
     LazyVGrid(
       columns: Array(
-        repeating: GridItem(.flexible(), spacing: Self.gridSpacing), count: columnCount),
+        repeating: GridItem(.flexible(), spacing: Self.gridSpacing, alignment: .top), count: columnCount),
       spacing: Self.gridSpacing
     ) {
       ForEach(largeItems) { item in
@@ -208,6 +208,7 @@ private struct GlassTrendingTypeSection: View {
                     .foregroundStyle(theme.tertiaryText)
                 }
               }
+              .glassReservedCaption(title: .footnote, detail: .caption2, spacing: 3)
               .frame(maxWidth: .infinity, alignment: .leading)
             }
           }
@@ -238,18 +239,21 @@ private struct GlassTrendingTypeSection: View {
               .subjectPreview(item.subject, collectionType: ctype) {
                 await reloadCollectionType(subjectId: item.subject.id)
               }
-            Text(item.subject.title(with: titlePreference))
-              .font(.caption2.weight(.semibold))
-              .foregroundStyle(theme.cardTitle)
-              .multilineTextAlignment(.leading)
-              .truncationMode(.middle)
-              .lineLimit(2)
-            if item.count > 10 {
-              Text("\(glassCompactCount(item.count)) 人关注")
-                .font(.caption2.weight(.semibold).monospaced())
-                .foregroundStyle(theme.tertiaryText)
-                .lineLimit(1)
+            VStack(alignment: .leading, spacing: 4) {
+              Text(item.subject.title(with: titlePreference))
+                .font(.caption2.weight(.semibold))
+                .foregroundStyle(theme.cardTitle)
+                .multilineTextAlignment(.leading)
+                .truncationMode(.middle)
+                .lineLimit(2)
+              if item.count > 10 {
+                Text("\(glassCompactCount(item.count)) 人关注")
+                  .font(.caption2.weight(.semibold).monospaced())
+                  .foregroundStyle(theme.tertiaryText)
+                  .lineLimit(1)
+              }
             }
+            .glassReservedCaption(title: .caption2, detail: .caption2, spacing: 4)
           }
           .frame(width: Self.smallCoverWidth, alignment: .leading)
         }

@@ -164,4 +164,23 @@ extension View {
       Rectangle().padding(.vertical, -24)
     }
   }
+
+  func glassReservedCaption(
+    title: Font, detail: Font? = nil, spacing: CGFloat, alignment: Alignment = .topLeading
+  ) -> some View {
+    ZStack(alignment: alignment) {
+      VStack(spacing: spacing) {
+        Text(verbatim: " ")
+          .font(title)
+          .lineLimit(2, reservesSpace: true)
+        if let detail {
+          Text(verbatim: " ")
+            .font(detail)
+        }
+      }
+      .hidden()
+      .accessibilityHidden(true)
+      self
+    }
+  }
 }

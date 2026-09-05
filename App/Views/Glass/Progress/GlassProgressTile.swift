@@ -112,38 +112,51 @@ struct GlassProgressTile: View {
   @ViewBuilder
   private var cells: some View {
     if needsEpisodeSync {
-      HStack(spacing: 3) {
-        ForEach(0..<5, id: \.self) { _ in
-          RoundedRectangle(cornerRadius: theme.metrics.cellRadius / 2, style: .continuous)
+      HStack(spacing: cellSpacing) {
+        ForEach(0..<cellSlots, id: \.self) { _ in
+          RoundedRectangle(cornerRadius: cellRadius, style: .continuous)
             .fill(theme.track)
             .frame(maxWidth: .infinity)
-            .frame(height: 18)
+            .frame(height: cellSize)
         }
       }
     } else {
-      HStack(spacing: 3) {
+      HStack(spacing: cellSpacing) {
         ForEach(episodes) { episode in
           ProgressEpisodeChip(
             episode: episode,
             kind: ProgressEpisodeTickKind(
               episode: episode, isNext: episode.id == nextEpisode?.id),
-            size: 18,
-            cornerRadius: theme.metrics.cellRadius / 2,
+            size: cellSize,
+            cornerRadius: cellRadius,
+            compact: true,
             interactionMode: interactionMode,
             subjectCollectionType: subject.ctypeEnum,
             reload: reload
           )
         }
-        Spacer(minLength: 0)
+        ForEach(episodes.count..<max(episodes.count, cellSlots), id: \.self) { _ in
+          Color.clear
+            .frame(maxWidth: .infinity)
+            .frame(height: cellSize)
+        }
       }
     }
+  }
+
+  private let cellSlots: Int = 5
+  private let cellSize: CGFloat = 22
+  private let cellSpacing: CGFloat = 4
+
+  private var cellRadius: CGFloat {
+    theme.metrics.cellRadius * 0.6
   }
 
   @ViewBuilder
   private var action: some View {
     if needsEpisodeSync {
       Button(action: loadEpisodes) {
-        GlassFillButton(kind: .glass) {
+        GlassFillButton(kind: .glass, compact: true, cornerRadius: cellRadius) {
           Text(loadingEpisodes ? "同步中…" : "↓ 同步")
             .lineLimit(1)
         }
@@ -159,7 +172,7 @@ struct GlassProgressTile: View {
       Button {
         markWatched(episode)
       } label: {
-        GlassFillButton(kind: episode.aired ? .accent : .muted) {
+        GlassFillButton(kind: episode.aired ? .accent : .muted, compact: true, cornerRadius: cellRadius) {
           Text(
             episode.aired
               ? "✓ \(episode.sort.progressEpisodeNumber)"
@@ -175,7 +188,7 @@ struct GlassProgressTile: View {
       Button {
         showCollectionBox = true
       } label: {
-        GlassFillButton(kind: .complete) {
+        GlassFillButton(kind: .complete, compact: true, cornerRadius: cellRadius) {
           Text("已看完")
             .lineLimit(1)
         }
@@ -196,7 +209,7 @@ struct GlassProgressTile: View {
   private var typeAction: some View {
     switch subject.type {
     case .anime, .real:
-      VStack(spacing: 5) {
+      VStack(spacing: 6) {
         cells
         action
       }
@@ -211,7 +224,6 @@ struct GlassProgressTile: View {
   var body: some View {
     VStack(alignment: .leading, spacing: 5) {
       cover
-      typeAction
       VStack(alignment: .leading, spacing: 2) {
         NavigationLink(value: NavDestination.subject(subject.id)) {
           Text(subject.title(with: titlePreference))
@@ -221,8 +233,10 @@ struct GlassProgressTile: View {
             .frame(maxWidth: .infinity, alignment: .leading)
         }
         .buttonStyle(.plain)
-        ProgressSecondLineView(subject: subject)
+        ProgressSecondLineView(subject: subject, compact: true)
       }
+      Spacer(minLength: 0)
+      typeAction
     }
   }
 }

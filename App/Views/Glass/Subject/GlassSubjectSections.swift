@@ -329,7 +329,7 @@ struct GlassSubjectRelations: View {
                   .foregroundStyle(theme.body)
                   .multilineTextAlignment(.leading)
                   .truncationMode(.middle)
-                  .lineLimit(2)
+                  .lineLimit(2, reservesSpace: true)
               }
               .frame(width: 88, alignment: .leading)
             }
@@ -415,7 +415,7 @@ struct GlassSubjectRecs: View {
                   .foregroundStyle(theme.body)
                   .multilineTextAlignment(.leading)
                   .truncationMode(.middle)
-                  .lineLimit(2)
+                  .lineLimit(2, reservesSpace: true)
               }
               .frame(width: 88, alignment: .leading)
             }
@@ -527,6 +527,7 @@ struct GlassSubjectIndexRow: View {
           .foregroundStyle(theme.disabled)
       }
       .padding(.vertical, 10)
+      .contentShape(Rectangle())
     }
     .buttonStyle(.plain)
   }

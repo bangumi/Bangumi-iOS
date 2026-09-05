@@ -233,7 +233,7 @@ struct GlassSubjectOffprints: View {
                   .foregroundStyle(theme.secondaryText)
                   .multilineTextAlignment(.leading)
                   .truncationMode(.middle)
-                  .lineLimit(2)
+                  .lineLimit(2, reservesSpace: true)
               }
               .frame(width: 66, alignment: .leading)
             }

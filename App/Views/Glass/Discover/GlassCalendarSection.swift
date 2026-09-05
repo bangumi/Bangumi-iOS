@@ -189,17 +189,20 @@ private struct GlassCalendarCoverRow: View {
               .subjectPreview(item.subject, collectionType: ctype) {
                 await reloadCollectionType(item.subject.id)
               }
-            Text(item.subject.title(with: titlePreference))
-              .font(.caption.weight(.semibold))
-              .foregroundStyle(theme.cardTitle)
-              .multilineTextAlignment(.leading)
-              .lineLimit(2)
-            if item.watchers > 10 {
-              Text("\(glassCompactCount(item.watchers)) 人在追")
-                .font(.caption2.weight(.semibold).monospaced())
-                .foregroundStyle(theme.tertiaryText)
-                .lineLimit(1)
+            VStack(alignment: .leading, spacing: 5) {
+              Text(item.subject.title(with: titlePreference))
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(theme.cardTitle)
+                .multilineTextAlignment(.leading)
+                .lineLimit(2)
+              if item.watchers > 10 {
+                Text("\(glassCompactCount(item.watchers)) 人在追")
+                  .font(.caption2.weight(.semibold).monospaced())
+                  .foregroundStyle(theme.tertiaryText)
+                  .lineLimit(1)
+              }
             }
+            .glassReservedCaption(title: .caption, detail: .caption2, spacing: 5)
           }
           .frame(width: Self.cardWidth, alignment: .leading)
         }

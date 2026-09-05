@@ -709,7 +709,7 @@ private struct GlassProgressGridSection: View {
   @State private var prefetchState = NextPagePrefetchState<ProgressSubjectDTO.ID>()
 
   private var columns: [GridItem] {
-    Array(repeating: GridItem(.flexible(), spacing: 10), count: 3)
+    Array(repeating: GridItem(.flexible(), spacing: 10, alignment: .top), count: 3)
   }
 
   private func requestNextPage(for trigger: NextPagePrefetchTaskKey<ProgressSubjectDTO.ID>) {

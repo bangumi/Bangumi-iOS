@@ -7,6 +7,7 @@ struct ProgressSecondLineView: View {
 
   let subject: SubjectDTO
   var lineLimit: Int? = nil
+  var compact: Bool = false
 
   var tagsCount: Int {
     switch progressViewMode {
@@ -58,14 +59,37 @@ struct ProgressSecondLineView: View {
       if doing > 0 || collect > 0 {
         Text("\(doing) 人在看 · \(collect) 人看过")
           .foregroundStyle(.secondary)
-          .font(.footnote)
+          .font(compact ? .caption : .footnote)
+          .lineLimit(compact ? 1 : nil)
       }
 
     case .ratingRank:
       let rank = subject.rating.rank
       let score = subject.rating.score
       let total = subject.rating.total
-      if rank > 0 || score > 0 {
+      if compact {
+        if rank > 0 || score > 0 {
+          HStack(spacing: 3) {
+            if total > 10, score > 0 {
+              Image(systemName: "star.fill")
+                .font(.system(size: 9, weight: .bold))
+              Text(score.rateDisplay)
+                .fontWeight(.bold)
+            }
+            if rank > 0 {
+              if total > 10, score > 0 {
+                Text("·")
+                  .foregroundStyle(.tertiary)
+              }
+              Text("#\(rank)")
+                .foregroundStyle(.secondary)
+            }
+          }
+          .font(.caption)
+          .foregroundStyle(.orange)
+          .lineLimit(1)
+        }
+      } else if rank > 0 || score > 0 {
         HStack(spacing: 12) {
           if rank > 0 {
             Text("#\(rank)")

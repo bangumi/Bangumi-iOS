@@ -127,6 +127,7 @@ struct GlassSubjectDetailView: View {
           .foregroundStyle(.primary)
           .lineLimit(1)
           .truncationMode(.tail)
+          .frame(maxWidth: 220)
       }
       ToolbarItem(placement: .topBarTrailing) {
         Menu {

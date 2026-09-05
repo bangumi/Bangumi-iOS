@@ -300,30 +300,22 @@ struct GlassIndexRelatedCard: View {
           .imageCollectionStatus(ctype: subjectCollectionType)
           .imageNavLink(subject.link)
         VStack(alignment: .leading, spacing: 5) {
-          VStack(alignment: .leading, spacing: 5) {
-            HStack(spacing: 6) {
-              GlassTypeBadge(type: subject.type)
-              if let year = indexAwardYear, let awardName = item.awardName(year: year) {
-                GlassMonoTag(text: awardName, tone: .accent)
-              }
-              Spacer(minLength: 0)
+          HStack(spacing: 6) {
+            GlassTypeBadge(type: subject.type)
+            if let year = indexAwardYear, let awardName = item.awardName(year: year) {
+              GlassMonoTag(text: awardName, tone: .accent)
             }
-            Text(subject.title(with: titlePreference).withLink(subject.link, linkColor: theme.link))
-              .font(.footnote.weight(.bold))
-              .lineLimit(2)
-            if let info = subject.info, !info.isEmpty {
-              Text(info)
-                .font(.caption2)
-                .foregroundStyle(theme.tertiaryText)
-                .lineLimit(2)
-            }
+            Spacer(minLength: 0)
           }
-          .subjectCollectionStatusOverlay(
-            subjectId: subject.id,
-            subjectType: subject.type,
-            collectionType: subjectCollectionType,
-            reload: loadSubjectCollectionType
-          )
+          Text(subject.title(with: titlePreference).withLink(subject.link, linkColor: theme.link))
+            .font(.footnote.weight(.bold))
+            .lineLimit(2)
+          if let info = subject.info, !info.isEmpty {
+            Text(info)
+              .font(.caption2)
+              .foregroundStyle(theme.tertiaryText)
+              .lineLimit(2)
+          }
         }
         Spacer(minLength: 0)
       }
@@ -350,7 +342,7 @@ struct GlassIndexRelatedCard: View {
                 .withLink(character.link, linkColor: theme.link)
             )
             .font(.footnote.weight(.bold))
-            .lineLimit(1)
+            .lineLimit(2)
             Spacer(minLength: 0)
           }
           GlassMonoTag(text: character.role.description, tone: .accent)
@@ -383,7 +375,7 @@ struct GlassIndexRelatedCard: View {
             categoryIcon()
             Text(person.title(with: titlePreference).withLink(person.link, linkColor: theme.link))
               .font(.footnote.weight(.bold))
-              .lineLimit(1)
+              .lineLimit(2)
             Spacer(minLength: 0)
           }
           if let career = person.career, !career.isEmpty {
@@ -422,13 +414,13 @@ struct GlassIndexRelatedCard: View {
             categoryIcon()
             Text(episode.title(with: titlePreference).withLink(episode.link, linkColor: theme.link))
               .font(.footnote.weight(.bold))
-              .lineLimit(1)
+              .lineLimit(2)
             Spacer(minLength: 0)
           }
           Text(subject.title(with: titlePreference))
             .font(.caption2)
             .foregroundStyle(theme.tertiaryText)
-            .lineLimit(1)
+            .lineLimit(2)
         }
         Spacer(minLength: 0)
       }
@@ -450,7 +442,7 @@ struct GlassIndexRelatedCard: View {
             categoryIcon()
             Text(blog.title.withLink(blog.link, linkColor: theme.link))
               .font(.footnote.weight(.bold))
-              .lineLimit(1)
+              .lineLimit(2)
             Spacer(minLength: 0)
           }
           metaLine(
@@ -482,7 +474,7 @@ struct GlassIndexRelatedCard: View {
               link: topic.link
             )
             .font(.footnote.weight(.bold))
-            .lineLimit(1)
+            .lineLimit(2)
             .truncationMode(.middle)
             Spacer(minLength: 0)
           }
@@ -519,7 +511,7 @@ struct GlassIndexRelatedCard: View {
               link: topic.link
             )
             .font(.footnote.weight(.bold))
-            .lineLimit(1)
+            .lineLimit(2)
             .truncationMode(.middle)
             Spacer(minLength: 0)
           }
@@ -562,10 +554,25 @@ struct GlassIndexRelatedCard: View {
     }
   }
 
+  @ViewBuilder
+  private var collectButton: some View {
+    if let subject = item.subject {
+      GlassCollectButton(
+        subjectId: subject.id,
+        subjectType: subject.type,
+        collectionType: subjectCollectionType,
+        reload: loadSubjectCollectionType
+      )
+    }
+  }
+
   var body: some View {
     CardView(padding: theme.metrics.cardPadding) {
       VStack(alignment: .leading, spacing: 9) {
-        relatedBody
+        HStack(alignment: .center, spacing: 10) {
+          relatedBody
+          collectButton
+        }
         commentBlock()
         if isOwner {
           ThemedDivider()

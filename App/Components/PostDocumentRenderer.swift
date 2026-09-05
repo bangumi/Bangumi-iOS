@@ -353,22 +353,55 @@ enum PostDocumentThemeCSS {
           }
 
           html.theme-glass .subreplies {
-            margin: 10px 0 0 48px;
-            padding: 0 0 0 12px;
+            margin: 12px 0 2px 48px;
+            padding: 2px 12px;
             border: none;
-            border-left: 2px solid rgba(242, 117, 139, 0.28);
-            border-radius: 0;
-            background: transparent;
+            border-radius: 14px;
+            background: rgba(242, 117, 139, 0.06);
+            box-shadow: inset 0 0 0 1px rgba(242, 117, 139, 0.1);
+          }
+
+          @media (prefers-color-scheme: dark) {
+            html.theme-glass .subreplies {
+              background: rgba(255, 255, 255, 0.05);
+              box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.07);
+            }
           }
 
           html.theme-glass .subreplies .reply {
             padding: 10px 0;
-            border-bottom: 1px dashed rgba(180, 140, 160, 0.16);
+            border-bottom: 1px solid rgba(180, 140, 160, 0.12);
           }
 
           html.theme-glass .subreplies > .reply:last-child {
-            padding-bottom: 2px;
             border-bottom: none;
+          }
+
+          html.theme-glass .subreplies .avatar {
+            width: 24px;
+            height: 24px;
+          }
+
+          html.theme-glass .subreplies .post-content,
+          html.theme-glass .subreplies .reactions {
+            margin-left: 32px;
+          }
+
+          html.theme-glass .subreplies .post-content {
+            font-size: 14px;
+          }
+
+          html.theme-glass .subreplies .user-name {
+            font-size: 12.5px;
+          }
+
+          html.theme-glass .subreplies .subreplies {
+            margin: 8px 0 0 32px;
+            padding: 0 0 0 10px;
+            border-left: 2px solid rgba(242, 117, 139, 0.22);
+            border-radius: 0;
+            background: transparent;
+            box-shadow: none;
           }
 
           html.theme-glass .state {
