@@ -3,6 +3,7 @@ import SwiftUI
 
 struct GlassProgressView: View {
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
+  @AppStorage("profile") var profile: Profile = Profile()
   @AppStorage("collectionsUpdatedAt") var collectionsUpdatedAt: Int = 0
   @AppStorage("progressViewMode") var progressViewMode: ProgressViewMode = .tile
   @AppStorage("progressSortMode") var progressSortMode: ProgressSortMode = .collectedAt
@@ -531,6 +532,15 @@ struct GlassProgressView: View {
     .navigationTitle("进度管理")
     .navigationBarTitleDisplayMode(.inline)
     .toolbar {
+      ToolbarItemGroup(placement: .topBarLeading) {
+        if isAuthenticated {
+          NavigationLink(value: NavDestination.profileHome) {
+            ProfileToolbarAvatarView(imageURL: profile.avatar?.large)
+          }
+          .buttonStyle(.plain)
+          .accessibilityLabel("我的")
+        }
+      }
       ToolbarItem(placement: .topBarTrailing) {
         Button {
           showOptions = true

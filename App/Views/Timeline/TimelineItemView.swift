@@ -248,7 +248,7 @@ struct TimelineItemView: View {
         }
         .foregroundStyle(.secondary)
         .font(.footnote)
-        Divider()
+        DottedDivider()
       }
       Spacer(minLength: 0)
     }

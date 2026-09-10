@@ -96,6 +96,7 @@ enum RakuenCategory: String, CaseIterable {
 struct ChiiRakuenView: View {
   @AppStorage("rakuenListMode") var rakuenListMode: RakuenListMode = .subjectTrending
   @AppStorage("isAuthenticated") var isAuthenticated = false
+  @AppStorage("profile") var profile: Profile = Profile()
 
   @Environment(\.theme) private var theme
 
@@ -129,6 +130,15 @@ struct ChiiRakuenView: View {
     .navigationTitle("超展开")
     .toolbarTitleDisplayMode(.inline)
     .toolbar {
+      ToolbarItemGroup(placement: .topBarLeading) {
+        if isAuthenticated {
+          NavigationLink(value: NavDestination.profileHome) {
+            ProfileToolbarAvatarView(imageURL: profile.avatar?.large)
+          }
+          .buttonStyle(.plain)
+          .accessibilityLabel("我的")
+        }
+      }
       ToolbarItem(placement: .topBarTrailing) {
         Menu {
           Menu {
@@ -209,7 +219,9 @@ struct ChiiRakuenView: View {
             }
           } label: {
             Text(mode.description)
-          }.adaptiveButtonStyle(rakuenListMode == mode ? .borderedProminent : .bordered)
+          }
+          .adaptiveButtonStyle(rakuenListMode == mode ? .borderedProminent : .bordered)
+          .controlSize(.small)
         }
       })
   }

@@ -92,6 +92,15 @@ struct ChiiDiscoverView: View {
     )
     .searchInputTraits()
     .toolbar {
+      ToolbarItemGroup(placement: .topBarLeading) {
+        if isAuthenticated {
+          NavigationLink(value: NavDestination.profileHome) {
+            ProfileToolbarAvatarView(imageURL: profile.avatar?.large)
+          }
+          .buttonStyle(.plain)
+          .accessibilityLabel("我的")
+        }
+      }
       ToolbarItemGroup(placement: .topBarTrailing) {
         if isAuthenticated, profile.canAccessWikiTools {
           NavigationLink(value: NavDestination.wikiHome) {

@@ -38,6 +38,26 @@ struct ThemedDivider: View {
   }
 }
 
+/// Dotted row separator matching chii.in timeline style (`1px dotted`).
+struct DottedDivider: View {
+  var body: some View {
+    DottedDividerLine()
+      .stroke(
+        Color.adaptive(light: 0xE8E8E8, dark: 0x555555),
+        style: StrokeStyle(lineWidth: 1, lineCap: .round, dash: [0.1, 3]))
+      .frame(height: 1)
+  }
+}
+
+private struct DottedDividerLine: Shape {
+  func path(in rect: CGRect) -> Path {
+    var path = Path()
+    path.move(to: CGPoint(x: rect.minX, y: rect.midY))
+    path.addLine(to: CGPoint(x: rect.maxX, y: rect.midY))
+    return path
+  }
+}
+
 private struct ThemedListRowBackground: View {
   @Environment(\.theme) private var theme
 

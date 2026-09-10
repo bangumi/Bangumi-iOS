@@ -109,23 +109,6 @@ struct TimelineListView: View {
             if loading, items.count > 0 {
               ProgressView()
             }
-            Picker("", selection: $timelineViewMode.animated()) {
-              ForEach(TimelineViewMode.allCases, id: \.self) { mode in
-                Text(mode.desc).tag(mode)
-              }
-            }
-            .disabled(loading)
-            .onChange(of: timelineViewMode) {
-              Task {
-                withAnimation(.default) {
-                  loading = true
-                }
-                await reload()
-                withAnimation(.default) {
-                  loading = false
-                }
-              }
-            }
             Button {
               showInput = true
             } label: {
@@ -169,5 +152,65 @@ struct TimelineListView: View {
     .refreshable {
       await reload()
     }
+    .toolbar {
+      if isAuthenticated {
+        ToolbarItem(placement: .principal) {
+          ClassicModeTabs(selection: modeSelection)
+        }
+      }
+    }
+    .onChange(of: timelineViewMode) {
+      Task {
+        withAnimation(.default) {
+          loading = true
+        }
+        await reload()
+        withAnimation(.default) {
+          loading = false
+        }
+      }
+    }
+  }
+
+  private var modeSelection: Binding<TimelineViewMode> {
+    Binding(
+      get: { timelineViewMode },
+      set: { newValue in
+        withAnimation(.default) {
+          timelineViewMode = newValue
+        }
+      })
+  }
+}
+
+private struct ClassicModeTabs: View {
+  @Binding var selection: TimelineViewMode
+
+  var body: some View {
+    HStack(spacing: 16) {
+      ForEach(TimelineViewMode.allCases, id: \.self) { mode in
+        tab(mode)
+      }
+    }
+    .fixedSize()
+  }
+
+  private func tab(_ mode: TimelineViewMode) -> some View {
+    let selected = mode == selection
+    return Button {
+      withAnimation(.default) {
+        selection = mode
+      }
+    } label: {
+      VStack(spacing: 3) {
+        Text(mode.desc)
+          .font(.subheadline.weight(selected ? .semibold : .regular))
+          .foregroundStyle(selected ? Color.primary : Color.secondary)
+        Capsule()
+          .fill(selected ? Color.accentColor : Color.clear)
+          .frame(width: 16, height: 2)
+      }
+    }
+    .buttonStyle(.plain)
   }
 }

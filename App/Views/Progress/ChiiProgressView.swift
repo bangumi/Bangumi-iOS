@@ -3,6 +3,7 @@ import SwiftUI
 
 struct ChiiProgressView: View {
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
+  @AppStorage("profile") var profile: Profile = Profile()
   @AppStorage("collectionsUpdatedAt") var collectionsUpdatedAt: Int = 0
   @AppStorage("progressViewMode") var progressViewMode: ProgressViewMode = .tile
   @AppStorage("progressSortMode") var progressSortMode: ProgressSortMode = .collectedAt
@@ -403,15 +404,6 @@ struct ChiiProgressView: View {
     }
   }
 
-  func typeDesc(stype: SubjectType) -> String {
-    let count = counts[stype, default: 0]
-    if count == 0 {
-      return stype.description
-    } else {
-      return "\(stype.description)(\(count))"
-    }
-  }
-
   @ViewBuilder
   private var progressSubjectsView: some View {
     if !progressSubjects.isEmpty {
@@ -462,14 +454,44 @@ struct ChiiProgressView: View {
     }
   }
 
-  private var progressTypePicker: some View {
-    Picker("SubjectType", selection: $progressTab.animated()) {
-      ForEach(SubjectType.progressTypes) { type in
-        Text(typeDesc(stype: type)).tag(type)
-      }
+  private func progressTabIcon(_ type: SubjectType) -> String {
+    switch type {
+    case .none:
+      return "square.grid.2x2"
+    default:
+      return type.icon
     }
-    .padding(.horizontal, 8)
-    .pickerStyle(.segmented)
+  }
+
+  private var progressTypePicker: some View {
+    ScrollView(.horizontal, showsIndicators: false) {
+      HStack(spacing: 8) {
+        ForEach(SubjectType.progressTypes) { type in
+          Button {
+            withAnimation(.default) {
+              progressTab = type
+            }
+          } label: {
+            HStack(spacing: 4) {
+              Image(systemName: progressTabIcon(type))
+              Text(type.description)
+              let count = counts[type, default: 0]
+              if count > 0 {
+                Text("\(count)")
+                  .foregroundStyle(
+                    progressTab == type
+                      ? AnyShapeStyle(.white.opacity(0.8)) : AnyShapeStyle(.secondary))
+              }
+            }
+          }
+          .adaptiveButtonStyle(progressTab == type ? .borderedProminent : .bordered)
+          .controlSize(.small)
+        }
+      }
+      .padding(.horizontal, 8)
+      .padding(.vertical, 4)
+    }
+    .scrollClipDisabled()
   }
 
   private var progressOptionsMenu: some View {
@@ -514,6 +536,15 @@ struct ChiiProgressView: View {
 
   @ToolbarContentBuilder
   private var progressToolbar: some ToolbarContent {
+    ToolbarItemGroup(placement: .topBarLeading) {
+      if isAuthenticated {
+        NavigationLink(value: NavDestination.profileHome) {
+          ProfileToolbarAvatarView(imageURL: profile.avatar?.large)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("我的")
+      }
+    }
     ToolbarItem(placement: .topBarTrailing) {
       progressToolbarContent
     }
