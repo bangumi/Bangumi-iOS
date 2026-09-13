@@ -52,6 +52,9 @@ ensure-config: ## Create App/Config.xcconfig from the example when missing
 build: ensure-config ## Build for iOS
 	$(call run_with_status,Building for iOS...,xcodebuild -project $(PROJECT) -scheme $(SCHEME) -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' build -quiet,Build succeeded.,Build failed.)
 
+test-bbcode: ## Run BBCode parser fixtures
+	$(call run_with_status,Running BBCode parser fixtures...,sh $(MISC_DIR)/bbcode/run-fixtures.sh,BBCode fixtures passed.,BBCode fixtures failed.)
+
 build-ci: ensure-config ## Build for iOS (CI, uses simulator, no code signing)
 	$(call run_with_status,Building for iOS...,xcodebuild -project $(PROJECT) -scheme $(SCHEME) -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' build -quiet CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO,Build succeeded.,Build failed.)
 

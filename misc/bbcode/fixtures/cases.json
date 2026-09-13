@@ -1,0 +1,427 @@
+{
+  "comment": "Language-neutral BBCode parser fixtures. Tree nodes: {\"text\": \"...\"} for plain text, {\"tag\": \"br\"} for line breaks, {\"tag\": \"<name>\", \"attr\": \"...\", \"children\": [...]} for tags. Adjacent plain text nodes are merged before comparison. 'text' asserts the joined visible text (br renders as \\n). 'inside'/'notInside' assert whether some <tag> subtree contains the given text. Cases are ported from bangumi/frontend packages/utils/bbcode/__test__/parser.test.ts plus app-specific extensions (list/ruby/photo/bmo, case-insensitive tags, catalog sticker canonicalization).",
+  "cases": [
+    {
+      "name": "text with unknown tag stays literal",
+      "input": "啊aあ\n)[bs][/bs]222",
+      "text": "啊aあ\n)[bs][/bs]222"
+    },
+    {
+      "name": "bangumi stickers and kaomoji-like text",
+      "input": "[(bgm38)[/(=A=)](=///=)(bgm01)",
+      "tree": [
+        { "text": "[" },
+        { "tag": "bgm", "attr": "bgm38" },
+        { "text": "[/(=A=)](=///=)" },
+        { "tag": "bgm", "attr": "bgm01" }
+      ]
+    },
+    {
+      "name": "url with attribute",
+      "input": "[url=http://chii.in]bgm[/url]",
+      "tree": [
+        { "tag": "url", "attr": "http://chii.in", "children": [{ "text": "bgm" }] }
+      ]
+    },
+    {
+      "name": "url with child text as href",
+      "input": " [url]http://chii.in/[/url]",
+      "tree": [
+        { "text": " " },
+        { "tag": "url", "children": [{ "text": "http://chii.in/" }] }
+      ]
+    },
+    {
+      "name": "invalid mixed bbcode round-trips as text",
+      "input": "[ba]bgm[/b](bg38)[b]加粗[b]",
+      "text": "[ba]bgm[/b](bg38)[b]加粗[b]"
+    },
+    {
+      "name": "img after text and newline",
+      "input": "存放于其他网络服务器的图片：\n[img]http://chii.in/img/ico/bgm88-31.gif[/img]",
+      "tree": [
+        { "text": "存放于其他网络服务器的图片：" },
+        { "tag": "br" },
+        { "tag": "img", "children": [{ "text": "http://chii.in/img/ico/bgm88-31.gif" }] }
+      ]
+    },
+    {
+      "name": "simple tags suite",
+      "input": "我是[mask]马赛克文字[/mask]\n[s]删除线文字[/s]\n[u]下划线文字[/u]\n[i]斜体字[/i]\n[b]粗体字[/b]\n[color=red]彩[/color][color=green]色[/color][color=blue]的[/color][color=orange]哟[/color]\n[quote]引用[/quote]\n[left]左[/left]\n[right]右[/right]\n[center]中[/center]\n[indent]块引用[/indent]\n[float]浮动[/float]\n",
+      "tree": [
+        { "text": "我是" },
+        { "tag": "mask", "children": [{ "text": "马赛克文字" }] },
+        { "tag": "br" },
+        { "tag": "s", "children": [{ "text": "删除线文字" }] },
+        { "tag": "br" },
+        { "tag": "u", "children": [{ "text": "下划线文字" }] },
+        { "tag": "br" },
+        { "tag": "i", "children": [{ "text": "斜体字" }] },
+        { "tag": "br" },
+        { "tag": "b", "children": [{ "text": "粗体字" }] },
+        { "tag": "br" },
+        { "tag": "color", "attr": "red", "children": [{ "text": "彩" }] },
+        { "tag": "color", "attr": "green", "children": [{ "text": "色" }] },
+        { "tag": "color", "attr": "blue", "children": [{ "text": "的" }] },
+        { "tag": "color", "attr": "orange", "children": [{ "text": "哟" }] },
+        { "tag": "br" },
+        { "tag": "quote", "children": [{ "text": "引用" }] },
+        { "tag": "br" },
+        { "tag": "left", "children": [{ "text": "左" }] },
+        { "tag": "br" },
+        { "tag": "right", "children": [{ "text": "右" }] },
+        { "tag": "br" },
+        { "tag": "center", "children": [{ "text": "中" }] },
+        { "tag": "br" },
+        { "text": "[indent]块引用[/indent]" },
+        { "tag": "br" },
+        { "tag": "float", "children": [{ "text": "浮动" }] },
+        { "tag": "br" }
+      ]
+    },
+    {
+      "name": "nested color and size",
+      "input": "[color=green]nest[size=16]更新：[/size][/color]",
+      "tree": [
+        {
+          "tag": "color",
+          "attr": "green",
+          "children": [
+            { "text": "nest" },
+            { "tag": "size", "attr": "16", "children": [{ "text": "更新：" }] }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "nested same tag",
+      "input": "[color=green][color=blue]更新：[/color][/color]",
+      "tree": [
+        {
+          "tag": "color",
+          "attr": "green",
+          "children": [
+            { "tag": "color", "attr": "blue", "children": [{ "text": "更新：" }] }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "code keeps raw content",
+      "input": "[code]afafaf[b]bbbbb[/b][/code]",
+      "tree": [
+        { "tag": "code", "children": [{ "text": "afafaf[b]bbbbb[/b]" }] }
+      ]
+    },
+    {
+      "name": "code nest 1",
+      "input": "[code][code]1[/code][/code] [code]2[/code]",
+      "tree": [
+        { "tag": "code", "children": [{ "text": "[code]1" }] },
+        { "text": "[/code] " },
+        { "tag": "code", "children": [{ "text": "2" }] }
+      ]
+    },
+    {
+      "name": "code nest 2",
+      "input": "[code]1[/code][/code] [code]2[/code]",
+      "tree": [
+        { "tag": "code", "children": [{ "text": "1" }] },
+        { "text": "[/code] " },
+        { "tag": "code", "children": [{ "text": "2" }] }
+      ]
+    },
+    {
+      "name": "code nest 3",
+      "input": "[code][code]1[/code] [code]2[/code]",
+      "tree": [
+        { "tag": "code", "children": [{ "text": "[code]1" }] },
+        { "text": " " },
+        { "tag": "code", "children": [{ "text": "2" }] }
+      ]
+    },
+    {
+      "name": "empty tags are invalid",
+      "input": "[b][/b][mask][/mask][s][/]",
+      "text": "[b][/b][mask][/mask][s][/]"
+    },
+    {
+      "name": "invalid urls stay literal",
+      "input": "[url]Bangumi 番组计划[/url][url=sfaf]番组计划[/url][url][/url]",
+      "text": "[url]Bangumi 番组计划[/url][url=sfaf]番组计划[/url][url][/url]"
+    },
+    {
+      "name": "unsafe url protocols are rejected",
+      "input": "[url=javascript:alert(1)]链接[/url][img]data:text/html,unsafe[/img]",
+      "text": "[url=javascript:alert(1)]链接[/url][img]data:text/html,unsafe[/img]"
+    },
+    {
+      "name": "invalid stickers stay literal",
+      "input": "(bgmab)(bgm38a",
+      "text": "(bgmab)(bgm38a"
+    },
+    {
+      "name": "character stickers with catalog gaps",
+      "input": "(musume_03)(blake_03)(musume_97)(musume_118)",
+      "tree": [
+        { "tag": "bgm", "attr": "musume_03" },
+        { "tag": "bgm", "attr": "blake_03" },
+        { "text": "(musume_97)" },
+        { "tag": "bgm", "attr": "musume_118" }
+      ]
+    },
+    {
+      "name": "bgm numeric ranges are validated",
+      "input": "(bgm125)(bgm200)(bgm238)(bgm500)(bgm529)",
+      "tree": [
+        { "tag": "bgm", "attr": "bgm125" },
+        { "tag": "bgm", "attr": "bgm200" },
+        { "tag": "bgm", "attr": "bgm238" },
+        { "tag": "bgm", "attr": "bgm500" },
+        { "tag": "bgm", "attr": "bgm529" }
+      ]
+    },
+    {
+      "name": "bgm out-of-range ids stay literal",
+      "input": "(bgm126)(bgm199)(bgm239)(bgm530)",
+      "text": "(bgm126)(bgm199)(bgm239)(bgm530)"
+    },
+    {
+      "name": "blake-only range",
+      "input": "(blake_97)(blake_98)(blake_118)",
+      "tree": [
+        { "tag": "bgm", "attr": "blake_97" },
+        { "tag": "bgm", "attr": "blake_98" },
+        { "tag": "bgm", "attr": "blake_118" }
+      ]
+    },
+    {
+      "name": "blake out-of-range stays literal",
+      "input": "(blake_119)",
+      "text": "(blake_119)"
+    },
+    {
+      "name": "character sticker ids are canonicalized",
+      "input": "(blake_031)(musume_3)",
+      "tree": [
+        { "tag": "bgm", "attr": "blake_31" },
+        { "tag": "bgm", "attr": "musume_03" }
+      ]
+    },
+    {
+      "name": "unterminated code stays literal",
+      "input": "[code]测试中/code]",
+      "text": "[code]测试中/code]"
+    },
+    {
+      "name": "subject with numeric id",
+      "input": "[subject=1]sub1[/subject]",
+      "tree": [
+        { "tag": "subject", "attr": "1", "children": [{ "text": "sub1" }] }
+      ]
+    },
+    {
+      "name": "subject without id stays literal",
+      "input": "[subject]sub2[/subject]",
+      "text": "[subject]sub2[/subject]"
+    },
+    {
+      "name": "subject with leading zero stays literal",
+      "input": "[subject=01]01[/subject]",
+      "text": "[subject=01]01[/subject]"
+    },
+    {
+      "name": "subject with non-numeric id stays literal",
+      "input": "[subject=abc]subabc[/subject]",
+      "text": "[subject=abc]subabc[/subject]"
+    },
+    {
+      "name": "align with valid value",
+      "input": "[align=left]对齐[/align]",
+      "tree": [
+        { "tag": "align", "attr": "left", "children": [{ "text": "对齐" }] }
+      ]
+    },
+    {
+      "name": "align with invalid value stays literal",
+      "input": "[align=lft]对齐[/align]",
+      "text": "[align=lft]对齐[/align]"
+    },
+    {
+      "name": "user with attr and with child",
+      "input": "[user=a_little]me[/user][user]a_little[/user]",
+      "tree": [
+        { "tag": "user", "attr": "a_little", "children": [{ "text": "me" }] },
+        { "tag": "user", "children": [{ "text": "a_little" }] }
+      ]
+    },
+    {
+      "name": "unknown tag inside valid tags does not break outer pairing",
+      "input": "[size=20][url=https://bangumi.tv/group/topic/402872][WIKI] 常见编辑错误/注意事项汇总&争议讨论[/url][/size]",
+      "tree": [
+        {
+          "tag": "size",
+          "attr": "20",
+          "children": [
+            {
+              "tag": "url",
+              "attr": "https://bangumi.tv/group/topic/402872",
+              "children": [
+                { "text": "[WIKI] 常见编辑错误/注意事项汇总&争议讨论" }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "mismatched extra closing tag invalidates only the unclosed color",
+      "input": "2.有活人收藏的[color=red][size=25]作品条目[/size][/size]→请在正确分类下新建一个任意条目",
+      "text": "2.有活人收藏的[color=red][size=25]作品条目[/size][/size]→请在正确分类下新建一个任意条目"
+    },
+    {
+      "name": "unclosed tag at EOF stays literal",
+      "input": "前文[b]未闭合",
+      "text": "前文[b]未闭合"
+    },
+    {
+      "name": "orphan closing tag at top level stays literal",
+      "input": "前面[/color]后面",
+      "text": "前面[/color]后面"
+    },
+    {
+      "name": "multi-line color",
+      "input": "[color=red]line1\nline2[/color]",
+      "tree": [
+        {
+          "tag": "color",
+          "attr": "red",
+          "children": [{ "text": "line1" }, { "tag": "br" }, { "text": "line2" }]
+        }
+      ]
+    },
+    {
+      "name": "list with items",
+      "input": "[list][*]苹果[*]香蕉[/list]",
+      "tree": [
+        {
+          "tag": "list",
+          "children": [
+            { "tag": "*" },
+            { "text": "苹果" },
+            { "tag": "*" },
+            { "text": "香蕉" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ordered list with attr",
+      "input": "[list=1][*]一[/list]",
+      "tree": [
+        { "tag": "list", "attr": "1", "children": [{ "tag": "*" }, { "text": "一" }] }
+      ]
+    },
+    {
+      "name": "ruby annotation",
+      "input": "[ruby=かん]漢[/ruby]",
+      "tree": [
+        { "tag": "ruby", "attr": "かん", "children": [{ "text": "漢" }] }
+      ]
+    },
+    {
+      "name": "photo with valid url",
+      "input": "[photo]https://img.example.com/a.jpg[/photo]",
+      "tree": [
+        { "tag": "photo", "children": [{ "text": "https://img.example.com/a.jpg" }] }
+      ]
+    },
+    {
+      "name": "photo with invalid url stays literal",
+      "input": "[photo]not-a-url[/photo]",
+      "text": "[photo]not-a-url[/photo]"
+    },
+    {
+      "name": "img with dimension attr",
+      "input": "[img=100x200]https://img.example.com/a.jpg[/img]",
+      "tree": [
+        {
+          "tag": "img",
+          "attr": "100x200",
+          "children": [{ "text": "https://img.example.com/a.jpg" }]
+        }
+      ]
+    },
+    {
+      "name": "nested quotes",
+      "input": "[quote]外[quote]内[/quote][/quote]",
+      "tree": [
+        {
+          "tag": "quote",
+          "children": [
+            { "text": "外" },
+            { "tag": "quote", "children": [{ "text": "内" }] }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "quote with attr",
+      "input": "[quote=someone]内容[/quote]",
+      "tree": [
+        { "tag": "quote", "attr": "someone", "children": [{ "text": "内容" }] }
+      ]
+    },
+    {
+      "name": "float with attr",
+      "input": "[float=right]x[/float]",
+      "tree": [
+        { "tag": "float", "attr": "right", "children": [{ "text": "x" }] }
+      ]
+    },
+    {
+      "name": "uppercase tag names are accepted",
+      "input": "[B]bold[/B]",
+      "tree": [{ "tag": "b", "children": [{ "text": "bold" }] }]
+    },
+    {
+      "name": "uppercase sticker code is canonicalized",
+      "input": "(BGM38)",
+      "tree": [{ "tag": "bgm", "attr": "bgm38" }]
+    },
+    {
+      "name": "kaomoji is not a sticker",
+      "input": "(=A=)",
+      "text": "(=A=)"
+    },
+    {
+      "name": "bmo sticker",
+      "input": "(bmo)",
+      "tree": [{ "tag": "bmo", "attr": "bmo" }]
+    },
+    {
+      "name": "color without attr stays literal",
+      "input": "[color]x[/color]",
+      "text": "[color]x[/color]"
+    },
+    {
+      "name": "size without digits stays literal",
+      "input": "[size=abc]x[/size]",
+      "text": "[size=abc]x[/size]"
+    },
+    {
+      "name": "topic 469999 regression: unclosed color does not leak",
+      "inputFile": "topic-469999.input.txt",
+      "inside": [
+        { "tag": "color", "contains": "不说人话的一概没有人权" },
+        { "tag": "color", "contains": "高亮：不要只丢个链接" },
+        { "tag": "url", "contains": "https://bgm.tv/group/topic/8465" }
+      ],
+      "notInside": [
+        { "tag": "color", "contains": "没有删除条目机能" },
+        { "tag": "color", "contains": "历史楼层" },
+        { "tag": "color", "contains": "三次元：" }
+      ]
+    }
+  ]
+}
