@@ -2,7 +2,9 @@ import SwiftUI
 
 extension View {
   @ViewBuilder
-  func imageCaption<Overlay: View>(@ViewBuilder caption: () -> Overlay) -> some View {
+  func imageCaption<Overlay: View>(
+    cornerRadius: CGFloat = 5, @ViewBuilder caption: () -> Overlay
+  ) -> some View {
     self
       .overlay {
         ZStack {
@@ -27,7 +29,7 @@ extension View {
           .font(.caption)
           .foregroundStyle(.white)
           .padding(.bottom, 2)
-        }.clipShape(RoundedRectangle(cornerRadius: 5))
+        }.clipShape(RoundedRectangle(cornerRadius: cornerRadius))
       }
   }
 }

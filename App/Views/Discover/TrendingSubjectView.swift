@@ -104,10 +104,12 @@ private struct TrendingSubjectTypeView: View {
     return max(count, 1)
   }
 
-  var largeCardWidth: CGFloat {
-    var w = CGFloat(320)
-    w = (width + 8) / CGFloat(columnCount) - 8
-    return max(w, 300)
+  var heroCardWidth: CGFloat {
+    min(width, 480)
+  }
+
+  var heroCardHeight: CGFloat {
+    heroCardWidth * type.coverAspectRatio
   }
 
   var smallCardWidth: CGFloat {
@@ -115,12 +117,12 @@ private struct TrendingSubjectTypeView: View {
     return max(w, 150)
   }
 
-  var largeItems: [TrendingSubjectDTO] {
-    return Array(items.prefix(columnCount))
+  var heroItem: TrendingSubjectDTO? {
+    items.first
   }
 
   var smallItems: [TrendingSubjectDTO] {
-    return Array(items.dropFirst(largeItems.count))
+    return Array(items.dropFirst())
   }
 
   private static func subjectIds(in items: [TrendingSubjectDTO]) -> [Int] {
@@ -131,87 +133,115 @@ private struct TrendingSubjectTypeView: View {
     collapseState[type]
   }
 
+  private func heroCard(item: TrendingSubjectDTO) -> some View {
+    let ctype = collectionTypes[item.subject.id] ?? CollectionType.none
+    return ImageView(img: item.subject.images?.resize(subjectImageQuality.largeSize))
+      .imageStyle(
+        width: heroCardWidth, height: heroCardHeight, cornerRadius: 12
+      )
+      .imageType(.subject)
+      .overlay(alignment: .topLeading) {
+        TrendingCollectionCapsule(ctype: ctype, subjectType: type, padding: 12)
+      }
+      .overlay(alignment: .bottom) {
+        LinearGradient(
+          gradient: Gradient(colors: [
+            Color.black.opacity(0),
+            Color.black.opacity(0.75),
+          ]), startPoint: .top, endPoint: .bottom
+        )
+        .frame(height: 140)
+        .clipShape(
+          UnevenRoundedRectangle(bottomLeadingRadius: 12, bottomTrailingRadius: 12)
+        )
+        .overlay(alignment: .bottomLeading) {
+          VStack(alignment: .leading, spacing: 4) {
+            Text(item.subject.title(with: titlePreference))
+              .font(.title3)
+              .bold()
+              .foregroundStyle(.white)
+              .multilineTextAlignment(.leading)
+              .truncationMode(.middle)
+              .lineLimit(2)
+              .shadow(color: .black.opacity(0.6), radius: 2, y: 1)
+            if item.count > 10 {
+              Text("\(item.count) 人关注")
+                .font(.caption)
+                .foregroundStyle(.white.opacity(0.85))
+            }
+          }
+          .padding(14)
+        }
+      }
+      .imageNavLink(item.subject.link)
+      .subjectPreview(
+        item.subject,
+        collectionType: ctype
+      ) {
+        await reloadCollectionType(subjectId: item.subject.id)
+      }
+  }
+
+  private var smallRow: some View {
+    ScrollView(.horizontal, showsIndicators: false) {
+      LazyHStack {
+        ForEach(smallItems) { item in
+          let ctype = collectionTypes[item.subject.id] ?? CollectionType.none
+          ImageView(img: item.subject.images?.resize(subjectImageQuality.mediumSize))
+            .imageStyle(
+              width: smallCardWidth, height: type.coverHeight(for: smallCardWidth),
+              cornerRadius: 12
+            )
+            .imageType(.subject)
+            .imageCaption(cornerRadius: 12) {
+              HStack {
+                VStack(alignment: .leading) {
+                  Text(item.subject.title(with: titlePreference))
+                    .multilineTextAlignment(.leading)
+                    .truncationMode(.middle)
+                    .lineLimit(2)
+                    .font(.footnote)
+                    .bold()
+                  if item.count > 10 {
+                    Text("\(item.count) 人关注")
+                      .font(.caption)
+                  }
+                }
+                Spacer(minLength: 0)
+              }.padding(8)
+            }
+            .overlay(alignment: .topLeading) {
+              TrendingCollectionCapsule(ctype: ctype, subjectType: type)
+            }
+            .imageNavLink(item.subject.link)
+            .subjectPreview(
+              item.subject,
+              collectionType: ctype
+            ) {
+              await reloadCollectionType(subjectId: item.subject.id)
+            }
+        }
+      }.scrollTargetLayout()
+    }
+    .scrollClipDisabled()
+    .scrollTargetBehavior(.viewAligned)
+  }
+
   var body: some View {
     VStack(spacing: 8) {
-      TrendingSubjectTypeHeader(type: type, collapseState: $collapseState)
+      TrendingSubjectTypeHeader(type: type, items: items, collapseState: $collapseState)
 
       if isCollapsed {
         EmptyView()
       } else if items.isEmpty {
         ProgressView()
       } else {
-        HStack {
-          ForEach(largeItems) { item in
-            ImageView(img: item.subject.images?.resize(subjectImageQuality.largeSize))
-              .imageStyle(width: largeCardWidth, height: type.coverHeight(for: largeCardWidth))
-              .imageType(.subject)
-              .imageCaption {
-                HStack {
-                  VStack(alignment: .leading) {
-                    if item.count > 10 {
-                      Text("\(item.count) 人关注")
-                        .font(.caption)
-                    }
-                    Text(item.subject.title(with: titlePreference))
-                      .multilineTextAlignment(.leading)
-                      .truncationMode(.middle)
-                      .lineLimit(2)
-                      .font(.body)
-                      .bold()
-                  }
-                  Spacer(minLength: 0)
-                }.padding(8)
-              }
-              .imageCollectionStatus(
-                ctype: collectionTypes[item.subject.id] ?? CollectionType.none
-              )
-              .imageNavLink(item.subject.link)
-              .subjectPreview(
-                item.subject,
-                collectionType: collectionTypes[item.subject.id] ?? CollectionType.none
-              ) {
-                await reloadCollectionType(subjectId: item.subject.id)
-              }
-          }
+        if let heroItem {
+          heroCard(item: heroItem)
         }
-        ScrollView(.horizontal, showsIndicators: false) {
-          LazyHStack {
-            ForEach(smallItems) { item in
-              ImageView(img: item.subject.images?.resize(subjectImageQuality.mediumSize))
-                .imageStyle(width: smallCardWidth, height: type.coverHeight(for: smallCardWidth))
-                .imageType(.subject)
-                .imageCaption {
-                  HStack {
-                    VStack(alignment: .leading) {
-                      if item.count > 10 {
-                        Text("\(item.count) 人关注")
-                          .font(.caption)
-                      }
-                      Text(item.subject.title(with: titlePreference))
-                        .multilineTextAlignment(.leading)
-                        .truncationMode(.middle)
-                        .lineLimit(2)
-                        .font(.footnote)
-                        .bold()
-                    }
-                    Spacer(minLength: 0)
-                  }.padding(4)
-                }
-                .imageCollectionStatus(
-                  ctype: collectionTypes[item.subject.id] ?? CollectionType.none
-                )
-                .imageNavLink(item.subject.link)
-                .subjectPreview(
-                  item.subject,
-                  collectionType: collectionTypes[item.subject.id] ?? CollectionType.none
-                ) {
-                  await reloadCollectionType(subjectId: item.subject.id)
-                }
-            }
-          }.scrollTargetLayout()
+        if !smallItems.isEmpty {
+          smallRow
         }
-        .scrollClipDisabled()
-        .scrollTargetBehavior(.viewAligned)
       }
     }
     .task(id: "\(type.rawValue)-\(reloadToken)") {
@@ -270,10 +300,34 @@ private struct TrendingSubjectTypeView: View {
 
 private struct TrendingSubjectTypeHeader: View {
   let type: SubjectType
+  let items: [TrendingSubjectDTO]
   @Binding var collapseState: TrendingSubjectCollapseState
+
+  @AppStorage("subjectImageQuality") var subjectImageQuality: ImageQuality = .high
 
   private var isCollapsed: Bool {
     collapseState[type]
+  }
+
+  private var previewItems: [TrendingSubjectDTO] {
+    Array(items.prefix(5))
+  }
+
+  private var collapsedCovers: some View {
+    HStack(spacing: -8) {
+      ForEach(Array(previewItems.enumerated()), id: \.element.id) { index, item in
+        ImageView(img: item.subject.images?.resize(subjectImageQuality.mediumSize))
+          .imageStyle(
+            width: 22, height: 22 * type.coverAspectRatio, cornerRadius: 4
+          )
+          .imageType(.subject)
+          .padding(1.5)
+          .background(Color(uiColor: .systemBackground))
+          .clipShape(RoundedRectangle(cornerRadius: 5.5))
+          .zIndex(Double(previewItems.count - index))
+      }
+    }
+    .allowsHitTesting(false)
   }
 
   var body: some View {
@@ -283,13 +337,19 @@ private struct TrendingSubjectTypeHeader: View {
           collapseState[type].toggle()
         }
       } label: {
-        HStack(spacing: 0) {
-          Image(systemName: isCollapsed ? "chevron.right" : "chevron.down")
-            .font(.headline)
-            .frame(width: 28, height: 28)
+        HStack(spacing: 10) {
+          HStack(spacing: 0) {
+            Image(systemName: isCollapsed ? "chevron.right" : "chevron.down")
+              .font(.headline)
+              .frame(width: 28, height: 28)
 
-          Text(type.description)
-            .font(.title)
+            Text(type.description)
+              .font(.title)
+          }
+
+          if isCollapsed, !previewItems.isEmpty {
+            collapsedCovers
+          }
         }
         .contentShape(Rectangle())
         .accessibilityLabel(isCollapsed ? "展开" : "收起")
@@ -302,6 +362,46 @@ private struct TrendingSubjectTypeHeader: View {
         Text("更多 »")
       }
       .buttonStyle(.navigation)
+    }
+  }
+}
+
+/// Collection status shown as a floating capsule on the top-leading corner
+/// of trending cards, replacing the shared circular corner badge.
+private struct TrendingCollectionCapsule: View {
+  let ctype: CollectionType
+  let subjectType: SubjectType
+  var padding: CGFloat = 8
+
+  var body: some View {
+    if ctype != .none {
+      TrendingCollectionMark(ctype: ctype, subjectType: subjectType)
+        .font(.caption.weight(.semibold))
+        .foregroundStyle(.white)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
+        .background(.black.opacity(0.45), in: Capsule())
+        .padding(padding)
+    }
+  }
+}
+
+/// Compact collection marker shown inline in the trending card caption,
+/// instead of the shared circular corner badge. White icon + status text,
+/// so the state reads clearly on any artwork.
+private struct TrendingCollectionMark: View {
+  let ctype: CollectionType
+  let subjectType: SubjectType
+
+  var body: some View {
+    if ctype != .none {
+      HStack(spacing: 3) {
+        Image(systemName: ctype.icon)
+          .font(.caption.weight(.bold))
+          .imageScale(.small)
+        Text(ctype.description(subjectType))
+      }
+      .shadow(color: .black.opacity(0.6), radius: 1, y: 1)
     }
   }
 }
