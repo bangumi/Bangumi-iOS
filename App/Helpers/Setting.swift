@@ -402,7 +402,7 @@ enum ChiiViewTab: String {
   var icon: String {
     switch self {
     case .timeline:
-      "text.bubble"
+      "person.2"
     case .progress:
       "square.grid.2x2"
     case .rakuen:
