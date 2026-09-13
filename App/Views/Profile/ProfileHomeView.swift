@@ -21,17 +21,17 @@ struct ProfileHomeView: View {
           .padding(.bottom, 8)
           .frame(maxWidth: .infinity)
 
+        ProfilePagesCard(user: profile.user)
+
         ForEach(SubjectType.allTypes) { stype in
           CollectionSubjectTypeView(stype: stype)
             .padding(.top, 5)
         }
       }.padding(.horizontal, 8)
     }
-    .navigationTitle("我的")
     .navigationBarTitleDisplayMode(.inline)
     .toolbar {
-      ToolbarItemGroup(placement: .topBarTrailing) {
-        ProfilePagesMenu(user: profile.user)
+      ToolbarItem(placement: .topBarTrailing) {
         ProfileActionsMenu()
       }
     }

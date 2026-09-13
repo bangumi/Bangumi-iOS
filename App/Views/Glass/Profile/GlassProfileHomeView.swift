@@ -20,7 +20,6 @@ struct GlassProfileHomeView: View {
       .padding(.top, 8)
       .padding(.bottom, 26)
     }
-    .navigationTitle("我的")
     .navigationBarTitleDisplayMode(.inline)
     .toolbar {
       ToolbarItem(placement: .topBarTrailing) {
