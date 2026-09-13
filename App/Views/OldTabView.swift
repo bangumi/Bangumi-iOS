@@ -4,12 +4,18 @@ import SwiftUI
 struct OldTabView: View {
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
   @AppStorage("isolationMode") var isolationMode: Bool = false
-  @AppStorage("mainTab") var mainTab: ChiiViewTab = .timeline
+
+  @State private var mainTab: ChiiViewTab
+
+  init() {
+    _mainTab = State(initialValue: AppConfig.mainTab.startupTab)
+  }
 
   @State private var timelineNav: NavigationPath = NavigationPath()
   @State private var progressNav: NavigationPath = NavigationPath()
   @State private var discoverNav: NavigationPath = NavigationPath()
   @State private var rakuenNav: NavigationPath = NavigationPath()
+  @State private var searchNav: NavigationPath = NavigationPath()
 
   private func selectVisibleTabIfNeeded() {
     if !isAuthenticated, mainTab == .progress {
@@ -105,13 +111,36 @@ struct OldTabView: View {
           }
         }
       )
+
+      NavigationStack(path: $searchNav) {
+        ChiiSearchView()
+          .themedScreen()
+          .navigationDestination(for: NavDestination.self) { $0 }
+      }
+      .tag(ChiiViewTab.search)
+      .tabItem {
+        Label(ChiiViewTab.search.title, systemImage: ChiiViewTab.search.icon)
+      }
+      .environment(
+        \.openURL,
+        OpenURLAction { url in
+          if handleURL(url, nav: $searchNav) {
+            return .handled
+          } else {
+            return .systemAction
+          }
+        }
+      )
       .onContinueUserActivity(CSSearchableItemActionType) { activity in
-        handleSearchActivity(activity, nav: $discoverNav)
-        mainTab = .discover
+        handleSearchActivity(activity, nav: $searchNav)
+        mainTab = .search
       }
     }
     .onAppear {
       selectVisibleTabIfNeeded()
+    }
+    .onChange(of: mainTab) { _, newValue in
+      AppConfig.mainTab = newValue
     }
     .onChange(of: isAuthenticated) { _, _ in
       selectVisibleTabIfNeeded()

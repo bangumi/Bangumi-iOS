@@ -48,4 +48,14 @@ enum AppConfig {
     get { FilterMode(UserDefaults.standard.string(forKey: "subjectCollectsFilterMode")) }
     set { UserDefaults.standard.set(newValue.rawValue, forKey: "subjectCollectsFilterMode") }
   }
+
+  static nonisolated var searchHistory: [String] {
+    get { [String](rawValue: UserDefaults.standard.string(forKey: "searchHistory") ?? "") ?? [] }
+    set { UserDefaults.standard.set(newValue.rawValue, forKey: "searchHistory") }
+  }
+
+  static nonisolated var mainTab: ChiiViewTab {
+    get { ChiiViewTab(UserDefaults.standard.string(forKey: "mainTab")) }
+    set { UserDefaults.standard.set(newValue.rawValue, forKey: "mainTab") }
+  }
 }

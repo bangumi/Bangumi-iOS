@@ -17,11 +17,11 @@ extension SearchType {
 struct GlassSearchView: View {
   let text: String
   @Binding var remote: Bool
+  @Binding var searchType: SearchType
+  @Binding var subjectType: SubjectType
 
   @Environment(\.theme) private var theme
 
-  @State private var searchType: SearchType = .subject
-  @State private var subjectType: SubjectType = .none
   @State private var localCount: Int = 0
   @State private var remoteTotal: Int = 0
 
@@ -52,27 +52,6 @@ struct GlassSearchView: View {
     .padding(.horizontal, 3)
   }
 
-  private var typeChips: some View {
-    ScrollView(.horizontal, showsIndicators: false) {
-      HStack(spacing: 6) {
-        chip(for: .none)
-        ForEach(SubjectType.allTypes) { type in
-          chip(for: type)
-        }
-      }
-      .padding(.horizontal, 2)
-    }
-    .scrollClipDisabled()
-  }
-
-  private func chip(for type: SubjectType) -> some View {
-    GlassChip(title: type.description, isSelected: subjectType == type) {
-      withAnimation(.default) {
-        subjectType = type
-      }
-    }
-  }
-
   @ViewBuilder
   private var results: some View {
     switch searchType {
@@ -99,33 +78,15 @@ struct GlassSearchView: View {
 
   var body: some View {
     VStack(alignment: .leading, spacing: theme.metrics.listSpacing) {
-      GlassSegmented(
-        selection: $searchType.animated(),
-        items: [SearchType.subject, .character, .person]
-      ) { item in
-        Text(item.glassTitle)
-      }
-      if searchType == .subject, !text.isEmpty {
-        typeChips
-      }
-      if text.isEmpty {
-        GlassEmptyCard(
-          systemImage: "magnifyingglass",
-          title: "输入关键字搜索",
-          description: "边输入即时匹配本地收藏与缓存\n回车搜索全站"
-        )
-        .padding(.top, 24)
-      } else {
-        indicatorRow
-        results
-        if !remote {
-          Text("以上来自本地缓存（我收藏/浏览过的条目）· 按回车搜索全站")
-            .font(.caption)
-            .foregroundStyle(theme.tertiaryText)
-            .multilineTextAlignment(.center)
-            .frame(maxWidth: .infinity)
-            .padding(.top, 2)
-        }
+      indicatorRow
+      results
+      if !remote {
+        Text("以上来自本地缓存（我收藏/浏览过的条目）· 按回车搜索全站")
+          .font(.caption)
+          .foregroundStyle(theme.tertiaryText)
+          .multilineTextAlignment(.center)
+          .frame(maxWidth: .infinity)
+          .padding(.top, 2)
       }
     }
     .onChange(of: searchType) { _, _ in

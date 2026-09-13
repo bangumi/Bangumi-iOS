@@ -6,14 +6,10 @@ struct GlassDiscoverView: View {
 
   @Environment(\.theme) private var theme
 
-  @State private var query: String = ""
-  @State private var remote: Bool = false
-  @State private var showsSearch = false
   @State private var didInitialRefresh = false
   @State private var refreshing = false
   @State private var calendarReloadToken = 0
   @State private var trendingReloadToken = 0
-  @FocusState private var searchFocused: Bool
 
   private func refreshCalendar() async {
     do {
@@ -53,56 +49,15 @@ struct GlassDiscoverView: View {
     }
   }
 
-  private func syncShowsSearch() {
-    let next = searchFocused || !query.isEmpty
-    guard showsSearch != next else { return }
-    withAnimation(.default) {
-      showsSearch = next
-    }
-  }
-
-  private var searchCancelAction: (() -> Void)? {
-    guard showsSearch else { return nil }
-    return { cancelSearch() }
-  }
-
-  private func cancelSearch() {
-    searchFocused = false
-    if !query.isEmpty {
-      query = ""
-    }
-    if remote {
-      remote = false
-    }
-    syncShowsSearch()
-  }
-
   var body: some View {
     GeometryReader { geometry in
       ScrollView {
         VStack(alignment: .leading, spacing: theme.metrics.listSpacing) {
-          GlassSearchField(
-            text: $query,
-            prompt: "搜索条目，角色，人物",
-            isFocused: $searchFocused,
-            onSubmit: {
-              withAnimation(.default) {
-                remote = true
-              }
-            },
-            onCancel: searchCancelAction
+          GlassCalendarSection(reloadToken: calendarReloadToken)
+          GlassTrendingSection(
+            width: geometry.size.width,
+            reloadToken: trendingReloadToken
           )
-          .searchInputTraits()
-
-          if showsSearch {
-            GlassSearchView(text: query, remote: $remote)
-          } else {
-            GlassCalendarSection(reloadToken: calendarReloadToken)
-            GlassTrendingSection(
-              width: geometry.size.width,
-              reloadToken: trendingReloadToken
-            )
-          }
         }
         .padding(.horizontal, theme.metrics.screenPadding)
         .padding(.top, 8)
@@ -135,19 +90,7 @@ struct GlassDiscoverView: View {
       }
     }
     .onAppear {
-      showsSearch = !query.isEmpty
       refreshInitiallyIfNeeded()
-    }
-    .onChange(of: query) { _, _ in
-      syncShowsSearch()
-      if remote {
-        withAnimation(.default) {
-          remote = false
-        }
-      }
-    }
-    .onChange(of: searchFocused) { _, _ in
-      syncShowsSearch()
     }
   }
 }

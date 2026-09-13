@@ -5,12 +5,18 @@ import SwiftUI
 struct MainView: View {
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
   @AppStorage("isolationMode") var isolationMode: Bool = false
-  @AppStorage("mainTab") var mainTab: ChiiViewTab = .timeline
+
+  @State private var mainTab: ChiiViewTab
+
+  init() {
+    _mainTab = State(initialValue: AppConfig.mainTab.startupTab)
+  }
 
   @State private var timelineNav: NavigationPath = NavigationPath()
   @State private var progressNav: NavigationPath = NavigationPath()
   @State private var rakuenNav: NavigationPath = NavigationPath()
   @State private var discoverNav: NavigationPath = NavigationPath()
+  @State private var searchNav: NavigationPath = NavigationPath()
 
   private func selectVisibleTabIfNeeded() {
     if !isAuthenticated, mainTab == .progress {
@@ -87,10 +93,7 @@ struct MainView: View {
         }
       }
 
-      Tab(
-        ChiiViewTab.discover.title, systemImage: ChiiViewTab.discover.icon,
-        value: ChiiViewTab.discover, role: .search
-      ) {
+      Tab(ChiiViewTab.discover.title, systemImage: ChiiViewTab.discover.icon, value: .discover) {
         ZoomTransitionContainer {
           NavigationStack(path: $discoverNav) {
             ChiiDiscoverView()
@@ -108,9 +111,32 @@ struct MainView: View {
             }
           }
         )
+      }
+
+      Tab(
+        ChiiViewTab.search.title, systemImage: ChiiViewTab.search.icon,
+        value: ChiiViewTab.search, role: .search
+      ) {
+        ZoomTransitionContainer {
+          NavigationStack(path: $searchNav) {
+            ChiiSearchView()
+              .themedScreen()
+              .navigationDestination(for: NavDestination.self) { $0 }
+          }
+        }
+        .environment(
+          \.openURL,
+          OpenURLAction { url in
+            if handleURL(url, nav: $searchNav) {
+              return .handled
+            } else {
+              return .systemAction
+            }
+          }
+        )
         .onContinueUserActivity(CSSearchableItemActionType) { activity in
-          handleSearchActivity(activity, nav: $discoverNav)
-          mainTab = .discover
+          handleSearchActivity(activity, nav: $searchNav)
+          mainTab = .search
         }
       }
 
@@ -118,6 +144,9 @@ struct MainView: View {
     .tabBarMinimizeBehaviorIfAvailable()
     .onAppear {
       selectVisibleTabIfNeeded()
+    }
+    .onChange(of: mainTab) { _, newValue in
+      AppConfig.mainTab = newValue
     }
     .onChange(of: isAuthenticated) { _, _ in
       selectVisibleTabIfNeeded()

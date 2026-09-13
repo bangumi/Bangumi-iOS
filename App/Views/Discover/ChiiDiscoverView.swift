@@ -6,10 +6,6 @@ struct ChiiDiscoverView: View {
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
   @AppStorage("profile") var profile: Profile = Profile()
 
-  @State private var query: String = ""
-  @State private var searching: Bool = false
-  @State private var remote: Bool = false
-  @State private var showsSearch = false
   @State private var didInitialRefresh = false
   @State private var refreshing = false
   @State private var calendarReloadToken = 0
@@ -64,19 +60,13 @@ struct ChiiDiscoverView: View {
 
   private var classicBody: some View {
     GeometryReader { geometry in
-      VStack {
-        if !showsSearch {
-          ScrollView {
-            VStack {
-              CalendarSlimView(reloadToken: calendarReloadToken)
-              TrendingSubjectView(
-                width: geometry.size.width,
-                reloadToken: trendingReloadToken
-              )
-            }
-          }
-        } else {
-          SearchView(text: $query, remote: $remote)
+      ScrollView {
+        VStack {
+          CalendarSlimView(reloadToken: calendarReloadToken)
+          TrendingSubjectView(
+            width: geometry.size.width,
+            reloadToken: trendingReloadToken
+          )
         }
       }
     }
@@ -85,12 +75,6 @@ struct ChiiDiscoverView: View {
     }
     .navigationTitle("发现")
     .toolbarTitleDisplayMode(.inline)
-    .searchable(
-      text: $query, isPresented: $searching,
-      placement: .navigationBarDrawer(displayMode: .always),
-      prompt: "搜索条目，角色，人物"
-    )
-    .searchInputTraits()
     .toolbar {
       ToolbarItemGroup(placement: .topBarLeading) {
         if isAuthenticated {
@@ -110,26 +94,7 @@ struct ChiiDiscoverView: View {
       }
     }
     .onAppear {
-      showsSearch = !query.isEmpty
       refreshInitiallyIfNeeded()
-    }
-    .onChange(of: query) { _, newValue in
-      let nextShowsSearch = !newValue.isEmpty
-      if showsSearch != nextShowsSearch {
-        withAnimation(.default) {
-          showsSearch = nextShowsSearch
-        }
-      }
-      if remote {
-        withAnimation(.default) {
-          remote = false
-        }
-      }
-    }
-    .onSubmit(of: .search) {
-      withAnimation(.default) {
-        remote = true
-      }
     }
   }
 }
