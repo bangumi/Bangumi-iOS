@@ -270,7 +270,9 @@ struct GlassIndexRelatedCard: View {
   }
 
   @ViewBuilder
-  private func metaLine(nickname: String, link: String, createdAt: Int, replies: Int)
+  private func metaLine(
+    nickname: String, link: String, createdAt: Int, replies: Int, showsAgeBadge: Bool = false
+  )
     -> some View
   {
     HStack(spacing: 5) {
@@ -284,6 +286,9 @@ struct GlassIndexRelatedCard: View {
         .foregroundStyle(theme.placeholder)
       Text("\(replies) 回复")
         .foregroundStyle(theme.tertiaryText)
+      if showsAgeBadge {
+        TopicAgeBadge(createdAt: createdAt)
+      }
       Spacer(minLength: 0)
     }
     .font(.caption2)
@@ -469,7 +474,6 @@ struct GlassIndexRelatedCard: View {
             categoryIcon()
             TopicTitleView(
               title: topic.title,
-              createdAt: topic.createdAt,
               replyCount: topic.replyCount,
               link: topic.link
             )
@@ -484,7 +488,7 @@ struct GlassIndexRelatedCard: View {
             .lineLimit(1)
           metaLine(
             nickname: creator.nickname, link: creator.link, createdAt: topic.createdAt,
-            replies: topic.replyCount)
+            replies: topic.replyCount, showsAgeBadge: true)
         }
         Spacer(minLength: 0)
       }
@@ -506,7 +510,6 @@ struct GlassIndexRelatedCard: View {
             categoryIcon()
             TopicTitleView(
               title: topic.title,
-              createdAt: topic.createdAt,
               replyCount: topic.replyCount,
               link: topic.link
             )
@@ -525,7 +528,7 @@ struct GlassIndexRelatedCard: View {
           }
           metaLine(
             nickname: creator.nickname, link: creator.link, createdAt: topic.createdAt,
-            replies: topic.replyCount)
+            replies: topic.replyCount, showsAgeBadge: true)
         }
         Spacer(minLength: 0)
       }

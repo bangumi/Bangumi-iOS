@@ -59,7 +59,9 @@ struct GlassTopicRow<Source: View>: View {
         .imageLink(avatarLink)
       VStack(alignment: .leading, spacing: 6) {
         NavigationLink(value: destination) {
-          TopicTitleView(title: title, createdAt: createdAt, replyCount: replyCount)
+          TopicTitleView(
+            title: title, replyCount: replyCount
+          )
             .font(.subheadline.weight(.semibold))
             .foregroundStyle(theme.cardTitle)
             .lineLimit(2)
@@ -76,6 +78,7 @@ struct GlassTopicRow<Source: View>: View {
             .monospacedDigit()
             .foregroundStyle(theme.tertiaryText)
             .lineLimit(1)
+          TopicAgeBadge(createdAt: createdAt)
         }
       }
       Spacer(minLength: 0)

@@ -9,7 +9,6 @@ struct SubjectTopicItemView: View {
         NavigationLink(value: NavDestination.subjectTopicDetail(topic.id)) {
           TopicTitleView(
             title: topic.title,
-            createdAt: topic.createdAt,
             replyCount: topic.replyCount
           )
             .font(.callout)
@@ -25,6 +24,8 @@ struct SubjectTopicItemView: View {
                 .lineLimit(1)
             }
           }.foregroundStyle(.secondary)
+          TopicAgeBadge(createdAt: topic.createdAt)
+            .padding(.leading, 4)
           Spacer()
           if let creator = topic.creator {
             Text(creator.nickname.withLink(creator.link))

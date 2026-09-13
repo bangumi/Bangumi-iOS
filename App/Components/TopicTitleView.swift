@@ -1,46 +1,31 @@
 import SwiftUI
 
 struct TopicTitleView: View {
-  private static let hour = 60 * 60
-  private static let day = 24 * hour
-  private static let year = 365 * day
-
-  @AppStorage("showTopicAgeBadge") private var showTopicAgeBadge = true
-
   @Environment(\.theme) private var theme
 
   let title: String
-  let createdAt: Int
   let replyCount: Int?
   let link: String?
   let showsReplyCount: Bool
 
   init(
     title: String,
-    createdAt: Int,
     replyCount: Int?,
     link: String? = nil,
     showsReplyCount: Bool = false
   ) {
     self.title = title
-    self.createdAt = createdAt
     self.replyCount = replyCount
     self.link = link
     self.showsReplyCount = showsReplyCount
   }
 
   var body: some View {
-    let now = Int(Date.now.timeIntervalSince1970)
-    var text = Text(title.withLink(link))
+    titleText
+  }
 
-    if showTopicAgeBadge, createdAt > 0, createdAt <= now {
-      let elapsed = now - createdAt
-      text =
-        text
-        + Text(" [\(ageText(elapsed: elapsed))]")
-        .font(.caption)
-        .foregroundColor(ageColor(elapsed: elapsed))
-    }
+  private var titleText: Text {
+    var text = Text(title.withLink(link))
 
     if showsReplyCount, let replyCount {
       text =
@@ -51,6 +36,31 @@ struct TopicTitleView: View {
     }
 
     return text
+  }
+}
+
+struct TopicAgeBadge: View {
+  private static let hour = 60 * 60
+  private static let day = 24 * hour
+  private static let year = 365 * day
+
+  @AppStorage("showTopicAgeBadge") private var showTopicAgeBadge = true
+
+  let createdAt: Int
+
+  var body: some View {
+    let now = Int(Date.now.timeIntervalSince1970)
+    if showTopicAgeBadge, createdAt > 0, createdAt <= now {
+      let elapsed = now - createdAt
+      let color = ageColor(elapsed: elapsed)
+      Text(ageText(elapsed: elapsed))
+        .font(.caption2.weight(.semibold))
+        .monospacedDigit()
+        .foregroundStyle(color)
+        .padding(.horizontal, 5)
+        .padding(.vertical, 1)
+        .background(color.opacity(0.15), in: Capsule())
+    }
   }
 
   private func ageText(elapsed: Int) -> String {
