@@ -387,7 +387,7 @@ enum ChiiViewTab: String {
   var title: String {
     switch self {
     case .timeline:
-      "时间线"
+      "时空管理局"
     case .progress:
       "进度管理"
     case .rakuen:
@@ -402,7 +402,7 @@ enum ChiiViewTab: String {
   var icon: String {
     switch self {
     case .timeline:
-      "person.2"
+      "building.columns"
     case .progress:
       "square.grid.2x2"
     case .rakuen:

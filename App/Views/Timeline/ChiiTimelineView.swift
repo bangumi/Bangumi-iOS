@@ -38,7 +38,7 @@ struct ChiiTimelineView: View {
 
   private var classicBody: some View {
     TimelineListView()
-      .navigationTitle("时间线")
+      .navigationTitle("时空管理局")
       .navigationBarTitleDisplayMode(.inline)
       .toolbar {
         ToolbarItemGroup(placement: .topBarLeading) {

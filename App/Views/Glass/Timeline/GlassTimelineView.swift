@@ -56,7 +56,7 @@ struct GlassTimelineView: View {
 
   var body: some View {
     GlassTimelineListView()
-      .navigationTitle("时间线")
+      .navigationTitle("时空管理局")
       .navigationBarTitleDisplayMode(.inline)
       .toolbar {
         ToolbarItemGroup(placement: .topBarLeading) {
