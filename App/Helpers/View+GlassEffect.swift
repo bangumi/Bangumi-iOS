@@ -23,18 +23,14 @@ extension View {
   func glassEffectIfAvailable<S: InsettableShape>(
     tint: Color? = nil, interactive: Bool = false, shape: S
   ) -> some View {
-    #if compiler(>=6.2)
-      if #available(iOS 26.0, *) {
-        if let tint {
-          self.glassEffect(.regular.tint(tint).interactive(interactive), in: shape)
-        } else {
-          self.glassEffect(.regular.interactive(interactive), in: shape)
-        }
+    if #available(iOS 26.0, *) {
+      if let tint {
+        self.glassEffect(.regular.tint(tint).interactive(interactive), in: shape)
       } else {
-        modifier(GlassSurfaceFallbackModifier(tint: tint, shape: shape))
+        self.glassEffect(.regular.interactive(interactive), in: shape)
       }
-    #else
+    } else {
       modifier(GlassSurfaceFallbackModifier(tint: tint, shape: shape))
-    #endif
+    }
   }
 }
