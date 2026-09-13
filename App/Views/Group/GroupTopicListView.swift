@@ -47,7 +47,6 @@ struct GroupTopicListView: View {
                 NavigationLink(value: NavDestination.groupTopicDetail(topic.id)) {
                   TopicTitleView(
                     title: topic.title,
-                    createdAt: topic.createdAt,
                     replyCount: topic.replyCount,
                     showsReplyCount: true
                   )
@@ -67,6 +66,7 @@ struct GroupTopicListView: View {
                   .lineLimit(1)
                 Spacer()
                 Text(topic.updatedAt.datetimeDisplay)
+                TopicAgeBadge(createdAt: topic.createdAt)
               }
               .font(.footnote)
               .foregroundStyle(.secondary)

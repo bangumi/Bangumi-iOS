@@ -384,7 +384,6 @@ struct GroupRecentTopicView: View {
                 NavigationLink(value: NavDestination.groupTopicDetail(topic.id)) {
                   TopicTitleView(
                     title: topic.title,
-                    createdAt: topic.createdAt,
                     replyCount: topic.replyCount,
                     showsReplyCount: true
                   )
@@ -398,6 +397,7 @@ struct GroupRecentTopicView: View {
                 Text(topic.createdAt.datetimeDisplay)
                   .lineLimit(1)
                   .foregroundStyle(.secondary)
+                TopicAgeBadge(createdAt: topic.createdAt)
                 Spacer()
                 if let creator = topic.creator {
                   Text(creator.nickname.withLink(creator.link))

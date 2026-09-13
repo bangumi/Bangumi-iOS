@@ -105,7 +105,6 @@ struct RakuenSubjectTopicItemView: View {
         VStack(alignment: .leading) {
           TopicTitleView(
             title: topic.title,
-            createdAt: topic.createdAt,
             replyCount: topic.replyCount,
             link: topic.link,
             showsReplyCount: true
@@ -116,6 +115,7 @@ struct RakuenSubjectTopicItemView: View {
               .font(.caption)
               .foregroundStyle(.secondary)
               .lineLimit(1)
+            TopicAgeBadge(createdAt: topic.createdAt)
             Spacer()
             NavigationLink(value: NavDestination.subject(topic.subject.id)) {
               Text(topic.subject.title(with: titlePreference))

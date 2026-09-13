@@ -929,7 +929,7 @@ struct GlassSubjectTopicRow: View {
       HStack(spacing: 10) {
         VStack(alignment: .leading, spacing: 3) {
           TopicTitleView(
-            title: topic.title, createdAt: topic.createdAt, replyCount: topic.replyCount
+            title: topic.title, replyCount: topic.replyCount
           )
           .font(.footnote.weight(.bold))
           .foregroundStyle(theme.cardTitle)
@@ -941,6 +941,7 @@ struct GlassSubjectTopicRow: View {
               Text(verbatim: "·")
             }
             Text(topic.createdAt.dateDisplay).lineLimit(1)
+            TopicAgeBadge(createdAt: topic.createdAt)
           }
           .font(.caption2)
           .monospacedDigit()

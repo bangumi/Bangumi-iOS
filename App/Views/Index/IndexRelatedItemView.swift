@@ -271,7 +271,6 @@ struct IndexRelatedItemView: View {
                     .font(.footnote)
                   TopicTitleView(
                     title: topic.title,
-                    createdAt: topic.createdAt,
                     replyCount: topic.replyCount,
                     link: topic.link
                   )
@@ -294,6 +293,8 @@ struct IndexRelatedItemView: View {
                   Text(" • ")
                     .foregroundStyle(.secondary)
                   Text("\(topic.replyCount)回复".withLink(topic.link))
+                  TopicAgeBadge(createdAt: topic.createdAt)
+                    .padding(.leading, 4)
                 }.font(.footnote)
                 if !item.comment.isEmpty {
                   BorderView(color: .secondary.opacity(0.2), padding: 4) {
@@ -328,7 +329,6 @@ struct IndexRelatedItemView: View {
                     .font(.footnote)
                   TopicTitleView(
                     title: topic.title,
-                    createdAt: topic.createdAt,
                     replyCount: topic.replyCount,
                     link: topic.link
                   )
@@ -356,6 +356,8 @@ struct IndexRelatedItemView: View {
                   Text(" • ")
                     .foregroundStyle(.secondary)
                   Text("\(topic.replyCount)回复".withLink(topic.link))
+                  TopicAgeBadge(createdAt: topic.createdAt)
+                    .padding(.leading, 4)
                 }.font(.footnote)
                 if !item.comment.isEmpty {
                   BorderView(color: .secondary.opacity(0.2), padding: 4) {
