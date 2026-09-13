@@ -297,16 +297,20 @@ struct PostDocumentWebView: UIViewRepresentable {
       topOffsetObservation =
         topOffsetObservation
         ?? scrollView.observe(\.contentOffset, options: [.new]) { [weak self] scrollView, _ in
-          guard let self, let until = guardsTopUntil else { return }
-          guard Date() < until else {
-            guardsTopUntil = nil
-            return
+          // KVO delivers this @Sendable closure off the main actor; hop back to
+          // the coordinator's isolation before touching main-actor state.
+          Task { @MainActor [weak self] in
+            guard let self, let until = guardsTopUntil else { return }
+            guard Date() < until else {
+              guardsTopUntil = nil
+              return
+            }
+            let top = -scrollView.adjustedContentInset.top
+            guard top < 0, scrollView.contentOffset.y == 0,
+              !scrollView.isDragging, !scrollView.isDecelerating
+            else { return }
+            scrollView.contentOffset.y = top
           }
-          let top = -scrollView.adjustedContentInset.top
-          guard top < 0, scrollView.contentOffset.y == 0,
-            !scrollView.isDragging, !scrollView.isDecelerating
-          else { return }
-          scrollView.contentOffset.y = top
         }
     }
 
