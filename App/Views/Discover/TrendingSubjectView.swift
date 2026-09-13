@@ -104,8 +104,11 @@ private struct TrendingSubjectTypeView: View {
     return max(count, 1)
   }
 
+  private static let heroSpacing: CGFloat = 12
+
   var heroCardWidth: CGFloat {
-    min(width, 480)
+    let total = width - Self.heroSpacing * CGFloat(columnCount - 1)
+    return total / CGFloat(columnCount)
   }
 
   var heroCardHeight: CGFloat {
@@ -117,12 +120,12 @@ private struct TrendingSubjectTypeView: View {
     return max(w, 150)
   }
 
-  var heroItem: TrendingSubjectDTO? {
-    items.first
+  var heroItems: [TrendingSubjectDTO] {
+    return Array(items.prefix(columnCount))
   }
 
   var smallItems: [TrendingSubjectDTO] {
-    return Array(items.dropFirst())
+    return Array(items.dropFirst(heroItems.count))
   }
 
   private static func subjectIds(in items: [TrendingSubjectDTO]) -> [Int] {
@@ -156,6 +159,11 @@ private struct TrendingSubjectTypeView: View {
         )
         .overlay(alignment: .bottomLeading) {
           VStack(alignment: .leading, spacing: 4) {
+            if item.count > 10 {
+              Text("\(item.count) 人关注")
+                .font(.caption)
+                .foregroundStyle(.white.opacity(0.85))
+            }
             Text(item.subject.title(with: titlePreference))
               .font(.title3)
               .bold()
@@ -164,11 +172,6 @@ private struct TrendingSubjectTypeView: View {
               .truncationMode(.middle)
               .lineLimit(2)
               .shadow(color: .black.opacity(0.6), radius: 2, y: 1)
-            if item.count > 10 {
-              Text("\(item.count) 人关注")
-                .font(.caption)
-                .foregroundStyle(.white.opacity(0.85))
-            }
           }
           .padding(14)
         }
@@ -196,16 +199,16 @@ private struct TrendingSubjectTypeView: View {
             .imageCaption(cornerRadius: 12) {
               HStack {
                 VStack(alignment: .leading) {
+                  if item.count > 10 {
+                    Text("\(item.count) 人关注")
+                      .font(.caption)
+                  }
                   Text(item.subject.title(with: titlePreference))
                     .multilineTextAlignment(.leading)
                     .truncationMode(.middle)
                     .lineLimit(2)
                     .font(.footnote)
                     .bold()
-                  if item.count > 10 {
-                    Text("\(item.count) 人关注")
-                      .font(.caption)
-                  }
                 }
                 Spacer(minLength: 0)
               }.padding(8)
@@ -236,8 +239,10 @@ private struct TrendingSubjectTypeView: View {
       } else if items.isEmpty {
         ProgressView()
       } else {
-        if let heroItem {
-          heroCard(item: heroItem)
+        HStack(spacing: Self.heroSpacing) {
+          ForEach(heroItems) { item in
+            heroCard(item: item)
+          }
         }
         if !smallItems.isEmpty {
           smallRow
