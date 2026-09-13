@@ -103,18 +103,21 @@ class BBCodeParserWorker {
     return input[pos...]
   }
 
+  // Swift treats CRLF as a single grapheme-cluster Character, so a line break
+  // may be "\r\n", "\r", or "\n" — all three must be recognized.
+  private func isLineBreak(_ c: Swift.Character) -> Bool {
+    return c == Swift.Character("\r\n") || c == Swift.Character("\r")
+      || c == Swift.Character("\n")
+  }
+
   private func parseChildren(into parent: BBCodeNode, topLevel: Bool) {
     while !isEOF {
       if !topLevel && remaining.hasPrefix("[/") {
         return
       }
       let c = input[pos]
-      if c == Swift.Character("\r") || c == Swift.Character("\n") {
-        // Collapse \r\n into a single line break.
-        let next = input.index(after: pos)
-        if c == Swift.Character("\r"), next < input.endIndex, input[next] == Swift.Character("\n") {
-          pos = next
-        }
+      if isLineBreak(c) {
+        // A "\r\n" cluster collapses into a single line break node.
         pos = input.index(after: pos)
         parent.children.append(makeNode(type: .br, parent: parent))
         continue
@@ -145,9 +148,7 @@ class BBCodeParserWorker {
     let start = pos
     while !isEOF {
       let c = input[pos]
-      if c == Swift.Character("[") || c == Swift.Character("(") || c == Swift.Character("\r")
-        || c == Swift.Character("\n")
-      {
+      if c == Swift.Character("[") || c == Swift.Character("(") || isLineBreak(c) {
         break
       }
       pos = input.index(after: pos)
@@ -167,7 +168,7 @@ class BBCodeParserWorker {
     let maxLength = 100
     while i < input.endIndex {
       let c = input[i]
-      if c == Swift.Character("\n") || c == Swift.Character("\r") {
+      if isLineBreak(c) {
         pos = i
         throw BBCodeParseFailure()
       }

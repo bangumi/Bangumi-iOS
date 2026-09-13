@@ -92,6 +92,7 @@ enum BBCodeTagType: Int {
   case bgm, bmo
   case subject, user
   case background, avatar, float
+  case indent
 
   static let unsupported: [BBCodeTagType] = [.background, .avatar, .float]
   static let layout: [BBCodeTagType] = [.center, .left, .right, .align]
@@ -131,6 +132,7 @@ enum BBCodeTagType: Int {
     case .background: return "background"
     case .avatar: return "avatar"
     case .float: return "float"
+    case .indent: return "indent"
     }
   }
 }
@@ -309,6 +311,17 @@ let bbcodeTagDefinitions: [BBCodeTagInfo] = [
   ),
   BBCodeTagInfo(
     "quote", .quote,
+    BBCodeTagDescription(
+      tagNeeded: true, isSelfClosing: false,
+      allowedChildren: [
+        .br, .mask, .quote, .code, .url, .image, .subject, .user,
+      ] + BBCodeTagType.unsupported + BBCodeTagType.layout + BBCodeTagType.textStyle,
+      allowAttr: false,
+      isBlock: true
+    )
+  ),
+  BBCodeTagInfo(
+    "indent", .indent,
     BBCodeTagDescription(
       tagNeeded: true, isSelfClosing: false,
       allowedChildren: [

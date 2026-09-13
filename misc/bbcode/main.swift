@@ -135,6 +135,27 @@ func runCase(_ testCase: [String: Any], fixturesDir: String, tagManager: BBCodeT
       }
     }
   }
+
+  if let countRules = testCase["tagCountAtLeast"] as? [[String: Any]] {
+    for rule in countRules {
+      let tag = rule["tag"] as? String ?? ""
+      let expected = rule["count"] as? Int ?? 0
+      var actual = 0
+      func countTag(_ node: BBCodeNode) {
+        if tag == "br" {
+          if node.type == .br { actual += 1 }
+        } else if node.type != .plain && node.type != .br && node.value == tag {
+          actual += 1
+        }
+        for child in node.children { countTag(child) }
+      }
+      countTag(root)
+      guard actual >= expected else {
+        throw FixtureFailure(
+          description: "expected at least \(expected) <\(tag)> node(s), got \(actual)")
+      }
+    }
+  }
 }
 
 // MARK: - Entry point

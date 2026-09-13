@@ -167,7 +167,7 @@ extension BBCode {
 
 private struct BBCodeTextKitRenderer {
   private static let blockTypes: Set<BBCodeTagType> = [
-    .center, .left, .right, .align, .quote, .code, .list,
+    .center, .left, .right, .align, .quote, .code, .list, .indent,
   ]
 
   private enum RenderedSegment {
@@ -323,7 +323,7 @@ private struct BBCodeTextKitRenderer {
       ]
     case .root, .float:
       return renderSegments(children: node.children)
-    case .center, .left, .right, .align, .code:
+    case .center, .left, .right, .align, .code, .indent:
       let childSegments = renderSegments(children: node.children)
       if childSegments.contains(where: \.containsBlock) {
         return blockBoundaries(around: applyNodeWrapper(node, to: childSegments))
@@ -385,6 +385,13 @@ private struct BBCodeTextKitRenderer {
         applyParagraphStyle(to: attributed) { style in
           style.firstLineHeadIndent = 8
           style.headIndent = 8
+        }
+      }
+    case .indent:
+      return mapTextSegments(segments) { attributed in
+        applyParagraphStyle(to: attributed) { style in
+          style.firstLineHeadIndent = 24
+          style.headIndent = 24
         }
       }
     case .subject:
@@ -864,6 +871,8 @@ private struct BBCodeTextKitRenderer {
       return renderCode(node)
     case .quote:
       return renderQuote(node)
+    case .indent:
+      return renderIndent(node)
     case .subject:
       return renderSubject(node)
     case .user:
@@ -1059,6 +1068,17 @@ private struct BBCodeTextKitRenderer {
       style.headIndent = 8
     }
     return result
+  }
+
+  private func renderIndent(_ node: BBCodeNode) -> NSMutableAttributedString {
+    let inner = renderChildren(node.children)
+    trimLeadingNewlines(in: inner)
+    trimTrailingNewlines(in: inner)
+    applyParagraphStyle(to: inner) { style in
+      style.firstLineHeadIndent = 24
+      style.headIndent = 24
+    }
+    return inner
   }
 
   private func renderSubject(_ node: BBCodeNode) -> NSMutableAttributedString {

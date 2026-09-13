@@ -186,6 +186,13 @@ var bbcodeHTMLRenderers: [BBCodeTagType: BBCodeHTMLRender] {
       html.append("</blockquote></div>")
       return html
     },
+    .indent: { (n: BBCodeNode, args: [String: Any]?) in
+      var html: String
+      html = "<blockquote class=\"clearit\">"
+      html.append(n.renderInnerHTML(args))
+      html.append("</blockquote>")
+      return html
+    },
     .subject: { (n: BBCodeNode, args: [String: Any]?) in
       let domains = bangumiDomains(from: args)
       let host = args?["host"] as? String

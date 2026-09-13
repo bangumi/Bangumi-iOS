@@ -7,6 +7,42 @@
       "text": "啊aあ\n)[bs][/bs]222"
     },
     {
+      "name": "CRLF line breaks become br nodes",
+      "input": "a\r\nb\r\n\r\nc",
+      "tree": [
+        { "text": "a" },
+        { "tag": "br" },
+        { "text": "b" },
+        { "tag": "br" },
+        { "tag": "br" },
+        { "text": "c" }
+      ]
+    },
+    {
+      "name": "lone CR and LF line breaks",
+      "input": "a\rb\nc",
+      "tree": [
+        { "text": "a" },
+        { "tag": "br" },
+        { "text": "b" },
+        { "tag": "br" },
+        { "text": "c" }
+      ]
+    },
+    {
+      "name": "CRLF inside tags",
+      "input": "[b]粗体[/b]\r\n[color=red]红\r\n字[/color]",
+      "tree": [
+        { "tag": "b", "children": [{ "text": "粗体" }] },
+        { "tag": "br" },
+        {
+          "tag": "color",
+          "attr": "red",
+          "children": [{ "text": "红" }, { "tag": "br" }, { "text": "字" }]
+        }
+      ]
+    },
+    {
       "name": "bangumi stickers and kaomoji-like text",
       "input": "[(bgm38)[/(=A=)](=///=)(bgm01)",
       "tree": [
@@ -73,7 +109,7 @@
         { "tag": "br" },
         { "tag": "center", "children": [{ "text": "中" }] },
         { "tag": "br" },
-        { "text": "[indent]块引用[/indent]" },
+        { "tag": "indent", "children": [{ "text": "块引用" }] },
         { "tag": "br" },
         { "tag": "float", "children": [{ "text": "浮动" }] },
         { "tag": "br" }
@@ -366,6 +402,16 @@
       ]
     },
     {
+      "name": "indent block",
+      "input": "[indent]缩进\r\n多行[/indent]",
+      "tree": [
+        {
+          "tag": "indent",
+          "children": [{ "text": "缩进" }, { "tag": "br" }, { "text": "多行" }]
+        }
+      ]
+    },
+    {
       "name": "quote with attr",
       "input": "[quote=someone]内容[/quote]",
       "tree": [
@@ -412,6 +458,7 @@
     {
       "name": "topic 469999 regression: unclosed color does not leak",
       "inputFile": "topic-469999.input.txt",
+      "tagCountAtLeast": [{ "tag": "br", "count": 140 }],
       "inside": [
         { "tag": "color", "contains": "不说人话的一概没有人权" },
         { "tag": "color", "contains": "高亮：不要只丢个链接" },
