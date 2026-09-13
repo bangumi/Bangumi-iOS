@@ -85,6 +85,9 @@ var bbcodePlainRenderers: [BBCodeTagType: BBCodePlainRender] {
     .url: { (n: BBCodeNode, args: [String: Any]?) in
       return ""
     },
+    .email: { (n: BBCodeNode, args: [String: Any]?) in
+      return ""
+    },
     .image: { (n: BBCodeNode, args: [String: Any]?) in
       return ""
     },

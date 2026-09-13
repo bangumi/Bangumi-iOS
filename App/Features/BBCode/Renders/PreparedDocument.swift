@@ -429,6 +429,14 @@ private struct BBCodeTextKitRenderer {
       }
 
       return mapLinkedSegments(segments, url: url)
+    case .email:
+      let fallbackText = node.renderInnerHTML(nil).trimmingCharacters(in: .whitespacesAndNewlines)
+      let address = node.attr.isEmpty ? fallbackText : node.attr
+      guard let url = URL(string: "mailto:\(address)") else {
+        return segments
+      }
+
+      return mapLinkedSegments(segments, url: url)
     case .bold:
       return mapTextSegmentsRecursively(segments) { attributed in
         applyFontTransform(to: attributed) { makeBoldFont(from: $0) }
@@ -879,6 +887,8 @@ private struct BBCodeTextKitRenderer {
       return renderUser(node)
     case .url:
       return renderURL(node)
+    case .email:
+      return renderEmail(node)
     case .image, .photo:
       return makeText(node.renderInnerHTML(nil))
     case .bold:
@@ -1135,6 +1145,20 @@ private struct BBCodeTextKitRenderer {
     guard let safeLink = bbcodeSafeURLString(url: rawURL, defaultScheme: "https", defaultHost: nil),
       let url = URL(string: safeLink)
     else {
+      return inner
+    }
+
+    applyLinkAttributes(to: inner, url: url)
+    return inner
+  }
+
+  private func renderEmail(_ node: BBCodeNode) -> NSMutableAttributedString {
+    let inner = renderChildren(node.children)
+    trimLeadingNewlines(in: inner)
+    trimTrailingNewlines(in: inner)
+
+    let address = node.attr.isEmpty ? inner.string : node.attr
+    guard let url = URL(string: "mailto:\(address)") else {
       return inner
     }
 

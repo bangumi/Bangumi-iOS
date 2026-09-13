@@ -363,8 +363,30 @@ class BBCodeParserWorker {
       if !node.attr.isEmpty { return true }
       if let child = singlePlainTextChild(node) { return !child.isEmpty }
       return false
+    case .email:
+      let address = node.attr.isEmpty ? singlePlainTextChild(node) : node.attr
+      guard let address else { return false }
+      return isValidEmailAddress(address)
     default:
       return true
     }
+  }
+
+  // Mirrors the main site's [email] pattern:
+  // [a-z0-9\-_.+]+@[a-z0-9\-_]+[.][a-z0-9\-_.]+ (case-insensitive)
+  private func isValidEmailAddress(_ raw: String) -> Bool {
+    let lowered = raw.lowercased()
+    guard let atIndex = lowered.firstIndex(of: "@") else { return false }
+    let local = lowered[..<atIndex]
+    let domain = lowered[lowered.index(after: atIndex)...]
+    let localAllowed = CharacterSet(charactersIn: "abcdefghijklmnopqrstuvwxyz0123456789-_.+")
+    let domainAllowed = CharacterSet(charactersIn: "abcdefghijklmnopqrstuvwxyz0123456789-_.")
+    guard !local.isEmpty, local.unicodeScalars.allSatisfy({ localAllowed.contains($0) }),
+      !domain.isEmpty, domain.contains("."),
+      domain.unicodeScalars.allSatisfy({ domainAllowed.contains($0) })
+    else {
+      return false
+    }
+    return true
   }
 }

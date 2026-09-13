@@ -412,6 +412,25 @@
       ]
     },
     {
+      "name": "email with attr",
+      "input": "[email=foo@bar.com]联系我[/email]",
+      "tree": [
+        { "tag": "email", "attr": "foo@bar.com", "children": [{ "text": "联系我" }] }
+      ]
+    },
+    {
+      "name": "email with child address",
+      "input": "[email]foo@bar.com[/email]",
+      "tree": [
+        { "tag": "email", "children": [{ "text": "foo@bar.com" }] }
+      ]
+    },
+    {
+      "name": "email with invalid address stays literal",
+      "input": "[email]not-an-email[/email]",
+      "text": "[email]not-an-email[/email]"
+    },
+    {
       "name": "quote with attr",
       "input": "[quote=someone]内容[/quote]",
       "tree": [
