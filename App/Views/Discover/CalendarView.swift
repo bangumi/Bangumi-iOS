@@ -292,9 +292,12 @@ struct CalendarWeekdayView: View {
                   Spacer(minLength: 0)
                 }.padding(4)
               }
-              .imageCollectionStatus(
-                ctype: collectionTypes[item.subject.id] ?? CollectionType.none
-              )
+              .overlay(alignment: .topLeading) {
+                CollectionStatusCapsule(
+                  ctype: collectionTypes[item.subject.id] ?? CollectionType.none,
+                  subjectType: item.subject.type
+                )
+              }
               .imageNavLink(item.subject.link)
               .subjectPreview(
                 item.subject,

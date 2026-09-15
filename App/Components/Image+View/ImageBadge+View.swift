@@ -161,6 +161,45 @@ struct ImageCollectedStatus: View {
   }
 }
 
+/// Collection status shown as a floating capsule on the top-leading corner
+/// of discover cards, replacing the shared circular corner badge.
+struct CollectionStatusCapsule: View {
+  let ctype: CollectionType
+  let subjectType: SubjectType?
+  var padding: CGFloat = 8
+
+  var body: some View {
+    if ctype != .none {
+      CollectionStatusMark(ctype: ctype, subjectType: subjectType)
+        .font(.caption.weight(.semibold))
+        .foregroundStyle(.white)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
+        .background(.black.opacity(0.45), in: Capsule())
+        .padding(padding)
+    }
+  }
+}
+
+/// Compact collection marker shown inside the capsule. White icon + status
+/// text, so the state reads clearly on any artwork.
+private struct CollectionStatusMark: View {
+  let ctype: CollectionType
+  let subjectType: SubjectType?
+
+  var body: some View {
+    if ctype != .none {
+      HStack(spacing: 3) {
+        Image(systemName: ctype.icon)
+          .font(.caption.weight(.bold))
+          .imageScale(.small)
+        Text(ctype.description(subjectType))
+      }
+      .shadow(color: .black.opacity(0.6), radius: 1, y: 1)
+    }
+  }
+}
+
 extension View {
   func imageCollectionStatus(ctype: CollectionType? = nil) -> some View {
     self.overlay(alignment: .bottomTrailing) {
