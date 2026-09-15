@@ -144,7 +144,7 @@ private struct TrendingSubjectTypeView: View {
       )
       .imageType(.subject)
       .overlay(alignment: .topLeading) {
-        TrendingCollectionCapsule(ctype: ctype, subjectType: type, padding: 12)
+        CollectionStatusCapsule(ctype: ctype, subjectType: type, padding: 12)
       }
       .overlay(alignment: .bottom) {
         LinearGradient(
@@ -214,7 +214,7 @@ private struct TrendingSubjectTypeView: View {
               }.padding(8)
             }
             .overlay(alignment: .topLeading) {
-              TrendingCollectionCapsule(ctype: ctype, subjectType: type)
+              CollectionStatusCapsule(ctype: ctype, subjectType: type)
             }
             .imageNavLink(item.subject.link)
             .subjectPreview(
@@ -367,46 +367,6 @@ private struct TrendingSubjectTypeHeader: View {
         Text("更多 »")
       }
       .buttonStyle(.navigation)
-    }
-  }
-}
-
-/// Collection status shown as a floating capsule on the top-leading corner
-/// of trending cards, replacing the shared circular corner badge.
-private struct TrendingCollectionCapsule: View {
-  let ctype: CollectionType
-  let subjectType: SubjectType
-  var padding: CGFloat = 8
-
-  var body: some View {
-    if ctype != .none {
-      TrendingCollectionMark(ctype: ctype, subjectType: subjectType)
-        .font(.caption.weight(.semibold))
-        .foregroundStyle(.white)
-        .padding(.horizontal, 8)
-        .padding(.vertical, 4)
-        .background(.black.opacity(0.45), in: Capsule())
-        .padding(padding)
-    }
-  }
-}
-
-/// Compact collection marker shown inline in the trending card caption,
-/// instead of the shared circular corner badge. White icon + status text,
-/// so the state reads clearly on any artwork.
-private struct TrendingCollectionMark: View {
-  let ctype: CollectionType
-  let subjectType: SubjectType
-
-  var body: some View {
-    if ctype != .none {
-      HStack(spacing: 3) {
-        Image(systemName: ctype.icon)
-          .font(.caption.weight(.bold))
-          .imageScale(.small)
-        Text(ctype.description(subjectType))
-      }
-      .shadow(color: .black.opacity(0.6), radius: 1, y: 1)
     }
   }
 }
