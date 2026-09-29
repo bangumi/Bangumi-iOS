@@ -167,7 +167,7 @@ jobs:
           fi
 
   upload:
-    runs-on: macos-26
+    runs-on: xcode-27
     needs: [detect, release]
     if: always() && needs.detect.outputs.build_changed == 'true' && (needs.release.result == 'success' || needs.release.result == 'skipped')
     steps:
