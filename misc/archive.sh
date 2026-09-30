@@ -83,6 +83,7 @@ xcodebuild archive \
   -configuration Release \
   -archivePath "$ARCHIVE_PATH" \
   -quiet \
+  COMPILATION_CACHE_ENABLE_CACHING=YES \
   "${AUTH_ARGS[@]}"
 
 echo -e "${GREEN}[OK] Archive created successfully${NC}"
