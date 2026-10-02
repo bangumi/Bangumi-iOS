@@ -19,6 +19,27 @@ struct GlassTimelineListView: View {
     isAuthenticated ? timelineViewMode : .all
   }
 
+  private var modeSelector: some View {
+    ScrollView(.horizontal, showsIndicators: false) {
+      HStack(spacing: 7) {
+        ForEach(TimelineViewMode.allCases, id: \.self) { mode in
+          if !isAuthenticated && mode != .all {
+            GlassLockedChip(title: mode.desc)
+          } else {
+            GlassChip(title: mode.desc, isSelected: activeMode == mode) {
+              guard isAuthenticated else { return }
+              withAnimation(.spring(response: 0.28, dampingFraction: 0.86)) {
+                timelineViewMode = mode
+              }
+            }
+          }
+        }
+      }
+      .padding(.vertical, 2)
+    }
+    .scrollClipDisabled()
+  }
+
   private func fetchPage(until: Int?) async throws -> [TimelineDTO] {
     switch activeMode {
     case .all:
@@ -111,6 +132,8 @@ struct GlassTimelineListView: View {
 
     ScrollView {
       LazyVStack(alignment: .leading, spacing: theme.metrics.listSpacing) {
+        modeSelector
+
         if !isAuthenticated {
           GlassLoginCard(
             title: "登录 Bangumi 番组计划",

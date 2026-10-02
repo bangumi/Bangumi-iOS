@@ -49,6 +49,36 @@ struct GlassChip: View {
   }
 }
 
+struct GlassLockedChip: View {
+  let title: String
+
+  @Environment(\.theme) private var theme
+
+  init(title: String) {
+    self.title = title
+  }
+
+  var body: some View {
+    GlassAuthButton {
+      HStack(spacing: 4) {
+        Text(title)
+        Image(systemName: "lock.fill")
+          .font(.system(size: 9, weight: .semibold))
+      }
+      .font(.caption.weight(.semibold))
+      .foregroundStyle(theme.tertiaryText)
+      .padding(.horizontal, 12)
+      .padding(.vertical, 6)
+      .background(theme.controlFill, in: Capsule())
+      .overlay {
+        Capsule().strokeBorder(theme.controlBorder, lineWidth: 1)
+      }
+      .contentShape(Capsule())
+    }
+    .buttonStyle(.plain)
+  }
+}
+
 struct GlassDayBanner: View {
   let title: String
   let subtitle: String

@@ -5,7 +5,6 @@ struct GlassTimelineView: View {
   @AppStorage("isAuthenticated") private var isAuthenticated: Bool = false
   @AppStorage("profile") private var profile: Profile = Profile()
   @AppStorage("isolationMode") private var isolationMode: Bool = false
-  @AppStorage("timelineViewMode") private var timelineViewMode: TimelineViewMode = .friends
 
   @State private var noticeUnreadCount: Int = 0
   @State private var checkingNotice: Bool = false
@@ -37,23 +36,6 @@ struct GlassTimelineView: View {
     noticeUnreadCount = unreadCount
   }
 
-  private var modeSelection: Binding<TimelineViewMode> {
-    Binding(
-      get: { isAuthenticated ? timelineViewMode : .all },
-      set: { newValue in
-        guard isAuthenticated else { return }
-        withAnimation(.default) {
-          timelineViewMode = newValue
-        }
-      })
-  }
-
-  private var modeItems: [(TimelineViewMode, String, Bool)] {
-    TimelineViewMode.allCases.map { mode in
-      (mode, mode.desc, !isAuthenticated && mode != .all)
-    }
-  }
-
   var body: some View {
     GlassTimelineListView()
       .navigationTitle("时空管理局")
@@ -61,10 +43,6 @@ struct GlassTimelineView: View {
       .toolbar {
         ToolbarItemGroup(placement: .topBarLeading) {
           leadingItem
-        }
-
-        ToolbarItem(placement: .principal) {
-          GlassModeTabs(selection: modeSelection, items: modeItems)
         }
 
         ToolbarItemGroup(placement: .topBarTrailing) {
