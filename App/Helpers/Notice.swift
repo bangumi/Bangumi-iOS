@@ -1,11 +1,6 @@
 import Foundation
 import SwiftUI
 
-enum NoticeTarget: Hashable {
-  case app(NavDestination)
-  case external(URL)
-}
-
 extension NoticeDTO {
   var message: LocalizedStringResource {
     switch type {
@@ -112,64 +107,71 @@ extension NoticeDTO {
     }
   }
 
-  var target: NoticeTarget? {
+  var targetURL: URL? {
     if type == 14 || type == 15 {
       guard !sender.username.isEmpty else {
         return nil
       }
-      return .app(.user(sender.username))
+      return URL(string: sender.link)
     }
     guard mainID > 0 else {
       return nil
     }
 
-    let initialPostID = relatedID > 0 ? relatedID : nil
     switch type {
     case 1, 2, 23:
-      return .app(
-        .groupTopicDetail(mainID, initialPostID: initialPostID)
-      )
+      return topicURL(host: "group")
     case 3, 4, 24:
-      return .app(
-        .subjectTopicDetail(mainID, initialPostID: initialPostID)
-      )
+      return topicURL(host: "subject")
     case 5, 6, 25:
-      return commentTarget(parent: .character(mainID), initialPostID: initialPostID)
+      return commentURL(host: "character")
     case 7, 8, 29:
-      return commentTarget(parent: .blog(mainID), initialPostID: initialPostID)
+      return commentURL(host: "blog")
     case 9, 10, 30:
-      return commentTarget(parent: .episode(mainID), initialPostID: initialPostID)
+      return commentURL(host: "episode")
     case 11, 12, 27:
-      return commentTarget(parent: .index(mainID), initialPostID: initialPostID)
+      return commentURL(host: "index")
     case 13, 26:
-      return commentTarget(parent: .person(mainID), initialPostID: initialPostID)
+      return commentURL(host: "person")
     case 22, 28:
-      return commentTarget(parent: .timeline(mainID), initialPostID: initialPostID)
+      return commentURL(host: "timeline")
     case 35, 37, 39, 47:
-      return patchTarget(kind: "s")
+      return patchURL(kind: "s")
     case 36, 38, 40, 48:
-      return patchTarget(kind: "e")
+      return patchURL(kind: "e")
     case 41, 43, 45, 49:
-      return patchTarget(kind: "c")
+      return patchURL(kind: "c")
     case 42, 44, 46, 50:
-      return patchTarget(kind: "p")
+      return patchURL(kind: "p")
     default:
       return nil
     }
   }
 
-  private func commentTarget(
-    parent: CommentParentType,
-    initialPostID: Int?
-  ) -> NoticeTarget {
-    .app(
-      .commentList(
-        CommentListRoute(parent: parent, initialPostID: initialPostID)
-      )
-    )
+  private func topicURL(host: String) -> URL? {
+    chiiURL(host: host, path: "/topic/\(mainID)")
   }
 
-  private func patchTarget(kind: String) -> NoticeTarget? {
+  private func commentURL(host: String) -> URL? {
+    // comments=1 keeps chii routing on the comment list instead of the parent page
+    chiiURL(
+      host: host, path: "/\(mainID)",
+      queryItems: [URLQueryItem(name: "comments", value: "1")])
+  }
+
+  private func chiiURL(host: String, path: String, queryItems: [URLQueryItem]? = nil) -> URL? {
+    var components = URLComponents()
+    components.scheme = "chii"
+    components.host = host
+    components.path = path
+    components.queryItems = queryItems
+    if relatedID > 0 {
+      components.fragment = "post_\(relatedID)"
+    }
+    return components.url
+  }
+
+  private func patchURL(kind: String) -> URL? {
     var components = URLComponents()
     components.scheme = "https"
     components.host = "patch.bgm38.tv"
@@ -177,6 +179,6 @@ extension NoticeDTO {
     if relatedID > 0 {
       components.fragment = String(relatedID)
     }
-    return components.url.map(NoticeTarget.external)
+    return components.url
   }
 }
