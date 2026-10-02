@@ -25,7 +25,6 @@ skill.
 - Prefer small, reviewable changes that match existing SwiftUI and GRDB patterns.
 - Do not include incidental `Bangumi.xcodeproj/project.pbxproj` changes in a PR unless the user asked for a version/build bump or the project file change is truly required.
 - Do not use unsafe language features, unsafe concurrency bypasses, or unsafe runtime assumptions anywhere in this repository. This is a hard global requirement. In Swift, this includes `unsafe` APIs, `nonisolated(unsafe)`, `MainActor.assumeIsolated`, unchecked actor isolation workarounds, and similar constructs.
-- In non-SQL code, do not use unconstrained interpolated literals inside `map` or `compactMap` followed by `joined()`. GRDB may infer the element type as `SQL` and leak `SQL(elements: ...)` descriptions into rendered output. Extract interpolated fragments into a helper that explicitly returns `String`, or append them to a typed `String` accumulator.
 - When a change alters a storage, client-architecture, or BBCode/image-preview boundary, update the `repo-conventions` skill in the same change.
 
 ## Coding Conventions
@@ -38,7 +37,7 @@ skill.
 6. Preserve scroll performance by animating first-page/reload content replacement only when it improves continuity; avoid animating infinite-scroll append paths unless the interaction explicitly calls for it.
 7. For fixed-size badges, chips, and compact counters, do not use `.minimumScaleFactor(...)` or `.allowsTightening(true)` to hide layout pressure. These can cause the same UI element to render at different visual sizes across layout passes. Do not add `.fixedSize(horizontal: true, vertical: false)` to compact labels unless overflow has been considered. For episode badges, keep the inherited font size stable; if text is too long, prefer normal one-line truncation/clipping over per-item font scaling.
 8. VoiceOver support is out of scope for this app. Do not add VoiceOver-specific labels, traits, actions, or layout workarounds unless the user explicitly asks for them.
-9. No force casts (`as!`), especially on GRDB `Row` subscripts; use the generic converting subscript (`let date: Date = row["created_at"]`) or `as?` with a fallback.
+9. No force casts (`as!`); use `as?` with a fallback.
 10. No object-style environment dependencies (`@Environment(SomeType.self)`, `@EnvironmentObject`). Pass objects via initializers, context structs, or action closures; value-style `@Environment(\.x)` remains the norm. Pass shared object dependencies explicitly at tab/`NavigationStack` roots, sheets, full-screen covers, and hosting-controller boundaries instead of assuming environment inheritance survives those transitions.
 11. Use `@Observable` for new observable types, not `ObservableObject` / `@Published`.
 12. No inline `Binding(get:set:)` at call sites.
@@ -46,7 +45,6 @@ skill.
 14. Never render an empty `HStack`/`VStack`; put the condition around the stack itself so nothing renders when there is no content.
 15. Lazy containers (`LazyVStack`/`LazyHStack`/`LazyVGrid`) only for genuinely unbounded content (paginated or otherwise huge lists); eager stacks everywhere else — lazy stacks cache child frames and misplace children during animated layout updates.
 16. Plain-style buttons and links (`.buttonStyle(.plain)`, text-or-label-only) must declare `.contentShape(Rectangle())` (or an equivalent hit shape) on the content inside the button's label so the whole frame is tappable; applying it on the button itself has no effect on hit-testing.
-17. When building JSON strings for storage or cache keys, use `JSONSerialization` with `sortedKeys` for stable raw values.
 
 ## Common Commands
 
@@ -88,7 +86,7 @@ gh pr view <number> --json commits,files
 - A PR is not done until the commit list and file list match the user-requested scope.
 - Avoid zsh empty-glob failures when looking for PR templates. Prefer `find` or a shell with `nullglob` instead of raw `.github/PULL_REQUEST_TEMPLATE/*.md`.
 - If the user says "提个 PR" or similar, complete branch creation, commit, push, PR creation, and post-create scope verification unless they explicitly ask to stop earlier.
-- If the user also asks for `make bump`, keep the bump as its own commit.
+- If the user also asks for `make bump`, keep the bump as its own commit. When several PRs are open in the same cycle, put the bump on the PR that merges last: `publish.yml` uploads the HEAD build to App Store Connect whenever `CURRENT_PROJECT_VERSION` changes on `main`, so only a bump on the final merge produces an upload containing all changes.
 
 ## App Store Releases
 

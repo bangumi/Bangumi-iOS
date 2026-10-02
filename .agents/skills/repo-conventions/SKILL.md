@@ -17,6 +17,9 @@ Subsystem conventions and invariants for Bangumi-iOS. `AGENTS.md` holds repo-wid
 - New non-null columns must either have a safe default or be introduced as nullable and backfilled before enforcing non-null behavior.
 - For SQLite changes that cannot be expressed safely with `ALTER TABLE`, create a replacement table, copy data explicitly, recreate indexes and foreign keys, then drop/rename inside the migration.
 - Treat BLOB or JSON payload shape changes as schema changes. Prefer backward-compatible decoders; otherwise migrate the payloads explicitly or clear only cache tables that are safe to rebuild from the network.
+- No force casts (`as!`) on GRDB `Row` subscripts; use the generic converting subscript (`let date: Date = row["created_at"]`) or `as?` with a fallback.
+- When building JSON strings for storage or cache keys, use `JSONSerialization` with `sortedKeys` for stable raw values.
+- In non-SQL code, do not use unconstrained interpolated literals inside `map` or `compactMap` followed by `joined()`. GRDB may infer the element type as `SQL` and leak `SQL(elements: ...)` descriptions into rendered output. Extract interpolated fragments into a helper that explicitly returns `String`, or append them to a typed `String` accumulator.
 - Validate storage changes with both a fresh database path and an upgraded existing database path, then run `make build`.
 
 ### GRDB Migration Discipline
