@@ -162,7 +162,8 @@ struct ImageCollectedStatus: View {
 }
 
 /// Collection status shown as a floating capsule on the top-leading corner
-/// of discover cards, replacing the shared circular corner badge.
+/// of discover cards, replacing the shared circular corner badge. The capsule
+/// scales with the cover size so it stays proportional on small cards.
 struct CollectionStatusCapsule: View {
   let ctype: CollectionType
   let subjectType: SubjectType?
@@ -170,14 +171,44 @@ struct CollectionStatusCapsule: View {
 
   var body: some View {
     if ctype != .none {
-      CollectionStatusMark(ctype: ctype, subjectType: subjectType)
-        .font(.caption.weight(.semibold))
-        .foregroundStyle(.white)
-        .padding(.horizontal, 8)
-        .padding(.vertical, 4)
-        .background(.black.opacity(0.45), in: Capsule())
-        .padding(padding)
+      GeometryReader { proxy in
+        let metrics = CollectionStatusCapsuleMetrics(imageSize: proxy.size, padding: padding)
+        ZStack(alignment: .topLeading) {
+          Color.clear
+          CollectionStatusMark(ctype: ctype, subjectType: subjectType, fontSize: metrics.fontSize)
+            .foregroundStyle(.white)
+            .padding(.horizontal, metrics.horizontalPadding)
+            .padding(.vertical, metrics.verticalPadding)
+            .background(.black.opacity(0.45), in: Capsule())
+            .padding(metrics.outerPadding)
+        }
+      }
     }
+  }
+}
+
+private struct CollectionStatusCapsuleMetrics {
+  let imageSize: CGSize
+  let padding: CGFloat
+
+  var fontSize: CGFloat {
+    let shortSide = min(imageSize.width, imageSize.height)
+    guard shortSide.isFinite, shortSide > 0 else {
+      return 12
+    }
+    return min(max(shortSide * 0.09, 9), 12)
+  }
+
+  var horizontalPadding: CGFloat {
+    fontSize * 0.67
+  }
+
+  var verticalPadding: CGFloat {
+    fontSize * 0.33
+  }
+
+  var outerPadding: CGFloat {
+    padding * fontSize / 12
   }
 }
 
@@ -186,14 +217,16 @@ struct CollectionStatusCapsule: View {
 private struct CollectionStatusMark: View {
   let ctype: CollectionType
   let subjectType: SubjectType?
+  let fontSize: CGFloat
 
   var body: some View {
     if ctype != .none {
       HStack(spacing: 3) {
         Image(systemName: ctype.icon)
-          .font(.caption.weight(.bold))
+          .font(.system(size: fontSize, weight: .bold))
           .imageScale(.small)
         Text(ctype.description(subjectType))
+          .font(.system(size: fontSize, weight: .semibold))
       }
       .shadow(color: .black.opacity(0.6), radius: 1, y: 1)
     }
