@@ -6,30 +6,31 @@ struct NoticeRowView: View {
   let notice: NoticeDTO
   let onOpen: () -> Void
 
+  @Environment(\.openURL) private var openURL
+
   var body: some View {
-    ZStack {
-      switch notice.target {
-      case .app(let destination):
-        NavigationLink(value: destination) {
-          rowContent(linksSender: false)
-        }
-        .buttonStyle(.plain)
-        .simultaneousGesture(openGesture)
-      case .external(let url):
-        Link(destination: url) {
-          rowContent(linksSender: false)
-        }
-        .buttonStyle(.plain)
-        .simultaneousGesture(openGesture)
-      case nil:
-        rowContent(linksSender: true)
+    row
+      .listRowBackground(
+        notice.unread
+          ? Color.accent.opacity(0.05)
+          : Color.clear
+      )
+  }
+
+  @ViewBuilder
+  private var row: some View {
+    if let url = notice.targetURL {
+      Button {
+        onOpen()
+        openURL(url)
+      } label: {
+        rowContent(linksSender: false)
+          .contentShape(Rectangle())
       }
+      .buttonStyle(.plain)
+    } else {
+      rowContent(linksSender: true)
     }
-    .listRowBackground(
-      notice.unread
-        ? Color.accent.opacity(0.05)
-        : Color.clear
-    )
   }
 
   private func rowContent(linksSender: Bool) -> some View {
@@ -74,12 +75,14 @@ struct NoticeRowView: View {
         RoundedRectangle(cornerRadius: 24)
           .stroke(notice.unread ? Color.accent.opacity(0.3) : Color.clear, lineWidth: 2)
       )
-    if linksSender && !notice.sender.username.isEmpty {
-      NavigationLink(value: NavDestination.user(notice.sender.username)) {
+    if linksSender, let url = senderURL {
+      Button {
+        onOpen()
+        openURL(url)
+      } label: {
         avatar
       }
       .buttonStyle(.plain)
-      .simultaneousGesture(openGesture)
     } else {
       avatar
     }
@@ -91,20 +94,21 @@ struct NoticeRowView: View {
       .font(.subheadline)
       .fontWeight(notice.unread ? .semibold : .regular)
       .lineLimit(1)
-    if linksSender && !notice.sender.username.isEmpty {
-      NavigationLink(value: NavDestination.user(notice.sender.username)) {
+    if linksSender, let url = senderURL {
+      Button {
+        onOpen()
+        openURL(url)
+      } label: {
         name
+          .contentShape(Rectangle())
       }
       .buttonStyle(.plain)
-      .simultaneousGesture(openGesture)
     } else {
       name
     }
   }
 
-  private var openGesture: some Gesture {
-    TapGesture().onEnded {
-      onOpen()
-    }
+  private var senderURL: URL? {
+    notice.sender.username.isEmpty ? nil : URL(string: notice.sender.link)
   }
 }

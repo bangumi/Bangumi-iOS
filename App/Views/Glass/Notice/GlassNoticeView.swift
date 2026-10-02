@@ -76,23 +76,19 @@ struct GlassNoticeRow: View {
   let onOpen: () -> Void
 
   @Environment(\.theme) private var theme
+  @Environment(\.openURL) private var openURL
 
-  @ViewBuilder
   var body: some View {
-    switch notice.target {
-    case .app(let destination):
-      NavigationLink(value: destination) {
+    if let url = notice.targetURL {
+      Button {
+        onOpen()
+        openURL(url)
+      } label: {
         rowContent(linksSender: false)
+          .contentShape(Rectangle())
       }
       .buttonStyle(.plain)
-      .simultaneousGesture(openGesture)
-    case .external(let url):
-      Link(destination: url) {
-        rowContent(linksSender: false)
-      }
-      .buttonStyle(.plain)
-      .simultaneousGesture(openGesture)
-    case nil:
+    } else {
       rowContent(linksSender: true)
     }
   }
@@ -134,12 +130,14 @@ struct GlassNoticeRow: View {
       .imageStyle(width: 38, height: 38)
       .imageType(.avatar)
       .glassAvatarRing(lineWidth: notice.unread ? 2 : 0)
-    if linksSender && !notice.sender.username.isEmpty {
-      NavigationLink(value: NavDestination.user(notice.sender.username)) {
+    if linksSender, let url = senderURL {
+      Button {
+        onOpen()
+        openURL(url)
+      } label: {
         avatar
       }
       .buttonStyle(.plain)
-      .simultaneousGesture(openGesture)
     } else {
       avatar
     }
@@ -151,20 +149,21 @@ struct GlassNoticeRow: View {
       .font(.subheadline.weight(notice.unread ? .bold : .semibold))
       .foregroundStyle(linksSender ? theme.link : theme.cardTitle)
       .lineLimit(1)
-    if linksSender && !notice.sender.username.isEmpty {
-      NavigationLink(value: NavDestination.user(notice.sender.username)) {
+    if linksSender, let url = senderURL {
+      Button {
+        onOpen()
+        openURL(url)
+      } label: {
         name
+          .contentShape(Rectangle())
       }
       .buttonStyle(.plain)
-      .simultaneousGesture(openGesture)
     } else {
       name
     }
   }
 
-  private var openGesture: some Gesture {
-    TapGesture().onEnded {
-      onOpen()
-    }
+  private var senderURL: URL? {
+    notice.sender.username.isEmpty ? nil : URL(string: notice.sender.link)
   }
 }
