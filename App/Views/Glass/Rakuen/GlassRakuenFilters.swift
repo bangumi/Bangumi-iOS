@@ -35,7 +35,7 @@ struct GlassRakuenFilters: View {
                 }
               }
             } else {
-              lockedChip(mode)
+              GlassLockedChip(title: mode.description)
             }
           }
         }
@@ -43,25 +43,5 @@ struct GlassRakuenFilters: View {
       }
       .scrollClipDisabled()
     }
-  }
-
-  private func lockedChip(_ mode: RakuenListMode) -> some View {
-    GlassAuthButton {
-      HStack(spacing: 4) {
-        Text(mode.description)
-        Image(systemName: "lock.fill")
-          .font(.system(size: 9, weight: .semibold))
-      }
-      .font(.caption.weight(.semibold))
-      .foregroundStyle(theme.tertiaryText)
-      .padding(.horizontal, 12)
-      .padding(.vertical, 6)
-      .background(theme.controlFill, in: Capsule())
-      .overlay {
-        Capsule().strokeBorder(theme.controlBorder, lineWidth: 1)
-      }
-      .contentShape(Capsule())
-    }
-    .buttonStyle(.plain)
   }
 }

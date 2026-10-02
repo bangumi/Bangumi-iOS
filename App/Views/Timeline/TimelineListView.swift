@@ -101,6 +101,7 @@ struct TimelineListView: View {
     ScrollView {
       VStack {
         if isAuthenticated {
+          modePicker
           HStack {
             Text("Hi! \(profile.nickname.withLink(profile.link))")
               .font(.title3)
@@ -152,13 +153,6 @@ struct TimelineListView: View {
     .refreshable {
       await reload()
     }
-    .toolbar {
-      if isAuthenticated {
-        ToolbarItem(placement: .principal) {
-          ClassicModeTabs(selection: modeSelection)
-        }
-      }
-    }
     .onChange(of: timelineViewMode) {
       Task {
         withAnimation(.default) {
@@ -172,45 +166,23 @@ struct TimelineListView: View {
     }
   }
 
-  private var modeSelection: Binding<TimelineViewMode> {
-    Binding(
-      get: { timelineViewMode },
-      set: { newValue in
-        withAnimation(.default) {
-          timelineViewMode = newValue
+  private var modePicker: some View {
+    ScrollView(.horizontal, showsIndicators: false) {
+      HStack(spacing: 8) {
+        ForEach(TimelineViewMode.allCases, id: \.self) { mode in
+          Button {
+            withAnimation(.default) {
+              timelineViewMode = mode
+            }
+          } label: {
+            Label(mode.desc, systemImage: mode.icon)
+          }
+          .adaptiveButtonStyle(timelineViewMode == mode ? .borderedProminent : .bordered)
+          .controlSize(.small)
         }
-      })
-  }
-}
-
-private struct ClassicModeTabs: View {
-  @Binding var selection: TimelineViewMode
-
-  var body: some View {
-    HStack(spacing: 16) {
-      ForEach(TimelineViewMode.allCases, id: \.self) { mode in
-        tab(mode)
       }
+      .padding(.vertical, 4)
     }
-    .fixedSize()
-  }
-
-  private func tab(_ mode: TimelineViewMode) -> some View {
-    let selected = mode == selection
-    return Button {
-      withAnimation(.default) {
-        selection = mode
-      }
-    } label: {
-      VStack(spacing: 3) {
-        Text(mode.desc)
-          .font(.subheadline.weight(selected ? .semibold : .regular))
-          .foregroundStyle(selected ? Color.primary : Color.secondary)
-        Capsule()
-          .fill(selected ? Color.accentColor : Color.clear)
-          .frame(width: 16, height: 2)
-      }
-    }
-    .buttonStyle(.plain)
+    .scrollClipDisabled()
   }
 }

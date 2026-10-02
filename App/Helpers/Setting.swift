@@ -153,6 +153,17 @@ enum TimelineViewMode: String, CaseIterable {
       "自己"
     }
   }
+
+  var icon: String {
+    switch self {
+    case .all:
+      "globe"
+    case .friends:
+      "person.2"
+    case .me:
+      "person"
+    }
+  }
 }
 
 enum ProgressViewMode: String, CaseIterable {
