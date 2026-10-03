@@ -66,13 +66,10 @@ Command notes:
 
 ## GitHub And PR Rules
 
-- This repo is a fork workflow:
-  - `origin` is the contributor's own fork
-  - the upstream/default GitHub repo is `bangumi/Bangumi-iOS`
-- For PRs to upstream, push a branch to the fork and use:
+- `origin` is the upstream repo `bangumi/Bangumi-iOS` itself. Push branches directly to `origin` and open same-repo PRs with:
 
 ```sh
-gh pr create --repo bangumi/Bangumi-iOS --base main --head '<fork-owner>:<branch>' --title '<semantic title>' --body-file /tmp/pr-body.md
+gh pr create --repo bangumi/Bangumi-iOS --base main --head '<branch>' --title '<semantic title>' --body-file /tmp/pr-body.md
 ```
 
 - Always use `--body-file` for PR descriptions.
