@@ -342,65 +342,28 @@ struct ChiiProgressView: View {
     }
 
     do {
-      let count = try await refreshCollections(since: collectionsUpdatedAt)
-      if count > 0 {
-        Notifier.shared.notify(message: "更新了 \(count) 条收藏")
+      refreshProgress = 0
+      let since = collectionsUpdatedAt
+      let loaded = try await CollectionRepository.refreshCollections(since: since) {
+        count, total in
+        refreshProgress = CGFloat(count) / CGFloat(total)
+      }
+      if since > 0 {
+        CollectionRepository.checkLoadEpisodes(loaded)
+      }
+      if loaded.count > 0 {
+        Notifier.shared.notify(message: "更新了 \(loaded.count) 条收藏")
       } else {
         Notifier.shared.notify(message: "没有收藏更新")
       }
       await loadLocalProgress(animate: true)
-      collectionsUpdatedAt = Int(now.timeIntervalSince1970)
+      // CollectionReconciler advances the same watermark in the background; keep it moving forward.
+      collectionsUpdatedAt = max(collectionsUpdatedAt, Int(now.timeIntervalSince1970))
     } catch {
       Notifier.shared.alert(error: error)
     }
     withAnimation(.default) {
       refreshing = false
-    }
-  }
-
-  func refreshCollections(since: Int = 0) async throws -> Int {
-    let db = try await AppContext.shared.getDB()
-    refreshProgress = 0
-    let limit: Int = 100
-    var offset: Int = 0
-    var count: Int = 0
-    var loaded: [Int: SubjectType] = [:]
-    while true {
-      let resp = try await CollectionService.getSubjectCollections(
-        since: since, limit: limit, offset: offset)
-      if resp.data.isEmpty {
-        break
-      }
-      for item in resp.data {
-        try await db.saveSubject(item)
-        count += 1
-        loaded[item.id] = item.type
-        refreshProgress = CGFloat(count) / CGFloat(resp.total)
-      }
-      await SearchIndexing.index(resp.data.map { $0.searchable() })
-      offset += limit
-      if offset >= resp.total {
-        break
-      }
-    }
-    if since > 0 {
-      checkLoadEpisodes(loaded)
-    }
-    return count
-  }
-
-  func checkLoadEpisodes(_ subjects: [Int: SubjectType]) {
-    Task.detached {
-      let subjectIds = subjects.filter {
-        $0.value == .anime || $0.value == .music || $0.value == .real
-      }.map { $0.key }
-      for subjectId in subjectIds {
-        do {
-          try await EpisodeRepository.loadEpisodes(subjectId)
-        } catch {
-          await Notifier.shared.alert(error: error)
-        }
-      }
     }
   }
 

@@ -51,5 +51,6 @@ enum EpisodeRepository {
     if let subjectId {
       await ProgressSubjectInvalidation.post(subjectId: subjectId)
     }
+    CollectionReconciler.shared.schedule()
   }
 }
