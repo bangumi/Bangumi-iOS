@@ -66,12 +66,6 @@ Command notes:
 
 ## GitHub And PR Rules
 
-- `origin` is the upstream repo `bangumi/Bangumi-iOS` itself. Push branches directly to `origin` and open same-repo PRs with:
-
-```sh
-gh pr create --repo bangumi/Bangumi-iOS --base main --head '<branch>' --title '<semantic title>' --body-file /tmp/pr-body.md
-```
-
 - Always use `--body-file` for PR descriptions.
 - After creating a PR, verify both metadata and scope:
 
