@@ -16,7 +16,7 @@ struct TimelineSayView: View {
       updating = true
       try await TimelineService.postTimeline(content: content, token: token)
       updating = false
-      Notifier.shared.notify(message: "发送成功")
+      Notifier.shared.notify(message: "发送成功", type: .success)
       dismiss()
     } catch {
       updating = false

@@ -227,7 +227,7 @@ struct PersonDetailView: View {
         try await PersonRepository.uncollectPerson(person.id)
       }
       await reload()
-      UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+      Haptics.impact()
     } catch {
       Notifier.shared.alert(error: error)
     }

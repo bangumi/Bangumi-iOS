@@ -100,7 +100,7 @@ private struct SubjectWikiCreateView: View {
         date: nil
       )
       let subjectId = try await WikiService.createSubject(payload, type: type)
-      Notifier.shared.notify(message: "已创建条目 #\(subjectId)")
+      Notifier.shared.notify(message: "已创建条目 #\(subjectId)", type: .success)
       dismiss()
     } catch {
       Notifier.shared.alert(error: error)
@@ -214,7 +214,7 @@ private struct PersonWikiCreateView: View {
         profession: profession,
         imageBase64: nil
       )
-      Notifier.shared.notify(message: "已创建人物 #\(personId)")
+      Notifier.shared.notify(message: "已创建人物 #\(personId)", type: .success)
       dismiss()
     } catch {
       Notifier.shared.alert(error: error)
@@ -304,7 +304,7 @@ private struct CharacterWikiCreateView: View {
         summary: summary,
         imageBase64: nil
       )
-      Notifier.shared.notify(message: "已创建角色 #\(characterId)")
+      Notifier.shared.notify(message: "已创建角色 #\(characterId)", type: .success)
       dismiss()
     } catch {
       Notifier.shared.alert(error: error)

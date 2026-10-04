@@ -5,9 +5,27 @@ import SwiftUI
 @MainActor
 @Observable
 class Notifier {
+  enum ToastType {
+    case success, error
+  }
+
   struct Notification: Identifiable, Equatable {
+    struct Action {
+      let title: String
+      let handler: @MainActor () -> Void
+    }
+
     let id = UUID()
     let message: String
+    let type: ToastType?
+    let createdAt: Date
+    let duration: TimeInterval
+    let action: Action?
+    let replacing: Bool
+
+    static func == (lhs: Self, rhs: Self) -> Bool {
+      lhs.id == rhs.id
+    }
   }
 
   static let shared = Notifier()
@@ -21,7 +39,7 @@ class Notifier {
     switch error {
     case .notice, .requireLogin:
       Logger.app.info("notice: \(error.diagnosticDescription)")
-      self.notify(message: error.userMessage)
+      self.notify(message: error.userMessage, type: .error)
     case .ignore:
       Logger.app.warning("ignore error: \(error.diagnosticDescription)")
     default:
@@ -78,16 +96,56 @@ class Notifier {
     self.hasAlert = true
   }
 
-  func notify(message: String, duration: TimeInterval = 2) {
+  func notify(
+    message: String,
+    type: ToastType? = nil,
+    duration: TimeInterval? = nil,
+    action: Notification.Action? = nil
+  ) {
     Logger.app.info("notify: \(message)")
-    let notification = Notification(message: message)
-    withAnimation(.snappy) {
-      self.notifications.append(notification)
+    let notification = Notification(
+      message: message,
+      type: type,
+      createdAt: Date(),
+      duration: Self.displayDuration(for: message, action: action, override: duration),
+      action: action,
+      replacing: !self.notifications.isEmpty)
+    if let type {
+      Haptics.notify(type == .success ? .success : .error)
     }
-    DispatchQueue.main.asyncAfter(deadline: .now() + duration) { [weak self] in
-      withAnimation(.snappy) {
-        self?.notifications.removeAll(where: { $0.id == notification.id })
+    if !self.notifications.isEmpty {
+      withAnimation(.overlayExit) {
+        self.notifications.removeAll()
       }
     }
+    withAnimation(.springy) {
+      self.notifications.append(notification)
+    }
+    DispatchQueue.main.asyncAfter(deadline: .now() + notification.duration) { [weak self] in
+      self?.dismiss(notification)
+    }
+  }
+
+  func dismiss(_ notification: Notification) {
+    withAnimation(.overlayExit) {
+      self.notifications.removeAll(where: { $0.id == notification.id })
+    }
+  }
+
+  private static func displayDuration(
+    for message: String, action: Notification.Action?, override: TimeInterval?
+  ) -> TimeInterval {
+    if let override {
+      return override
+    }
+    if action != nil {
+      return 5
+    }
+    // Reading pace is ~14 chars/s clamped to 5–8s; short status confirmations settle quicker.
+    let count = message.count
+    if count <= 10 {
+      return 3
+    }
+    return max(5, min(8, Double(count) / 14))
   }
 }

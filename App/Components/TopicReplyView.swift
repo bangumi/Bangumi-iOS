@@ -250,7 +250,7 @@ struct ReplyItemNormalView: View {
             updating = true
             do {
               try await TopicService.deleteSubjectPost(postId: reply.id)
-              Notifier.shared.notify(message: "删除成功")
+              Notifier.shared.notify(message: "删除成功", type: .success)
             } catch {
               Notifier.shared.alert(error: error)
             }
@@ -421,7 +421,7 @@ struct SubReplyNormalView: View {
           updating = true
           do {
             try await TopicService.deleteSubjectPost(postId: subreply.id)
-            Notifier.shared.notify(message: "删除成功")
+            Notifier.shared.notify(message: "删除成功", type: .success)
           } catch {
             Notifier.shared.alert(error: error)
           }
@@ -480,7 +480,7 @@ struct CreateReplyBoxSheet: View {
         content = quote + content
       }
       try await type.reply(topicId: topicId, content: content, replyTo: reply?.id, token: token)
-      Notifier.shared.notify(message: "回复成功")
+      Notifier.shared.notify(message: "回复成功", type: .success)
       onSuccess?()
       dismiss()
     } catch {
@@ -559,7 +559,7 @@ struct EditReplyBoxSheet: View {
         return
       }
       try await type.editPost(postId: postId, content: content)
-      Notifier.shared.notify(message: "编辑成功")
+      Notifier.shared.notify(message: "编辑成功", type: .success)
       onSuccess?()
       dismiss()
     } catch {
@@ -624,7 +624,7 @@ struct CreateTopicBoxSheet: View {
   func createTopic(title: String, content: String, token: String) async {
     do {
       try await type.createTopic(title: title, content: content, token: token)
-      Notifier.shared.notify(message: "创建成功")
+      Notifier.shared.notify(message: "创建成功", type: .success)
       onSuccess?()
       dismiss()
     } catch {
@@ -713,7 +713,7 @@ struct EditTopicBoxSheet: View {
     do {
       updating = true
       try await type.editTopic(topicId: topicId, title: title, content: content)
-      Notifier.shared.notify(message: "编辑成功")
+      Notifier.shared.notify(message: "编辑成功", type: .success)
       onSuccess?()
       dismiss()
     } catch {

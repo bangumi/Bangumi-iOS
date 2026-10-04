@@ -23,7 +23,7 @@ struct ReportSheet: View {
         reason: selectedReason,
         comment: finalComment
       )
-      Notifier.shared.notify(message: "感谢报告，我们会尽快处理")
+      Notifier.shared.notify(message: "感谢报告，我们会尽快处理", type: .success)
       dismiss()
     } catch {
       Notifier.shared.alert(error: error)

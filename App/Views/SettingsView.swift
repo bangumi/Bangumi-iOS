@@ -71,7 +71,7 @@ struct SettingsView: View {
       do {
         let db = try await AppContext.shared.getDB()
         try await CSSearchableIndex.default().deleteAllSearchableItems()
-        Notifier.shared.notify(message: "Spotlight 索引清除成功")
+        Notifier.shared.notify(message: "Spotlight 索引清除成功", type: .success)
         while true {
           let resp = try await db.fetchCollectedSubjectSearchable(limit: limit, offset: offset)
           if resp.data.isEmpty {
@@ -83,7 +83,7 @@ struct SettingsView: View {
             break
           }
         }
-        Notifier.shared.notify(message: "Spotlight 索引重建完成")
+        Notifier.shared.notify(message: "Spotlight 索引重建完成", type: .success)
       } catch {
         Notifier.shared.alert(error: error)
       }

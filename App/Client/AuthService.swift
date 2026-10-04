@@ -47,7 +47,7 @@ enum AuthService {
         clearedGeneration: clearedGeneration
       )
       guard revision == operationRevision else { return }
-      Notifier.shared.notify(message: "退出登录成功")
+      Notifier.shared.notify(message: "退出登录成功", type: .success)
     } catch {
       guard revision == operationRevision else { return }
       Notifier.shared.alert(error: error)

@@ -353,7 +353,7 @@ func handleChiiURL(_ url: URL, _ nav: Binding<NavigationPath>) -> Bool {
       }
     }
   default:
-    Notifier.shared.notify(message: "未知的 chii URL: \(url)")
+    Notifier.shared.notify(message: "未知的 chii URL: \(url)", type: .error)
     break
   }
   return true

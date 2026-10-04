@@ -94,7 +94,7 @@ struct UserView: View {
         try await FriendService.addFriend(username)
         guard loadKey == key, loadedKey == key else { return }
         user?.isFriend = true
-        Notifier.shared.notify(message: "添加好友成功")
+        Notifier.shared.notify(message: "添加好友成功", type: .success)
       } catch {
         guard loadKey == key, loadedKey == key else { return }
         Notifier.shared.alert(error: error)
@@ -110,7 +110,7 @@ struct UserView: View {
         try await FriendService.removeFriend(username)
         guard loadKey == key, loadedKey == key else { return }
         user?.isFriend = false
-        Notifier.shared.notify(message: "解除好友成功")
+        Notifier.shared.notify(message: "解除好友成功", type: .success)
       } catch {
         guard loadKey == key, loadedKey == key else { return }
         Notifier.shared.alert(error: error)

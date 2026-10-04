@@ -35,7 +35,7 @@ struct ContentView: View {
     do {
       blocklist = try await AccountService.getBlockList()
     } catch {
-      Notifier.shared.notify(message: "获取黑名单列表失败")
+      Notifier.shared.notify(message: "获取黑名单列表失败", type: .error)
       Logger.api.warning("refresh blocklist failed: \(error)")
     }
   }
