@@ -388,6 +388,12 @@ private struct GlassSubjectRemoteResults: View {
         reload: nil
       )
     }
+    .emptyPlaceholder {
+      ThemedEmptyState(
+        systemImage: "questionmark.circle",
+        title: "没有找到相关结果",
+        description: "换个关键字再试试")
+    }
     .onChange(of: subjectType) { _, _ in
       withAnimation(.default) {
         reloader.toggle()
@@ -513,6 +519,12 @@ private struct GlassCharacterRemoteResults: View {
     OffsetPagedView<SlimCharacterDTO, _>(nextPageFunc: fetch) { item in
       GlassCharacterRemoteItem(characterId: item.id, keyword: text)
     }
+    .emptyPlaceholder {
+      ThemedEmptyState(
+        systemImage: "questionmark.circle",
+        title: "没有找到相关结果",
+        description: "换个关键字再试试")
+    }
   }
 }
 
@@ -637,6 +649,12 @@ private struct GlassPersonRemoteResults: View {
   var body: some View {
     OffsetPagedView<SlimPersonDTO, _>(nextPageFunc: fetch) { item in
       GlassPersonRemoteItem(personId: item.id, keyword: text)
+    }
+    .emptyPlaceholder {
+      ThemedEmptyState(
+        systemImage: "questionmark.circle",
+        title: "没有找到相关结果",
+        description: "换个关键字再试试")
     }
   }
 }

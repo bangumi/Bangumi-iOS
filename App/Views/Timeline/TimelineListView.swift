@@ -10,6 +10,7 @@ struct TimelineListView: View {
 
   @State private var exhausted: Bool = false
   @State private var loading: Bool = false
+  @State private var didFetch: Bool = false
   @State private var lastID: Int?
   @State private var fetched: [Int: Bool] = [:]
   @State private var items: [TimelineDTO] = []
@@ -26,8 +27,15 @@ struct TimelineListView: View {
         data = try await UserService.getUserTimeline(
           username: profile.username, limit: 20, until: nil)
       }
+      withAnimation(.layoutShift) {
+        didFetch = true
+      }
       if data.count == 0 {
-        Notifier.shared.notify(message: "没有新动态")
+        // An empty list already gets the empty-state card; the toast only earns
+        // its keep when a refresh finds nothing new on top of existing items.
+        if !items.isEmpty {
+          Notifier.shared.notify(message: "没有新动态")
+        }
         return
       }
       withAnimation(.default) {
@@ -127,27 +135,41 @@ struct TimelineListView: View {
             .frame(height: 100)
         }
       }.padding(8)
-      LazyVStack(alignment: .leading) {
-        ForEach(rows) { row in
-          TimelineItemView(
-            item: row.item,
-            previousUID: row.previousUID
-          )
-          .padding(.bottom, 8)
-          .task(id: row.nextPageTriggerID) {
-            if let triggerID = row.nextPageTriggerID {
-              await loadNextPage(triggerID: triggerID)
+      if items.isEmpty {
+        if !didFetch {
+          if loading {
+            TimelineListSkeleton()
+          }
+        } else {
+          ThemedEmptyState(
+            systemImage: "clock.arrow.circlepath",
+            title: "暂无动态",
+            description: "下拉可以刷新时间线")
+            .padding(.vertical, 48)
+        }
+      } else {
+        LazyVStack(alignment: .leading) {
+          ForEach(rows) { row in
+            TimelineItemView(
+              item: row.item,
+              previousUID: row.previousUID
+            )
+            .padding(.bottom, 8)
+            .task(id: row.nextPageTriggerID) {
+              if let triggerID = row.nextPageTriggerID {
+                await loadNextPage(triggerID: triggerID)
+              }
             }
           }
-        }
-        if loading {
-          HStack {
-            Spacer()
-            ProgressView()
-            Spacer()
+          if loading {
+            HStack {
+              Spacer()
+              ProgressView()
+              Spacer()
+            }
           }
-        }
-      }.padding(.horizontal, 8)
+        }.padding(.horizontal, 8)
+      }
     }
     .onAppear(perform: loadInitialPageIfNeeded)
     .refreshable {

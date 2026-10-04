@@ -144,6 +144,10 @@ where C: View, T: Identifiable & Codable & Sendable {
   let nextPageFunc: (Int, Int) async -> PagedDTO<Item>?
   let content: (Item) -> Content
 
+  /// Placeholder shown when the first page comes back empty; without it an empty result
+  /// only shows the plain "没有更多了" footer.
+  private var emptyContent: AnyView?
+
   @State private var loading: Bool = false
   @State private var offset: Int = 0
   @State private var exhausted: Bool = false
@@ -228,6 +232,12 @@ where C: View, T: Identifiable & Codable & Sendable {
     }
   }
 
+  func emptyPlaceholder<V: View>(@ViewBuilder content: () -> V) -> OffsetPagedView<T, C> {
+    var copy = self
+    copy.emptyContent = AnyView(content())
+    return copy
+  }
+
   public var body: some View {
     let displayItems = items.filter(isIncluded)
     let nextPageTrigger = displayItems.nextPagePrefetchTrigger()
@@ -254,12 +264,16 @@ where C: View, T: Identifiable & Codable & Sendable {
       }
 
       if exhausted {
-        HStack {
-          Spacer()
-          Text("没有更多了")
-            .font(.footnote)
-            .foregroundStyle(.secondary)
-          Spacer()
+        if displayItems.isEmpty, let emptyContent {
+          emptyContent
+        } else {
+          HStack {
+            Spacer()
+            Text("没有更多了")
+              .font(.footnote)
+              .foregroundStyle(.secondary)
+            Spacer()
+          }
         }
       }
     }

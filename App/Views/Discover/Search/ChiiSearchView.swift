@@ -111,7 +111,8 @@ struct ChiiSearchView: View {
       } else {
         SearchView(
           text: $query, remote: $remote,
-          searchType: $searchType, subjectType: $subjectType
+          searchType: $searchType, subjectType: $subjectType,
+          onGoRemote: submitSearch
         )
       }
     }
