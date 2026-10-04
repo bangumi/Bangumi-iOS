@@ -1,6 +1,6 @@
 ---
 name: repo-conventions
-description: Bangumi-iOS subsystem conventions and invariants — GRDB storage and migration discipline, client architecture boundaries (APIClient, services, repositories, AppConfig, AppContext), BBCode rendering and image preview pipelines. Use when working on the local database schema or migrations, persistence, API client/services/repositories, BBCode rendering, or image preview and sharing.
+description: Bangumi-iOS subsystem conventions and invariants — GRDB storage and migration discipline, client architecture boundaries (APIClient, services, repositories, AppConfig, AppContext), BBCode rendering and image preview pipelines, animation tokens and haptics. Use when working on the local database schema or migrations, persistence, API client/services/repositories, BBCode rendering, image preview and sharing, animation, or haptic feedback.
 ---
 
 # Repo Conventions
@@ -47,11 +47,28 @@ Runtime GRDB migrations in `DatabaseFactory` are historical artifacts and must b
 ## BBCode And Image Preview
 
 - BBCode image rendering flows through:
-  - `BBCode/Sources/BBCode/Renders/PreparedDocument.swift`
-  - `BBCode/Sources/BBCode/Views/BBCodeUIKitView.swift`
+  - `App/Features/BBCode/Renders/PreparedDocument.swift`
+  - `App/Features/BBCode/Views/BBCodeUIKitView.swift`
+- Inter-block spacing is a pair table keyed by (upper, lower) block type; blocks carry no vertical margins/insets of their own. First and last blocks keep zero outer gap.
+  - WebView path (`PostDocumentRenderer`): `.post-content` resets all block margins to 0 and applies adjacent-sibling rules — default 8px, `p + p` 5px, image-adjacent 6px, quote-adjacent 10px, list-adjacent 10px, code-adjacent 12px. Quote and list interiors use a fixed compact gap (4–5px) instead of re-entering the table. Quotes render as a 3px rounded left bar with 4px vertical padding and 20px text offset.
+  - UITextView path (`BBCodeBlocksContainerView` + `BBCodeLayoutMetrics.spacing(between:and:)`): quote-adjacent 10, mask/list-adjacent 8, image-adjacent 6, text–text 5, applied via `UIStackView.setCustomSpacing`; nested containers (quote/mask/list items) run the same table.
+  - Code blocks are text payload in the UITextView path, so they follow text spacing there; the 12px code tier only exists in the WebView path.
 - When fixing image alignment, preserve the asset's natural visual size. Do not solve centering by making all images full width.
 - Thumbnail/downsample logic must not upscale small images.
 - Treat vector/unconstrained SVG images carefully; avoid forcing them through raster thumbnail paths that expand them to container width.
 - For image preview sharing, prefer directly presenting `UIActivityViewController` from UIKit when the existing code path is UIKit-based.
 - Share sheet previews should provide image data and `LPLinkMetadata` when needed; sharing only a URL can produce empty previews and miss save-image behavior.
 - In image preview controls, prefer native system control styling. Keep only minimal shape or hit-area constraints such as circular button shape when needed.
+- The SwiftUI previewer (`ImagePreviewer`) is a gallery: it takes `[URL]` + initial index (single-image callers are a one-page gallery), pages with a horizontal `ScrollView` of full-width pages + 20pt inter-page spacing (the gap only shows mid-swipe, like Telegram's pager) and `.scrollTargetBehavior(.viewAligned)` (`.paging` cannot express the width+gap stride), and shows a bottom thumbnail strip only when there is more than one page.
+- Pull-to-dismiss and horizontal paging are both gated on the current page's zoom state reported by `ZoomableImageScrollView`: the dismiss `DragGesture` only takes over at minimum zoom scale, and the pager is `.scrollDisabled` while zoomed so horizontal pans scroll the zoomed page instead of turning pages. Keep these gates in sync when changing either side. Additionally, on iOS 26+ with an active zoom transition the system owns pull-to-dismiss (interactive zoom-out), so the custom `DragGesture` is masked off via `zoomTransitionInteractive` / `systemOwnsPullDismiss`; on earlier systems the custom gesture stays.
+- The UIKit BBCode path (`ImagePreviewPresenter`) still presents single images only; do not widen it without an explicit request.
+
+## Animation And Haptics
+
+- Animation tokens live in `App/Helpers/Animation.swift` as static properties on `Animation`. Pick by role: `contentSwap` for small in-place text/icon/state swaps, `layoutShift` for section visibility and card expansion, `springy` for overlay entrances, `overlayExit` for overlay dismissals, `pressDown`/`pressUp` for button press micro-interactions, `pressSubtle` for compact controls such as chips.
+- New code must use these tokens instead of `withAnimation(.default)` or ad-hoc parameters. If no token fits, add one with a usage note rather than inlining parameters. Migrating pre-existing call sites is opt-in; do not batch-rewrite them.
+- Shared micro-effect modifiers live in `App/Helpers/ViewEffects.swift`: `shake(trigger:)` signals validation failure (fire `Haptics.notify(.error)` alongside the trigger increment at the call site), and `staggeredIn(index:)` plays a first-appearance fade+rise staggered by index for horizontal image rows (plays once per view identity, so lazy-stack re-entries and page appends of already-seen rows stay still). Numeric labels that change in place use `.contentTransition(.numericText())` paired with `.animation(.contentSwap, value:)`; fixed-size badges and episode chips stay exempt per AGENTS.md rule 7.
+- Haptics go through `Haptics` in `App/Helpers/Haptics.swift` at three semantic levels: `selection()` for pickers, swipe-to-select, and toggles; `impact()` for tap/action triggers (default `.light`, `.medium` only for weighty triggers such as batch operations, form commits, and deliberate gestures); `notify(_:)` only when an operation has a clear success/failure/warning outcome.
+- Toasts go through `Notifier.notify(message:type:duration:action:)`. The optional `type` (`.success`/`.error`) fires `Haptics.notify` at trigger time and draws a glyph inside the countdown ring; status-confirmation toasts stay untyped and silent. Duration is computed internally (short confirmations 3s, reading-paced 5–8s, action toasts 5s) unless a call site overrides it.
+- Generators are created on demand and discarded at the call site; do not add singletons or caching. `ScrubHaptics` in `ProgressEpisodeTrackView` is the sanctioned exception because scrubbing needs prepared generators for latency.
+- iOS 17 `.sensoryFeedback` call sites stay as-is; do not rewrite them to `Haptics`.
