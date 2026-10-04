@@ -12,6 +12,7 @@ struct IndexRelatedAddSheet: View {
   @State private var comment: String = ""
   @State private var isSubmitting = false
   @State private var showSearch = false
+  @State private var idShakeTrigger = 0
 
   private var supportsSearch: Bool {
     switch selectedCategory {
@@ -24,6 +25,8 @@ struct IndexRelatedAddSheet: View {
 
   func submit() async {
     guard let rid = Int(relatedId), !relatedId.isEmpty else {
+      idShakeTrigger += 1
+      Haptics.notify(.error)
       Notifier.shared.alert(message: "请输入有效的 ID")
       return
     }
@@ -59,6 +62,7 @@ struct IndexRelatedAddSheet: View {
             HStack {
               TextField("ID", text: $relatedId)
                 .keyboardType(.numberPad)
+                .shake(trigger: idShakeTrigger)
               if supportsSearch {
                 Button {
                   showSearch = true
@@ -143,6 +147,7 @@ struct IndexRelatedEditSheet: View {
   @State private var order: String
   @State private var comment: String
   @State private var isSubmitting = false
+  @State private var orderShakeTrigger = 0
 
   init(indexId: Int, relatedId: Int, order: Int, comment: String, onSave: @escaping () -> Void) {
     self.indexId = indexId
@@ -154,6 +159,8 @@ struct IndexRelatedEditSheet: View {
 
   func submit() async {
     guard let orderNum = Int(order) else {
+      orderShakeTrigger += 1
+      Haptics.notify(.error)
       Notifier.shared.alert(message: "请输入有效的排序")
       return
     }
@@ -184,6 +191,7 @@ struct IndexRelatedEditSheet: View {
         Group {
           TextField("排序", text: $order)
             .keyboardType(.numberPad)
+            .shake(trigger: orderShakeTrigger)
 
           TextEditor(text: $comment)
             .frame(minHeight: 100)

@@ -111,7 +111,7 @@ struct GlassCoverWall: View {
 
   var body: some View {
     LazyVGrid(columns: columns, spacing: 8) {
-      ForEach(subjects.prefix(limit)) { subject in
+      ForEach(Array(subjects.prefix(limit).enumerated()), id: \.element.id) { index, subject in
         Color.clear
           .aspectRatio(3 / 4, contentMode: .fit)
           .overlay {
@@ -133,6 +133,7 @@ struct GlassCoverWall: View {
           .clipShape(shape)
           .imageNavLink(subject.link)
           .subjectPreview(subject)
+          .staggeredIn(index: index)
       }
     }
   }

@@ -239,6 +239,7 @@ struct EpisodeNextView: View {
   var reload: (() async -> Void)? = nil
 
   @State private var updating: Bool = false
+  @State private var watchConfirmToken = 0
 
   init(
     episode: EpisodeDTO,
@@ -265,7 +266,8 @@ struct EpisodeNextView: View {
         try await EpisodeRepository.updateEpisodeCollection(
           episodeId: episode.id, type: type)
         await reload?()
-        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+        watchConfirmToken += 1
+        Haptics.impact()
       } catch {
         Notifier.shared.alert(error: error)
       }
@@ -294,6 +296,7 @@ struct EpisodeNextView: View {
     } label: {
       ZStack {
         EpisodeNextLabel(desc: episodeDesc, icon: episodeIcon)
+          .symbolEffect(.bounce, value: watchConfirmToken)
           .opacity(updating ? 0 : 1)
           .accessibilityHidden(updating)
 

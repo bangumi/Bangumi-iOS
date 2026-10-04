@@ -118,6 +118,7 @@ private struct GlassProgressEpisodeSection: View {
   @State private var loadingEpisodes: Bool = false
   @State private var autoSyncRequested: Bool = false
   @State private var showCollectionBox: Bool = false
+  @State private var watchConfirmToken = 0
 
   private var subject: SubjectDTO {
     payload.item.subject
@@ -163,7 +164,8 @@ private struct GlassProgressEpisodeSection: View {
         try await EpisodeRepository.updateEpisodeCollection(
           episodeId: episode.id, type: .collect)
         await reload()
-        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+        watchConfirmToken += 1
+        Haptics.impact()
       } catch {
         Notifier.shared.alert(error: error)
       }
@@ -206,6 +208,7 @@ private struct GlassProgressEpisodeSection: View {
         GlassFillButton(kind: episode.aired ? .accent : .muted) {
           HStack(spacing: 6) {
             Image(systemName: episode.aired ? "checkmark" : "clock")
+              .symbolEffect(.bounce, value: watchConfirmToken)
             Text(
               episode.aired
                 ? "第 \(episode.sort.progressEpisodeNumber) 话 看过"
@@ -418,7 +421,7 @@ struct GlassProgressBookSection: View {
           vols: chapters ? nil : volStatus + 1
         )
         await reload()
-        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+        Haptics.impact()
       } catch {
         Notifier.shared.alert(error: error)
       }
@@ -547,7 +550,7 @@ struct GlassBookProgressEditorSheet: View {
           vols: vols == initialVols ? nil : vols
         )
         await reload()
-        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+        Haptics.impact(.medium)
         dismiss()
       } catch {
         Notifier.shared.alert(error: error)

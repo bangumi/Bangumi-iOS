@@ -70,11 +70,12 @@ struct TimelineItemView: View {
             if let users = item.memo.daily?.users, users.count > 0 {
               ScrollView(.horizontal, showsIndicators: false) {
                 HStack {
-                  ForEach(users.prefix(5)) { user in
+                  ForEach(Array(users.prefix(5).enumerated()), id: \.element.id) { index, user in
                     ImageView(img: user.avatar?.large)
                       .imageStyle(width: 60, height: 60)
                       .imageType(.avatar)
                       .imageLink(user.link)
+                      .staggeredIn(index: index)
                   }
                 }
               }
@@ -84,11 +85,12 @@ struct TimelineItemView: View {
             if let groups = item.memo.daily?.groups, groups.count > 0 {
               ScrollView(.horizontal, showsIndicators: false) {
                 HStack {
-                  ForEach(groups.prefix(5)) { group in
+                  ForEach(Array(groups.prefix(5).enumerated()), id: \.element.id) { index, group in
                     ImageView(img: group.icon?.large)
                       .imageStyle(width: 60, height: 60)
                       .imageType(.icon)
                       .imageLink(group.link)
+                      .staggeredIn(index: index)
                   }
                 }
               }
@@ -110,13 +112,14 @@ struct TimelineItemView: View {
             let subjects = item.memo.subject?.map(\.subject).filter { $0.images != nil } ?? []
             ScrollView(.horizontal, showsIndicators: false) {
               HStack {
-                ForEach(subjects.prefix(5)) { subject in
+                ForEach(Array(subjects.prefix(5).enumerated()), id: \.element.id) { index, subject in
                   ImageView(img: subject.images?.resize(.r200))
                     .imageStyle(width: 60, height: 72)
                     .imageType(.subject)
                     .imageNSFW(subject.nsfw)
                     .imageNavLink(subject.link)
                     .subjectPreview(subject)
+                    .staggeredIn(index: index)
                 }
               }
             }
@@ -175,17 +178,21 @@ struct TimelineItemView: View {
           if let mono = item.memo.mono, mono.characters.count + mono.persons.count > 0 {
             ScrollView(.horizontal, showsIndicators: false) {
               HStack {
-                ForEach(mono.characters.prefix(5)) { character in
+                ForEach(Array(mono.characters.prefix(5).enumerated()), id: \.element.id) {
+                  index, character in
                   ImageView(img: character.images?.resize(.r200))
                     .imageStyle(width: 60, height: 60, alignment: .top)
                     .imageType(.person)
                     .imageNavLink(character.link)
+                    .staggeredIn(index: index)
                 }
-                ForEach(mono.persons.prefix(5)) { person in
+                ForEach(Array(mono.persons.prefix(5).enumerated()), id: \.element.id) {
+                  index, person in
                   ImageView(img: person.images?.resize(.r200))
                     .imageStyle(width: 60, height: 60, alignment: .top)
                     .imageType(.person)
                     .imageNavLink(person.link)
+                    .staggeredIn(index: mono.characters.prefix(5).count + index)
                 }
               }
             }
