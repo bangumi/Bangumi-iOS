@@ -133,7 +133,7 @@ private struct LargeBookProgressEditorView: View {
         try await SubjectRepository.updateSubjectProgress(
           subjectId: subject.id, eps: eps, vols: vols)
         await reload?()
-        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+        Haptics.impact(.medium)
       } catch {
         Notifier.shared.alert(error: error)
       }
@@ -306,7 +306,7 @@ private struct BookProgressSummaryView: View {
           )
         }
         await reload?()
-        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+        Haptics.impact()
       } catch {
         Notifier.shared.alert(error: error)
       }
@@ -517,7 +517,7 @@ private struct BookProgressEditorSheet: View {
           vols: vols == initialVols ? nil : vols
         )
         await reload?()
-        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+        Haptics.impact(.medium)
         dismiss()
       } catch {
         Notifier.shared.alert(error: error)

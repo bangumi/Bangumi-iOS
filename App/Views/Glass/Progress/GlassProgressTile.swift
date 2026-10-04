@@ -51,7 +51,7 @@ struct GlassProgressTile: View {
         try await EpisodeRepository.updateEpisodeCollection(
           episodeId: episode.id, type: .collect)
         await reload()
-        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+        Haptics.impact()
       } catch {
         Notifier.shared.alert(error: error)
       }

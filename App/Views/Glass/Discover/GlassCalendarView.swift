@@ -143,7 +143,7 @@ struct GlassCalendarView: View {
         .navigationBarTitleDisplayMode(.inline)
         .refreshable {
           refreshed = false
-          UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+          Haptics.impact()
           await refreshCalendar()
         }
       }
