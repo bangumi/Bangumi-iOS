@@ -101,6 +101,8 @@ struct PostDocumentNavigatorOverlay: View {
                 Text(widestFloor)
                   .hidden()
                 Text(visibleItem?.floor ?? "楼层")
+                  .contentTransition(.numericText())
+                  .animation(.contentSwap, value: visibleItem?.floor)
               }
               .monospacedDigit()
             }
@@ -197,6 +199,8 @@ struct PostDocumentNavigatorOverlay: View {
               Text(widestFloor)
                 .hidden()
               Text(visibleItem?.floor ?? "楼层")
+                .contentTransition(.numericText())
+                .animation(.contentSwap, value: visibleItem?.floor)
             }
             .monospacedDigit()
           }

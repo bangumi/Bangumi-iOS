@@ -416,9 +416,12 @@ struct GlassProgressView: View {
   private var emptySection: some View {
     if collectionsUpdatedAt > 0 {
       if progressPageLoading {
-        ProgressView()
-          .frame(maxWidth: .infinity)
-          .padding()
+        VStack(spacing: theme.metrics.listSpacing) {
+          GlassSkeletonCard()
+          GlassSkeletonCard(opacity: 0.7)
+          GlassSkeletonCard(opacity: 0.4)
+        }
+        .padding(.horizontal, theme.metrics.screenPadding)
       } else {
         GlassEmptyCard(
           systemImage: "leaf",
@@ -428,10 +431,13 @@ struct GlassProgressView: View {
         .padding(.horizontal, theme.metrics.screenPadding)
       }
     } else {
-      GlassEmptyCard(
+      ThemedEmptyState(
         systemImage: "cloud",
         title: "还没有同步过收藏",
-        description: "下拉即可同步你的 Bangumi 收藏"
+        description: "同步后即可管理你的观看进度",
+        primary: .init(title: "立即同步") {
+          Task { await refresh(force: true) }
+        }
       )
       .padding(.horizontal, theme.metrics.screenPadding)
     }
@@ -489,7 +495,7 @@ struct GlassProgressView: View {
       .padding(.bottom, theme.metrics.screenPadding)
     }
     .refreshable {
-      UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+      Haptics.impact()
       await refresh(showProgress: false)
     }
     .navigationTitle("进度管理")

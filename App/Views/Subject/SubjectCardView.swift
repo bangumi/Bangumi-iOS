@@ -131,6 +131,9 @@ struct CollectionTypeChipsView: View {
             Text("\(type.description(subjectType)) \(counts[type, default: 0])")
               .lineLimit(1)
               .font(.footnote)
+              .monospacedDigit()
+              .contentTransition(.numericText())
+              .animation(.contentSwap, value: counts[type, default: 0])
               .foregroundStyle(.linkText)
           }
           .padding(1)

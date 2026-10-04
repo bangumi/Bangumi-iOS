@@ -25,6 +25,12 @@ struct SearchCharacterView: View {
     OffsetPagedView<SlimCharacterDTO, _>(nextPageFunc: fetch) { item in
       SearchCharacterItemView(characterId: item.id)
     }
+    .emptyPlaceholder {
+      ThemedEmptyState(
+        systemImage: "magnifyingglass",
+        title: "没有找到相关结果",
+        description: "换个关键字再试试")
+    }
   }
 }
 
@@ -74,8 +80,10 @@ struct SearchCharacterItemView: View {
 
 struct SearchCharacterLocalView: View {
   let text: String
+  let onGoRemote: () -> Void
 
   @State private var characters: [CharacterDTO] = []
+  @State private var loaded: Bool = false
 
   private func load() async {
     do {
@@ -83,6 +91,7 @@ struct SearchCharacterLocalView: View {
       let fetched = try await db.fetchLocalCharacters(search: text.gb)
       withAnimation(.default) {
         characters = fetched
+        loaded = true
       }
     } catch {
       Notifier.shared.alert(error: error)
@@ -119,6 +128,14 @@ struct SearchCharacterLocalView: View {
       Task {
         await load()
       }
+    }
+
+    if loaded, characters.isEmpty {
+      ThemedEmptyState(
+        systemImage: "internaldrive",
+        title: "本地缓存没有匹配结果",
+        description: "在线搜索可以查找全站数据",
+        primary: .init(title: "在线搜索", systemImage: "globe", handler: onGoRemote))
     }
   }
 }

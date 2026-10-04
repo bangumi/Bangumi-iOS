@@ -182,7 +182,7 @@ struct SubjectWikiEditSheet: View {
         )
       }
       _ = try? await SubjectRepository.loadSubject(subjectId)
-      Notifier.shared.notify(message: "条目 Wiki 已保存")
+      Notifier.shared.notify(message: "条目 Wiki 已保存", type: .success)
       onSave()
       dismiss()
     } catch {
@@ -337,7 +337,7 @@ struct PersonWikiEditSheet: View {
         commitMessage: commitMessage
       )
       try? await PersonRepository.loadPerson(personId)
-      Notifier.shared.notify(message: "人物 Wiki 已保存")
+      Notifier.shared.notify(message: "人物 Wiki 已保存", type: .success)
       onSave()
       dismiss()
     } catch {
@@ -452,7 +452,7 @@ struct CharacterWikiEditSheet: View {
         commitMessage: commitMessage
       )
       try? await CharacterRepository.loadCharacter(characterId)
-      Notifier.shared.notify(message: "角色 Wiki 已保存")
+      Notifier.shared.notify(message: "角色 Wiki 已保存", type: .success)
       onSave()
       dismiss()
     } catch {
@@ -601,7 +601,7 @@ struct EpisodeWikiEditSheet: View {
         commitMessage: commitMessage
       )
       try? await EpisodeRepository.loadEpisode(episodeId)
-      Notifier.shared.notify(message: "章节 Wiki 已保存")
+      Notifier.shared.notify(message: "章节 Wiki 已保存", type: .success)
       onSave()
       dismiss()
     } catch {
@@ -843,7 +843,7 @@ struct SubjectEpisodeWikiSheet: View {
         guard let payload = payload(id: nil, preservingEmptyText: false) else { return }
         let ids = try await WikiService.createEpisodes(subjectId: subjectId, episodes: [payload])
         let idsText = ids.map(String.init).joined(separator: ", ")
-        Notifier.shared.notify(message: "已创建章节 #\(idsText)")
+        Notifier.shared.notify(message: "已创建章节 #\(idsText)", type: .success)
       case .edit:
         guard let episodeId = parsedEpisodeId,
           let loadedEpisode,
@@ -856,7 +856,7 @@ struct SubjectEpisodeWikiSheet: View {
           expectedRevision: expectedRevision.map { [$0] },
           commitMessage: commitMessage
         )
-        Notifier.shared.notify(message: "章节 Wiki 已保存")
+        Notifier.shared.notify(message: "章节 Wiki 已保存", type: .success)
       }
       try? await EpisodeRepository.loadEpisodes(subjectId)
       onSave()

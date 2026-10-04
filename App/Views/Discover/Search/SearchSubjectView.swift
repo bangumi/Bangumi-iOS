@@ -28,6 +28,12 @@ struct SearchSubjectView: View {
     OffsetPagedView<SubjectListItemDTO, _>(reloader: reloader, nextPageFunc: fetch) { item in
       SubjectSlimListItemView(subject: item.subject, collectionType: item.collectionType)
     }
+    .emptyPlaceholder {
+      ThemedEmptyState(
+        systemImage: "magnifyingglass",
+        title: "没有找到相关结果",
+        description: "换个关键字再试试")
+    }
     .onChange(of: subjectType) { _, _ in
       withAnimation(.default) {
         reloader.toggle()
@@ -39,8 +45,10 @@ struct SearchSubjectView: View {
 struct SearchSubjectLocalView: View {
   let text: String
   let subjectType: SubjectType
+  let onGoRemote: () -> Void
 
   @State private var subjects: [SubjectDTO] = []
+  @State private var loaded: Bool = false
 
   private func load() async {
     do {
@@ -51,6 +59,7 @@ struct SearchSubjectLocalView: View {
       )
       withAnimation(.default) {
         subjects = fetched
+        loaded = true
       }
     } catch {
       Notifier.shared.alert(error: error)
@@ -73,6 +82,14 @@ struct SearchSubjectLocalView: View {
     }
     .task(id: "\(text)-\(subjectType.rawValue)") {
       await load()
+    }
+
+    if loaded, subjects.isEmpty {
+      ThemedEmptyState(
+        systemImage: "internaldrive",
+        title: "本地缓存没有匹配结果",
+        description: "在线搜索可以查找全站数据",
+        primary: .init(title: "在线搜索", systemImage: "globe", handler: onGoRemote))
     }
   }
 }

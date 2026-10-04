@@ -392,14 +392,17 @@ struct ChiiProgressView: View {
       }
     } else if collectionsUpdatedAt > 0 {
       if refreshing || progressPageLoading {
-        ProgressView()
-          .padding()
+        ProgressSubjectsSkeleton(mode: progressViewMode)
+      } else if !search.isEmpty {
+        ThemedEmptyState(
+          systemImage: "magnifyingglass",
+          title: "没有找到相关条目",
+          description: "换个关键字再试试")
       } else {
-        ContentUnavailableView {
-          Label("没有条目", systemImage: "tray")
-        } description: {
-          Text("当前列表为空，或是搜索无结果")
-        }
+        ThemedEmptyState(
+          systemImage: "tray",
+          title: "这个分类下暂时是空的",
+          description: "去发现页找点想看的吧")
       }
     } else {
       if refreshing {
@@ -408,11 +411,13 @@ struct ChiiProgressView: View {
             .progressViewStyle(.linear)
         }.padding()
       } else {
-        ContentUnavailableView {
-          Label("没有收藏数据", systemImage: "tray")
-        } description: {
-          Text("下拉刷新以获取正在观看的条目")
-        }
+        ThemedEmptyState(
+          systemImage: "cloud",
+          title: "还没有同步过收藏",
+          description: "同步后即可管理你的观看进度",
+          primary: .init(title: "立即同步") {
+            Task { await refresh() }
+          })
       }
     }
   }
@@ -441,6 +446,9 @@ struct ChiiProgressView: View {
               let count = counts[type, default: 0]
               if count > 0 {
                 Text("\(count)")
+                  .monospacedDigit()
+                  .contentTransition(.numericText())
+                  .animation(.contentSwap, value: count)
                   .foregroundStyle(
                     progressTab == type
                       ? AnyShapeStyle(.white.opacity(0.8)) : AnyShapeStyle(.secondary))
@@ -521,7 +529,7 @@ struct ChiiProgressView: View {
       }
     }
     .refreshable {
-      UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+      Haptics.impact()
       await refresh(showProgress: false)
     }
     .searchable(

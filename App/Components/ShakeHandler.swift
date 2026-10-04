@@ -19,9 +19,7 @@ struct ShakeHandler: UIViewControllerRepresentable {
       // Toggle between chinese and original
       titlePreference = titlePreference == .chinese ? .original : .chinese
 
-      // Provide haptic feedback
-      let generator = UIImpactFeedbackGenerator(style: .medium)
-      generator.impactOccurred()
+      Haptics.impact(.medium)
 
       // Show notification
       let preferenceText = titlePreference == .chinese ? "中文名优先" : "原名优先"

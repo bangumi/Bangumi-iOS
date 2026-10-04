@@ -19,7 +19,7 @@ enum ImagePreviewPresenter {
     }
 
     let controller = ImagePreviewHostingController(
-      rootView: ImagePreviewer(url: url),
+      rootView: ImagePreviewer(url: url, zoomTransitionInteractive: zoomSourceView != nil),
       onDismiss: onDismiss
     )
     controller.modalPresentationStyle = .overFullScreen

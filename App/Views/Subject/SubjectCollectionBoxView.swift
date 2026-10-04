@@ -140,7 +140,7 @@ struct SubjectCollectionBoxView: View {
           progress: autoCompleteProgress
         )
         await onSaved?()
-        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+        Haptics.impact(.medium)
         dismiss()
       } catch {
         Notifier.shared.alert(error: error)

@@ -6,78 +6,98 @@ import SwiftUI
 import UIKit
 
 public struct ImagePreviewer: View {
-  private enum LoadState {
-    case loading
-    case loaded
-    case failed
+  private enum DragAxis {
+    case unknown
+    case horizontal
+    case vertical
   }
 
-  let url: URL
+  let urls: [URL]
+  let initialIndex: Int
   let zoomID: AnyHashable?
   let zoomNamespace: Namespace.ID?
+  /// Whether the presentation uses a zoom transition (SwiftUI cover path infers
+  /// this from zoomID; the UIKit presenter path passes it explicitly).
+  let zoomTransitionInteractive: Bool
 
-  @State private var loadState = LoadState.loading
+  @State private var selection: Int?
   @State private var showControls = true
-  @State private var reloadID = UUID()
-  @State private var shouldRefresh = false
-  @State private var loadedImage: UIImage?
+  @State private var dragOffset: CGFloat = 0
+  @State private var dragAxis = DragAxis.unknown
+  @State private var loadedImages: [Int: UIImage] = [:]
+  @State private var zoomedPages: Set<Int> = []
 
   @Environment(\.dismiss) private var dismiss
 
-  public init(url: URL, zoomID: AnyHashable? = nil, zoomNamespace: Namespace.ID? = nil) {
-    self.url = url
+  public init(
+    url: URL,
+    zoomID: AnyHashable? = nil,
+    zoomNamespace: Namespace.ID? = nil,
+    zoomTransitionInteractive: Bool? = nil
+  ) {
+    self.init(
+      urls: [url],
+      initialIndex: 0,
+      zoomID: zoomID,
+      zoomNamespace: zoomNamespace,
+      zoomTransitionInteractive: zoomTransitionInteractive
+    )
+  }
+
+  public init(
+    urls: [URL],
+    initialIndex: Int = 0,
+    zoomID: AnyHashable? = nil,
+    zoomNamespace: Namespace.ID? = nil,
+    zoomTransitionInteractive: Bool? = nil
+  ) {
+    self.urls = urls
     self.zoomID = zoomID
     self.zoomNamespace = zoomNamespace
+    self.zoomTransitionInteractive =
+      zoomTransitionInteractive ?? (zoomID != nil && zoomNamespace != nil)
+    let clamped = urls.isEmpty ? 0 : min(max(initialIndex, 0), urls.count - 1)
+    self.initialIndex = clamped
+    self._selection = State(initialValue: clamped)
+  }
+
+  private var currentIndex: Int {
+    selection ?? initialIndex
+  }
+
+  private var isCurrentPageZoomed: Bool {
+    zoomedPages.contains(currentIndex)
+  }
+
+  /// Zoom transitions are interactively dismissible since iOS 26; there the
+  /// system owns the pull-down gesture and our custom one would fight it.
+  private var systemOwnsPullDismiss: Bool {
+    guard zoomTransitionInteractive else { return false }
+    if #available(iOS 26.0, *) { return true }
+    return false
   }
 
   public var body: some View {
     GeometryReader { proxy in
-      let hiddenOffset = -(proxy.safeAreaInsets.top + 80)
+      let pageGap: CGFloat = 20
+      // Pages are full-width like Telegram's pager: the gap only exists
+      // between pages mid-swipe, not as permanent margins at rest.
+      let pageWidth = proxy.size.width
+      let pageHeight = proxy.size.height
+      let dragAmount = abs(dragOffset)
+      let backgroundOpacity = max(0, 1 - dragAmount / 80)
+      let controlsDragOpacity = max(0, 1 - dragAmount / 50)
+      let hiddenTopOffset = -(proxy.safeAreaInsets.top + 80)
+      let hiddenBottomOffset = proxy.safeAreaInsets.bottom + 80
+
       ZStack {
         Color.black
+          .opacity(backgroundOpacity)
           .ignoresSafeArea()
 
-        ZoomableImageScrollView(
-          url: url,
-          reloadID: reloadID,
-          options: imageOptions,
-          maxScale: 6.0,
-          doubleTapScale: 2.5,
-          onFailure: {
-            DispatchQueue.main.async {
-              loadState = .failed
-              shouldRefresh = false
-            }
-          },
-          onSuccess: { image in
-            DispatchQueue.main.async {
-              loadState = .loaded
-              shouldRefresh = false
-              loadedImage = image
-            }
-          },
-          onSingleTap: {
-            withAnimation {
-              showControls.toggle()
-            }
-          }
-        )
-
-        if loadState == .loading {
-          ProgressView()
-            .tint(.white.opacity(0.8))
-        } else if loadState == .failed {
-          VStack(spacing: 12) {
-            Image(systemName: "exclamationmark.triangle")
-              .font(.title2)
-            Button {
-              reloadImage()
-            } label: {
-              Label("Reload", systemImage: "arrow.clockwise")
-            }
-            .adaptiveButtonStyle(.borderedProminent)
-          }
-          .foregroundColor(.white)
+        if !urls.isEmpty {
+          pager(pageWidth: pageWidth, pageHeight: pageHeight, pageGap: pageGap)
+            .offset(y: dragOffset)
         }
 
         VStack {
@@ -109,15 +129,221 @@ public struct ImagePreviewer: View {
           Spacer()
         }
         .padding(.top, proxy.safeAreaInsets.top)
-        .offset(y: showControls ? 0 : hiddenOffset)
-        .opacity(showControls ? 1 : 0)
+        .offset(y: showControls ? 0 : hiddenTopOffset)
+        .opacity(showControls ? controlsDragOpacity : 0)
         .animation(.spring(response: 0.35, dampingFraction: 0.9), value: showControls)
         .allowsHitTesting(showControls)
+
+        if urls.count > 1 {
+          VStack {
+            Spacer()
+            thumbnailStrip(proxy: proxy)
+          }
+          .padding(.bottom, proxy.safeAreaInsets.bottom + 12)
+          .offset(y: showControls ? 0 : hiddenBottomOffset)
+          .opacity(showControls ? controlsDragOpacity : 0)
+          .animation(.spring(response: 0.35, dampingFraction: 0.9), value: showControls)
+          .allowsHitTesting(showControls)
+        }
       }
       .frame(maxWidth: .infinity, maxHeight: .infinity)
       .ignoresSafeArea()
+      .gesture(
+        dismissGesture(height: pageHeight),
+        including: systemOwnsPullDismiss ? .none : .all
+      )
     }
     .navigationTransitionZoomIfAvailable(sourceID: zoomID, in: zoomNamespace)
+  }
+
+  private func pager(pageWidth: CGFloat, pageHeight: CGFloat, pageGap: CGFloat) -> some View {
+    ScrollView(.horizontal, showsIndicators: false) {
+      HStack(spacing: pageGap) {
+        ForEach(Array(urls.enumerated()), id: \.offset) { index, url in
+          ImagePreviewPage(
+            url: url,
+            onImageLoaded: { image in
+              loadedImages[index] = image
+            },
+            onSingleTap: {
+              withAnimation {
+                showControls.toggle()
+              }
+            },
+            onZoomStateChange: { isZoomed in
+              if isZoomed {
+                zoomedPages.insert(index)
+              } else {
+                zoomedPages.remove(index)
+              }
+            }
+          )
+          .frame(width: pageWidth, height: pageHeight)
+        }
+      }
+      .scrollTargetLayout()
+    }
+    // `.paging` snaps by container width and cannot express a page stride of
+    // (width + gap), so gaps between pages require view-aligned snapping.
+    .scrollTargetBehavior(.viewAligned)
+    .scrollPosition(id: $selection)
+    // While a page is zoomed, horizontal pans must scroll that page's content
+    // instead of turning the page. Vertical drags own the dismiss gesture, so
+    // paging is disabled for them too — otherwise diagonal drags do both.
+    .scrollDisabled(isCurrentPageZoomed || dragAxis == .vertical)
+  }
+
+  private func thumbnailStrip(proxy: GeometryProxy) -> some View {
+    ScrollViewReader { reader in
+      ScrollView(.horizontal, showsIndicators: false) {
+        HStack(spacing: 2) {
+          ForEach(Array(urls.enumerated()), id: \.offset) { index, url in
+            GalleryThumbnail(
+              url: url,
+              isSelected: index == currentIndex,
+              aspect: loadedImages[index].map { $0.size.width / max($0.size.height, 1) },
+              action: {
+                withAnimation {
+                  selection = index
+                }
+              }
+            )
+            .id(index)
+          }
+        }
+        .padding(.horizontal, max(0, proxy.size.width / 2 - 38))
+        .animation(.spring(duration: 0.4), value: selection)
+      }
+      .onAppear {
+        reader.scrollTo(currentIndex, anchor: .center)
+      }
+      .onChange(of: selection) { _, newValue in
+        if let newValue {
+          withAnimation(.spring(duration: 0.4)) {
+            reader.scrollTo(newValue, anchor: .center)
+          }
+        }
+      }
+    }
+  }
+
+  private func dismissGesture(height: CGFloat) -> some Gesture {
+    DragGesture(minimumDistance: 12)
+      .onChanged { value in
+        // Vertical pull-to-dismiss only takes over while the current page sits
+        // at its minimum zoom scale, like Telegram's zoomScale != minScale gate.
+        guard !isCurrentPageZoomed else { return }
+        let translation = value.translation
+        if dragAxis == .unknown {
+          dragAxis = abs(translation.height) > abs(translation.width) ? .vertical : .horizontal
+        }
+        guard dragAxis == .vertical else { return }
+        dragOffset = translation.height
+      }
+      .onEnded { value in
+        let axis = dragAxis
+        dragAxis = .unknown
+        guard axis == .vertical else { return }
+        let drag = value.translation.height
+        let predicted = value.predictedEndTranslation.height
+        if abs(drag) > height / 4 || abs(predicted) > height / 2 {
+          let target = predicted >= 0 ? height : -height
+          withAnimation(.easeOut(duration: 0.2)) {
+            dragOffset = target
+          }
+          DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+            dismiss()
+          }
+        } else {
+          withAnimation(.spring) {
+            dragOffset = 0
+          }
+        }
+      }
+  }
+
+  private func presentShareSheet() {
+    guard let presenter = UIViewController.activeTopMostPresentedViewController,
+      urls.indices.contains(currentIndex)
+    else {
+      return
+    }
+
+    let activityItem = ImagePreviewActivityItemSource(
+      image: loadedImages[currentIndex], url: urls[currentIndex])
+    let controller = UIActivityViewController(
+      activityItems: [activityItem],
+      applicationActivities: nil
+    )
+    controller.popoverPresentationController?.sourceView = presenter.view
+    controller.popoverPresentationController?.sourceRect = CGRect(
+      x: presenter.view.bounds.maxX - 44,
+      y: presenter.view.safeAreaInsets.top + 44,
+      width: 1,
+      height: 1
+    )
+    presenter.present(controller, animated: true)
+  }
+}
+
+private struct ImagePreviewPage: View {
+  private enum LoadState {
+    case loading
+    case loaded
+    case failed
+  }
+
+  let url: URL
+  let onImageLoaded: (UIImage) -> Void
+  let onSingleTap: () -> Void
+  let onZoomStateChange: (Bool) -> Void
+
+  @State private var loadState = LoadState.loading
+  @State private var reloadID = UUID()
+  @State private var shouldRefresh = false
+
+  var body: some View {
+    ZStack {
+      ZoomableImageScrollView(
+        url: url,
+        reloadID: reloadID,
+        options: imageOptions,
+        maxScale: 6.0,
+        doubleTapScale: 2.5,
+        onFailure: {
+          DispatchQueue.main.async {
+            loadState = .failed
+            shouldRefresh = false
+          }
+        },
+        onSuccess: { image in
+          DispatchQueue.main.async {
+            loadState = .loaded
+            shouldRefresh = false
+            onImageLoaded(image)
+          }
+        },
+        onSingleTap: onSingleTap,
+        onZoomStateChange: onZoomStateChange
+      )
+
+      if loadState == .loading {
+        ProgressView()
+          .tint(.white.opacity(0.8))
+      } else if loadState == .failed {
+        VStack(spacing: 12) {
+          Image(systemName: "exclamationmark.triangle")
+            .font(.title2)
+          Button {
+            reloadImage()
+          } label: {
+            Label("Reload", systemImage: "arrow.clockwise")
+          }
+          .adaptiveButtonStyle(.borderedProminent)
+        }
+        .foregroundColor(.white)
+      }
+    }
   }
 
   private var imageOptions: SDWebImageOptions {
@@ -133,25 +359,39 @@ public struct ImagePreviewer: View {
     shouldRefresh = true
     reloadID = UUID()
   }
+}
 
-  private func presentShareSheet() {
-    guard let presenter = UIViewController.activeTopMostPresentedViewController else {
-      return
+private struct GalleryThumbnail: View {
+  let url: URL
+  let isSelected: Bool
+  let aspect: CGFloat?
+  let action: () -> Void
+
+  @Environment(\.displayScale) private var displayScale
+
+  private var width: CGFloat {
+    guard isSelected else { return 15 }
+    guard let aspect, aspect > 0 else { return 45 }
+    return min(30 * aspect, 75)
+  }
+
+  var body: some View {
+    Button(action: action) {
+      AnimatedImage(url: url, context: thumbnailContext)
+        .resizable()
+        .scaledToFill()
+        .frame(width: width, height: 30)
+        .clipShape(RoundedRectangle(cornerRadius: 4))
+        .contentShape(Rectangle())
     }
+    .buttonStyle(.plain)
+  }
 
-    let activityItem = ImagePreviewActivityItemSource(image: loadedImage, url: url)
-    let controller = UIActivityViewController(
-      activityItems: [activityItem],
-      applicationActivities: nil
-    )
-    controller.popoverPresentationController?.sourceView = presenter.view
-    controller.popoverPresentationController?.sourceRect = CGRect(
-      x: presenter.view.bounds.maxX - 44,
-      y: presenter.view.safeAreaInsets.top + 44,
-      width: 1,
-      height: 1
-    )
-    presenter.present(controller, animated: true)
+  private var thumbnailContext: [SDWebImageContextOption: Any] {
+    let scale = min(max(displayScale, 1), 2)
+    return [
+      .imageThumbnailPixelSize: CGSize(width: 75 * scale, height: 30 * scale)
+    ]
   }
 }
 
@@ -200,6 +440,7 @@ private struct ZoomableImageScrollView: UIViewRepresentable {
   let onFailure: () -> Void
   let onSuccess: (UIImage) -> Void
   let onSingleTap: () -> Void
+  let onZoomStateChange: (Bool) -> Void
 
   func makeCoordinator() -> ZoomableImageScrollCoordinator {
     ZoomableImageScrollCoordinator(parent: self)
@@ -214,6 +455,9 @@ private struct ZoomableImageScrollView: UIViewRepresentable {
     scrollView.backgroundColor = .black
     scrollView.alwaysBounceVertical = false
     scrollView.alwaysBounceHorizontal = false
+    // At minimum zoom the page must not rubber-band, otherwise it fights the
+    // outer pull-to-dismiss gesture; scrolling is re-enabled once zoomed in.
+    scrollView.isScrollEnabled = false
 
     context.coordinator.attach(to: scrollView)
     context.coordinator.loadImageIfNeeded(url: url, options: options, reloadID: reloadID)
@@ -237,6 +481,7 @@ private final class ZoomableImageScrollCoordinator: NSObject, UIScrollViewDelega
   private var lastURL: URL?
   private var lastOptions: SDWebImageOptions = []
   private var lastBounds: CGSize = .zero
+  private var lastIsZoomed = false
 
   init(parent: ZoomableImageScrollView) {
     self.parent = parent
@@ -299,6 +544,18 @@ private final class ZoomableImageScrollCoordinator: NSObject, UIScrollViewDelega
 
   func scrollViewDidZoom(_ scrollView: UIScrollView) {
     centerContent(in: scrollView)
+    reportZoomState(scrollView)
+  }
+
+  private func reportZoomState(_ scrollView: UIScrollView) {
+    let isZoomed = scrollView.zoomScale > scrollView.minimumZoomScale + 0.01
+    guard isZoomed != lastIsZoomed else { return }
+    lastIsZoomed = isZoomed
+    scrollView.isScrollEnabled = isZoomed
+    let callback = parent.onZoomStateChange
+    DispatchQueue.main.async {
+      callback(isZoomed)
+    }
   }
 
   private func updateImage(_ image: UIImage) {

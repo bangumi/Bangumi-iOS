@@ -24,7 +24,7 @@ struct ThemedChipStyle: ButtonStyle {
       }
       .shadow(color: shadow.color, radius: shadow.radius, y: shadow.y)
       .scaleEffect(configuration.isPressed && !reduceMotion ? 0.96 : 1)
-      .animation(.easeOut(duration: 0.15), value: configuration.isPressed)
+      .animation(.pressSubtle, value: configuration.isPressed)
   }
 
   private var fill: AnyShapeStyle {

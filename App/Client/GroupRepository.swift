@@ -12,7 +12,7 @@ enum GroupRepository {
       } catch {
         Logger.api.error("Failed to load \(label): \(error)")
         await MainActor.run {
-          Notifier.shared.notify(message: "加载\(label)失败")
+          Notifier.shared.notify(message: "加载\(label)失败", type: .error)
         }
         return nil
       }

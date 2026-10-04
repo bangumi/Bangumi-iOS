@@ -62,7 +62,7 @@ struct SubjectWikiCoversView: View {
     do {
       let payload = try await WikiImagePayload.base64(from: item)
       try await WikiService.uploadSubjectCover(subjectId: subjectId, content: payload)
-      Notifier.shared.notify(message: "封面已上传")
+      Notifier.shared.notify(message: "封面已上传", type: .success)
       await load()
     } catch {
       Notifier.shared.alert(error: error)
@@ -267,7 +267,7 @@ struct WikiPortraitUploadSheet: View {
       default:
         return
       }
-      Notifier.shared.notify(message: "肖像已上传")
+      Notifier.shared.notify(message: "肖像已上传", type: .success)
       onSave()
       dismiss()
     } catch {

@@ -53,7 +53,7 @@ struct IndexPickerSheet: View {
         cat: category,
         sid: itemId
       )
-      Notifier.shared.notify(message: "已添加到「\(index.title)」")
+      Notifier.shared.notify(message: "已添加到「\(index.title)」", type: .success)
       dismiss()
     } catch ChiiError.conflict {
       Notifier.shared.notify(message: "目录「\(index.title)」里已存在")

@@ -12,6 +12,7 @@ struct SearchView: View {
   @Binding var remote: Bool
   @Binding var searchType: SearchType
   @Binding var subjectType: SubjectType
+  let onGoRemote: () -> Void
 
   var body: some View {
     ScrollView {
@@ -21,19 +22,19 @@ struct SearchView: View {
           if remote {
             SearchSubjectView(text: text, subjectType: subjectType)
           } else {
-            SearchSubjectLocalView(text: text, subjectType: subjectType)
+            SearchSubjectLocalView(text: text, subjectType: subjectType, onGoRemote: onGoRemote)
           }
         case .character:
           if remote {
             SearchCharacterView(text: text)
           } else {
-            SearchCharacterLocalView(text: text)
+            SearchCharacterLocalView(text: text, onGoRemote: onGoRemote)
           }
         case .person:
           if remote {
             SearchPersonView(text: text)
           } else {
-            SearchPersonLocalView(text: text)
+            SearchPersonLocalView(text: text, onGoRemote: onGoRemote)
           }
         }
       }

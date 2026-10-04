@@ -722,7 +722,7 @@ struct CommentListView: View {
 
     do {
       try await route.parent.delete(commentId: target.id)
-      Notifier.shared.notify(message: "删除成功")
+      Notifier.shared.notify(message: "删除成功", type: .success)
       await refreshDocument()
     } catch {
       Notifier.shared.alert(error: error)
@@ -757,7 +757,7 @@ struct CommentListView: View {
       reactionRequests.remove(target.id)
     }
     selectReaction(optimisticValue, postID: target.id)
-    UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+    Haptics.impact()
 
     do {
       if toggle, isSelected {

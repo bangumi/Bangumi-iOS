@@ -78,7 +78,7 @@ struct GlassSubjectBookProgress: View {
         try await SubjectRepository.updateSubjectProgress(
           subjectId: subject.id, eps: eps, vols: vols)
         await reload()
-        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+        Haptics.impact(.medium)
       } catch {
         Notifier.shared.alert(error: error)
       }

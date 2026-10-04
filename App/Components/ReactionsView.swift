@@ -57,6 +57,8 @@ struct ReactionsView: View {
       Text("\(reaction.users.count)")
         .font(.callout)
         .monospacedDigit()
+        .contentTransition(.numericText())
+        .animation(.contentSwap, value: reaction.users.count)
         .foregroundStyle(textColor(reaction))
     }.padding(.horizontal, 4)
   }
@@ -72,7 +74,7 @@ struct ReactionsView: View {
           try await AccountService.like(path: type.path, value: reaction.value)
           onAdd(reaction.value)
         }
-        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+        Haptics.impact()
       } catch {
         Notifier.shared.alert(error: error)
       }
@@ -160,7 +162,7 @@ struct ReactionButton: View {
       do {
         try await AccountService.like(path: type.path, value: value)
         showPopover = false
-        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+        Haptics.impact()
         onAdd(value)
       } catch {
         Notifier.shared.alert(error: error)

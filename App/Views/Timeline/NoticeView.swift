@@ -125,7 +125,10 @@ struct NoticeView: View {
         }
         .themedListRow()
       } else if notices.isEmpty {
-        ContentUnavailableView("暂无提醒", systemImage: "bell.slash")
+        ThemedEmptyState(
+          systemImage: "bell.slash",
+          title: "暂无提醒",
+          description: "新的回复和提醒会出现在这里")
           .listRowSeparator(.hidden)
           .themedListRow()
       } else {
@@ -165,7 +168,7 @@ struct NoticeView: View {
         }
       }
       .refreshable {
-        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+        Haptics.impact()
         await refreshNotice()
       }
       .navigationTitle(unreadCount > 0 ? "电波提醒 (\(unreadCount))" : "电波提醒")

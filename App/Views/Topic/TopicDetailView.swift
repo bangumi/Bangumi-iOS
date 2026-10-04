@@ -647,7 +647,7 @@ struct TopicDetailView: View {
 
     do {
       try await data.parentType.deletePost(postId: target.id)
-      Notifier.shared.notify(message: "删除成功")
+      Notifier.shared.notify(message: "删除成功", type: .success)
       await refresh()
     } catch {
       Notifier.shared.alert(error: error)
@@ -685,7 +685,7 @@ struct TopicDetailView: View {
       postID: target.id,
       user: profile.simple
     )
-    UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+    Haptics.impact()
 
     do {
       if toggle, isSelected {

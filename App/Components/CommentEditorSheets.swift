@@ -103,7 +103,7 @@ struct CreateCommentBoxSheet: View {
         content: submittedContent,
         token: token
       )
-      Notifier.shared.notify(message: "回复成功")
+      Notifier.shared.notify(message: "回复成功", type: .success)
       onSuccess?()
       dismiss()
     } catch {
@@ -188,7 +188,7 @@ struct EditCommentBoxSheet: View {
 
     do {
       try await type.edit(commentId: commentID, content: content)
-      Notifier.shared.notify(message: "编辑成功")
+      Notifier.shared.notify(message: "编辑成功", type: .success)
       onSuccess?()
       dismiss()
     } catch {

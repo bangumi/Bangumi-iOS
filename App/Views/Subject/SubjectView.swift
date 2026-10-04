@@ -75,7 +75,7 @@ struct SubjectView: View {
       } else if refreshed {
         NotFoundView()
       } else {
-        ProgressView()
+        SubjectDetailSkeleton()
       }
     }
     .task {

@@ -29,7 +29,7 @@ struct GlassCharacterDetailView: View {
         try await CharacterRepository.uncollectCharacter(character.id)
       }
       await reload()
-      UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+      Haptics.impact()
     } catch {
       Notifier.shared.alert(error: error)
     }

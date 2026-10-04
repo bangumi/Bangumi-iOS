@@ -184,6 +184,6 @@ func handleSearchActivity(_ activity: NSUserActivity, nav: Binding<NavigationPat
   case "person":
     nav.wrappedValue.append(NavDestination.person(id))
   default:
-    Notifier.shared.notify(message: "未知的搜索结果类型: \(identifier)")
+    Notifier.shared.notify(message: "未知的搜索结果类型: \(identifier)", type: .error)
   }
 }

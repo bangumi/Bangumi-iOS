@@ -21,7 +21,7 @@ struct EpisodeUpdateMenu: View {
         try await EpisodeRepository.updateEpisodeCollection(
           episodeId: episode.id, type: type)
         await reload?()
-        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+        Haptics.impact()
       } catch {
         Notifier.shared.alert(error: error)
       }
@@ -34,7 +34,7 @@ struct EpisodeUpdateMenu: View {
         try await EpisodeRepository.updateEpisodeCollection(
           episodeId: episode.id, type: .collect, batch: true)
         await reload?()
-        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+        Haptics.impact(.medium)
       } catch {
         Notifier.shared.alert(error: error)
       }
