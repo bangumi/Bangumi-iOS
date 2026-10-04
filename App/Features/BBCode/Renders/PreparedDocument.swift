@@ -104,11 +104,50 @@ extension NSAttributedString.Key {
 
 enum BBCodeLayoutMetrics {
   static let lineHeightMultiple: CGFloat = 1.08
-  static let textContainerVerticalInset: CGFloat = 2
+  // Inter-block gaps come from the container's pair table, so a text block
+  // carries no vertical inset of its own.
+  static let textContainerVerticalInset: CGFloat = 0
+
+  // Pair-table gap between two stacked blocks: quote adjacency breathes most,
+  // image pairs stay tight, plain text runs tightest.
+  static func spacing(
+    between upper: BBCodePreparedBlock.Payload,
+    and lower: BBCodePreparedBlock.Payload
+  ) -> CGFloat {
+    let payloads = [upper, lower]
+    if payloads.contains(where: \.isQuote) {
+      return 10
+    }
+    if payloads.contains(where: \.isMaskOrList) {
+      return 8
+    }
+    if payloads.contains(where: \.isImage) {
+      return 6
+    }
+    return 5
+  }
 
   static func inlineAttachmentVerticalOffset(for height: CGFloat, font: UIFont) -> CGFloat {
     let overflow = max(0, height - font.lineHeight)
     return font.descender - overflow / 2
+  }
+}
+
+extension BBCodePreparedBlock.Payload {
+  var isQuote: Bool {
+    if case .quote = self { return true }
+    return false
+  }
+
+  var isMaskOrList: Bool {
+    if case .mask = self { return true }
+    if case .list = self { return true }
+    return false
+  }
+
+  var isImage: Bool {
+    if case .image = self { return true }
+    return false
   }
 }
 

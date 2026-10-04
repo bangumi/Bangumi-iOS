@@ -50,8 +50,19 @@ final class BBCodeBlocksContainerView: UIView {
 
     lastRenderID = renderID
     stackView.bbcodeRemoveAllArrangedSubviews()
+    var previousView: UIView?
+    var previousBlock: BBCodePreparedBlock?
     for block in blocks {
-      stackView.addArrangedSubview(makeView(for: block))
+      let view = makeView(for: block)
+      stackView.addArrangedSubview(view)
+      if let previousView, let previousBlock {
+        stackView.setCustomSpacing(
+          BBCodeLayoutMetrics.spacing(between: previousBlock.payload, and: block.payload),
+          after: previousView
+        )
+      }
+      previousView = view
+      previousBlock = block
     }
 
     applyOpenURLHandlerToDescendants()
@@ -499,7 +510,7 @@ private final class BBCodeMediaBlockView: UIView {
 
     translatesAutoresizingMaskIntoConstraints = false
     backgroundColor = .clear
-    directionalLayoutMargins = NSDirectionalEdgeInsets(top: 4, leading: 0, bottom: 4, trailing: 0)
+    directionalLayoutMargins = .zero
     isUserInteractionEnabled = true
     isAccessibilityElement = true
     accessibilityTraits = [.image, .button]
@@ -739,9 +750,9 @@ private final class BBCodeMaskBlockView: UIView {
     layer.cornerRadius = 2
     clipsToBounds = true
     directionalLayoutMargins = NSDirectionalEdgeInsets(
-      top: 4,
+      top: 0,
       leading: 5,
-      bottom: 4,
+      bottom: 0,
       trailing: 5
     )
     setContentCompressionResistancePriority(.required, for: .vertical)
@@ -796,7 +807,7 @@ private final class BBCodeQuoteBlockView: UIView {
     super.init(frame: .zero)
     translatesAutoresizingMaskIntoConstraints = false
     backgroundColor = .clear
-    directionalLayoutMargins = NSDirectionalEdgeInsets(top: 6, leading: 0, bottom: 8, trailing: 0)
+    directionalLayoutMargins = .zero
     setContentCompressionResistancePriority(.required, for: .vertical)
     setContentHuggingPriority(.required, for: .vertical)
 
@@ -871,7 +882,7 @@ private final class BBCodeListBlockView: UIView {
     super.init(frame: .zero)
     translatesAutoresizingMaskIntoConstraints = false
     backgroundColor = .clear
-    directionalLayoutMargins = NSDirectionalEdgeInsets(top: 4, leading: 0, bottom: 4, trailing: 0)
+    directionalLayoutMargins = .zero
     setContentCompressionResistancePriority(.required, for: .vertical)
     setContentHuggingPriority(.required, for: .vertical)
 

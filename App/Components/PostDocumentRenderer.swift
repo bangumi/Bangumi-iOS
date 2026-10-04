@@ -850,8 +850,49 @@ actor PostDocumentRenderer {
             line-height: 1.35;
           }
 
-          .post-content p {
-            margin: 0.35em 0;
+          /* Block gaps come from a pair table on (upper, lower) block type:
+             blocks carry no margins of their own, the gap sits on the lower
+             block via adjacent-sibling rules. */
+          .post-content p,
+          .post-content img,
+          .post-content pre,
+          .post-content blockquote,
+          .post-content ul,
+          .post-content ol {
+            margin: 0;
+          }
+
+          .post-content > * + * {
+            margin-top: 8px;
+          }
+
+          .post-content p + p {
+            margin-top: 5px;
+          }
+
+          .post-content > p + img,
+          .post-content > img + p,
+          .post-content > img + img {
+            margin-top: 6px;
+          }
+
+          .post-content > * + .quote,
+          .post-content > .quote + *,
+          .post-content > * + blockquote,
+          .post-content > blockquote + * {
+            margin-top: 10px;
+          }
+
+          .post-content > * + ul,
+          .post-content > ul + *,
+          .post-content > * + ol,
+          .post-content > ol + * {
+            margin-top: 10px;
+          }
+
+          .post-content > * + .code,
+          .post-content > .code + * {
+            margin-top: 12px;
           }
 
           .post-content img {
@@ -859,6 +900,21 @@ actor PostDocumentRenderer {
             width: auto;
             max-width: 100%;
             height: auto;
+          }
+
+          /* A bare top-level image keeps its 6px below so a soft line break
+             (image + caption text) does not collapse to zero; pair-table
+             gaps all >= 6px, so margin collapsing still yields the table
+             value between real blocks. */
+          .post-content > img {
+            margin-bottom: 6px;
+          }
+
+          .post-content > img:last-child {
+            margin-bottom: 0;
+          }
+
+          .post-content p img {
             margin: 6px 0;
           }
 
@@ -911,11 +967,25 @@ actor PostDocumentRenderer {
             white-space: pre-wrap;
           }
 
+          /* List and quote interiors stay compact with a fixed small gap
+             instead of re-entering the pair table. */
+          .post-content li + li {
+            margin-top: 4px;
+          }
+
+          .post-content li > * + * {
+            margin-top: 5px;
+          }
+
           .post-content blockquote {
-            margin: 6px 0;
-            padding-left: 12px;
+            padding: 4px 0 4px 17px;
             border-left: 3px solid var(--separator);
+            border-radius: 1.5px;
             color: var(--secondary);
+          }
+
+          .post-content blockquote > * + * {
+            margin-top: 4px;
           }
 
           .mask {
