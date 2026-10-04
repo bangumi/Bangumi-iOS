@@ -51,12 +51,18 @@ extension View {
   func progressActionFill(_ progress: Double?) -> some View {
     background(alignment: .leading) {
       if let progress {
-        GeometryReader { geometry in
-          RoundedRectangle(cornerRadius: 8, style: .continuous)
-            .fill(Color(hex: 0x4897FF).opacity(0.15))
-            .frame(width: geometry.size.width * min(max(progress, 0), 1))
-        }
-        .animation(.default, value: progress)
+        // Mask the full button shape instead of framing a GeometryReader fill,
+        // which renders past the border inside a Button.
+        RoundedRectangle(cornerRadius: 8)
+          .fill(Color(hex: 0x4897FF).opacity(0.15))
+          .mask(alignment: .leading) {
+            GeometryReader { geometry in
+              Color.black
+                .frame(width: geometry.size.width * min(max(progress, 0), 1))
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+            }
+          }
+          .animation(.default, value: progress)
       }
     }
   }
