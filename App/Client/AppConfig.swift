@@ -19,6 +19,14 @@ enum AppConfig {
     set { UserDefaults.standard.set(newValue, forKey: "collectionsUpdatedAt") }
   }
 
+  /// The since filter is `updated_at >= since` at second precision, so the watermark
+  /// must advance strictly past the max fetched `updatedAt` or the same update is
+  /// re-fetched next time. Nil (empty fetch) only moves 0 → 1, which is a no-op after
+  /// any real sync but lets a zero-collection account finish its first full sync.
+  static nonisolated func advanceCollectionsWatermark(_ maxUpdatedAt: Int?) {
+    collectionsUpdatedAt = max(collectionsUpdatedAt, (maxUpdatedAt ?? 0) + 1)
+  }
+
   static nonisolated var profile: String {
     get { UserDefaults.standard.string(forKey: "profile") ?? "" }
     set { UserDefaults.standard.set(newValue, forKey: "profile") }

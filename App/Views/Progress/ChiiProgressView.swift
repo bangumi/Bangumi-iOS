@@ -331,7 +331,6 @@ struct ChiiProgressView: View {
   }
 
   func refresh(force: Bool = false, showProgress: Bool = true) async {
-    let now = Date()
     if force {
       collectionsUpdatedAt = 0
     }
@@ -344,7 +343,7 @@ struct ChiiProgressView: View {
     do {
       refreshProgress = 0
       let since = collectionsUpdatedAt
-      let loaded = try await CollectionRepository.refreshCollections(since: since) {
+      let (loaded, maxUpdatedAt) = try await CollectionRepository.refreshCollections(since: since) {
         count, total in
         refreshProgress = CGFloat(count) / CGFloat(total)
       }
@@ -354,11 +353,10 @@ struct ChiiProgressView: View {
       if loaded.count > 0 {
         Notifier.shared.notify(message: "更新了 \(loaded.count) 条收藏")
       } else {
-        Notifier.shared.notify(message: "没有收藏更新")
+        Notifier.shared.notify(message: "没有收藏更新", duration: 1.5)
       }
       await loadLocalProgress(animate: true)
-      // CollectionReconciler advances the same watermark in the background; keep it moving forward.
-      collectionsUpdatedAt = max(collectionsUpdatedAt, Int(now.timeIntervalSince1970))
+      AppConfig.advanceCollectionsWatermark(maxUpdatedAt)
     } catch {
       Notifier.shared.alert(error: error)
     }
