@@ -368,7 +368,7 @@ struct GlassProgressView: View {
       if loaded.count > 0 {
         Notifier.shared.notify(message: "更新了 \(loaded.count) 条收藏")
       } else {
-        Notifier.shared.notify(message: "没有收藏更新")
+        Notifier.shared.notify(message: "没有收藏更新", duration: 1.5)
       }
       await loadLocalProgress(animate: true)
       AppConfig.advanceCollectionsWatermark(maxUpdatedAt)
