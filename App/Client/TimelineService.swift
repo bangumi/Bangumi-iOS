@@ -32,9 +32,12 @@ enum TimelineService {
           do {
             let payloads = await APIClient.shared.serverSentEventPayloads(url: url)
             for try await payload in payloads {
-              guard let data = payload.data(using: .utf8),
-                let event: TimelineEventDTO = try? await APIClient.shared.decodeResponse(data)
-              else { continue }
+              guard let data = payload.data(using: .utf8) else { continue }
+              guard let event: TimelineEventDTO = try? await APIClient.shared.decodeResponse(data)
+              else {
+                Logger.api.warning("timeline live event decode failed: \(payload)")
+                continue
+              }
               switch event.event {
               case "connected":
                 attempt = 0

@@ -39,7 +39,7 @@ struct GlassTimelineListView: View {
         if isAuthenticated && activeMode != .me {
           GlassChip(title: "实时", isSelected: liveMode) {
             Haptics.selection()
-            withAnimation(.spring(response: 0.28, dampingFraction: 0.86)) {
+            withAnimation(.pressSubtle) {
               liveMode.toggle()
             }
           }
@@ -157,7 +157,9 @@ struct GlassTimelineListView: View {
     }
     withAnimation(.layoutShift) {
       items.insert(item, at: 0)
-      if items.count > timelineLiveItemsCap {
+      // Trimming while a page fetch is in flight would gap the list around its
+      // append, so defer to the next event.
+      if items.count > timelineLiveItemsCap && !loading {
         items.removeLast(items.count - timelineLiveItemsCap)
         lastID = items.last?.id
         fetched = [:]

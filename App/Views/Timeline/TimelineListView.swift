@@ -124,7 +124,9 @@ struct TimelineListView: View {
     }
     withAnimation(.layoutShift) {
       items.insert(item, at: 0)
-      if items.count > timelineLiveItemsCap {
+      // Trimming while a page fetch is in flight would gap the list around its
+      // append, so defer to the next event.
+      if items.count > timelineLiveItemsCap && !loading {
         items.removeLast(items.count - timelineLiveItemsCap)
         lastID = items.last?.id
         fetched = [:]
@@ -250,7 +252,9 @@ struct TimelineListView: View {
         if timelineViewMode != .me {
           Button {
             Haptics.selection()
-            liveMode.toggle()
+            withAnimation(.pressSubtle) {
+              liveMode.toggle()
+            }
           } label: {
             Label("实时", systemImage: "dot.radiowaves.left.and.right")
           }
