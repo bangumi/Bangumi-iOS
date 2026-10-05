@@ -237,6 +237,81 @@ extension APIClient {
     throw ChiiError(request: "Request failed without an error")
   }
 
+  /// Opens an SSE connection and yields each event's `data:` payload until the server
+  /// closes the stream or the consumer cancels. Built on a per-call session with infinite
+  /// timeouts because the cached request sessions cap requests at 10s/20s.
+  func serverSentEventPayloads(url: URL, auth: AuthMode = .auto) -> AsyncThrowingStream<
+    String, Error
+  > {
+    AsyncThrowingStream { continuation in
+      let task = Task {
+        do {
+          let authed: Bool
+          switch auth {
+          case .auto:
+            authed = self.isAuthenticated()
+          case .required:
+            authed = true
+          case .disabled:
+            authed = false
+          }
+          let requestSession: RequestSession
+          do {
+            requestSession = try await self.getStreamingSession(authorized: authed)
+          } catch SessionError.authenticationRequired(let credentialGeneration) {
+            await self.notifyAuthenticationRequired(ifCurrent: credentialGeneration)
+            throw ChiiError.requireLogin
+          }
+          defer {
+            requestSession.session.finishTasksAndInvalidate()
+          }
+          var request = URLRequest(url: url)
+          request.httpMethod = "GET"
+          request.setValue("text/event-stream", forHTTPHeaderField: "Accept")
+          request.setValue("no-cache", forHTTPHeaderField: "Cache-Control")
+          Logger.api.info("--> SSE \(url.absoluteString)")
+          let (bytes, response) = try await requestSession.session.bytes(for: request)
+          guard let response = response as? HTTPURLResponse else {
+            throw ChiiError(message: "api response nil")
+          }
+          if response.statusCode == 401 {
+            if let requestAuthGeneration = requestSession.credentialGeneration {
+              guard requestAuthGeneration == self.authGeneration else {
+                throw ChiiError(ignore: "Discarded stale unauthorized response")
+              }
+              await self.notifyAuthenticationRequired(ifCurrent: requestAuthGeneration)
+            }
+            throw ChiiError.requireLogin
+          }
+          guard response.statusCode < 400 else {
+            let requestID = response.allHeaderFields["x-request-id"] as? String
+            Logger.api.error("SSE \(response.statusCode) \(url.absoluteString)")
+            throw ChiiError(code: response.statusCode, response: "", requestID: requestID)
+          }
+          // bytes.lines never yields empty lines, so the blank-line event framing is
+          // invisible here and every data: line is dispatched as a complete payload.
+          // ":" heartbeat comments and event:/id:/retry: fields carry no payload.
+          for try await line in bytes.lines {
+            guard line.hasPrefix("data:") else { continue }
+            var value = line.dropFirst(5)
+            if value.hasPrefix(" ") {
+              value = value.dropFirst()
+            }
+            continuation.yield(String(value))
+          }
+          continuation.finish()
+        } catch is CancellationError {
+          continuation.finish()
+        } catch {
+          continuation.finish(throwing: error)
+        }
+      }
+      continuation.onTermination = { _ in
+        task.cancel()
+      }
+    }
+  }
+
   private func getSession(authorized: Bool) async throws -> RequestSession {
     if !authorized {
       return RequestSession(
@@ -271,6 +346,26 @@ extension APIClient {
       )
     }
 
+    let credentials = try await self.getCurrentCredentials()
+    if let session = self.authorizedSession,
+      self.authorizedSessionGeneration == credentials.generation
+    {
+      return RequestSession(
+        session: session,
+        credentialGeneration: credentials.generation
+      )
+    }
+    let config = self.buildSessionConfig(accessToken: credentials.auth.accessToken)
+    let session = URLSession(configuration: config)
+    self.authorizedSession = session
+    self.authorizedSessionGeneration = credentials.generation
+    return RequestSession(
+      session: session,
+      credentialGeneration: credentials.generation
+    )
+  }
+
+  private func getCurrentCredentials() async throws -> CredentialSnapshot {
     for _ in 0..<2 {
       let attemptedGeneration = self.authGeneration
       let credentials: CredentialSnapshot
@@ -282,31 +377,19 @@ extension APIClient {
         )
       }
       guard credentials.generation == self.authGeneration else { continue }
-      if let session = self.authorizedSession,
-        self.authorizedSessionGeneration == credentials.generation
-      {
-        return RequestSession(
-          session: session,
-          credentialGeneration: credentials.generation
-        )
-      }
-      let config = self.buildSessionConfig(accessToken: credentials.auth.accessToken)
-      let session = URLSession(configuration: config)
-      self.authorizedSession = session
-      self.authorizedSessionGeneration = credentials.generation
-      return RequestSession(
-        session: session,
-        credentialGeneration: credentials.generation
-      )
+      return credentials
     }
-
-    throw ChiiError(ignore: "Credentials changed while building an authorized session")
+    throw ChiiError(ignore: "Credentials changed while resolving session credentials")
   }
 
-  private func buildSessionConfig(accessToken: String?) -> URLSessionConfiguration {
+  private func buildSessionConfig(
+    accessToken: String?,
+    requestTimeout: TimeInterval = 10,
+    resourceTimeout: TimeInterval = 20
+  ) -> URLSessionConfiguration {
     let sessionConfig = URLSessionConfiguration.default
-    sessionConfig.timeoutIntervalForRequest = 10
-    sessionConfig.timeoutIntervalForResource = 20
+    sessionConfig.timeoutIntervalForRequest = requestTimeout
+    sessionConfig.timeoutIntervalForResource = resourceTimeout
     var headers: [AnyHashable: Any] = [:]
     headers["User-Agent"] = self.userAgent
     if let accessToken {
@@ -314,6 +397,26 @@ extension APIClient {
     }
     sessionConfig.httpAdditionalHeaders = headers
     return sessionConfig
+  }
+
+  private func getStreamingSession(authorized: Bool) async throws -> RequestSession {
+    if !authorized {
+      return RequestSession(
+        session: URLSession(
+          configuration: self.buildSessionConfig(
+            accessToken: nil, requestTimeout: .infinity, resourceTimeout: .infinity)),
+        credentialGeneration: nil
+      )
+    }
+    let credentials = try await self.getCurrentCredentials()
+    return RequestSession(
+      session: URLSession(
+        configuration: self.buildSessionConfig(
+          accessToken: credentials.auth.accessToken,
+          requestTimeout: .infinity,
+          resourceTimeout: .infinity)),
+      credentialGeneration: credentials.generation
+    )
   }
 
   private func getAccessToken() async throws -> CredentialSnapshot {
