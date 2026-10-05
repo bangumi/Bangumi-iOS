@@ -2,10 +2,8 @@ import Foundation
 import OSLog
 
 enum CollectionRepository {
-  /// The since filter is `updated_at >= since` at second precision, so callers must
-  /// advance the watermark strictly past the max fetched `updatedAt` or the same update
-  /// is re-fetched next time. An empty result may mean a fresh mark is not visible to
-  /// the query yet — leave the watermark alone then so it is still picked up later.
+  /// Returns the max fetched `updatedAt` so callers can advance the collections
+  /// watermark via `AppConfig.advanceCollectionsWatermark`.
   @discardableResult
   static func refreshCollections(
     since: Int = 0,
@@ -93,9 +91,7 @@ actor CollectionReconciler {
     }
     do {
       let (loaded, maxUpdatedAt) = try await CollectionRepository.refreshCollections(since: since)
-      if let maxUpdatedAt {
-        AppConfig.collectionsUpdatedAt = max(AppConfig.collectionsUpdatedAt, maxUpdatedAt + 1)
-      }
+      AppConfig.advanceCollectionsWatermark(maxUpdatedAt)
       for subjectId in loaded.keys {
         await ProgressSubjectInvalidation.post(subjectId: subjectId)
       }

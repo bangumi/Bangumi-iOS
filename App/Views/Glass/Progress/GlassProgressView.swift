@@ -371,9 +371,7 @@ struct GlassProgressView: View {
         Notifier.shared.notify(message: "没有收藏更新")
       }
       await loadLocalProgress(animate: true)
-      if let maxUpdatedAt {
-        collectionsUpdatedAt = max(collectionsUpdatedAt, maxUpdatedAt + 1)
-      }
+      AppConfig.advanceCollectionsWatermark(maxUpdatedAt)
     } catch {
       Notifier.shared.alert(error: error)
     }
