@@ -1,4 +1,5 @@
 import Foundation
+import OSLog
 
 enum TimelineService {
   static func getTimeline(mode: TimelineMode = .friends, limit: Int = 20, until: Int? = nil)
@@ -16,6 +17,56 @@ enum TimelineService {
       url: url.appending(queryItems: queryItems), method: "GET")
     let resp: [TimelineDTO] = try await APIClient.shared.decodeResponse(data)
     return resp
+  }
+
+  /// Subscribes to `GET /p1/timeline/-/events` and yields new timeline items as they
+  /// arrive. Reconnects with exponential backoff after failures; only `requireLogin`
+  /// is terminal. The stream ends when the consuming task is cancelled.
+  static func liveEvents(mode: TimelineMode) -> AsyncThrowingStream<TimelineDTO, Error> {
+    let url = BangumiURL.next(path: "p1/timeline/-/events")
+      .appending(queryItems: [URLQueryItem(name: "mode", value: mode.rawValue)])
+    return AsyncThrowingStream { continuation in
+      let task = Task {
+        var attempt = 0
+        while !Task.isCancelled {
+          do {
+            let payloads = await APIClient.shared.serverSentEventPayloads(url: url)
+            for try await payload in payloads {
+              guard let data = payload.data(using: .utf8),
+                let event: TimelineEventDTO = try? await APIClient.shared.decodeResponse(data)
+              else { continue }
+              switch event.event {
+              case "connected":
+                attempt = 0
+              case "timeline":
+                if let timeline = event.timeline {
+                  continuation.yield(timeline)
+                }
+              default:
+                continue
+              }
+            }
+          } catch is CancellationError {
+            break
+          } catch ChiiError.requireLogin {
+            continuation.finish(throwing: ChiiError.requireLogin)
+            return
+          } catch {
+            Logger.api.warning("timeline live stream interrupted, reconnecting: \(error)")
+          }
+          if Task.isCancelled {
+            break
+          }
+          let backoff = min(pow(2.0, Double(attempt)), 30.0)
+          attempt += 1
+          try? await Task.sleep(nanoseconds: UInt64(backoff * 1_000_000_000))
+        }
+        continuation.finish()
+      }
+      continuation.onTermination = { _ in
+        task.cancel()
+      }
+    }
   }
 
   static func getTimelineReplies(_ id: Int) async throws -> [CommentDTO] {

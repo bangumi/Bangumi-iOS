@@ -1286,6 +1286,11 @@ struct TimelineDTO: Codable, Identifiable, Hashable {
   var reactions: [ReactionDTO]?
 }
 
+struct TimelineEventDTO: Codable {
+  var event: String
+  var timeline: TimelineDTO?
+}
+
 struct TimelineMemoDTO: Codable, Hashable {
   var blog: SlimBlogEntryDTO?
   var daily: TimelineDailyDTO?
@@ -1390,6 +1395,25 @@ struct TimelineSubjectDTO: Codable, Hashable {
   var comment: String
   var rate: Float
   var collectID: Int?
+
+  private enum CodingKeys: String, CodingKey {
+    case subject, comment, rate, collectID
+  }
+
+  // The API is inconsistent about collectID: some payloads quote it as a string.
+  init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.subject = try container.decode(SlimSubjectDTO.self, forKey: .subject)
+    self.comment = try container.decode(String.self, forKey: .comment)
+    self.rate = try container.decode(Float.self, forKey: .rate)
+    if let id = try? container.decode(Int.self, forKey: .collectID) {
+      self.collectID = id
+    } else if let idString = try? container.decode(String.self, forKey: .collectID) {
+      self.collectID = Int(idString)
+    } else {
+      self.collectID = nil
+    }
+  }
 }
 
 struct TimelineWikiDTO: Codable, Hashable {

@@ -1,9 +1,11 @@
+import OSLog
 import SwiftUI
 
 struct GlassTimelineListView: View {
   @AppStorage("isAuthenticated") private var isAuthenticated: Bool = false
   @AppStorage("profile") private var profile: Profile = Profile()
   @AppStorage("timelineViewMode") private var timelineViewMode: TimelineViewMode = .friends
+  @AppStorage("timelineLiveMode") private var liveMode: Bool = false
 
   @State private var showInput = false
 
@@ -31,6 +33,14 @@ struct GlassTimelineListView: View {
               withAnimation(.spring(response: 0.28, dampingFraction: 0.86)) {
                 timelineViewMode = mode
               }
+            }
+          }
+        }
+        if isAuthenticated && activeMode != .me {
+          GlassChip(title: "实时", isSelected: liveMode) {
+            Haptics.selection()
+            withAnimation(.spring(response: 0.28, dampingFraction: 0.86)) {
+              liveMode.toggle()
             }
           }
         }
@@ -127,6 +137,35 @@ struct GlassTimelineListView: View {
     }
   }
 
+  /// `.me` has no SSE counterpart, and the events endpoint rejects anonymous
+  /// connections, so live mode pauses (without clearing the toggle) in both cases.
+  private var liveStreamMode: TimelineMode? {
+    guard liveMode, isAuthenticated else { return nil }
+    switch activeMode {
+    case .all:
+      return .all
+    case .friends:
+      return .friends
+    case .me:
+      return nil
+    }
+  }
+
+  private func ingestLiveItem(_ item: TimelineDTO) {
+    if let first = items.first, item.id <= first.id {
+      return
+    }
+    withAnimation(.layoutShift) {
+      items.insert(item, at: 0)
+      if items.count > timelineLiveItemsCap {
+        items.removeLast(items.count - timelineLiveItemsCap)
+        lastID = items.last?.id
+        fetched = [:]
+        exhausted = false
+      }
+    }
+  }
+
   var body: some View {
     let rows = items.timelineListRows(lastID: lastID)
 
@@ -197,6 +236,21 @@ struct GlassTimelineListView: View {
     }
     .refreshable {
       await reload()
+    }
+    .task(id: liveStreamMode) {
+      guard let liveStreamMode else { return }
+      // The stream only pushes events created after it connects, so reload first
+      // to close the gap since the last fetch.
+      await reload()
+      do {
+        for try await item in TimelineService.liveEvents(mode: liveStreamMode) {
+          ingestLiveItem(item)
+        }
+      } catch is CancellationError {
+      } catch {
+        Logger.app.error("timeline live stream ended: \(error)")
+        liveMode = false
+      }
     }
   }
 

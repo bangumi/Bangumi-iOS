@@ -1,5 +1,10 @@
 import SwiftUI
 
+/// Upper bound for the timeline list while live mode keeps prepending SSE events.
+/// Items past the cap are dropped from the tail; they stay reachable through
+/// normal pagination, which resumes from the tail id.
+let timelineLiveItemsCap = 200
+
 struct TimelineListRowItem: Identifiable {
   let item: TimelineDTO
   let previousUID: Int?

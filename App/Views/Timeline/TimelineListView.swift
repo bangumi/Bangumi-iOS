@@ -5,6 +5,7 @@ struct TimelineListView: View {
   @AppStorage("isAuthenticated") var isAuthenticated: Bool = false
   @AppStorage("profile") var profile: Profile = Profile()
   @AppStorage("timelineViewMode") var timelineViewMode: TimelineViewMode = .friends
+  @AppStorage("timelineLiveMode") var liveMode: Bool = false
 
   @State private var showInput = false
 
@@ -103,6 +104,35 @@ struct TimelineListView: View {
     }
   }
 
+  /// `.me` has no SSE counterpart, and anonymous users only see the auth card here,
+  /// so live mode pauses (without clearing the toggle) in both cases.
+  private var liveStreamMode: TimelineMode? {
+    guard liveMode, isAuthenticated else { return nil }
+    switch timelineViewMode {
+    case .all:
+      return .all
+    case .friends:
+      return .friends
+    case .me:
+      return nil
+    }
+  }
+
+  private func ingestLiveItem(_ item: TimelineDTO) {
+    if let first = items.first, item.id <= first.id {
+      return
+    }
+    withAnimation(.layoutShift) {
+      items.insert(item, at: 0)
+      if items.count > timelineLiveItemsCap {
+        items.removeLast(items.count - timelineLiveItemsCap)
+        lastID = items.last?.id
+        fetched = [:]
+        exhausted = false
+      }
+    }
+  }
+
   var body: some View {
     let rows = items.timelineListRows(lastID: lastID)
 
@@ -186,6 +216,21 @@ struct TimelineListView: View {
         }
       }
     }
+    .task(id: liveStreamMode) {
+      guard let liveStreamMode else { return }
+      // The stream only pushes events created after it connects, so reload first
+      // to close the gap since the last fetch.
+      await reload()
+      do {
+        for try await item in TimelineService.liveEvents(mode: liveStreamMode) {
+          ingestLiveItem(item)
+        }
+      } catch is CancellationError {
+      } catch {
+        Logger.app.error("timeline live stream ended: \(error)")
+        liveMode = false
+      }
+    }
   }
 
   private var modePicker: some View {
@@ -200,6 +245,16 @@ struct TimelineListView: View {
             Label(mode.desc, systemImage: mode.icon)
           }
           .adaptiveButtonStyle(timelineViewMode == mode ? .borderedProminent : .bordered)
+          .controlSize(.small)
+        }
+        if timelineViewMode != .me {
+          Button {
+            Haptics.selection()
+            liveMode.toggle()
+          } label: {
+            Label("实时", systemImage: "dot.radiowaves.left.and.right")
+          }
+          .adaptiveButtonStyle(liveMode ? .borderedProminent : .bordered)
           .controlSize(.small)
         }
       }
