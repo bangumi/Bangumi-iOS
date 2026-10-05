@@ -2,15 +2,20 @@ import Foundation
 import OSLog
 
 enum CollectionRepository {
+  /// The since filter is `updated_at >= since` at second precision, so callers must
+  /// advance the watermark strictly past the max fetched `updatedAt` or the same update
+  /// is re-fetched next time. An empty result may mean a fresh mark is not visible to
+  /// the query yet — leave the watermark alone then so it is still picked up later.
   @discardableResult
   static func refreshCollections(
     since: Int = 0,
     onProgress: (@MainActor (_ count: Int, _ total: Int) -> Void)? = nil
-  ) async throws -> [Int: SubjectType] {
+  ) async throws -> (loaded: [Int: SubjectType], maxUpdatedAt: Int?) {
     let db = try await AppContext.shared.getDB()
     let limit: Int = 100
     var offset: Int = 0
     var loaded: [Int: SubjectType] = [:]
+    var maxUpdatedAt: Int? = nil
     while true {
       let resp = try await CollectionService.getSubjectCollections(
         since: since, limit: limit, offset: offset)
@@ -20,6 +25,9 @@ enum CollectionRepository {
       for item in resp.data {
         try await db.saveSubject(item)
         loaded[item.id] = item.type
+        if let updatedAt = item.interest?.updatedAt {
+          maxUpdatedAt = max(maxUpdatedAt ?? 0, updatedAt)
+        }
         await onProgress?(loaded.count, resp.total)
       }
       await SearchIndexing.index(resp.data.map { $0.searchable() })
@@ -28,7 +36,7 @@ enum CollectionRepository {
         break
       }
     }
-    return loaded
+    return (loaded, maxUpdatedAt)
   }
 
   /// Episode reloads fan out to one request per subject, so only call this for
@@ -83,11 +91,11 @@ actor CollectionReconciler {
     guard since > 0 else {
       return
     }
-    let now = Int(Date().timeIntervalSince1970)
     do {
-      let loaded = try await CollectionRepository.refreshCollections(since: since)
-      // Views advance the same watermark concurrently; keep it moving forward.
-      AppConfig.collectionsUpdatedAt = max(AppConfig.collectionsUpdatedAt, now)
+      let (loaded, maxUpdatedAt) = try await CollectionRepository.refreshCollections(since: since)
+      if let maxUpdatedAt {
+        AppConfig.collectionsUpdatedAt = max(AppConfig.collectionsUpdatedAt, maxUpdatedAt + 1)
+      }
       for subjectId in loaded.keys {
         await ProgressSubjectInvalidation.post(subjectId: subjectId)
       }

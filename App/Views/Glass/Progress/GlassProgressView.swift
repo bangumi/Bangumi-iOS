@@ -342,7 +342,6 @@ struct GlassProgressView: View {
   }
 
   private func refresh(force: Bool = false, showProgress: Bool = true) async {
-    let now = Date()
     if force {
       collectionsUpdatedAt = 0
     }
@@ -357,7 +356,7 @@ struct GlassProgressView: View {
       refreshCurrent = 0
       refreshTotal = 0
       let since = collectionsUpdatedAt
-      let loaded = try await CollectionRepository.refreshCollections(since: since) {
+      let (loaded, maxUpdatedAt) = try await CollectionRepository.refreshCollections(since: since) {
         count, total in
         refreshProgress = CGFloat(count) / CGFloat(total)
         refreshCurrent = count
@@ -372,8 +371,9 @@ struct GlassProgressView: View {
         Notifier.shared.notify(message: "没有收藏更新")
       }
       await loadLocalProgress(animate: true)
-      // CollectionReconciler advances the same watermark in the background; keep it moving forward.
-      collectionsUpdatedAt = max(collectionsUpdatedAt, Int(now.timeIntervalSince1970))
+      if let maxUpdatedAt {
+        collectionsUpdatedAt = max(collectionsUpdatedAt, maxUpdatedAt + 1)
+      }
     } catch {
       Notifier.shared.alert(error: error)
     }
