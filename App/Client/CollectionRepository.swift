@@ -2,10 +2,11 @@ import Foundation
 import OSLog
 
 enum CollectionRepository {
-  /// Returns the max fetched `updatedAt` so callers can advance the collections
-  /// watermark via `AppConfig.advanceCollectionsWatermark`.
+  /// Only reachable through `CollectionSyncer.sync`, which chains syncs so the
+  /// watermark read/advance stays atomic with the fetch. Returns the max fetched
+  /// `updatedAt` for that advance.
   @discardableResult
-  static func refreshCollections(
+  fileprivate static func refreshCollections(
     since: Int = 0,
     onProgress: (@MainActor (_ count: Int, _ total: Int) -> Void)? = nil
   ) async throws -> (loaded: [Int: SubjectType], maxUpdatedAt: Int?) {
@@ -55,48 +56,78 @@ enum CollectionRepository {
   }
 }
 
-/// Episode marks update the local database by simulation only, while the server's
-/// epStatus also counts watched SP (non-main) episodes, so the two can diverge.
-/// After a successful mark this reconciler re-fetches incrementally in the background
-/// so server truth overwrites the simulation. Failures are logged only: the watermark
-/// stays put and the next pull-to-refresh still covers the gap.
-actor CollectionReconciler {
-  static let shared = CollectionReconciler()
+/// All collection syncs go through this coordinator. Syncs are chained: each one starts
+/// only after the previously requested sync completes, so its `since` always includes
+/// every earlier fetch's watermark advance. The watermark read and advance must stay
+/// atomic with the fetch: a pull-to-refresh overlapping the post-mark reconcile
+/// snapshots the same pre-mark watermark and re-reports the update already consumed.
+actor CollectionSyncer {
+  static let shared = CollectionSyncer()
 
-  private var running = false
-  private var pending = false
+  private var lastSync: Task<(loaded: [Int: SubjectType], since: Int), Error>?
+  private var reconcileRunning = false
+  private var reconcilePending = false
 
-  nonisolated func schedule() {
-    Task { await self.run() }
+  /// Episode marks update the local database by simulation only, while the server's
+  /// epStatus also counts watched SP (non-main) episodes, so the two can diverge.
+  /// After a successful mark this pulls server truth in the background through the
+  /// same serialized sync. Failures are logged only: the watermark stays put and the
+  /// next pull-to-refresh still covers the gap.
+  nonisolated func scheduleReconcile() {
+    Task { await self.runReconcile() }
   }
 
-  private func run() async {
-    guard !running else {
-      pending = true
+  private func runReconcile() async {
+    guard !reconcileRunning else {
+      reconcilePending = true
       return
     }
-    running = true
+    reconcileRunning = true
     repeat {
-      pending = false
-      await reconcileOnce()
-    } while pending
-    running = false
+      reconcilePending = false
+      // Watermark 0 means no full sync has happened yet; leave that first sync to the progress view.
+      if AppConfig.collectionsUpdatedAt > 0 {
+        do {
+          let (loaded, _) = try await sync()
+          for subjectId in loaded.keys {
+            await ProgressSubjectInvalidation.post(subjectId: subjectId)
+          }
+        } catch {
+          Logger.api.error("Failed to reconcile collections: \(error)")
+        }
+      }
+    } while reconcilePending
+    reconcileRunning = false
   }
 
-  private func reconcileOnce() async {
-    let since = AppConfig.collectionsUpdatedAt
-    // Watermark 0 means no full sync has happened yet; leave that first sync to the progress view.
-    guard since > 0 else {
-      return
-    }
-    do {
-      let (loaded, maxUpdatedAt) = try await CollectionRepository.refreshCollections(since: since)
-      AppConfig.advanceCollectionsWatermark(maxUpdatedAt)
-      for subjectId in loaded.keys {
-        await ProgressSubjectInvalidation.post(subjectId: subjectId)
+  @discardableResult
+  func sync(
+    force: Bool = false,
+    onProgress: (@MainActor (_ count: Int, _ total: Int) -> Void)? = nil
+  ) async throws -> (loaded: [Int: SubjectType], since: Int) {
+    let previous = lastSync
+    let current = Task {
+      if let previous {
+        _ = try? await previous.value
       }
-    } catch {
-      Logger.api.error("Failed to reconcile collections: \(error)")
+      // The reset must happen inside the chain: resetting before enqueueing would let an
+      // earlier in-flight sync advance the watermark again and turn this full sync into
+      // an incremental one.
+      if force {
+        AppConfig.collectionsUpdatedAt = 0
+      }
+      let since = AppConfig.collectionsUpdatedAt
+      let (loaded, maxUpdatedAt) = try await CollectionRepository.refreshCollections(
+        since: since, onProgress: onProgress)
+      // Logout and account switch clear the watermark to 0 outside this chain.
+      // Advancing from a pre-clear snapshot would turn the next account's first
+      // sync into an incremental one and silently drop its collections.
+      if AppConfig.collectionsUpdatedAt >= since {
+        AppConfig.advanceCollectionsWatermark(maxUpdatedAt)
+      }
+      return (loaded: loaded, since: since)
     }
+    lastSync = current
+    return try await current.value
   }
 }

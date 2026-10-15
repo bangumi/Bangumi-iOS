@@ -342,9 +342,6 @@ struct GlassProgressView: View {
   }
 
   private func refresh(force: Bool = false, showProgress: Bool = true) async {
-    if force {
-      collectionsUpdatedAt = 0
-    }
     if showProgress {
       withAnimation(.default) {
         refreshing = true
@@ -355,9 +352,7 @@ struct GlassProgressView: View {
       refreshProgress = 0
       refreshCurrent = 0
       refreshTotal = 0
-      let since = collectionsUpdatedAt
-      let (loaded, maxUpdatedAt) = try await CollectionRepository.refreshCollections(since: since) {
-        count, total in
+      let (loaded, since) = try await CollectionSyncer.shared.sync(force: force) { count, total in
         refreshProgress = CGFloat(count) / CGFloat(total)
         refreshCurrent = count
         refreshTotal = total
@@ -371,7 +366,7 @@ struct GlassProgressView: View {
         Notifier.shared.notify(message: "没有收藏更新", duration: 1.5)
       }
       await loadLocalProgress(animate: true)
-      AppConfig.advanceCollectionsWatermark(maxUpdatedAt)
+    } catch is CancellationError {
     } catch {
       Notifier.shared.alert(error: error)
     }
