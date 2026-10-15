@@ -1,4 +1,5 @@
 import Foundation
+import OSLog
 
 enum EpisodeRepository {
   static func loadEpisodes(_ subjectId: Int) async throws {
@@ -48,6 +49,9 @@ enum EpisodeRepository {
     let db = try await AppContext.shared.getDB()
     let subjectId = try await db.updateEpisodeCollection(
       episodeId: episodeId, type: type, batch: batch)
+    Logger.api.notice(
+      "episode marked: episode=\(episodeId) subject=\(subjectId ?? -1) type=\(type.rawValue) batch=\(batch)"
+    )
     if let subjectId {
       await ProgressSubjectInvalidation.post(subjectId: subjectId)
     }

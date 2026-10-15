@@ -150,6 +150,8 @@ enum SubjectRepository {
 
   static func updateSubjectProgress(subjectId: Int, eps: Int?, vols: Int?) async throws {
     try await SubjectService.updateSubjectProgress(subjectId: subjectId, eps: eps, vols: vols)
+    Logger.api.notice(
+      "subject progress updated: subject=\(subjectId) eps=\(eps ?? -1) vols=\(vols ?? -1)")
     let db = try await AppContext.shared.getDB()
     try await db.updateSubjectProgress(subjectId: subjectId, eps: eps, vols: vols)
     await ProgressSubjectInvalidation.post(subjectId: subjectId)
@@ -172,6 +174,9 @@ enum SubjectRepository {
       priv: priv,
       tags: tags,
       progress: progress
+    )
+    Logger.api.notice(
+      "subject collection updated: subject=\(subjectId) type=\(type?.rawValue ?? -1) rate=\(rate ?? -1) comment=\(comment != nil) priv=\(priv != nil) tags=\(tags != nil) progress=\(progress ?? false)"
     )
     let db = try await AppContext.shared.getDB()
     try await db.updateSubjectCollection(

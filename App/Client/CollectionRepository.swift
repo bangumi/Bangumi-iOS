@@ -21,11 +21,20 @@ enum CollectionRepository {
       if resp.data.isEmpty {
         break
       }
+      Logger.api.notice(
+        "collection fetch page: since=\(since) offset=\(offset) got=\(resp.data.count) total=\(resp.total)"
+      )
       for item in resp.data {
         try await db.saveSubject(item)
         loaded[item.id] = item.type
         if let updatedAt = item.interest?.updatedAt {
           maxUpdatedAt = max(maxUpdatedAt ?? 0, updatedAt)
+        }
+        // Full syncs page thousands of rows; trace rows only for incremental fetches.
+        if since > 0 {
+          Logger.api.notice(
+            "collection row: subject=\(item.id) type=\(item.type.rawValue) updatedAt=\(item.interest?.updatedAt ?? -1) interestNil=\(item.interest == nil)"
+          )
         }
         await onProgress?(loaded.count, resp.total)
       }
@@ -74,12 +83,14 @@ actor CollectionSyncer {
   /// same serialized sync. Failures are logged only: the watermark stays put and the
   /// next pull-to-refresh still covers the gap.
   nonisolated func scheduleReconcile() {
+    Logger.api.notice("collection reconcile scheduled")
     Task { await self.runReconcile() }
   }
 
   private func runReconcile() async {
     guard !reconcileRunning else {
       reconcilePending = true
+      Logger.api.notice("collection reconcile coalesced: already running")
       return
     }
     reconcileRunning = true
@@ -88,13 +99,15 @@ actor CollectionSyncer {
       // Watermark 0 means no full sync has happened yet; leave that first sync to the progress view.
       if AppConfig.collectionsUpdatedAt > 0 {
         do {
-          let (loaded, _) = try await sync()
+          let (loaded, _) = try await sync(reason: "reconcile")
           for subjectId in loaded.keys {
             await ProgressSubjectInvalidation.post(subjectId: subjectId)
           }
         } catch {
-          Logger.api.error("Failed to reconcile collections: \(error)")
+          Logger.api.error("Failed to reconcile collections: \(error, privacy: .public)")
         }
+      } else {
+        Logger.api.notice("collection reconcile skipped: watermark=0")
       }
     } while reconcilePending
     reconcileRunning = false
@@ -102,6 +115,7 @@ actor CollectionSyncer {
 
   @discardableResult
   func sync(
+    reason: String,
     force: Bool = false,
     onProgress: (@MainActor (_ count: Int, _ total: Int) -> Void)? = nil
   ) async throws -> (loaded: [Int: SubjectType], since: Int) {
@@ -117,14 +131,19 @@ actor CollectionSyncer {
         AppConfig.collectionsUpdatedAt = 0
       }
       let since = AppConfig.collectionsUpdatedAt
+      Logger.api.notice("collection sync begin: reason=\(reason, privacy: .public) since=\(since)")
       let (loaded, maxUpdatedAt) = try await CollectionRepository.refreshCollections(
         since: since, onProgress: onProgress)
       // Logout and account switch clear the watermark to 0 outside this chain.
       // Advancing from a pre-clear snapshot would turn the next account's first
       // sync into an incremental one and silently drop its collections.
-      if AppConfig.collectionsUpdatedAt >= since {
+      let canAdvance = AppConfig.collectionsUpdatedAt >= since
+      if canAdvance {
         AppConfig.advanceCollectionsWatermark(maxUpdatedAt)
       }
+      Logger.api.notice(
+        "collection sync end: reason=\(reason, privacy: .public) loaded=\(loaded.count) maxUpdatedAt=\(maxUpdatedAt ?? -1) watermark=\(AppConfig.collectionsUpdatedAt) advanced=\(canAdvance)"
+      )
       return (loaded: loaded, since: since)
     }
     lastSync = current

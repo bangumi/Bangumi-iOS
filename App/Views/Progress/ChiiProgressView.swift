@@ -339,9 +339,12 @@ struct ChiiProgressView: View {
 
     do {
       refreshProgress = 0
-      let (loaded, since) = try await CollectionSyncer.shared.sync(force: force) { count, total in
+      let (loaded, since) = try await CollectionSyncer.shared.sync(
+        reason: force ? "refresh-all" : "refresh", force: force
+      ) { count, total in
         refreshProgress = CGFloat(count) / CGFloat(total)
       }
+      Logger.app.notice("progress refresh done: since=\(since) loaded=\(loaded.count)")
       if since > 0 {
         CollectionRepository.checkLoadEpisodes(loaded)
       }
