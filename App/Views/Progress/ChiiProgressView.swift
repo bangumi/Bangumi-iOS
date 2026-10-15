@@ -331,9 +331,6 @@ struct ChiiProgressView: View {
   }
 
   func refresh(force: Bool = false, showProgress: Bool = true) async {
-    if force {
-      collectionsUpdatedAt = 0
-    }
     if showProgress {
       withAnimation(.default) {
         refreshing = true
@@ -342,9 +339,7 @@ struct ChiiProgressView: View {
 
     do {
       refreshProgress = 0
-      let since = collectionsUpdatedAt
-      let (loaded, maxUpdatedAt) = try await CollectionRepository.refreshCollections(since: since) {
-        count, total in
+      let (loaded, since) = try await CollectionSyncer.shared.sync(force: force) { count, total in
         refreshProgress = CGFloat(count) / CGFloat(total)
       }
       if since > 0 {
@@ -352,11 +347,9 @@ struct ChiiProgressView: View {
       }
       if loaded.count > 0 {
         Notifier.shared.notify(message: "更新了 \(loaded.count) 条收藏")
-      } else {
-        Notifier.shared.notify(message: "没有收藏更新", duration: 1.5)
       }
       await loadLocalProgress(animate: true)
-      AppConfig.advanceCollectionsWatermark(maxUpdatedAt)
+    } catch is CancellationError {
     } catch {
       Notifier.shared.alert(error: error)
     }
