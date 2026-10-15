@@ -131,7 +131,7 @@ struct TimelineItemView: View {
                   .padding(.horizontal, 8)
               }
               if !collect.comment.isEmpty {
-                BorderView(color: .secondary.opacity(0.2), padding: 4, paddingRatio: 1) {
+                BorderView(color: .secondary.opacity(0.2), padding: 6, paddingRatio: 2) {
                   Text(collect.comment)
                     .font(.callout)
                     .fixedSize(horizontal: false, vertical: true)
