@@ -13,7 +13,7 @@ Release the current development version to the App Store, then start the next ve
 - The repo's `MARKETING_VERSION` runs one version ahead of the store. Releasing means submitting the *current* `MARKETING_VERSION` at HEAD (e.g. submit 3.3 while the store sells 3.2), then bumping to the next version.
 - `releaseType` is `MANUAL`: after review approval the user releases it themselves. Never run `asc versions release` unless explicitly asked.
 - CI (`publish.yml`) on push to `main`: any `CURRENT_PROJECT_VERSION` change uploads the HEAD build to ASC; a minor transition (`X.Y` -> `X.Y+1`) additionally creates the GitHub Release `vX.Y` at the pre-bump commit. GitHub Releases carry no IPA artifacts.
-- `main` on `bangumi/Bangumi-iOS` is protected (required check `Build iOS`). Every change lands through a PR — direct pushes to `main` are rejected. Release work is done by maintainers, who push a branch to origin and open a PR; no fork is needed.
+- `main` on `bangumi/Bangumi-iOS` is protected (required check `Build iOS`). Every change lands through a PR — direct pushes to `main` are rejected. Release work is done by maintainers, who push a branch to origin and open a PR.
 
 ## Guardrails
 
