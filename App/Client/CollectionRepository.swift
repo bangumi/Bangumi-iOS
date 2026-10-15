@@ -68,11 +68,13 @@ actor CollectionSyncer {
   private var reconcileRunning = false
   private var reconcilePending = false
 
-  /// Episode marks update the local database by simulation only, while the server's
-  /// epStatus also counts watched SP (non-main) episodes, so the two can diverge.
-  /// After a successful mark this pulls server truth in the background through the
-  /// same serialized sync. Failures are logged only: the watermark stays put and the
-  /// next pull-to-refresh still covers the gap.
+  /// Every local write bumps the same server timestamp the incremental fetch filters on,
+  /// so without a follow-up sync the next manual refresh reports the app's own write as a
+  /// new update. Episode marks additionally diverge from server truth: epStatus counts
+  /// watched SP (non-main) episodes the local simulation skips. After a successful write
+  /// this pulls the delta in the background through the same serialized sync. Failures
+  /// are logged only: the watermark stays put and the next pull-to-refresh still covers
+  /// the gap.
   nonisolated func scheduleReconcile() {
     Task { await self.runReconcile() }
   }
