@@ -155,7 +155,7 @@ struct SettingsView: View {
               Text(style.desc).tag(style)
             }
           } label: {
-            SettingLabel("头像样式", description: "圆形或经典方形头像样式")
+            SettingLabel("头像样式", description: "圆形或方形头像样式")
           }
         }
         .themedListRow()
@@ -426,7 +426,7 @@ struct SettingsView: View {
       }
       GlassDashedDivider()
       GlassSettingsRow {
-        SettingLabel("头像样式", description: "圆形或经典方形头像样式")
+        SettingLabel("头像样式", description: "圆形或方形头像样式")
         Spacer()
         Picker("头像样式", selection: $avatarStyle) {
           ForEach(AvatarStyle.allCases, id: \.self) { style in

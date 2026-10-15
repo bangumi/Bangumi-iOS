@@ -304,7 +304,7 @@ enum AvatarStyle: String, CaseIterable, Sendable {
     case .round:
       "圆形"
     case .classic:
-      "经典"
+      "方形"
     }
   }
 }
