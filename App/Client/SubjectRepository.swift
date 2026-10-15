@@ -153,6 +153,9 @@ enum SubjectRepository {
     let db = try await AppContext.shared.getDB()
     try await db.updateSubjectProgress(subjectId: subjectId, eps: eps, vols: vols)
     await ProgressSubjectInvalidation.post(subjectId: subjectId)
+    if eps != nil || vols != nil {
+      CollectionSyncer.shared.scheduleReconcile()
+    }
   }
 
   static func updateSubjectCollection(
@@ -187,5 +190,8 @@ enum SubjectRepository {
       subjectId: subjectId,
       mayChangeProgressMembership: true
     )
+    if type != nil || rate != nil || comment != nil || priv != nil || tags != nil || progress != nil {
+      CollectionSyncer.shared.scheduleReconcile()
+    }
   }
 }
