@@ -1,6 +1,6 @@
 ---
 name: appstore-release
-description: "Run the Bangumi-iOS App Store release workflow. Use when asked to release or publish the next version: create the App Store Connect version for the current development version, write zh-Hans whatsNew, attach the latest VALID build, submit for review, then run make minor and land the next-version-cycle PR through the fork workflow. Also covers verifying the CI-created GitHub Release and build upload."
+description: "Run the Bangumi-iOS App Store release workflow. Use when asked to release or publish the next version: create the App Store Connect version for the current development version, write zh-Hans whatsNew, attach the latest VALID build, submit for review, then run make minor and land the next-version-cycle PR from a same-repo branch. Also covers verifying the CI-created GitHub Release and build upload."
 ---
 
 # Bangumi-iOS App Store Release
@@ -13,7 +13,7 @@ Release the current development version to the App Store, then start the next ve
 - The repo's `MARKETING_VERSION` runs one version ahead of the store. Releasing means submitting the *current* `MARKETING_VERSION` at HEAD (e.g. submit 3.3 while the store sells 3.2), then bumping to the next version.
 - `releaseType` is `MANUAL`: after review approval the user releases it themselves. Never run `asc versions release` unless explicitly asked.
 - CI (`publish.yml`) on push to `main`: any `CURRENT_PROJECT_VERSION` change uploads the HEAD build to ASC; a minor transition (`X.Y` -> `X.Y+1`) additionally creates the GitHub Release `vX.Y` at the pre-bump commit. GitHub Releases carry no IPA artifacts.
-- `main` on `bangumi/Bangumi-iOS` is protected (required check `Build iOS`). Direct pushes are rejected; version bumps land through the fork PR workflow in AGENTS.md.
+- `main` on `bangumi/Bangumi-iOS` is protected (required check `Build iOS`). Every change lands through a PR — direct pushes to `main` are rejected. Release work is done by maintainers, who push a branch to origin and open a PR; no fork is needed.
 
 ## Guardrails
 
@@ -27,7 +27,7 @@ Release the current development version to the App Store, then start the next ve
 ## Phase 1: Determine What To Release
 
 ```bash
-git fetch upstream && git status -sb
+git fetch origin && git status -sb
 grep -m1 MARKETING_VERSION Bangumi.xcodeproj/project.pbxproj
 grep -m1 CURRENT_PROJECT_VERSION Bangumi.xcodeproj/project.pbxproj
 asc versions list --app 6499502714 --platform IOS --pretty   # find READY_FOR_SALE version
@@ -82,25 +82,24 @@ Verify `asc versions view` reports `WAITING_FOR_REVIEW`. Remind the user that re
 From clean, synced `main`:
 
 ```bash
-fork_owner=$(git remote get-url origin | sed -E 's#(git@github\.com:|https://github\.com/)([^/]+)/.*#\2#')
 git switch -c "release/bump-$next_version"
 make minor        # creates commit "chore: bump version to $next_version"
 git push -u origin "release/bump-$next_version"
-gh pr create --repo bangumi/Bangumi-iOS --base main --head "${fork_owner}:release/bump-$next_version" \
+gh pr create --repo bangumi/Bangumi-iOS --base main --head "release/bump-$next_version" \
   --title "chore: bump version to $next_version" --body-file /tmp/pr-body.md
 gh pr view <PR> --json url,title,body,headRefName,baseRefName,state,statusCheckRollup
 gh pr view <PR> --json commits,files    # scope: exactly one commit, only project.pbxproj
 ```
 
-Wait for `Build iOS` to pass, then squash-merge and resync. The squash merge produces a *new* commit hash on upstream, so reset local `main` instead of pulling:
+Wait for `Build iOS` to pass, then squash-merge and resync. The squash merge produces a *new* commit hash on origin, so reset local `main` instead of pulling:
 
 ```bash
 gh pr merge <PR> --repo bangumi/Bangumi-iOS --squash --delete-branch \
   --subject "chore: bump version to $next_version" --body "..."
-git fetch --prune origin && git fetch --prune upstream
+git fetch --prune origin
 git switch main
-git diff HEAD upstream/main --stat    # must be empty (same content, different hash)
-git reset --hard upstream/main && git push origin main
+git diff HEAD origin/main --stat    # must be empty (same content, different hash)
+git reset --hard origin/main
 git branch -d "release/bump-$next_version"
 ```
 
