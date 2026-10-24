@@ -270,7 +270,7 @@ struct GlassTimelineItemView: View {
   }
 
   private func batchProgressEmbed(_ batch: TimelineBatchProgressDTO) -> some View {
-    NavigationLink(value: NavDestination.subject(batch.subject.id, zoom: true)) {
+    NavigationLink(value: NavDestination.subject(batch.subject.id)) {
       GlassEmbedCard {
         HStack(spacing: 12) {
           ImageView(img: batch.subject.images?.resize(.r200))
@@ -295,7 +295,6 @@ struct GlassTimelineItemView: View {
       }
     }
     .buttonStyle(.plain)
-    .zoomSource(ZoomNavigationID(type: .subject, id: batch.subject.id))
     .subjectPreview(batch.subject, eps: true)
   }
 
