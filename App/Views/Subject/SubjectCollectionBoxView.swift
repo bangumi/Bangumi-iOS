@@ -43,9 +43,9 @@ struct SubjectCollectionBoxView: View {
 
   var buttonText: String {
     if (subject?.ctypeEnum ?? .none) != .none {
-      return priv ? "悄悄地更新" : "更新"
+      return "更新"
     } else {
-      return priv ? "悄悄地添加" : "添加"
+      return "添加"
     }
   }
 
@@ -164,31 +164,32 @@ struct SubjectCollectionBoxView: View {
       }
       .task(loadIfNeeded)
     } controls: {
-      Button {
-        withAnimation(.default) {
-          priv.toggle()
-        }
-      } label: {
-        Image(systemName: priv ? "lock.fill" : "lock.circle.dotted")
-      }
-      .adaptiveButtonStyle(priv ? .borderedProminent : .plain)
-      .disabled(updating)
-      .sensoryFeedback(.selection, trigger: priv)
+      Button(buttonText, action: update)
+        .disabled(submitDisabled || updating)
     }
+  }
+
+  private var privacyRow: some View {
+    Button {
+      withAnimation(.contentSwap) {
+        priv.toggle()
+      }
+    } label: {
+      HStack {
+        Text("仅自己可见")
+        Spacer()
+        Image(systemName: priv ? "checkmark.circle.fill" : "circle")
+          .foregroundStyle(priv ? theme.accent : theme.secondaryText)
+      }
+      .frame(maxWidth: .infinity)
+      .contentShape(Rectangle())
+    }
+    .buttonStyle(.plain)
+    .sensoryFeedback(.selection, trigger: priv)
   }
 
   private var classicBody: some View {
     VStack {
-      HStack {
-        Button(action: update) {
-          Spacer()
-          Text(buttonText)
-          Spacer()
-        }
-        .buttonStyle(.borderedProminent)
-        .disabled(submitDisabled)
-      }
-
       if let interest = subject?.interest, interest.updatedAt > 0 {
         Section {
           Text("上次更新：\(interest.updatedAt.datetimeDisplay)")
@@ -205,6 +206,8 @@ struct SubjectCollectionBoxView: View {
         }
       }
       .pickerStyle(.segmented)
+
+      privacyRow
 
       VStack(alignment: .leading) {
         HStack(alignment: .top) {
@@ -313,12 +316,6 @@ struct SubjectCollectionBoxView: View {
 
   private var glassBody: some View {
     VStack(alignment: .leading, spacing: GlassForm.blockSpacing) {
-      Button(action: update) {
-        Text(buttonText)
-      }
-      .buttonStyle(.themedProminent)
-      .disabled(submitDisabled)
-
       if let interest = subject?.interest, interest.updatedAt > 0 {
         GlassFormMetaRow {
           Text("上次更新 \(interest.updatedAt.datetimeDisplay)")
@@ -332,6 +329,8 @@ struct SubjectCollectionBoxView: View {
       GlassSegmented(selection: $ctype.animated(), items: CollectionType.allTypes()) { ct in
         Text(ct.description(subject?.type ?? .anime))
       }
+
+      privacyRow
 
       ratingBlock
 
