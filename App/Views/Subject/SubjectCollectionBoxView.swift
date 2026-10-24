@@ -169,6 +169,25 @@ struct SubjectCollectionBoxView: View {
     }
   }
 
+  private var privacyRow: some View {
+    Button {
+      withAnimation(.contentSwap) {
+        priv.toggle()
+      }
+    } label: {
+      HStack {
+        Text("仅自己可见")
+        Spacer()
+        Image(systemName: priv ? "checkmark.circle.fill" : "circle")
+          .foregroundStyle(priv ? theme.accent : theme.secondaryText)
+      }
+      .frame(maxWidth: .infinity)
+      .contentShape(Rectangle())
+    }
+    .buttonStyle(.plain)
+    .sensoryFeedback(.selection, trigger: priv)
+  }
+
   private var classicBody: some View {
     VStack {
       if let interest = subject?.interest, interest.updatedAt > 0 {
@@ -188,8 +207,7 @@ struct SubjectCollectionBoxView: View {
       }
       .pickerStyle(.segmented)
 
-      Toggle("仅自己可见", isOn: $priv)
-        .sensoryFeedback(.selection, trigger: priv)
+      privacyRow
 
       VStack(alignment: .leading) {
         HStack(alignment: .top) {
@@ -312,8 +330,7 @@ struct SubjectCollectionBoxView: View {
         Text(ct.description(subject?.type ?? .anime))
       }
 
-      Toggle("仅自己可见", isOn: $priv)
-        .sensoryFeedback(.selection, trigger: priv)
+      privacyRow
 
       ratingBlock
 
