@@ -165,27 +165,48 @@ struct SubjectCollectionBoxView: View {
       .task(loadIfNeeded)
     } controls: {
       Button(buttonText, action: update)
+        .adaptiveButtonStyle(.borderedProminent)
         .disabled(submitDisabled || updating)
     }
   }
 
+  private var privacyBinding: Binding<Bool> {
+    Binding(
+      get: { priv },
+      set: { value in
+        guard value != priv else { return }
+        Haptics.selection()
+        withAnimation(.contentSwap) {
+          priv = value
+        }
+      }
+    )
+  }
+
   private var privacyRow: some View {
-    Button {
-      withAnimation(.contentSwap) {
-        priv.toggle()
-      }
-    } label: {
-      HStack {
-        Text("仅自己可见")
-        Spacer()
-        Image(systemName: priv ? "checkmark.circle.fill" : "circle")
+    Toggle(isOn: privacyBinding) {
+      HStack(spacing: 8) {
+        Image(systemName: priv ? "lock.fill" : "lock.open")
+          .font(.subheadline.weight(.semibold))
           .foregroundStyle(priv ? theme.accent : theme.secondaryText)
+          .contentTransition(.symbolEffect(.replace))
+        Text("仅自己可见")
+          .font(.subheadline.weight(.semibold))
+          .foregroundStyle(theme.body)
       }
-      .frame(maxWidth: .infinity)
-      .contentShape(Rectangle())
     }
-    .buttonStyle(.plain)
-    .sensoryFeedback(.selection, trigger: priv)
+    .toggleStyle(.switch)
+    .tint(theme.accent)
+    .padding(.horizontal, 12)
+    .padding(.vertical, 6)
+    .frame(maxWidth: .infinity)
+    .overlay {
+      Capsule().strokeBorder(
+        priv ? theme.accent.opacity(0.45) : theme.controlBorder,
+        lineWidth: priv ? 1.5 : 1
+      )
+    }
+    .contentShape(Capsule())
   }
 
   private var classicBody: some View {
