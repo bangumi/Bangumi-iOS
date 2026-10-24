@@ -12,7 +12,6 @@ struct SubjectView: View {
   @State private var refreshed: Bool = false
   @State private var refreshing: Bool = false
 
-  @Environment(\.theme) private var theme
   @State private var subject: SubjectDTO?
   @State private var detail: SubjectDetailDTO = SubjectDetailDTO()
 
@@ -85,7 +84,7 @@ struct SubjectView: View {
     .modifier(
       ZoomTransitionModifier(
         zoomID: ZoomNavigationID(type: .subject, id: subjectId),
-        enabled: zoom || theme.isClassic
+        enabled: zoom
       )
     )
   }

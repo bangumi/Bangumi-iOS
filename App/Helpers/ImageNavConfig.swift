@@ -45,15 +45,16 @@ struct ZoomTransitionContainer<Content: View>: View {
 @available(iOS 18.0, *)
 private struct ImageNavLinkModifier: ViewModifier {
   let link: String?
+  let zoom: Bool
 
   @Environment(\.zoomNamespace) private var namespace
 
   func body(content: Content) -> some View {
     if let link = link,
       let url = URL(string: link),
-      let (destination, zoomID) = parseChiiLink(url)
+      let (destination, zoomID) = parseChiiLink(url, zoom: zoom && namespace != nil)
     {
-      if let namespace = namespace {
+      if zoom, let namespace = namespace {
         NavigationLink(value: destination) {
           content
         }
@@ -74,22 +75,22 @@ private struct ImageNavLinkModifier: ViewModifier {
     }
   }
 
-  private func parseChiiLink(_ url: URL) -> (NavDestination, ZoomNavigationID)? {
+  private func parseChiiLink(_ url: URL, zoom: Bool) -> (NavDestination, ZoomNavigationID)? {
     guard url.scheme == "chii" else { return nil }
 
     let components = url.pathComponents.dropFirst()
     switch url.host {
     case "subject":
       if let idStr = components.first, let id = Int(idStr) {
-        return (.subject(id, zoom: true), ZoomNavigationID(type: .subject, id: id))
+        return (.subject(id, zoom: zoom), ZoomNavigationID(type: .subject, id: id))
       }
     case "character":
       if let idStr = components.first, let id = Int(idStr) {
-        return (.character(id, zoom: true), ZoomNavigationID(type: .character, id: id))
+        return (.character(id, zoom: zoom), ZoomNavigationID(type: .character, id: id))
       }
     case "person":
       if let idStr = components.first, let id = Int(idStr) {
-        return (.person(id, zoom: true), ZoomNavigationID(type: .person, id: id))
+        return (.person(id, zoom: zoom), ZoomNavigationID(type: .person, id: id))
       }
     default:
       break
@@ -101,12 +102,12 @@ private struct ImageNavLinkModifier: ViewModifier {
 // MARK: - View Extension
 
 extension View {
-  /// NavigationLink-based image navigation with iOS 18+ zoom transition support.
+  /// NavigationLink-based image navigation with optional iOS 18+ zoom transition support.
   /// Falls back to regular Link on older iOS versions.
   @ViewBuilder
-  func imageNavLink(_ link: String?) -> some View {
+  func imageNavLink(_ link: String?, zoom: Bool = false) -> some View {
     if #available(iOS 18.0, *) {
-      self.modifier(ImageNavLinkModifier(link: link))
+      self.modifier(ImageNavLinkModifier(link: link, zoom: zoom))
     } else {
       self.imageLink(link)
     }

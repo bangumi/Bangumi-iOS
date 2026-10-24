@@ -176,7 +176,7 @@ private struct TrendingSubjectTypeView: View {
           .padding(14)
         }
       }
-      .imageNavLink(item.subject.link)
+      .imageNavLink(item.subject.link, zoom: true)
       .subjectPreview(
         item.subject,
         collectionType: ctype

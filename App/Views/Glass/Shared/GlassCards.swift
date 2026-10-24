@@ -46,7 +46,7 @@ struct GlassSubjectEmbed: View {
   }
 
   var body: some View {
-    NavigationLink(value: NavDestination.subject(subject.id, zoom: true)) {
+    NavigationLink(value: NavDestination.subject(subject.id)) {
       GlassEmbedCard {
         HStack(alignment: .center, spacing: 12) {
           ImageView(img: subject.images?.resize(.r200))
@@ -90,7 +90,6 @@ struct GlassSubjectEmbed: View {
       }
     }
     .buttonStyle(.plain)
-    .zoomSource(ZoomNavigationID(type: .subject, id: subject.id))
     .subjectPreview(subject, eps: true)
   }
 }

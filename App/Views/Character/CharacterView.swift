@@ -198,7 +198,7 @@ struct CharacterView: View {
     .modifier(
       ZoomTransitionModifier(
         zoomID: ZoomNavigationID(type: .character, id: characterId),
-        enabled: zoom || theme.isClassic
+        enabled: zoom
       )
     )
   }
