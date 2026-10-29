@@ -6,6 +6,8 @@ struct GlassTimelineSayView: View {
 
   @AppStorage("profile") private var profile: Profile = Profile()
 
+  @Binding var posted: Bool
+
   @State private var content: String = ""
   @State private var token: String = ""
   @State private var showTurnstile: Bool = false
@@ -20,6 +22,7 @@ struct GlassTimelineSayView: View {
       updating = true
       try await TimelineService.postTimeline(content: content, token: token)
       updating = false
+      posted = true
       Notifier.shared.notify(message: "发送成功", type: .success)
       dismiss()
     } catch {

@@ -8,6 +8,7 @@ struct GlassTimelineListView: View {
   @AppStorage("timelineLiveMode") private var liveMode: Bool = false
 
   @State private var showInput = false
+  @State private var posted = false
 
   @State private var exhausted: Bool = false
   @State private var loading: Bool = false
@@ -109,6 +110,14 @@ struct GlassTimelineListView: View {
     }
     withAnimation(.default) {
       loading = false
+    }
+  }
+
+  private func reloadAfterPost() {
+    guard posted else { return }
+    posted = false
+    Task {
+      await reload()
     }
   }
 
@@ -225,8 +234,8 @@ struct GlassTimelineListView: View {
         .padding(.bottom, 16)
       }
     }
-    .sheet(isPresented: $showInput) {
-      GlassTimelineSayView()
+    .sheet(isPresented: $showInput, onDismiss: reloadAfterPost) {
+      GlassTimelineSayView(posted: $posted)
     }
     .onAppear(perform: loadInitialPageIfNeeded)
     .onChange(of: timelineViewMode) {
