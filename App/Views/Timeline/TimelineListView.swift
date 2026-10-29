@@ -8,6 +8,7 @@ struct TimelineListView: View {
   @AppStorage("timelineLiveMode") var liveMode: Bool = false
 
   @State private var showInput = false
+  @State private var posted = false
 
   @State private var exhausted: Bool = false
   @State private var loading: Bool = false
@@ -91,6 +92,14 @@ struct TimelineListView: View {
     }
   }
 
+  private func reloadAfterPost() {
+    guard posted else { return }
+    posted = false
+    Task {
+      await reload()
+    }
+  }
+
   private func loadInitialPageIfNeeded() {
     guard items.isEmpty, !loading else { return }
     withAnimation(.default) {
@@ -158,8 +167,8 @@ struct TimelineListView: View {
             }
             .adaptiveButtonStyle(.borderedProminent)
             .disabled(showInput)
-            .sheet(isPresented: $showInput) {
-              TimelineSayView()
+            .sheet(isPresented: $showInput, onDismiss: reloadAfterPost) {
+              TimelineSayView(posted: $posted)
             }
           }
         } else {
