@@ -131,23 +131,20 @@ struct CalendarSlimView: View {
           }
           ForEach(dates) { item in
             VStack(alignment: .leading, spacing: 6) {
-              HStack(spacing: 4) {
-                Text(item.desc)
-                Text("·")
-                Text(item.weekday.cn)
+              HStack(alignment: .firstTextBaseline, spacing: 6) {
+                Capsule()
+                  .fill(item.weekday.color)
+                  .frame(width: 4, height: 14)
+                  .alignmentGuide(.firstTextBaseline) { $0[.bottom] - 2 }
+                Text("\(item.desc) · \(item.weekday.cn)")
+                  .font(.subheadline.weight(.semibold))
+                  .foregroundStyle(.primary)
                 if item.count > 0 {
-                  Text("·")
-                  Text("\(item.count)部")
-                  Text("·")
-                  Text("\(item.watchers)人收看")
+                  Text("\(item.count)部 · \(item.watchers)人收看")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
                 }
               }
-              .font(.caption)
-              .foregroundStyle(.white)
-              .padding(.horizontal, 8)
-              .padding(.vertical, 3)
-              .background(item.weekday.color)
-              .cornerRadius(5)
               CalendarWeekdaySlimView(
                 calendar: item.calendar,
                 collectionTypes: collectionTypes,
