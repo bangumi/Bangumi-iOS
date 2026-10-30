@@ -294,9 +294,11 @@ extension DatabaseOperator {
   public func makeSubjectListItems(_ subjects: [SlimSubjectDTO]) throws -> [SubjectListItemDTO] {
     let collectionTypes = try getCollectionTypes(subjectIds: subjects.map(\.id))
     return subjects.map { subject in
+      // Search responses carry the viewer's interest; prefer it over the
+      // local cache, which only knows collections that have been synced.
       SubjectListItemDTO(
         subject: subject,
-        collectionType: collectionTypes[subject.id] ?? .none
+        collectionType: subject.interest?.type ?? collectionTypes[subject.id] ?? .none
       )
     }
   }

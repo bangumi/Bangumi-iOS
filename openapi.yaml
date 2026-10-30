@@ -2414,8 +2414,12 @@ components:
           type: string
         nsfw:
           type: boolean
+        platform:
+          $ref: '#/components/schemas/SubjectPlatform'
         rating:
           $ref: '#/components/schemas/SubjectRating'
+        series:
+          type: boolean
         type:
           $ref: '#/components/schemas/SubjectType'
       required:
@@ -2428,6 +2432,7 @@ components:
         - rating
         - locked
         - nsfw
+        - series
       title: SlimSubject
       type: object
     SlimSubjectInterest:

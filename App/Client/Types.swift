@@ -445,6 +445,8 @@ struct SlimSubjectDTO: Codable, Identifiable, Hashable, Linkable {
   var name: String
   var nameCN: String
   var nsfw: Bool
+  var platform: SubjectPlatform?
+  var series: Bool?
   var type: SubjectType
   var interest: SlimSubjectInterestDTO?
 
@@ -458,6 +460,8 @@ struct SlimSubjectDTO: Codable, Identifiable, Hashable, Linkable {
     case name
     case nameCN
     case nsfw
+    case platform
+    case series
     case type
     case interest
   }
@@ -473,6 +477,8 @@ struct SlimSubjectDTO: Codable, Identifiable, Hashable, Linkable {
     self.name = try container.decode(String.self, forKey: .name)
     self.nameCN = try container.decode(String.self, forKey: .nameCN)
     self.nsfw = try container.decode(Bool.self, forKey: .nsfw)
+    self.platform = try container.decodeIfPresent(SubjectPlatform.self, forKey: .platform)
+    self.series = try container.decodeIfPresent(Bool.self, forKey: .series)
     self.type = try container.decode(SubjectType.self, forKey: .type)
     self.interest = try container.decodeIfPresent(SlimSubjectInterestDTO.self, forKey: .interest)
   }
@@ -487,6 +493,8 @@ struct SlimSubjectDTO: Codable, Identifiable, Hashable, Linkable {
     self.name = ""
     self.nameCN = ""
     self.nsfw = false
+    self.platform = nil
+    self.series = nil
     self.type = .none
     self.interest = nil
   }
@@ -501,6 +509,8 @@ struct SlimSubjectDTO: Codable, Identifiable, Hashable, Linkable {
     self.name = subject.name
     self.nameCN = subject.nameCN
     self.nsfw = subject.nsfw
+    self.platform = subject.platform
+    self.series = subject.series
     self.type = subject.typeEnum
     self.interest = subject.interest?.slim
   }
@@ -515,12 +525,21 @@ struct SlimSubjectDTO: Codable, Identifiable, Hashable, Linkable {
     self.name = subject.name
     self.nameCN = subject.nameCN
     self.nsfw = subject.nsfw
+    self.platform = subject.platform
+    self.series = subject.series
     self.type = subject.type
     self.interest = subject.interest?.slim
   }
 
   var link: String {
     "chii://subject/\(id)"
+  }
+
+  var category: String {
+    guard let platform, !platform.typeCN.isEmpty else {
+      return type.description
+    }
+    return series == true ? "\(platform.typeCN)系列" : platform.typeCN
   }
 
   func title(with preference: TitlePreference) -> String {

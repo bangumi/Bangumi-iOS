@@ -47,7 +47,7 @@ struct SubjectSlimRowView: View {
         HStack(spacing: 4) {
           if subject.type != .none {
             BorderView {
-              Text(subject.type.description).lineLimit(1)
+              Text(subject.category).lineLimit(1)
             }
           }
           if !subject.metaTags.isEmpty {

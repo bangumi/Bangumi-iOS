@@ -211,7 +211,7 @@ private struct GlassSearchSubjectRow: View {
             .multilineTextAlignment(.leading)
             .lineLimit(2)
             HStack(spacing: 5) {
-              GlassTypeBadge(type: subject.type)
+              GlassTypeBadge(type: subject.type, label: subject.category)
               if !metaText.isEmpty {
                 Text(metaText)
                   .font(.caption)
