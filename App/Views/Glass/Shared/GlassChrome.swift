@@ -156,16 +156,18 @@ struct GlassCollectionBadge: View {
 
 struct GlassTypeBadge: View {
   let type: SubjectType
+  let label: String?
 
   @Environment(\.theme) private var theme
 
-  init(type: SubjectType) {
+  init(type: SubjectType, label: String? = nil) {
     self.type = type
+    self.label = label
   }
 
   var body: some View {
     let tint = theme.subjectTint(type)
-    Text(type.description)
+    Text(label ?? type.description)
       .font(.caption2.weight(.bold))
       .lineLimit(1)
       .foregroundStyle(tint.text)

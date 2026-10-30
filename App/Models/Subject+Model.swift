@@ -71,9 +71,9 @@ final class Subject: Searchable, Linkable {
     name = item.name
     nameCN = item.nameCN
     nsfw = item.nsfw
-    platform = SubjectPlatform(name: "")
+    platform = item.platform ?? SubjectPlatform(name: "")
     rating = item.rating ?? SubjectRating()
-    series = false
+    series = item.series ?? false
     summary = ""
     type = item.type.rawValue
     volumes = 0
@@ -232,6 +232,8 @@ extension Subject {
     if self.name != item.name { self.name = item.name }
     if self.nameCN != item.nameCN { self.nameCN = item.nameCN }
     if self.nsfw != item.nsfw { self.nsfw = item.nsfw }
+    if let platform = item.platform, self.platform != platform { self.platform = platform }
+    if let series = item.series, self.series != series { self.series = series }
     if self.type != item.type.rawValue { self.type = item.type.rawValue }
   }
 
