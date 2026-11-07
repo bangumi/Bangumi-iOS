@@ -365,11 +365,14 @@ private final class BBCodeTextBlockView: UITextView, UITextViewDelegate {
       animatedSmileyViews[key] = imageView
     }
 
-    if forceReload || imageView.resourcePath != attachment.resourcePath {
-      imageView.resourcePath = attachment.resourcePath
+    if forceReload || imageView.sourceURL != attachment.sourceURL {
+      imageView.sourceURL = attachment.sourceURL
       imageView.sd_setImage(
-        with: URL(fileURLWithPath: attachment.resourcePath),
-        placeholderImage: attachment.placeholderImage
+        with: attachment.sourceURL,
+        placeholderImage: attachment.placeholderImage,
+        options: [.retryFailed],
+        context: BangumiSmileyStore.shared.imageContext,
+        progress: nil
       ) { _, _, _, _ in
         imageView.startAnimating()
       }
@@ -444,7 +447,7 @@ private final class BBCodeTextBlockView: UITextView, UITextViewDelegate {
 }
 
 private final class BBCodeAnimatedSmileyImageView: SDAnimatedImageView {
-  var resourcePath: String?
+  var sourceURL: URL?
 }
 
 private final class BBCodeHiddenTextAttachment: NSTextAttachment {

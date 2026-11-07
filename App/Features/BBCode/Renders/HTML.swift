@@ -40,14 +40,20 @@ private func bangumiDomains(from args: [String: Any]?) -> BangumiDomains {
   args?["domains"] as? BangumiDomains ?? .official
 }
 
-private func bbcodeSmileySource(
+func bbcodeSmileySource(
   _ smiley: BBCodeSmileyItem,
   args: [String: Any]?
 ) -> String {
+  let domains = bangumiDomains(from: args)
   if let scheme = args?["smileyURLScheme"] as? String {
-    return "\(scheme)://smiley/\(smiley.code)"
+    var components = URLComponents()
+    components.scheme = scheme
+    components.host = "smiley"
+    components.path = "/\(smiley.code)"
+    components.queryItems = [URLQueryItem(name: "imageDomain", value: domains.image)]
+    return components.url?.absoluteString ?? smiley.remoteURLString(domains: domains)
   }
-  return smiley.remoteURLString(domains: bangumiDomains(from: args))
+  return smiley.remoteURLString(domains: domains)
 }
 
 private func bbcodeCSSColorValue(_ rawValue: String) -> String? {

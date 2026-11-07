@@ -672,16 +672,8 @@ private struct SmileyGridItem: View {
   let size: CGFloat
 
   var body: some View {
-    Group {
-      if item.resourceURL() != nil {
-        BBCodeSmileyImageView(item: item, size: size)
-      } else {
-        Text(item.token)
-          .font(.caption2)
-          .lineLimit(1)
-      }
-    }
-    .frame(width: size, height: size)
+    BBCodeSmileyImageView(item: item, size: size)
+      .frame(width: size, height: size)
   }
 }
 

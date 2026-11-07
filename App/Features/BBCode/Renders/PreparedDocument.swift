@@ -6,6 +6,11 @@ struct BBCodePreparedDocument {
   let palette: BBCodePalette
 }
 
+private struct BBCodeLoadedSmileys: Sendable {
+  let resources: [String: BBCodeSmileyResource]
+  let isComplete: Bool
+}
+
 @MainActor
 private final class BBCodePreparedDocumentCache {
   static let shared = BBCodePreparedDocumentCache()
@@ -189,18 +194,67 @@ extension BBCode {
     }
 
     normalizeBBCodeLineBreaksAndParagraphs(node: tree, tagManager: tagManager)
+    let loadedSmileys = await loadSmileys(in: tree, domains: domains)
     let renderer = BBCodeTextKitRenderer(
-      textSize: textSize, domains: domains, palette: palette)
-    let document = BBCodePreparedDocument(
-      blocks: renderer.renderBlocks(root: tree), palette: palette)
-    BBCodePreparedDocumentCache.shared.store(
-      document,
-      for: bbcode,
       textSize: textSize,
       domains: domains,
-      palette: palette
+      palette: palette,
+      smileys: loadedSmileys.resources
     )
+    let document = BBCodePreparedDocument(
+      blocks: renderer.renderBlocks(root: tree), palette: palette)
+    if loadedSmileys.isComplete {
+      BBCodePreparedDocumentCache.shared.store(
+        document,
+        for: bbcode,
+        textSize: textSize,
+        domains: domains,
+        palette: palette
+      )
+    }
     return document
+  }
+
+  @MainActor
+  private func loadSmileys(
+    in root: BBCodeNode,
+    domains: BangumiDomains
+  ) async -> BBCodeLoadedSmileys {
+    var items: [String: BBCodeSmileyItem] = [:]
+    collectSmileys(in: root, into: &items)
+
+    return await withTaskGroup(
+      of: (String, BBCodeSmileyResource?).self,
+      returning: BBCodeLoadedSmileys.self
+    ) { group in
+      for item in items.values {
+        group.addTask {
+          let resource = await BangumiSmileyStore.shared.load(item, domains: domains)
+          return (item.code, resource)
+        }
+      }
+
+      var resources: [String: BBCodeSmileyResource] = [:]
+      for await (code, resource) in group {
+        resources[code] = resource
+      }
+      return BBCodeLoadedSmileys(
+        resources: resources,
+        isComplete: resources.count == items.count
+      )
+    }
+  }
+
+  private func collectSmileys(
+    in node: BBCodeNode,
+    into items: inout [String: BBCodeSmileyItem]
+  ) {
+    if node.type == .bgm, let item = BBCodeSmileyCatalog.item(for: node.attr) {
+      items[item.code] = item
+    }
+    for child in node.children {
+      collectSmileys(in: child, into: &items)
+    }
   }
 }
 
@@ -279,11 +333,18 @@ private struct BBCodeTextKitRenderer {
   let baseParagraphStyle: NSParagraphStyle
   let domains: BangumiDomains
   let palette: BBCodePalette
+  let smileys: [String: BBCodeSmileyResource]
 
-  init(textSize: Int, domains: BangumiDomains = .official, palette: BBCodePalette = .classic) {
+  init(
+    textSize: Int,
+    domains: BangumiDomains = .official,
+    palette: BBCodePalette = .classic,
+    smileys: [String: BBCodeSmileyResource] = [:]
+  ) {
     self.textSize = CGFloat(textSize)
     self.domains = domains
     self.palette = palette
+    self.smileys = smileys
     self.baseFont = .systemFont(ofSize: CGFloat(textSize))
     self.linkColor = palette.link
     self.secondaryColor = .secondaryLabel
@@ -1224,17 +1285,16 @@ private struct BBCodeTextKitRenderer {
 
   private func renderSmiley(_ node: BBCodeNode) -> NSMutableAttributedString {
     guard let smiley = BBCodeSmileyCatalog.item(for: node.attr),
-      let path = smiley.resourcePath(),
-      let baseImage = UIImage(contentsOfFile: path)
+      let resource = smileys[smiley.code]
     else {
       return makeText("(\(node.attr))")
     }
 
-    let displaySize = inlineSmileySize(smiley: smiley, sourceSize: baseImage.size)
+    let displaySize = inlineSmileySize(smiley: smiley, sourceSize: resource.image.size)
     let attachment = BBCodeSmileyTextAttachment(
       item: smiley,
-      resourcePath: path,
-      placeholderImage: baseImage,
+      sourceURL: smiley.remoteURL(domains: domains),
+      placeholderImage: resource.image,
       displaySize: displaySize
     )
     return makeInlineAttachmentText(attachment)
@@ -1474,15 +1534,15 @@ final class BBCodeSmileyTextAttachment: NSTextAttachment {
   private static let horizontalPadding: CGFloat = 2
 
   let item: BBCodeSmileyItem
-  let resourcePath: String
+  let sourceURL: URL
   let displaySize: CGSize
   let placeholderImage: UIImage
   let renderedSize: CGSize
   let horizontalPadding: CGFloat
 
-  init(item: BBCodeSmileyItem, resourcePath: String, placeholderImage: UIImage, displaySize: CGSize) {
+  init(item: BBCodeSmileyItem, sourceURL: URL, placeholderImage: UIImage, displaySize: CGSize) {
     self.item = item
-    self.resourcePath = resourcePath
+    self.sourceURL = sourceURL
     self.displaySize = displaySize
     self.placeholderImage = placeholderImage
     self.horizontalPadding = Self.horizontalPadding

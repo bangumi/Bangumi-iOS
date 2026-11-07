@@ -13,6 +13,9 @@ public struct BBCodeSmileyItem: Identifiable, Hashable, Sendable {
   public func remoteURLString(domains: BangumiDomains) -> String {
     domains.imageURLString(path: remotePath)
   }
+  public func remoteURL(domains: BangumiDomains) -> URL {
+    domains.imageURL(path: remotePath)
+  }
   public var isDynamic: Bool { code.hasPrefix("musume_") || code.hasPrefix("blake_") }
   public var preferredDisplayWidth: Int? {
     switch code {
@@ -38,21 +41,6 @@ public struct BBCodeSmileyItem: Identifiable, Hashable, Sendable {
   }
   public var htmlClassString: String { htmlClassNames.joined(separator: " ") }
 
-  public func resourcePath() -> String? {
-    BangumiStickerResources.path(
-      forResource: resourceName,
-      ofType: fileExtension,
-      inDirectory: resourceSubdirectory
-    )
-  }
-
-  public func resourceURL() -> URL? {
-    BangumiStickerResources.url(
-      forResource: resourceName,
-      withExtension: fileExtension,
-      subdirectory: resourceSubdirectory
-    )
-  }
 }
 
 public struct BBCodeSmileyGroup: Identifiable, Hashable, Sendable {
