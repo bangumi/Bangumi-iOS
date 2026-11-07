@@ -853,7 +853,7 @@ struct PostDocumentSurface: View {
 
 private final class PostStickerSchemeHandler: NSObject, WKURLSchemeHandler {
   private let musumeData = UIImage(named: "Musume")?.pngData()
-  private let smileyCache = NSCache<NSString, NSData>()
+  private var smileyTasks: [ObjectIdentifier: Task<Void, Never>] = [:]
 
   func webView(_ webView: WKWebView, start urlSchemeTask: any WKURLSchemeTask) {
     guard let url = urlSchemeTask.request.url else {
@@ -861,23 +861,56 @@ private final class PostStickerSchemeHandler: NSObject, WKURLSchemeHandler {
       return
     }
 
-    let data: Data
-    let contentType: String
     if url.host == "asset", url.path == "/musume.png", let musumeData {
-      data = musumeData
-      contentType = "image/png"
-    } else if url.host == "smiley",
+      respond(to: urlSchemeTask, url: url, data: musumeData, contentType: "image/png")
+      return
+    }
+
+    guard url.host == "smiley",
       let code = url.pathComponents.last,
-      let item = BBCodeSmileyCatalog.item(for: code),
-      let resourceData = smileyData(for: item)
-    {
-      data = resourceData
-      contentType = mimeType(for: item.fileExtension)
-    } else {
+      let item = BBCodeSmileyCatalog.item(for: code)
+    else {
       urlSchemeTask.didFailWithError(URLError(.fileDoesNotExist))
       return
     }
 
+    let imageDomain = URLComponents(url: url, resolvingAgainstBaseURL: false)?
+      .queryItems?
+      .first(where: { $0.name == "imageDomain" })?
+      .value
+    let domains = BangumiDomains(image: imageDomain ?? BangumiDomains.official.image)
+    let taskID = ObjectIdentifier(urlSchemeTask)
+    smileyTasks[taskID] = Task { @MainActor [weak self] in
+      let resource = await BangumiSmileyStore.shared.load(item, domains: domains)
+      guard let self,
+        self.smileyTasks.removeValue(forKey: taskID) != nil,
+        !Task.isCancelled
+      else {
+        return
+      }
+      guard let resource, let data = resource.data else {
+        urlSchemeTask.didFailWithError(URLError(.cannotLoadFromNetwork))
+        return
+      }
+      self.respond(
+        to: urlSchemeTask,
+        url: url,
+        data: data,
+        contentType: self.mimeType(for: item.fileExtension)
+      )
+    }
+  }
+
+  func webView(_ webView: WKWebView, stop urlSchemeTask: any WKURLSchemeTask) {
+    smileyTasks.removeValue(forKey: ObjectIdentifier(urlSchemeTask))?.cancel()
+  }
+
+  private func respond(
+    to urlSchemeTask: any WKURLSchemeTask,
+    url: URL,
+    data: Data,
+    contentType: String
+  ) {
     let response = URLResponse(
       url: url,
       mimeType: contentType,
@@ -887,24 +920,6 @@ private final class PostStickerSchemeHandler: NSObject, WKURLSchemeHandler {
     urlSchemeTask.didReceive(response)
     urlSchemeTask.didReceive(data)
     urlSchemeTask.didFinish()
-  }
-
-  func webView(_ webView: WKWebView, stop urlSchemeTask: any WKURLSchemeTask) {}
-
-  private func smileyData(for item: BBCodeSmileyItem) -> Data? {
-    let key = item.code as NSString
-    if let cachedData = smileyCache.object(forKey: key) {
-      return cachedData as Data
-    }
-
-    guard let resourceURL = item.resourceURL(),
-      let data = try? Data(contentsOf: resourceURL)
-    else {
-      return nil
-    }
-
-    smileyCache.setObject(data as NSData, forKey: key)
-    return data
   }
 
   private func mimeType(for fileExtension: String) -> String {

@@ -115,14 +115,16 @@ extension PostDocumentRenderInput {
       mainPost.collectReactionHTML(
         into: &result,
         canReact: canReact,
-        showReactions: showReactions
+        showReactions: showReactions,
+        domains: domains
       )
     }
     for reply in replies {
       reply.collectReactionHTML(
         into: &result,
         canReact: canReact,
-        showReactions: showReactions
+        showReactions: showReactions,
+        domains: domains
       )
     }
 
@@ -150,7 +152,8 @@ private extension PostDocumentRenderInput.Post {
   func collectReactionHTML(
     into result: inout [Int: String],
     canReact: Bool,
-    showReactions: Bool
+    showReactions: Bool,
+    domains: BangumiDomains
   ) {
     result[id] =
       isNormal
@@ -159,13 +162,15 @@ private extension PostDocumentRenderInput.Post {
         postID: id,
         canReact: canReact,
         showReactions: showReactions,
-        isPending: isReactionPending
+        isPending: isReactionPending,
+        domains: domains
       ) : ""
     for reply in replies {
       reply.collectReactionHTML(
         into: &result,
         canReact: canReact,
-        showReactions: showReactions
+        showReactions: showReactions,
+        domains: domains
       )
     }
   }
@@ -445,7 +450,8 @@ private enum PostDocumentReactionRenderer {
     postID: Int,
     canReact: Bool,
     showReactions: Bool,
-    isPending: Bool
+    isPending: Bool,
+    domains: BangumiDomains
   ) -> String {
     guard showReactions, !reactions.isEmpty || isPending else {
       return ""
@@ -456,7 +462,13 @@ private enum PostDocumentReactionRenderer {
       let disabled = canReact && !isPending ? "" : " disabled"
       let image: String
       if let item = BBCodeSmileyCatalog.item(for: reaction.smileyCode) {
-        let source = "\(PostDocumentRenderer.stickerURLScheme)://smiley/\(item.code)"
+        let source = bbcodeSmileySource(
+          item,
+          args: [
+            "smileyURLScheme": PostDocumentRenderer.stickerURLScheme,
+            "domains": domains,
+          ]
+        )
         image = "<img src=\"\(source.bbcodeHTMLEscaped)\" alt=\"\">"
       } else {
         image = "<span>(\(reaction.smileyCode.bbcodeHTMLEscaped))</span>"
@@ -1691,7 +1703,8 @@ actor PostDocumentRenderer {
       postID: postID,
       canReact: input.canReact,
       showReactions: input.showReactions,
-      isPending: isPending
+      isPending: isPending,
+      domains: input.domains
     )
   }
 
