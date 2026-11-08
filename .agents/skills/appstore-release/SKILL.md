@@ -62,7 +62,7 @@ asc localizations update --version "$version_id" --locale zh-Hans --whats-new "$
 
 ```bash
 asc builds list --app 6499502714 --pretty   # confirm target build is VALID, usesNonExemptEncryption=false
-asc versions attach-build --version-id "$version_id" --build "$build_id" --pretty
+asc versions attach-build --version-id "$version_id" --build-id "$build_id" --pretty
 asc versions view --version-id "$version_id" --include-build --pretty   # `get` was removed; use `view`
 ```
 
