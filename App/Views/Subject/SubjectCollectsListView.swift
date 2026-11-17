@@ -133,7 +133,6 @@ struct SubjectCollectRowView: View {
             Text(collect.interest.comment)
               .font(.caption)
               .foregroundStyle(.secondary)
-              .lineLimit(3)
           }
 
         }

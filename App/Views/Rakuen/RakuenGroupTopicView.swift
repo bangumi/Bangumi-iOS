@@ -79,7 +79,7 @@ struct RakuenGroupTopicListView: View {
   }
 
   private func isVisible(_ topic: GroupTopicDTO) -> Bool {
-    !hideBlocklist || !blocklist.contains(topic.creator?.id ?? 0)
+    !hideBlocklist || !blocklist.contains(topic.creatorID)
   }
 }
 
@@ -308,6 +308,6 @@ struct CachedGroupTopicListView: View {
   }
 
   private func isVisible(_ topic: GroupTopicDTO) -> Bool {
-    !hideBlocklist || !blocklist.contains(topic.creator?.id ?? 0)
+    !hideBlocklist || !blocklist.contains(topic.creatorID)
   }
 }
